@@ -21,12 +21,8 @@
  ***************************************************************************/
 
 #include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
@@ -53,6 +49,7 @@ using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalCredentials;
 
 namespace {
@@ -136,10 +133,10 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
 {
     EmberAfAttributeSearchRecord record;
     record.endpoint         = 0;
-    record.clusterId        = ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID;
+    record.clusterId        = OperationalCredentials::Id;
     record.clusterMask      = CLUSTER_MASK_SERVER;
     record.manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE;
-    record.attributeId      = ZCL_FABRICS_ATTRIBUTE_ID;
+    record.attributeId      = Attributes::FabricsList::Id;
 
     // When reading or writing a List attribute the 'index' value could have 3 types of values:
     //  -1: Read/Write the whole list content, including the number of elements in the list
@@ -407,8 +404,8 @@ FabricInfo gFabricBeingCommissioned;
 
 CHIP_ERROR SendNOCResponse(app::Command * commandObj, EmberAfNodeOperationalCertStatus status, uint8_t index, CharSpan debug_text)
 {
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
-                                         ZCL_NOC_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, OperationalCredentials::Id,
+                                         Commands::NOCResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
     TLV::TLVWriter * writer          = nullptr;
 
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INCORRECT_STATE);

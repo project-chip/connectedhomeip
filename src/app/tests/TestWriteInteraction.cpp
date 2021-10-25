@@ -79,6 +79,22 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
+class TestWriteClientCallback : public chip::app::WriteClient::Callback
+{
+public:
+    void ResetCounter() { mOnSuccessCalled = mOnErrorCalled = mOnDoneCalled = 0; }
+    void OnResponse(const WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path, StatusIB status) override
+    {
+        mOnSuccessCalled++;
+    }
+    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override { mOnErrorCalled++; }
+    void OnDone(WriteClient * apWriteClient) override { mOnDoneCalled++; }
+
+    int mOnSuccessCalled = 0;
+    int mOnErrorCalled   = 0;
+    int mOnDoneCalled    = 0;
+};
+
 void TestWriteInteraction::AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -215,9 +231,9 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
     app::WriteClientHandle writeClientHandle;
     writeClientHandle.SetWriteClient(&writeClient);
 
-    chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = writeClient.Init(&ctx.GetExchangeManager(), &delegate, 0);
+    TestWriteClientCallback callback;
+    err = writeClient.Init(&ctx.GetExchangeManager(), &callback);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AddAttributeDataElement(apSuite, apContext, writeClientHandle);
 
@@ -271,19 +287,6 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
                                     Protocols::InteractionModel::Status::Success);
 }
 
-class RoundtripDelegate : public chip::app::InteractionModelDelegate
-{
-public:
-    CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient, const app::StatusIB & aStatusIB,
-                                   AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex) override
-    {
-        mGotResponse = true;
-        return CHIP_NO_ERROR;
-    }
-
-    bool mGotResponse = false;
-};
-
 void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -294,13 +297,13 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     // Shouldn't have anything in the retransmit table when starting the test.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
-    RoundtripDelegate delegate;
+    TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClientHandle writeClient;
-    err = engine->NewWriteClient(writeClient);
+    err = engine->NewWriteClient(writeClient, &callback);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -325,14 +328,14 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     writeClient.EncodeAttributeWritePayload(attributePathParams, dataTx);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(apSuite, !delegate.mGotResponse);
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0);
 
     SessionHandle session = ctx.GetSessionBobToAlice();
 
     err = writeClient.SendWriteRequest(ctx.GetAliceNodeId(), ctx.GetFabricIndex(), Optional<SessionHandle>::Value(session));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(apSuite, delegate.mGotResponse);
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1);
 
     {
         app::Clusters::TestCluster::Structs::SimpleStruct::Type dataRx;
@@ -346,6 +349,8 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
         // Equals to dataRx.e.size() == dataTx.e.size() && memncmp(dataRx.e.data(), dataTx.e.data(), dataTx.e.size()) == 0
         NL_TEST_ASSERT(apSuite, dataRx.e.data_equal(dataTx.e));
     }
+
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1);
 
     // By now we should have closed all exchanges and sent all pending acks, so
     // there should be no queued-up things in the retransmit table.
@@ -364,26 +369,26 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     // Shouldn't have anything in the retransmit table when starting the test.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
-    RoundtripDelegate delegate;
+    TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClientHandle writeClient;
-    err = engine->NewWriteClient(writeClient);
+    err = engine->NewWriteClient(writeClient, &callback);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     AddAttributeDataElement(apSuite, apContext, writeClient);
 
-    NL_TEST_ASSERT(apSuite, !delegate.mGotResponse);
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
 
     SessionHandle session = ctx.GetSessionBobToAlice();
 
     err = writeClient.SendWriteRequest(ctx.GetAliceNodeId(), ctx.GetFabricIndex(), Optional<SessionHandle>::Value(session));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(apSuite, delegate.mGotResponse);
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1);
 
     // By now we should have closed all exchanges and sent all pending acks, so
     // there should be no queued-up things in the retransmit table.

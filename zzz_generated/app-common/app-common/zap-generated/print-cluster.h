@@ -114,6 +114,12 @@
 #define CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_BRIDGED_ACTIONS_CLUSTER_SERVER) || defined(ZCL_USING_BRIDGED_ACTIONS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER { ZCL_BRIDGED_ACTIONS_CLUSTER_ID, 37, "Bridged Actions" },
+#else
+#define CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER
+#endif
+
 #if defined(ZCL_USING_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BASIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_BASIC_CLUSTER { ZCL_BASIC_CLUSTER_ID, 40, "Basic" },
 #else
@@ -753,6 +759,7 @@
     CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
+    CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER                                                                                        \

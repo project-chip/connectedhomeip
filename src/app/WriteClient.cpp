@@ -22,6 +22,7 @@
  *
  */
 
+#include "lib/core/CHIPError.h"
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/WriteClient.h>
@@ -29,8 +30,7 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                             uint64_t aApplicationIdentifier)
+CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback)
 {
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -49,9 +49,8 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
 
     ClearExistingExchangeContext();
     mpExchangeMgr         = apExchangeMgr;
-    mpDelegate            = apDelegate;
+    mpCallback            = apCallback;
     mAttributeStatusIndex = 0;
-    mAppIdentifier        = aApplicationIdentifier;
     MoveToState(State::Initialized);
 
     return CHIP_NO_ERROR;
@@ -70,9 +69,10 @@ void WriteClient::ShutdownInternal()
 
     mpExchangeMgr         = nullptr;
     mpExchangeCtx         = nullptr;
-    mpDelegate            = nullptr;
     mAttributeStatusIndex = 0;
     ClearState();
+
+    mpCallback->OnDone(this);
 }
 
 void WriteClient::ClearExistingExchangeContext()
@@ -287,25 +287,19 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     VerifyOrDie(apExchangeContext == mpExchangeCtx);
 
-    // Verify that the message is an Write Response.
-    // If not, close the exchange and free the payload.
-    if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse))
-    {
-        ExitNow();
-    }
+    // Verify that the message is an Write Response. If not, this is an unexpected message.
+    // Signal the error through the error callback and shutdown the client.
+    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse),
+                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     err = ProcessWriteResponseMessage(std::move(aPayload));
 
 exit:
-    if (mpDelegate != nullptr)
+    if (mpCallback != nullptr)
     {
         if (err != CHIP_NO_ERROR)
         {
-            mpDelegate->WriteResponseError(this, err);
-        }
-        else
-        {
-            mpDelegate->WriteResponseProcessed(this);
+            mpCallback->OnError(this, err);
         }
     }
     ShutdownInternal();
@@ -317,9 +311,9 @@ void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
     ChipLogProgress(DataManagement, "Time out! failed to receive write response from Exchange: " ChipLogFormatExchange,
                     ChipLogValueExchange(apExchangeContext));
 
-    if (mpDelegate != nullptr)
+    if (mpCallback != nullptr)
     {
-        mpDelegate->WriteResponseError(this, CHIP_ERROR_TIMEOUT);
+        mpCallback->OnError(this, CHIP_ERROR_TIMEOUT);
     }
     ShutdownInternal();
 }
@@ -366,17 +360,15 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
     {
         err = StatusIBParser.DecodeStatusIB(statusIB);
         SuccessOrExit(err);
-        if (mpDelegate != nullptr)
+        if (mpCallback != nullptr)
         {
-            mpDelegate->WriteResponseStatus(this, statusIB, attributePathParams, mAttributeStatusIndex);
+            ConcreteAttributePath path(attributePathParams.mEndpointId, attributePathParams.mClusterId,
+                                       attributePathParams.mFieldId);
+            mpCallback->OnResponse(this, path, statusIB);
         }
     }
 
 exit:
-    if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
-    {
-        mpDelegate->WriteResponseProtocolError(this, mAttributeStatusIndex);
-    }
     return err;
 }
 

@@ -102,44 +102,6 @@ public:
     virtual CHIP_ERROR ReadError(ReadClient * apReadClient, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
-     * Notification that a WriteClient has received a Write Response containing a status code.
-     * aAttributeIndex is processing attribute index which can identify attribute if there exists multiple attribute changes with
-     * same attribute path
-     */
-    virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient, const StatusIB & aStatusIB,
-                                           AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
-     * Notification that a Write Response has been processed and application can do further work .
-     */
-    virtual CHIP_ERROR WriteResponseProcessed(const WriteClient * apWriteClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /**
-     * Notification that a Write Client has received a Write Response and fails to process a attribute data element in that
-     * write response
-     */
-    virtual CHIP_ERROR WriteResponseProtocolError(const WriteClient * apWriteClient, uint8_t aAttributeIndex)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
-     * Notification that a write client encountered an asynchronous failure.
-     * @param[in]  apWriteClient  A current write client which can identify the write client to the consumer, particularly
-     * during multiple write interactions
-     * @param[in]  aError         A error that could be CHIP_ERROR_TIMEOUT when write client fails to receive, or other error when
-     *                            fail to process write response.
-     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
-     */
-    virtual CHIP_ERROR WriteResponseError(const WriteClient * apWriteClient, CHIP_ERROR aError)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
      * Notification that a Subscribe Response has been processed and application can do further work .
      */
     virtual CHIP_ERROR SubscribeResponseProcessed(const ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -158,7 +120,6 @@ public:
      * Notification that a read interaction was completed on the client successfully.
      * @param[in]  apReadClient  A current read client which can identify the read client to the consumer, particularly
      * during multiple read interactions
-     * @param[in]  aError  notify final error regarding the current read interaction
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
     virtual CHIP_ERROR ReadDone(ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }

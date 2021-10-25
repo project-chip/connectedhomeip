@@ -37,7 +37,7 @@ namespace chip {
 
 namespace {
 
-constexpr size_t kAESCCMIVLen = 12;
+constexpr size_t kAESCCMIVLen = 13;
 constexpr size_t kMaxAADLen   = 128;
 
 /* Session Establish Key Info */
@@ -137,8 +137,9 @@ CHIP_ERROR CryptoContext::GetIV(const PacketHeader & header, uint8_t * iv, size_
 
     Encoding::LittleEndian::BufferWriter bbuf(iv, len);
 
-    bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
+    bbuf.Put8(header.GetSecurityFlags());
     bbuf.Put32(header.GetMessageCounter());
+    bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
 
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }

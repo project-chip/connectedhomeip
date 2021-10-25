@@ -40,12 +40,12 @@ namespace MainsVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * mainsVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, MainsVoltage::Id, (uint8_t *) mainsVoltage,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) mainsVoltage,
                                       sizeof(*mainsVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t mainsVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, MainsVoltage::Id, (uint8_t *) &mainsVoltage,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &mainsVoltage,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -55,12 +55,12 @@ namespace MainsFrequency {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * mainsFrequency)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, MainsFrequency::Id, (uint8_t *) mainsFrequency,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) mainsFrequency,
                                       sizeof(*mainsFrequency));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t mainsFrequency)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, MainsFrequency::Id, (uint8_t *) &mainsFrequency,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &mainsFrequency,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -70,12 +70,12 @@ namespace MainsAlarmMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * mainsAlarmMask)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, MainsAlarmMask::Id, (uint8_t *) mainsAlarmMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) mainsAlarmMask,
                                       sizeof(*mainsAlarmMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t mainsAlarmMask)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, MainsAlarmMask::Id, (uint8_t *) &mainsAlarmMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &mainsAlarmMask,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -85,13 +85,13 @@ namespace MainsVoltageMinThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * mainsVoltageMinThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, MainsVoltageMinThreshold::Id,
-                                      (uint8_t *) mainsVoltageMinThreshold, sizeof(*mainsVoltageMinThreshold));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) mainsVoltageMinThreshold,
+                                      sizeof(*mainsVoltageMinThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t mainsVoltageMinThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, MainsVoltageMinThreshold::Id,
-                                       (uint8_t *) &mainsVoltageMinThreshold, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &mainsVoltageMinThreshold,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MainsVoltageMinThreshold
@@ -100,13 +100,13 @@ namespace MainsVoltageMaxThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * mainsVoltageMaxThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, MainsVoltageMaxThreshold::Id,
-                                      (uint8_t *) mainsVoltageMaxThreshold, sizeof(*mainsVoltageMaxThreshold));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) mainsVoltageMaxThreshold,
+                                      sizeof(*mainsVoltageMaxThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t mainsVoltageMaxThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, MainsVoltageMaxThreshold::Id,
-                                       (uint8_t *) &mainsVoltageMaxThreshold, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &mainsVoltageMaxThreshold,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MainsVoltageMaxThreshold
@@ -115,13 +115,13 @@ namespace MainsVoltageDwellTrip {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * mainsVoltageDwellTrip)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, MainsVoltageDwellTrip::Id,
-                                      (uint8_t *) mainsVoltageDwellTrip, sizeof(*mainsVoltageDwellTrip));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) mainsVoltageDwellTrip,
+                                      sizeof(*mainsVoltageDwellTrip));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t mainsVoltageDwellTrip)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, MainsVoltageDwellTrip::Id,
-                                       (uint8_t *) &mainsVoltageDwellTrip, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &mainsVoltageDwellTrip,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MainsVoltageDwellTrip
@@ -130,12 +130,12 @@ namespace BatteryVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryVoltage::Id, (uint8_t *) batteryVoltage,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryVoltage,
                                       sizeof(*batteryVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryVoltage::Id, (uint8_t *) &batteryVoltage,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryVoltage,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -145,13 +145,13 @@ namespace BatteryPercentageRemaining {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryPercentageRemaining)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryPercentageRemaining::Id,
-                                      (uint8_t *) batteryPercentageRemaining, sizeof(*batteryPercentageRemaining));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryPercentageRemaining,
+                                      sizeof(*batteryPercentageRemaining));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryPercentageRemaining)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryPercentageRemaining::Id,
-                                       (uint8_t *) &batteryPercentageRemaining, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryPercentageRemaining,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryPercentageRemaining
@@ -160,12 +160,12 @@ namespace BatterySize {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batterySize)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatterySize::Id, (uint8_t *) batterySize,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batterySize,
                                       sizeof(*batterySize));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batterySize)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatterySize::Id, (uint8_t *) &batterySize,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batterySize,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -175,12 +175,12 @@ namespace BatteryAhrRating {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * batteryAhrRating)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryAhrRating::Id, (uint8_t *) batteryAhrRating,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryAhrRating,
                                       sizeof(*batteryAhrRating));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t batteryAhrRating)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryAhrRating::Id, (uint8_t *) &batteryAhrRating,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryAhrRating,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -190,12 +190,12 @@ namespace BatteryQuantity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryQuantity)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryQuantity::Id, (uint8_t *) batteryQuantity,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryQuantity,
                                       sizeof(*batteryQuantity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryQuantity)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryQuantity::Id, (uint8_t *) &batteryQuantity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryQuantity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -205,12 +205,12 @@ namespace BatteryRatedVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryRatedVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryRatedVoltage::Id, (uint8_t *) batteryRatedVoltage,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryRatedVoltage,
                                       sizeof(*batteryRatedVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryRatedVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryRatedVoltage::Id, (uint8_t *) &batteryRatedVoltage,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryRatedVoltage,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -220,12 +220,12 @@ namespace BatteryAlarmMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryAlarmMask)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryAlarmMask::Id, (uint8_t *) batteryAlarmMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryAlarmMask,
                                       sizeof(*batteryAlarmMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryAlarmMask)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryAlarmMask::Id, (uint8_t *) &batteryAlarmMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryAlarmMask,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -235,13 +235,13 @@ namespace BatteryVoltageMinThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryVoltageMinThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryVoltageMinThreshold::Id,
-                                      (uint8_t *) batteryVoltageMinThreshold, sizeof(*batteryVoltageMinThreshold));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryVoltageMinThreshold,
+                                      sizeof(*batteryVoltageMinThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryVoltageMinThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryVoltageMinThreshold::Id,
-                                       (uint8_t *) &batteryVoltageMinThreshold, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryVoltageMinThreshold,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryVoltageMinThreshold
@@ -250,13 +250,13 @@ namespace BatteryVoltageThreshold1 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryVoltageThreshold1)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryVoltageThreshold1::Id,
-                                      (uint8_t *) batteryVoltageThreshold1, sizeof(*batteryVoltageThreshold1));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryVoltageThreshold1,
+                                      sizeof(*batteryVoltageThreshold1));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryVoltageThreshold1)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryVoltageThreshold1::Id,
-                                       (uint8_t *) &batteryVoltageThreshold1, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryVoltageThreshold1,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryVoltageThreshold1
@@ -265,13 +265,13 @@ namespace BatteryVoltageThreshold2 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryVoltageThreshold2)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryVoltageThreshold2::Id,
-                                      (uint8_t *) batteryVoltageThreshold2, sizeof(*batteryVoltageThreshold2));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryVoltageThreshold2,
+                                      sizeof(*batteryVoltageThreshold2));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryVoltageThreshold2)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryVoltageThreshold2::Id,
-                                       (uint8_t *) &batteryVoltageThreshold2, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryVoltageThreshold2,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryVoltageThreshold2
@@ -280,13 +280,13 @@ namespace BatteryVoltageThreshold3 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryVoltageThreshold3)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryVoltageThreshold3::Id,
-                                      (uint8_t *) batteryVoltageThreshold3, sizeof(*batteryVoltageThreshold3));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryVoltageThreshold3,
+                                      sizeof(*batteryVoltageThreshold3));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryVoltageThreshold3)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryVoltageThreshold3::Id,
-                                       (uint8_t *) &batteryVoltageThreshold3, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryVoltageThreshold3,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryVoltageThreshold3
@@ -295,13 +295,13 @@ namespace BatteryPercentageMinThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryPercentageMinThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryPercentageMinThreshold::Id,
-                                      (uint8_t *) batteryPercentageMinThreshold, sizeof(*batteryPercentageMinThreshold));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryPercentageMinThreshold,
+                                      sizeof(*batteryPercentageMinThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryPercentageMinThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryPercentageMinThreshold::Id,
-                                       (uint8_t *) &batteryPercentageMinThreshold, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryPercentageMinThreshold,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryPercentageMinThreshold
@@ -310,13 +310,13 @@ namespace BatteryPercentageThreshold1 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryPercentageThreshold1)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryPercentageThreshold1::Id,
-                                      (uint8_t *) batteryPercentageThreshold1, sizeof(*batteryPercentageThreshold1));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryPercentageThreshold1,
+                                      sizeof(*batteryPercentageThreshold1));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryPercentageThreshold1)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryPercentageThreshold1::Id,
-                                       (uint8_t *) &batteryPercentageThreshold1, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryPercentageThreshold1,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryPercentageThreshold1
@@ -325,13 +325,13 @@ namespace BatteryPercentageThreshold2 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryPercentageThreshold2)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryPercentageThreshold2::Id,
-                                      (uint8_t *) batteryPercentageThreshold2, sizeof(*batteryPercentageThreshold2));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryPercentageThreshold2,
+                                      sizeof(*batteryPercentageThreshold2));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryPercentageThreshold2)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryPercentageThreshold2::Id,
-                                       (uint8_t *) &batteryPercentageThreshold2, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryPercentageThreshold2,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryPercentageThreshold2
@@ -340,13 +340,13 @@ namespace BatteryPercentageThreshold3 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryPercentageThreshold3)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryPercentageThreshold3::Id,
-                                      (uint8_t *) batteryPercentageThreshold3, sizeof(*batteryPercentageThreshold3));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryPercentageThreshold3,
+                                      sizeof(*batteryPercentageThreshold3));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryPercentageThreshold3)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryPercentageThreshold3::Id,
-                                       (uint8_t *) &batteryPercentageThreshold3, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryPercentageThreshold3,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryPercentageThreshold3
@@ -355,12 +355,12 @@ namespace BatteryAlarmState {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * batteryAlarmState)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, BatteryAlarmState::Id, (uint8_t *) batteryAlarmState,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) batteryAlarmState,
                                       sizeof(*batteryAlarmState));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t batteryAlarmState)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, BatteryAlarmState::Id, (uint8_t *) &batteryAlarmState,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &batteryAlarmState,
                                        ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
@@ -370,12 +370,12 @@ namespace Battery2Voltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2Voltage)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2Voltage::Id, (uint8_t *) battery2Voltage,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2Voltage,
                                       sizeof(*battery2Voltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2Voltage)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2Voltage::Id, (uint8_t *) &battery2Voltage,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2Voltage,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -385,13 +385,13 @@ namespace Battery2PercentageRemaining {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2PercentageRemaining)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2PercentageRemaining::Id,
-                                      (uint8_t *) battery2PercentageRemaining, sizeof(*battery2PercentageRemaining));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2PercentageRemaining,
+                                      sizeof(*battery2PercentageRemaining));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2PercentageRemaining)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2PercentageRemaining::Id,
-                                       (uint8_t *) &battery2PercentageRemaining, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2PercentageRemaining,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery2PercentageRemaining
@@ -400,12 +400,12 @@ namespace Battery2Size {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2Size)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2Size::Id, (uint8_t *) battery2Size,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2Size,
                                       sizeof(*battery2Size));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2Size)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2Size::Id, (uint8_t *) &battery2Size,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2Size,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -415,12 +415,12 @@ namespace Battery2AhrRating {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * battery2AhrRating)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2AhrRating::Id, (uint8_t *) battery2AhrRating,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2AhrRating,
                                       sizeof(*battery2AhrRating));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t battery2AhrRating)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2AhrRating::Id, (uint8_t *) &battery2AhrRating,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2AhrRating,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -430,12 +430,12 @@ namespace Battery2Quantity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2Quantity)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2Quantity::Id, (uint8_t *) battery2Quantity,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2Quantity,
                                       sizeof(*battery2Quantity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2Quantity)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2Quantity::Id, (uint8_t *) &battery2Quantity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2Quantity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -445,13 +445,13 @@ namespace Battery2RatedVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2RatedVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2RatedVoltage::Id, (uint8_t *) battery2RatedVoltage,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2RatedVoltage,
                                       sizeof(*battery2RatedVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2RatedVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2RatedVoltage::Id,
-                                       (uint8_t *) &battery2RatedVoltage, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2RatedVoltage,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery2RatedVoltage
@@ -460,12 +460,12 @@ namespace Battery2AlarmMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2AlarmMask)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2AlarmMask::Id, (uint8_t *) battery2AlarmMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2AlarmMask,
                                       sizeof(*battery2AlarmMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2AlarmMask)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2AlarmMask::Id, (uint8_t *) &battery2AlarmMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2AlarmMask,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -475,13 +475,13 @@ namespace Battery2VoltageMinThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2VoltageMinThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2VoltageMinThreshold::Id,
-                                      (uint8_t *) battery2VoltageMinThreshold, sizeof(*battery2VoltageMinThreshold));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2VoltageMinThreshold,
+                                      sizeof(*battery2VoltageMinThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2VoltageMinThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2VoltageMinThreshold::Id,
-                                       (uint8_t *) &battery2VoltageMinThreshold, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2VoltageMinThreshold,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery2VoltageMinThreshold
@@ -490,13 +490,13 @@ namespace Battery2VoltageThreshold1 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2VoltageThreshold1)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2VoltageThreshold1::Id,
-                                      (uint8_t *) battery2VoltageThreshold1, sizeof(*battery2VoltageThreshold1));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2VoltageThreshold1,
+                                      sizeof(*battery2VoltageThreshold1));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2VoltageThreshold1)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2VoltageThreshold1::Id,
-                                       (uint8_t *) &battery2VoltageThreshold1, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2VoltageThreshold1,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery2VoltageThreshold1
@@ -505,13 +505,13 @@ namespace Battery2VoltageThreshold2 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2VoltageThreshold2)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2VoltageThreshold2::Id,
-                                      (uint8_t *) battery2VoltageThreshold2, sizeof(*battery2VoltageThreshold2));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2VoltageThreshold2,
+                                      sizeof(*battery2VoltageThreshold2));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2VoltageThreshold2)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2VoltageThreshold2::Id,
-                                       (uint8_t *) &battery2VoltageThreshold2, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2VoltageThreshold2,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery2VoltageThreshold2
@@ -520,13 +520,13 @@ namespace Battery2VoltageThreshold3 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2VoltageThreshold3)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2VoltageThreshold3::Id,
-                                      (uint8_t *) battery2VoltageThreshold3, sizeof(*battery2VoltageThreshold3));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2VoltageThreshold3,
+                                      sizeof(*battery2VoltageThreshold3));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2VoltageThreshold3)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2VoltageThreshold3::Id,
-                                       (uint8_t *) &battery2VoltageThreshold3, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2VoltageThreshold3,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery2VoltageThreshold3
@@ -535,13 +535,13 @@ namespace Battery2PercentageMinThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2PercentageMinThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2PercentageMinThreshold::Id,
-                                      (uint8_t *) battery2PercentageMinThreshold, sizeof(*battery2PercentageMinThreshold));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2PercentageMinThreshold,
+                                      sizeof(*battery2PercentageMinThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2PercentageMinThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2PercentageMinThreshold::Id,
-                                       (uint8_t *) &battery2PercentageMinThreshold, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2PercentageMinThreshold,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery2PercentageMinThreshold
@@ -550,13 +550,13 @@ namespace Battery2PercentageThreshold1 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2PercentageThreshold1)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2PercentageThreshold1::Id,
-                                      (uint8_t *) battery2PercentageThreshold1, sizeof(*battery2PercentageThreshold1));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2PercentageThreshold1,
+                                      sizeof(*battery2PercentageThreshold1));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2PercentageThreshold1)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2PercentageThreshold1::Id,
-                                       (uint8_t *) &battery2PercentageThreshold1, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2PercentageThreshold1,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery2PercentageThreshold1
@@ -565,13 +565,13 @@ namespace Battery2PercentageThreshold2 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2PercentageThreshold2)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2PercentageThreshold2::Id,
-                                      (uint8_t *) battery2PercentageThreshold2, sizeof(*battery2PercentageThreshold2));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2PercentageThreshold2,
+                                      sizeof(*battery2PercentageThreshold2));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2PercentageThreshold2)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2PercentageThreshold2::Id,
-                                       (uint8_t *) &battery2PercentageThreshold2, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2PercentageThreshold2,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery2PercentageThreshold2
@@ -580,13 +580,13 @@ namespace Battery2PercentageThreshold3 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery2PercentageThreshold3)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2PercentageThreshold3::Id,
-                                      (uint8_t *) battery2PercentageThreshold3, sizeof(*battery2PercentageThreshold3));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2PercentageThreshold3,
+                                      sizeof(*battery2PercentageThreshold3));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery2PercentageThreshold3)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2PercentageThreshold3::Id,
-                                       (uint8_t *) &battery2PercentageThreshold3, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2PercentageThreshold3,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery2PercentageThreshold3
@@ -595,12 +595,12 @@ namespace Battery2AlarmState {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * battery2AlarmState)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery2AlarmState::Id, (uint8_t *) battery2AlarmState,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery2AlarmState,
                                       sizeof(*battery2AlarmState));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t battery2AlarmState)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery2AlarmState::Id, (uint8_t *) &battery2AlarmState,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery2AlarmState,
                                        ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
@@ -610,12 +610,12 @@ namespace Battery3Voltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3Voltage)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3Voltage::Id, (uint8_t *) battery3Voltage,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3Voltage,
                                       sizeof(*battery3Voltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3Voltage)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3Voltage::Id, (uint8_t *) &battery3Voltage,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3Voltage,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -625,13 +625,13 @@ namespace Battery3PercentageRemaining {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3PercentageRemaining)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3PercentageRemaining::Id,
-                                      (uint8_t *) battery3PercentageRemaining, sizeof(*battery3PercentageRemaining));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3PercentageRemaining,
+                                      sizeof(*battery3PercentageRemaining));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3PercentageRemaining)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3PercentageRemaining::Id,
-                                       (uint8_t *) &battery3PercentageRemaining, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3PercentageRemaining,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery3PercentageRemaining
@@ -640,12 +640,12 @@ namespace Battery3Size {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3Size)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3Size::Id, (uint8_t *) battery3Size,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3Size,
                                       sizeof(*battery3Size));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3Size)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3Size::Id, (uint8_t *) &battery3Size,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3Size,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -655,12 +655,12 @@ namespace Battery3AhrRating {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * battery3AhrRating)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3AhrRating::Id, (uint8_t *) battery3AhrRating,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3AhrRating,
                                       sizeof(*battery3AhrRating));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t battery3AhrRating)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3AhrRating::Id, (uint8_t *) &battery3AhrRating,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3AhrRating,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -670,12 +670,12 @@ namespace Battery3Quantity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3Quantity)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3Quantity::Id, (uint8_t *) battery3Quantity,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3Quantity,
                                       sizeof(*battery3Quantity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3Quantity)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3Quantity::Id, (uint8_t *) &battery3Quantity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3Quantity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -685,13 +685,13 @@ namespace Battery3RatedVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3RatedVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3RatedVoltage::Id, (uint8_t *) battery3RatedVoltage,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3RatedVoltage,
                                       sizeof(*battery3RatedVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3RatedVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3RatedVoltage::Id,
-                                       (uint8_t *) &battery3RatedVoltage, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3RatedVoltage,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery3RatedVoltage
@@ -700,12 +700,12 @@ namespace Battery3AlarmMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3AlarmMask)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3AlarmMask::Id, (uint8_t *) battery3AlarmMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3AlarmMask,
                                       sizeof(*battery3AlarmMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3AlarmMask)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3AlarmMask::Id, (uint8_t *) &battery3AlarmMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3AlarmMask,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -715,13 +715,13 @@ namespace Battery3VoltageMinThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3VoltageMinThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3VoltageMinThreshold::Id,
-                                      (uint8_t *) battery3VoltageMinThreshold, sizeof(*battery3VoltageMinThreshold));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3VoltageMinThreshold,
+                                      sizeof(*battery3VoltageMinThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3VoltageMinThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3VoltageMinThreshold::Id,
-                                       (uint8_t *) &battery3VoltageMinThreshold, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3VoltageMinThreshold,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery3VoltageMinThreshold
@@ -730,13 +730,13 @@ namespace Battery3VoltageThreshold1 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3VoltageThreshold1)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3VoltageThreshold1::Id,
-                                      (uint8_t *) battery3VoltageThreshold1, sizeof(*battery3VoltageThreshold1));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3VoltageThreshold1,
+                                      sizeof(*battery3VoltageThreshold1));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3VoltageThreshold1)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3VoltageThreshold1::Id,
-                                       (uint8_t *) &battery3VoltageThreshold1, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3VoltageThreshold1,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery3VoltageThreshold1
@@ -745,13 +745,13 @@ namespace Battery3VoltageThreshold2 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3VoltageThreshold2)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3VoltageThreshold2::Id,
-                                      (uint8_t *) battery3VoltageThreshold2, sizeof(*battery3VoltageThreshold2));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3VoltageThreshold2,
+                                      sizeof(*battery3VoltageThreshold2));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3VoltageThreshold2)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3VoltageThreshold2::Id,
-                                       (uint8_t *) &battery3VoltageThreshold2, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3VoltageThreshold2,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery3VoltageThreshold2
@@ -760,13 +760,13 @@ namespace Battery3VoltageThreshold3 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3VoltageThreshold3)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3VoltageThreshold3::Id,
-                                      (uint8_t *) battery3VoltageThreshold3, sizeof(*battery3VoltageThreshold3));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3VoltageThreshold3,
+                                      sizeof(*battery3VoltageThreshold3));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3VoltageThreshold3)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3VoltageThreshold3::Id,
-                                       (uint8_t *) &battery3VoltageThreshold3, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3VoltageThreshold3,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery3VoltageThreshold3
@@ -775,13 +775,13 @@ namespace Battery3PercentageMinThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3PercentageMinThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3PercentageMinThreshold::Id,
-                                      (uint8_t *) battery3PercentageMinThreshold, sizeof(*battery3PercentageMinThreshold));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3PercentageMinThreshold,
+                                      sizeof(*battery3PercentageMinThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3PercentageMinThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3PercentageMinThreshold::Id,
-                                       (uint8_t *) &battery3PercentageMinThreshold, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3PercentageMinThreshold,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery3PercentageMinThreshold
@@ -790,13 +790,13 @@ namespace Battery3PercentageThreshold1 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3PercentageThreshold1)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3PercentageThreshold1::Id,
-                                      (uint8_t *) battery3PercentageThreshold1, sizeof(*battery3PercentageThreshold1));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3PercentageThreshold1,
+                                      sizeof(*battery3PercentageThreshold1));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3PercentageThreshold1)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3PercentageThreshold1::Id,
-                                       (uint8_t *) &battery3PercentageThreshold1, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3PercentageThreshold1,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery3PercentageThreshold1
@@ -805,13 +805,13 @@ namespace Battery3PercentageThreshold2 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3PercentageThreshold2)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3PercentageThreshold2::Id,
-                                      (uint8_t *) battery3PercentageThreshold2, sizeof(*battery3PercentageThreshold2));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3PercentageThreshold2,
+                                      sizeof(*battery3PercentageThreshold2));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3PercentageThreshold2)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3PercentageThreshold2::Id,
-                                       (uint8_t *) &battery3PercentageThreshold2, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3PercentageThreshold2,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery3PercentageThreshold2
@@ -820,13 +820,13 @@ namespace Battery3PercentageThreshold3 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * battery3PercentageThreshold3)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3PercentageThreshold3::Id,
-                                      (uint8_t *) battery3PercentageThreshold3, sizeof(*battery3PercentageThreshold3));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3PercentageThreshold3,
+                                      sizeof(*battery3PercentageThreshold3));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t battery3PercentageThreshold3)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3PercentageThreshold3::Id,
-                                       (uint8_t *) &battery3PercentageThreshold3, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3PercentageThreshold3,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Battery3PercentageThreshold3
@@ -835,12 +835,12 @@ namespace Battery3AlarmState {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * battery3AlarmState)
 {
-    return emberAfReadServerAttribute(endpoint, PowerConfiguration::Id, Battery3AlarmState::Id, (uint8_t *) battery3AlarmState,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) battery3AlarmState,
                                       sizeof(*battery3AlarmState));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t battery3AlarmState)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerConfiguration::Id, Battery3AlarmState::Id, (uint8_t *) &battery3AlarmState,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerConfiguration::Id, Id, (uint8_t *) &battery3AlarmState,
                                        ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
@@ -856,13 +856,13 @@ namespace CurrentTemperature {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * currentTemperature)
 {
-    return emberAfReadServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, CurrentTemperature::Id,
-                                      (uint8_t *) currentTemperature, sizeof(*currentTemperature));
+    return emberAfReadServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) currentTemperature,
+                                      sizeof(*currentTemperature));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t currentTemperature)
 {
-    return emberAfWriteServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, CurrentTemperature::Id,
-                                       (uint8_t *) &currentTemperature, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) &currentTemperature,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentTemperature
@@ -871,13 +871,13 @@ namespace MinTempExperienced {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * minTempExperienced)
 {
-    return emberAfReadServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, MinTempExperienced::Id,
-                                      (uint8_t *) minTempExperienced, sizeof(*minTempExperienced));
+    return emberAfReadServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) minTempExperienced,
+                                      sizeof(*minTempExperienced));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t minTempExperienced)
 {
-    return emberAfWriteServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, MinTempExperienced::Id,
-                                       (uint8_t *) &minTempExperienced, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) &minTempExperienced,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinTempExperienced
@@ -886,13 +886,13 @@ namespace MaxTempExperienced {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * maxTempExperienced)
 {
-    return emberAfReadServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, MaxTempExperienced::Id,
-                                      (uint8_t *) maxTempExperienced, sizeof(*maxTempExperienced));
+    return emberAfReadServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) maxTempExperienced,
+                                      sizeof(*maxTempExperienced));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t maxTempExperienced)
 {
-    return emberAfWriteServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, MaxTempExperienced::Id,
-                                       (uint8_t *) &maxTempExperienced, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) &maxTempExperienced,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxTempExperienced
@@ -901,13 +901,13 @@ namespace OverTempTotalDwell {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * overTempTotalDwell)
 {
-    return emberAfReadServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, OverTempTotalDwell::Id,
-                                      (uint8_t *) overTempTotalDwell, sizeof(*overTempTotalDwell));
+    return emberAfReadServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) overTempTotalDwell,
+                                      sizeof(*overTempTotalDwell));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t overTempTotalDwell)
 {
-    return emberAfWriteServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, OverTempTotalDwell::Id,
-                                       (uint8_t *) &overTempTotalDwell, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) &overTempTotalDwell,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace OverTempTotalDwell
@@ -916,13 +916,13 @@ namespace DeviceTempAlarmMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * deviceTempAlarmMask)
 {
-    return emberAfReadServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, DeviceTempAlarmMask::Id,
-                                      (uint8_t *) deviceTempAlarmMask, sizeof(*deviceTempAlarmMask));
+    return emberAfReadServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) deviceTempAlarmMask,
+                                      sizeof(*deviceTempAlarmMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t deviceTempAlarmMask)
 {
-    return emberAfWriteServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, DeviceTempAlarmMask::Id,
-                                       (uint8_t *) &deviceTempAlarmMask, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) &deviceTempAlarmMask,
+                                       ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace DeviceTempAlarmMask
@@ -931,13 +931,13 @@ namespace LowTempThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * lowTempThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, LowTempThreshold::Id,
-                                      (uint8_t *) lowTempThreshold, sizeof(*lowTempThreshold));
+    return emberAfReadServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) lowTempThreshold,
+                                      sizeof(*lowTempThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t lowTempThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, LowTempThreshold::Id,
-                                       (uint8_t *) &lowTempThreshold, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) &lowTempThreshold,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace LowTempThreshold
@@ -946,13 +946,13 @@ namespace HighTempThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * highTempThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, HighTempThreshold::Id,
-                                      (uint8_t *) highTempThreshold, sizeof(*highTempThreshold));
+    return emberAfReadServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) highTempThreshold,
+                                      sizeof(*highTempThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t highTempThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, DeviceTemperatureConfiguration::Id, HighTempThreshold::Id,
-                                       (uint8_t *) &highTempThreshold, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) &highTempThreshold,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace HighTempThreshold
@@ -967,12 +967,11 @@ namespace IdentifyTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * identifyTime)
 {
-    return emberAfReadServerAttribute(endpoint, Identify::Id, IdentifyTime::Id, (uint8_t *) identifyTime, sizeof(*identifyTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::Identify::Id, Id, (uint8_t *) identifyTime, sizeof(*identifyTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t identifyTime)
 {
-    return emberAfWriteServerAttribute(endpoint, Identify::Id, IdentifyTime::Id, (uint8_t *) &identifyTime,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Identify::Id, Id, (uint8_t *) &identifyTime, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace IdentifyTime
@@ -981,12 +980,11 @@ namespace IdentifyType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * identifyType)
 {
-    return emberAfReadServerAttribute(endpoint, Identify::Id, IdentifyType::Id, (uint8_t *) identifyType, sizeof(*identifyType));
+    return emberAfReadServerAttribute(endpoint, Clusters::Identify::Id, Id, (uint8_t *) identifyType, sizeof(*identifyType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t identifyType)
 {
-    return emberAfWriteServerAttribute(endpoint, Identify::Id, IdentifyType::Id, (uint8_t *) &identifyType,
-                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Identify::Id, Id, (uint8_t *) &identifyType, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace IdentifyType
@@ -1001,11 +999,11 @@ namespace NameSupport {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * nameSupport)
 {
-    return emberAfReadServerAttribute(endpoint, Groups::Id, NameSupport::Id, (uint8_t *) nameSupport, sizeof(*nameSupport));
+    return emberAfReadServerAttribute(endpoint, Clusters::Groups::Id, Id, (uint8_t *) nameSupport, sizeof(*nameSupport));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t nameSupport)
 {
-    return emberAfWriteServerAttribute(endpoint, Groups::Id, NameSupport::Id, (uint8_t *) &nameSupport, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Groups::Id, Id, (uint8_t *) &nameSupport, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace NameSupport
@@ -1020,11 +1018,11 @@ namespace SceneCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * sceneCount)
 {
-    return emberAfReadServerAttribute(endpoint, Scenes::Id, SceneCount::Id, (uint8_t *) sceneCount, sizeof(*sceneCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) sceneCount, sizeof(*sceneCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t sceneCount)
 {
-    return emberAfWriteServerAttribute(endpoint, Scenes::Id, SceneCount::Id, (uint8_t *) &sceneCount, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) &sceneCount, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SceneCount
@@ -1033,11 +1031,11 @@ namespace CurrentScene {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentScene)
 {
-    return emberAfReadServerAttribute(endpoint, Scenes::Id, CurrentScene::Id, (uint8_t *) currentScene, sizeof(*currentScene));
+    return emberAfReadServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) currentScene, sizeof(*currentScene));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentScene)
 {
-    return emberAfWriteServerAttribute(endpoint, Scenes::Id, CurrentScene::Id, (uint8_t *) &currentScene, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) &currentScene, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentScene
@@ -1046,12 +1044,11 @@ namespace CurrentGroup {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentGroup)
 {
-    return emberAfReadServerAttribute(endpoint, Scenes::Id, CurrentGroup::Id, (uint8_t *) currentGroup, sizeof(*currentGroup));
+    return emberAfReadServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) currentGroup, sizeof(*currentGroup));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentGroup)
 {
-    return emberAfWriteServerAttribute(endpoint, Scenes::Id, CurrentGroup::Id, (uint8_t *) &currentGroup,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) &currentGroup, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentGroup
@@ -1060,11 +1057,11 @@ namespace SceneValid {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * sceneValid)
 {
-    return emberAfReadServerAttribute(endpoint, Scenes::Id, SceneValid::Id, (uint8_t *) sceneValid, sizeof(*sceneValid));
+    return emberAfReadServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) sceneValid, sizeof(*sceneValid));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool sceneValid)
 {
-    return emberAfWriteServerAttribute(endpoint, Scenes::Id, SceneValid::Id, (uint8_t *) &sceneValid, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) &sceneValid, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace SceneValid
@@ -1073,11 +1070,11 @@ namespace NameSupport {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * nameSupport)
 {
-    return emberAfReadServerAttribute(endpoint, Scenes::Id, NameSupport::Id, (uint8_t *) nameSupport, sizeof(*nameSupport));
+    return emberAfReadServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) nameSupport, sizeof(*nameSupport));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t nameSupport)
 {
-    return emberAfWriteServerAttribute(endpoint, Scenes::Id, NameSupport::Id, (uint8_t *) &nameSupport, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) &nameSupport, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace NameSupport
@@ -1086,12 +1083,11 @@ namespace LastConfiguredBy {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::NodeId * lastConfiguredBy)
 {
-    return emberAfReadServerAttribute(endpoint, Scenes::Id, LastConfiguredBy::Id, (uint8_t *) lastConfiguredBy,
-                                      sizeof(*lastConfiguredBy));
+    return emberAfReadServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) lastConfiguredBy, sizeof(*lastConfiguredBy));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId lastConfiguredBy)
 {
-    return emberAfWriteServerAttribute(endpoint, Scenes::Id, LastConfiguredBy::Id, (uint8_t *) &lastConfiguredBy,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Scenes::Id, Id, (uint8_t *) &lastConfiguredBy,
                                        ZCL_NODE_ID_ATTRIBUTE_TYPE);
 }
 
@@ -1107,11 +1103,11 @@ namespace OnOff {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * onOff)
 {
-    return emberAfReadServerAttribute(endpoint, OnOff::Id, OnOff::Id, (uint8_t *) onOff, sizeof(*onOff));
+    return emberAfReadServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) onOff, sizeof(*onOff));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool onOff)
 {
-    return emberAfWriteServerAttribute(endpoint, OnOff::Id, OnOff::Id, (uint8_t *) &onOff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) &onOff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace OnOff
@@ -1120,14 +1116,13 @@ namespace SampleMfgSpecificAttribute0x00000x1002 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * sampleMfgSpecificAttribute0x00000x1002)
 {
-    return emberAfReadServerAttribute(endpoint, OnOff::Id, SampleMfgSpecificAttribute0x00000x1002::Id,
-                                      (uint8_t *) sampleMfgSpecificAttribute0x00000x1002,
+    return emberAfReadServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) sampleMfgSpecificAttribute0x00000x1002,
                                       sizeof(*sampleMfgSpecificAttribute0x00000x1002));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t sampleMfgSpecificAttribute0x00000x1002)
 {
-    return emberAfWriteServerAttribute(endpoint, OnOff::Id, SampleMfgSpecificAttribute0x00000x1002::Id,
-                                       (uint8_t *) &sampleMfgSpecificAttribute0x00000x1002, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) &sampleMfgSpecificAttribute0x00000x1002,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SampleMfgSpecificAttribute0x00000x1002
@@ -1136,14 +1131,13 @@ namespace SampleMfgSpecificAttribute0x00000x1049 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * sampleMfgSpecificAttribute0x00000x1049)
 {
-    return emberAfReadServerAttribute(endpoint, OnOff::Id, SampleMfgSpecificAttribute0x00000x1049::Id,
-                                      (uint8_t *) sampleMfgSpecificAttribute0x00000x1049,
+    return emberAfReadServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) sampleMfgSpecificAttribute0x00000x1049,
                                       sizeof(*sampleMfgSpecificAttribute0x00000x1049));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t sampleMfgSpecificAttribute0x00000x1049)
 {
-    return emberAfWriteServerAttribute(endpoint, OnOff::Id, SampleMfgSpecificAttribute0x00000x1049::Id,
-                                       (uint8_t *) &sampleMfgSpecificAttribute0x00000x1049, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) &sampleMfgSpecificAttribute0x00000x1049,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SampleMfgSpecificAttribute0x00000x1049
@@ -1152,14 +1146,13 @@ namespace SampleMfgSpecificAttribute0x00010x1002 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * sampleMfgSpecificAttribute0x00010x1002)
 {
-    return emberAfReadServerAttribute(endpoint, OnOff::Id, SampleMfgSpecificAttribute0x00010x1002::Id,
-                                      (uint8_t *) sampleMfgSpecificAttribute0x00010x1002,
+    return emberAfReadServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) sampleMfgSpecificAttribute0x00010x1002,
                                       sizeof(*sampleMfgSpecificAttribute0x00010x1002));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t sampleMfgSpecificAttribute0x00010x1002)
 {
-    return emberAfWriteServerAttribute(endpoint, OnOff::Id, SampleMfgSpecificAttribute0x00010x1002::Id,
-                                       (uint8_t *) &sampleMfgSpecificAttribute0x00010x1002, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) &sampleMfgSpecificAttribute0x00010x1002,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SampleMfgSpecificAttribute0x00010x1002
@@ -1168,14 +1161,13 @@ namespace SampleMfgSpecificAttribute0x00010x1040 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * sampleMfgSpecificAttribute0x00010x1040)
 {
-    return emberAfReadServerAttribute(endpoint, OnOff::Id, SampleMfgSpecificAttribute0x00010x1040::Id,
-                                      (uint8_t *) sampleMfgSpecificAttribute0x00010x1040,
+    return emberAfReadServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) sampleMfgSpecificAttribute0x00010x1040,
                                       sizeof(*sampleMfgSpecificAttribute0x00010x1040));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t sampleMfgSpecificAttribute0x00010x1040)
 {
-    return emberAfWriteServerAttribute(endpoint, OnOff::Id, SampleMfgSpecificAttribute0x00010x1040::Id,
-                                       (uint8_t *) &sampleMfgSpecificAttribute0x00010x1040, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) &sampleMfgSpecificAttribute0x00010x1040,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SampleMfgSpecificAttribute0x00010x1040
@@ -1184,12 +1176,12 @@ namespace GlobalSceneControl {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * globalSceneControl)
 {
-    return emberAfReadServerAttribute(endpoint, OnOff::Id, GlobalSceneControl::Id, (uint8_t *) globalSceneControl,
+    return emberAfReadServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) globalSceneControl,
                                       sizeof(*globalSceneControl));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool globalSceneControl)
 {
-    return emberAfWriteServerAttribute(endpoint, OnOff::Id, GlobalSceneControl::Id, (uint8_t *) &globalSceneControl,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) &globalSceneControl,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -1199,11 +1191,11 @@ namespace OnTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * onTime)
 {
-    return emberAfReadServerAttribute(endpoint, OnOff::Id, OnTime::Id, (uint8_t *) onTime, sizeof(*onTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) onTime, sizeof(*onTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t onTime)
 {
-    return emberAfWriteServerAttribute(endpoint, OnOff::Id, OnTime::Id, (uint8_t *) &onTime, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) &onTime, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace OnTime
@@ -1212,11 +1204,11 @@ namespace OffWaitTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * offWaitTime)
 {
-    return emberAfReadServerAttribute(endpoint, OnOff::Id, OffWaitTime::Id, (uint8_t *) offWaitTime, sizeof(*offWaitTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) offWaitTime, sizeof(*offWaitTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t offWaitTime)
 {
-    return emberAfWriteServerAttribute(endpoint, OnOff::Id, OffWaitTime::Id, (uint8_t *) &offWaitTime, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) &offWaitTime, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace OffWaitTime
@@ -1225,11 +1217,11 @@ namespace StartUpOnOff {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * startUpOnOff)
 {
-    return emberAfReadServerAttribute(endpoint, OnOff::Id, StartUpOnOff::Id, (uint8_t *) startUpOnOff, sizeof(*startUpOnOff));
+    return emberAfReadServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) startUpOnOff, sizeof(*startUpOnOff));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t startUpOnOff)
 {
-    return emberAfWriteServerAttribute(endpoint, OnOff::Id, StartUpOnOff::Id, (uint8_t *) &startUpOnOff, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, (uint8_t *) &startUpOnOff, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace StartUpOnOff
@@ -1244,12 +1236,12 @@ namespace SwitchType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * switchType)
 {
-    return emberAfReadServerAttribute(endpoint, OnOffSwitchConfiguration::Id, SwitchType::Id, (uint8_t *) switchType,
+    return emberAfReadServerAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, (uint8_t *) switchType,
                                       sizeof(*switchType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t switchType)
 {
-    return emberAfWriteServerAttribute(endpoint, OnOffSwitchConfiguration::Id, SwitchType::Id, (uint8_t *) &switchType,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, (uint8_t *) &switchType,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -1259,12 +1251,12 @@ namespace SwitchActions {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * switchActions)
 {
-    return emberAfReadServerAttribute(endpoint, OnOffSwitchConfiguration::Id, SwitchActions::Id, (uint8_t *) switchActions,
+    return emberAfReadServerAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, (uint8_t *) switchActions,
                                       sizeof(*switchActions));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t switchActions)
 {
-    return emberAfWriteServerAttribute(endpoint, OnOffSwitchConfiguration::Id, SwitchActions::Id, (uint8_t *) &switchActions,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, (uint8_t *) &switchActions,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -1280,12 +1272,11 @@ namespace CurrentLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentLevel)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, CurrentLevel::Id, (uint8_t *) currentLevel,
-                                      sizeof(*currentLevel));
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) currentLevel, sizeof(*currentLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, CurrentLevel::Id, (uint8_t *) &currentLevel,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &currentLevel,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -1295,12 +1286,11 @@ namespace RemainingTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * remainingTime)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, RemainingTime::Id, (uint8_t *) remainingTime,
-                                      sizeof(*remainingTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) remainingTime, sizeof(*remainingTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t remainingTime)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, RemainingTime::Id, (uint8_t *) &remainingTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &remainingTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1310,11 +1300,11 @@ namespace MinLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * minLevel)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MinLevel::Id, (uint8_t *) minLevel, sizeof(*minLevel));
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) minLevel, sizeof(*minLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t minLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MinLevel::Id, (uint8_t *) &minLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &minLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinLevel
@@ -1323,11 +1313,11 @@ namespace MaxLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * maxLevel)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MaxLevel::Id, (uint8_t *) maxLevel, sizeof(*maxLevel));
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) maxLevel, sizeof(*maxLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t maxLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MaxLevel::Id, (uint8_t *) &maxLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &maxLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxLevel
@@ -1336,12 +1326,12 @@ namespace CurrentFrequency {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentFrequency)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, CurrentFrequency::Id, (uint8_t *) currentFrequency,
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) currentFrequency,
                                       sizeof(*currentFrequency));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentFrequency)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, CurrentFrequency::Id, (uint8_t *) &currentFrequency,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &currentFrequency,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1351,12 +1341,11 @@ namespace MinFrequency {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * minFrequency)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MinFrequency::Id, (uint8_t *) minFrequency,
-                                      sizeof(*minFrequency));
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) minFrequency, sizeof(*minFrequency));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t minFrequency)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MinFrequency::Id, (uint8_t *) &minFrequency,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &minFrequency,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1366,12 +1355,11 @@ namespace MaxFrequency {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxFrequency)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MaxFrequency::Id, (uint8_t *) maxFrequency,
-                                      sizeof(*maxFrequency));
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) maxFrequency, sizeof(*maxFrequency));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxFrequency)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MaxFrequency::Id, (uint8_t *) &maxFrequency,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &maxFrequency,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1381,11 +1369,11 @@ namespace Options {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * options)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, Options::Id, (uint8_t *) options, sizeof(*options));
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) options, sizeof(*options));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t options)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, Options::Id, (uint8_t *) &options, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &options, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Options
@@ -1394,12 +1382,12 @@ namespace OnOffTransitionTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * onOffTransitionTime)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, OnOffTransitionTime::Id, (uint8_t *) onOffTransitionTime,
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) onOffTransitionTime,
                                       sizeof(*onOffTransitionTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t onOffTransitionTime)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, OnOffTransitionTime::Id, (uint8_t *) &onOffTransitionTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &onOffTransitionTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1409,11 +1397,11 @@ namespace OnLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * onLevel)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, OnLevel::Id, (uint8_t *) onLevel, sizeof(*onLevel));
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) onLevel, sizeof(*onLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t onLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, OnLevel::Id, (uint8_t *) &onLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &onLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace OnLevel
@@ -1422,12 +1410,12 @@ namespace OnTransitionTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * onTransitionTime)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, OnTransitionTime::Id, (uint8_t *) onTransitionTime,
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) onTransitionTime,
                                       sizeof(*onTransitionTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t onTransitionTime)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, OnTransitionTime::Id, (uint8_t *) &onTransitionTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &onTransitionTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1437,12 +1425,12 @@ namespace OffTransitionTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * offTransitionTime)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, OffTransitionTime::Id, (uint8_t *) offTransitionTime,
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) offTransitionTime,
                                       sizeof(*offTransitionTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t offTransitionTime)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, OffTransitionTime::Id, (uint8_t *) &offTransitionTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &offTransitionTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1452,12 +1440,12 @@ namespace DefaultMoveRate {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * defaultMoveRate)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, DefaultMoveRate::Id, (uint8_t *) defaultMoveRate,
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) defaultMoveRate,
                                       sizeof(*defaultMoveRate));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t defaultMoveRate)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, DefaultMoveRate::Id, (uint8_t *) &defaultMoveRate,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &defaultMoveRate,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -1467,12 +1455,12 @@ namespace StartUpCurrentLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * startUpCurrentLevel)
 {
-    return emberAfReadServerAttribute(endpoint, LevelControl::Id, StartUpCurrentLevel::Id, (uint8_t *) startUpCurrentLevel,
+    return emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) startUpCurrentLevel,
                                       sizeof(*startUpCurrentLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t startUpCurrentLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, StartUpCurrentLevel::Id, (uint8_t *) &startUpCurrentLevel,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, (uint8_t *) &startUpCurrentLevel,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -1488,11 +1476,11 @@ namespace AlarmCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * alarmCount)
 {
-    return emberAfReadServerAttribute(endpoint, Alarms::Id, AlarmCount::Id, (uint8_t *) alarmCount, sizeof(*alarmCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::Alarms::Id, Id, (uint8_t *) alarmCount, sizeof(*alarmCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t alarmCount)
 {
-    return emberAfWriteServerAttribute(endpoint, Alarms::Id, AlarmCount::Id, (uint8_t *) &alarmCount, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Alarms::Id, Id, (uint8_t *) &alarmCount, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmCount
@@ -1507,11 +1495,11 @@ namespace Time {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * time)
 {
-    return emberAfReadServerAttribute(endpoint, Time::Id, Time::Id, (uint8_t *) time, sizeof(*time));
+    return emberAfReadServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) time, sizeof(*time));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t time)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, Time::Id, (uint8_t *) &time, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) &time, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Time
@@ -1520,11 +1508,11 @@ namespace TimeStatus {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * timeStatus)
 {
-    return emberAfReadServerAttribute(endpoint, Time::Id, TimeStatus::Id, (uint8_t *) timeStatus, sizeof(*timeStatus));
+    return emberAfReadServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) timeStatus, sizeof(*timeStatus));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t timeStatus)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, TimeStatus::Id, (uint8_t *) &timeStatus, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) &timeStatus, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace TimeStatus
@@ -1533,11 +1521,11 @@ namespace TimeZone {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int32_t * timeZone)
 {
-    return emberAfReadServerAttribute(endpoint, Time::Id, TimeZone::Id, (uint8_t *) timeZone, sizeof(*timeZone));
+    return emberAfReadServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) timeZone, sizeof(*timeZone));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int32_t timeZone)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, TimeZone::Id, (uint8_t *) &timeZone, ZCL_INT32S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) &timeZone, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 } // namespace TimeZone
@@ -1546,11 +1534,11 @@ namespace DstStart {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * dstStart)
 {
-    return emberAfReadServerAttribute(endpoint, Time::Id, DstStart::Id, (uint8_t *) dstStart, sizeof(*dstStart));
+    return emberAfReadServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) dstStart, sizeof(*dstStart));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t dstStart)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, DstStart::Id, (uint8_t *) &dstStart, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) &dstStart, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DstStart
@@ -1559,11 +1547,11 @@ namespace DstEnd {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * dstEnd)
 {
-    return emberAfReadServerAttribute(endpoint, Time::Id, DstEnd::Id, (uint8_t *) dstEnd, sizeof(*dstEnd));
+    return emberAfReadServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) dstEnd, sizeof(*dstEnd));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t dstEnd)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, DstEnd::Id, (uint8_t *) &dstEnd, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) &dstEnd, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DstEnd
@@ -1572,11 +1560,11 @@ namespace DstShift {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int32_t * dstShift)
 {
-    return emberAfReadServerAttribute(endpoint, Time::Id, DstShift::Id, (uint8_t *) dstShift, sizeof(*dstShift));
+    return emberAfReadServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) dstShift, sizeof(*dstShift));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int32_t dstShift)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, DstShift::Id, (uint8_t *) &dstShift, ZCL_INT32S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) &dstShift, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 } // namespace DstShift
@@ -1585,11 +1573,11 @@ namespace StandardTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * standardTime)
 {
-    return emberAfReadServerAttribute(endpoint, Time::Id, StandardTime::Id, (uint8_t *) standardTime, sizeof(*standardTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) standardTime, sizeof(*standardTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t standardTime)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, StandardTime::Id, (uint8_t *) &standardTime, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) &standardTime, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace StandardTime
@@ -1598,11 +1586,11 @@ namespace LocalTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * localTime)
 {
-    return emberAfReadServerAttribute(endpoint, Time::Id, LocalTime::Id, (uint8_t *) localTime, sizeof(*localTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) localTime, sizeof(*localTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t localTime)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, LocalTime::Id, (uint8_t *) &localTime, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) &localTime, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace LocalTime
@@ -1611,11 +1599,11 @@ namespace LastSetTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * lastSetTime)
 {
-    return emberAfReadServerAttribute(endpoint, Time::Id, LastSetTime::Id, (uint8_t *) lastSetTime, sizeof(*lastSetTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) lastSetTime, sizeof(*lastSetTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t lastSetTime)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, LastSetTime::Id, (uint8_t *) &lastSetTime, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) &lastSetTime, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace LastSetTime
@@ -1624,12 +1612,11 @@ namespace ValidUntilTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * validUntilTime)
 {
-    return emberAfReadServerAttribute(endpoint, Time::Id, ValidUntilTime::Id, (uint8_t *) validUntilTime, sizeof(*validUntilTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) validUntilTime, sizeof(*validUntilTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t validUntilTime)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, ValidUntilTime::Id, (uint8_t *) &validUntilTime,
-                                       ZCL_EPOCH_S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Time::Id, Id, (uint8_t *) &validUntilTime, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ValidUntilTime
@@ -1644,12 +1631,12 @@ namespace OutOfService {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * outOfService)
 {
-    return emberAfReadServerAttribute(endpoint, BinaryInputBasic::Id, OutOfService::Id, (uint8_t *) outOfService,
+    return emberAfReadServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) outOfService,
                                       sizeof(*outOfService));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool outOfService)
 {
-    return emberAfWriteServerAttribute(endpoint, BinaryInputBasic::Id, OutOfService::Id, (uint8_t *) &outOfService,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) &outOfService,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -1659,11 +1646,11 @@ namespace Polarity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * polarity)
 {
-    return emberAfReadServerAttribute(endpoint, BinaryInputBasic::Id, Polarity::Id, (uint8_t *) polarity, sizeof(*polarity));
+    return emberAfReadServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) polarity, sizeof(*polarity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t polarity)
 {
-    return emberAfWriteServerAttribute(endpoint, BinaryInputBasic::Id, Polarity::Id, (uint8_t *) &polarity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) &polarity,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -1673,12 +1660,12 @@ namespace PresentValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * presentValue)
 {
-    return emberAfReadServerAttribute(endpoint, BinaryInputBasic::Id, PresentValue::Id, (uint8_t *) presentValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) presentValue,
                                       sizeof(*presentValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool presentValue)
 {
-    return emberAfWriteServerAttribute(endpoint, BinaryInputBasic::Id, PresentValue::Id, (uint8_t *) &presentValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) &presentValue,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -1688,12 +1675,11 @@ namespace Reliability {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * reliability)
 {
-    return emberAfReadServerAttribute(endpoint, BinaryInputBasic::Id, Reliability::Id, (uint8_t *) reliability,
-                                      sizeof(*reliability));
+    return emberAfReadServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) reliability, sizeof(*reliability));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t reliability)
 {
-    return emberAfWriteServerAttribute(endpoint, BinaryInputBasic::Id, Reliability::Id, (uint8_t *) &reliability,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) &reliability,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -1703,12 +1689,11 @@ namespace StatusFlags {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * statusFlags)
 {
-    return emberAfReadServerAttribute(endpoint, BinaryInputBasic::Id, StatusFlags::Id, (uint8_t *) statusFlags,
-                                      sizeof(*statusFlags));
+    return emberAfReadServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) statusFlags, sizeof(*statusFlags));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t statusFlags)
 {
-    return emberAfWriteServerAttribute(endpoint, BinaryInputBasic::Id, StatusFlags::Id, (uint8_t *) &statusFlags,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) &statusFlags,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -1718,12 +1703,12 @@ namespace ApplicationType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * applicationType)
 {
-    return emberAfReadServerAttribute(endpoint, BinaryInputBasic::Id, ApplicationType::Id, (uint8_t *) applicationType,
+    return emberAfReadServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) applicationType,
                                       sizeof(*applicationType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t applicationType)
 {
-    return emberAfWriteServerAttribute(endpoint, BinaryInputBasic::Id, ApplicationType::Id, (uint8_t *) &applicationType,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, (uint8_t *) &applicationType,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -1739,12 +1724,12 @@ namespace TotalProfileNum {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * totalProfileNum)
 {
-    return emberAfReadServerAttribute(endpoint, PowerProfile::Id, TotalProfileNum::Id, (uint8_t *) totalProfileNum,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerProfile::Id, Id, (uint8_t *) totalProfileNum,
                                       sizeof(*totalProfileNum));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t totalProfileNum)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerProfile::Id, TotalProfileNum::Id, (uint8_t *) &totalProfileNum,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerProfile::Id, Id, (uint8_t *) &totalProfileNum,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -1754,12 +1739,12 @@ namespace MultipleScheduling {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * multipleScheduling)
 {
-    return emberAfReadServerAttribute(endpoint, PowerProfile::Id, MultipleScheduling::Id, (uint8_t *) multipleScheduling,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerProfile::Id, Id, (uint8_t *) multipleScheduling,
                                       sizeof(*multipleScheduling));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool multipleScheduling)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerProfile::Id, MultipleScheduling::Id, (uint8_t *) &multipleScheduling,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerProfile::Id, Id, (uint8_t *) &multipleScheduling,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -1769,12 +1754,12 @@ namespace EnergyFormatting {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * energyFormatting)
 {
-    return emberAfReadServerAttribute(endpoint, PowerProfile::Id, EnergyFormatting::Id, (uint8_t *) energyFormatting,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerProfile::Id, Id, (uint8_t *) energyFormatting,
                                       sizeof(*energyFormatting));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t energyFormatting)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerProfile::Id, EnergyFormatting::Id, (uint8_t *) &energyFormatting,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerProfile::Id, Id, (uint8_t *) &energyFormatting,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -1784,12 +1769,11 @@ namespace EnergyRemote {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * energyRemote)
 {
-    return emberAfReadServerAttribute(endpoint, PowerProfile::Id, EnergyRemote::Id, (uint8_t *) energyRemote,
-                                      sizeof(*energyRemote));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerProfile::Id, Id, (uint8_t *) energyRemote, sizeof(*energyRemote));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool energyRemote)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerProfile::Id, EnergyRemote::Id, (uint8_t *) &energyRemote,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerProfile::Id, Id, (uint8_t *) &energyRemote,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -1799,12 +1783,11 @@ namespace ScheduleMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * scheduleMode)
 {
-    return emberAfReadServerAttribute(endpoint, PowerProfile::Id, ScheduleMode::Id, (uint8_t *) scheduleMode,
-                                      sizeof(*scheduleMode));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerProfile::Id, Id, (uint8_t *) scheduleMode, sizeof(*scheduleMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t scheduleMode)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerProfile::Id, ScheduleMode::Id, (uint8_t *) &scheduleMode,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerProfile::Id, Id, (uint8_t *) &scheduleMode,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -1820,11 +1803,11 @@ namespace StartTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * startTime)
 {
-    return emberAfReadServerAttribute(endpoint, ApplianceControl::Id, StartTime::Id, (uint8_t *) startTime, sizeof(*startTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplianceControl::Id, Id, (uint8_t *) startTime, sizeof(*startTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t startTime)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplianceControl::Id, StartTime::Id, (uint8_t *) &startTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplianceControl::Id, Id, (uint8_t *) &startTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1834,11 +1817,11 @@ namespace FinishTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * finishTime)
 {
-    return emberAfReadServerAttribute(endpoint, ApplianceControl::Id, FinishTime::Id, (uint8_t *) finishTime, sizeof(*finishTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplianceControl::Id, Id, (uint8_t *) finishTime, sizeof(*finishTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t finishTime)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplianceControl::Id, FinishTime::Id, (uint8_t *) &finishTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplianceControl::Id, Id, (uint8_t *) &finishTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1848,12 +1831,12 @@ namespace RemainingTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * remainingTime)
 {
-    return emberAfReadServerAttribute(endpoint, ApplianceControl::Id, RemainingTime::Id, (uint8_t *) remainingTime,
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplianceControl::Id, Id, (uint8_t *) remainingTime,
                                       sizeof(*remainingTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t remainingTime)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplianceControl::Id, RemainingTime::Id, (uint8_t *) &remainingTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplianceControl::Id, Id, (uint8_t *) &remainingTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1875,12 +1858,12 @@ namespace CheckInInterval {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * checkInInterval)
 {
-    return emberAfReadServerAttribute(endpoint, PollControl::Id, CheckInInterval::Id, (uint8_t *) checkInInterval,
+    return emberAfReadServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) checkInInterval,
                                       sizeof(*checkInInterval));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t checkInInterval)
 {
-    return emberAfWriteServerAttribute(endpoint, PollControl::Id, CheckInInterval::Id, (uint8_t *) &checkInInterval,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) &checkInInterval,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -1890,12 +1873,12 @@ namespace LongPollInterval {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * longPollInterval)
 {
-    return emberAfReadServerAttribute(endpoint, PollControl::Id, LongPollInterval::Id, (uint8_t *) longPollInterval,
+    return emberAfReadServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) longPollInterval,
                                       sizeof(*longPollInterval));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t longPollInterval)
 {
-    return emberAfWriteServerAttribute(endpoint, PollControl::Id, LongPollInterval::Id, (uint8_t *) &longPollInterval,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) &longPollInterval,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -1905,12 +1888,12 @@ namespace ShortPollInterval {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * shortPollInterval)
 {
-    return emberAfReadServerAttribute(endpoint, PollControl::Id, ShortPollInterval::Id, (uint8_t *) shortPollInterval,
+    return emberAfReadServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) shortPollInterval,
                                       sizeof(*shortPollInterval));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t shortPollInterval)
 {
-    return emberAfWriteServerAttribute(endpoint, PollControl::Id, ShortPollInterval::Id, (uint8_t *) &shortPollInterval,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) &shortPollInterval,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1920,12 +1903,12 @@ namespace FastPollTimeout {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * fastPollTimeout)
 {
-    return emberAfReadServerAttribute(endpoint, PollControl::Id, FastPollTimeout::Id, (uint8_t *) fastPollTimeout,
+    return emberAfReadServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) fastPollTimeout,
                                       sizeof(*fastPollTimeout));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t fastPollTimeout)
 {
-    return emberAfWriteServerAttribute(endpoint, PollControl::Id, FastPollTimeout::Id, (uint8_t *) &fastPollTimeout,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) &fastPollTimeout,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1935,12 +1918,12 @@ namespace CheckInIntervalMin {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * checkInIntervalMin)
 {
-    return emberAfReadServerAttribute(endpoint, PollControl::Id, CheckInIntervalMin::Id, (uint8_t *) checkInIntervalMin,
+    return emberAfReadServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) checkInIntervalMin,
                                       sizeof(*checkInIntervalMin));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t checkInIntervalMin)
 {
-    return emberAfWriteServerAttribute(endpoint, PollControl::Id, CheckInIntervalMin::Id, (uint8_t *) &checkInIntervalMin,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) &checkInIntervalMin,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -1950,12 +1933,12 @@ namespace LongPollIntervalMin {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * longPollIntervalMin)
 {
-    return emberAfReadServerAttribute(endpoint, PollControl::Id, LongPollIntervalMin::Id, (uint8_t *) longPollIntervalMin,
+    return emberAfReadServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) longPollIntervalMin,
                                       sizeof(*longPollIntervalMin));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t longPollIntervalMin)
 {
-    return emberAfWriteServerAttribute(endpoint, PollControl::Id, LongPollIntervalMin::Id, (uint8_t *) &longPollIntervalMin,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) &longPollIntervalMin,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -1965,12 +1948,12 @@ namespace FastPollTimeoutMax {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * fastPollTimeoutMax)
 {
-    return emberAfReadServerAttribute(endpoint, PollControl::Id, FastPollTimeoutMax::Id, (uint8_t *) fastPollTimeoutMax,
+    return emberAfReadServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) fastPollTimeoutMax,
                                       sizeof(*fastPollTimeoutMax));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t fastPollTimeoutMax)
 {
-    return emberAfWriteServerAttribute(endpoint, PollControl::Id, FastPollTimeoutMax::Id, (uint8_t *) &fastPollTimeoutMax,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PollControl::Id, Id, (uint8_t *) &fastPollTimeoutMax,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -1979,6 +1962,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t fastPollTimeoutMax)
 } // namespace Attributes
 } // namespace PollControl
 
+namespace BridgedActions {
+namespace Attributes {
+
+} // namespace Attributes
+} // namespace BridgedActions
+
 namespace Basic {
 namespace Attributes {
 
@@ -1986,12 +1975,12 @@ namespace InteractionModelVersion {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * interactionModelVersion)
 {
-    return emberAfReadServerAttribute(endpoint, Basic::Id, InteractionModelVersion::Id, (uint8_t *) interactionModelVersion,
+    return emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) interactionModelVersion,
                                       sizeof(*interactionModelVersion));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t interactionModelVersion)
 {
-    return emberAfWriteServerAttribute(endpoint, Basic::Id, InteractionModelVersion::Id, (uint8_t *) &interactionModelVersion,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) &interactionModelVersion,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -2001,11 +1990,11 @@ namespace VendorID {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * vendorID)
 {
-    return emberAfReadServerAttribute(endpoint, Basic::Id, VendorID::Id, (uint8_t *) vendorID, sizeof(*vendorID));
+    return emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) vendorID, sizeof(*vendorID));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t vendorID)
 {
-    return emberAfWriteServerAttribute(endpoint, Basic::Id, VendorID::Id, (uint8_t *) &vendorID, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) &vendorID, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorID
@@ -2014,11 +2003,11 @@ namespace ProductID {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * productID)
 {
-    return emberAfReadServerAttribute(endpoint, Basic::Id, ProductID::Id, (uint8_t *) productID, sizeof(*productID));
+    return emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) productID, sizeof(*productID));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t productID)
 {
-    return emberAfWriteServerAttribute(endpoint, Basic::Id, ProductID::Id, (uint8_t *) &productID, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) &productID, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductID
@@ -2027,13 +2016,11 @@ namespace HardwareVersion {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * hardwareVersion)
 {
-    return emberAfReadServerAttribute(endpoint, Basic::Id, HardwareVersion::Id, (uint8_t *) hardwareVersion,
-                                      sizeof(*hardwareVersion));
+    return emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) hardwareVersion, sizeof(*hardwareVersion));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t hardwareVersion)
 {
-    return emberAfWriteServerAttribute(endpoint, Basic::Id, HardwareVersion::Id, (uint8_t *) &hardwareVersion,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) &hardwareVersion, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace HardwareVersion
@@ -2042,13 +2029,11 @@ namespace SoftwareVersion {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * softwareVersion)
 {
-    return emberAfReadServerAttribute(endpoint, Basic::Id, SoftwareVersion::Id, (uint8_t *) softwareVersion,
-                                      sizeof(*softwareVersion));
+    return emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) softwareVersion, sizeof(*softwareVersion));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t softwareVersion)
 {
-    return emberAfWriteServerAttribute(endpoint, Basic::Id, SoftwareVersion::Id, (uint8_t *) &softwareVersion,
-                                       ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) &softwareVersion, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SoftwareVersion
@@ -2057,12 +2042,12 @@ namespace LocalConfigDisabled {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * localConfigDisabled)
 {
-    return emberAfReadServerAttribute(endpoint, Basic::Id, LocalConfigDisabled::Id, (uint8_t *) localConfigDisabled,
+    return emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) localConfigDisabled,
                                       sizeof(*localConfigDisabled));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool localConfigDisabled)
 {
-    return emberAfWriteServerAttribute(endpoint, Basic::Id, LocalConfigDisabled::Id, (uint8_t *) &localConfigDisabled,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) &localConfigDisabled,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -2072,11 +2057,11 @@ namespace Reachable {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * reachable)
 {
-    return emberAfReadServerAttribute(endpoint, Basic::Id, Reachable::Id, (uint8_t *) reachable, sizeof(*reachable));
+    return emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) reachable, sizeof(*reachable));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool reachable)
 {
-    return emberAfWriteServerAttribute(endpoint, Basic::Id, Reachable::Id, (uint8_t *) &reachable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, (uint8_t *) &reachable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Reachable
@@ -2091,12 +2076,12 @@ namespace UpdatePossible {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * updatePossible)
 {
-    return emberAfReadServerAttribute(endpoint, OtaSoftwareUpdateRequestor::Id, UpdatePossible::Id, (uint8_t *) updatePossible,
+    return emberAfReadServerAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, (uint8_t *) updatePossible,
                                       sizeof(*updatePossible));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool updatePossible)
 {
-    return emberAfWriteServerAttribute(endpoint, OtaSoftwareUpdateRequestor::Id, UpdatePossible::Id, (uint8_t *) &updatePossible,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, (uint8_t *) &updatePossible,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -2112,11 +2097,11 @@ namespace Status {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * status)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Status::Id, (uint8_t *) status, sizeof(*status));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) status, sizeof(*status));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t status)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Status::Id, (uint8_t *) &status, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &status, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Status
@@ -2125,11 +2110,11 @@ namespace Order {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * order)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Order::Id, (uint8_t *) order, sizeof(*order));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) order, sizeof(*order));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t order)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Order::Id, (uint8_t *) &order, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &order, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Order
@@ -2138,13 +2123,13 @@ namespace WiredAssessedInputVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * wiredAssessedInputVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, WiredAssessedInputVoltage::Id,
-                                      (uint8_t *) wiredAssessedInputVoltage, sizeof(*wiredAssessedInputVoltage));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) wiredAssessedInputVoltage,
+                                      sizeof(*wiredAssessedInputVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t wiredAssessedInputVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, WiredAssessedInputVoltage::Id,
-                                       (uint8_t *) &wiredAssessedInputVoltage, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &wiredAssessedInputVoltage,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace WiredAssessedInputVoltage
@@ -2153,13 +2138,13 @@ namespace WiredAssessedInputFrequency {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * wiredAssessedInputFrequency)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, WiredAssessedInputFrequency::Id,
-                                      (uint8_t *) wiredAssessedInputFrequency, sizeof(*wiredAssessedInputFrequency));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) wiredAssessedInputFrequency,
+                                      sizeof(*wiredAssessedInputFrequency));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t wiredAssessedInputFrequency)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, WiredAssessedInputFrequency::Id,
-                                       (uint8_t *) &wiredAssessedInputFrequency, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &wiredAssessedInputFrequency,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace WiredAssessedInputFrequency
@@ -2168,12 +2153,12 @@ namespace WiredCurrentType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * wiredCurrentType)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, WiredCurrentType::Id, (uint8_t *) wiredCurrentType,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) wiredCurrentType,
                                       sizeof(*wiredCurrentType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t wiredCurrentType)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, WiredCurrentType::Id, (uint8_t *) &wiredCurrentType,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &wiredCurrentType,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -2183,12 +2168,12 @@ namespace WiredAssessedCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * wiredAssessedCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, WiredAssessedCurrent::Id, (uint8_t *) wiredAssessedCurrent,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) wiredAssessedCurrent,
                                       sizeof(*wiredAssessedCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t wiredAssessedCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, WiredAssessedCurrent::Id, (uint8_t *) &wiredAssessedCurrent,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &wiredAssessedCurrent,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2198,12 +2183,12 @@ namespace WiredNominalVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * wiredNominalVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, WiredNominalVoltage::Id, (uint8_t *) wiredNominalVoltage,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) wiredNominalVoltage,
                                       sizeof(*wiredNominalVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t wiredNominalVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, WiredNominalVoltage::Id, (uint8_t *) &wiredNominalVoltage,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &wiredNominalVoltage,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2213,12 +2198,12 @@ namespace WiredMaximumCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * wiredMaximumCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, WiredMaximumCurrent::Id, (uint8_t *) wiredMaximumCurrent,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) wiredMaximumCurrent,
                                       sizeof(*wiredMaximumCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t wiredMaximumCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, WiredMaximumCurrent::Id, (uint8_t *) &wiredMaximumCurrent,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &wiredMaximumCurrent,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2228,11 +2213,11 @@ namespace WiredPresent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * wiredPresent)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, WiredPresent::Id, (uint8_t *) wiredPresent, sizeof(*wiredPresent));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) wiredPresent, sizeof(*wiredPresent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool wiredPresent)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, WiredPresent::Id, (uint8_t *) &wiredPresent,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &wiredPresent,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -2242,12 +2227,11 @@ namespace BatteryVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * batteryVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryVoltage::Id, (uint8_t *) batteryVoltage,
-                                      sizeof(*batteryVoltage));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryVoltage, sizeof(*batteryVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t batteryVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryVoltage::Id, (uint8_t *) &batteryVoltage,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryVoltage,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2257,12 +2241,12 @@ namespace BatteryPercentRemaining {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryPercentRemaining)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryPercentRemaining::Id, (uint8_t *) batteryPercentRemaining,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryPercentRemaining,
                                       sizeof(*batteryPercentRemaining));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryPercentRemaining)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryPercentRemaining::Id, (uint8_t *) &batteryPercentRemaining,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryPercentRemaining,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -2272,12 +2256,12 @@ namespace BatteryTimeRemaining {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * batteryTimeRemaining)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryTimeRemaining::Id, (uint8_t *) batteryTimeRemaining,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryTimeRemaining,
                                       sizeof(*batteryTimeRemaining));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t batteryTimeRemaining)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryTimeRemaining::Id, (uint8_t *) &batteryTimeRemaining,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryTimeRemaining,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2287,12 +2271,12 @@ namespace BatteryChargeLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryChargeLevel)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryChargeLevel::Id, (uint8_t *) batteryChargeLevel,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryChargeLevel,
                                       sizeof(*batteryChargeLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryChargeLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryChargeLevel::Id, (uint8_t *) &batteryChargeLevel,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryChargeLevel,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -2302,13 +2286,13 @@ namespace BatteryReplacementNeeded {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * batteryReplacementNeeded)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryReplacementNeeded::Id, (uint8_t *) batteryReplacementNeeded,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryReplacementNeeded,
                                       sizeof(*batteryReplacementNeeded));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool batteryReplacementNeeded)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryReplacementNeeded::Id,
-                                       (uint8_t *) &batteryReplacementNeeded, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryReplacementNeeded,
+                                       ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryReplacementNeeded
@@ -2317,12 +2301,12 @@ namespace BatteryReplaceability {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryReplaceability)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryReplaceability::Id, (uint8_t *) batteryReplaceability,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryReplaceability,
                                       sizeof(*batteryReplaceability));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryReplaceability)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryReplaceability::Id, (uint8_t *) &batteryReplaceability,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryReplaceability,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -2332,12 +2316,11 @@ namespace BatteryPresent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * batteryPresent)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryPresent::Id, (uint8_t *) batteryPresent,
-                                      sizeof(*batteryPresent));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryPresent, sizeof(*batteryPresent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool batteryPresent)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryPresent::Id, (uint8_t *) &batteryPresent,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryPresent,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -2347,13 +2330,13 @@ namespace BatteryCommonDesignation {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * batteryCommonDesignation)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryCommonDesignation::Id, (uint8_t *) batteryCommonDesignation,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryCommonDesignation,
                                       sizeof(*batteryCommonDesignation));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t batteryCommonDesignation)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryCommonDesignation::Id,
-                                       (uint8_t *) &batteryCommonDesignation, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryCommonDesignation,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryCommonDesignation
@@ -2362,13 +2345,13 @@ namespace BatteryApprovedChemistry {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * batteryApprovedChemistry)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryApprovedChemistry::Id, (uint8_t *) batteryApprovedChemistry,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryApprovedChemistry,
                                       sizeof(*batteryApprovedChemistry));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t batteryApprovedChemistry)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryApprovedChemistry::Id,
-                                       (uint8_t *) &batteryApprovedChemistry, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryApprovedChemistry,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryApprovedChemistry
@@ -2377,12 +2360,12 @@ namespace BatteryCapacity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * batteryCapacity)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryCapacity::Id, (uint8_t *) batteryCapacity,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryCapacity,
                                       sizeof(*batteryCapacity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t batteryCapacity)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryCapacity::Id, (uint8_t *) &batteryCapacity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryCapacity,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2392,12 +2375,12 @@ namespace BatteryQuantity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryQuantity)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryQuantity::Id, (uint8_t *) batteryQuantity,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryQuantity,
                                       sizeof(*batteryQuantity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryQuantity)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryQuantity::Id, (uint8_t *) &batteryQuantity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryQuantity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -2407,12 +2390,12 @@ namespace BatteryChargeState {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * batteryChargeState)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryChargeState::Id, (uint8_t *) batteryChargeState,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryChargeState,
                                       sizeof(*batteryChargeState));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t batteryChargeState)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryChargeState::Id, (uint8_t *) &batteryChargeState,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryChargeState,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -2422,12 +2405,12 @@ namespace BatteryTimeToFullCharge {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * batteryTimeToFullCharge)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryTimeToFullCharge::Id, (uint8_t *) batteryTimeToFullCharge,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryTimeToFullCharge,
                                       sizeof(*batteryTimeToFullCharge));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t batteryTimeToFullCharge)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryTimeToFullCharge::Id, (uint8_t *) &batteryTimeToFullCharge,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryTimeToFullCharge,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2437,13 +2420,13 @@ namespace BatteryFunctionalWhileCharging {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * batteryFunctionalWhileCharging)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryFunctionalWhileCharging::Id,
-                                      (uint8_t *) batteryFunctionalWhileCharging, sizeof(*batteryFunctionalWhileCharging));
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryFunctionalWhileCharging,
+                                      sizeof(*batteryFunctionalWhileCharging));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool batteryFunctionalWhileCharging)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryFunctionalWhileCharging::Id,
-                                       (uint8_t *) &batteryFunctionalWhileCharging, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryFunctionalWhileCharging,
+                                       ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryFunctionalWhileCharging
@@ -2452,12 +2435,12 @@ namespace BatteryChargingCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * batteryChargingCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, PowerSource::Id, BatteryChargingCurrent::Id, (uint8_t *) batteryChargingCurrent,
+    return emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) batteryChargingCurrent,
                                       sizeof(*batteryChargingCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t batteryChargingCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, BatteryChargingCurrent::Id, (uint8_t *) &batteryChargingCurrent,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, (uint8_t *) &batteryChargingCurrent,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2473,12 +2456,12 @@ namespace Breadcrumb {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * breadcrumb)
 {
-    return emberAfReadServerAttribute(endpoint, GeneralCommissioning::Id, Breadcrumb::Id, (uint8_t *) breadcrumb,
+    return emberAfReadServerAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, (uint8_t *) breadcrumb,
                                       sizeof(*breadcrumb));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t breadcrumb)
 {
-    return emberAfWriteServerAttribute(endpoint, GeneralCommissioning::Id, Breadcrumb::Id, (uint8_t *) &breadcrumb,
+    return emberAfWriteServerAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, (uint8_t *) &breadcrumb,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -2494,12 +2477,12 @@ namespace RebootCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rebootCount)
 {
-    return emberAfReadServerAttribute(endpoint, GeneralDiagnostics::Id, RebootCount::Id, (uint8_t *) rebootCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, (uint8_t *) rebootCount,
                                       sizeof(*rebootCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rebootCount)
 {
-    return emberAfWriteServerAttribute(endpoint, GeneralDiagnostics::Id, RebootCount::Id, (uint8_t *) &rebootCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, (uint8_t *) &rebootCount,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -2509,11 +2492,11 @@ namespace UpTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * upTime)
 {
-    return emberAfReadServerAttribute(endpoint, GeneralDiagnostics::Id, UpTime::Id, (uint8_t *) upTime, sizeof(*upTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, (uint8_t *) upTime, sizeof(*upTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t upTime)
 {
-    return emberAfWriteServerAttribute(endpoint, GeneralDiagnostics::Id, UpTime::Id, (uint8_t *) &upTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, (uint8_t *) &upTime,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -2523,13 +2506,13 @@ namespace TotalOperationalHours {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * totalOperationalHours)
 {
-    return emberAfReadServerAttribute(endpoint, GeneralDiagnostics::Id, TotalOperationalHours::Id,
-                                      (uint8_t *) totalOperationalHours, sizeof(*totalOperationalHours));
+    return emberAfReadServerAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, (uint8_t *) totalOperationalHours,
+                                      sizeof(*totalOperationalHours));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t totalOperationalHours)
 {
-    return emberAfWriteServerAttribute(endpoint, GeneralDiagnostics::Id, TotalOperationalHours::Id,
-                                       (uint8_t *) &totalOperationalHours, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, (uint8_t *) &totalOperationalHours,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace TotalOperationalHours
@@ -2538,12 +2521,12 @@ namespace BootReasons {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * bootReasons)
 {
-    return emberAfReadServerAttribute(endpoint, GeneralDiagnostics::Id, BootReasons::Id, (uint8_t *) bootReasons,
+    return emberAfReadServerAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, (uint8_t *) bootReasons,
                                       sizeof(*bootReasons));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t bootReasons)
 {
-    return emberAfWriteServerAttribute(endpoint, GeneralDiagnostics::Id, BootReasons::Id, (uint8_t *) &bootReasons,
+    return emberAfWriteServerAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, (uint8_t *) &bootReasons,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -2559,12 +2542,12 @@ namespace CurrentHeapFree {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * currentHeapFree)
 {
-    return emberAfReadServerAttribute(endpoint, SoftwareDiagnostics::Id, CurrentHeapFree::Id, (uint8_t *) currentHeapFree,
+    return emberAfReadServerAttribute(endpoint, Clusters::SoftwareDiagnostics::Id, Id, (uint8_t *) currentHeapFree,
                                       sizeof(*currentHeapFree));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t currentHeapFree)
 {
-    return emberAfWriteServerAttribute(endpoint, SoftwareDiagnostics::Id, CurrentHeapFree::Id, (uint8_t *) &currentHeapFree,
+    return emberAfWriteServerAttribute(endpoint, Clusters::SoftwareDiagnostics::Id, Id, (uint8_t *) &currentHeapFree,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -2574,12 +2557,12 @@ namespace CurrentHeapUsed {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * currentHeapUsed)
 {
-    return emberAfReadServerAttribute(endpoint, SoftwareDiagnostics::Id, CurrentHeapUsed::Id, (uint8_t *) currentHeapUsed,
+    return emberAfReadServerAttribute(endpoint, Clusters::SoftwareDiagnostics::Id, Id, (uint8_t *) currentHeapUsed,
                                       sizeof(*currentHeapUsed));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t currentHeapUsed)
 {
-    return emberAfWriteServerAttribute(endpoint, SoftwareDiagnostics::Id, CurrentHeapUsed::Id, (uint8_t *) &currentHeapUsed,
+    return emberAfWriteServerAttribute(endpoint, Clusters::SoftwareDiagnostics::Id, Id, (uint8_t *) &currentHeapUsed,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -2589,13 +2572,13 @@ namespace CurrentHeapHighWatermark {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * currentHeapHighWatermark)
 {
-    return emberAfReadServerAttribute(endpoint, SoftwareDiagnostics::Id, CurrentHeapHighWatermark::Id,
-                                      (uint8_t *) currentHeapHighWatermark, sizeof(*currentHeapHighWatermark));
+    return emberAfReadServerAttribute(endpoint, Clusters::SoftwareDiagnostics::Id, Id, (uint8_t *) currentHeapHighWatermark,
+                                      sizeof(*currentHeapHighWatermark));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t currentHeapHighWatermark)
 {
-    return emberAfWriteServerAttribute(endpoint, SoftwareDiagnostics::Id, CurrentHeapHighWatermark::Id,
-                                       (uint8_t *) &currentHeapHighWatermark, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::SoftwareDiagnostics::Id, Id, (uint8_t *) &currentHeapHighWatermark,
+                                       ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentHeapHighWatermark
@@ -2610,11 +2593,11 @@ namespace Channel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * channel)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Channel::Id, (uint8_t *) channel, sizeof(*channel));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) channel, sizeof(*channel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t channel)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Channel::Id, (uint8_t *) &channel,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &channel,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -2624,12 +2607,12 @@ namespace RoutingRole {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * routingRole)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RoutingRole::Id, (uint8_t *) routingRole,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) routingRole,
                                       sizeof(*routingRole));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t routingRole)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RoutingRole::Id, (uint8_t *) &routingRole,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &routingRole,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -2639,11 +2622,11 @@ namespace PanId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * panId)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, PanId::Id, (uint8_t *) panId, sizeof(*panId));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) panId, sizeof(*panId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t panId)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, PanId::Id, (uint8_t *) &panId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &panId,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -2653,12 +2636,12 @@ namespace ExtendedPanId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * extendedPanId)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, ExtendedPanId::Id, (uint8_t *) extendedPanId,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) extendedPanId,
                                       sizeof(*extendedPanId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t extendedPanId)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, ExtendedPanId::Id, (uint8_t *) &extendedPanId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &extendedPanId,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -2668,12 +2651,12 @@ namespace OverrunCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * overrunCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, OverrunCount::Id, (uint8_t *) overrunCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) overrunCount,
                                       sizeof(*overrunCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t overrunCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, OverrunCount::Id, (uint8_t *) &overrunCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &overrunCount,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -2683,12 +2666,12 @@ namespace PartitionId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * partitionId)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, PartitionId::Id, (uint8_t *) partitionId,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) partitionId,
                                       sizeof(*partitionId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t partitionId)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, PartitionId::Id, (uint8_t *) &partitionId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &partitionId,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2698,12 +2681,12 @@ namespace Weighting {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * weighting)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Weighting::Id, (uint8_t *) weighting,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) weighting,
                                       sizeof(*weighting));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t weighting)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Weighting::Id, (uint8_t *) &weighting,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &weighting,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -2713,12 +2696,12 @@ namespace DataVersion {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * dataVersion)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, DataVersion::Id, (uint8_t *) dataVersion,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) dataVersion,
                                       sizeof(*dataVersion));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t dataVersion)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, DataVersion::Id, (uint8_t *) &dataVersion,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &dataVersion,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -2728,13 +2711,13 @@ namespace StableDataVersion {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * stableDataVersion)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, StableDataVersion::Id, (uint8_t *) stableDataVersion,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) stableDataVersion,
                                       sizeof(*stableDataVersion));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t stableDataVersion)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, StableDataVersion::Id,
-                                       (uint8_t *) &stableDataVersion, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &stableDataVersion,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace StableDataVersion
@@ -2743,12 +2726,12 @@ namespace LeaderRouterId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * leaderRouterId)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, LeaderRouterId::Id, (uint8_t *) leaderRouterId,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) leaderRouterId,
                                       sizeof(*leaderRouterId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t leaderRouterId)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, LeaderRouterId::Id, (uint8_t *) &leaderRouterId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &leaderRouterId,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -2758,13 +2741,13 @@ namespace DetachedRoleCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * detachedRoleCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, DetachedRoleCount::Id, (uint8_t *) detachedRoleCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) detachedRoleCount,
                                       sizeof(*detachedRoleCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t detachedRoleCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, DetachedRoleCount::Id,
-                                       (uint8_t *) &detachedRoleCount, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &detachedRoleCount,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DetachedRoleCount
@@ -2773,12 +2756,12 @@ namespace ChildRoleCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * childRoleCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, ChildRoleCount::Id, (uint8_t *) childRoleCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) childRoleCount,
                                       sizeof(*childRoleCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t childRoleCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, ChildRoleCount::Id, (uint8_t *) &childRoleCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &childRoleCount,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -2788,12 +2771,12 @@ namespace RouterRoleCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * routerRoleCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RouterRoleCount::Id, (uint8_t *) routerRoleCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) routerRoleCount,
                                       sizeof(*routerRoleCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t routerRoleCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RouterRoleCount::Id, (uint8_t *) &routerRoleCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &routerRoleCount,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -2803,12 +2786,12 @@ namespace LeaderRoleCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * leaderRoleCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, LeaderRoleCount::Id, (uint8_t *) leaderRoleCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) leaderRoleCount,
                                       sizeof(*leaderRoleCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t leaderRoleCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, LeaderRoleCount::Id, (uint8_t *) &leaderRoleCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &leaderRoleCount,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -2818,13 +2801,13 @@ namespace AttachAttemptCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * attachAttemptCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, AttachAttemptCount::Id,
-                                      (uint8_t *) attachAttemptCount, sizeof(*attachAttemptCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) attachAttemptCount,
+                                      sizeof(*attachAttemptCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t attachAttemptCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, AttachAttemptCount::Id,
-                                       (uint8_t *) &attachAttemptCount, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &attachAttemptCount,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AttachAttemptCount
@@ -2833,13 +2816,13 @@ namespace PartitionIdChangeCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * partitionIdChangeCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, PartitionIdChangeCount::Id,
-                                      (uint8_t *) partitionIdChangeCount, sizeof(*partitionIdChangeCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) partitionIdChangeCount,
+                                      sizeof(*partitionIdChangeCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t partitionIdChangeCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, PartitionIdChangeCount::Id,
-                                       (uint8_t *) &partitionIdChangeCount, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &partitionIdChangeCount,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PartitionIdChangeCount
@@ -2848,12 +2831,12 @@ namespace BetterPartitionAttachAttemptCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * betterPartitionAttachAttemptCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, BetterPartitionAttachAttemptCount::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id,
                                       (uint8_t *) betterPartitionAttachAttemptCount, sizeof(*betterPartitionAttachAttemptCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t betterPartitionAttachAttemptCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, BetterPartitionAttachAttemptCount::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id,
                                        (uint8_t *) &betterPartitionAttachAttemptCount, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -2863,13 +2846,13 @@ namespace ParentChangeCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * parentChangeCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, ParentChangeCount::Id, (uint8_t *) parentChangeCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) parentChangeCount,
                                       sizeof(*parentChangeCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t parentChangeCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, ParentChangeCount::Id,
-                                       (uint8_t *) &parentChangeCount, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &parentChangeCount,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ParentChangeCount
@@ -2878,12 +2861,12 @@ namespace TxTotalCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txTotalCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxTotalCount::Id, (uint8_t *) txTotalCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txTotalCount,
                                       sizeof(*txTotalCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txTotalCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxTotalCount::Id, (uint8_t *) &txTotalCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txTotalCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2893,12 +2876,12 @@ namespace TxUnicastCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txUnicastCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxUnicastCount::Id, (uint8_t *) txUnicastCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txUnicastCount,
                                       sizeof(*txUnicastCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txUnicastCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxUnicastCount::Id, (uint8_t *) &txUnicastCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txUnicastCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2908,12 +2891,12 @@ namespace TxBroadcastCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txBroadcastCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxBroadcastCount::Id, (uint8_t *) txBroadcastCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txBroadcastCount,
                                       sizeof(*txBroadcastCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txBroadcastCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxBroadcastCount::Id, (uint8_t *) &txBroadcastCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txBroadcastCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2923,13 +2906,13 @@ namespace TxAckRequestedCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txAckRequestedCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxAckRequestedCount::Id,
-                                      (uint8_t *) txAckRequestedCount, sizeof(*txAckRequestedCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txAckRequestedCount,
+                                      sizeof(*txAckRequestedCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txAckRequestedCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxAckRequestedCount::Id,
-                                       (uint8_t *) &txAckRequestedCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txAckRequestedCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace TxAckRequestedCount
@@ -2938,12 +2921,12 @@ namespace TxAckedCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txAckedCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxAckedCount::Id, (uint8_t *) txAckedCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txAckedCount,
                                       sizeof(*txAckedCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txAckedCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxAckedCount::Id, (uint8_t *) &txAckedCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txAckedCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2953,13 +2936,13 @@ namespace TxNoAckRequestedCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txNoAckRequestedCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxNoAckRequestedCount::Id,
-                                      (uint8_t *) txNoAckRequestedCount, sizeof(*txNoAckRequestedCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txNoAckRequestedCount,
+                                      sizeof(*txNoAckRequestedCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txNoAckRequestedCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxNoAckRequestedCount::Id,
-                                       (uint8_t *) &txNoAckRequestedCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txNoAckRequestedCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace TxNoAckRequestedCount
@@ -2968,12 +2951,12 @@ namespace TxDataCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txDataCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxDataCount::Id, (uint8_t *) txDataCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txDataCount,
                                       sizeof(*txDataCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txDataCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxDataCount::Id, (uint8_t *) &txDataCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txDataCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2983,12 +2966,12 @@ namespace TxDataPollCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txDataPollCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxDataPollCount::Id, (uint8_t *) txDataPollCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txDataPollCount,
                                       sizeof(*txDataPollCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txDataPollCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxDataPollCount::Id, (uint8_t *) &txDataPollCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txDataPollCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -2998,12 +2981,12 @@ namespace TxBeaconCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txBeaconCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxBeaconCount::Id, (uint8_t *) txBeaconCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txBeaconCount,
                                       sizeof(*txBeaconCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txBeaconCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxBeaconCount::Id, (uint8_t *) &txBeaconCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txBeaconCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3013,13 +2996,13 @@ namespace TxBeaconRequestCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txBeaconRequestCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxBeaconRequestCount::Id,
-                                      (uint8_t *) txBeaconRequestCount, sizeof(*txBeaconRequestCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txBeaconRequestCount,
+                                      sizeof(*txBeaconRequestCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txBeaconRequestCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxBeaconRequestCount::Id,
-                                       (uint8_t *) &txBeaconRequestCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txBeaconRequestCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace TxBeaconRequestCount
@@ -3028,12 +3011,12 @@ namespace TxOtherCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txOtherCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxOtherCount::Id, (uint8_t *) txOtherCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txOtherCount,
                                       sizeof(*txOtherCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txOtherCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxOtherCount::Id, (uint8_t *) &txOtherCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txOtherCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3043,12 +3026,12 @@ namespace TxRetryCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txRetryCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxRetryCount::Id, (uint8_t *) txRetryCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txRetryCount,
                                       sizeof(*txRetryCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txRetryCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxRetryCount::Id, (uint8_t *) &txRetryCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txRetryCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3058,12 +3041,12 @@ namespace TxDirectMaxRetryExpiryCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txDirectMaxRetryExpiryCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxDirectMaxRetryExpiryCount::Id,
-                                      (uint8_t *) txDirectMaxRetryExpiryCount, sizeof(*txDirectMaxRetryExpiryCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txDirectMaxRetryExpiryCount,
+                                      sizeof(*txDirectMaxRetryExpiryCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txDirectMaxRetryExpiryCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxDirectMaxRetryExpiryCount::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id,
                                        (uint8_t *) &txDirectMaxRetryExpiryCount, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3073,12 +3056,12 @@ namespace TxIndirectMaxRetryExpiryCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txIndirectMaxRetryExpiryCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxIndirectMaxRetryExpiryCount::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id,
                                       (uint8_t *) txIndirectMaxRetryExpiryCount, sizeof(*txIndirectMaxRetryExpiryCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txIndirectMaxRetryExpiryCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxIndirectMaxRetryExpiryCount::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id,
                                        (uint8_t *) &txIndirectMaxRetryExpiryCount, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3088,12 +3071,12 @@ namespace TxErrCcaCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txErrCcaCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxErrCcaCount::Id, (uint8_t *) txErrCcaCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txErrCcaCount,
                                       sizeof(*txErrCcaCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txErrCcaCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxErrCcaCount::Id, (uint8_t *) &txErrCcaCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txErrCcaCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3103,12 +3086,12 @@ namespace TxErrAbortCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txErrAbortCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxErrAbortCount::Id, (uint8_t *) txErrAbortCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txErrAbortCount,
                                       sizeof(*txErrAbortCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txErrAbortCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxErrAbortCount::Id, (uint8_t *) &txErrAbortCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txErrAbortCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3118,13 +3101,13 @@ namespace TxErrBusyChannelCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * txErrBusyChannelCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxErrBusyChannelCount::Id,
-                                      (uint8_t *) txErrBusyChannelCount, sizeof(*txErrBusyChannelCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) txErrBusyChannelCount,
+                                      sizeof(*txErrBusyChannelCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t txErrBusyChannelCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, TxErrBusyChannelCount::Id,
-                                       (uint8_t *) &txErrBusyChannelCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &txErrBusyChannelCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace TxErrBusyChannelCount
@@ -3133,12 +3116,12 @@ namespace RxTotalCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxTotalCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxTotalCount::Id, (uint8_t *) rxTotalCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxTotalCount,
                                       sizeof(*rxTotalCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxTotalCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxTotalCount::Id, (uint8_t *) &rxTotalCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxTotalCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3148,12 +3131,12 @@ namespace RxUnicastCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxUnicastCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxUnicastCount::Id, (uint8_t *) rxUnicastCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxUnicastCount,
                                       sizeof(*rxUnicastCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxUnicastCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxUnicastCount::Id, (uint8_t *) &rxUnicastCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxUnicastCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3163,12 +3146,12 @@ namespace RxBroadcastCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxBroadcastCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxBroadcastCount::Id, (uint8_t *) rxBroadcastCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxBroadcastCount,
                                       sizeof(*rxBroadcastCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxBroadcastCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxBroadcastCount::Id, (uint8_t *) &rxBroadcastCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxBroadcastCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3178,12 +3161,12 @@ namespace RxDataCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxDataCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxDataCount::Id, (uint8_t *) rxDataCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxDataCount,
                                       sizeof(*rxDataCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxDataCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxDataCount::Id, (uint8_t *) &rxDataCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxDataCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3193,12 +3176,12 @@ namespace RxDataPollCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxDataPollCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxDataPollCount::Id, (uint8_t *) rxDataPollCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxDataPollCount,
                                       sizeof(*rxDataPollCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxDataPollCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxDataPollCount::Id, (uint8_t *) &rxDataPollCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxDataPollCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3208,12 +3191,12 @@ namespace RxBeaconCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxBeaconCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxBeaconCount::Id, (uint8_t *) rxBeaconCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxBeaconCount,
                                       sizeof(*rxBeaconCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxBeaconCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxBeaconCount::Id, (uint8_t *) &rxBeaconCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxBeaconCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3223,13 +3206,13 @@ namespace RxBeaconRequestCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxBeaconRequestCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxBeaconRequestCount::Id,
-                                      (uint8_t *) rxBeaconRequestCount, sizeof(*rxBeaconRequestCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxBeaconRequestCount,
+                                      sizeof(*rxBeaconRequestCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxBeaconRequestCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxBeaconRequestCount::Id,
-                                       (uint8_t *) &rxBeaconRequestCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxBeaconRequestCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RxBeaconRequestCount
@@ -3238,12 +3221,12 @@ namespace RxOtherCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxOtherCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxOtherCount::Id, (uint8_t *) rxOtherCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxOtherCount,
                                       sizeof(*rxOtherCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxOtherCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxOtherCount::Id, (uint8_t *) &rxOtherCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxOtherCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3253,13 +3236,13 @@ namespace RxAddressFilteredCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxAddressFilteredCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxAddressFilteredCount::Id,
-                                      (uint8_t *) rxAddressFilteredCount, sizeof(*rxAddressFilteredCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxAddressFilteredCount,
+                                      sizeof(*rxAddressFilteredCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxAddressFilteredCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxAddressFilteredCount::Id,
-                                       (uint8_t *) &rxAddressFilteredCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxAddressFilteredCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RxAddressFilteredCount
@@ -3268,13 +3251,13 @@ namespace RxDestAddrFilteredCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxDestAddrFilteredCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxDestAddrFilteredCount::Id,
-                                      (uint8_t *) rxDestAddrFilteredCount, sizeof(*rxDestAddrFilteredCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxDestAddrFilteredCount,
+                                      sizeof(*rxDestAddrFilteredCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxDestAddrFilteredCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxDestAddrFilteredCount::Id,
-                                       (uint8_t *) &rxDestAddrFilteredCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxDestAddrFilteredCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RxDestAddrFilteredCount
@@ -3283,13 +3266,13 @@ namespace RxDuplicatedCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxDuplicatedCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxDuplicatedCount::Id, (uint8_t *) rxDuplicatedCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxDuplicatedCount,
                                       sizeof(*rxDuplicatedCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxDuplicatedCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxDuplicatedCount::Id,
-                                       (uint8_t *) &rxDuplicatedCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxDuplicatedCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RxDuplicatedCount
@@ -3298,13 +3281,13 @@ namespace RxErrNoFrameCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxErrNoFrameCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrNoFrameCount::Id, (uint8_t *) rxErrNoFrameCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxErrNoFrameCount,
                                       sizeof(*rxErrNoFrameCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxErrNoFrameCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrNoFrameCount::Id,
-                                       (uint8_t *) &rxErrNoFrameCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxErrNoFrameCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RxErrNoFrameCount
@@ -3313,13 +3296,13 @@ namespace RxErrUnknownNeighborCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxErrUnknownNeighborCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrUnknownNeighborCount::Id,
-                                      (uint8_t *) rxErrUnknownNeighborCount, sizeof(*rxErrUnknownNeighborCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxErrUnknownNeighborCount,
+                                      sizeof(*rxErrUnknownNeighborCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxErrUnknownNeighborCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrUnknownNeighborCount::Id,
-                                       (uint8_t *) &rxErrUnknownNeighborCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxErrUnknownNeighborCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RxErrUnknownNeighborCount
@@ -3328,13 +3311,13 @@ namespace RxErrInvalidSrcAddrCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxErrInvalidSrcAddrCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrInvalidSrcAddrCount::Id,
-                                      (uint8_t *) rxErrInvalidSrcAddrCount, sizeof(*rxErrInvalidSrcAddrCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxErrInvalidSrcAddrCount,
+                                      sizeof(*rxErrInvalidSrcAddrCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxErrInvalidSrcAddrCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrInvalidSrcAddrCount::Id,
-                                       (uint8_t *) &rxErrInvalidSrcAddrCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxErrInvalidSrcAddrCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RxErrInvalidSrcAddrCount
@@ -3343,12 +3326,12 @@ namespace RxErrSecCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxErrSecCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrSecCount::Id, (uint8_t *) rxErrSecCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxErrSecCount,
                                       sizeof(*rxErrSecCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxErrSecCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrSecCount::Id, (uint8_t *) &rxErrSecCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxErrSecCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3358,12 +3341,12 @@ namespace RxErrFcsCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxErrFcsCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrFcsCount::Id, (uint8_t *) rxErrFcsCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxErrFcsCount,
                                       sizeof(*rxErrFcsCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxErrFcsCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrFcsCount::Id, (uint8_t *) &rxErrFcsCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxErrFcsCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3373,12 +3356,12 @@ namespace RxErrOtherCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * rxErrOtherCount)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrOtherCount::Id, (uint8_t *) rxErrOtherCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) rxErrOtherCount,
                                       sizeof(*rxErrOtherCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t rxErrOtherCount)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, RxErrOtherCount::Id, (uint8_t *) &rxErrOtherCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &rxErrOtherCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3388,12 +3371,12 @@ namespace ActiveTimestamp {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * activeTimestamp)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, ActiveTimestamp::Id, (uint8_t *) activeTimestamp,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) activeTimestamp,
                                       sizeof(*activeTimestamp));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t activeTimestamp)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, ActiveTimestamp::Id, (uint8_t *) &activeTimestamp,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &activeTimestamp,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -3403,12 +3386,12 @@ namespace PendingTimestamp {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * pendingTimestamp)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, PendingTimestamp::Id, (uint8_t *) pendingTimestamp,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) pendingTimestamp,
                                       sizeof(*pendingTimestamp));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t pendingTimestamp)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, PendingTimestamp::Id, (uint8_t *) &pendingTimestamp,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &pendingTimestamp,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -3418,11 +3401,11 @@ namespace Delay {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * delay)
 {
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Delay::Id, (uint8_t *) delay, sizeof(*delay));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) delay, sizeof(*delay));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t delay)
 {
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Delay::Id, (uint8_t *) &delay,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, (uint8_t *) &delay,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3438,12 +3421,12 @@ namespace SecurityType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * securityType)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, SecurityType::Id, (uint8_t *) securityType,
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) securityType,
                                       sizeof(*securityType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t securityType)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, SecurityType::Id, (uint8_t *) &securityType,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &securityType,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -3453,12 +3436,12 @@ namespace WiFiVersion {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * wiFiVersion)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, WiFiVersion::Id, (uint8_t *) wiFiVersion,
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) wiFiVersion,
                                       sizeof(*wiFiVersion));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t wiFiVersion)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, WiFiVersion::Id, (uint8_t *) &wiFiVersion,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &wiFiVersion,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -3468,12 +3451,12 @@ namespace ChannelNumber {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * channelNumber)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, ChannelNumber::Id, (uint8_t *) channelNumber,
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) channelNumber,
                                       sizeof(*channelNumber));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t channelNumber)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, ChannelNumber::Id, (uint8_t *) &channelNumber,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &channelNumber,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -3483,11 +3466,12 @@ namespace Rssi {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int8_t * rssi)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, Rssi::Id, (uint8_t *) rssi, sizeof(*rssi));
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) rssi, sizeof(*rssi));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t rssi)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, Rssi::Id, (uint8_t *) &rssi, ZCL_INT8S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &rssi,
+                                       ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Rssi
@@ -3496,12 +3480,12 @@ namespace BeaconLostCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * beaconLostCount)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, BeaconLostCount::Id, (uint8_t *) beaconLostCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) beaconLostCount,
                                       sizeof(*beaconLostCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t beaconLostCount)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, BeaconLostCount::Id, (uint8_t *) &beaconLostCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &beaconLostCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3511,12 +3495,12 @@ namespace BeaconRxCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * beaconRxCount)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, BeaconRxCount::Id, (uint8_t *) beaconRxCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) beaconRxCount,
                                       sizeof(*beaconRxCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t beaconRxCount)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, BeaconRxCount::Id, (uint8_t *) &beaconRxCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &beaconRxCount,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3526,13 +3510,13 @@ namespace PacketMulticastRxCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * packetMulticastRxCount)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, PacketMulticastRxCount::Id,
-                                      (uint8_t *) packetMulticastRxCount, sizeof(*packetMulticastRxCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) packetMulticastRxCount,
+                                      sizeof(*packetMulticastRxCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t packetMulticastRxCount)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, PacketMulticastRxCount::Id,
-                                       (uint8_t *) &packetMulticastRxCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &packetMulticastRxCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PacketMulticastRxCount
@@ -3541,13 +3525,13 @@ namespace PacketMulticastTxCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * packetMulticastTxCount)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, PacketMulticastTxCount::Id,
-                                      (uint8_t *) packetMulticastTxCount, sizeof(*packetMulticastTxCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) packetMulticastTxCount,
+                                      sizeof(*packetMulticastTxCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t packetMulticastTxCount)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, PacketMulticastTxCount::Id,
-                                       (uint8_t *) &packetMulticastTxCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &packetMulticastTxCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PacketMulticastTxCount
@@ -3556,13 +3540,13 @@ namespace PacketUnicastRxCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * packetUnicastRxCount)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, PacketUnicastRxCount::Id,
-                                      (uint8_t *) packetUnicastRxCount, sizeof(*packetUnicastRxCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) packetUnicastRxCount,
+                                      sizeof(*packetUnicastRxCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t packetUnicastRxCount)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, PacketUnicastRxCount::Id,
-                                       (uint8_t *) &packetUnicastRxCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &packetUnicastRxCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PacketUnicastRxCount
@@ -3571,13 +3555,13 @@ namespace PacketUnicastTxCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * packetUnicastTxCount)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, PacketUnicastTxCount::Id,
-                                      (uint8_t *) packetUnicastTxCount, sizeof(*packetUnicastTxCount));
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) packetUnicastTxCount,
+                                      sizeof(*packetUnicastTxCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t packetUnicastTxCount)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, PacketUnicastTxCount::Id,
-                                       (uint8_t *) &packetUnicastTxCount, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &packetUnicastTxCount,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PacketUnicastTxCount
@@ -3586,12 +3570,12 @@ namespace CurrentMaxRate {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * currentMaxRate)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, CurrentMaxRate::Id, (uint8_t *) currentMaxRate,
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) currentMaxRate,
                                       sizeof(*currentMaxRate));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t currentMaxRate)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, CurrentMaxRate::Id, (uint8_t *) &currentMaxRate,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &currentMaxRate,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -3601,12 +3585,12 @@ namespace OverrunCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * overrunCount)
 {
-    return emberAfReadServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, OverrunCount::Id, (uint8_t *) overrunCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) overrunCount,
                                       sizeof(*overrunCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t overrunCount)
 {
-    return emberAfWriteServerAttribute(endpoint, WiFiNetworkDiagnostics::Id, OverrunCount::Id, (uint8_t *) &overrunCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, (uint8_t *) &overrunCount,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -3622,11 +3606,12 @@ namespace PHYRate {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * PHYRate)
 {
-    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PHYRate::Id, (uint8_t *) PHYRate, sizeof(*PHYRate));
+    return emberAfReadServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) PHYRate,
+                                      sizeof(*PHYRate));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t PHYRate)
 {
-    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PHYRate::Id, (uint8_t *) &PHYRate,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) &PHYRate,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -3636,12 +3621,12 @@ namespace FullDuplex {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * fullDuplex)
 {
-    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, FullDuplex::Id, (uint8_t *) fullDuplex,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) fullDuplex,
                                       sizeof(*fullDuplex));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool fullDuplex)
 {
-    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, FullDuplex::Id, (uint8_t *) &fullDuplex,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) &fullDuplex,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -3651,12 +3636,12 @@ namespace PacketRxCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * packetRxCount)
 {
-    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PacketRxCount::Id, (uint8_t *) packetRxCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) packetRxCount,
                                       sizeof(*packetRxCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t packetRxCount)
 {
-    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PacketRxCount::Id, (uint8_t *) &packetRxCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) &packetRxCount,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -3666,12 +3651,12 @@ namespace PacketTxCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * packetTxCount)
 {
-    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PacketTxCount::Id, (uint8_t *) packetTxCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) packetTxCount,
                                       sizeof(*packetTxCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t packetTxCount)
 {
-    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, PacketTxCount::Id, (uint8_t *) &packetTxCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) &packetTxCount,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -3681,12 +3666,12 @@ namespace TxErrCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * txErrCount)
 {
-    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, TxErrCount::Id, (uint8_t *) txErrCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) txErrCount,
                                       sizeof(*txErrCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t txErrCount)
 {
-    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, TxErrCount::Id, (uint8_t *) &txErrCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) &txErrCount,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -3696,12 +3681,12 @@ namespace CollisionCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * collisionCount)
 {
-    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, CollisionCount::Id, (uint8_t *) collisionCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) collisionCount,
                                       sizeof(*collisionCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t collisionCount)
 {
-    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, CollisionCount::Id, (uint8_t *) &collisionCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) &collisionCount,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -3711,12 +3696,12 @@ namespace OverrunCount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * overrunCount)
 {
-    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, OverrunCount::Id, (uint8_t *) overrunCount,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) overrunCount,
                                       sizeof(*overrunCount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t overrunCount)
 {
-    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, OverrunCount::Id, (uint8_t *) &overrunCount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) &overrunCount,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -3726,12 +3711,12 @@ namespace CarrierDetect {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * carrierDetect)
 {
-    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, CarrierDetect::Id, (uint8_t *) carrierDetect,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) carrierDetect,
                                       sizeof(*carrierDetect));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool carrierDetect)
 {
-    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, CarrierDetect::Id, (uint8_t *) &carrierDetect,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) &carrierDetect,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -3741,12 +3726,12 @@ namespace TimeSinceReset {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * timeSinceReset)
 {
-    return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, TimeSinceReset::Id, (uint8_t *) timeSinceReset,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) timeSinceReset,
                                       sizeof(*timeSinceReset));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t timeSinceReset)
 {
-    return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, TimeSinceReset::Id, (uint8_t *) &timeSinceReset,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, (uint8_t *) &timeSinceReset,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -3762,11 +3747,11 @@ namespace VendorID {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * vendorID)
 {
-    return emberAfReadServerAttribute(endpoint, BridgedDeviceBasic::Id, VendorID::Id, (uint8_t *) vendorID, sizeof(*vendorID));
+    return emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, (uint8_t *) vendorID, sizeof(*vendorID));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t vendorID)
 {
-    return emberAfWriteServerAttribute(endpoint, BridgedDeviceBasic::Id, VendorID::Id, (uint8_t *) &vendorID,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, (uint8_t *) &vendorID,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -3776,12 +3761,12 @@ namespace HardwareVersion {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * hardwareVersion)
 {
-    return emberAfReadServerAttribute(endpoint, BridgedDeviceBasic::Id, HardwareVersion::Id, (uint8_t *) hardwareVersion,
+    return emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, (uint8_t *) hardwareVersion,
                                       sizeof(*hardwareVersion));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t hardwareVersion)
 {
-    return emberAfWriteServerAttribute(endpoint, BridgedDeviceBasic::Id, HardwareVersion::Id, (uint8_t *) &hardwareVersion,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, (uint8_t *) &hardwareVersion,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -3791,12 +3776,12 @@ namespace SoftwareVersion {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * softwareVersion)
 {
-    return emberAfReadServerAttribute(endpoint, BridgedDeviceBasic::Id, SoftwareVersion::Id, (uint8_t *) softwareVersion,
+    return emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, (uint8_t *) softwareVersion,
                                       sizeof(*softwareVersion));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t softwareVersion)
 {
-    return emberAfWriteServerAttribute(endpoint, BridgedDeviceBasic::Id, SoftwareVersion::Id, (uint8_t *) &softwareVersion,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, (uint8_t *) &softwareVersion,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -3806,11 +3791,11 @@ namespace Reachable {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * reachable)
 {
-    return emberAfReadServerAttribute(endpoint, BridgedDeviceBasic::Id, Reachable::Id, (uint8_t *) reachable, sizeof(*reachable));
+    return emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, (uint8_t *) reachable, sizeof(*reachable));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool reachable)
 {
-    return emberAfWriteServerAttribute(endpoint, BridgedDeviceBasic::Id, Reachable::Id, (uint8_t *) &reachable,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, (uint8_t *) &reachable,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -3826,12 +3811,12 @@ namespace NumberOfPositions {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * numberOfPositions)
 {
-    return emberAfReadServerAttribute(endpoint, Switch::Id, NumberOfPositions::Id, (uint8_t *) numberOfPositions,
+    return emberAfReadServerAttribute(endpoint, Clusters::Switch::Id, Id, (uint8_t *) numberOfPositions,
                                       sizeof(*numberOfPositions));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t numberOfPositions)
 {
-    return emberAfWriteServerAttribute(endpoint, Switch::Id, NumberOfPositions::Id, (uint8_t *) &numberOfPositions,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Switch::Id, Id, (uint8_t *) &numberOfPositions,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -3841,13 +3826,11 @@ namespace CurrentPosition {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentPosition)
 {
-    return emberAfReadServerAttribute(endpoint, Switch::Id, CurrentPosition::Id, (uint8_t *) currentPosition,
-                                      sizeof(*currentPosition));
+    return emberAfReadServerAttribute(endpoint, Clusters::Switch::Id, Id, (uint8_t *) currentPosition, sizeof(*currentPosition));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentPosition)
 {
-    return emberAfWriteServerAttribute(endpoint, Switch::Id, CurrentPosition::Id, (uint8_t *) &currentPosition,
-                                       ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Switch::Id, Id, (uint8_t *) &currentPosition, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentPosition
@@ -3856,12 +3839,11 @@ namespace MultiPressMax {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * multiPressMax)
 {
-    return emberAfReadServerAttribute(endpoint, Switch::Id, MultiPressMax::Id, (uint8_t *) multiPressMax, sizeof(*multiPressMax));
+    return emberAfReadServerAttribute(endpoint, Clusters::Switch::Id, Id, (uint8_t *) multiPressMax, sizeof(*multiPressMax));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t multiPressMax)
 {
-    return emberAfWriteServerAttribute(endpoint, Switch::Id, MultiPressMax::Id, (uint8_t *) &multiPressMax,
-                                       ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Switch::Id, Id, (uint8_t *) &multiPressMax, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MultiPressMax
@@ -3876,12 +3858,12 @@ namespace SupportedFabrics {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * supportedFabrics)
 {
-    return emberAfReadServerAttribute(endpoint, OperationalCredentials::Id, SupportedFabrics::Id, (uint8_t *) supportedFabrics,
+    return emberAfReadServerAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, (uint8_t *) supportedFabrics,
                                       sizeof(*supportedFabrics));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t supportedFabrics)
 {
-    return emberAfWriteServerAttribute(endpoint, OperationalCredentials::Id, SupportedFabrics::Id, (uint8_t *) &supportedFabrics,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, (uint8_t *) &supportedFabrics,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -3891,13 +3873,13 @@ namespace CommissionedFabrics {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * commissionedFabrics)
 {
-    return emberAfReadServerAttribute(endpoint, OperationalCredentials::Id, CommissionedFabrics::Id,
-                                      (uint8_t *) commissionedFabrics, sizeof(*commissionedFabrics));
+    return emberAfReadServerAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, (uint8_t *) commissionedFabrics,
+                                      sizeof(*commissionedFabrics));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t commissionedFabrics)
 {
-    return emberAfWriteServerAttribute(endpoint, OperationalCredentials::Id, CommissionedFabrics::Id,
-                                       (uint8_t *) &commissionedFabrics, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, (uint8_t *) &commissionedFabrics,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CommissionedFabrics
@@ -3918,11 +3900,11 @@ namespace StateValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * stateValue)
 {
-    return emberAfReadServerAttribute(endpoint, BooleanState::Id, StateValue::Id, (uint8_t *) stateValue, sizeof(*stateValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::BooleanState::Id, Id, (uint8_t *) stateValue, sizeof(*stateValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool stateValue)
 {
-    return emberAfWriteServerAttribute(endpoint, BooleanState::Id, StateValue::Id, (uint8_t *) &stateValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BooleanState::Id, Id, (uint8_t *) &stateValue,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -3938,12 +3920,12 @@ namespace PhysicalClosedLimit {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * physicalClosedLimit)
 {
-    return emberAfReadServerAttribute(endpoint, ShadeConfiguration::Id, PhysicalClosedLimit::Id, (uint8_t *) physicalClosedLimit,
+    return emberAfReadServerAttribute(endpoint, Clusters::ShadeConfiguration::Id, Id, (uint8_t *) physicalClosedLimit,
                                       sizeof(*physicalClosedLimit));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t physicalClosedLimit)
 {
-    return emberAfWriteServerAttribute(endpoint, ShadeConfiguration::Id, PhysicalClosedLimit::Id, (uint8_t *) &physicalClosedLimit,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ShadeConfiguration::Id, Id, (uint8_t *) &physicalClosedLimit,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -3953,12 +3935,12 @@ namespace MotorStepSize {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * motorStepSize)
 {
-    return emberAfReadServerAttribute(endpoint, ShadeConfiguration::Id, MotorStepSize::Id, (uint8_t *) motorStepSize,
+    return emberAfReadServerAttribute(endpoint, Clusters::ShadeConfiguration::Id, Id, (uint8_t *) motorStepSize,
                                       sizeof(*motorStepSize));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t motorStepSize)
 {
-    return emberAfWriteServerAttribute(endpoint, ShadeConfiguration::Id, MotorStepSize::Id, (uint8_t *) &motorStepSize,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ShadeConfiguration::Id, Id, (uint8_t *) &motorStepSize,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -3968,11 +3950,11 @@ namespace Status {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * status)
 {
-    return emberAfReadServerAttribute(endpoint, ShadeConfiguration::Id, Status::Id, (uint8_t *) status, sizeof(*status));
+    return emberAfReadServerAttribute(endpoint, Clusters::ShadeConfiguration::Id, Id, (uint8_t *) status, sizeof(*status));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t status)
 {
-    return emberAfWriteServerAttribute(endpoint, ShadeConfiguration::Id, Status::Id, (uint8_t *) &status,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ShadeConfiguration::Id, Id, (uint8_t *) &status,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -3982,12 +3964,12 @@ namespace ClosedLimit {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * closedLimit)
 {
-    return emberAfReadServerAttribute(endpoint, ShadeConfiguration::Id, ClosedLimit::Id, (uint8_t *) closedLimit,
+    return emberAfReadServerAttribute(endpoint, Clusters::ShadeConfiguration::Id, Id, (uint8_t *) closedLimit,
                                       sizeof(*closedLimit));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t closedLimit)
 {
-    return emberAfWriteServerAttribute(endpoint, ShadeConfiguration::Id, ClosedLimit::Id, (uint8_t *) &closedLimit,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ShadeConfiguration::Id, Id, (uint8_t *) &closedLimit,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -3997,11 +3979,11 @@ namespace Mode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * mode)
 {
-    return emberAfReadServerAttribute(endpoint, ShadeConfiguration::Id, Mode::Id, (uint8_t *) mode, sizeof(*mode));
+    return emberAfReadServerAttribute(endpoint, Clusters::ShadeConfiguration::Id, Id, (uint8_t *) mode, sizeof(*mode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t mode)
 {
-    return emberAfWriteServerAttribute(endpoint, ShadeConfiguration::Id, Mode::Id, (uint8_t *) &mode, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ShadeConfiguration::Id, Id, (uint8_t *) &mode, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Mode
@@ -4016,11 +3998,11 @@ namespace LockState {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * lockState)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, LockState::Id, (uint8_t *) lockState, sizeof(*lockState));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) lockState, sizeof(*lockState));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t lockState)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, LockState::Id, (uint8_t *) &lockState, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &lockState, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace LockState
@@ -4029,11 +4011,11 @@ namespace LockType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * lockType)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, LockType::Id, (uint8_t *) lockType, sizeof(*lockType));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) lockType, sizeof(*lockType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t lockType)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, LockType::Id, (uint8_t *) &lockType, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &lockType, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace LockType
@@ -4042,12 +4024,11 @@ namespace ActuatorEnabled {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * actuatorEnabled)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, ActuatorEnabled::Id, (uint8_t *) actuatorEnabled,
-                                      sizeof(*actuatorEnabled));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) actuatorEnabled, sizeof(*actuatorEnabled));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool actuatorEnabled)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, ActuatorEnabled::Id, (uint8_t *) &actuatorEnabled,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &actuatorEnabled,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -4057,11 +4038,11 @@ namespace DoorState {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * doorState)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, DoorState::Id, (uint8_t *) doorState, sizeof(*doorState));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) doorState, sizeof(*doorState));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t doorState)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, DoorState::Id, (uint8_t *) &doorState, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &doorState, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace DoorState
@@ -4070,12 +4051,11 @@ namespace DoorOpenEvents {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * doorOpenEvents)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, DoorOpenEvents::Id, (uint8_t *) doorOpenEvents,
-                                      sizeof(*doorOpenEvents));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) doorOpenEvents, sizeof(*doorOpenEvents));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t doorOpenEvents)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, DoorOpenEvents::Id, (uint8_t *) &doorOpenEvents,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &doorOpenEvents,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -4085,12 +4065,12 @@ namespace DoorClosedEvents {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * doorClosedEvents)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, DoorClosedEvents::Id, (uint8_t *) doorClosedEvents,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) doorClosedEvents,
                                       sizeof(*doorClosedEvents));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t doorClosedEvents)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, DoorClosedEvents::Id, (uint8_t *) &doorClosedEvents,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &doorClosedEvents,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -4100,11 +4080,11 @@ namespace OpenPeriod {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * openPeriod)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, OpenPeriod::Id, (uint8_t *) openPeriod, sizeof(*openPeriod));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) openPeriod, sizeof(*openPeriod));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t openPeriod)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, OpenPeriod::Id, (uint8_t *) &openPeriod, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &openPeriod, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace OpenPeriod
@@ -4113,12 +4093,12 @@ namespace NumLockRecordsSupported {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * numLockRecordsSupported)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, NumLockRecordsSupported::Id, (uint8_t *) numLockRecordsSupported,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) numLockRecordsSupported,
                                       sizeof(*numLockRecordsSupported));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t numLockRecordsSupported)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, NumLockRecordsSupported::Id, (uint8_t *) &numLockRecordsSupported,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &numLockRecordsSupported,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -4128,12 +4108,12 @@ namespace NumTotalUsersSupported {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * numTotalUsersSupported)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, NumTotalUsersSupported::Id, (uint8_t *) numTotalUsersSupported,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) numTotalUsersSupported,
                                       sizeof(*numTotalUsersSupported));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t numTotalUsersSupported)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, NumTotalUsersSupported::Id, (uint8_t *) &numTotalUsersSupported,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &numTotalUsersSupported,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -4143,12 +4123,12 @@ namespace NumPinUsersSupported {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * numPinUsersSupported)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, NumPinUsersSupported::Id, (uint8_t *) numPinUsersSupported,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) numPinUsersSupported,
                                       sizeof(*numPinUsersSupported));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t numPinUsersSupported)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, NumPinUsersSupported::Id, (uint8_t *) &numPinUsersSupported,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &numPinUsersSupported,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -4158,12 +4138,12 @@ namespace NumRfidUsersSupported {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * numRfidUsersSupported)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, NumRfidUsersSupported::Id, (uint8_t *) numRfidUsersSupported,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) numRfidUsersSupported,
                                       sizeof(*numRfidUsersSupported));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t numRfidUsersSupported)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, NumRfidUsersSupported::Id, (uint8_t *) &numRfidUsersSupported,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &numRfidUsersSupported,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -4173,14 +4153,13 @@ namespace NumWeekdaySchedulesSupportedPerUser {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * numWeekdaySchedulesSupportedPerUser)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, NumWeekdaySchedulesSupportedPerUser::Id,
-                                      (uint8_t *) numWeekdaySchedulesSupportedPerUser,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) numWeekdaySchedulesSupportedPerUser,
                                       sizeof(*numWeekdaySchedulesSupportedPerUser));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t numWeekdaySchedulesSupportedPerUser)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, NumWeekdaySchedulesSupportedPerUser::Id,
-                                       (uint8_t *) &numWeekdaySchedulesSupportedPerUser, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &numWeekdaySchedulesSupportedPerUser,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumWeekdaySchedulesSupportedPerUser
@@ -4189,14 +4168,13 @@ namespace NumYeardaySchedulesSupportedPerUser {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * numYeardaySchedulesSupportedPerUser)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, NumYeardaySchedulesSupportedPerUser::Id,
-                                      (uint8_t *) numYeardaySchedulesSupportedPerUser,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) numYeardaySchedulesSupportedPerUser,
                                       sizeof(*numYeardaySchedulesSupportedPerUser));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t numYeardaySchedulesSupportedPerUser)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, NumYeardaySchedulesSupportedPerUser::Id,
-                                       (uint8_t *) &numYeardaySchedulesSupportedPerUser, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &numYeardaySchedulesSupportedPerUser,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumYeardaySchedulesSupportedPerUser
@@ -4205,14 +4183,13 @@ namespace NumHolidaySchedulesSupportedPerUser {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * numHolidaySchedulesSupportedPerUser)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, NumHolidaySchedulesSupportedPerUser::Id,
-                                      (uint8_t *) numHolidaySchedulesSupportedPerUser,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) numHolidaySchedulesSupportedPerUser,
                                       sizeof(*numHolidaySchedulesSupportedPerUser));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t numHolidaySchedulesSupportedPerUser)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, NumHolidaySchedulesSupportedPerUser::Id,
-                                       (uint8_t *) &numHolidaySchedulesSupportedPerUser, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &numHolidaySchedulesSupportedPerUser,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumHolidaySchedulesSupportedPerUser
@@ -4221,12 +4198,11 @@ namespace MaxPinLength {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * maxPinLength)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, MaxPinLength::Id, (uint8_t *) maxPinLength, sizeof(*maxPinLength));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) maxPinLength, sizeof(*maxPinLength));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t maxPinLength)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, MaxPinLength::Id, (uint8_t *) &maxPinLength,
-                                       ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &maxPinLength, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxPinLength
@@ -4235,12 +4211,11 @@ namespace MinPinLength {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * minPinLength)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, MinPinLength::Id, (uint8_t *) minPinLength, sizeof(*minPinLength));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) minPinLength, sizeof(*minPinLength));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t minPinLength)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, MinPinLength::Id, (uint8_t *) &minPinLength,
-                                       ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &minPinLength, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinPinLength
@@ -4249,12 +4224,12 @@ namespace MaxRfidCodeLength {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * maxRfidCodeLength)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, MaxRfidCodeLength::Id, (uint8_t *) maxRfidCodeLength,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) maxRfidCodeLength,
                                       sizeof(*maxRfidCodeLength));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t maxRfidCodeLength)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, MaxRfidCodeLength::Id, (uint8_t *) &maxRfidCodeLength,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &maxRfidCodeLength,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -4264,12 +4239,12 @@ namespace MinRfidCodeLength {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * minRfidCodeLength)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, MinRfidCodeLength::Id, (uint8_t *) minRfidCodeLength,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) minRfidCodeLength,
                                       sizeof(*minRfidCodeLength));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t minRfidCodeLength)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, MinRfidCodeLength::Id, (uint8_t *) &minRfidCodeLength,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &minRfidCodeLength,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -4279,11 +4254,11 @@ namespace EnableLogging {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * enableLogging)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, EnableLogging::Id, (uint8_t *) enableLogging, sizeof(*enableLogging));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) enableLogging, sizeof(*enableLogging));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool enableLogging)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, EnableLogging::Id, (uint8_t *) &enableLogging,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &enableLogging,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -4293,11 +4268,11 @@ namespace LedSettings {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * ledSettings)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, LedSettings::Id, (uint8_t *) ledSettings, sizeof(*ledSettings));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) ledSettings, sizeof(*ledSettings));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t ledSettings)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, LedSettings::Id, (uint8_t *) &ledSettings, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &ledSettings, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace LedSettings
@@ -4306,12 +4281,11 @@ namespace AutoRelockTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * autoRelockTime)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, AutoRelockTime::Id, (uint8_t *) autoRelockTime,
-                                      sizeof(*autoRelockTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) autoRelockTime, sizeof(*autoRelockTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t autoRelockTime)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, AutoRelockTime::Id, (uint8_t *) &autoRelockTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &autoRelockTime,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -4321,11 +4295,11 @@ namespace SoundVolume {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * soundVolume)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, SoundVolume::Id, (uint8_t *) soundVolume, sizeof(*soundVolume));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) soundVolume, sizeof(*soundVolume));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t soundVolume)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, SoundVolume::Id, (uint8_t *) &soundVolume, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &soundVolume, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SoundVolume
@@ -4334,12 +4308,11 @@ namespace OperatingMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * operatingMode)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, OperatingMode::Id, (uint8_t *) operatingMode, sizeof(*operatingMode));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) operatingMode, sizeof(*operatingMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t operatingMode)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, OperatingMode::Id, (uint8_t *) &operatingMode,
-                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &operatingMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace OperatingMode
@@ -4348,12 +4321,12 @@ namespace SupportedOperatingModes {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * supportedOperatingModes)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, SupportedOperatingModes::Id, (uint8_t *) supportedOperatingModes,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) supportedOperatingModes,
                                       sizeof(*supportedOperatingModes));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t supportedOperatingModes)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, SupportedOperatingModes::Id, (uint8_t *) &supportedOperatingModes,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &supportedOperatingModes,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -4363,13 +4336,13 @@ namespace DefaultConfigurationRegister {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * defaultConfigurationRegister)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, DefaultConfigurationRegister::Id,
-                                      (uint8_t *) defaultConfigurationRegister, sizeof(*defaultConfigurationRegister));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) defaultConfigurationRegister,
+                                      sizeof(*defaultConfigurationRegister));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t defaultConfigurationRegister)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, DefaultConfigurationRegister::Id,
-                                       (uint8_t *) &defaultConfigurationRegister, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &defaultConfigurationRegister,
+                                       ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace DefaultConfigurationRegister
@@ -4378,12 +4351,12 @@ namespace EnableLocalProgramming {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * enableLocalProgramming)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, EnableLocalProgramming::Id, (uint8_t *) enableLocalProgramming,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) enableLocalProgramming,
                                       sizeof(*enableLocalProgramming));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool enableLocalProgramming)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, EnableLocalProgramming::Id, (uint8_t *) &enableLocalProgramming,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &enableLocalProgramming,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -4393,12 +4366,12 @@ namespace EnableOneTouchLocking {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * enableOneTouchLocking)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, EnableOneTouchLocking::Id, (uint8_t *) enableOneTouchLocking,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) enableOneTouchLocking,
                                       sizeof(*enableOneTouchLocking));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool enableOneTouchLocking)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, EnableOneTouchLocking::Id, (uint8_t *) &enableOneTouchLocking,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &enableOneTouchLocking,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -4408,12 +4381,12 @@ namespace EnableInsideStatusLed {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * enableInsideStatusLed)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, EnableInsideStatusLed::Id, (uint8_t *) enableInsideStatusLed,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) enableInsideStatusLed,
                                       sizeof(*enableInsideStatusLed));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool enableInsideStatusLed)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, EnableInsideStatusLed::Id, (uint8_t *) &enableInsideStatusLed,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &enableInsideStatusLed,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -4423,12 +4396,12 @@ namespace EnablePrivacyModeButton {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * enablePrivacyModeButton)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, EnablePrivacyModeButton::Id, (uint8_t *) enablePrivacyModeButton,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) enablePrivacyModeButton,
                                       sizeof(*enablePrivacyModeButton));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool enablePrivacyModeButton)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, EnablePrivacyModeButton::Id, (uint8_t *) &enablePrivacyModeButton,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &enablePrivacyModeButton,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -4438,12 +4411,12 @@ namespace WrongCodeEntryLimit {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * wrongCodeEntryLimit)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, WrongCodeEntryLimit::Id, (uint8_t *) wrongCodeEntryLimit,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) wrongCodeEntryLimit,
                                       sizeof(*wrongCodeEntryLimit));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t wrongCodeEntryLimit)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, WrongCodeEntryLimit::Id, (uint8_t *) &wrongCodeEntryLimit,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &wrongCodeEntryLimit,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -4453,13 +4426,13 @@ namespace UserCodeTemporaryDisableTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * userCodeTemporaryDisableTime)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, UserCodeTemporaryDisableTime::Id,
-                                      (uint8_t *) userCodeTemporaryDisableTime, sizeof(*userCodeTemporaryDisableTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) userCodeTemporaryDisableTime,
+                                      sizeof(*userCodeTemporaryDisableTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t userCodeTemporaryDisableTime)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, UserCodeTemporaryDisableTime::Id,
-                                       (uint8_t *) &userCodeTemporaryDisableTime, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &userCodeTemporaryDisableTime,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace UserCodeTemporaryDisableTime
@@ -4468,12 +4441,12 @@ namespace SendPinOverTheAir {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * sendPinOverTheAir)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, SendPinOverTheAir::Id, (uint8_t *) sendPinOverTheAir,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) sendPinOverTheAir,
                                       sizeof(*sendPinOverTheAir));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool sendPinOverTheAir)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, SendPinOverTheAir::Id, (uint8_t *) &sendPinOverTheAir,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &sendPinOverTheAir,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -4483,12 +4456,12 @@ namespace RequirePinForRfOperation {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * requirePinForRfOperation)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, RequirePinForRfOperation::Id, (uint8_t *) requirePinForRfOperation,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) requirePinForRfOperation,
                                       sizeof(*requirePinForRfOperation));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool requirePinForRfOperation)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, RequirePinForRfOperation::Id, (uint8_t *) &requirePinForRfOperation,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &requirePinForRfOperation,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -4498,12 +4471,12 @@ namespace ZigbeeSecurityLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * zigbeeSecurityLevel)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, ZigbeeSecurityLevel::Id, (uint8_t *) zigbeeSecurityLevel,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) zigbeeSecurityLevel,
                                       sizeof(*zigbeeSecurityLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t zigbeeSecurityLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, ZigbeeSecurityLevel::Id, (uint8_t *) &zigbeeSecurityLevel,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &zigbeeSecurityLevel,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -4513,11 +4486,11 @@ namespace AlarmMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * alarmMask)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, AlarmMask::Id, (uint8_t *) alarmMask, sizeof(*alarmMask));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) alarmMask, sizeof(*alarmMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t alarmMask)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, AlarmMask::Id, (uint8_t *) &alarmMask, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &alarmMask, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmMask
@@ -4526,12 +4499,12 @@ namespace KeypadOperationEventMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * keypadOperationEventMask)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, KeypadOperationEventMask::Id, (uint8_t *) keypadOperationEventMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) keypadOperationEventMask,
                                       sizeof(*keypadOperationEventMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t keypadOperationEventMask)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, KeypadOperationEventMask::Id, (uint8_t *) &keypadOperationEventMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &keypadOperationEventMask,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -4541,12 +4514,12 @@ namespace RfOperationEventMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rfOperationEventMask)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, RfOperationEventMask::Id, (uint8_t *) rfOperationEventMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) rfOperationEventMask,
                                       sizeof(*rfOperationEventMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rfOperationEventMask)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, RfOperationEventMask::Id, (uint8_t *) &rfOperationEventMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &rfOperationEventMask,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -4556,12 +4529,12 @@ namespace ManualOperationEventMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * manualOperationEventMask)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, ManualOperationEventMask::Id, (uint8_t *) manualOperationEventMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) manualOperationEventMask,
                                       sizeof(*manualOperationEventMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t manualOperationEventMask)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, ManualOperationEventMask::Id, (uint8_t *) &manualOperationEventMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &manualOperationEventMask,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -4571,12 +4544,12 @@ namespace RfidOperationEventMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rfidOperationEventMask)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, RfidOperationEventMask::Id, (uint8_t *) rfidOperationEventMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) rfidOperationEventMask,
                                       sizeof(*rfidOperationEventMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rfidOperationEventMask)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, RfidOperationEventMask::Id, (uint8_t *) &rfidOperationEventMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &rfidOperationEventMask,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -4586,13 +4559,13 @@ namespace KeypadProgrammingEventMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * keypadProgrammingEventMask)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, KeypadProgrammingEventMask::Id,
-                                      (uint8_t *) keypadProgrammingEventMask, sizeof(*keypadProgrammingEventMask));
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) keypadProgrammingEventMask,
+                                      sizeof(*keypadProgrammingEventMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t keypadProgrammingEventMask)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, KeypadProgrammingEventMask::Id,
-                                       (uint8_t *) &keypadProgrammingEventMask, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &keypadProgrammingEventMask,
+                                       ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace KeypadProgrammingEventMask
@@ -4601,12 +4574,12 @@ namespace RfProgrammingEventMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rfProgrammingEventMask)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, RfProgrammingEventMask::Id, (uint8_t *) rfProgrammingEventMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) rfProgrammingEventMask,
                                       sizeof(*rfProgrammingEventMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rfProgrammingEventMask)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, RfProgrammingEventMask::Id, (uint8_t *) &rfProgrammingEventMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &rfProgrammingEventMask,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -4616,12 +4589,12 @@ namespace RfidProgrammingEventMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rfidProgrammingEventMask)
 {
-    return emberAfReadServerAttribute(endpoint, DoorLock::Id, RfidProgrammingEventMask::Id, (uint8_t *) rfidProgrammingEventMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) rfidProgrammingEventMask,
                                       sizeof(*rfidProgrammingEventMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rfidProgrammingEventMask)
 {
-    return emberAfWriteServerAttribute(endpoint, DoorLock::Id, RfidProgrammingEventMask::Id, (uint8_t *) &rfidProgrammingEventMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, (uint8_t *) &rfidProgrammingEventMask,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -4637,11 +4610,11 @@ namespace Type {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * type)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, Type::Id, (uint8_t *) type, sizeof(*type));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) type, sizeof(*type));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t type)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, Type::Id, (uint8_t *) &type, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &type, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Type
@@ -4650,13 +4623,13 @@ namespace PhysicalClosedLimitLift {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * physicalClosedLimitLift)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, PhysicalClosedLimitLift::Id,
-                                      (uint8_t *) physicalClosedLimitLift, sizeof(*physicalClosedLimitLift));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) physicalClosedLimitLift,
+                                      sizeof(*physicalClosedLimitLift));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t physicalClosedLimitLift)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, PhysicalClosedLimitLift::Id,
-                                       (uint8_t *) &physicalClosedLimitLift, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &physicalClosedLimitLift,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PhysicalClosedLimitLift
@@ -4665,13 +4638,13 @@ namespace PhysicalClosedLimitTilt {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * physicalClosedLimitTilt)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, PhysicalClosedLimitTilt::Id,
-                                      (uint8_t *) physicalClosedLimitTilt, sizeof(*physicalClosedLimitTilt));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) physicalClosedLimitTilt,
+                                      sizeof(*physicalClosedLimitTilt));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t physicalClosedLimitTilt)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, PhysicalClosedLimitTilt::Id,
-                                       (uint8_t *) &physicalClosedLimitTilt, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &physicalClosedLimitTilt,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PhysicalClosedLimitTilt
@@ -4680,12 +4653,12 @@ namespace CurrentPositionLift {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentPositionLift)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, CurrentPositionLift::Id, (uint8_t *) currentPositionLift,
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) currentPositionLift,
                                       sizeof(*currentPositionLift));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentPositionLift)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, CurrentPositionLift::Id, (uint8_t *) &currentPositionLift,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &currentPositionLift,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -4695,12 +4668,12 @@ namespace CurrentPositionTilt {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentPositionTilt)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, CurrentPositionTilt::Id, (uint8_t *) currentPositionTilt,
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) currentPositionTilt,
                                       sizeof(*currentPositionTilt));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentPositionTilt)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, CurrentPositionTilt::Id, (uint8_t *) &currentPositionTilt,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &currentPositionTilt,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -4710,13 +4683,13 @@ namespace NumberOfActuationsLift {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * numberOfActuationsLift)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, NumberOfActuationsLift::Id, (uint8_t *) numberOfActuationsLift,
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) numberOfActuationsLift,
                                       sizeof(*numberOfActuationsLift));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t numberOfActuationsLift)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, NumberOfActuationsLift::Id,
-                                       (uint8_t *) &numberOfActuationsLift, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &numberOfActuationsLift,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfActuationsLift
@@ -4725,13 +4698,13 @@ namespace NumberOfActuationsTilt {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * numberOfActuationsTilt)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, NumberOfActuationsTilt::Id, (uint8_t *) numberOfActuationsTilt,
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) numberOfActuationsTilt,
                                       sizeof(*numberOfActuationsTilt));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t numberOfActuationsTilt)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, NumberOfActuationsTilt::Id,
-                                       (uint8_t *) &numberOfActuationsTilt, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &numberOfActuationsTilt,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfActuationsTilt
@@ -4740,12 +4713,11 @@ namespace ConfigStatus {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * configStatus)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, ConfigStatus::Id, (uint8_t *) configStatus,
-                                      sizeof(*configStatus));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) configStatus, sizeof(*configStatus));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t configStatus)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, ConfigStatus::Id, (uint8_t *) &configStatus,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &configStatus,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -4755,13 +4727,13 @@ namespace CurrentPositionLiftPercentage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentPositionLiftPercentage)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, CurrentPositionLiftPercentage::Id,
-                                      (uint8_t *) currentPositionLiftPercentage, sizeof(*currentPositionLiftPercentage));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) currentPositionLiftPercentage,
+                                      sizeof(*currentPositionLiftPercentage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentPositionLiftPercentage)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, CurrentPositionLiftPercentage::Id,
-                                       (uint8_t *) &currentPositionLiftPercentage, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &currentPositionLiftPercentage,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentPositionLiftPercentage
@@ -4770,13 +4742,13 @@ namespace CurrentPositionTiltPercentage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentPositionTiltPercentage)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, CurrentPositionTiltPercentage::Id,
-                                      (uint8_t *) currentPositionTiltPercentage, sizeof(*currentPositionTiltPercentage));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) currentPositionTiltPercentage,
+                                      sizeof(*currentPositionTiltPercentage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentPositionTiltPercentage)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, CurrentPositionTiltPercentage::Id,
-                                       (uint8_t *) &currentPositionTiltPercentage, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &currentPositionTiltPercentage,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentPositionTiltPercentage
@@ -4785,12 +4757,12 @@ namespace OperationalStatus {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * operationalStatus)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, OperationalStatus::Id, (uint8_t *) operationalStatus,
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) operationalStatus,
                                       sizeof(*operationalStatus));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t operationalStatus)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, OperationalStatus::Id, (uint8_t *) &operationalStatus,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &operationalStatus,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -4800,13 +4772,13 @@ namespace TargetPositionLiftPercent100ths {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * targetPositionLiftPercent100ths)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, TargetPositionLiftPercent100ths::Id,
-                                      (uint8_t *) targetPositionLiftPercent100ths, sizeof(*targetPositionLiftPercent100ths));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) targetPositionLiftPercent100ths,
+                                      sizeof(*targetPositionLiftPercent100ths));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t targetPositionLiftPercent100ths)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, TargetPositionLiftPercent100ths::Id,
-                                       (uint8_t *) &targetPositionLiftPercent100ths, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &targetPositionLiftPercent100ths,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace TargetPositionLiftPercent100ths
@@ -4815,13 +4787,13 @@ namespace TargetPositionTiltPercent100ths {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * targetPositionTiltPercent100ths)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, TargetPositionTiltPercent100ths::Id,
-                                      (uint8_t *) targetPositionTiltPercent100ths, sizeof(*targetPositionTiltPercent100ths));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) targetPositionTiltPercent100ths,
+                                      sizeof(*targetPositionTiltPercent100ths));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t targetPositionTiltPercent100ths)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, TargetPositionTiltPercent100ths::Id,
-                                       (uint8_t *) &targetPositionTiltPercent100ths, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &targetPositionTiltPercent100ths,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace TargetPositionTiltPercent100ths
@@ -4830,12 +4802,12 @@ namespace EndProductType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * endProductType)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, EndProductType::Id, (uint8_t *) endProductType,
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) endProductType,
                                       sizeof(*endProductType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t endProductType)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, EndProductType::Id, (uint8_t *) &endProductType,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &endProductType,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -4845,13 +4817,13 @@ namespace CurrentPositionLiftPercent100ths {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentPositionLiftPercent100ths)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, CurrentPositionLiftPercent100ths::Id,
-                                      (uint8_t *) currentPositionLiftPercent100ths, sizeof(*currentPositionLiftPercent100ths));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) currentPositionLiftPercent100ths,
+                                      sizeof(*currentPositionLiftPercent100ths));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentPositionLiftPercent100ths)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, CurrentPositionLiftPercent100ths::Id,
-                                       (uint8_t *) &currentPositionLiftPercent100ths, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &currentPositionLiftPercent100ths,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentPositionLiftPercent100ths
@@ -4860,13 +4832,13 @@ namespace CurrentPositionTiltPercent100ths {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentPositionTiltPercent100ths)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, CurrentPositionTiltPercent100ths::Id,
-                                      (uint8_t *) currentPositionTiltPercent100ths, sizeof(*currentPositionTiltPercent100ths));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) currentPositionTiltPercent100ths,
+                                      sizeof(*currentPositionTiltPercent100ths));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentPositionTiltPercent100ths)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, CurrentPositionTiltPercent100ths::Id,
-                                       (uint8_t *) &currentPositionTiltPercent100ths, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &currentPositionTiltPercent100ths,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentPositionTiltPercent100ths
@@ -4875,13 +4847,13 @@ namespace InstalledOpenLimitLift {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * installedOpenLimitLift)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, InstalledOpenLimitLift::Id, (uint8_t *) installedOpenLimitLift,
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) installedOpenLimitLift,
                                       sizeof(*installedOpenLimitLift));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t installedOpenLimitLift)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, InstalledOpenLimitLift::Id,
-                                       (uint8_t *) &installedOpenLimitLift, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &installedOpenLimitLift,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstalledOpenLimitLift
@@ -4890,13 +4862,13 @@ namespace InstalledClosedLimitLift {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * installedClosedLimitLift)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, InstalledClosedLimitLift::Id,
-                                      (uint8_t *) installedClosedLimitLift, sizeof(*installedClosedLimitLift));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) installedClosedLimitLift,
+                                      sizeof(*installedClosedLimitLift));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t installedClosedLimitLift)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, InstalledClosedLimitLift::Id,
-                                       (uint8_t *) &installedClosedLimitLift, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &installedClosedLimitLift,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstalledClosedLimitLift
@@ -4905,13 +4877,13 @@ namespace InstalledOpenLimitTilt {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * installedOpenLimitTilt)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, InstalledOpenLimitTilt::Id, (uint8_t *) installedOpenLimitTilt,
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) installedOpenLimitTilt,
                                       sizeof(*installedOpenLimitTilt));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t installedOpenLimitTilt)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, InstalledOpenLimitTilt::Id,
-                                       (uint8_t *) &installedOpenLimitTilt, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &installedOpenLimitTilt,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstalledOpenLimitTilt
@@ -4920,13 +4892,13 @@ namespace InstalledClosedLimitTilt {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * installedClosedLimitTilt)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, InstalledClosedLimitTilt::Id,
-                                      (uint8_t *) installedClosedLimitTilt, sizeof(*installedClosedLimitTilt));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) installedClosedLimitTilt,
+                                      sizeof(*installedClosedLimitTilt));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t installedClosedLimitTilt)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, InstalledClosedLimitTilt::Id,
-                                       (uint8_t *) &installedClosedLimitTilt, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &installedClosedLimitTilt,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstalledClosedLimitTilt
@@ -4935,12 +4907,11 @@ namespace VelocityLift {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * velocityLift)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, VelocityLift::Id, (uint8_t *) velocityLift,
-                                      sizeof(*velocityLift));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) velocityLift, sizeof(*velocityLift));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t velocityLift)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, VelocityLift::Id, (uint8_t *) &velocityLift,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &velocityLift,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -4950,12 +4921,12 @@ namespace AccelerationTimeLift {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * accelerationTimeLift)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, AccelerationTimeLift::Id, (uint8_t *) accelerationTimeLift,
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) accelerationTimeLift,
                                       sizeof(*accelerationTimeLift));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t accelerationTimeLift)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, AccelerationTimeLift::Id, (uint8_t *) &accelerationTimeLift,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &accelerationTimeLift,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -4965,12 +4936,12 @@ namespace DecelerationTimeLift {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * decelerationTimeLift)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, DecelerationTimeLift::Id, (uint8_t *) decelerationTimeLift,
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) decelerationTimeLift,
                                       sizeof(*decelerationTimeLift));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t decelerationTimeLift)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, DecelerationTimeLift::Id, (uint8_t *) &decelerationTimeLift,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &decelerationTimeLift,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -4980,11 +4951,11 @@ namespace Mode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * mode)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, Mode::Id, (uint8_t *) mode, sizeof(*mode));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) mode, sizeof(*mode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t mode)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, Mode::Id, (uint8_t *) &mode, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &mode, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Mode
@@ -4993,12 +4964,11 @@ namespace SafetyStatus {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * safetyStatus)
 {
-    return emberAfReadServerAttribute(endpoint, WindowCovering::Id, SafetyStatus::Id, (uint8_t *) safetyStatus,
-                                      sizeof(*safetyStatus));
+    return emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) safetyStatus, sizeof(*safetyStatus));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t safetyStatus)
 {
-    return emberAfWriteServerAttribute(endpoint, WindowCovering::Id, SafetyStatus::Id, (uint8_t *) &safetyStatus,
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, (uint8_t *) &safetyStatus,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -5014,12 +4984,12 @@ namespace BarrierMovingState {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * barrierMovingState)
 {
-    return emberAfReadServerAttribute(endpoint, BarrierControl::Id, BarrierMovingState::Id, (uint8_t *) barrierMovingState,
+    return emberAfReadServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) barrierMovingState,
                                       sizeof(*barrierMovingState));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t barrierMovingState)
 {
-    return emberAfWriteServerAttribute(endpoint, BarrierControl::Id, BarrierMovingState::Id, (uint8_t *) &barrierMovingState,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) &barrierMovingState,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -5029,12 +4999,12 @@ namespace BarrierSafetyStatus {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * barrierSafetyStatus)
 {
-    return emberAfReadServerAttribute(endpoint, BarrierControl::Id, BarrierSafetyStatus::Id, (uint8_t *) barrierSafetyStatus,
+    return emberAfReadServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) barrierSafetyStatus,
                                       sizeof(*barrierSafetyStatus));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t barrierSafetyStatus)
 {
-    return emberAfWriteServerAttribute(endpoint, BarrierControl::Id, BarrierSafetyStatus::Id, (uint8_t *) &barrierSafetyStatus,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) &barrierSafetyStatus,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -5044,12 +5014,12 @@ namespace BarrierCapabilities {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * barrierCapabilities)
 {
-    return emberAfReadServerAttribute(endpoint, BarrierControl::Id, BarrierCapabilities::Id, (uint8_t *) barrierCapabilities,
+    return emberAfReadServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) barrierCapabilities,
                                       sizeof(*barrierCapabilities));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t barrierCapabilities)
 {
-    return emberAfWriteServerAttribute(endpoint, BarrierControl::Id, BarrierCapabilities::Id, (uint8_t *) &barrierCapabilities,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) &barrierCapabilities,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -5059,12 +5029,12 @@ namespace BarrierOpenEvents {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * barrierOpenEvents)
 {
-    return emberAfReadServerAttribute(endpoint, BarrierControl::Id, BarrierOpenEvents::Id, (uint8_t *) barrierOpenEvents,
+    return emberAfReadServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) barrierOpenEvents,
                                       sizeof(*barrierOpenEvents));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t barrierOpenEvents)
 {
-    return emberAfWriteServerAttribute(endpoint, BarrierControl::Id, BarrierOpenEvents::Id, (uint8_t *) &barrierOpenEvents,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) &barrierOpenEvents,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -5074,12 +5044,12 @@ namespace BarrierCloseEvents {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * barrierCloseEvents)
 {
-    return emberAfReadServerAttribute(endpoint, BarrierControl::Id, BarrierCloseEvents::Id, (uint8_t *) barrierCloseEvents,
+    return emberAfReadServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) barrierCloseEvents,
                                       sizeof(*barrierCloseEvents));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t barrierCloseEvents)
 {
-    return emberAfWriteServerAttribute(endpoint, BarrierControl::Id, BarrierCloseEvents::Id, (uint8_t *) &barrierCloseEvents,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) &barrierCloseEvents,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -5089,13 +5059,13 @@ namespace BarrierCommandOpenEvents {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * barrierCommandOpenEvents)
 {
-    return emberAfReadServerAttribute(endpoint, BarrierControl::Id, BarrierCommandOpenEvents::Id,
-                                      (uint8_t *) barrierCommandOpenEvents, sizeof(*barrierCommandOpenEvents));
+    return emberAfReadServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) barrierCommandOpenEvents,
+                                      sizeof(*barrierCommandOpenEvents));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t barrierCommandOpenEvents)
 {
-    return emberAfWriteServerAttribute(endpoint, BarrierControl::Id, BarrierCommandOpenEvents::Id,
-                                       (uint8_t *) &barrierCommandOpenEvents, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) &barrierCommandOpenEvents,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierCommandOpenEvents
@@ -5104,13 +5074,13 @@ namespace BarrierCommandCloseEvents {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * barrierCommandCloseEvents)
 {
-    return emberAfReadServerAttribute(endpoint, BarrierControl::Id, BarrierCommandCloseEvents::Id,
-                                      (uint8_t *) barrierCommandCloseEvents, sizeof(*barrierCommandCloseEvents));
+    return emberAfReadServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) barrierCommandCloseEvents,
+                                      sizeof(*barrierCommandCloseEvents));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t barrierCommandCloseEvents)
 {
-    return emberAfWriteServerAttribute(endpoint, BarrierControl::Id, BarrierCommandCloseEvents::Id,
-                                       (uint8_t *) &barrierCommandCloseEvents, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) &barrierCommandCloseEvents,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierCommandCloseEvents
@@ -5119,12 +5089,12 @@ namespace BarrierOpenPeriod {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * barrierOpenPeriod)
 {
-    return emberAfReadServerAttribute(endpoint, BarrierControl::Id, BarrierOpenPeriod::Id, (uint8_t *) barrierOpenPeriod,
+    return emberAfReadServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) barrierOpenPeriod,
                                       sizeof(*barrierOpenPeriod));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t barrierOpenPeriod)
 {
-    return emberAfWriteServerAttribute(endpoint, BarrierControl::Id, BarrierOpenPeriod::Id, (uint8_t *) &barrierOpenPeriod,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) &barrierOpenPeriod,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -5134,12 +5104,12 @@ namespace BarrierClosePeriod {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * barrierClosePeriod)
 {
-    return emberAfReadServerAttribute(endpoint, BarrierControl::Id, BarrierClosePeriod::Id, (uint8_t *) barrierClosePeriod,
+    return emberAfReadServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) barrierClosePeriod,
                                       sizeof(*barrierClosePeriod));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t barrierClosePeriod)
 {
-    return emberAfWriteServerAttribute(endpoint, BarrierControl::Id, BarrierClosePeriod::Id, (uint8_t *) &barrierClosePeriod,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) &barrierClosePeriod,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -5149,12 +5119,12 @@ namespace BarrierPosition {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * barrierPosition)
 {
-    return emberAfReadServerAttribute(endpoint, BarrierControl::Id, BarrierPosition::Id, (uint8_t *) barrierPosition,
+    return emberAfReadServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) barrierPosition,
                                       sizeof(*barrierPosition));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t barrierPosition)
 {
-    return emberAfWriteServerAttribute(endpoint, BarrierControl::Id, BarrierPosition::Id, (uint8_t *) &barrierPosition,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BarrierControl::Id, Id, (uint8_t *) &barrierPosition,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -5170,12 +5140,12 @@ namespace MaxPressure {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * maxPressure)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxPressure::Id, (uint8_t *) maxPressure,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) maxPressure,
                                       sizeof(*maxPressure));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t maxPressure)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxPressure::Id, (uint8_t *) &maxPressure,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &maxPressure,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5185,12 +5155,12 @@ namespace MaxSpeed {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxSpeed)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxSpeed::Id, (uint8_t *) maxSpeed,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) maxSpeed,
                                       sizeof(*maxSpeed));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxSpeed)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxSpeed::Id, (uint8_t *) &maxSpeed,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &maxSpeed,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -5200,12 +5170,12 @@ namespace MaxFlow {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxFlow)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxFlow::Id, (uint8_t *) maxFlow,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) maxFlow,
                                       sizeof(*maxFlow));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxFlow)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxFlow::Id, (uint8_t *) &maxFlow,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &maxFlow,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -5215,13 +5185,13 @@ namespace MinConstPressure {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * minConstPressure)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MinConstPressure::Id, (uint8_t *) minConstPressure,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) minConstPressure,
                                       sizeof(*minConstPressure));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t minConstPressure)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MinConstPressure::Id,
-                                       (uint8_t *) &minConstPressure, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &minConstPressure,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinConstPressure
@@ -5230,13 +5200,13 @@ namespace MaxConstPressure {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * maxConstPressure)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxConstPressure::Id, (uint8_t *) maxConstPressure,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) maxConstPressure,
                                       sizeof(*maxConstPressure));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t maxConstPressure)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxConstPressure::Id,
-                                       (uint8_t *) &maxConstPressure, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &maxConstPressure,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxConstPressure
@@ -5245,12 +5215,12 @@ namespace MinCompPressure {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * minCompPressure)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MinCompPressure::Id, (uint8_t *) minCompPressure,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) minCompPressure,
                                       sizeof(*minCompPressure));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t minCompPressure)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MinCompPressure::Id, (uint8_t *) &minCompPressure,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &minCompPressure,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5260,12 +5230,12 @@ namespace MaxCompPressure {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * maxCompPressure)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxCompPressure::Id, (uint8_t *) maxCompPressure,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) maxCompPressure,
                                       sizeof(*maxCompPressure));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t maxCompPressure)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxCompPressure::Id, (uint8_t *) &maxCompPressure,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &maxCompPressure,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5275,12 +5245,12 @@ namespace MinConstSpeed {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * minConstSpeed)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MinConstSpeed::Id, (uint8_t *) minConstSpeed,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) minConstSpeed,
                                       sizeof(*minConstSpeed));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t minConstSpeed)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MinConstSpeed::Id, (uint8_t *) &minConstSpeed,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &minConstSpeed,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -5290,12 +5260,12 @@ namespace MaxConstSpeed {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxConstSpeed)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxConstSpeed::Id, (uint8_t *) maxConstSpeed,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) maxConstSpeed,
                                       sizeof(*maxConstSpeed));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxConstSpeed)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxConstSpeed::Id, (uint8_t *) &maxConstSpeed,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &maxConstSpeed,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -5305,12 +5275,12 @@ namespace MinConstFlow {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * minConstFlow)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MinConstFlow::Id, (uint8_t *) minConstFlow,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) minConstFlow,
                                       sizeof(*minConstFlow));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t minConstFlow)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MinConstFlow::Id, (uint8_t *) &minConstFlow,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &minConstFlow,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -5320,12 +5290,12 @@ namespace MaxConstFlow {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxConstFlow)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxConstFlow::Id, (uint8_t *) maxConstFlow,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) maxConstFlow,
                                       sizeof(*maxConstFlow));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxConstFlow)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxConstFlow::Id, (uint8_t *) &maxConstFlow,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &maxConstFlow,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -5335,12 +5305,12 @@ namespace MinConstTemp {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * minConstTemp)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MinConstTemp::Id, (uint8_t *) minConstTemp,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) minConstTemp,
                                       sizeof(*minConstTemp));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t minConstTemp)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MinConstTemp::Id, (uint8_t *) &minConstTemp,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &minConstTemp,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5350,12 +5320,12 @@ namespace MaxConstTemp {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * maxConstTemp)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxConstTemp::Id, (uint8_t *) maxConstTemp,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) maxConstTemp,
                                       sizeof(*maxConstTemp));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t maxConstTemp)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, MaxConstTemp::Id, (uint8_t *) &maxConstTemp,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &maxConstTemp,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5365,12 +5335,12 @@ namespace PumpStatus {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * pumpStatus)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, PumpStatus::Id, (uint8_t *) pumpStatus,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) pumpStatus,
                                       sizeof(*pumpStatus));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t pumpStatus)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, PumpStatus::Id, (uint8_t *) &pumpStatus,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &pumpStatus,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -5380,13 +5350,13 @@ namespace EffectiveOperationMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * effectiveOperationMode)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, EffectiveOperationMode::Id,
-                                      (uint8_t *) effectiveOperationMode, sizeof(*effectiveOperationMode));
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) effectiveOperationMode,
+                                      sizeof(*effectiveOperationMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t effectiveOperationMode)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, EffectiveOperationMode::Id,
-                                       (uint8_t *) &effectiveOperationMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &effectiveOperationMode,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EffectiveOperationMode
@@ -5395,13 +5365,13 @@ namespace EffectiveControlMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * effectiveControlMode)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, EffectiveControlMode::Id,
-                                      (uint8_t *) effectiveControlMode, sizeof(*effectiveControlMode));
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) effectiveControlMode,
+                                      sizeof(*effectiveControlMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t effectiveControlMode)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, EffectiveControlMode::Id,
-                                       (uint8_t *) &effectiveControlMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &effectiveControlMode,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EffectiveControlMode
@@ -5410,12 +5380,12 @@ namespace Capacity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * capacity)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, Capacity::Id, (uint8_t *) capacity,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) capacity,
                                       sizeof(*capacity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t capacity)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, Capacity::Id, (uint8_t *) &capacity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &capacity,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5425,11 +5395,11 @@ namespace Speed {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * speed)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, Speed::Id, (uint8_t *) speed, sizeof(*speed));
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) speed, sizeof(*speed));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t speed)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, Speed::Id, (uint8_t *) &speed,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &speed,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -5439,13 +5409,13 @@ namespace LifetimeEnergyConsumed {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * lifetimeEnergyConsumed)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, LifetimeEnergyConsumed::Id,
-                                      (uint8_t *) lifetimeEnergyConsumed, sizeof(*lifetimeEnergyConsumed));
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) lifetimeEnergyConsumed,
+                                      sizeof(*lifetimeEnergyConsumed));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t lifetimeEnergyConsumed)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, LifetimeEnergyConsumed::Id,
-                                       (uint8_t *) &lifetimeEnergyConsumed, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &lifetimeEnergyConsumed,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace LifetimeEnergyConsumed
@@ -5454,12 +5424,12 @@ namespace OperationMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * operationMode)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, OperationMode::Id, (uint8_t *) operationMode,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) operationMode,
                                       sizeof(*operationMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t operationMode)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, OperationMode::Id, (uint8_t *) &operationMode,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &operationMode,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -5469,12 +5439,12 @@ namespace ControlMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * controlMode)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, ControlMode::Id, (uint8_t *) controlMode,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) controlMode,
                                       sizeof(*controlMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t controlMode)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, ControlMode::Id, (uint8_t *) &controlMode,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &controlMode,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -5484,12 +5454,12 @@ namespace AlarmMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * alarmMask)
 {
-    return emberAfReadServerAttribute(endpoint, PumpConfigurationAndControl::Id, AlarmMask::Id, (uint8_t *) alarmMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) alarmMask,
                                       sizeof(*alarmMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t alarmMask)
 {
-    return emberAfWriteServerAttribute(endpoint, PumpConfigurationAndControl::Id, AlarmMask::Id, (uint8_t *) &alarmMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &alarmMask,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -5505,12 +5475,12 @@ namespace LocalTemperature {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * localTemperature)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, LocalTemperature::Id, (uint8_t *) localTemperature,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) localTemperature,
                                       sizeof(*localTemperature));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t localTemperature)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, LocalTemperature::Id, (uint8_t *) &localTemperature,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &localTemperature,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5520,12 +5490,12 @@ namespace OutdoorTemperature {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * outdoorTemperature)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, OutdoorTemperature::Id, (uint8_t *) outdoorTemperature,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) outdoorTemperature,
                                       sizeof(*outdoorTemperature));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t outdoorTemperature)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, OutdoorTemperature::Id, (uint8_t *) &outdoorTemperature,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &outdoorTemperature,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5535,11 +5505,11 @@ namespace Occupancy {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * occupancy)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, Occupancy::Id, (uint8_t *) occupancy, sizeof(*occupancy));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) occupancy, sizeof(*occupancy));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t occupancy)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, Occupancy::Id, (uint8_t *) &occupancy, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &occupancy, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Occupancy
@@ -5548,12 +5518,12 @@ namespace AbsMinHeatSetpointLimit {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * absMinHeatSetpointLimit)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AbsMinHeatSetpointLimit::Id, (uint8_t *) absMinHeatSetpointLimit,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) absMinHeatSetpointLimit,
                                       sizeof(*absMinHeatSetpointLimit));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t absMinHeatSetpointLimit)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AbsMinHeatSetpointLimit::Id, (uint8_t *) &absMinHeatSetpointLimit,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &absMinHeatSetpointLimit,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5563,12 +5533,12 @@ namespace AbsMaxHeatSetpointLimit {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * absMaxHeatSetpointLimit)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AbsMaxHeatSetpointLimit::Id, (uint8_t *) absMaxHeatSetpointLimit,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) absMaxHeatSetpointLimit,
                                       sizeof(*absMaxHeatSetpointLimit));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t absMaxHeatSetpointLimit)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AbsMaxHeatSetpointLimit::Id, (uint8_t *) &absMaxHeatSetpointLimit,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &absMaxHeatSetpointLimit,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5578,12 +5548,12 @@ namespace AbsMinCoolSetpointLimit {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * absMinCoolSetpointLimit)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AbsMinCoolSetpointLimit::Id, (uint8_t *) absMinCoolSetpointLimit,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) absMinCoolSetpointLimit,
                                       sizeof(*absMinCoolSetpointLimit));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t absMinCoolSetpointLimit)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AbsMinCoolSetpointLimit::Id, (uint8_t *) &absMinCoolSetpointLimit,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &absMinCoolSetpointLimit,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5593,12 +5563,12 @@ namespace AbsMaxCoolSetpointLimit {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * absMaxCoolSetpointLimit)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AbsMaxCoolSetpointLimit::Id, (uint8_t *) absMaxCoolSetpointLimit,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) absMaxCoolSetpointLimit,
                                       sizeof(*absMaxCoolSetpointLimit));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t absMaxCoolSetpointLimit)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AbsMaxCoolSetpointLimit::Id, (uint8_t *) &absMaxCoolSetpointLimit,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &absMaxCoolSetpointLimit,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5608,12 +5578,12 @@ namespace PiCoolingDemand {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * piCoolingDemand)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, PiCoolingDemand::Id, (uint8_t *) piCoolingDemand,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) piCoolingDemand,
                                       sizeof(*piCoolingDemand));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t piCoolingDemand)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, PiCoolingDemand::Id, (uint8_t *) &piCoolingDemand,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &piCoolingDemand,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -5623,12 +5593,12 @@ namespace PiHeatingDemand {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * piHeatingDemand)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, PiHeatingDemand::Id, (uint8_t *) piHeatingDemand,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) piHeatingDemand,
                                       sizeof(*piHeatingDemand));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t piHeatingDemand)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, PiHeatingDemand::Id, (uint8_t *) &piHeatingDemand,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &piHeatingDemand,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -5638,13 +5608,13 @@ namespace HvacSystemTypeConfiguration {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * hvacSystemTypeConfiguration)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, HvacSystemTypeConfiguration::Id,
-                                      (uint8_t *) hvacSystemTypeConfiguration, sizeof(*hvacSystemTypeConfiguration));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) hvacSystemTypeConfiguration,
+                                      sizeof(*hvacSystemTypeConfiguration));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t hvacSystemTypeConfiguration)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, HvacSystemTypeConfiguration::Id,
-                                       (uint8_t *) &hvacSystemTypeConfiguration, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &hvacSystemTypeConfiguration,
+                                       ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace HvacSystemTypeConfiguration
@@ -5653,13 +5623,13 @@ namespace LocalTemperatureCalibration {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int8_t * localTemperatureCalibration)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, LocalTemperatureCalibration::Id,
-                                      (uint8_t *) localTemperatureCalibration, sizeof(*localTemperatureCalibration));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) localTemperatureCalibration,
+                                      sizeof(*localTemperatureCalibration));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t localTemperatureCalibration)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, LocalTemperatureCalibration::Id,
-                                       (uint8_t *) &localTemperatureCalibration, ZCL_INT8S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &localTemperatureCalibration,
+                                       ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace LocalTemperatureCalibration
@@ -5668,12 +5638,12 @@ namespace OccupiedCoolingSetpoint {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * occupiedCoolingSetpoint)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, OccupiedCoolingSetpoint::Id, (uint8_t *) occupiedCoolingSetpoint,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) occupiedCoolingSetpoint,
                                       sizeof(*occupiedCoolingSetpoint));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t occupiedCoolingSetpoint)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, OccupiedCoolingSetpoint::Id, (uint8_t *) &occupiedCoolingSetpoint,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &occupiedCoolingSetpoint,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5683,12 +5653,12 @@ namespace OccupiedHeatingSetpoint {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * occupiedHeatingSetpoint)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, OccupiedHeatingSetpoint::Id, (uint8_t *) occupiedHeatingSetpoint,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) occupiedHeatingSetpoint,
                                       sizeof(*occupiedHeatingSetpoint));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t occupiedHeatingSetpoint)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, OccupiedHeatingSetpoint::Id, (uint8_t *) &occupiedHeatingSetpoint,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &occupiedHeatingSetpoint,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5698,13 +5668,13 @@ namespace UnoccupiedCoolingSetpoint {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * unoccupiedCoolingSetpoint)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, UnoccupiedCoolingSetpoint::Id,
-                                      (uint8_t *) unoccupiedCoolingSetpoint, sizeof(*unoccupiedCoolingSetpoint));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) unoccupiedCoolingSetpoint,
+                                      sizeof(*unoccupiedCoolingSetpoint));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t unoccupiedCoolingSetpoint)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, UnoccupiedCoolingSetpoint::Id,
-                                       (uint8_t *) &unoccupiedCoolingSetpoint, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &unoccupiedCoolingSetpoint,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace UnoccupiedCoolingSetpoint
@@ -5713,13 +5683,13 @@ namespace UnoccupiedHeatingSetpoint {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * unoccupiedHeatingSetpoint)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, UnoccupiedHeatingSetpoint::Id,
-                                      (uint8_t *) unoccupiedHeatingSetpoint, sizeof(*unoccupiedHeatingSetpoint));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) unoccupiedHeatingSetpoint,
+                                      sizeof(*unoccupiedHeatingSetpoint));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t unoccupiedHeatingSetpoint)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, UnoccupiedHeatingSetpoint::Id,
-                                       (uint8_t *) &unoccupiedHeatingSetpoint, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &unoccupiedHeatingSetpoint,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace UnoccupiedHeatingSetpoint
@@ -5728,12 +5698,12 @@ namespace MinHeatSetpointLimit {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * minHeatSetpointLimit)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, MinHeatSetpointLimit::Id, (uint8_t *) minHeatSetpointLimit,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) minHeatSetpointLimit,
                                       sizeof(*minHeatSetpointLimit));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t minHeatSetpointLimit)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, MinHeatSetpointLimit::Id, (uint8_t *) &minHeatSetpointLimit,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &minHeatSetpointLimit,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5743,12 +5713,12 @@ namespace MaxHeatSetpointLimit {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * maxHeatSetpointLimit)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, MaxHeatSetpointLimit::Id, (uint8_t *) maxHeatSetpointLimit,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) maxHeatSetpointLimit,
                                       sizeof(*maxHeatSetpointLimit));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t maxHeatSetpointLimit)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, MaxHeatSetpointLimit::Id, (uint8_t *) &maxHeatSetpointLimit,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &maxHeatSetpointLimit,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5758,12 +5728,12 @@ namespace MinCoolSetpointLimit {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * minCoolSetpointLimit)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, MinCoolSetpointLimit::Id, (uint8_t *) minCoolSetpointLimit,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) minCoolSetpointLimit,
                                       sizeof(*minCoolSetpointLimit));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t minCoolSetpointLimit)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, MinCoolSetpointLimit::Id, (uint8_t *) &minCoolSetpointLimit,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &minCoolSetpointLimit,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5773,12 +5743,12 @@ namespace MaxCoolSetpointLimit {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * maxCoolSetpointLimit)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, MaxCoolSetpointLimit::Id, (uint8_t *) maxCoolSetpointLimit,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) maxCoolSetpointLimit,
                                       sizeof(*maxCoolSetpointLimit));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t maxCoolSetpointLimit)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, MaxCoolSetpointLimit::Id, (uint8_t *) &maxCoolSetpointLimit,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &maxCoolSetpointLimit,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -5788,12 +5758,12 @@ namespace MinSetpointDeadBand {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int8_t * minSetpointDeadBand)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, MinSetpointDeadBand::Id, (uint8_t *) minSetpointDeadBand,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) minSetpointDeadBand,
                                       sizeof(*minSetpointDeadBand));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t minSetpointDeadBand)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, MinSetpointDeadBand::Id, (uint8_t *) &minSetpointDeadBand,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &minSetpointDeadBand,
                                        ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
@@ -5803,12 +5773,11 @@ namespace RemoteSensing {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * remoteSensing)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, RemoteSensing::Id, (uint8_t *) remoteSensing,
-                                      sizeof(*remoteSensing));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) remoteSensing, sizeof(*remoteSensing));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t remoteSensing)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, RemoteSensing::Id, (uint8_t *) &remoteSensing,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &remoteSensing,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -5818,13 +5787,13 @@ namespace ControlSequenceOfOperation {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * controlSequenceOfOperation)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, ControlSequenceOfOperation::Id,
-                                      (uint8_t *) controlSequenceOfOperation, sizeof(*controlSequenceOfOperation));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) controlSequenceOfOperation,
+                                      sizeof(*controlSequenceOfOperation));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t controlSequenceOfOperation)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, ControlSequenceOfOperation::Id,
-                                       (uint8_t *) &controlSequenceOfOperation, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &controlSequenceOfOperation,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ControlSequenceOfOperation
@@ -5833,11 +5802,11 @@ namespace SystemMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * systemMode)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, SystemMode::Id, (uint8_t *) systemMode, sizeof(*systemMode));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) systemMode, sizeof(*systemMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t systemMode)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, SystemMode::Id, (uint8_t *) &systemMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &systemMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace SystemMode
@@ -5846,11 +5815,11 @@ namespace AlarmMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * alarmMask)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AlarmMask::Id, (uint8_t *) alarmMask, sizeof(*alarmMask));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) alarmMask, sizeof(*alarmMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t alarmMask)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AlarmMask::Id, (uint8_t *) &alarmMask, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &alarmMask, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmMask
@@ -5859,12 +5828,12 @@ namespace ThermostatRunningMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * thermostatRunningMode)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, ThermostatRunningMode::Id, (uint8_t *) thermostatRunningMode,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) thermostatRunningMode,
                                       sizeof(*thermostatRunningMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t thermostatRunningMode)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, ThermostatRunningMode::Id, (uint8_t *) &thermostatRunningMode,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &thermostatRunningMode,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -5874,12 +5843,11 @@ namespace StartOfWeek {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * startOfWeek)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, StartOfWeek::Id, (uint8_t *) startOfWeek, sizeof(*startOfWeek));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) startOfWeek, sizeof(*startOfWeek));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t startOfWeek)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, StartOfWeek::Id, (uint8_t *) &startOfWeek,
-                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &startOfWeek, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace StartOfWeek
@@ -5888,13 +5856,13 @@ namespace NumberOfWeeklyTransitions {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * numberOfWeeklyTransitions)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, NumberOfWeeklyTransitions::Id,
-                                      (uint8_t *) numberOfWeeklyTransitions, sizeof(*numberOfWeeklyTransitions));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) numberOfWeeklyTransitions,
+                                      sizeof(*numberOfWeeklyTransitions));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t numberOfWeeklyTransitions)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, NumberOfWeeklyTransitions::Id,
-                                       (uint8_t *) &numberOfWeeklyTransitions, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &numberOfWeeklyTransitions,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfWeeklyTransitions
@@ -5903,13 +5871,13 @@ namespace NumberOfDailyTransitions {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * numberOfDailyTransitions)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, NumberOfDailyTransitions::Id, (uint8_t *) numberOfDailyTransitions,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) numberOfDailyTransitions,
                                       sizeof(*numberOfDailyTransitions));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t numberOfDailyTransitions)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, NumberOfDailyTransitions::Id,
-                                       (uint8_t *) &numberOfDailyTransitions, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &numberOfDailyTransitions,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfDailyTransitions
@@ -5918,12 +5886,12 @@ namespace TemperatureSetpointHold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * temperatureSetpointHold)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, TemperatureSetpointHold::Id, (uint8_t *) temperatureSetpointHold,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) temperatureSetpointHold,
                                       sizeof(*temperatureSetpointHold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t temperatureSetpointHold)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, TemperatureSetpointHold::Id, (uint8_t *) &temperatureSetpointHold,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &temperatureSetpointHold,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -5933,13 +5901,13 @@ namespace TemperatureSetpointHoldDuration {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * temperatureSetpointHoldDuration)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, TemperatureSetpointHoldDuration::Id,
-                                      (uint8_t *) temperatureSetpointHoldDuration, sizeof(*temperatureSetpointHoldDuration));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) temperatureSetpointHoldDuration,
+                                      sizeof(*temperatureSetpointHoldDuration));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t temperatureSetpointHoldDuration)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, TemperatureSetpointHoldDuration::Id,
-                                       (uint8_t *) &temperatureSetpointHoldDuration, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &temperatureSetpointHoldDuration,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace TemperatureSetpointHoldDuration
@@ -5948,13 +5916,13 @@ namespace ThermostatProgrammingOperationMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * thermostatProgrammingOperationMode)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, ThermostatProgrammingOperationMode::Id,
-                                      (uint8_t *) thermostatProgrammingOperationMode, sizeof(*thermostatProgrammingOperationMode));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) thermostatProgrammingOperationMode,
+                                      sizeof(*thermostatProgrammingOperationMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t thermostatProgrammingOperationMode)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, ThermostatProgrammingOperationMode::Id,
-                                       (uint8_t *) &thermostatProgrammingOperationMode, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &thermostatProgrammingOperationMode,
+                                       ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ThermostatProgrammingOperationMode
@@ -5963,12 +5931,11 @@ namespace HvacRelayState {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * hvacRelayState)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, HvacRelayState::Id, (uint8_t *) hvacRelayState,
-                                      sizeof(*hvacRelayState));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) hvacRelayState, sizeof(*hvacRelayState));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t hvacRelayState)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, HvacRelayState::Id, (uint8_t *) &hvacRelayState,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &hvacRelayState,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -5978,12 +5945,12 @@ namespace SetpointChangeSource {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * setpointChangeSource)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, SetpointChangeSource::Id, (uint8_t *) setpointChangeSource,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) setpointChangeSource,
                                       sizeof(*setpointChangeSource));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t setpointChangeSource)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, SetpointChangeSource::Id, (uint8_t *) &setpointChangeSource,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &setpointChangeSource,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -5993,12 +5960,12 @@ namespace SetpointChangeAmount {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * setpointChangeAmount)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, SetpointChangeAmount::Id, (uint8_t *) setpointChangeAmount,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) setpointChangeAmount,
                                       sizeof(*setpointChangeAmount));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t setpointChangeAmount)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, SetpointChangeAmount::Id, (uint8_t *) &setpointChangeAmount,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &setpointChangeAmount,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -6008,13 +5975,13 @@ namespace SetpointChangeSourceTimestamp {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * setpointChangeSourceTimestamp)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, SetpointChangeSourceTimestamp::Id,
-                                      (uint8_t *) setpointChangeSourceTimestamp, sizeof(*setpointChangeSourceTimestamp));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) setpointChangeSourceTimestamp,
+                                      sizeof(*setpointChangeSourceTimestamp));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t setpointChangeSourceTimestamp)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, SetpointChangeSourceTimestamp::Id,
-                                       (uint8_t *) &setpointChangeSourceTimestamp, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &setpointChangeSourceTimestamp,
+                                       ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace SetpointChangeSourceTimestamp
@@ -6023,11 +5990,11 @@ namespace AcType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * acType)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AcType::Id, (uint8_t *) acType, sizeof(*acType));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) acType, sizeof(*acType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t acType)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AcType::Id, (uint8_t *) &acType, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &acType, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcType
@@ -6036,12 +6003,11 @@ namespace AcCapacity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acCapacity)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AcCapacity::Id, (uint8_t *) acCapacity, sizeof(*acCapacity));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) acCapacity, sizeof(*acCapacity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acCapacity)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AcCapacity::Id, (uint8_t *) &acCapacity,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &acCapacity, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcCapacity
@@ -6050,12 +6016,12 @@ namespace AcRefrigerantType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * acRefrigerantType)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AcRefrigerantType::Id, (uint8_t *) acRefrigerantType,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) acRefrigerantType,
                                       sizeof(*acRefrigerantType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t acRefrigerantType)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AcRefrigerantType::Id, (uint8_t *) &acRefrigerantType,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &acRefrigerantType,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -6065,12 +6031,11 @@ namespace AcCompressor {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * acCompressor)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AcCompressor::Id, (uint8_t *) acCompressor, sizeof(*acCompressor));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) acCompressor, sizeof(*acCompressor));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t acCompressor)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AcCompressor::Id, (uint8_t *) &acCompressor,
-                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &acCompressor, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcCompressor
@@ -6079,11 +6044,11 @@ namespace AcErrorCode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * acErrorCode)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AcErrorCode::Id, (uint8_t *) acErrorCode, sizeof(*acErrorCode));
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) acErrorCode, sizeof(*acErrorCode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t acErrorCode)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AcErrorCode::Id, (uint8_t *) &acErrorCode,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &acErrorCode,
                                        ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
@@ -6093,12 +6058,12 @@ namespace AcLouverPosition {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * acLouverPosition)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AcLouverPosition::Id, (uint8_t *) acLouverPosition,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) acLouverPosition,
                                       sizeof(*acLouverPosition));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t acLouverPosition)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AcLouverPosition::Id, (uint8_t *) &acLouverPosition,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &acLouverPosition,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -6108,12 +6073,12 @@ namespace AcCoilTemperature {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * acCoilTemperature)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AcCoilTemperature::Id, (uint8_t *) acCoilTemperature,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) acCoilTemperature,
                                       sizeof(*acCoilTemperature));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t acCoilTemperature)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AcCoilTemperature::Id, (uint8_t *) &acCoilTemperature,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &acCoilTemperature,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -6123,12 +6088,12 @@ namespace AcCapacityFormat {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * acCapacityFormat)
 {
-    return emberAfReadServerAttribute(endpoint, Thermostat::Id, AcCapacityFormat::Id, (uint8_t *) acCapacityFormat,
+    return emberAfReadServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) acCapacityFormat,
                                       sizeof(*acCapacityFormat));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t acCapacityFormat)
 {
-    return emberAfWriteServerAttribute(endpoint, Thermostat::Id, AcCapacityFormat::Id, (uint8_t *) &acCapacityFormat,
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, (uint8_t *) &acCapacityFormat,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -6144,11 +6109,11 @@ namespace FanMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * fanMode)
 {
-    return emberAfReadServerAttribute(endpoint, FanControl::Id, FanMode::Id, (uint8_t *) fanMode, sizeof(*fanMode));
+    return emberAfReadServerAttribute(endpoint, Clusters::FanControl::Id, Id, (uint8_t *) fanMode, sizeof(*fanMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t fanMode)
 {
-    return emberAfWriteServerAttribute(endpoint, FanControl::Id, FanMode::Id, (uint8_t *) &fanMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::FanControl::Id, Id, (uint8_t *) &fanMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace FanMode
@@ -6157,12 +6122,12 @@ namespace FanModeSequence {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * fanModeSequence)
 {
-    return emberAfReadServerAttribute(endpoint, FanControl::Id, FanModeSequence::Id, (uint8_t *) fanModeSequence,
+    return emberAfReadServerAttribute(endpoint, Clusters::FanControl::Id, Id, (uint8_t *) fanModeSequence,
                                       sizeof(*fanModeSequence));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t fanModeSequence)
 {
-    return emberAfWriteServerAttribute(endpoint, FanControl::Id, FanModeSequence::Id, (uint8_t *) &fanModeSequence,
+    return emberAfWriteServerAttribute(endpoint, Clusters::FanControl::Id, Id, (uint8_t *) &fanModeSequence,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -6178,12 +6143,12 @@ namespace RelativeHumidity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * relativeHumidity)
 {
-    return emberAfReadServerAttribute(endpoint, DehumidificationControl::Id, RelativeHumidity::Id, (uint8_t *) relativeHumidity,
+    return emberAfReadServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) relativeHumidity,
                                       sizeof(*relativeHumidity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t relativeHumidity)
 {
-    return emberAfWriteServerAttribute(endpoint, DehumidificationControl::Id, RelativeHumidity::Id, (uint8_t *) &relativeHumidity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) &relativeHumidity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6193,13 +6158,13 @@ namespace DehumidificationCooling {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * dehumidificationCooling)
 {
-    return emberAfReadServerAttribute(endpoint, DehumidificationControl::Id, DehumidificationCooling::Id,
-                                      (uint8_t *) dehumidificationCooling, sizeof(*dehumidificationCooling));
+    return emberAfReadServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) dehumidificationCooling,
+                                      sizeof(*dehumidificationCooling));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t dehumidificationCooling)
 {
-    return emberAfWriteServerAttribute(endpoint, DehumidificationControl::Id, DehumidificationCooling::Id,
-                                       (uint8_t *) &dehumidificationCooling, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) &dehumidificationCooling,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DehumidificationCooling
@@ -6208,13 +6173,13 @@ namespace RhDehumidificationSetpoint {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * rhDehumidificationSetpoint)
 {
-    return emberAfReadServerAttribute(endpoint, DehumidificationControl::Id, RhDehumidificationSetpoint::Id,
-                                      (uint8_t *) rhDehumidificationSetpoint, sizeof(*rhDehumidificationSetpoint));
+    return emberAfReadServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) rhDehumidificationSetpoint,
+                                      sizeof(*rhDehumidificationSetpoint));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t rhDehumidificationSetpoint)
 {
-    return emberAfWriteServerAttribute(endpoint, DehumidificationControl::Id, RhDehumidificationSetpoint::Id,
-                                       (uint8_t *) &rhDehumidificationSetpoint, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) &rhDehumidificationSetpoint,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RhDehumidificationSetpoint
@@ -6223,13 +6188,13 @@ namespace RelativeHumidityMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * relativeHumidityMode)
 {
-    return emberAfReadServerAttribute(endpoint, DehumidificationControl::Id, RelativeHumidityMode::Id,
-                                      (uint8_t *) relativeHumidityMode, sizeof(*relativeHumidityMode));
+    return emberAfReadServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) relativeHumidityMode,
+                                      sizeof(*relativeHumidityMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t relativeHumidityMode)
 {
-    return emberAfWriteServerAttribute(endpoint, DehumidificationControl::Id, RelativeHumidityMode::Id,
-                                       (uint8_t *) &relativeHumidityMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) &relativeHumidityMode,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace RelativeHumidityMode
@@ -6238,13 +6203,13 @@ namespace DehumidificationLockout {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * dehumidificationLockout)
 {
-    return emberAfReadServerAttribute(endpoint, DehumidificationControl::Id, DehumidificationLockout::Id,
-                                      (uint8_t *) dehumidificationLockout, sizeof(*dehumidificationLockout));
+    return emberAfReadServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) dehumidificationLockout,
+                                      sizeof(*dehumidificationLockout));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t dehumidificationLockout)
 {
-    return emberAfWriteServerAttribute(endpoint, DehumidificationControl::Id, DehumidificationLockout::Id,
-                                       (uint8_t *) &dehumidificationLockout, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) &dehumidificationLockout,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace DehumidificationLockout
@@ -6253,13 +6218,13 @@ namespace DehumidificationHysteresis {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * dehumidificationHysteresis)
 {
-    return emberAfReadServerAttribute(endpoint, DehumidificationControl::Id, DehumidificationHysteresis::Id,
-                                      (uint8_t *) dehumidificationHysteresis, sizeof(*dehumidificationHysteresis));
+    return emberAfReadServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) dehumidificationHysteresis,
+                                      sizeof(*dehumidificationHysteresis));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t dehumidificationHysteresis)
 {
-    return emberAfWriteServerAttribute(endpoint, DehumidificationControl::Id, DehumidificationHysteresis::Id,
-                                       (uint8_t *) &dehumidificationHysteresis, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) &dehumidificationHysteresis,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DehumidificationHysteresis
@@ -6268,13 +6233,13 @@ namespace DehumidificationMaxCool {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * dehumidificationMaxCool)
 {
-    return emberAfReadServerAttribute(endpoint, DehumidificationControl::Id, DehumidificationMaxCool::Id,
-                                      (uint8_t *) dehumidificationMaxCool, sizeof(*dehumidificationMaxCool));
+    return emberAfReadServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) dehumidificationMaxCool,
+                                      sizeof(*dehumidificationMaxCool));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t dehumidificationMaxCool)
 {
-    return emberAfWriteServerAttribute(endpoint, DehumidificationControl::Id, DehumidificationMaxCool::Id,
-                                       (uint8_t *) &dehumidificationMaxCool, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) &dehumidificationMaxCool,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DehumidificationMaxCool
@@ -6283,13 +6248,13 @@ namespace RelativeHumidityDisplay {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * relativeHumidityDisplay)
 {
-    return emberAfReadServerAttribute(endpoint, DehumidificationControl::Id, RelativeHumidityDisplay::Id,
-                                      (uint8_t *) relativeHumidityDisplay, sizeof(*relativeHumidityDisplay));
+    return emberAfReadServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) relativeHumidityDisplay,
+                                      sizeof(*relativeHumidityDisplay));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t relativeHumidityDisplay)
 {
-    return emberAfWriteServerAttribute(endpoint, DehumidificationControl::Id, RelativeHumidityDisplay::Id,
-                                       (uint8_t *) &relativeHumidityDisplay, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DehumidificationControl::Id, Id, (uint8_t *) &relativeHumidityDisplay,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace RelativeHumidityDisplay
@@ -6304,12 +6269,12 @@ namespace TemperatureDisplayMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * temperatureDisplayMode)
 {
-    return emberAfReadServerAttribute(endpoint, ThermostatUserInterfaceConfiguration::Id, TemperatureDisplayMode::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id,
                                       (uint8_t *) temperatureDisplayMode, sizeof(*temperatureDisplayMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t temperatureDisplayMode)
 {
-    return emberAfWriteServerAttribute(endpoint, ThermostatUserInterfaceConfiguration::Id, TemperatureDisplayMode::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id,
                                        (uint8_t *) &temperatureDisplayMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -6319,13 +6284,13 @@ namespace KeypadLockout {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * keypadLockout)
 {
-    return emberAfReadServerAttribute(endpoint, ThermostatUserInterfaceConfiguration::Id, KeypadLockout::Id,
-                                      (uint8_t *) keypadLockout, sizeof(*keypadLockout));
+    return emberAfReadServerAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, (uint8_t *) keypadLockout,
+                                      sizeof(*keypadLockout));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t keypadLockout)
 {
-    return emberAfWriteServerAttribute(endpoint, ThermostatUserInterfaceConfiguration::Id, KeypadLockout::Id,
-                                       (uint8_t *) &keypadLockout, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, (uint8_t *) &keypadLockout,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace KeypadLockout
@@ -6334,12 +6299,12 @@ namespace ScheduleProgrammingVisibility {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * scheduleProgrammingVisibility)
 {
-    return emberAfReadServerAttribute(endpoint, ThermostatUserInterfaceConfiguration::Id, ScheduleProgrammingVisibility::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id,
                                       (uint8_t *) scheduleProgrammingVisibility, sizeof(*scheduleProgrammingVisibility));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t scheduleProgrammingVisibility)
 {
-    return emberAfWriteServerAttribute(endpoint, ThermostatUserInterfaceConfiguration::Id, ScheduleProgrammingVisibility::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id,
                                        (uint8_t *) &scheduleProgrammingVisibility, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -6355,12 +6320,11 @@ namespace CurrentHue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentHue)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, CurrentHue::Id, (uint8_t *) currentHue, sizeof(*currentHue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) currentHue, sizeof(*currentHue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentHue)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, CurrentHue::Id, (uint8_t *) &currentHue,
-                                       ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &currentHue, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentHue
@@ -6369,12 +6333,12 @@ namespace CurrentSaturation {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentSaturation)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, CurrentSaturation::Id, (uint8_t *) currentSaturation,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) currentSaturation,
                                       sizeof(*currentSaturation));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentSaturation)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, CurrentSaturation::Id, (uint8_t *) &currentSaturation,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &currentSaturation,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6384,12 +6348,11 @@ namespace RemainingTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * remainingTime)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, RemainingTime::Id, (uint8_t *) remainingTime,
-                                      sizeof(*remainingTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) remainingTime, sizeof(*remainingTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t remainingTime)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, RemainingTime::Id, (uint8_t *) &remainingTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &remainingTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6399,11 +6362,11 @@ namespace CurrentX {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentX)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, CurrentX::Id, (uint8_t *) currentX, sizeof(*currentX));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) currentX, sizeof(*currentX));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentX)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, CurrentX::Id, (uint8_t *) &currentX, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &currentX, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentX
@@ -6412,11 +6375,11 @@ namespace CurrentY {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentY)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, CurrentY::Id, (uint8_t *) currentY, sizeof(*currentY));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) currentY, sizeof(*currentY));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentY)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, CurrentY::Id, (uint8_t *) &currentY, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &currentY, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentY
@@ -6425,12 +6388,12 @@ namespace DriftCompensation {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * driftCompensation)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, DriftCompensation::Id, (uint8_t *) driftCompensation,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) driftCompensation,
                                       sizeof(*driftCompensation));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t driftCompensation)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, DriftCompensation::Id, (uint8_t *) &driftCompensation,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &driftCompensation,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -6440,12 +6403,12 @@ namespace ColorTemperature {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorTemperature)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorTemperature::Id, (uint8_t *) colorTemperature,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorTemperature,
                                       sizeof(*colorTemperature));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorTemperature)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorTemperature::Id, (uint8_t *) &colorTemperature,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorTemperature,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6455,11 +6418,11 @@ namespace ColorMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * colorMode)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorMode::Id, (uint8_t *) colorMode, sizeof(*colorMode));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorMode, sizeof(*colorMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t colorMode)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorMode::Id, (uint8_t *) &colorMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorMode
@@ -6468,12 +6431,12 @@ namespace ColorControlOptions {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * colorControlOptions)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorControlOptions::Id, (uint8_t *) colorControlOptions,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorControlOptions,
                                       sizeof(*colorControlOptions));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t colorControlOptions)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorControlOptions::Id, (uint8_t *) &colorControlOptions,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorControlOptions,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -6483,12 +6446,12 @@ namespace NumberOfPrimaries {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * numberOfPrimaries)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, NumberOfPrimaries::Id, (uint8_t *) numberOfPrimaries,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) numberOfPrimaries,
                                       sizeof(*numberOfPrimaries));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t numberOfPrimaries)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, NumberOfPrimaries::Id, (uint8_t *) &numberOfPrimaries,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &numberOfPrimaries,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6498,12 +6461,11 @@ namespace Primary1X {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary1X)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary1X::Id, (uint8_t *) primary1X, sizeof(*primary1X));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary1X, sizeof(*primary1X));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary1X)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary1X::Id, (uint8_t *) &primary1X,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary1X, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary1X
@@ -6512,12 +6474,11 @@ namespace Primary1Y {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary1Y)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary1Y::Id, (uint8_t *) primary1Y, sizeof(*primary1Y));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary1Y, sizeof(*primary1Y));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary1Y)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary1Y::Id, (uint8_t *) &primary1Y,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary1Y, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary1Y
@@ -6526,12 +6487,12 @@ namespace Primary1Intensity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * primary1Intensity)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary1Intensity::Id, (uint8_t *) primary1Intensity,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary1Intensity,
                                       sizeof(*primary1Intensity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t primary1Intensity)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary1Intensity::Id, (uint8_t *) &primary1Intensity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary1Intensity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6541,12 +6502,11 @@ namespace Primary2X {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary2X)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary2X::Id, (uint8_t *) primary2X, sizeof(*primary2X));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary2X, sizeof(*primary2X));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary2X)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary2X::Id, (uint8_t *) &primary2X,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary2X, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary2X
@@ -6555,12 +6515,11 @@ namespace Primary2Y {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary2Y)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary2Y::Id, (uint8_t *) primary2Y, sizeof(*primary2Y));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary2Y, sizeof(*primary2Y));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary2Y)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary2Y::Id, (uint8_t *) &primary2Y,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary2Y, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary2Y
@@ -6569,12 +6528,12 @@ namespace Primary2Intensity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * primary2Intensity)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary2Intensity::Id, (uint8_t *) primary2Intensity,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary2Intensity,
                                       sizeof(*primary2Intensity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t primary2Intensity)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary2Intensity::Id, (uint8_t *) &primary2Intensity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary2Intensity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6584,12 +6543,11 @@ namespace Primary3X {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary3X)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary3X::Id, (uint8_t *) primary3X, sizeof(*primary3X));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary3X, sizeof(*primary3X));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary3X)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary3X::Id, (uint8_t *) &primary3X,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary3X, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary3X
@@ -6598,12 +6556,11 @@ namespace Primary3Y {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary3Y)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary3Y::Id, (uint8_t *) primary3Y, sizeof(*primary3Y));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary3Y, sizeof(*primary3Y));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary3Y)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary3Y::Id, (uint8_t *) &primary3Y,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary3Y, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary3Y
@@ -6612,12 +6569,12 @@ namespace Primary3Intensity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * primary3Intensity)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary3Intensity::Id, (uint8_t *) primary3Intensity,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary3Intensity,
                                       sizeof(*primary3Intensity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t primary3Intensity)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary3Intensity::Id, (uint8_t *) &primary3Intensity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary3Intensity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6627,12 +6584,11 @@ namespace Primary4X {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary4X)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary4X::Id, (uint8_t *) primary4X, sizeof(*primary4X));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary4X, sizeof(*primary4X));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary4X)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary4X::Id, (uint8_t *) &primary4X,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary4X, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary4X
@@ -6641,12 +6597,11 @@ namespace Primary4Y {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary4Y)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary4Y::Id, (uint8_t *) primary4Y, sizeof(*primary4Y));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary4Y, sizeof(*primary4Y));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary4Y)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary4Y::Id, (uint8_t *) &primary4Y,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary4Y, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary4Y
@@ -6655,12 +6610,12 @@ namespace Primary4Intensity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * primary4Intensity)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary4Intensity::Id, (uint8_t *) primary4Intensity,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary4Intensity,
                                       sizeof(*primary4Intensity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t primary4Intensity)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary4Intensity::Id, (uint8_t *) &primary4Intensity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary4Intensity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6670,12 +6625,11 @@ namespace Primary5X {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary5X)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary5X::Id, (uint8_t *) primary5X, sizeof(*primary5X));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary5X, sizeof(*primary5X));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary5X)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary5X::Id, (uint8_t *) &primary5X,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary5X, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary5X
@@ -6684,12 +6638,11 @@ namespace Primary5Y {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary5Y)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary5Y::Id, (uint8_t *) primary5Y, sizeof(*primary5Y));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary5Y, sizeof(*primary5Y));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary5Y)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary5Y::Id, (uint8_t *) &primary5Y,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary5Y, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary5Y
@@ -6698,12 +6651,12 @@ namespace Primary5Intensity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * primary5Intensity)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary5Intensity::Id, (uint8_t *) primary5Intensity,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary5Intensity,
                                       sizeof(*primary5Intensity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t primary5Intensity)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary5Intensity::Id, (uint8_t *) &primary5Intensity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary5Intensity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6713,12 +6666,11 @@ namespace Primary6X {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary6X)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary6X::Id, (uint8_t *) primary6X, sizeof(*primary6X));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary6X, sizeof(*primary6X));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary6X)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary6X::Id, (uint8_t *) &primary6X,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary6X, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary6X
@@ -6727,12 +6679,11 @@ namespace Primary6Y {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * primary6Y)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary6Y::Id, (uint8_t *) primary6Y, sizeof(*primary6Y));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary6Y, sizeof(*primary6Y));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t primary6Y)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary6Y::Id, (uint8_t *) &primary6Y,
-                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary6Y, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary6Y
@@ -6741,12 +6692,12 @@ namespace Primary6Intensity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * primary6Intensity)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, Primary6Intensity::Id, (uint8_t *) primary6Intensity,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) primary6Intensity,
                                       sizeof(*primary6Intensity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t primary6Intensity)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, Primary6Intensity::Id, (uint8_t *) &primary6Intensity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &primary6Intensity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6756,11 +6707,11 @@ namespace WhitePointX {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * whitePointX)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, WhitePointX::Id, (uint8_t *) whitePointX, sizeof(*whitePointX));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) whitePointX, sizeof(*whitePointX));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t whitePointX)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, WhitePointX::Id, (uint8_t *) &whitePointX,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &whitePointX,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6770,11 +6721,11 @@ namespace WhitePointY {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * whitePointY)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, WhitePointY::Id, (uint8_t *) whitePointY, sizeof(*whitePointY));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) whitePointY, sizeof(*whitePointY));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t whitePointY)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, WhitePointY::Id, (uint8_t *) &whitePointY,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &whitePointY,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6784,12 +6735,11 @@ namespace ColorPointRX {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorPointRX)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorPointRX::Id, (uint8_t *) colorPointRX,
-                                      sizeof(*colorPointRX));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorPointRX, sizeof(*colorPointRX));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorPointRX)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorPointRX::Id, (uint8_t *) &colorPointRX,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorPointRX,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6799,12 +6749,11 @@ namespace ColorPointRY {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorPointRY)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorPointRY::Id, (uint8_t *) colorPointRY,
-                                      sizeof(*colorPointRY));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorPointRY, sizeof(*colorPointRY));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorPointRY)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorPointRY::Id, (uint8_t *) &colorPointRY,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorPointRY,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6814,12 +6763,12 @@ namespace ColorPointRIntensity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * colorPointRIntensity)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorPointRIntensity::Id, (uint8_t *) colorPointRIntensity,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorPointRIntensity,
                                       sizeof(*colorPointRIntensity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t colorPointRIntensity)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorPointRIntensity::Id, (uint8_t *) &colorPointRIntensity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorPointRIntensity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6829,12 +6778,11 @@ namespace ColorPointGX {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorPointGX)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorPointGX::Id, (uint8_t *) colorPointGX,
-                                      sizeof(*colorPointGX));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorPointGX, sizeof(*colorPointGX));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorPointGX)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorPointGX::Id, (uint8_t *) &colorPointGX,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorPointGX,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6844,12 +6792,11 @@ namespace ColorPointGY {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorPointGY)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorPointGY::Id, (uint8_t *) colorPointGY,
-                                      sizeof(*colorPointGY));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorPointGY, sizeof(*colorPointGY));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorPointGY)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorPointGY::Id, (uint8_t *) &colorPointGY,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorPointGY,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6859,12 +6806,12 @@ namespace ColorPointGIntensity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * colorPointGIntensity)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorPointGIntensity::Id, (uint8_t *) colorPointGIntensity,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorPointGIntensity,
                                       sizeof(*colorPointGIntensity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t colorPointGIntensity)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorPointGIntensity::Id, (uint8_t *) &colorPointGIntensity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorPointGIntensity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6874,12 +6821,11 @@ namespace ColorPointBX {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorPointBX)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorPointBX::Id, (uint8_t *) colorPointBX,
-                                      sizeof(*colorPointBX));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorPointBX, sizeof(*colorPointBX));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorPointBX)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorPointBX::Id, (uint8_t *) &colorPointBX,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorPointBX,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6889,12 +6835,11 @@ namespace ColorPointBY {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorPointBY)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorPointBY::Id, (uint8_t *) colorPointBY,
-                                      sizeof(*colorPointBY));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorPointBY, sizeof(*colorPointBY));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorPointBY)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorPointBY::Id, (uint8_t *) &colorPointBY,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorPointBY,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6904,12 +6849,12 @@ namespace ColorPointBIntensity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * colorPointBIntensity)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorPointBIntensity::Id, (uint8_t *) colorPointBIntensity,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorPointBIntensity,
                                       sizeof(*colorPointBIntensity));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t colorPointBIntensity)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorPointBIntensity::Id, (uint8_t *) &colorPointBIntensity,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorPointBIntensity,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6919,12 +6864,12 @@ namespace EnhancedCurrentHue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * enhancedCurrentHue)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, EnhancedCurrentHue::Id, (uint8_t *) enhancedCurrentHue,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) enhancedCurrentHue,
                                       sizeof(*enhancedCurrentHue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t enhancedCurrentHue)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, EnhancedCurrentHue::Id, (uint8_t *) &enhancedCurrentHue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &enhancedCurrentHue,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6934,12 +6879,12 @@ namespace EnhancedColorMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * enhancedColorMode)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, EnhancedColorMode::Id, (uint8_t *) enhancedColorMode,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) enhancedColorMode,
                                       sizeof(*enhancedColorMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t enhancedColorMode)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, EnhancedColorMode::Id, (uint8_t *) &enhancedColorMode,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &enhancedColorMode,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -6949,12 +6894,12 @@ namespace ColorLoopActive {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * colorLoopActive)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorLoopActive::Id, (uint8_t *) colorLoopActive,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorLoopActive,
                                       sizeof(*colorLoopActive));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t colorLoopActive)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorLoopActive::Id, (uint8_t *) &colorLoopActive,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorLoopActive,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6964,12 +6909,12 @@ namespace ColorLoopDirection {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * colorLoopDirection)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorLoopDirection::Id, (uint8_t *) colorLoopDirection,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorLoopDirection,
                                       sizeof(*colorLoopDirection));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t colorLoopDirection)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorLoopDirection::Id, (uint8_t *) &colorLoopDirection,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorLoopDirection,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -6979,12 +6924,11 @@ namespace ColorLoopTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorLoopTime)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorLoopTime::Id, (uint8_t *) colorLoopTime,
-                                      sizeof(*colorLoopTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorLoopTime, sizeof(*colorLoopTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorLoopTime)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorLoopTime::Id, (uint8_t *) &colorLoopTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorLoopTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -6994,13 +6938,13 @@ namespace ColorLoopStartEnhancedHue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorLoopStartEnhancedHue)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorLoopStartEnhancedHue::Id,
-                                      (uint8_t *) colorLoopStartEnhancedHue, sizeof(*colorLoopStartEnhancedHue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorLoopStartEnhancedHue,
+                                      sizeof(*colorLoopStartEnhancedHue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorLoopStartEnhancedHue)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorLoopStartEnhancedHue::Id,
-                                       (uint8_t *) &colorLoopStartEnhancedHue, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorLoopStartEnhancedHue,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorLoopStartEnhancedHue
@@ -7009,13 +6953,13 @@ namespace ColorLoopStoredEnhancedHue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorLoopStoredEnhancedHue)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorLoopStoredEnhancedHue::Id,
-                                      (uint8_t *) colorLoopStoredEnhancedHue, sizeof(*colorLoopStoredEnhancedHue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorLoopStoredEnhancedHue,
+                                      sizeof(*colorLoopStoredEnhancedHue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorLoopStoredEnhancedHue)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorLoopStoredEnhancedHue::Id,
-                                       (uint8_t *) &colorLoopStoredEnhancedHue, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorLoopStoredEnhancedHue,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorLoopStoredEnhancedHue
@@ -7024,12 +6968,12 @@ namespace ColorCapabilities {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorCapabilities)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorCapabilities::Id, (uint8_t *) colorCapabilities,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorCapabilities,
                                       sizeof(*colorCapabilities));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorCapabilities)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorCapabilities::Id, (uint8_t *) &colorCapabilities,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorCapabilities,
                                        ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
@@ -7039,12 +6983,12 @@ namespace ColorTempPhysicalMin {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorTempPhysicalMin)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorTempPhysicalMin::Id, (uint8_t *) colorTempPhysicalMin,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorTempPhysicalMin,
                                       sizeof(*colorTempPhysicalMin));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorTempPhysicalMin)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorTempPhysicalMin::Id, (uint8_t *) &colorTempPhysicalMin,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorTempPhysicalMin,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7054,12 +6998,12 @@ namespace ColorTempPhysicalMax {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * colorTempPhysicalMax)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, ColorTempPhysicalMax::Id, (uint8_t *) colorTempPhysicalMax,
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) colorTempPhysicalMax,
                                       sizeof(*colorTempPhysicalMax));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t colorTempPhysicalMax)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, ColorTempPhysicalMax::Id, (uint8_t *) &colorTempPhysicalMax,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &colorTempPhysicalMax,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7069,13 +7013,13 @@ namespace CoupleColorTempToLevelMinMireds {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * coupleColorTempToLevelMinMireds)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, CoupleColorTempToLevelMinMireds::Id,
-                                      (uint8_t *) coupleColorTempToLevelMinMireds, sizeof(*coupleColorTempToLevelMinMireds));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) coupleColorTempToLevelMinMireds,
+                                      sizeof(*coupleColorTempToLevelMinMireds));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t coupleColorTempToLevelMinMireds)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, CoupleColorTempToLevelMinMireds::Id,
-                                       (uint8_t *) &coupleColorTempToLevelMinMireds, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &coupleColorTempToLevelMinMireds,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CoupleColorTempToLevelMinMireds
@@ -7084,13 +7028,13 @@ namespace StartUpColorTemperatureMireds {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * startUpColorTemperatureMireds)
 {
-    return emberAfReadServerAttribute(endpoint, ColorControl::Id, StartUpColorTemperatureMireds::Id,
-                                      (uint8_t *) startUpColorTemperatureMireds, sizeof(*startUpColorTemperatureMireds));
+    return emberAfReadServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) startUpColorTemperatureMireds,
+                                      sizeof(*startUpColorTemperatureMireds));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t startUpColorTemperatureMireds)
 {
-    return emberAfWriteServerAttribute(endpoint, ColorControl::Id, StartUpColorTemperatureMireds::Id,
-                                       (uint8_t *) &startUpColorTemperatureMireds, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ColorControl::Id, Id, (uint8_t *) &startUpColorTemperatureMireds,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace StartUpColorTemperatureMireds
@@ -7105,12 +7049,12 @@ namespace PhysicalMinLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * physicalMinLevel)
 {
-    return emberAfReadServerAttribute(endpoint, BallastConfiguration::Id, PhysicalMinLevel::Id, (uint8_t *) physicalMinLevel,
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) physicalMinLevel,
                                       sizeof(*physicalMinLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t physicalMinLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, BallastConfiguration::Id, PhysicalMinLevel::Id, (uint8_t *) &physicalMinLevel,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &physicalMinLevel,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -7120,12 +7064,12 @@ namespace PhysicalMaxLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * physicalMaxLevel)
 {
-    return emberAfReadServerAttribute(endpoint, BallastConfiguration::Id, PhysicalMaxLevel::Id, (uint8_t *) physicalMaxLevel,
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) physicalMaxLevel,
                                       sizeof(*physicalMaxLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t physicalMaxLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, BallastConfiguration::Id, PhysicalMaxLevel::Id, (uint8_t *) &physicalMaxLevel,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &physicalMaxLevel,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -7135,12 +7079,12 @@ namespace BallastStatus {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * ballastStatus)
 {
-    return emberAfReadServerAttribute(endpoint, BallastConfiguration::Id, BallastStatus::Id, (uint8_t *) ballastStatus,
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) ballastStatus,
                                       sizeof(*ballastStatus));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t ballastStatus)
 {
-    return emberAfWriteServerAttribute(endpoint, BallastConfiguration::Id, BallastStatus::Id, (uint8_t *) &ballastStatus,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &ballastStatus,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -7150,11 +7094,11 @@ namespace MinLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * minLevel)
 {
-    return emberAfReadServerAttribute(endpoint, BallastConfiguration::Id, MinLevel::Id, (uint8_t *) minLevel, sizeof(*minLevel));
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) minLevel, sizeof(*minLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t minLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, BallastConfiguration::Id, MinLevel::Id, (uint8_t *) &minLevel,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &minLevel,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -7164,11 +7108,11 @@ namespace MaxLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * maxLevel)
 {
-    return emberAfReadServerAttribute(endpoint, BallastConfiguration::Id, MaxLevel::Id, (uint8_t *) maxLevel, sizeof(*maxLevel));
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) maxLevel, sizeof(*maxLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t maxLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, BallastConfiguration::Id, MaxLevel::Id, (uint8_t *) &maxLevel,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &maxLevel,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -7178,12 +7122,12 @@ namespace PowerOnLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * powerOnLevel)
 {
-    return emberAfReadServerAttribute(endpoint, BallastConfiguration::Id, PowerOnLevel::Id, (uint8_t *) powerOnLevel,
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) powerOnLevel,
                                       sizeof(*powerOnLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t powerOnLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, BallastConfiguration::Id, PowerOnLevel::Id, (uint8_t *) &powerOnLevel,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &powerOnLevel,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -7193,12 +7137,12 @@ namespace PowerOnFadeTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * powerOnFadeTime)
 {
-    return emberAfReadServerAttribute(endpoint, BallastConfiguration::Id, PowerOnFadeTime::Id, (uint8_t *) powerOnFadeTime,
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) powerOnFadeTime,
                                       sizeof(*powerOnFadeTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t powerOnFadeTime)
 {
-    return emberAfWriteServerAttribute(endpoint, BallastConfiguration::Id, PowerOnFadeTime::Id, (uint8_t *) &powerOnFadeTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &powerOnFadeTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7208,13 +7152,13 @@ namespace IntrinsicBallastFactor {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * intrinsicBallastFactor)
 {
-    return emberAfReadServerAttribute(endpoint, BallastConfiguration::Id, IntrinsicBallastFactor::Id,
-                                      (uint8_t *) intrinsicBallastFactor, sizeof(*intrinsicBallastFactor));
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) intrinsicBallastFactor,
+                                      sizeof(*intrinsicBallastFactor));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t intrinsicBallastFactor)
 {
-    return emberAfWriteServerAttribute(endpoint, BallastConfiguration::Id, IntrinsicBallastFactor::Id,
-                                       (uint8_t *) &intrinsicBallastFactor, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &intrinsicBallastFactor,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace IntrinsicBallastFactor
@@ -7223,13 +7167,13 @@ namespace BallastFactorAdjustment {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * ballastFactorAdjustment)
 {
-    return emberAfReadServerAttribute(endpoint, BallastConfiguration::Id, BallastFactorAdjustment::Id,
-                                      (uint8_t *) ballastFactorAdjustment, sizeof(*ballastFactorAdjustment));
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) ballastFactorAdjustment,
+                                      sizeof(*ballastFactorAdjustment));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t ballastFactorAdjustment)
 {
-    return emberAfWriteServerAttribute(endpoint, BallastConfiguration::Id, BallastFactorAdjustment::Id,
-                                       (uint8_t *) &ballastFactorAdjustment, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &ballastFactorAdjustment,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BallastFactorAdjustment
@@ -7238,12 +7182,12 @@ namespace LampQuality {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * lampQuality)
 {
-    return emberAfReadServerAttribute(endpoint, BallastConfiguration::Id, LampQuality::Id, (uint8_t *) lampQuality,
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) lampQuality,
                                       sizeof(*lampQuality));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t lampQuality)
 {
-    return emberAfWriteServerAttribute(endpoint, BallastConfiguration::Id, LampQuality::Id, (uint8_t *) &lampQuality,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &lampQuality,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -7253,12 +7197,12 @@ namespace LampAlarmMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * lampAlarmMode)
 {
-    return emberAfReadServerAttribute(endpoint, BallastConfiguration::Id, LampAlarmMode::Id, (uint8_t *) lampAlarmMode,
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) lampAlarmMode,
                                       sizeof(*lampAlarmMode));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t lampAlarmMode)
 {
-    return emberAfWriteServerAttribute(endpoint, BallastConfiguration::Id, LampAlarmMode::Id, (uint8_t *) &lampAlarmMode,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &lampAlarmMode,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -7274,12 +7218,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, IlluminanceMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, IlluminanceMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7289,12 +7233,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, IlluminanceMeasurement::Id, MinMeasuredValue::Id, (uint8_t *) minMeasuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
                                       sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, IlluminanceMeasurement::Id, MinMeasuredValue::Id, (uint8_t *) &minMeasuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7304,12 +7248,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, IlluminanceMeasurement::Id, MaxMeasuredValue::Id, (uint8_t *) maxMeasuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
                                       sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, IlluminanceMeasurement::Id, MaxMeasuredValue::Id, (uint8_t *) &maxMeasuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7319,12 +7263,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, IlluminanceMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, IlluminanceMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7334,12 +7278,12 @@ namespace LightSensorType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * lightSensorType)
 {
-    return emberAfReadServerAttribute(endpoint, IlluminanceMeasurement::Id, LightSensorType::Id, (uint8_t *) lightSensorType,
+    return emberAfReadServerAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, (uint8_t *) lightSensorType,
                                       sizeof(*lightSensorType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t lightSensorType)
 {
-    return emberAfWriteServerAttribute(endpoint, IlluminanceMeasurement::Id, LightSensorType::Id, (uint8_t *) &lightSensorType,
+    return emberAfWriteServerAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, (uint8_t *) &lightSensorType,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -7355,12 +7299,12 @@ namespace LevelStatus {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * levelStatus)
 {
-    return emberAfReadServerAttribute(endpoint, IlluminanceLevelSensing::Id, LevelStatus::Id, (uint8_t *) levelStatus,
+    return emberAfReadServerAttribute(endpoint, Clusters::IlluminanceLevelSensing::Id, Id, (uint8_t *) levelStatus,
                                       sizeof(*levelStatus));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t levelStatus)
 {
-    return emberAfWriteServerAttribute(endpoint, IlluminanceLevelSensing::Id, LevelStatus::Id, (uint8_t *) &levelStatus,
+    return emberAfWriteServerAttribute(endpoint, Clusters::IlluminanceLevelSensing::Id, Id, (uint8_t *) &levelStatus,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -7370,12 +7314,12 @@ namespace LightSensorType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * lightSensorType)
 {
-    return emberAfReadServerAttribute(endpoint, IlluminanceLevelSensing::Id, LightSensorType::Id, (uint8_t *) lightSensorType,
+    return emberAfReadServerAttribute(endpoint, Clusters::IlluminanceLevelSensing::Id, Id, (uint8_t *) lightSensorType,
                                       sizeof(*lightSensorType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t lightSensorType)
 {
-    return emberAfWriteServerAttribute(endpoint, IlluminanceLevelSensing::Id, LightSensorType::Id, (uint8_t *) &lightSensorType,
+    return emberAfWriteServerAttribute(endpoint, Clusters::IlluminanceLevelSensing::Id, Id, (uint8_t *) &lightSensorType,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -7385,13 +7329,13 @@ namespace IlluminanceLevelTarget {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * illuminanceLevelTarget)
 {
-    return emberAfReadServerAttribute(endpoint, IlluminanceLevelSensing::Id, IlluminanceLevelTarget::Id,
-                                      (uint8_t *) illuminanceLevelTarget, sizeof(*illuminanceLevelTarget));
+    return emberAfReadServerAttribute(endpoint, Clusters::IlluminanceLevelSensing::Id, Id, (uint8_t *) illuminanceLevelTarget,
+                                      sizeof(*illuminanceLevelTarget));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t illuminanceLevelTarget)
 {
-    return emberAfWriteServerAttribute(endpoint, IlluminanceLevelSensing::Id, IlluminanceLevelTarget::Id,
-                                       (uint8_t *) &illuminanceLevelTarget, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::IlluminanceLevelSensing::Id, Id, (uint8_t *) &illuminanceLevelTarget,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace IlluminanceLevelTarget
@@ -7406,12 +7350,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TemperatureMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TemperatureMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7421,12 +7365,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TemperatureMeasurement::Id, MinMeasuredValue::Id, (uint8_t *) minMeasuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
                                       sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TemperatureMeasurement::Id, MinMeasuredValue::Id, (uint8_t *) &minMeasuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7436,12 +7380,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TemperatureMeasurement::Id, MaxMeasuredValue::Id, (uint8_t *) maxMeasuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
                                       sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TemperatureMeasurement::Id, MaxMeasuredValue::Id, (uint8_t *) &maxMeasuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7451,12 +7395,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, TemperatureMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, TemperatureMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7472,12 +7416,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, PressureMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, PressureMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7487,12 +7431,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, PressureMeasurement::Id, MinMeasuredValue::Id, (uint8_t *) minMeasuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
                                       sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, PressureMeasurement::Id, MinMeasuredValue::Id, (uint8_t *) &minMeasuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7502,12 +7446,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, PressureMeasurement::Id, MaxMeasuredValue::Id, (uint8_t *) maxMeasuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
                                       sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, PressureMeasurement::Id, MaxMeasuredValue::Id, (uint8_t *) &maxMeasuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7517,11 +7461,11 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, PressureMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance, sizeof(*tolerance));
+    return emberAfReadServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) tolerance, sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, PressureMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7531,12 +7475,12 @@ namespace ScaledValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * scaledValue)
 {
-    return emberAfReadServerAttribute(endpoint, PressureMeasurement::Id, ScaledValue::Id, (uint8_t *) scaledValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) scaledValue,
                                       sizeof(*scaledValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t scaledValue)
 {
-    return emberAfWriteServerAttribute(endpoint, PressureMeasurement::Id, ScaledValue::Id, (uint8_t *) &scaledValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) &scaledValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7546,12 +7490,12 @@ namespace MinScaledValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * minScaledValue)
 {
-    return emberAfReadServerAttribute(endpoint, PressureMeasurement::Id, MinScaledValue::Id, (uint8_t *) minScaledValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) minScaledValue,
                                       sizeof(*minScaledValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t minScaledValue)
 {
-    return emberAfWriteServerAttribute(endpoint, PressureMeasurement::Id, MinScaledValue::Id, (uint8_t *) &minScaledValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) &minScaledValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7561,12 +7505,12 @@ namespace MaxScaledValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * maxScaledValue)
 {
-    return emberAfReadServerAttribute(endpoint, PressureMeasurement::Id, MaxScaledValue::Id, (uint8_t *) maxScaledValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) maxScaledValue,
                                       sizeof(*maxScaledValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t maxScaledValue)
 {
-    return emberAfWriteServerAttribute(endpoint, PressureMeasurement::Id, MaxScaledValue::Id, (uint8_t *) &maxScaledValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) &maxScaledValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7576,12 +7520,12 @@ namespace ScaledTolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * scaledTolerance)
 {
-    return emberAfReadServerAttribute(endpoint, PressureMeasurement::Id, ScaledTolerance::Id, (uint8_t *) scaledTolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) scaledTolerance,
                                       sizeof(*scaledTolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t scaledTolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, PressureMeasurement::Id, ScaledTolerance::Id, (uint8_t *) &scaledTolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) &scaledTolerance,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7591,11 +7535,12 @@ namespace Scale {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int8_t * scale)
 {
-    return emberAfReadServerAttribute(endpoint, PressureMeasurement::Id, Scale::Id, (uint8_t *) scale, sizeof(*scale));
+    return emberAfReadServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) scale, sizeof(*scale));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t scale)
 {
-    return emberAfWriteServerAttribute(endpoint, PressureMeasurement::Id, Scale::Id, (uint8_t *) &scale, ZCL_INT8S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, (uint8_t *) &scale,
+                                       ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Scale
@@ -7610,12 +7555,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, FlowMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, FlowMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7625,12 +7570,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, FlowMeasurement::Id, MinMeasuredValue::Id, (uint8_t *) minMeasuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
                                       sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, FlowMeasurement::Id, MinMeasuredValue::Id, (uint8_t *) &minMeasuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7640,12 +7585,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, FlowMeasurement::Id, MaxMeasuredValue::Id, (uint8_t *) maxMeasuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
                                       sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, FlowMeasurement::Id, MaxMeasuredValue::Id, (uint8_t *) &maxMeasuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -7655,11 +7600,11 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, FlowMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance, sizeof(*tolerance));
+    return emberAfReadServerAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, (uint8_t *) tolerance, sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, FlowMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7675,12 +7620,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, RelativeHumidityMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, RelativeHumidityMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7690,13 +7635,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, RelativeHumidityMeasurement::Id, MinMeasuredValue::Id, (uint8_t *) minMeasuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
                                       sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, RelativeHumidityMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -7705,13 +7650,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, RelativeHumidityMeasurement::Id, MaxMeasuredValue::Id, (uint8_t *) maxMeasuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
                                       sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, RelativeHumidityMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -7720,12 +7665,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, RelativeHumidityMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, RelativeHumidityMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7741,11 +7686,11 @@ namespace Occupancy {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * occupancy)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, Occupancy::Id, (uint8_t *) occupancy, sizeof(*occupancy));
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) occupancy, sizeof(*occupancy));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t occupancy)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, Occupancy::Id, (uint8_t *) &occupancy,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) &occupancy,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -7755,12 +7700,12 @@ namespace OccupancySensorType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * occupancySensorType)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, OccupancySensorType::Id, (uint8_t *) occupancySensorType,
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) occupancySensorType,
                                       sizeof(*occupancySensorType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t occupancySensorType)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, OccupancySensorType::Id, (uint8_t *) &occupancySensorType,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) &occupancySensorType,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -7770,13 +7715,13 @@ namespace OccupancySensorTypeBitmap {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * occupancySensorTypeBitmap)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, OccupancySensorTypeBitmap::Id,
-                                      (uint8_t *) occupancySensorTypeBitmap, sizeof(*occupancySensorTypeBitmap));
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) occupancySensorTypeBitmap,
+                                      sizeof(*occupancySensorTypeBitmap));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t occupancySensorTypeBitmap)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, OccupancySensorTypeBitmap::Id,
-                                       (uint8_t *) &occupancySensorTypeBitmap, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) &occupancySensorTypeBitmap,
+                                       ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace OccupancySensorTypeBitmap
@@ -7785,13 +7730,13 @@ namespace PirOccupiedToUnoccupiedDelay {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * pirOccupiedToUnoccupiedDelay)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, PirOccupiedToUnoccupiedDelay::Id,
-                                      (uint8_t *) pirOccupiedToUnoccupiedDelay, sizeof(*pirOccupiedToUnoccupiedDelay));
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) pirOccupiedToUnoccupiedDelay,
+                                      sizeof(*pirOccupiedToUnoccupiedDelay));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t pirOccupiedToUnoccupiedDelay)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, PirOccupiedToUnoccupiedDelay::Id,
-                                       (uint8_t *) &pirOccupiedToUnoccupiedDelay, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) &pirOccupiedToUnoccupiedDelay,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PirOccupiedToUnoccupiedDelay
@@ -7800,13 +7745,13 @@ namespace PirUnoccupiedToOccupiedDelay {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * pirUnoccupiedToOccupiedDelay)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, PirUnoccupiedToOccupiedDelay::Id,
-                                      (uint8_t *) pirUnoccupiedToOccupiedDelay, sizeof(*pirUnoccupiedToOccupiedDelay));
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) pirUnoccupiedToOccupiedDelay,
+                                      sizeof(*pirUnoccupiedToOccupiedDelay));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t pirUnoccupiedToOccupiedDelay)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, PirUnoccupiedToOccupiedDelay::Id,
-                                       (uint8_t *) &pirUnoccupiedToOccupiedDelay, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) &pirUnoccupiedToOccupiedDelay,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PirUnoccupiedToOccupiedDelay
@@ -7815,13 +7760,13 @@ namespace PirUnoccupiedToOccupiedThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * pirUnoccupiedToOccupiedThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, PirUnoccupiedToOccupiedThreshold::Id,
-                                      (uint8_t *) pirUnoccupiedToOccupiedThreshold, sizeof(*pirUnoccupiedToOccupiedThreshold));
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) pirUnoccupiedToOccupiedThreshold,
+                                      sizeof(*pirUnoccupiedToOccupiedThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t pirUnoccupiedToOccupiedThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, PirUnoccupiedToOccupiedThreshold::Id,
-                                       (uint8_t *) &pirUnoccupiedToOccupiedThreshold, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) &pirUnoccupiedToOccupiedThreshold,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PirUnoccupiedToOccupiedThreshold
@@ -7830,13 +7775,12 @@ namespace UltrasonicOccupiedToUnoccupiedDelay {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * ultrasonicOccupiedToUnoccupiedDelay)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, UltrasonicOccupiedToUnoccupiedDelay::Id,
-                                      (uint8_t *) ultrasonicOccupiedToUnoccupiedDelay,
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) ultrasonicOccupiedToUnoccupiedDelay,
                                       sizeof(*ultrasonicOccupiedToUnoccupiedDelay));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t ultrasonicOccupiedToUnoccupiedDelay)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, UltrasonicOccupiedToUnoccupiedDelay::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id,
                                        (uint8_t *) &ultrasonicOccupiedToUnoccupiedDelay, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7846,13 +7790,12 @@ namespace UltrasonicUnoccupiedToOccupiedDelay {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * ultrasonicUnoccupiedToOccupiedDelay)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, UltrasonicUnoccupiedToOccupiedDelay::Id,
-                                      (uint8_t *) ultrasonicUnoccupiedToOccupiedDelay,
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id, (uint8_t *) ultrasonicUnoccupiedToOccupiedDelay,
                                       sizeof(*ultrasonicUnoccupiedToOccupiedDelay));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t ultrasonicUnoccupiedToOccupiedDelay)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, UltrasonicUnoccupiedToOccupiedDelay::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id,
                                        (uint8_t *) &ultrasonicUnoccupiedToOccupiedDelay, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7862,13 +7805,13 @@ namespace UltrasonicUnoccupiedToOccupiedThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * ultrasonicUnoccupiedToOccupiedThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, UltrasonicUnoccupiedToOccupiedThreshold::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id,
                                       (uint8_t *) ultrasonicUnoccupiedToOccupiedThreshold,
                                       sizeof(*ultrasonicUnoccupiedToOccupiedThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t ultrasonicUnoccupiedToOccupiedThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, UltrasonicUnoccupiedToOccupiedThreshold::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id,
                                        (uint8_t *) &ultrasonicUnoccupiedToOccupiedThreshold, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -7878,13 +7821,13 @@ namespace PhysicalContactOccupiedToUnoccupiedDelay {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * physicalContactOccupiedToUnoccupiedDelay)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, PhysicalContactOccupiedToUnoccupiedDelay::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id,
                                       (uint8_t *) physicalContactOccupiedToUnoccupiedDelay,
                                       sizeof(*physicalContactOccupiedToUnoccupiedDelay));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t physicalContactOccupiedToUnoccupiedDelay)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, PhysicalContactOccupiedToUnoccupiedDelay::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id,
                                        (uint8_t *) &physicalContactOccupiedToUnoccupiedDelay, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7894,13 +7837,13 @@ namespace PhysicalContactUnoccupiedToOccupiedDelay {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * physicalContactUnoccupiedToOccupiedDelay)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, PhysicalContactUnoccupiedToOccupiedDelay::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id,
                                       (uint8_t *) physicalContactUnoccupiedToOccupiedDelay,
                                       sizeof(*physicalContactUnoccupiedToOccupiedDelay));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t physicalContactUnoccupiedToOccupiedDelay)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, PhysicalContactUnoccupiedToOccupiedDelay::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id,
                                        (uint8_t *) &physicalContactUnoccupiedToOccupiedDelay, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -7910,13 +7853,13 @@ namespace PhysicalContactUnoccupiedToOccupiedThreshold {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * physicalContactUnoccupiedToOccupiedThreshold)
 {
-    return emberAfReadServerAttribute(endpoint, OccupancySensing::Id, PhysicalContactUnoccupiedToOccupiedThreshold::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id,
                                       (uint8_t *) physicalContactUnoccupiedToOccupiedThreshold,
                                       sizeof(*physicalContactUnoccupiedToOccupiedThreshold));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t physicalContactUnoccupiedToOccupiedThreshold)
 {
-    return emberAfWriteServerAttribute(endpoint, OccupancySensing::Id, PhysicalContactUnoccupiedToOccupiedThreshold::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OccupancySensing::Id, Id,
                                        (uint8_t *) &physicalContactUnoccupiedToOccupiedThreshold, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -7932,12 +7875,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MeasuredValue::Id,
-                                      (uint8_t *) measuredValue, sizeof(*measuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
+                                      sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -7947,12 +7890,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -7962,12 +7905,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -7977,12 +7920,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -7998,12 +7941,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
-                                      (uint8_t *) measuredValue, sizeof(*measuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
+                                      sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8013,12 +7956,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8028,12 +7971,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8043,12 +7986,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8064,13 +8007,13 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MeasuredValue::Id,
-                                       (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredValue
@@ -8079,13 +8022,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -8094,13 +8037,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -8109,12 +8052,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8130,12 +8073,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MeasuredValue::Id,
-                                      (uint8_t *) measuredValue, sizeof(*measuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::EthyleneOxideConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
+                                      sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthyleneOxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8145,12 +8088,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthyleneOxideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthyleneOxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8160,12 +8103,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthyleneOxideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthyleneOxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8175,12 +8118,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::EthyleneOxideConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthyleneOxideConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8196,13 +8139,13 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MeasuredValue::Id,
-                                       (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredValue
@@ -8211,13 +8154,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -8226,13 +8169,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -8241,12 +8184,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8262,12 +8205,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::HydrogenSulphideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::HydrogenSulphideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8277,12 +8220,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::HydrogenSulphideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::HydrogenSulphideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8292,12 +8235,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::HydrogenSulphideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::HydrogenSulphideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8307,13 +8250,13 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::HydrogenSulphideConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, Tolerance::Id,
-                                       (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::HydrogenSulphideConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace Tolerance
@@ -8328,13 +8271,13 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MeasuredValue::Id,
-                                      (uint8_t *) measuredValue, sizeof(*measuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::NitricOxideConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
+                                      sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MeasuredValue::Id,
-                                       (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::NitricOxideConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredValue
@@ -8343,12 +8286,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::NitricOxideConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::NitricOxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8358,12 +8301,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::NitricOxideConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::NitricOxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8373,12 +8316,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::NitricOxideConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::NitricOxideConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8394,12 +8337,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8409,12 +8352,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8424,12 +8367,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8439,12 +8382,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8460,12 +8403,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8475,13 +8418,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -8490,13 +8433,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -8505,12 +8448,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8526,12 +8469,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8541,13 +8484,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -8556,13 +8499,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -8571,12 +8514,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8592,12 +8535,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
-                                      (uint8_t *) measuredValue, sizeof(*measuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::SulfurDioxideConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
+                                      sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::SulfurDioxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8607,12 +8550,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::SulfurDioxideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::SulfurDioxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8622,12 +8565,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::SulfurDioxideConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::SulfurDioxideConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8637,12 +8580,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::SulfurDioxideConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::SulfurDioxideConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8658,12 +8601,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::DissolvedOxygenConcentrationMeasurement::Id, Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DissolvedOxygenConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8673,12 +8616,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::DissolvedOxygenConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DissolvedOxygenConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8688,12 +8631,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::DissolvedOxygenConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DissolvedOxygenConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8703,12 +8646,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::DissolvedOxygenConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::DissolvedOxygenConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8724,12 +8667,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8739,13 +8682,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -8754,13 +8697,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -8769,12 +8712,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, BromateConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, BromateConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8790,13 +8733,13 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MeasuredValue::Id,
-                                      (uint8_t *) measuredValue, sizeof(*measuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ChloraminesConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
+                                      sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MeasuredValue::Id,
-                                       (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChloraminesConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredValue
@@ -8805,12 +8748,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ChloraminesConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChloraminesConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8820,12 +8763,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ChloraminesConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChloraminesConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8835,12 +8778,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::ChloraminesConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChloraminesConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8856,13 +8799,13 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MeasuredValue::Id,
-                                       (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredValue
@@ -8871,13 +8814,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -8886,13 +8829,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -8901,12 +8844,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8922,12 +8865,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::FecalColiformAndEColiConcentrationMeasurement::Id, Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::FecalColiformAndEColiConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8937,12 +8880,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::FecalColiformAndEColiConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::FecalColiformAndEColiConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8952,12 +8895,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::FecalColiformAndEColiConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::FecalColiformAndEColiConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8967,12 +8910,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, Tolerance::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::FecalColiformAndEColiConcentrationMeasurement::Id, Id,
                                       (uint8_t *) tolerance, sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, Tolerance::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::FecalColiformAndEColiConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -8988,13 +8931,13 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MeasuredValue::Id,
-                                       (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredValue
@@ -9003,13 +8946,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -9018,13 +8961,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -9033,12 +8976,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9054,12 +8997,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::HaloaceticAcidsConcentrationMeasurement::Id, Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::HaloaceticAcidsConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9069,12 +9012,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::HaloaceticAcidsConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::HaloaceticAcidsConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9084,12 +9027,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::HaloaceticAcidsConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::HaloaceticAcidsConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9099,12 +9042,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::HaloaceticAcidsConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::HaloaceticAcidsConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9120,12 +9063,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::TotalTrihalomethanesConcentrationMeasurement::Id, Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TotalTrihalomethanesConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9135,12 +9078,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::TotalTrihalomethanesConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TotalTrihalomethanesConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9150,12 +9093,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::TotalTrihalomethanesConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TotalTrihalomethanesConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9165,12 +9108,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, Tolerance::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::TotalTrihalomethanesConcentrationMeasurement::Id, Id,
                                       (uint8_t *) tolerance, sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, Tolerance::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TotalTrihalomethanesConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9186,12 +9129,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::TotalColiformBacteriaConcentrationMeasurement::Id, Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TotalColiformBacteriaConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9201,12 +9144,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::TotalColiformBacteriaConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TotalColiformBacteriaConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9216,12 +9159,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::TotalColiformBacteriaConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TotalColiformBacteriaConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9231,12 +9174,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, Tolerance::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::TotalColiformBacteriaConcentrationMeasurement::Id, Id,
                                       (uint8_t *) tolerance, sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, Tolerance::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TotalColiformBacteriaConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9252,13 +9195,13 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::TurbidityConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MeasuredValue::Id,
-                                       (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TurbidityConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredValue
@@ -9267,13 +9210,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::TurbidityConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TurbidityConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -9282,13 +9225,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::TurbidityConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TurbidityConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -9297,12 +9240,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::TurbidityConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TurbidityConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9318,12 +9261,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9333,13 +9276,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -9348,13 +9291,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -9363,12 +9306,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, CopperConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, CopperConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9384,12 +9327,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9399,13 +9342,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -9414,13 +9357,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -9429,12 +9372,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, LeadConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, LeadConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9450,13 +9393,13 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::ManganeseConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MeasuredValue::Id,
-                                       (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ManganeseConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredValue
@@ -9465,13 +9408,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ManganeseConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ManganeseConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -9480,13 +9423,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ManganeseConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ManganeseConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -9495,12 +9438,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::ManganeseConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ManganeseConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9516,12 +9459,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9531,13 +9474,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -9546,13 +9489,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -9561,12 +9504,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9582,12 +9525,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::BromodichloromethaneConcentrationMeasurement::Id, Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromodichloromethaneConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9597,12 +9540,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::BromodichloromethaneConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromodichloromethaneConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9612,12 +9555,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::BromodichloromethaneConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromodichloromethaneConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9627,12 +9570,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, Tolerance::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::BromodichloromethaneConcentrationMeasurement::Id, Id,
                                       (uint8_t *) tolerance, sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, Tolerance::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromodichloromethaneConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9648,13 +9591,13 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::BromoformConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MeasuredValue::Id,
-                                       (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromoformConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredValue
@@ -9663,13 +9606,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::BromoformConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromoformConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -9678,13 +9621,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::BromoformConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromoformConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -9693,12 +9636,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::BromoformConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::BromoformConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9714,12 +9657,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ChlorodibromomethaneConcentrationMeasurement::Id, Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChlorodibromomethaneConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9729,12 +9672,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ChlorodibromomethaneConcentrationMeasurement::Id, Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChlorodibromomethaneConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9744,12 +9687,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ChlorodibromomethaneConcentrationMeasurement::Id, Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChlorodibromomethaneConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9759,12 +9702,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, Tolerance::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ChlorodibromomethaneConcentrationMeasurement::Id, Id,
                                       (uint8_t *) tolerance, sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, Tolerance::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChlorodibromomethaneConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9780,13 +9723,13 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MeasuredValue::Id,
-                                      (uint8_t *) measuredValue, sizeof(*measuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ChloroformConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
+                                      sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MeasuredValue::Id,
-                                       (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChloroformConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredValue
@@ -9795,12 +9738,12 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ChloroformConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MinMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChloroformConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9810,12 +9753,12 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::ChloroformConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MaxMeasuredValue::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChloroformConcentrationMeasurement::Id, Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9825,12 +9768,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::ChloroformConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ChloroformConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9846,12 +9789,12 @@ namespace MeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
+    return emberAfReadServerAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
+    return emberAfWriteServerAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9861,13 +9804,13 @@ namespace MinMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MinMeasuredValue::Id,
-                                       (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, (uint8_t *) &minMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinMeasuredValue
@@ -9876,13 +9819,13 @@ namespace MaxMeasuredValue {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
-    return emberAfReadServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
+    return emberAfReadServerAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
-    return emberAfWriteServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MaxMeasuredValue::Id,
-                                       (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxMeasuredValue
@@ -9891,12 +9834,12 @@ namespace Tolerance {
 
 EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
-    return emberAfReadServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
+    return emberAfReadServerAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
-    return emberAfWriteServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
+    return emberAfWriteServerAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
@@ -9912,11 +9855,11 @@ namespace ZoneState {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * zoneState)
 {
-    return emberAfReadServerAttribute(endpoint, IasZone::Id, ZoneState::Id, (uint8_t *) zoneState, sizeof(*zoneState));
+    return emberAfReadServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) zoneState, sizeof(*zoneState));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t zoneState)
 {
-    return emberAfWriteServerAttribute(endpoint, IasZone::Id, ZoneState::Id, (uint8_t *) &zoneState, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) &zoneState, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ZoneState
@@ -9925,11 +9868,11 @@ namespace ZoneType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * zoneType)
 {
-    return emberAfReadServerAttribute(endpoint, IasZone::Id, ZoneType::Id, (uint8_t *) zoneType, sizeof(*zoneType));
+    return emberAfReadServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) zoneType, sizeof(*zoneType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t zoneType)
 {
-    return emberAfWriteServerAttribute(endpoint, IasZone::Id, ZoneType::Id, (uint8_t *) &zoneType, ZCL_ENUM16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) &zoneType, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 } // namespace ZoneType
@@ -9938,11 +9881,11 @@ namespace ZoneStatus {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * zoneStatus)
 {
-    return emberAfReadServerAttribute(endpoint, IasZone::Id, ZoneStatus::Id, (uint8_t *) zoneStatus, sizeof(*zoneStatus));
+    return emberAfReadServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) zoneStatus, sizeof(*zoneStatus));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t zoneStatus)
 {
-    return emberAfWriteServerAttribute(endpoint, IasZone::Id, ZoneStatus::Id, (uint8_t *) &zoneStatus, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) &zoneStatus, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace ZoneStatus
@@ -9951,12 +9894,11 @@ namespace IasCieAddress {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::NodeId * iasCieAddress)
 {
-    return emberAfReadServerAttribute(endpoint, IasZone::Id, IasCieAddress::Id, (uint8_t *) iasCieAddress, sizeof(*iasCieAddress));
+    return emberAfReadServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) iasCieAddress, sizeof(*iasCieAddress));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId iasCieAddress)
 {
-    return emberAfWriteServerAttribute(endpoint, IasZone::Id, IasCieAddress::Id, (uint8_t *) &iasCieAddress,
-                                       ZCL_NODE_ID_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) &iasCieAddress, ZCL_NODE_ID_ATTRIBUTE_TYPE);
 }
 
 } // namespace IasCieAddress
@@ -9965,11 +9907,11 @@ namespace ZoneId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * zoneId)
 {
-    return emberAfReadServerAttribute(endpoint, IasZone::Id, ZoneId::Id, (uint8_t *) zoneId, sizeof(*zoneId));
+    return emberAfReadServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) zoneId, sizeof(*zoneId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t zoneId)
 {
-    return emberAfWriteServerAttribute(endpoint, IasZone::Id, ZoneId::Id, (uint8_t *) &zoneId, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) &zoneId, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ZoneId
@@ -9978,14 +9920,13 @@ namespace NumberOfZoneSensitivityLevelsSupported {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * numberOfZoneSensitivityLevelsSupported)
 {
-    return emberAfReadServerAttribute(endpoint, IasZone::Id, NumberOfZoneSensitivityLevelsSupported::Id,
-                                      (uint8_t *) numberOfZoneSensitivityLevelsSupported,
+    return emberAfReadServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) numberOfZoneSensitivityLevelsSupported,
                                       sizeof(*numberOfZoneSensitivityLevelsSupported));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t numberOfZoneSensitivityLevelsSupported)
 {
-    return emberAfWriteServerAttribute(endpoint, IasZone::Id, NumberOfZoneSensitivityLevelsSupported::Id,
-                                       (uint8_t *) &numberOfZoneSensitivityLevelsSupported, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) &numberOfZoneSensitivityLevelsSupported,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfZoneSensitivityLevelsSupported
@@ -9994,13 +9935,13 @@ namespace CurrentZoneSensitivityLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentZoneSensitivityLevel)
 {
-    return emberAfReadServerAttribute(endpoint, IasZone::Id, CurrentZoneSensitivityLevel::Id,
-                                      (uint8_t *) currentZoneSensitivityLevel, sizeof(*currentZoneSensitivityLevel));
+    return emberAfReadServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) currentZoneSensitivityLevel,
+                                      sizeof(*currentZoneSensitivityLevel));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentZoneSensitivityLevel)
 {
-    return emberAfWriteServerAttribute(endpoint, IasZone::Id, CurrentZoneSensitivityLevel::Id,
-                                       (uint8_t *) &currentZoneSensitivityLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::IasZone::Id, Id, (uint8_t *) &currentZoneSensitivityLevel,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentZoneSensitivityLevel
@@ -10015,11 +9956,11 @@ namespace MaxDuration {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxDuration)
 {
-    return emberAfReadServerAttribute(endpoint, IasWd::Id, MaxDuration::Id, (uint8_t *) maxDuration, sizeof(*maxDuration));
+    return emberAfReadServerAttribute(endpoint, Clusters::IasWd::Id, Id, (uint8_t *) maxDuration, sizeof(*maxDuration));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxDuration)
 {
-    return emberAfWriteServerAttribute(endpoint, IasWd::Id, MaxDuration::Id, (uint8_t *) &maxDuration, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::IasWd::Id, Id, (uint8_t *) &maxDuration, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxDuration
@@ -10046,13 +9987,13 @@ namespace CurrentNavigatorTarget {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentNavigatorTarget)
 {
-    return emberAfReadServerAttribute(endpoint, TargetNavigator::Id, CurrentNavigatorTarget::Id, (uint8_t *) currentNavigatorTarget,
+    return emberAfReadServerAttribute(endpoint, Clusters::TargetNavigator::Id, Id, (uint8_t *) currentNavigatorTarget,
                                       sizeof(*currentNavigatorTarget));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentNavigatorTarget)
 {
-    return emberAfWriteServerAttribute(endpoint, TargetNavigator::Id, CurrentNavigatorTarget::Id,
-                                       (uint8_t *) &currentNavigatorTarget, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TargetNavigator::Id, Id, (uint8_t *) &currentNavigatorTarget,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentNavigatorTarget
@@ -10067,12 +10008,11 @@ namespace PlaybackState {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * playbackState)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, PlaybackState::Id, (uint8_t *) playbackState,
-                                      sizeof(*playbackState));
+    return emberAfReadServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) playbackState, sizeof(*playbackState));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t playbackState)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, PlaybackState::Id, (uint8_t *) &playbackState,
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) &playbackState,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -10082,11 +10022,11 @@ namespace StartTime {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * startTime)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, StartTime::Id, (uint8_t *) startTime, sizeof(*startTime));
+    return emberAfReadServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) startTime, sizeof(*startTime));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t startTime)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, StartTime::Id, (uint8_t *) &startTime,
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) &startTime,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -10096,11 +10036,11 @@ namespace Duration {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * duration)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, Duration::Id, (uint8_t *) duration, sizeof(*duration));
+    return emberAfReadServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) duration, sizeof(*duration));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t duration)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Duration::Id, (uint8_t *) &duration, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) &duration, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Duration
@@ -10109,12 +10049,12 @@ namespace PositionUpdatedAt {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * positionUpdatedAt)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, PositionUpdatedAt::Id, (uint8_t *) positionUpdatedAt,
+    return emberAfReadServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) positionUpdatedAt,
                                       sizeof(*positionUpdatedAt));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t positionUpdatedAt)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, PositionUpdatedAt::Id, (uint8_t *) &positionUpdatedAt,
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) &positionUpdatedAt,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -10124,11 +10064,11 @@ namespace Position {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * position)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, Position::Id, (uint8_t *) position, sizeof(*position));
+    return emberAfReadServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) position, sizeof(*position));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t position)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Position::Id, (uint8_t *) &position, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) &position, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Position
@@ -10137,12 +10077,11 @@ namespace PlaybackSpeed {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * playbackSpeed)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, PlaybackSpeed::Id, (uint8_t *) playbackSpeed,
-                                      sizeof(*playbackSpeed));
+    return emberAfReadServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) playbackSpeed, sizeof(*playbackSpeed));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t playbackSpeed)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, PlaybackSpeed::Id, (uint8_t *) &playbackSpeed,
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) &playbackSpeed,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -10152,12 +10091,11 @@ namespace SeekRangeEnd {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * seekRangeEnd)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, SeekRangeEnd::Id, (uint8_t *) seekRangeEnd,
-                                      sizeof(*seekRangeEnd));
+    return emberAfReadServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) seekRangeEnd, sizeof(*seekRangeEnd));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t seekRangeEnd)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, SeekRangeEnd::Id, (uint8_t *) &seekRangeEnd,
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) &seekRangeEnd,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -10167,12 +10105,12 @@ namespace SeekRangeStart {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * seekRangeStart)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, SeekRangeStart::Id, (uint8_t *) seekRangeStart,
+    return emberAfReadServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) seekRangeStart,
                                       sizeof(*seekRangeStart));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t seekRangeStart)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, SeekRangeStart::Id, (uint8_t *) &seekRangeStart,
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, (uint8_t *) &seekRangeStart,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
@@ -10188,12 +10126,12 @@ namespace CurrentMediaInput {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentMediaInput)
 {
-    return emberAfReadServerAttribute(endpoint, MediaInput::Id, CurrentMediaInput::Id, (uint8_t *) currentMediaInput,
+    return emberAfReadServerAttribute(endpoint, Clusters::MediaInput::Id, Id, (uint8_t *) currentMediaInput,
                                       sizeof(*currentMediaInput));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentMediaInput)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaInput::Id, CurrentMediaInput::Id, (uint8_t *) &currentMediaInput,
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaInput::Id, Id, (uint8_t *) &currentMediaInput,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -10215,12 +10153,12 @@ namespace CurrentAudioOutput {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentAudioOutput)
 {
-    return emberAfReadServerAttribute(endpoint, AudioOutput::Id, CurrentAudioOutput::Id, (uint8_t *) currentAudioOutput,
+    return emberAfReadServerAttribute(endpoint, Clusters::AudioOutput::Id, Id, (uint8_t *) currentAudioOutput,
                                       sizeof(*currentAudioOutput));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentAudioOutput)
 {
-    return emberAfWriteServerAttribute(endpoint, AudioOutput::Id, CurrentAudioOutput::Id, (uint8_t *) &currentAudioOutput,
+    return emberAfWriteServerAttribute(endpoint, Clusters::AudioOutput::Id, Id, (uint8_t *) &currentAudioOutput,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -10236,12 +10174,12 @@ namespace CatalogVendorId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * catalogVendorId)
 {
-    return emberAfReadServerAttribute(endpoint, ApplicationLauncher::Id, CatalogVendorId::Id, (uint8_t *) catalogVendorId,
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, (uint8_t *) catalogVendorId,
                                       sizeof(*catalogVendorId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t catalogVendorId)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplicationLauncher::Id, CatalogVendorId::Id, (uint8_t *) &catalogVendorId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, (uint8_t *) &catalogVendorId,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -10251,12 +10189,12 @@ namespace ApplicationId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * applicationId)
 {
-    return emberAfReadServerAttribute(endpoint, ApplicationLauncher::Id, ApplicationId::Id, (uint8_t *) applicationId,
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, (uint8_t *) applicationId,
                                       sizeof(*applicationId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t applicationId)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplicationLauncher::Id, ApplicationId::Id, (uint8_t *) &applicationId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, (uint8_t *) &applicationId,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -10272,11 +10210,11 @@ namespace VendorId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * vendorId)
 {
-    return emberAfReadServerAttribute(endpoint, ApplicationBasic::Id, VendorId::Id, (uint8_t *) vendorId, sizeof(*vendorId));
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, (uint8_t *) vendorId, sizeof(*vendorId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t vendorId)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplicationBasic::Id, VendorId::Id, (uint8_t *) &vendorId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, (uint8_t *) &vendorId,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10286,11 +10224,11 @@ namespace ProductId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * productId)
 {
-    return emberAfReadServerAttribute(endpoint, ApplicationBasic::Id, ProductId::Id, (uint8_t *) productId, sizeof(*productId));
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, (uint8_t *) productId, sizeof(*productId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t productId)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplicationBasic::Id, ProductId::Id, (uint8_t *) &productId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, (uint8_t *) &productId,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10300,12 +10238,12 @@ namespace CatalogVendorId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * catalogVendorId)
 {
-    return emberAfReadServerAttribute(endpoint, ApplicationBasic::Id, CatalogVendorId::Id, (uint8_t *) catalogVendorId,
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, (uint8_t *) catalogVendorId,
                                       sizeof(*catalogVendorId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t catalogVendorId)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplicationBasic::Id, CatalogVendorId::Id, (uint8_t *) &catalogVendorId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, (uint8_t *) &catalogVendorId,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10315,12 +10253,12 @@ namespace ApplicationStatus {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * applicationStatus)
 {
-    return emberAfReadServerAttribute(endpoint, ApplicationBasic::Id, ApplicationStatus::Id, (uint8_t *) applicationStatus,
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, (uint8_t *) applicationStatus,
                                       sizeof(*applicationStatus));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t applicationStatus)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplicationBasic::Id, ApplicationStatus::Id, (uint8_t *) &applicationStatus,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, (uint8_t *) &applicationStatus,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
@@ -10336,11 +10274,11 @@ namespace Boolean {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * boolean)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Boolean::Id, (uint8_t *) boolean, sizeof(*boolean));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) boolean, sizeof(*boolean));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool boolean)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Boolean::Id, (uint8_t *) &boolean, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &boolean, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Boolean
@@ -10349,11 +10287,11 @@ namespace Bitmap8 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * bitmap8)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Bitmap8::Id, (uint8_t *) bitmap8, sizeof(*bitmap8));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) bitmap8, sizeof(*bitmap8));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t bitmap8)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Bitmap8::Id, (uint8_t *) &bitmap8, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &bitmap8, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap8
@@ -10362,11 +10300,11 @@ namespace Bitmap16 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * bitmap16)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Bitmap16::Id, (uint8_t *) bitmap16, sizeof(*bitmap16));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) bitmap16, sizeof(*bitmap16));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t bitmap16)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Bitmap16::Id, (uint8_t *) &bitmap16, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &bitmap16, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap16
@@ -10375,11 +10313,11 @@ namespace Bitmap32 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * bitmap32)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Bitmap32::Id, (uint8_t *) bitmap32, sizeof(*bitmap32));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) bitmap32, sizeof(*bitmap32));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t bitmap32)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Bitmap32::Id, (uint8_t *) &bitmap32, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &bitmap32, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap32
@@ -10388,11 +10326,11 @@ namespace Bitmap64 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * bitmap64)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Bitmap64::Id, (uint8_t *) bitmap64, sizeof(*bitmap64));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) bitmap64, sizeof(*bitmap64));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t bitmap64)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Bitmap64::Id, (uint8_t *) &bitmap64, ZCL_BITMAP64_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &bitmap64, ZCL_BITMAP64_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap64
@@ -10401,11 +10339,11 @@ namespace Int8u {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * int8u)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Int8u::Id, (uint8_t *) int8u, sizeof(*int8u));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) int8u, sizeof(*int8u));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t int8u)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Int8u::Id, (uint8_t *) &int8u, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &int8u, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int8u
@@ -10414,11 +10352,11 @@ namespace Int16u {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * int16u)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Int16u::Id, (uint8_t *) int16u, sizeof(*int16u));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) int16u, sizeof(*int16u));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t int16u)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Int16u::Id, (uint8_t *) &int16u, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &int16u, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int16u
@@ -10427,11 +10365,11 @@ namespace Int32u {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * int32u)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Int32u::Id, (uint8_t *) int32u, sizeof(*int32u));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) int32u, sizeof(*int32u));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t int32u)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Int32u::Id, (uint8_t *) &int32u, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &int32u, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int32u
@@ -10440,11 +10378,11 @@ namespace Int64u {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * int64u)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Int64u::Id, (uint8_t *) int64u, sizeof(*int64u));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) int64u, sizeof(*int64u));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t int64u)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Int64u::Id, (uint8_t *) &int64u, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &int64u, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int64u
@@ -10453,11 +10391,11 @@ namespace Int8s {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int8_t * int8s)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Int8s::Id, (uint8_t *) int8s, sizeof(*int8s));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) int8s, sizeof(*int8s));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t int8s)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Int8s::Id, (uint8_t *) &int8s, ZCL_INT8S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &int8s, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int8s
@@ -10466,11 +10404,11 @@ namespace Int16s {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * int16s)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Int16s::Id, (uint8_t *) int16s, sizeof(*int16s));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) int16s, sizeof(*int16s));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t int16s)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Int16s::Id, (uint8_t *) &int16s, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &int16s, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int16s
@@ -10479,11 +10417,11 @@ namespace Int32s {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int32_t * int32s)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Int32s::Id, (uint8_t *) int32s, sizeof(*int32s));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) int32s, sizeof(*int32s));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int32_t int32s)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Int32s::Id, (uint8_t *) &int32s, ZCL_INT32S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &int32s, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int32s
@@ -10492,11 +10430,11 @@ namespace Int64s {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int64_t * int64s)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Int64s::Id, (uint8_t *) int64s, sizeof(*int64s));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) int64s, sizeof(*int64s));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int64_t int64s)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Int64s::Id, (uint8_t *) &int64s, ZCL_INT64S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &int64s, ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int64s
@@ -10505,11 +10443,11 @@ namespace Enum8 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * enum8)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Enum8::Id, (uint8_t *) enum8, sizeof(*enum8));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) enum8, sizeof(*enum8));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t enum8)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Enum8::Id, (uint8_t *) &enum8, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &enum8, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Enum8
@@ -10518,11 +10456,11 @@ namespace Enum16 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * enum16)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Enum16::Id, (uint8_t *) enum16, sizeof(*enum16));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) enum16, sizeof(*enum16));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t enum16)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Enum16::Id, (uint8_t *) &enum16, ZCL_ENUM16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &enum16, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 } // namespace Enum16
@@ -10531,11 +10469,11 @@ namespace EpochUs {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * epochUs)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, EpochUs::Id, (uint8_t *) epochUs, sizeof(*epochUs));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) epochUs, sizeof(*epochUs));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t epochUs)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, EpochUs::Id, (uint8_t *) &epochUs, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &epochUs, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
 }
 
 } // namespace EpochUs
@@ -10544,11 +10482,11 @@ namespace EpochS {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * epochS)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, EpochS::Id, (uint8_t *) epochS, sizeof(*epochS));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) epochS, sizeof(*epochS));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t epochS)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, EpochS::Id, (uint8_t *) &epochS, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &epochS, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace EpochS
@@ -10557,11 +10495,11 @@ namespace Unsupported {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * unsupported)
 {
-    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Unsupported::Id, (uint8_t *) unsupported, sizeof(*unsupported));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) unsupported, sizeof(*unsupported));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, bool unsupported)
 {
-    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Unsupported::Id, (uint8_t *) &unsupported,
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &unsupported,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -10577,12 +10515,12 @@ namespace CompanyId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * companyId)
 {
-    return emberAfReadServerAttribute(endpoint, ApplianceIdentification::Id, CompanyId::Id, (uint8_t *) companyId,
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplianceIdentification::Id, Id, (uint8_t *) companyId,
                                       sizeof(*companyId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t companyId)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplianceIdentification::Id, CompanyId::Id, (uint8_t *) &companyId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplianceIdentification::Id, Id, (uint8_t *) &companyId,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10592,11 +10530,11 @@ namespace BrandId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * brandId)
 {
-    return emberAfReadServerAttribute(endpoint, ApplianceIdentification::Id, BrandId::Id, (uint8_t *) brandId, sizeof(*brandId));
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplianceIdentification::Id, Id, (uint8_t *) brandId, sizeof(*brandId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t brandId)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplianceIdentification::Id, BrandId::Id, (uint8_t *) &brandId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplianceIdentification::Id, Id, (uint8_t *) &brandId,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10606,12 +10544,12 @@ namespace ProductTypeId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * productTypeId)
 {
-    return emberAfReadServerAttribute(endpoint, ApplianceIdentification::Id, ProductTypeId::Id, (uint8_t *) productTypeId,
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplianceIdentification::Id, Id, (uint8_t *) productTypeId,
                                       sizeof(*productTypeId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t productTypeId)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplianceIdentification::Id, ProductTypeId::Id, (uint8_t *) &productTypeId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplianceIdentification::Id, Id, (uint8_t *) &productTypeId,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10621,13 +10559,13 @@ namespace CecedSpecificationVersion {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * cecedSpecificationVersion)
 {
-    return emberAfReadServerAttribute(endpoint, ApplianceIdentification::Id, CecedSpecificationVersion::Id,
-                                      (uint8_t *) cecedSpecificationVersion, sizeof(*cecedSpecificationVersion));
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplianceIdentification::Id, Id, (uint8_t *) cecedSpecificationVersion,
+                                      sizeof(*cecedSpecificationVersion));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t cecedSpecificationVersion)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplianceIdentification::Id, CecedSpecificationVersion::Id,
-                                       (uint8_t *) &cecedSpecificationVersion, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplianceIdentification::Id, Id, (uint8_t *) &cecedSpecificationVersion,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CecedSpecificationVersion
@@ -10642,12 +10580,12 @@ namespace MeterTypeId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * meterTypeId)
 {
-    return emberAfReadServerAttribute(endpoint, MeterIdentification::Id, MeterTypeId::Id, (uint8_t *) meterTypeId,
+    return emberAfReadServerAttribute(endpoint, Clusters::MeterIdentification::Id, Id, (uint8_t *) meterTypeId,
                                       sizeof(*meterTypeId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t meterTypeId)
 {
-    return emberAfWriteServerAttribute(endpoint, MeterIdentification::Id, MeterTypeId::Id, (uint8_t *) &meterTypeId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::MeterIdentification::Id, Id, (uint8_t *) &meterTypeId,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10657,12 +10595,12 @@ namespace DataQualityId {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * dataQualityId)
 {
-    return emberAfReadServerAttribute(endpoint, MeterIdentification::Id, DataQualityId::Id, (uint8_t *) dataQualityId,
+    return emberAfReadServerAttribute(endpoint, Clusters::MeterIdentification::Id, Id, (uint8_t *) dataQualityId,
                                       sizeof(*dataQualityId));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t dataQualityId)
 {
-    return emberAfWriteServerAttribute(endpoint, MeterIdentification::Id, DataQualityId::Id, (uint8_t *) &dataQualityId,
+    return emberAfWriteServerAttribute(endpoint, Clusters::MeterIdentification::Id, Id, (uint8_t *) &dataQualityId,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10678,12 +10616,11 @@ namespace LogMaxSize {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * logMaxSize)
 {
-    return emberAfReadServerAttribute(endpoint, ApplianceStatistics::Id, LogMaxSize::Id, (uint8_t *) logMaxSize,
-                                      sizeof(*logMaxSize));
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplianceStatistics::Id, Id, (uint8_t *) logMaxSize, sizeof(*logMaxSize));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t logMaxSize)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplianceStatistics::Id, LogMaxSize::Id, (uint8_t *) &logMaxSize,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplianceStatistics::Id, Id, (uint8_t *) &logMaxSize,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -10693,12 +10630,12 @@ namespace LogQueueMaxSize {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * logQueueMaxSize)
 {
-    return emberAfReadServerAttribute(endpoint, ApplianceStatistics::Id, LogQueueMaxSize::Id, (uint8_t *) logQueueMaxSize,
+    return emberAfReadServerAttribute(endpoint, Clusters::ApplianceStatistics::Id, Id, (uint8_t *) logQueueMaxSize,
                                       sizeof(*logQueueMaxSize));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t logQueueMaxSize)
 {
-    return emberAfWriteServerAttribute(endpoint, ApplianceStatistics::Id, LogQueueMaxSize::Id, (uint8_t *) &logQueueMaxSize,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplianceStatistics::Id, Id, (uint8_t *) &logQueueMaxSize,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -10714,12 +10651,12 @@ namespace MeasurementType {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * measurementType)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, MeasurementType::Id, (uint8_t *) measurementType,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) measurementType,
                                       sizeof(*measurementType));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t measurementType)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, MeasurementType::Id, (uint8_t *) &measurementType,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &measurementType,
                                        ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
@@ -10729,12 +10666,11 @@ namespace DcVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * dcVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcVoltage::Id, (uint8_t *) dcVoltage,
-                                      sizeof(*dcVoltage));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcVoltage, sizeof(*dcVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t dcVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcVoltage::Id, (uint8_t *) &dcVoltage,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcVoltage,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -10744,12 +10680,12 @@ namespace DcVoltageMin {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * dcVoltageMin)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcVoltageMin::Id, (uint8_t *) dcVoltageMin,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcVoltageMin,
                                       sizeof(*dcVoltageMin));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t dcVoltageMin)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcVoltageMin::Id, (uint8_t *) &dcVoltageMin,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcVoltageMin,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -10759,12 +10695,12 @@ namespace DcVoltageMax {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * dcVoltageMax)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcVoltageMax::Id, (uint8_t *) dcVoltageMax,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcVoltageMax,
                                       sizeof(*dcVoltageMax));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t dcVoltageMax)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcVoltageMax::Id, (uint8_t *) &dcVoltageMax,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcVoltageMax,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -10774,12 +10710,11 @@ namespace DcCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * dcCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcCurrent::Id, (uint8_t *) dcCurrent,
-                                      sizeof(*dcCurrent));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcCurrent, sizeof(*dcCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t dcCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcCurrent::Id, (uint8_t *) &dcCurrent,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcCurrent,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -10789,12 +10724,12 @@ namespace DcCurrentMin {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * dcCurrentMin)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcCurrentMin::Id, (uint8_t *) dcCurrentMin,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcCurrentMin,
                                       sizeof(*dcCurrentMin));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t dcCurrentMin)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcCurrentMin::Id, (uint8_t *) &dcCurrentMin,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcCurrentMin,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -10804,12 +10739,12 @@ namespace DcCurrentMax {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * dcCurrentMax)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcCurrentMax::Id, (uint8_t *) dcCurrentMax,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcCurrentMax,
                                       sizeof(*dcCurrentMax));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t dcCurrentMax)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcCurrentMax::Id, (uint8_t *) &dcCurrentMax,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcCurrentMax,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -10819,11 +10754,11 @@ namespace DcPower {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * dcPower)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcPower::Id, (uint8_t *) dcPower, sizeof(*dcPower));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcPower, sizeof(*dcPower));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t dcPower)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcPower::Id, (uint8_t *) &dcPower,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcPower,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -10833,12 +10768,12 @@ namespace DcPowerMin {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * dcPowerMin)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcPowerMin::Id, (uint8_t *) dcPowerMin,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcPowerMin,
                                       sizeof(*dcPowerMin));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t dcPowerMin)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcPowerMin::Id, (uint8_t *) &dcPowerMin,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcPowerMin,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -10848,12 +10783,12 @@ namespace DcPowerMax {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * dcPowerMax)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcPowerMax::Id, (uint8_t *) dcPowerMax,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcPowerMax,
                                       sizeof(*dcPowerMax));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t dcPowerMax)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcPowerMax::Id, (uint8_t *) &dcPowerMax,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcPowerMax,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -10863,13 +10798,13 @@ namespace DcVoltageMultiplier {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * dcVoltageMultiplier)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcVoltageMultiplier::Id, (uint8_t *) dcVoltageMultiplier,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcVoltageMultiplier,
                                       sizeof(*dcVoltageMultiplier));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t dcVoltageMultiplier)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcVoltageMultiplier::Id,
-                                       (uint8_t *) &dcVoltageMultiplier, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcVoltageMultiplier,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcVoltageMultiplier
@@ -10878,12 +10813,12 @@ namespace DcVoltageDivisor {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * dcVoltageDivisor)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcVoltageDivisor::Id, (uint8_t *) dcVoltageDivisor,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcVoltageDivisor,
                                       sizeof(*dcVoltageDivisor));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t dcVoltageDivisor)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcVoltageDivisor::Id, (uint8_t *) &dcVoltageDivisor,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcVoltageDivisor,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10893,13 +10828,13 @@ namespace DcCurrentMultiplier {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * dcCurrentMultiplier)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcCurrentMultiplier::Id, (uint8_t *) dcCurrentMultiplier,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcCurrentMultiplier,
                                       sizeof(*dcCurrentMultiplier));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t dcCurrentMultiplier)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcCurrentMultiplier::Id,
-                                       (uint8_t *) &dcCurrentMultiplier, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcCurrentMultiplier,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcCurrentMultiplier
@@ -10908,12 +10843,12 @@ namespace DcCurrentDivisor {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * dcCurrentDivisor)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcCurrentDivisor::Id, (uint8_t *) dcCurrentDivisor,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcCurrentDivisor,
                                       sizeof(*dcCurrentDivisor));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t dcCurrentDivisor)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcCurrentDivisor::Id, (uint8_t *) &dcCurrentDivisor,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcCurrentDivisor,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10923,12 +10858,12 @@ namespace DcPowerMultiplier {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * dcPowerMultiplier)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcPowerMultiplier::Id, (uint8_t *) dcPowerMultiplier,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcPowerMultiplier,
                                       sizeof(*dcPowerMultiplier));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t dcPowerMultiplier)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcPowerMultiplier::Id, (uint8_t *) &dcPowerMultiplier,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcPowerMultiplier,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10938,12 +10873,12 @@ namespace DcPowerDivisor {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * dcPowerDivisor)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, DcPowerDivisor::Id, (uint8_t *) dcPowerDivisor,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) dcPowerDivisor,
                                       sizeof(*dcPowerDivisor));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t dcPowerDivisor)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, DcPowerDivisor::Id, (uint8_t *) &dcPowerDivisor,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &dcPowerDivisor,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10953,12 +10888,12 @@ namespace AcFrequency {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acFrequency)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcFrequency::Id, (uint8_t *) acFrequency,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acFrequency,
                                       sizeof(*acFrequency));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acFrequency)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcFrequency::Id, (uint8_t *) &acFrequency,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acFrequency,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10968,12 +10903,12 @@ namespace AcFrequencyMin {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acFrequencyMin)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcFrequencyMin::Id, (uint8_t *) acFrequencyMin,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acFrequencyMin,
                                       sizeof(*acFrequencyMin));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acFrequencyMin)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcFrequencyMin::Id, (uint8_t *) &acFrequencyMin,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acFrequencyMin,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10983,12 +10918,12 @@ namespace AcFrequencyMax {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acFrequencyMax)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcFrequencyMax::Id, (uint8_t *) acFrequencyMax,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acFrequencyMax,
                                       sizeof(*acFrequencyMax));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acFrequencyMax)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcFrequencyMax::Id, (uint8_t *) &acFrequencyMax,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acFrequencyMax,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -10998,12 +10933,12 @@ namespace NeutralCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * neutralCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, NeutralCurrent::Id, (uint8_t *) neutralCurrent,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) neutralCurrent,
                                       sizeof(*neutralCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t neutralCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, NeutralCurrent::Id, (uint8_t *) &neutralCurrent,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &neutralCurrent,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11013,12 +10948,12 @@ namespace TotalActivePower {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int32_t * totalActivePower)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, TotalActivePower::Id, (uint8_t *) totalActivePower,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) totalActivePower,
                                       sizeof(*totalActivePower));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int32_t totalActivePower)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, TotalActivePower::Id, (uint8_t *) &totalActivePower,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &totalActivePower,
                                        ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
@@ -11028,12 +10963,12 @@ namespace TotalReactivePower {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int32_t * totalReactivePower)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, TotalReactivePower::Id, (uint8_t *) totalReactivePower,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) totalReactivePower,
                                       sizeof(*totalReactivePower));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int32_t totalReactivePower)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, TotalReactivePower::Id, (uint8_t *) &totalReactivePower,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &totalReactivePower,
                                        ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
@@ -11043,12 +10978,12 @@ namespace TotalApparentPower {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * totalApparentPower)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, TotalApparentPower::Id, (uint8_t *) totalApparentPower,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) totalApparentPower,
                                       sizeof(*totalApparentPower));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t totalApparentPower)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, TotalApparentPower::Id, (uint8_t *) &totalApparentPower,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &totalApparentPower,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -11058,13 +10993,13 @@ namespace Measured1stHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measured1stHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, Measured1stHarmonicCurrent::Id,
-                                      (uint8_t *) measured1stHarmonicCurrent, sizeof(*measured1stHarmonicCurrent));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) measured1stHarmonicCurrent,
+                                      sizeof(*measured1stHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measured1stHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, Measured1stHarmonicCurrent::Id,
-                                       (uint8_t *) &measured1stHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &measured1stHarmonicCurrent,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured1stHarmonicCurrent
@@ -11073,13 +11008,13 @@ namespace Measured3rdHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measured3rdHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, Measured3rdHarmonicCurrent::Id,
-                                      (uint8_t *) measured3rdHarmonicCurrent, sizeof(*measured3rdHarmonicCurrent));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) measured3rdHarmonicCurrent,
+                                      sizeof(*measured3rdHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measured3rdHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, Measured3rdHarmonicCurrent::Id,
-                                       (uint8_t *) &measured3rdHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &measured3rdHarmonicCurrent,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured3rdHarmonicCurrent
@@ -11088,13 +11023,13 @@ namespace Measured5thHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measured5thHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, Measured5thHarmonicCurrent::Id,
-                                      (uint8_t *) measured5thHarmonicCurrent, sizeof(*measured5thHarmonicCurrent));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) measured5thHarmonicCurrent,
+                                      sizeof(*measured5thHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measured5thHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, Measured5thHarmonicCurrent::Id,
-                                       (uint8_t *) &measured5thHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &measured5thHarmonicCurrent,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured5thHarmonicCurrent
@@ -11103,13 +11038,13 @@ namespace Measured7thHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measured7thHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, Measured7thHarmonicCurrent::Id,
-                                      (uint8_t *) measured7thHarmonicCurrent, sizeof(*measured7thHarmonicCurrent));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) measured7thHarmonicCurrent,
+                                      sizeof(*measured7thHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measured7thHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, Measured7thHarmonicCurrent::Id,
-                                       (uint8_t *) &measured7thHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &measured7thHarmonicCurrent,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured7thHarmonicCurrent
@@ -11118,13 +11053,13 @@ namespace Measured9thHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measured9thHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, Measured9thHarmonicCurrent::Id,
-                                      (uint8_t *) measured9thHarmonicCurrent, sizeof(*measured9thHarmonicCurrent));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) measured9thHarmonicCurrent,
+                                      sizeof(*measured9thHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measured9thHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, Measured9thHarmonicCurrent::Id,
-                                       (uint8_t *) &measured9thHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &measured9thHarmonicCurrent,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured9thHarmonicCurrent
@@ -11133,13 +11068,13 @@ namespace Measured11thHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measured11thHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, Measured11thHarmonicCurrent::Id,
-                                      (uint8_t *) measured11thHarmonicCurrent, sizeof(*measured11thHarmonicCurrent));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) measured11thHarmonicCurrent,
+                                      sizeof(*measured11thHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measured11thHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, Measured11thHarmonicCurrent::Id,
-                                       (uint8_t *) &measured11thHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &measured11thHarmonicCurrent,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured11thHarmonicCurrent
@@ -11148,12 +11083,12 @@ namespace MeasuredPhase1stHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measuredPhase1stHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase1stHarmonicCurrent::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) measuredPhase1stHarmonicCurrent, sizeof(*measuredPhase1stHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measuredPhase1stHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase1stHarmonicCurrent::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &measuredPhase1stHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11163,12 +11098,12 @@ namespace MeasuredPhase3rdHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measuredPhase3rdHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase3rdHarmonicCurrent::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) measuredPhase3rdHarmonicCurrent, sizeof(*measuredPhase3rdHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measuredPhase3rdHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase3rdHarmonicCurrent::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &measuredPhase3rdHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11178,12 +11113,12 @@ namespace MeasuredPhase5thHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measuredPhase5thHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase5thHarmonicCurrent::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) measuredPhase5thHarmonicCurrent, sizeof(*measuredPhase5thHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measuredPhase5thHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase5thHarmonicCurrent::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &measuredPhase5thHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11193,12 +11128,12 @@ namespace MeasuredPhase7thHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measuredPhase7thHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase7thHarmonicCurrent::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) measuredPhase7thHarmonicCurrent, sizeof(*measuredPhase7thHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measuredPhase7thHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase7thHarmonicCurrent::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &measuredPhase7thHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11208,12 +11143,12 @@ namespace MeasuredPhase9thHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measuredPhase9thHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase9thHarmonicCurrent::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) measuredPhase9thHarmonicCurrent, sizeof(*measuredPhase9thHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measuredPhase9thHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase9thHarmonicCurrent::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &measuredPhase9thHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11223,12 +11158,12 @@ namespace MeasuredPhase11thHarmonicCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * measuredPhase11thHarmonicCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase11thHarmonicCurrent::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) measuredPhase11thHarmonicCurrent, sizeof(*measuredPhase11thHarmonicCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t measuredPhase11thHarmonicCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, MeasuredPhase11thHarmonicCurrent::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &measuredPhase11thHarmonicCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11238,13 +11173,13 @@ namespace AcFrequencyMultiplier {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acFrequencyMultiplier)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcFrequencyMultiplier::Id,
-                                      (uint8_t *) acFrequencyMultiplier, sizeof(*acFrequencyMultiplier));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acFrequencyMultiplier,
+                                      sizeof(*acFrequencyMultiplier));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acFrequencyMultiplier)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcFrequencyMultiplier::Id,
-                                       (uint8_t *) &acFrequencyMultiplier, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acFrequencyMultiplier,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcFrequencyMultiplier
@@ -11253,12 +11188,12 @@ namespace AcFrequencyDivisor {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acFrequencyDivisor)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcFrequencyDivisor::Id, (uint8_t *) acFrequencyDivisor,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acFrequencyDivisor,
                                       sizeof(*acFrequencyDivisor));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acFrequencyDivisor)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcFrequencyDivisor::Id, (uint8_t *) &acFrequencyDivisor,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acFrequencyDivisor,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11268,12 +11203,12 @@ namespace PowerMultiplier {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * powerMultiplier)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, PowerMultiplier::Id, (uint8_t *) powerMultiplier,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) powerMultiplier,
                                       sizeof(*powerMultiplier));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t powerMultiplier)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, PowerMultiplier::Id, (uint8_t *) &powerMultiplier,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &powerMultiplier,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -11283,12 +11218,12 @@ namespace PowerDivisor {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * powerDivisor)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, PowerDivisor::Id, (uint8_t *) powerDivisor,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) powerDivisor,
                                       sizeof(*powerDivisor));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t powerDivisor)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, PowerDivisor::Id, (uint8_t *) &powerDivisor,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &powerDivisor,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
@@ -11298,13 +11233,13 @@ namespace HarmonicCurrentMultiplier {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int8_t * harmonicCurrentMultiplier)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, HarmonicCurrentMultiplier::Id,
-                                      (uint8_t *) harmonicCurrentMultiplier, sizeof(*harmonicCurrentMultiplier));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) harmonicCurrentMultiplier,
+                                      sizeof(*harmonicCurrentMultiplier));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t harmonicCurrentMultiplier)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, HarmonicCurrentMultiplier::Id,
-                                       (uint8_t *) &harmonicCurrentMultiplier, ZCL_INT8S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &harmonicCurrentMultiplier,
+                                       ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace HarmonicCurrentMultiplier
@@ -11313,12 +11248,12 @@ namespace PhaseHarmonicCurrentMultiplier {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int8_t * phaseHarmonicCurrentMultiplier)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, PhaseHarmonicCurrentMultiplier::Id,
-                                      (uint8_t *) phaseHarmonicCurrentMultiplier, sizeof(*phaseHarmonicCurrentMultiplier));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) phaseHarmonicCurrentMultiplier,
+                                      sizeof(*phaseHarmonicCurrentMultiplier));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t phaseHarmonicCurrentMultiplier)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, PhaseHarmonicCurrentMultiplier::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &phaseHarmonicCurrentMultiplier, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
@@ -11328,13 +11263,13 @@ namespace InstantaneousVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * instantaneousVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, InstantaneousVoltage::Id,
-                                      (uint8_t *) instantaneousVoltage, sizeof(*instantaneousVoltage));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) instantaneousVoltage,
+                                      sizeof(*instantaneousVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t instantaneousVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, InstantaneousVoltage::Id,
-                                       (uint8_t *) &instantaneousVoltage, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &instantaneousVoltage,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstantaneousVoltage
@@ -11343,13 +11278,13 @@ namespace InstantaneousLineCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * instantaneousLineCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, InstantaneousLineCurrent::Id,
-                                      (uint8_t *) instantaneousLineCurrent, sizeof(*instantaneousLineCurrent));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) instantaneousLineCurrent,
+                                      sizeof(*instantaneousLineCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t instantaneousLineCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, InstantaneousLineCurrent::Id,
-                                       (uint8_t *) &instantaneousLineCurrent, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &instantaneousLineCurrent,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstantaneousLineCurrent
@@ -11358,13 +11293,13 @@ namespace InstantaneousActiveCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * instantaneousActiveCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, InstantaneousActiveCurrent::Id,
-                                      (uint8_t *) instantaneousActiveCurrent, sizeof(*instantaneousActiveCurrent));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) instantaneousActiveCurrent,
+                                      sizeof(*instantaneousActiveCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t instantaneousActiveCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, InstantaneousActiveCurrent::Id,
-                                       (uint8_t *) &instantaneousActiveCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &instantaneousActiveCurrent,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstantaneousActiveCurrent
@@ -11373,13 +11308,13 @@ namespace InstantaneousReactiveCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * instantaneousReactiveCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, InstantaneousReactiveCurrent::Id,
-                                      (uint8_t *) instantaneousReactiveCurrent, sizeof(*instantaneousReactiveCurrent));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) instantaneousReactiveCurrent,
+                                      sizeof(*instantaneousReactiveCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t instantaneousReactiveCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, InstantaneousReactiveCurrent::Id,
-                                       (uint8_t *) &instantaneousReactiveCurrent, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &instantaneousReactiveCurrent,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstantaneousReactiveCurrent
@@ -11388,12 +11323,12 @@ namespace InstantaneousPower {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * instantaneousPower)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, InstantaneousPower::Id, (uint8_t *) instantaneousPower,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) instantaneousPower,
                                       sizeof(*instantaneousPower));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t instantaneousPower)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, InstantaneousPower::Id, (uint8_t *) &instantaneousPower,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &instantaneousPower,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11403,12 +11338,12 @@ namespace RmsVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltage::Id, (uint8_t *) rmsVoltage,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltage,
                                       sizeof(*rmsVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltage::Id, (uint8_t *) &rmsVoltage,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltage,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11418,12 +11353,12 @@ namespace RmsVoltageMin {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageMin)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMin::Id, (uint8_t *) rmsVoltageMin,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageMin,
                                       sizeof(*rmsVoltageMin));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageMin)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMin::Id, (uint8_t *) &rmsVoltageMin,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageMin,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11433,12 +11368,12 @@ namespace RmsVoltageMax {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageMax)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMax::Id, (uint8_t *) rmsVoltageMax,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageMax,
                                       sizeof(*rmsVoltageMax));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageMax)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMax::Id, (uint8_t *) &rmsVoltageMax,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageMax,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11448,12 +11383,12 @@ namespace RmsCurrent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsCurrent)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrent::Id, (uint8_t *) rmsCurrent,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsCurrent,
                                       sizeof(*rmsCurrent));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsCurrent)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrent::Id, (uint8_t *) &rmsCurrent,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsCurrent,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11463,12 +11398,12 @@ namespace RmsCurrentMin {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsCurrentMin)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMin::Id, (uint8_t *) rmsCurrentMin,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsCurrentMin,
                                       sizeof(*rmsCurrentMin));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsCurrentMin)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMin::Id, (uint8_t *) &rmsCurrentMin,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsCurrentMin,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11478,12 +11413,12 @@ namespace RmsCurrentMax {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsCurrentMax)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMax::Id, (uint8_t *) rmsCurrentMax,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsCurrentMax,
                                       sizeof(*rmsCurrentMax));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsCurrentMax)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMax::Id, (uint8_t *) &rmsCurrentMax,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsCurrentMax,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11493,12 +11428,12 @@ namespace ActivePower {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * activePower)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePower::Id, (uint8_t *) activePower,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) activePower,
                                       sizeof(*activePower));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t activePower)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePower::Id, (uint8_t *) &activePower,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &activePower,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11508,12 +11443,12 @@ namespace ActivePowerMin {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * activePowerMin)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMin::Id, (uint8_t *) activePowerMin,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) activePowerMin,
                                       sizeof(*activePowerMin));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t activePowerMin)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMin::Id, (uint8_t *) &activePowerMin,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &activePowerMin,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11523,12 +11458,12 @@ namespace ActivePowerMax {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * activePowerMax)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMax::Id, (uint8_t *) activePowerMax,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) activePowerMax,
                                       sizeof(*activePowerMax));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t activePowerMax)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMax::Id, (uint8_t *) &activePowerMax,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &activePowerMax,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11538,12 +11473,12 @@ namespace ReactivePower {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * reactivePower)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ReactivePower::Id, (uint8_t *) reactivePower,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) reactivePower,
                                       sizeof(*reactivePower));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t reactivePower)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ReactivePower::Id, (uint8_t *) &reactivePower,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &reactivePower,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11553,12 +11488,12 @@ namespace ApparentPower {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * apparentPower)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ApparentPower::Id, (uint8_t *) apparentPower,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) apparentPower,
                                       sizeof(*apparentPower));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t apparentPower)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ApparentPower::Id, (uint8_t *) &apparentPower,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &apparentPower,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11568,12 +11503,12 @@ namespace PowerFactor {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int8_t * powerFactor)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, PowerFactor::Id, (uint8_t *) powerFactor,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) powerFactor,
                                       sizeof(*powerFactor));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t powerFactor)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, PowerFactor::Id, (uint8_t *) &powerFactor,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &powerFactor,
                                        ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
@@ -11583,12 +11518,12 @@ namespace AverageRmsVoltageMeasurementPeriod {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * averageRmsVoltageMeasurementPeriod)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsVoltageMeasurementPeriod::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) averageRmsVoltageMeasurementPeriod, sizeof(*averageRmsVoltageMeasurementPeriod));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t averageRmsVoltageMeasurementPeriod)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsVoltageMeasurementPeriod::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &averageRmsVoltageMeasurementPeriod, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11598,12 +11533,12 @@ namespace AverageRmsUnderVoltageCounter {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * averageRmsUnderVoltageCounter)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsUnderVoltageCounter::Id,
-                                      (uint8_t *) averageRmsUnderVoltageCounter, sizeof(*averageRmsUnderVoltageCounter));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) averageRmsUnderVoltageCounter,
+                                      sizeof(*averageRmsUnderVoltageCounter));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t averageRmsUnderVoltageCounter)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsUnderVoltageCounter::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &averageRmsUnderVoltageCounter, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11613,13 +11548,13 @@ namespace RmsExtremeOverVoltagePeriod {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsExtremeOverVoltagePeriod)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeOverVoltagePeriod::Id,
-                                      (uint8_t *) rmsExtremeOverVoltagePeriod, sizeof(*rmsExtremeOverVoltagePeriod));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsExtremeOverVoltagePeriod,
+                                      sizeof(*rmsExtremeOverVoltagePeriod));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsExtremeOverVoltagePeriod)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeOverVoltagePeriod::Id,
-                                       (uint8_t *) &rmsExtremeOverVoltagePeriod, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsExtremeOverVoltagePeriod,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeOverVoltagePeriod
@@ -11628,13 +11563,13 @@ namespace RmsExtremeUnderVoltagePeriod {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsExtremeUnderVoltagePeriod)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeUnderVoltagePeriod::Id,
-                                      (uint8_t *) rmsExtremeUnderVoltagePeriod, sizeof(*rmsExtremeUnderVoltagePeriod));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsExtremeUnderVoltagePeriod,
+                                      sizeof(*rmsExtremeUnderVoltagePeriod));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsExtremeUnderVoltagePeriod)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeUnderVoltagePeriod::Id,
-                                       (uint8_t *) &rmsExtremeUnderVoltagePeriod, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsExtremeUnderVoltagePeriod,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeUnderVoltagePeriod
@@ -11643,13 +11578,13 @@ namespace RmsVoltageSagPeriod {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageSagPeriod)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSagPeriod::Id, (uint8_t *) rmsVoltageSagPeriod,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageSagPeriod,
                                       sizeof(*rmsVoltageSagPeriod));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageSagPeriod)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSagPeriod::Id,
-                                       (uint8_t *) &rmsVoltageSagPeriod, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageSagPeriod,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSagPeriod
@@ -11658,13 +11593,13 @@ namespace RmsVoltageSwellPeriod {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageSwellPeriod)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSwellPeriod::Id,
-                                      (uint8_t *) rmsVoltageSwellPeriod, sizeof(*rmsVoltageSwellPeriod));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageSwellPeriod,
+                                      sizeof(*rmsVoltageSwellPeriod));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageSwellPeriod)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSwellPeriod::Id,
-                                       (uint8_t *) &rmsVoltageSwellPeriod, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageSwellPeriod,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSwellPeriod
@@ -11673,13 +11608,13 @@ namespace AcVoltageMultiplier {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acVoltageMultiplier)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcVoltageMultiplier::Id, (uint8_t *) acVoltageMultiplier,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acVoltageMultiplier,
                                       sizeof(*acVoltageMultiplier));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acVoltageMultiplier)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcVoltageMultiplier::Id,
-                                       (uint8_t *) &acVoltageMultiplier, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acVoltageMultiplier,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcVoltageMultiplier
@@ -11688,12 +11623,12 @@ namespace AcVoltageDivisor {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acVoltageDivisor)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcVoltageDivisor::Id, (uint8_t *) acVoltageDivisor,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acVoltageDivisor,
                                       sizeof(*acVoltageDivisor));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acVoltageDivisor)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcVoltageDivisor::Id, (uint8_t *) &acVoltageDivisor,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acVoltageDivisor,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11703,13 +11638,13 @@ namespace AcCurrentMultiplier {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acCurrentMultiplier)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcCurrentMultiplier::Id, (uint8_t *) acCurrentMultiplier,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acCurrentMultiplier,
                                       sizeof(*acCurrentMultiplier));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acCurrentMultiplier)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcCurrentMultiplier::Id,
-                                       (uint8_t *) &acCurrentMultiplier, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acCurrentMultiplier,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcCurrentMultiplier
@@ -11718,12 +11653,12 @@ namespace AcCurrentDivisor {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acCurrentDivisor)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcCurrentDivisor::Id, (uint8_t *) acCurrentDivisor,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acCurrentDivisor,
                                       sizeof(*acCurrentDivisor));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acCurrentDivisor)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcCurrentDivisor::Id, (uint8_t *) &acCurrentDivisor,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acCurrentDivisor,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11733,12 +11668,12 @@ namespace AcPowerMultiplier {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acPowerMultiplier)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcPowerMultiplier::Id, (uint8_t *) acPowerMultiplier,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acPowerMultiplier,
                                       sizeof(*acPowerMultiplier));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acPowerMultiplier)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcPowerMultiplier::Id, (uint8_t *) &acPowerMultiplier,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acPowerMultiplier,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11748,12 +11683,12 @@ namespace AcPowerDivisor {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acPowerDivisor)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcPowerDivisor::Id, (uint8_t *) acPowerDivisor,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acPowerDivisor,
                                       sizeof(*acPowerDivisor));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acPowerDivisor)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcPowerDivisor::Id, (uint8_t *) &acPowerDivisor,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acPowerDivisor,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11763,12 +11698,12 @@ namespace OverloadAlarmsMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * overloadAlarmsMask)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, OverloadAlarmsMask::Id, (uint8_t *) overloadAlarmsMask,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) overloadAlarmsMask,
                                       sizeof(*overloadAlarmsMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t overloadAlarmsMask)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, OverloadAlarmsMask::Id, (uint8_t *) &overloadAlarmsMask,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &overloadAlarmsMask,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
@@ -11778,12 +11713,12 @@ namespace VoltageOverload {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * voltageOverload)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, VoltageOverload::Id, (uint8_t *) voltageOverload,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) voltageOverload,
                                       sizeof(*voltageOverload));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t voltageOverload)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, VoltageOverload::Id, (uint8_t *) &voltageOverload,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &voltageOverload,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11793,12 +11728,12 @@ namespace CurrentOverload {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * currentOverload)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, CurrentOverload::Id, (uint8_t *) currentOverload,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) currentOverload,
                                       sizeof(*currentOverload));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t currentOverload)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, CurrentOverload::Id, (uint8_t *) &currentOverload,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &currentOverload,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11808,13 +11743,13 @@ namespace AcOverloadAlarmsMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * acOverloadAlarmsMask)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcOverloadAlarmsMask::Id,
-                                      (uint8_t *) acOverloadAlarmsMask, sizeof(*acOverloadAlarmsMask));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acOverloadAlarmsMask,
+                                      sizeof(*acOverloadAlarmsMask));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t acOverloadAlarmsMask)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcOverloadAlarmsMask::Id,
-                                       (uint8_t *) &acOverloadAlarmsMask, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acOverloadAlarmsMask,
+                                       ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcOverloadAlarmsMask
@@ -11823,12 +11758,12 @@ namespace AcVoltageOverload {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * acVoltageOverload)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcVoltageOverload::Id, (uint8_t *) acVoltageOverload,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acVoltageOverload,
                                       sizeof(*acVoltageOverload));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t acVoltageOverload)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcVoltageOverload::Id, (uint8_t *) &acVoltageOverload,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acVoltageOverload,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11838,12 +11773,12 @@ namespace AcCurrentOverload {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * acCurrentOverload)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcCurrentOverload::Id, (uint8_t *) acCurrentOverload,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acCurrentOverload,
                                       sizeof(*acCurrentOverload));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t acCurrentOverload)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcCurrentOverload::Id, (uint8_t *) &acCurrentOverload,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acCurrentOverload,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11853,13 +11788,13 @@ namespace AcActivePowerOverload {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * acActivePowerOverload)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcActivePowerOverload::Id,
-                                      (uint8_t *) acActivePowerOverload, sizeof(*acActivePowerOverload));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acActivePowerOverload,
+                                      sizeof(*acActivePowerOverload));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t acActivePowerOverload)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcActivePowerOverload::Id,
-                                       (uint8_t *) &acActivePowerOverload, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acActivePowerOverload,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcActivePowerOverload
@@ -11868,13 +11803,13 @@ namespace AcReactivePowerOverload {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * acReactivePowerOverload)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AcReactivePowerOverload::Id,
-                                      (uint8_t *) acReactivePowerOverload, sizeof(*acReactivePowerOverload));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) acReactivePowerOverload,
+                                      sizeof(*acReactivePowerOverload));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t acReactivePowerOverload)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AcReactivePowerOverload::Id,
-                                       (uint8_t *) &acReactivePowerOverload, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &acReactivePowerOverload,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcReactivePowerOverload
@@ -11883,13 +11818,13 @@ namespace AverageRmsOverVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * averageRmsOverVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsOverVoltage::Id,
-                                      (uint8_t *) averageRmsOverVoltage, sizeof(*averageRmsOverVoltage));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) averageRmsOverVoltage,
+                                      sizeof(*averageRmsOverVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t averageRmsOverVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsOverVoltage::Id,
-                                       (uint8_t *) &averageRmsOverVoltage, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &averageRmsOverVoltage,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsOverVoltage
@@ -11898,13 +11833,13 @@ namespace AverageRmsUnderVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * averageRmsUnderVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsUnderVoltage::Id,
-                                      (uint8_t *) averageRmsUnderVoltage, sizeof(*averageRmsUnderVoltage));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) averageRmsUnderVoltage,
+                                      sizeof(*averageRmsUnderVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t averageRmsUnderVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsUnderVoltage::Id,
-                                       (uint8_t *) &averageRmsUnderVoltage, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &averageRmsUnderVoltage,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsUnderVoltage
@@ -11913,13 +11848,13 @@ namespace RmsExtremeOverVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * rmsExtremeOverVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeOverVoltage::Id,
-                                      (uint8_t *) rmsExtremeOverVoltage, sizeof(*rmsExtremeOverVoltage));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsExtremeOverVoltage,
+                                      sizeof(*rmsExtremeOverVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t rmsExtremeOverVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeOverVoltage::Id,
-                                       (uint8_t *) &rmsExtremeOverVoltage, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsExtremeOverVoltage,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeOverVoltage
@@ -11928,13 +11863,13 @@ namespace RmsExtremeUnderVoltage {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * rmsExtremeUnderVoltage)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeUnderVoltage::Id,
-                                      (uint8_t *) rmsExtremeUnderVoltage, sizeof(*rmsExtremeUnderVoltage));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsExtremeUnderVoltage,
+                                      sizeof(*rmsExtremeUnderVoltage));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t rmsExtremeUnderVoltage)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeUnderVoltage::Id,
-                                       (uint8_t *) &rmsExtremeUnderVoltage, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsExtremeUnderVoltage,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeUnderVoltage
@@ -11943,12 +11878,12 @@ namespace RmsVoltageSag {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * rmsVoltageSag)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSag::Id, (uint8_t *) rmsVoltageSag,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageSag,
                                       sizeof(*rmsVoltageSag));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t rmsVoltageSag)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSag::Id, (uint8_t *) &rmsVoltageSag,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageSag,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11958,12 +11893,12 @@ namespace RmsVoltageSwell {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * rmsVoltageSwell)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSwell::Id, (uint8_t *) rmsVoltageSwell,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageSwell,
                                       sizeof(*rmsVoltageSwell));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t rmsVoltageSwell)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSwell::Id, (uint8_t *) &rmsVoltageSwell,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageSwell,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -11973,12 +11908,12 @@ namespace LineCurrentPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * lineCurrentPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, LineCurrentPhaseB::Id, (uint8_t *) lineCurrentPhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) lineCurrentPhaseB,
                                       sizeof(*lineCurrentPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t lineCurrentPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, LineCurrentPhaseB::Id, (uint8_t *) &lineCurrentPhaseB,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &lineCurrentPhaseB,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -11988,13 +11923,13 @@ namespace ActiveCurrentPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * activeCurrentPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ActiveCurrentPhaseB::Id, (uint8_t *) activeCurrentPhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) activeCurrentPhaseB,
                                       sizeof(*activeCurrentPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t activeCurrentPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ActiveCurrentPhaseB::Id,
-                                       (uint8_t *) &activeCurrentPhaseB, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &activeCurrentPhaseB,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActiveCurrentPhaseB
@@ -12003,13 +11938,13 @@ namespace ReactiveCurrentPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * reactiveCurrentPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ReactiveCurrentPhaseB::Id,
-                                      (uint8_t *) reactiveCurrentPhaseB, sizeof(*reactiveCurrentPhaseB));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) reactiveCurrentPhaseB,
+                                      sizeof(*reactiveCurrentPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t reactiveCurrentPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ReactiveCurrentPhaseB::Id,
-                                       (uint8_t *) &reactiveCurrentPhaseB, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &reactiveCurrentPhaseB,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ReactiveCurrentPhaseB
@@ -12018,12 +11953,12 @@ namespace RmsVoltagePhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltagePhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltagePhaseB::Id, (uint8_t *) rmsVoltagePhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltagePhaseB,
                                       sizeof(*rmsVoltagePhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltagePhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltagePhaseB::Id, (uint8_t *) &rmsVoltagePhaseB,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltagePhaseB,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12033,13 +11968,13 @@ namespace RmsVoltageMinPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageMinPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMinPhaseB::Id, (uint8_t *) rmsVoltageMinPhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageMinPhaseB,
                                       sizeof(*rmsVoltageMinPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageMinPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMinPhaseB::Id,
-                                       (uint8_t *) &rmsVoltageMinPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageMinPhaseB,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageMinPhaseB
@@ -12048,13 +11983,13 @@ namespace RmsVoltageMaxPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageMaxPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMaxPhaseB::Id, (uint8_t *) rmsVoltageMaxPhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageMaxPhaseB,
                                       sizeof(*rmsVoltageMaxPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageMaxPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMaxPhaseB::Id,
-                                       (uint8_t *) &rmsVoltageMaxPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageMaxPhaseB,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageMaxPhaseB
@@ -12063,12 +11998,12 @@ namespace RmsCurrentPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsCurrentPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentPhaseB::Id, (uint8_t *) rmsCurrentPhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsCurrentPhaseB,
                                       sizeof(*rmsCurrentPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsCurrentPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentPhaseB::Id, (uint8_t *) &rmsCurrentPhaseB,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsCurrentPhaseB,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12078,13 +12013,13 @@ namespace RmsCurrentMinPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsCurrentMinPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMinPhaseB::Id, (uint8_t *) rmsCurrentMinPhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsCurrentMinPhaseB,
                                       sizeof(*rmsCurrentMinPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsCurrentMinPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMinPhaseB::Id,
-                                       (uint8_t *) &rmsCurrentMinPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsCurrentMinPhaseB,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentMinPhaseB
@@ -12093,13 +12028,13 @@ namespace RmsCurrentMaxPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsCurrentMaxPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMaxPhaseB::Id, (uint8_t *) rmsCurrentMaxPhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsCurrentMaxPhaseB,
                                       sizeof(*rmsCurrentMaxPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsCurrentMaxPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMaxPhaseB::Id,
-                                       (uint8_t *) &rmsCurrentMaxPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsCurrentMaxPhaseB,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentMaxPhaseB
@@ -12108,12 +12043,12 @@ namespace ActivePowerPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * activePowerPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerPhaseB::Id, (uint8_t *) activePowerPhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) activePowerPhaseB,
                                       sizeof(*activePowerPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t activePowerPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerPhaseB::Id, (uint8_t *) &activePowerPhaseB,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &activePowerPhaseB,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -12123,13 +12058,13 @@ namespace ActivePowerMinPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * activePowerMinPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMinPhaseB::Id,
-                                      (uint8_t *) activePowerMinPhaseB, sizeof(*activePowerMinPhaseB));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) activePowerMinPhaseB,
+                                      sizeof(*activePowerMinPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t activePowerMinPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMinPhaseB::Id,
-                                       (uint8_t *) &activePowerMinPhaseB, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &activePowerMinPhaseB,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerMinPhaseB
@@ -12138,13 +12073,13 @@ namespace ActivePowerMaxPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * activePowerMaxPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMaxPhaseB::Id,
-                                      (uint8_t *) activePowerMaxPhaseB, sizeof(*activePowerMaxPhaseB));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) activePowerMaxPhaseB,
+                                      sizeof(*activePowerMaxPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t activePowerMaxPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMaxPhaseB::Id,
-                                       (uint8_t *) &activePowerMaxPhaseB, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &activePowerMaxPhaseB,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerMaxPhaseB
@@ -12153,13 +12088,13 @@ namespace ReactivePowerPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * reactivePowerPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ReactivePowerPhaseB::Id, (uint8_t *) reactivePowerPhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) reactivePowerPhaseB,
                                       sizeof(*reactivePowerPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t reactivePowerPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ReactivePowerPhaseB::Id,
-                                       (uint8_t *) &reactivePowerPhaseB, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &reactivePowerPhaseB,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ReactivePowerPhaseB
@@ -12168,13 +12103,13 @@ namespace ApparentPowerPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * apparentPowerPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ApparentPowerPhaseB::Id, (uint8_t *) apparentPowerPhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) apparentPowerPhaseB,
                                       sizeof(*apparentPowerPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t apparentPowerPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ApparentPowerPhaseB::Id,
-                                       (uint8_t *) &apparentPowerPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &apparentPowerPhaseB,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ApparentPowerPhaseB
@@ -12183,12 +12118,12 @@ namespace PowerFactorPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int8_t * powerFactorPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, PowerFactorPhaseB::Id, (uint8_t *) powerFactorPhaseB,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) powerFactorPhaseB,
                                       sizeof(*powerFactorPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t powerFactorPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, PowerFactorPhaseB::Id, (uint8_t *) &powerFactorPhaseB,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &powerFactorPhaseB,
                                        ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
@@ -12198,13 +12133,13 @@ namespace AverageRmsVoltageMeasurementPeriodPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * averageRmsVoltageMeasurementPeriodPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsVoltageMeasurementPeriodPhaseB::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) averageRmsVoltageMeasurementPeriodPhaseB,
                                       sizeof(*averageRmsVoltageMeasurementPeriodPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t averageRmsVoltageMeasurementPeriodPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsVoltageMeasurementPeriodPhaseB::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &averageRmsVoltageMeasurementPeriodPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12214,12 +12149,12 @@ namespace AverageRmsOverVoltageCounterPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * averageRmsOverVoltageCounterPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsOverVoltageCounterPhaseB::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) averageRmsOverVoltageCounterPhaseB, sizeof(*averageRmsOverVoltageCounterPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t averageRmsOverVoltageCounterPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsOverVoltageCounterPhaseB::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &averageRmsOverVoltageCounterPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12229,13 +12164,13 @@ namespace AverageRmsUnderVoltageCounterPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * averageRmsUnderVoltageCounterPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsUnderVoltageCounterPhaseB::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) averageRmsUnderVoltageCounterPhaseB,
                                       sizeof(*averageRmsUnderVoltageCounterPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t averageRmsUnderVoltageCounterPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsUnderVoltageCounterPhaseB::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &averageRmsUnderVoltageCounterPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12245,12 +12180,12 @@ namespace RmsExtremeOverVoltagePeriodPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsExtremeOverVoltagePeriodPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeOverVoltagePeriodPhaseB::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) rmsExtremeOverVoltagePeriodPhaseB, sizeof(*rmsExtremeOverVoltagePeriodPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsExtremeOverVoltagePeriodPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeOverVoltagePeriodPhaseB::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &rmsExtremeOverVoltagePeriodPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12260,12 +12195,12 @@ namespace RmsExtremeUnderVoltagePeriodPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsExtremeUnderVoltagePeriodPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeUnderVoltagePeriodPhaseB::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) rmsExtremeUnderVoltagePeriodPhaseB, sizeof(*rmsExtremeUnderVoltagePeriodPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsExtremeUnderVoltagePeriodPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeUnderVoltagePeriodPhaseB::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &rmsExtremeUnderVoltagePeriodPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12275,13 +12210,13 @@ namespace RmsVoltageSagPeriodPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageSagPeriodPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSagPeriodPhaseB::Id,
-                                      (uint8_t *) rmsVoltageSagPeriodPhaseB, sizeof(*rmsVoltageSagPeriodPhaseB));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageSagPeriodPhaseB,
+                                      sizeof(*rmsVoltageSagPeriodPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageSagPeriodPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSagPeriodPhaseB::Id,
-                                       (uint8_t *) &rmsVoltageSagPeriodPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageSagPeriodPhaseB,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSagPeriodPhaseB
@@ -12290,13 +12225,13 @@ namespace RmsVoltageSwellPeriodPhaseB {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageSwellPeriodPhaseB)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSwellPeriodPhaseB::Id,
-                                      (uint8_t *) rmsVoltageSwellPeriodPhaseB, sizeof(*rmsVoltageSwellPeriodPhaseB));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageSwellPeriodPhaseB,
+                                      sizeof(*rmsVoltageSwellPeriodPhaseB));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageSwellPeriodPhaseB)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSwellPeriodPhaseB::Id,
-                                       (uint8_t *) &rmsVoltageSwellPeriodPhaseB, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageSwellPeriodPhaseB,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSwellPeriodPhaseB
@@ -12305,12 +12240,12 @@ namespace LineCurrentPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * lineCurrentPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, LineCurrentPhaseC::Id, (uint8_t *) lineCurrentPhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) lineCurrentPhaseC,
                                       sizeof(*lineCurrentPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t lineCurrentPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, LineCurrentPhaseC::Id, (uint8_t *) &lineCurrentPhaseC,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &lineCurrentPhaseC,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12320,13 +12255,13 @@ namespace ActiveCurrentPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * activeCurrentPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ActiveCurrentPhaseC::Id, (uint8_t *) activeCurrentPhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) activeCurrentPhaseC,
                                       sizeof(*activeCurrentPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t activeCurrentPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ActiveCurrentPhaseC::Id,
-                                       (uint8_t *) &activeCurrentPhaseC, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &activeCurrentPhaseC,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActiveCurrentPhaseC
@@ -12335,13 +12270,13 @@ namespace ReactiveCurrentPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * reactiveCurrentPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ReactiveCurrentPhaseC::Id,
-                                      (uint8_t *) reactiveCurrentPhaseC, sizeof(*reactiveCurrentPhaseC));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) reactiveCurrentPhaseC,
+                                      sizeof(*reactiveCurrentPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t reactiveCurrentPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ReactiveCurrentPhaseC::Id,
-                                       (uint8_t *) &reactiveCurrentPhaseC, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &reactiveCurrentPhaseC,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ReactiveCurrentPhaseC
@@ -12350,12 +12285,12 @@ namespace RmsVoltagePhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltagePhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltagePhaseC::Id, (uint8_t *) rmsVoltagePhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltagePhaseC,
                                       sizeof(*rmsVoltagePhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltagePhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltagePhaseC::Id, (uint8_t *) &rmsVoltagePhaseC,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltagePhaseC,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12365,13 +12300,13 @@ namespace RmsVoltageMinPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageMinPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMinPhaseC::Id, (uint8_t *) rmsVoltageMinPhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageMinPhaseC,
                                       sizeof(*rmsVoltageMinPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageMinPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMinPhaseC::Id,
-                                       (uint8_t *) &rmsVoltageMinPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageMinPhaseC,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageMinPhaseC
@@ -12380,13 +12315,13 @@ namespace RmsVoltageMaxPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageMaxPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMaxPhaseC::Id, (uint8_t *) rmsVoltageMaxPhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageMaxPhaseC,
                                       sizeof(*rmsVoltageMaxPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageMaxPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageMaxPhaseC::Id,
-                                       (uint8_t *) &rmsVoltageMaxPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageMaxPhaseC,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageMaxPhaseC
@@ -12395,12 +12330,12 @@ namespace RmsCurrentPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsCurrentPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentPhaseC::Id, (uint8_t *) rmsCurrentPhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsCurrentPhaseC,
                                       sizeof(*rmsCurrentPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsCurrentPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentPhaseC::Id, (uint8_t *) &rmsCurrentPhaseC,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsCurrentPhaseC,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12410,13 +12345,13 @@ namespace RmsCurrentMinPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsCurrentMinPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMinPhaseC::Id, (uint8_t *) rmsCurrentMinPhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsCurrentMinPhaseC,
                                       sizeof(*rmsCurrentMinPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsCurrentMinPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMinPhaseC::Id,
-                                       (uint8_t *) &rmsCurrentMinPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsCurrentMinPhaseC,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentMinPhaseC
@@ -12425,13 +12360,13 @@ namespace RmsCurrentMaxPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsCurrentMaxPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMaxPhaseC::Id, (uint8_t *) rmsCurrentMaxPhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsCurrentMaxPhaseC,
                                       sizeof(*rmsCurrentMaxPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsCurrentMaxPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsCurrentMaxPhaseC::Id,
-                                       (uint8_t *) &rmsCurrentMaxPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsCurrentMaxPhaseC,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentMaxPhaseC
@@ -12440,12 +12375,12 @@ namespace ActivePowerPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * activePowerPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerPhaseC::Id, (uint8_t *) activePowerPhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) activePowerPhaseC,
                                       sizeof(*activePowerPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t activePowerPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerPhaseC::Id, (uint8_t *) &activePowerPhaseC,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &activePowerPhaseC,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
@@ -12455,13 +12390,13 @@ namespace ActivePowerMinPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * activePowerMinPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMinPhaseC::Id,
-                                      (uint8_t *) activePowerMinPhaseC, sizeof(*activePowerMinPhaseC));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) activePowerMinPhaseC,
+                                      sizeof(*activePowerMinPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t activePowerMinPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMinPhaseC::Id,
-                                       (uint8_t *) &activePowerMinPhaseC, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &activePowerMinPhaseC,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerMinPhaseC
@@ -12470,13 +12405,13 @@ namespace ActivePowerMaxPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * activePowerMaxPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMaxPhaseC::Id,
-                                      (uint8_t *) activePowerMaxPhaseC, sizeof(*activePowerMaxPhaseC));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) activePowerMaxPhaseC,
+                                      sizeof(*activePowerMaxPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t activePowerMaxPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ActivePowerMaxPhaseC::Id,
-                                       (uint8_t *) &activePowerMaxPhaseC, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &activePowerMaxPhaseC,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerMaxPhaseC
@@ -12485,13 +12420,13 @@ namespace ReactivePowerPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int16_t * reactivePowerPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ReactivePowerPhaseC::Id, (uint8_t *) reactivePowerPhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) reactivePowerPhaseC,
                                       sizeof(*reactivePowerPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t reactivePowerPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ReactivePowerPhaseC::Id,
-                                       (uint8_t *) &reactivePowerPhaseC, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &reactivePowerPhaseC,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ReactivePowerPhaseC
@@ -12500,13 +12435,13 @@ namespace ApparentPowerPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * apparentPowerPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, ApparentPowerPhaseC::Id, (uint8_t *) apparentPowerPhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) apparentPowerPhaseC,
                                       sizeof(*apparentPowerPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t apparentPowerPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, ApparentPowerPhaseC::Id,
-                                       (uint8_t *) &apparentPowerPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &apparentPowerPhaseC,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ApparentPowerPhaseC
@@ -12515,12 +12450,12 @@ namespace PowerFactorPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, int8_t * powerFactorPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, PowerFactorPhaseC::Id, (uint8_t *) powerFactorPhaseC,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) powerFactorPhaseC,
                                       sizeof(*powerFactorPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t powerFactorPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, PowerFactorPhaseC::Id, (uint8_t *) &powerFactorPhaseC,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &powerFactorPhaseC,
                                        ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
@@ -12530,13 +12465,13 @@ namespace AverageRmsVoltageMeasurementPeriodPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * averageRmsVoltageMeasurementPeriodPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsVoltageMeasurementPeriodPhaseC::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) averageRmsVoltageMeasurementPeriodPhaseC,
                                       sizeof(*averageRmsVoltageMeasurementPeriodPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t averageRmsVoltageMeasurementPeriodPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsVoltageMeasurementPeriodPhaseC::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &averageRmsVoltageMeasurementPeriodPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12546,12 +12481,12 @@ namespace AverageRmsOverVoltageCounterPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * averageRmsOverVoltageCounterPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsOverVoltageCounterPhaseC::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) averageRmsOverVoltageCounterPhaseC, sizeof(*averageRmsOverVoltageCounterPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t averageRmsOverVoltageCounterPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsOverVoltageCounterPhaseC::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &averageRmsOverVoltageCounterPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12561,13 +12496,13 @@ namespace AverageRmsUnderVoltageCounterPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * averageRmsUnderVoltageCounterPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsUnderVoltageCounterPhaseC::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) averageRmsUnderVoltageCounterPhaseC,
                                       sizeof(*averageRmsUnderVoltageCounterPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t averageRmsUnderVoltageCounterPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, AverageRmsUnderVoltageCounterPhaseC::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &averageRmsUnderVoltageCounterPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12577,12 +12512,12 @@ namespace RmsExtremeOverVoltagePeriodPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsExtremeOverVoltagePeriodPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeOverVoltagePeriodPhaseC::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) rmsExtremeOverVoltagePeriodPhaseC, sizeof(*rmsExtremeOverVoltagePeriodPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsExtremeOverVoltagePeriodPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeOverVoltagePeriodPhaseC::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &rmsExtremeOverVoltagePeriodPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12592,12 +12527,12 @@ namespace RmsExtremeUnderVoltagePeriodPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsExtremeUnderVoltagePeriodPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeUnderVoltagePeriodPhaseC::Id,
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                       (uint8_t *) rmsExtremeUnderVoltagePeriodPhaseC, sizeof(*rmsExtremeUnderVoltagePeriodPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsExtremeUnderVoltagePeriodPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsExtremeUnderVoltagePeriodPhaseC::Id,
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id,
                                        (uint8_t *) &rmsExtremeUnderVoltagePeriodPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
@@ -12607,13 +12542,13 @@ namespace RmsVoltageSagPeriodPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageSagPeriodPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSagPeriodPhaseC::Id,
-                                      (uint8_t *) rmsVoltageSagPeriodPhaseC, sizeof(*rmsVoltageSagPeriodPhaseC));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageSagPeriodPhaseC,
+                                      sizeof(*rmsVoltageSagPeriodPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageSagPeriodPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSagPeriodPhaseC::Id,
-                                       (uint8_t *) &rmsVoltageSagPeriodPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageSagPeriodPhaseC,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSagPeriodPhaseC
@@ -12622,13 +12557,13 @@ namespace RmsVoltageSwellPeriodPhaseC {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * rmsVoltageSwellPeriodPhaseC)
 {
-    return emberAfReadServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSwellPeriodPhaseC::Id,
-                                      (uint8_t *) rmsVoltageSwellPeriodPhaseC, sizeof(*rmsVoltageSwellPeriodPhaseC));
+    return emberAfReadServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) rmsVoltageSwellPeriodPhaseC,
+                                      sizeof(*rmsVoltageSwellPeriodPhaseC));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t rmsVoltageSwellPeriodPhaseC)
 {
-    return emberAfWriteServerAttribute(endpoint, ElectricalMeasurement::Id, RmsVoltageSwellPeriodPhaseC::Id,
-                                       (uint8_t *) &rmsVoltageSwellPeriodPhaseC, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, (uint8_t *) &rmsVoltageSwellPeriodPhaseC,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSwellPeriodPhaseC
@@ -12649,13 +12584,13 @@ namespace EmberSampleAttribute {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * emberSampleAttribute)
 {
-    return emberAfReadServerAttribute(endpoint, SampleMfgSpecificCluster::Id, EmberSampleAttribute::Id,
-                                      (uint8_t *) emberSampleAttribute, sizeof(*emberSampleAttribute));
+    return emberAfReadServerAttribute(endpoint, Clusters::SampleMfgSpecificCluster::Id, Id, (uint8_t *) emberSampleAttribute,
+                                      sizeof(*emberSampleAttribute));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t emberSampleAttribute)
 {
-    return emberAfWriteServerAttribute(endpoint, SampleMfgSpecificCluster::Id, EmberSampleAttribute::Id,
-                                       (uint8_t *) &emberSampleAttribute, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::SampleMfgSpecificCluster::Id, Id, (uint8_t *) &emberSampleAttribute,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace EmberSampleAttribute
@@ -12664,13 +12599,13 @@ namespace EmberSampleAttribute2 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * emberSampleAttribute2)
 {
-    return emberAfReadServerAttribute(endpoint, SampleMfgSpecificCluster::Id, EmberSampleAttribute2::Id,
-                                      (uint8_t *) emberSampleAttribute2, sizeof(*emberSampleAttribute2));
+    return emberAfReadServerAttribute(endpoint, Clusters::SampleMfgSpecificCluster::Id, Id, (uint8_t *) emberSampleAttribute2,
+                                      sizeof(*emberSampleAttribute2));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t emberSampleAttribute2)
 {
-    return emberAfWriteServerAttribute(endpoint, SampleMfgSpecificCluster::Id, EmberSampleAttribute2::Id,
-                                       (uint8_t *) &emberSampleAttribute2, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::SampleMfgSpecificCluster::Id, Id, (uint8_t *) &emberSampleAttribute2,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace EmberSampleAttribute2
@@ -12685,13 +12620,13 @@ namespace EmberSampleAttribute3 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * emberSampleAttribute3)
 {
-    return emberAfReadServerAttribute(endpoint, SampleMfgSpecificCluster2::Id, EmberSampleAttribute3::Id,
-                                      (uint8_t *) emberSampleAttribute3, sizeof(*emberSampleAttribute3));
+    return emberAfReadServerAttribute(endpoint, Clusters::SampleMfgSpecificCluster2::Id, Id, (uint8_t *) emberSampleAttribute3,
+                                      sizeof(*emberSampleAttribute3));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t emberSampleAttribute3)
 {
-    return emberAfWriteServerAttribute(endpoint, SampleMfgSpecificCluster2::Id, EmberSampleAttribute3::Id,
-                                       (uint8_t *) &emberSampleAttribute3, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::SampleMfgSpecificCluster2::Id, Id, (uint8_t *) &emberSampleAttribute3,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace EmberSampleAttribute3
@@ -12700,13 +12635,13 @@ namespace EmberSampleAttribute4 {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * emberSampleAttribute4)
 {
-    return emberAfReadServerAttribute(endpoint, SampleMfgSpecificCluster2::Id, EmberSampleAttribute4::Id,
-                                      (uint8_t *) emberSampleAttribute4, sizeof(*emberSampleAttribute4));
+    return emberAfReadServerAttribute(endpoint, Clusters::SampleMfgSpecificCluster2::Id, Id, (uint8_t *) emberSampleAttribute4,
+                                      sizeof(*emberSampleAttribute4));
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t emberSampleAttribute4)
 {
-    return emberAfWriteServerAttribute(endpoint, SampleMfgSpecificCluster2::Id, EmberSampleAttribute4::Id,
-                                       (uint8_t *) &emberSampleAttribute4, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::SampleMfgSpecificCluster2::Id, Id, (uint8_t *) &emberSampleAttribute4,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace EmberSampleAttribute4

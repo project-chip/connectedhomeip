@@ -158,19 +158,14 @@ OnApplicationLauncherApplicationLauncherListListAttributeResponse(void * context
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnApplicationLauncherApplicationLauncherListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -183,8 +178,7 @@ OnApplicationLauncherApplicationLauncherListListAttributeResponse(void * context
         ++i;
         ChipLogProgress(chipTool, "INT16U[%" PRIu16 "]: %" PRIu16 "", i, entry);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnAudioOutputAudioOutputListListAttributeResponse(
@@ -193,19 +187,14 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnAudioOutputAudioOutputListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -221,8 +210,76 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
         ChipLogProgress(chipTool, "  outputType: %" PRIu8 "", entry.outputType);
         ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
     }
+    command->SetCommandExitStatus(iter.GetStatus());
+}
 
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+static void OnBridgedActionsActionListListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & list)
+{
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        command->SetCommandExitStatus(err);
+        return;
+    }
+
+    ChipLogProgress(chipTool, "OnBridgedActionsActionListListAttributeResponse: %zu entries", count);
+
+    auto iter  = list.begin();
+    uint16_t i = 0;
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ++i;
+        ChipLogProgress(chipTool, "ActionStruct[%" PRIu16 "]:", i);
+        ChipLogProgress(chipTool, "  actionID: %" PRIu16 "", entry.actionID);
+        ChipLogProgress(Zcl, "  Name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
+        ChipLogProgress(chipTool, "  type: %" PRIu8 "", entry.type);
+        ChipLogProgress(chipTool, "  endpointListID: %" PRIu16 "", entry.endpointListID);
+        ChipLogProgress(chipTool, "  supportedCommands: %" PRIu16 "", entry.supportedCommands);
+        ChipLogProgress(chipTool, "  status: %" PRIu8 "", entry.status);
+    }
+    command->SetCommandExitStatus(iter.GetStatus());
+}
+
+static void OnBridgedActionsEndpointListListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+        list)
+{
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        command->SetCommandExitStatus(err);
+        return;
+    }
+
+    ChipLogProgress(chipTool, "OnBridgedActionsEndpointListListAttributeResponse: %zu entries", count);
+
+    auto iter  = list.begin();
+    uint16_t i = 0;
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ++i;
+        ChipLogProgress(chipTool, "EndpointListStruct[%" PRIu16 "]:", i);
+        ChipLogProgress(chipTool, "  endpointListID: %" PRIu16 "", entry.endpointListID);
+        ChipLogProgress(Zcl, "  Name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
+        ChipLogProgress(chipTool, "  type: %" PRIu8 "", entry.type);
+        ChipLogProgress(Zcl, "  Endpoints: %zu", entry.endpoints.size());
+    }
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void
@@ -231,19 +288,14 @@ OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context,
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnContentLauncherAcceptsHeaderListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -256,8 +308,7 @@ OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context,
         ++i;
         ChipLogProgress(Zcl, "  : %zu", entry.size());
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(
@@ -266,19 +317,14 @@ static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnContentLauncherSupportedStreamingTypesListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -291,8 +337,7 @@ static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(
         ++i;
         ChipLogProgress(chipTool, "ContentLaunchStreamingType[%" PRIu16 "]: %" PRIu8 "", i, entry);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnDescriptorDeviceListListAttributeResponse(
@@ -301,19 +346,14 @@ static void OnDescriptorDeviceListListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnDescriptorDeviceListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -328,8 +368,7 @@ static void OnDescriptorDeviceListListAttributeResponse(
         ChipLogProgress(chipTool, "  type: %" PRIu32 "", entry.type);
         ChipLogProgress(chipTool, "  revision: %" PRIu16 "", entry.revision);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnDescriptorServerListListAttributeResponse(void * context,
@@ -337,19 +376,14 @@ static void OnDescriptorServerListListAttributeResponse(void * context,
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnDescriptorServerListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -362,8 +396,7 @@ static void OnDescriptorServerListListAttributeResponse(void * context,
         ++i;
         ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu32 "", i, entry);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnDescriptorClientListListAttributeResponse(void * context,
@@ -371,19 +404,14 @@ static void OnDescriptorClientListListAttributeResponse(void * context,
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnDescriptorClientListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -396,8 +424,7 @@ static void OnDescriptorClientListListAttributeResponse(void * context,
         ++i;
         ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu32 "", i, entry);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnDescriptorPartsListListAttributeResponse(void * context,
@@ -405,19 +432,14 @@ static void OnDescriptorPartsListListAttributeResponse(void * context,
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnDescriptorPartsListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -430,8 +452,7 @@ static void OnDescriptorPartsListListAttributeResponse(void * context,
         ++i;
         ChipLogProgress(chipTool, "ENDPOINT_NO[%" PRIu16 "]: %" PRIu16 "", i, entry);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnFixedLabelLabelListListAttributeResponse(
@@ -440,19 +461,14 @@ static void OnFixedLabelLabelListListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnFixedLabelLabelListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -467,8 +483,7 @@ static void OnFixedLabelLabelListListAttributeResponse(
         ChipLogProgress(Zcl, "  label: %.*s", static_cast<int>(entry.label.size()), entry.label.data());
         ChipLogProgress(Zcl, "  value: %.*s", static_cast<int>(entry.value.size()), entry.value.data());
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeResponse(
@@ -478,19 +493,14 @@ static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeRespons
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnGeneralCommissioningBasicCommissioningInfoListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -504,8 +514,7 @@ static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeRespons
         ChipLogProgress(chipTool, "BasicCommissioningInfoType[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  failSafeExpiryLengthMs: %" PRIu32 "", entry.failSafeExpiryLengthMs);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
@@ -515,19 +524,14 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -546,8 +550,7 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
         ChipLogProgress(Zcl, "  HardwareAddress: %zu", entry.hardwareAddress.size());
         ChipLogProgress(chipTool, "  type: %" PRIu8 "", entry.type);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnGroupKeyManagementGroupsListAttributeResponse(
@@ -556,19 +559,14 @@ static void OnGroupKeyManagementGroupsListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnGroupKeyManagementGroupsListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -584,8 +582,7 @@ static void OnGroupKeyManagementGroupsListAttributeResponse(
         ChipLogProgress(chipTool, "  vendorGroupId: %" PRIu16 "", entry.vendorGroupId);
         ChipLogProgress(chipTool, "  groupKeySetIndex: %" PRIu16 "", entry.groupKeySetIndex);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnGroupKeyManagementGroupKeysListAttributeResponse(
@@ -594,19 +591,14 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnGroupKeyManagementGroupKeysListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -624,8 +616,7 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(
         ChipLogProgress(chipTool, "  groupKeyEpochStartTime: %" PRIu64 "", entry.groupKeyEpochStartTime);
         ChipLogProgress(chipTool, "  groupKeySecurityPolicy: %" PRIu8 "", entry.groupKeySecurityPolicy);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnMediaInputMediaInputListListAttributeResponse(
@@ -634,19 +625,14 @@ static void OnMediaInputMediaInputListListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnMediaInputMediaInputListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -663,8 +649,7 @@ static void OnMediaInputMediaInputListListAttributeResponse(
         ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "  description: %.*s", static_cast<int>(entry.description.size()), entry.description.data());
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnOperationalCredentialsFabricsListListAttributeResponse(
@@ -674,19 +659,14 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnOperationalCredentialsFabricsListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -705,8 +685,7 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
         ChipLogProgress(chipTool, "  nodeId: %" PRIu64 "", entry.nodeId);
         ChipLogProgress(Zcl, "  Label: %.*s", static_cast<int>(entry.label.size()), entry.label.data());
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context,
@@ -714,19 +693,14 @@ static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnPowerSourceActiveBatteryFaultsListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -739,8 +713,7 @@ static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context
         ++i;
         ChipLogProgress(chipTool, "ENUM8[%" PRIu16 "]: %" PRIu8 "", i, entry);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnTvChannelTvChannelListListAttributeResponse(
@@ -749,19 +722,14 @@ static void OnTvChannelTvChannelListListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnTvChannelTvChannelListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -780,8 +748,7 @@ static void OnTvChannelTvChannelListListAttributeResponse(
         ChipLogProgress(Zcl, "  affiliateCallSign: %.*s", static_cast<int>(entry.affiliateCallSign.size()),
                         entry.affiliateCallSign.data());
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
@@ -791,19 +758,14 @@ static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnTargetNavigatorTargetNavigatorListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -818,27 +780,21 @@ static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
         ChipLogProgress(chipTool, "  identifier: %" PRIu8 "", entry.identifier);
         ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnTestClusterListInt8uListAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnTestClusterListInt8uListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -851,8 +807,7 @@ static void OnTestClusterListInt8uListAttributeResponse(void * context, const ch
         ++i;
         ChipLogProgress(chipTool, "INT8U[%" PRIu16 "]: %" PRIu8 "", i, entry);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnTestClusterListOctetStringListAttributeResponse(void * context,
@@ -860,19 +815,14 @@ static void OnTestClusterListOctetStringListAttributeResponse(void * context,
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnTestClusterListOctetStringListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -885,8 +835,7 @@ static void OnTestClusterListOctetStringListAttributeResponse(void * context,
         ++i;
         ChipLogProgress(Zcl, "  : %zu", entry.size());
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnTestClusterListStructOctetStringListAttributeResponse(
@@ -895,19 +844,14 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnTestClusterListStructOctetStringListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -922,8 +866,7 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(
         ChipLogProgress(chipTool, "  fabricIndex: %" PRIu64 "", entry.fabricIndex);
         ChipLogProgress(Zcl, "  operationalCert: %zu", entry.operationalCert.size());
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
@@ -933,19 +876,14 @@ static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -972,8 +910,7 @@ static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
         ChipLogProgress(chipTool, "  fullNetworkData: %d", entry.fullNetworkData);
         ChipLogProgress(chipTool, "  isChild: %d", entry.isChild);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(
@@ -983,19 +920,14 @@ static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -1018,8 +950,7 @@ static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(
         ChipLogProgress(chipTool, "  allocated: %d", entry.allocated);
         ChipLogProgress(chipTool, "  linkEstablished: %d", entry.linkEstablished);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(
@@ -1029,19 +960,14 @@ static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -1056,8 +982,7 @@ static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(
         ChipLogProgress(chipTool, "  rotationTime: %" PRIu16 "", entry.rotationTime);
         ChipLogProgress(chipTool, "  flags: %" PRIu16 "", entry.flags);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeResponse(
@@ -1067,19 +992,14 @@ static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeR
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -1104,8 +1024,7 @@ static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeR
         ChipLogProgress(chipTool, "  securityPolicyPresent: %d", entry.securityPolicyPresent);
         ChipLogProgress(chipTool, "  channelMaskPresent: %d", entry.channelMaskPresent);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeResponse(
@@ -1113,19 +1032,14 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -1138,8 +1052,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
         ++i;
         ChipLogProgress(chipTool, "NetworkFault[%" PRIu16 "]: %" PRIu8 "", i, entry);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnAccountLoginGetSetupPINResponseSuccess(
@@ -1987,6 +1900,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | BinaryInputBasic                                                    | 0x000F |
 | Binding                                                             | 0xF000 |
 | BooleanState                                                        | 0x0045 |
+| BridgedActions                                                      | 0x0025 |
 | BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
 | ContentLauncher                                                     | 0x050A |
@@ -4455,6 +4369,485 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0045) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::BooleanStateCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster BridgedActions                                              | 0x0025 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * DisableAction                                                     |   0x0A |
+| * DisableActionWithDuration                                         |   0x0B |
+| * EnableAction                                                      |   0x08 |
+| * EnableActionWithDuration                                          |   0x09 |
+| * InstantAction                                                     |   0x00 |
+| * InstantActionWithTransition                                       |   0x01 |
+| * PauseAction                                                       |   0x05 |
+| * PauseActionWithDuration                                           |   0x06 |
+| * ResumeAction                                                      |   0x07 |
+| * StartAction                                                       |   0x02 |
+| * StartActionWithDuration                                           |   0x03 |
+| * StopAction                                                        |   0x04 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ActionList                                                        | 0x0000 |
+| * EndpointList                                                      | 0x0001 |
+| * SetupUrl                                                          | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command DisableAction
+ */
+class BridgedActionsDisableAction : public ModelCommand
+{
+public:
+    BridgedActionsDisableAction() : ModelCommand("disable-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::DisableAction::Type mRequest;
+};
+
+/*
+ * Command DisableActionWithDuration
+ */
+class BridgedActionsDisableActionWithDuration : public ModelCommand
+{
+public:
+    BridgedActionsDisableActionWithDuration() : ModelCommand("disable-action-with-duration")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type mRequest;
+};
+
+/*
+ * Command EnableAction
+ */
+class BridgedActionsEnableAction : public ModelCommand
+{
+public:
+    BridgedActionsEnableAction() : ModelCommand("enable-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::EnableAction::Type mRequest;
+};
+
+/*
+ * Command EnableActionWithDuration
+ */
+class BridgedActionsEnableActionWithDuration : public ModelCommand
+{
+public:
+    BridgedActionsEnableActionWithDuration() : ModelCommand("enable-action-with-duration")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type mRequest;
+};
+
+/*
+ * Command InstantAction
+ */
+class BridgedActionsInstantAction : public ModelCommand
+{
+public:
+    BridgedActionsInstantAction() : ModelCommand("instant-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::InstantAction::Type mRequest;
+};
+
+/*
+ * Command InstantActionWithTransition
+ */
+class BridgedActionsInstantActionWithTransition : public ModelCommand
+{
+public:
+    BridgedActionsInstantActionWithTransition() : ModelCommand("instant-action-with-transition")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type mRequest;
+};
+
+/*
+ * Command PauseAction
+ */
+class BridgedActionsPauseAction : public ModelCommand
+{
+public:
+    BridgedActionsPauseAction() : ModelCommand("pause-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::PauseAction::Type mRequest;
+};
+
+/*
+ * Command PauseActionWithDuration
+ */
+class BridgedActionsPauseActionWithDuration : public ModelCommand
+{
+public:
+    BridgedActionsPauseActionWithDuration() : ModelCommand("pause-action-with-duration")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type mRequest;
+};
+
+/*
+ * Command ResumeAction
+ */
+class BridgedActionsResumeAction : public ModelCommand
+{
+public:
+    BridgedActionsResumeAction() : ModelCommand("resume-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type mRequest;
+};
+
+/*
+ * Command StartAction
+ */
+class BridgedActionsStartAction : public ModelCommand
+{
+public:
+    BridgedActionsStartAction() : ModelCommand("start-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::StartAction::Type mRequest;
+};
+
+/*
+ * Command StartActionWithDuration
+ */
+class BridgedActionsStartActionWithDuration : public ModelCommand
+{
+public:
+    BridgedActionsStartActionWithDuration() : ModelCommand("start-action-with-duration")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type mRequest;
+};
+
+/*
+ * Command StopAction
+ */
+class BridgedActionsStopAction : public ModelCommand
+{
+public:
+    BridgedActionsStopAction() : ModelCommand("stop-action")
+    {
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::BridgedActions::Commands::StopAction::Type mRequest;
+};
+
+/*
+ * Attribute ActionList
+ */
+class ReadBridgedActionsActionList : public ModelCommand
+{
+public:
+    ReadBridgedActionsActionList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "action-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedActionsActionList()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0025) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeActionList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BridgedActionsActionListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BridgedActionsActionListListAttributeCallback>(OnBridgedActionsActionListListAttributeResponse,
+                                                                                    this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute EndpointList
+ */
+class ReadBridgedActionsEndpointList : public ModelCommand
+{
+public:
+    ReadBridgedActionsEndpointList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "endpoint-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedActionsEndpointList()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0025) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeEndpointList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BridgedActionsEndpointListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BridgedActionsEndpointListListAttributeCallback>(
+            OnBridgedActionsEndpointListListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute SetupUrl
+ */
+class ReadBridgedActionsSetupUrl : public ModelCommand
+{
+public:
+    ReadBridgedActionsSetupUrl() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "setup-url");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedActionsSetupUrl()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0025) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSetupUrl(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadBridgedActionsClusterRevision : public ModelCommand
+{
+public:
+    ReadBridgedActionsClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedActionsClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0025) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -25790,6 +26183,31 @@ void registerClusterBooleanState(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterBridgedActions(Commands & commands)
+{
+    const char * clusterName = "BridgedActions";
+
+    commands_list clusterCommands = {
+        make_unique<BridgedActionsDisableAction>(),               //
+        make_unique<BridgedActionsDisableActionWithDuration>(),   //
+        make_unique<BridgedActionsEnableAction>(),                //
+        make_unique<BridgedActionsEnableActionWithDuration>(),    //
+        make_unique<BridgedActionsInstantAction>(),               //
+        make_unique<BridgedActionsInstantActionWithTransition>(), //
+        make_unique<BridgedActionsPauseAction>(),                 //
+        make_unique<BridgedActionsPauseActionWithDuration>(),     //
+        make_unique<BridgedActionsResumeAction>(),                //
+        make_unique<BridgedActionsStartAction>(),                 //
+        make_unique<BridgedActionsStartActionWithDuration>(),     //
+        make_unique<BridgedActionsStopAction>(),                  //
+        make_unique<ReadBridgedActionsActionList>(),              //
+        make_unique<ReadBridgedActionsEndpointList>(),            //
+        make_unique<ReadBridgedActionsSetupUrl>(),                //
+        make_unique<ReadBridgedActionsClusterRevision>(),         //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterBridgedDeviceBasic(Commands & commands)
 {
     const char * clusterName = "BridgedDeviceBasic";
@@ -26824,6 +27242,7 @@ void registerClusters(Commands & commands)
     registerClusterBinaryInputBasic(commands);
     registerClusterBinding(commands);
     registerClusterBooleanState(commands);
+    registerClusterBridgedActions(commands);
     registerClusterBridgedDeviceBasic(commands);
     registerClusterColorControl(commands);
     registerClusterContentLauncher(commands);
