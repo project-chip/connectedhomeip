@@ -48,6 +48,7 @@ class TCPTest;
 namespace Inet {
 
 class InetLayer;
+class TCPTest;
 
 /**
  * @brief   Objects of this class represent TCP transport endpoints.
@@ -61,31 +62,9 @@ class DLL_EXPORT TCPEndPoint : public EndPointBasis
 {
     friend class InetLayer;
     friend class ::chip::Transport::TCPTest;
+    friend class TCPTest;
 
 public:
-    /** Control switch indicating whether the application is receiving data. */
-    bool ReceiveEnabled;
-
-    /**
-     * Basic dynamic state of the underlying endpoint.
-     *
-     *  Objects are initialized in the "ready" state, proceed to subsequent
-     *  states corresponding to a simplification of the states of the TCP
-     *  transport state machine.
-     */
-    enum class State : uint8_t
-    {
-        kReady           = 0, /**< Endpoint initialized, but not bound. */
-        kBound           = 1, /**< Endpoint bound, but not listening. */
-        kListening       = 2, /**< Endpoint receiving connections. */
-        kConnecting      = 3, /**< Endpoint attempting to connect. */
-        kConnected       = 4, /**< Endpoint connected, ready for tx/rx. */
-        kSendShutdown    = 5, /**< Endpoint initiated its half-close. */
-        kReceiveShutdown = 6, /**< Endpoint responded to half-close. */
-        kClosing         = 7, /**< Endpoint closing bidirectionally. */
-        kClosed          = 8  /**< Endpoint closed, ready for release. */
-    } mState;
-
     TCPEndPoint() = default;
 
     /**
@@ -174,7 +153,7 @@ public:
      * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
      *
      * @details
-     *  Do not use \c NULL pointer values for either argument.
+     *  Do not use \c nullptr for either argument.
      */
     CHIP_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const;
 
@@ -189,9 +168,9 @@ public:
      * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
      *
      * @details
-     *  Do not use \c NULL pointer values for either argument.
+     *  Do not use \c nullptr for either argument.
      */
-    CHIP_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort);
+    CHIP_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const;
 
     /**
      * @brief   Extract the interface id of the TCP endpoint.
@@ -216,32 +195,27 @@ public:
     CHIP_ERROR Send(chip::System::PacketBufferHandle && data, bool push = true);
 
     /**
-     * @brief   Disable reception.
+     * Disable reception.
      *
-     * @details
      *  Disable all event handlers. Data sent to an endpoint that disables
      *  reception will be acknowledged until the receive window is exhausted.
      */
-    void DisableReceive() { ReceiveEnabled = false; }
+    void DisableReceive() { mReceiveEnabled = false; }
 
     /**
-     * @brief   Enable reception.
+     * Enable reception.
      *
-     * @details
      *  Enable all event handlers. Data sent to an endpoint that disables
      *  reception will be acknowledged until the receive window is exhausted.
      */
     void EnableReceive()
     {
-        ReceiveEnabled = true;
+        mReceiveEnabled = true;
         DriveReceiving();
     }
 
     /**
-     *  @brief EnableNoDelay
-     *
-     *    Switch off nagle buffering algorithm in TCP by setting the
-     *    TCP_NODELAY socket options.
+     * Switch off Nagle buffering algorithm.
      */
     CHIP_ERROR EnableNoDelay();
 
@@ -599,6 +573,29 @@ public:
 private:
     static chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
 
+    /**
+     * Basic dynamic state of the underlying endpoint.
+     *
+     *  Objects are initialized in the "ready" state, proceed to subsequent
+     *  states corresponding to a simplification of the states of the TCP
+     *  transport state machine.
+     */
+    enum class State : uint8_t
+    {
+        kReady           = 0, /**< Endpoint initialized, but not bound. */
+        kBound           = 1, /**< Endpoint bound, but not listening. */
+        kListening       = 2, /**< Endpoint receiving connections. */
+        kConnecting      = 3, /**< Endpoint attempting to connect. */
+        kConnected       = 4, /**< Endpoint connected, ready for tx/rx. */
+        kSendShutdown    = 5, /**< Endpoint initiated its half-close. */
+        kReceiveShutdown = 6, /**< Endpoint responded to half-close. */
+        kClosing         = 7, /**< Endpoint closing bidirectionally. */
+        kClosed          = 8  /**< Endpoint closed, ready for release. */
+    } mState;
+
+    /** Control switch indicating whether the application is receiving data. */
+    bool mReceiveEnabled;
+
     chip::System::PacketBufferHandle mRcvQueue;
     chip::System::PacketBufferHandle mSendQueue;
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -657,7 +654,7 @@ private:
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-    TCPEndPoint(const TCPEndPoint &); // not defined
+    TCPEndPoint(const TCPEndPoint &) = delete;
 
     void Init(InetLayer * inetLayer);
     CHIP_ERROR DriveSending();
@@ -716,6 +713,7 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    CHIP_ERROR GetSocketInfo(int getname(int, sockaddr *, socklen_t *), IPAddress * retAddr, uint16_t * retPort) const;
     CHIP_ERROR GetSocket(IPAddressType addrType);
     void HandlePendingIO(System::SocketEvents events);
     void ReceiveData();

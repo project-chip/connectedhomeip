@@ -255,15 +255,6 @@
 #define ZCL_LONG_POLL_INTERVAL_MIN_ATTRIBUTE_ID (0x0005)
 #define ZCL_FAST_POLL_TIMEOUT_MAX_ATTRIBUTE_ID (0x0006)
 
-// Attribute ids for cluster: Bridged Actions
-
-// Client attributes
-
-// Server attributes
-#define ZCL_ACTION_LIST_ATTRIBUTE_ID (0x0000)
-#define ZCL_ENDPOINT_LIST_ATTRIBUTE_ID (0x0001)
-#define ZCL_SETUP_URL_ATTRIBUTE_ID (0x0002)
-
 // Attribute ids for cluster: Basic
 
 // Client attributes
@@ -855,16 +846,7 @@
 #define ZCL_ILLUM_MIN_MEASURED_VALUE_ATTRIBUTE_ID (0x0001)
 #define ZCL_ILLUM_MAX_MEASURED_VALUE_ATTRIBUTE_ID (0x0002)
 #define ZCL_ILLUM_TOLERANCE_ATTRIBUTE_ID (0x0003)
-#define ZCL_MEASUREMENT_LIGHT_SENSOR_TYPE_ATTRIBUTE_ID (0x0004)
-
-// Attribute ids for cluster: Illuminance Level Sensing
-
-// Client attributes
-
-// Server attributes
-#define ZCL_LEVEL_STATUS_ATTRIBUTE_ID (0x0000)
-#define ZCL_SENSING_LIGHT_SENSOR_TYPE_ATTRIBUTE_ID (0x0001)
-#define ZCL_ILLUMINANCE_TARGET_LEVEL_ATTRIBUTE_ID (0x0010)
+#define ZCL_ILLUM_LIGHT_SENSOR_TYPE_ATTRIBUTE_ID (0x0004)
 
 // Attribute ids for cluster: Temperature Measurement
 
