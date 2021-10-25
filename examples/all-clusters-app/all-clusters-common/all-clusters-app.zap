@@ -11270,6 +11270,21 @@
               "reportableChange": 0
             },
             {
+              "name": "min setpoint dead band",
+              "code": 25,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x19",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "control sequence of operation",
               "code": 27,
               "mfgCode": null,
