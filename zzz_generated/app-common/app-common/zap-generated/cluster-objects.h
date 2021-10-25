@@ -5488,7 +5488,7 @@ struct TypeInfo
     using Type          = DataModel::List<Structs::ActionStruct::Type>;
     using DecodableType = DataModel::DecodableList<Structs::ActionStruct::DecodableType>;
 
-    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActionList::Id; }
 };
 } // namespace ActionList
@@ -5498,7 +5498,7 @@ struct TypeInfo
     using Type          = DataModel::List<Structs::EndpointListStruct::Type>;
     using DecodableType = DataModel::DecodableList<Structs::EndpointListStruct::DecodableType>;
 
-    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EndpointList::Id; }
 };
 } // namespace EndpointList
@@ -5508,10 +5508,30 @@ struct TypeInfo
     using Type          = chip::CharSpan;
     using DecodableType = chip::CharSpan;
 
-    static constexpr ClusterId GetClusterId() { return BridgedActions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetupUrl::Id; }
 };
 } // namespace SetupUrl
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
 } // namespace Attributes
 } // namespace BridgedActions
 namespace Basic {
