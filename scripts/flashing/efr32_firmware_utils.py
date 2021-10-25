@@ -112,7 +112,8 @@ class Flasher(firmware_utils.Flasher):
         self.define_options(EFR32_OPTIONS)
 
     # Common command line arguments for commander device subcommands.
-    DEVICE_ARGUMENTS = [{'optional': 'serialno'}, {'optional': 'ip'}, {'optional': 'device'}]
+    DEVICE_ARGUMENTS = [{'optional': 'serialno'}, {
+        'optional': 'ip'}, {'optional': 'device'}]
 
     def erase(self):
         """Perform `commander device masserase`."""
