@@ -22537,6 +22537,61 @@ public:
 using DecodableType = Type;
 
 } // namespace SimpleStruct
+namespace NullablesAndOptionalsStruct {
+enum class Fields
+{
+    kNullableInt            = 0,
+    kOptionalInt            = 1,
+    kNullableOptionalInt    = 2,
+    kNullableString         = 3,
+    kOptionalString         = 4,
+    kNullableOptionalString = 5,
+    kNullableStruct         = 6,
+    kOptionalStruct         = 7,
+    kNullableOptionalStruct = 8,
+    kNullableList           = 9,
+    kOptionalList           = 10,
+    kNullableOptionalList   = 11,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<uint16_t> nullableInt;
+    Optional<uint16_t> optionalInt;
+    Optional<DataModel::Nullable<uint16_t>> nullableOptionalInt;
+    DataModel::Nullable<chip::CharSpan> nullableString;
+    Optional<chip::CharSpan> optionalString;
+    Optional<DataModel::Nullable<chip::CharSpan>> nullableOptionalString;
+    DataModel::Nullable<Structs::SimpleStruct::Type> nullableStruct;
+    Optional<Structs::SimpleStruct::Type> optionalStruct;
+    Optional<DataModel::Nullable<Structs::SimpleStruct::Type>> nullableOptionalStruct;
+    DataModel::Nullable<DataModel::List<SimpleEnum>> nullableList;
+    Optional<DataModel::List<SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::List<SimpleEnum>>> nullableOptionalList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::Nullable<uint16_t> nullableInt;
+    Optional<uint16_t> optionalInt;
+    Optional<DataModel::Nullable<uint16_t>> nullableOptionalInt;
+    DataModel::Nullable<chip::CharSpan> nullableString;
+    Optional<chip::CharSpan> optionalString;
+    Optional<DataModel::Nullable<chip::CharSpan>> nullableOptionalString;
+    DataModel::Nullable<Structs::SimpleStruct::DecodableType> nullableStruct;
+    Optional<Structs::SimpleStruct::DecodableType> optionalStruct;
+    Optional<DataModel::Nullable<Structs::SimpleStruct::DecodableType>> nullableOptionalStruct;
+    DataModel::Nullable<DataModel::DecodableList<SimpleEnum>> nullableList;
+    Optional<DataModel::DecodableList<SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::DecodableList<SimpleEnum>>> nullableOptionalList;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace NullablesAndOptionalsStruct
 namespace NestedStruct {
 enum class Fields
 {
@@ -23028,6 +23083,40 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestStructArrayArgumentRequest
+namespace TestNullableOptionalResponse {
+enum class Fields
+{
+    kWasPresent = 0,
+    kWasNull    = 1,
+    kValue      = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestNullableOptionalResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    bool wasPresent;
+    Optional<bool> wasNull;
+    Optional<uint8_t> value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestNullableOptionalResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    bool wasPresent;
+    Optional<bool> wasNull;
+    Optional<uint8_t> value;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNullableOptionalResponse
 namespace TestStructArgumentRequest {
 enum class Fields
 {
@@ -23056,6 +23145,115 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestStructArgumentRequest
+namespace TestComplexNullableOptionalResponse {
+enum class Fields
+{
+    kNullableIntWasNull               = 0,
+    kNullableIntValue                 = 1,
+    kOptionalIntWasPresent            = 2,
+    kOptionalIntValue                 = 3,
+    kNullableOptionalIntWasPresent    = 4,
+    kNullableOptionalIntWasNull       = 5,
+    kNullableOptionalIntValue         = 6,
+    kNullableStringWasNull            = 7,
+    kNullableStringValue              = 8,
+    kOptionalStringWasPresent         = 9,
+    kOptionalStringValue              = 10,
+    kNullableOptionalStringWasPresent = 11,
+    kNullableOptionalStringWasNull    = 12,
+    kNullableOptionalStringValue      = 13,
+    kNullableStructWasNull            = 14,
+    kNullableStructValue              = 15,
+    kOptionalStructWasPresent         = 16,
+    kOptionalStructValue              = 17,
+    kNullableOptionalStructWasPresent = 18,
+    kNullableOptionalStructWasNull    = 19,
+    kNullableOptionalStructValue      = 20,
+    kNullableListWasNull              = 21,
+    kNullableListValue                = 22,
+    kOptionalListWasPresent           = 23,
+    kOptionalListValue                = 24,
+    kNullableOptionalListWasPresent   = 25,
+    kNullableOptionalListWasNull      = 26,
+    kNullableOptionalListValue        = 27,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestComplexNullableOptionalResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    bool nullableIntWasNull;
+    Optional<uint16_t> nullableIntValue;
+    bool optionalIntWasPresent;
+    Optional<uint16_t> optionalIntValue;
+    bool nullableOptionalIntWasPresent;
+    Optional<bool> nullableOptionalIntWasNull;
+    Optional<uint16_t> nullableOptionalIntValue;
+    bool nullableStringWasNull;
+    Optional<chip::CharSpan> nullableStringValue;
+    bool optionalStringWasPresent;
+    Optional<chip::CharSpan> optionalStringValue;
+    bool nullableOptionalStringWasPresent;
+    Optional<bool> nullableOptionalStringWasNull;
+    Optional<chip::CharSpan> nullableOptionalStringValue;
+    bool nullableStructWasNull;
+    Optional<Structs::SimpleStruct::Type> nullableStructValue;
+    bool optionalStructWasPresent;
+    Optional<Structs::SimpleStruct::Type> optionalStructValue;
+    bool nullableOptionalStructWasPresent;
+    Optional<bool> nullableOptionalStructWasNull;
+    Optional<Structs::SimpleStruct::Type> nullableOptionalStructValue;
+    bool nullableListWasNull;
+    Optional<DataModel::List<SimpleEnum>> nullableListValue;
+    bool optionalListWasPresent;
+    Optional<DataModel::List<SimpleEnum>> optionalListValue;
+    bool nullableOptionalListWasPresent;
+    Optional<bool> nullableOptionalListWasNull;
+    Optional<DataModel::List<SimpleEnum>> nullableOptionalListValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestComplexNullableOptionalResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    bool nullableIntWasNull;
+    Optional<uint16_t> nullableIntValue;
+    bool optionalIntWasPresent;
+    Optional<uint16_t> optionalIntValue;
+    bool nullableOptionalIntWasPresent;
+    Optional<bool> nullableOptionalIntWasNull;
+    Optional<uint16_t> nullableOptionalIntValue;
+    bool nullableStringWasNull;
+    Optional<chip::CharSpan> nullableStringValue;
+    bool optionalStringWasPresent;
+    Optional<chip::CharSpan> optionalStringValue;
+    bool nullableOptionalStringWasPresent;
+    Optional<bool> nullableOptionalStringWasNull;
+    Optional<chip::CharSpan> nullableOptionalStringValue;
+    bool nullableStructWasNull;
+    Optional<Structs::SimpleStruct::DecodableType> nullableStructValue;
+    bool optionalStructWasPresent;
+    Optional<Structs::SimpleStruct::DecodableType> optionalStructValue;
+    bool nullableOptionalStructWasPresent;
+    Optional<bool> nullableOptionalStructWasNull;
+    Optional<Structs::SimpleStruct::DecodableType> nullableOptionalStructValue;
+    bool nullableListWasNull;
+    Optional<DataModel::DecodableList<SimpleEnum>> nullableListValue;
+    bool optionalListWasPresent;
+    Optional<DataModel::DecodableList<SimpleEnum>> optionalListValue;
+    bool nullableOptionalListWasPresent;
+    Optional<bool> nullableOptionalListWasNull;
+    Optional<DataModel::DecodableList<SimpleEnum>> nullableOptionalListValue;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestComplexNullableOptionalResponse
 namespace TestNestedStructArgumentRequest {
 enum class Fields
 {
@@ -23255,6 +23453,95 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestEnumsRequest
+namespace TestNullableOptionalRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestNullableOptionalRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Optional<DataModel::Nullable<uint8_t>> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestNullableOptionalRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Optional<DataModel::Nullable<uint8_t>> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNullableOptionalRequest
+namespace TestComplexNullableOptionalRequest {
+enum class Fields
+{
+    kNullableInt            = 0,
+    kOptionalInt            = 1,
+    kNullableOptionalInt    = 2,
+    kNullableString         = 3,
+    kOptionalString         = 4,
+    kNullableOptionalString = 5,
+    kNullableStruct         = 6,
+    kOptionalStruct         = 7,
+    kNullableOptionalStruct = 8,
+    kNullableList           = 9,
+    kOptionalList           = 10,
+    kNullableOptionalList   = 11,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestComplexNullableOptionalRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::Nullable<uint16_t> nullableInt;
+    Optional<uint16_t> optionalInt;
+    Optional<DataModel::Nullable<uint16_t>> nullableOptionalInt;
+    DataModel::Nullable<chip::CharSpan> nullableString;
+    Optional<chip::CharSpan> optionalString;
+    Optional<DataModel::Nullable<chip::CharSpan>> nullableOptionalString;
+    DataModel::Nullable<Structs::SimpleStruct::Type> nullableStruct;
+    Optional<Structs::SimpleStruct::Type> optionalStruct;
+    Optional<DataModel::Nullable<Structs::SimpleStruct::Type>> nullableOptionalStruct;
+    DataModel::Nullable<DataModel::List<SimpleEnum>> nullableList;
+    Optional<DataModel::List<SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::List<SimpleEnum>>> nullableOptionalList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestComplexNullableOptionalRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::Nullable<uint16_t> nullableInt;
+    Optional<uint16_t> optionalInt;
+    Optional<DataModel::Nullable<uint16_t>> nullableOptionalInt;
+    DataModel::Nullable<chip::CharSpan> nullableString;
+    Optional<chip::CharSpan> optionalString;
+    Optional<DataModel::Nullable<chip::CharSpan>> nullableOptionalString;
+    DataModel::Nullable<Structs::SimpleStruct::DecodableType> nullableStruct;
+    Optional<Structs::SimpleStruct::DecodableType> optionalStruct;
+    Optional<DataModel::Nullable<Structs::SimpleStruct::DecodableType>> nullableOptionalStruct;
+    DataModel::Nullable<DataModel::DecodableList<SimpleEnum>> nullableList;
+    Optional<DataModel::DecodableList<SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::DecodableList<SimpleEnum>>> nullableOptionalList;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestComplexNullableOptionalRequest
 } // namespace Commands
 
 namespace Attributes {
