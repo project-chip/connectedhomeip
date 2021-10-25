@@ -202,13 +202,9 @@ static void OnBridgedActionsActionListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -222,7 +218,7 @@ static void OnBridgedActionsActionListListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -236,6 +232,14 @@ static void OnBridgedActionsActionListListAttributeResponse(
         ChipLogProgress(Zcl, "      SupportedCommands: %" PRIu16 ",", entry.supportedCommands);
         ChipLogProgress(Zcl, "      Status: %" PRIu8 ",", entry.status);
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -252,13 +256,9 @@ static void OnBridgedActionsEndpointListListAttributeResponse(
     const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
         list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -272,7 +272,7 @@ static void OnBridgedActionsEndpointListListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -284,6 +284,14 @@ static void OnBridgedActionsEndpointListListAttributeResponse(
         ChipLogProgress(Zcl, "      Type: %" PRIu8 ",", entry.type);
         ChipLogProgress(Zcl, "      Endpoints: %s,", ByteSpanToString(entry.endpoints).c_str());
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)

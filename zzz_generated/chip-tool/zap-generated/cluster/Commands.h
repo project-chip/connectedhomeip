@@ -219,19 +219,14 @@ static void OnBridgedActionsActionListListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnBridgedActionsActionListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -250,8 +245,7 @@ static void OnBridgedActionsActionListListAttributeResponse(
         ChipLogProgress(chipTool, "  supportedCommands: %" PRIu16 "", entry.supportedCommands);
         ChipLogProgress(chipTool, "  status: %" PRIu8 "", entry.status);
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void OnBridgedActionsEndpointListListAttributeResponse(
@@ -261,19 +255,14 @@ static void OnBridgedActionsEndpointListListAttributeResponse(
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
-    size_t count = 0;
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            command->SetCommandExitStatus(iter.GetStatus());
-            return;
-        }
+        command->SetCommandExitStatus(err);
+        return;
     }
+
     ChipLogProgress(chipTool, "OnBridgedActionsEndpointListListAttributeResponse: %zu entries", count);
 
     auto iter  = list.begin();
@@ -290,8 +279,7 @@ static void OnBridgedActionsEndpointListListAttributeResponse(
         ChipLogProgress(chipTool, "  type: %" PRIu8 "", entry.type);
         ChipLogProgress(Zcl, "  Endpoints: %zu", entry.endpoints.size());
     }
-
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(iter.GetStatus());
 }
 
 static void
