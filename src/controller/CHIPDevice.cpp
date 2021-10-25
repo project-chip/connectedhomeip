@@ -101,7 +101,7 @@ CHIP_ERROR Device::SendCommands(app::CommandSender * commandObj)
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return commandObj->SendCommandRequest(mDeviceId, mFabricIndex, mSecureSession);
+    return commandObj->SendCommandRequest(mSecureSession.Value());
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -835,7 +835,7 @@ CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Cal
     {
         AddIMResponseHandler(writeClient, onSuccessCallback, onFailureCallback);
     }
-    if ((err = aHandle.SendWriteRequest(GetDeviceId(), 0, mSecureSession)) != CHIP_NO_ERROR)
+    if ((err = aHandle.SendWriteRequest(mSecureSession.Value())) != CHIP_NO_ERROR)
     {
         CancelIMResponseHandler(writeClient);
     }

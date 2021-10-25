@@ -137,8 +137,6 @@ public:
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
-    // TODO: issue #6792 - the secure session parameter should be made non-optional and passed by reference.
-    //
     // Sends a queued up command request to the target encapsulated by the secureSession handle.
     //
     // Upon successful return from this call, all subsequent errors that occur during this interaction
@@ -155,8 +153,7 @@ public:
     // Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
     // Default timeout value will be used otherwise.
     //
-    CHIP_ERROR SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
-                                  System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
     // ExchangeDelegate interface implementation.  Private so people won't

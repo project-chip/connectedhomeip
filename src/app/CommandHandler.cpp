@@ -82,6 +82,8 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     ReturnErrorOnFailure(Finalize(commandPacket));
     ReturnErrorOnFailure(
         mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket)));
+    // The ExchangeContext is automatically freed here, and it makes mpExchangeCtx be temporary dangling here, but in
+    // all cases, we are going to call Close immediately after this function, while null out the mpExchangeCtx.
 
     MoveToState(CommandState::CommandSent);
 
