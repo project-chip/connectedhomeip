@@ -10,6 +10,9 @@ control.
     -   [Building the Example Application](#building-the-example-application)
     -   [Commissioning and cluster control](#commissioning-and-cluster-control)
         -   [Commissioning](#commissioning)
+            -   [Bypass mode](#bypass-mode)
+            -   [BLE mode](#ble-mode)
+            -   [IP mode](#ip-mode)
         -   [Cluster control](#cluster-control)
 
 ---
@@ -40,36 +43,99 @@ The CHIP demo application is supported on
     The output image files are stored in
     `out/ameba-amebad-all-clusters/asdk/image` folder.
 
+    The bootloader image files are stored in
+    `out/ameba-amebad-all-clusters/asdk/bootloader` folder.
+
 -   After building the application, **Ameba Image Tool** is used to flash it to
     Ameba board.
 
-1.  Connect your device via USB and open Ameba Image Tool.
-2.  Select correct serial port and set baudrate as **115200**.
-3.  Browse and add the corresponding image files in the Flash Download list to
-    the correct locations
-4.  Click **Download** button.
+1. Connect your device via USB and open Ameba Image Tool.
+2. Select correct serial port and set baudrate as **115200**.
+3. Browse and add the corresponding image files in the Flash Download list to
+   the correct locations
+4. Click **Download** button.
 
 ## Commissioning and Cluster Control
 
-### Commissioning
+## Commissioning
 
-The commissioning is carried out via WiFi.
+There are three commissioning modes supported by Ameba platform:
 
-1.  After download all-cluster example to Ameba board, boot up the board by
-    pressing the reset button.
-2.  Use ATW commands to setup network.
-3.  Use ATS\$ command to run all-cluster example.
-4.  Use
-    [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
-    to communicate with the device.
+### Bypass mode
 
-          $ ./chip-tool pairing bypass 192.168.xx.xxx 5540
+1. In "connectedhomeip/config/ameba/args.gni"
 
-### Cluster Control
+    - set `chip_bypass_rendezvous = true`
+    - Set `chip_ip_commissioning = false`
+    - Set `chip_use_clusters_for_ip_commissioning = false`
+    - Set `chip_config_network_layer_ble = false`
 
--   After successful commissioning, use the OnOff cluster command to control the
-    OnOff attribute. This allows you to toggle a parameter implemented by the
-    device to be On or Off.
+2. In "connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h"
+
+    - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0`
+
+3. Build and Flash
+4. Use ATS\$ command to run all-cluster example.
+5. Connect to AP using `ATW0, ATW1, ATWC` commands
+6. Test with
+   [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+   or
+   [Python Controller](https://github.com/hank820/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
+
+### BLE mode
+
+1. In "connectedhomeip/config/ameba/args.gni"
+
+    - set `chip_bypass_rendezvous = false`
+    - Set `chip_ip_commissioning = false`
+    - Set `chip_use_clusters_for_ip_commissioning = false`
+    - Set `chip_config_network_layer_ble = true`
+
+2. In "connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h"
+
+    - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1`
+
+3. Build and Flash
+4. Use ATS\$ command to run all-cluster example.
+5. Test with
+   [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+   or
+   [Python Controller](https://github.com/hank820/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
+
+### IP mode
+
+1. In "connectedhomeip/config/ameba/args.gni"
+
+    - set `chip_bypass_rendezvous = false`
+    - Set `chip_ip_commissioning = true`
+    - Set `chip_use_clusters_for_ip_commissioning = true`
+    - Set `chip_config_network_layer_ble = false`
+
+2. In "connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h"
+
+    - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0`
+
+3. Build and Flash
+4. Use ATS\$ command to run all-cluster example.
+5. Connect to AP using `ATW0, ATW1, ATWC` commands
+6. Test with
+   [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+   or
+   [Python Controller](https://github.com/hank820/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
+
+## Cluster Control
+
+After successful commissioning, use the OnOff cluster command to control the
+OnOff attribute. This allows you to toggle a parameter implemented by the device
+to be On or Off.
+
+-   Via
+    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool#using-the-client-to-send-matter-commands)
 
           $ ./chip-tool onoff on 1
           $ ./chip-tool onoff off 1
+
+-   Via
+    [Python Controller](https://github.com/hank820/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md#step-8-control-application-zcl-clusters)
+
+          $ chip-device-ctrl > zcl OnOff Toggle 1234 1 0
