@@ -524,7 +524,7 @@ void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
 
         gSendIntervalExpired = false;
         gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);
-        gSystemLayer.StartTimer(gSendIntervalMs, Common::HandleSendTimerComplete, nullptr);
+        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         SetStatusFailed(sTestState.mStatus);
     }
@@ -760,7 +760,7 @@ void DriveSend()
     else
     {
         gSendIntervalExpired = false;
-        gSystemLayer.StartTimer(gSendIntervalMs, Common::HandleSendTimerComplete, nullptr);
+        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         if (sTestState.mStats.mTransmit.mActual < sTestState.mStats.mTransmit.mExpected)
         {

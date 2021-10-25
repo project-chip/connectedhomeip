@@ -53,6 +53,7 @@
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::System;
+using namespace chip::System::Clock::Literals;
 
 #define TOOL_NAME "TestInetEndPoint"
 
@@ -105,7 +106,7 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-    err = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
+    err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // then init network
@@ -333,14 +334,14 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     // Verify same aComplete and aAppState args do not exhaust timer pool
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
     {
-        err = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
+        err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
     char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
-        err = gSystemLayer.StartTimer(10, HandleTimer, &numTimersTest[i]);
+        err = gSystemLayer.StartTimer(10_ms32, HandleTimer, &numTimersTest[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
 #endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 

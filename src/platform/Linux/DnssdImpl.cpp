@@ -314,8 +314,8 @@ void Poller::SystemTimerUpdate(AvahiTimeout * timer)
     if ((mEarliestTimeout == std::chrono::steady_clock::time_point()) || (timer->mAbsTimeout < mEarliestTimeout))
     {
         mEarliestTimeout = timer->mAbsTimeout;
-        auto msDelay     = std::chrono::duration_cast<std::chrono::milliseconds>(steady_clock::now() - mEarliestTimeout).count();
-        DeviceLayer::SystemLayer().StartTimer(msDelay, SystemTimerCallback, this);
+        auto delay       = std::chrono::duration_cast<chip::System::Clock::Milliseconds32>(steady_clock::now() - mEarliestTimeout);
+        DeviceLayer::SystemLayer().StartTimer(delay, SystemTimerCallback, this);
     }
 }
 
@@ -722,7 +722,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                 struct in_addr addr4;
 
                 memcpy(&addr4, &(address->data.ipv4), sizeof(addr4));
-                result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv4(addr4));
+                result.mAddress.SetValue(chip::Inet::IPAddress(addr4));
 #else
                 result_err = CHIP_ERROR_INVALID_ADDRESS;
                 ChipLogError(Discovery, "Ignoring IPv4 mDNS address.");
@@ -732,7 +732,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                 struct in6_addr addr6;
 
                 memcpy(&addr6, &(address->data.ipv6), sizeof(addr6));
-                result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv6(addr6));
+                result.mAddress.SetValue(chip::Inet::IPAddress(addr6));
                 break;
             default:
                 break;

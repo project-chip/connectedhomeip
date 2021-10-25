@@ -47,9 +47,9 @@ void TestCommand::OnWaitForMsFn(chip::System::Layer * systemLayer, void * contex
     command->NextTest();
 }
 
-CHIP_ERROR TestCommand::WaitForMs(uint32_t ms)
+CHIP_ERROR TestCommand::Wait(chip::System::Clock::Timeout duration)
 {
-    return chip::DeviceLayer::SystemLayer().StartTimer(ms, OnWaitForMsFn, this);
+    return chip::DeviceLayer::SystemLayer().StartTimer(duration, OnWaitForMsFn, this);
 }
 
 CHIP_ERROR TestCommand::Log(const char * message)

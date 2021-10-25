@@ -56,6 +56,7 @@ from device_service import device_service_pb2
 from lighting_service import lighting_service_pb2
 from locking_service import locking_service_pb2
 from wifi_service import wifi_service_pb2
+from echo_service import echo_pb2
 
 _LOG = logging.getLogger(__name__)
 _DEVICE_LOG = logging.getLogger('rpc_device')
@@ -68,7 +69,8 @@ PROTOS = [button_service_pb2,
           lighting_service_pb2,
           locking_service_pb2,
           wifi_service_pb2,
-          device_service_pb2]
+          device_service_pb2,
+          echo_pb2]
 
 
 def _parse_args():

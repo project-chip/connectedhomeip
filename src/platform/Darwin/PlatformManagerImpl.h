@@ -58,7 +58,7 @@ private:
     CHIP_ERROR _InitChipStack();
     CHIP_ERROR _Shutdown();
 
-    CHIP_ERROR _StartChipTimer(int64_t aMilliseconds) { return CHIP_ERROR_NOT_IMPLEMENTED; };
+    CHIP_ERROR _StartChipTimer(System::Clock::Timeout delay) { return CHIP_ERROR_NOT_IMPLEMENTED; };
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
     void _RunEventLoop();

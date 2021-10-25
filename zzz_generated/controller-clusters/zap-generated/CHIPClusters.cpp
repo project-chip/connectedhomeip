@@ -51,7 +51,7 @@ namespace Controller {
 
 // AccountLogin Cluster Commands
 CHIP_ERROR AccountLoginCluster::GetSetupPIN(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            chip::ByteSpan tempAccountIdentifier)
+                                            chip::CharSpan tempAccountIdentifier)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -75,9 +75,7 @@ CHIP_ERROR AccountLoginCluster::GetSetupPIN(Callback::Cancelable * onSuccessCall
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // tempAccountIdentifier: charString
-    SuccessOrExit(err = writer->PutString(
-                      TLV::ContextTag(argSeqNumber++),
-                      Span<const char>(Uint8::to_const_char(tempAccountIdentifier.data()), tempAccountIdentifier.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), tempAccountIdentifier.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -94,7 +92,7 @@ exit:
 }
 
 CHIP_ERROR AccountLoginCluster::Login(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      chip::ByteSpan tempAccountIdentifier, chip::ByteSpan setupPIN)
+                                      chip::CharSpan tempAccountIdentifier, chip::CharSpan setupPIN)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -118,12 +116,9 @@ CHIP_ERROR AccountLoginCluster::Login(Callback::Cancelable * onSuccessCallback, 
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // tempAccountIdentifier: charString
-    SuccessOrExit(err = writer->PutString(
-                      TLV::ContextTag(argSeqNumber++),
-                      Span<const char>(Uint8::to_const_char(tempAccountIdentifier.data()), tempAccountIdentifier.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), tempAccountIdentifier.data()));
     // setupPIN: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(setupPIN.data()), setupPIN.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), setupPIN.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -478,7 +473,7 @@ template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ApplicationB
 
 // ApplicationLauncher Cluster Commands
 CHIP_ERROR ApplicationLauncherCluster::LaunchApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 chip::ByteSpan data, uint16_t catalogVendorId, chip::ByteSpan applicationId)
+                                                 chip::CharSpan data, uint16_t catalogVendorId, chip::CharSpan applicationId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -502,13 +497,11 @@ CHIP_ERROR ApplicationLauncherCluster::LaunchApp(Callback::Cancelable * onSucces
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // data: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(data.data()), data.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data.data()));
     // catalogVendorId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
     // applicationId: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(applicationId.data()), applicationId.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), applicationId.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -582,7 +575,7 @@ ClusterBase::InvokeCommand<chip::app::Clusters::ApplicationLauncher::Commands::L
 
 // AudioOutput Cluster Commands
 CHIP_ERROR AudioOutputCluster::RenameOutput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint8_t index, chip::ByteSpan name)
+                                            uint8_t index, chip::CharSpan name)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -608,8 +601,7 @@ CHIP_ERROR AudioOutputCluster::RenameOutput(Callback::Cancelable * onSuccessCall
     // index: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), index));
     // name: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(name.data()), name.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), name.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -975,7 +967,7 @@ CHIP_ERROR BasicCluster::ReadAttributeUserLabel(Callback::Cancelable * onSuccess
 }
 
 CHIP_ERROR BasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 chip::ByteSpan value)
+                                                 chip::CharSpan value)
 {
     app::WriteClientHandle handle;
     chip::app::AttributePathParams attributePath;
@@ -1003,7 +995,7 @@ CHIP_ERROR BasicCluster::ReadAttributeLocation(Callback::Cancelable * onSuccessC
 }
 
 CHIP_ERROR BasicCluster::WriteAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                chip::ByteSpan value)
+                                                chip::CharSpan value)
 {
     app::WriteClientHandle handle;
     chip::app::AttributePathParams attributePath;
@@ -1421,6 +1413,50 @@ ClusterBase::InvokeCommand<chip::app::Clusters::Binding::Commands::Unbind::Type,
     const chip::app::Clusters::Binding::Commands::Unbind::Type &, void *,
     CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
+// BooleanState Cluster Commands
+// BooleanState Cluster Attributes
+CHIP_ERROR BooleanStateCluster::ReadAttributeStateValue(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000000;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<BooleanAttributeCallback>);
+}
+
+CHIP_ERROR BooleanStateCluster::SubscribeAttributeStateValue(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                             uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = BooleanState::Attributes::StateValue::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BooleanStateCluster::ReportAttributeStateValue(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BooleanState::Attributes::StateValue::Id, onReportCallback,
+                                     BasicAttributeFilter<BooleanAttributeCallback>);
+}
+
+CHIP_ERROR BooleanStateCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0000FFFD;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
 // BridgedDeviceBasic Cluster Commands
 // BridgedDeviceBasic Cluster Attributes
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback,
@@ -1472,7 +1508,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeUserLabel(Callback::Cancelabl
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                              Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     app::WriteClientHandle handle;
     chip::app::AttributePathParams attributePath;
@@ -3610,7 +3646,7 @@ ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StopMove
 
 // ContentLauncher Cluster Commands
 CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 bool autoPlay, chip::ByteSpan data)
+                                                 bool autoPlay, chip::CharSpan data)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3636,8 +3672,7 @@ CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSucces
     // autoPlay: boolean
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), autoPlay));
     // data: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(data.data()), data.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3654,7 +3689,7 @@ exit:
 }
 
 CHIP_ERROR ContentLauncherCluster::LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             chip::ByteSpan contentURL, chip::ByteSpan displayString)
+                                             chip::CharSpan contentURL, chip::CharSpan displayString)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3678,11 +3713,9 @@ CHIP_ERROR ContentLauncherCluster::LaunchURL(Callback::Cancelable * onSuccessCal
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // contentURL: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(contentURL.data()), contentURL.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), contentURL.data()));
     // displayString: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(displayString.data()), displayString.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), displayString.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3860,9 +3893,10 @@ exit:
 // DiagnosticLogs Cluster Attributes
 
 template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type,
-                                               chip::app::DataModel::NullObjectType>(
+                                               chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType>(
     const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType>,
+    CommandResponseFailureCallback);
 
 // DoorLock Cluster Commands
 CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -5538,7 +5572,7 @@ exit:
 
 CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint8_t location,
-                                                            chip::ByteSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs)
+                                                            chip::CharSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -5565,8 +5599,7 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable
     // location: regulatoryLocationType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
     // countryCode: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(countryCode.data()), countryCode.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), countryCode.data()));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
@@ -5776,7 +5809,7 @@ CHIP_ERROR GroupKeyManagementCluster::ReadAttributeClusterRevision(Callback::Can
 
 // Groups Cluster Commands
 CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t groupId, chip::ByteSpan groupName)
+                                   uint16_t groupId, chip::CharSpan groupName)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -5802,8 +5835,7 @@ CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Cal
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // groupName: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(groupName.data()), groupName.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), groupName.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -5820,7 +5852,7 @@ exit:
 }
 
 CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                uint16_t groupId, chip::ByteSpan groupName)
+                                                uint16_t groupId, chip::CharSpan groupName)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -5846,8 +5878,7 @@ CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccess
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // groupName: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(groupName.data()), groupName.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), groupName.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -7152,7 +7183,7 @@ exit:
 }
 
 CHIP_ERROR MediaInputCluster::RenameInput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint8_t index, chip::ByteSpan name)
+                                          uint8_t index, chip::CharSpan name)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7178,8 +7209,7 @@ CHIP_ERROR MediaInputCluster::RenameInput(Callback::Cancelable * onSuccessCallba
     // index: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), index));
     // name: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(name.data()), name.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), name.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -8541,7 +8571,7 @@ exit:
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint16_t vendorId,
                                                         uint16_t productId, uint16_t hardwareVersion, uint32_t softwareVersion,
-                                                        uint8_t protocolsSupported, chip::ByteSpan location,
+                                                        uint8_t protocolsSupported, chip::CharSpan location,
                                                         bool requestorCanConsent, chip::ByteSpan metadataForProvider)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
@@ -8577,8 +8607,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     // protocolsSupported: OTADownloadProtocol
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
     // location: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(location.data()), location.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), location.data()));
     // requestorCanConsent: boolean
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), requestorCanConsent));
     // metadataForProvider: octetString
@@ -9593,7 +9622,7 @@ exit:
 }
 
 CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, chip::ByteSpan label)
+                                                            Callback::Cancelable * onFailureCallback, chip::CharSpan label)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -9618,8 +9647,7 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // label: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(label.data()), label.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), label.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -10416,7 +10444,7 @@ CHIP_ERROR RelativeHumidityMeasurementCluster::ReadAttributeClusterRevision(Call
 
 // Scenes Cluster Commands
 CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::ByteSpan sceneName,
+                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName,
                                    chip::ClusterId clusterId, uint8_t length, uint8_t value)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
@@ -10447,8 +10475,7 @@ CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Cal
     // transitionTime: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // sceneName: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(sceneName.data()), sceneName.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), sceneName.data()));
     // clusterId: clusterId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
     // length: int8u
@@ -10993,7 +11020,7 @@ CHIP_ERROR SwitchCluster::ReadAttributeClusterRevision(Callback::Cancelable * on
 
 // TvChannel Cluster Commands
 CHIP_ERROR TvChannelCluster::ChangeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           chip::ByteSpan match)
+                                           chip::CharSpan match)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -11017,8 +11044,7 @@ CHIP_ERROR TvChannelCluster::ChangeChannel(Callback::Cancelable * onSuccessCallb
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // match: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(match.data()), match.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), match.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -11186,7 +11212,7 @@ ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::SkipChannel
 
 // TargetNavigator Cluster Commands
 CHIP_ERROR TargetNavigatorCluster::NavigateTarget(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback, uint8_t target, chip::ByteSpan data)
+                                                  Callback::Cancelable * onFailureCallback, uint8_t target, chip::CharSpan data)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -11212,8 +11238,7 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTarget(Callback::Cancelable * onSucce
     // target: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), target));
     // data: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(data.data()), data.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data.data()));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -11497,7 +11522,7 @@ exit:
 
 CHIP_ERROR TestClusterCluster::TestListStructArgumentRequest(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint8_t c,
-                                                             chip::ByteSpan d, chip::ByteSpan e, uint8_t f)
+                                                             chip::ByteSpan d, chip::CharSpan e, uint8_t f)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -11530,8 +11555,7 @@ CHIP_ERROR TestClusterCluster::TestListStructArgumentRequest(Callback::Cancelabl
     // d: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), d));
     // e: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(e.data()), e.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), e.data()));
     // f: simpleBitmap
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
 
@@ -11627,7 +11651,7 @@ exit:
 
 CHIP_ERROR TestClusterCluster::TestStructArgumentRequest(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint8_t c,
-                                                         chip::ByteSpan d, chip::ByteSpan e, uint8_t f)
+                                                         chip::ByteSpan d, chip::CharSpan e, uint8_t f)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -11660,8 +11684,7 @@ CHIP_ERROR TestClusterCluster::TestStructArgumentRequest(Callback::Cancelable * 
     // d: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), d));
     // e: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(e.data()), e.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), e.data()));
     // f: simpleBitmap
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
 
@@ -12261,7 +12284,7 @@ CHIP_ERROR TestClusterCluster::ReadAttributeCharString(Callback::Cancelable * on
 }
 
 CHIP_ERROR TestClusterCluster::WriteAttributeCharString(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                        Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     app::WriteClientHandle handle;
     chip::app::AttributePathParams attributePath;
@@ -12290,7 +12313,7 @@ CHIP_ERROR TestClusterCluster::ReadAttributeLongCharString(Callback::Cancelable 
 }
 
 CHIP_ERROR TestClusterCluster::WriteAttributeLongCharString(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+                                                            Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
     app::WriteClientHandle handle;
     chip::app::AttributePathParams attributePath;

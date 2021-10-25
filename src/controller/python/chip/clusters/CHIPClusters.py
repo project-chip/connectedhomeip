@@ -449,6 +449,25 @@ class ChipClusters:
             },
         },
     }
+    _BOOLEAN_STATE_CLUSTER_INFO = {
+        "clusterName": "BooleanState",
+        "clusterId": 0x00000045,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "StateValue",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+            },
+        },
+    }
     _BRIDGED_DEVICE_BASIC_CLUSTER_INFO = {
         "clusterName": "BridgedDeviceBasic",
         "clusterId": 0x00000039,
@@ -4037,6 +4056,7 @@ class ChipClusters:
         0x00000028: _BASIC_CLUSTER_INFO,
         0x0000000F: _BINARY_INPUT_BASIC_CLUSTER_INFO,
         0x0000F000: _BINDING_CLUSTER_INFO,
+        0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
         0x00000300: _COLOR_CONTROL_CLUSTER_INFO,
         0x0000050A: _CONTENT_LAUNCHER_CLUSTER_INFO,
@@ -4093,6 +4113,7 @@ class ChipClusters:
         "Basic": _BASIC_CLUSTER_INFO,
         "BinaryInputBasic": _BINARY_INPUT_BASIC_CLUSTER_INFO,
         "Binding": _BINDING_CLUSTER_INFO,
+        "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "BridgedDeviceBasic": _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
         "ColorControl": _COLOR_CONTROL_CLUSTER_INFO,
         "ContentLauncher": _CONTENT_LAUNCHER_CLUSTER_INFO,
@@ -4199,14 +4220,14 @@ class ChipClusters:
 
     # Cluster commands
 
-    def ClusterAccountLogin_CommandGetSetupPIN(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, tempAccountIdentifier: bytes):
+    def ClusterAccountLogin_CommandGetSetupPIN(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, tempAccountIdentifier: str):
         tempAccountIdentifier = tempAccountIdentifier.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_AccountLogin_GetSetupPIN(
             device, ZCLendpoint, ZCLgroupid, tempAccountIdentifier, len(
                 tempAccountIdentifier)
         )
 
-    def ClusterAccountLogin_CommandLogin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, tempAccountIdentifier: bytes, setupPIN: bytes):
+    def ClusterAccountLogin_CommandLogin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, tempAccountIdentifier: str, setupPIN: str):
         tempAccountIdentifier = tempAccountIdentifier.encode("utf-8") + b'\x00'
         setupPIN = setupPIN.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_AccountLogin_Login(
@@ -4235,7 +4256,7 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid, status
         )
 
-    def ClusterApplicationLauncher_CommandLaunchApp(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, data: bytes, catalogVendorId: int, applicationId: bytes):
+    def ClusterApplicationLauncher_CommandLaunchApp(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, data: str, catalogVendorId: int, applicationId: str):
         data = data.encode("utf-8") + b'\x00'
         applicationId = applicationId.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_ApplicationLauncher_LaunchApp(
@@ -4243,7 +4264,7 @@ class ChipClusters:
                 data), catalogVendorId, applicationId, len(applicationId)
         )
 
-    def ClusterAudioOutput_CommandRenameOutput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int, name: bytes):
+    def ClusterAudioOutput_CommandRenameOutput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int, name: str):
         name = name.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_AudioOutput_RenameOutput(
             device, ZCLendpoint, ZCLgroupid, index, name, len(name)
@@ -4374,13 +4395,13 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid, optionsMask, optionsOverride
         )
 
-    def ClusterContentLauncher_CommandLaunchContent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, autoPlay: bool, data: bytes):
+    def ClusterContentLauncher_CommandLaunchContent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, autoPlay: bool, data: str):
         data = data.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_ContentLauncher_LaunchContent(
             device, ZCLendpoint, ZCLgroupid, autoPlay, data, len(data)
         )
 
-    def ClusterContentLauncher_CommandLaunchURL(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, contentURL: bytes, displayString: bytes):
+    def ClusterContentLauncher_CommandLaunchURL(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, contentURL: str, displayString: str):
         contentURL = contentURL.encode("utf-8") + b'\x00'
         displayString = displayString.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_ContentLauncher_LaunchURL(
@@ -4526,20 +4547,20 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid
         )
 
-    def ClusterGeneralCommissioning_CommandSetRegulatoryConfig(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, location: int, countryCode: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterGeneralCommissioning_CommandSetRegulatoryConfig(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, location: int, countryCode: str, breadcrumb: int, timeoutMs: int):
         countryCode = countryCode.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig(
             device, ZCLendpoint, ZCLgroupid, location, countryCode, len(
                 countryCode), breadcrumb, timeoutMs
         )
 
-    def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
+    def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: str):
         groupName = groupName.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_Groups_AddGroup(
             device, ZCLendpoint, ZCLgroupid, groupId, groupName, len(groupName)
         )
 
-    def ClusterGroups_CommandAddGroupIfIdentifying(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
+    def ClusterGroups_CommandAddGroupIfIdentifying(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: str):
         groupName = groupName.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying(
             device, ZCLendpoint, ZCLgroupid, groupId, groupName, len(groupName)
@@ -4635,7 +4656,7 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid
         )
 
-    def ClusterMediaInput_CommandRenameInput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int, name: bytes):
+    def ClusterMediaInput_CommandRenameInput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int, name: str):
         name = name.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_MediaInput_RenameInput(
             device, ZCLendpoint, ZCLgroupid, index, name, len(name)
@@ -4771,7 +4792,7 @@ class ChipClusters:
                 updateToken), softwareVersion
         )
 
-    def ClusterOtaSoftwareUpdateProvider_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, hardwareVersion: int, softwareVersion: int, protocolsSupported: int, location: bytes, requestorCanConsent: bool, metadataForProvider: bytes):
+    def ClusterOtaSoftwareUpdateProvider_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, hardwareVersion: int, softwareVersion: int, protocolsSupported: int, location: str, requestorCanConsent: bool, metadataForProvider: bytes):
         location = location.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
             device, ZCLendpoint, ZCLgroupid, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported, location, len(
@@ -4853,7 +4874,7 @@ class ChipClusters:
                 trustedRootIdentifier)
         )
 
-    def ClusterOperationalCredentials_CommandUpdateFabricLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, label: bytes):
+    def ClusterOperationalCredentials_CommandUpdateFabricLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, label: str):
         label = label.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel(
             device, ZCLendpoint, ZCLgroupid, label, len(label)
@@ -4865,7 +4886,7 @@ class ChipClusters:
                 NOCValue), ICACValue, len(ICACValue)
         )
 
-    def ClusterScenes_CommandAddScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: bytes, clusterId: int, length: int, value: int):
+    def ClusterScenes_CommandAddScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: str, clusterId: int, length: int, value: int):
         sceneName = sceneName.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_Scenes_AddScene(
             device, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime, sceneName, len(
@@ -4907,7 +4928,7 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid
         )
 
-    def ClusterTvChannel_CommandChangeChannel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, match: bytes):
+    def ClusterTvChannel_CommandChangeChannel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, match: str):
         match = match.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannel(
             device, ZCLendpoint, ZCLgroupid, match, len(match)
@@ -4923,7 +4944,7 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid, count
         )
 
-    def ClusterTargetNavigator_CommandNavigateTarget(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, target: int, data: bytes):
+    def ClusterTargetNavigator_CommandNavigateTarget(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, target: int, data: str):
         data = data.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_TargetNavigator_NavigateTarget(
             device, ZCLendpoint, ZCLgroupid, target, data, len(data)
@@ -4949,7 +4970,7 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid, arg1
         )
 
-    def ClusterTestCluster_CommandTestListStructArgumentRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, a: int, b: bool, c: int, d: bytes, e: bytes, f: int):
+    def ClusterTestCluster_CommandTestListStructArgumentRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, a: int, b: bool, c: int, d: bytes, e: str, f: int):
         e = e.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestListStructArgumentRequest(
             device, ZCLendpoint, ZCLgroupid, a, b, c, d, len(d), e, len(e), f
@@ -4965,7 +4986,7 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid
         )
 
-    def ClusterTestCluster_CommandTestStructArgumentRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, a: int, b: bool, c: int, d: bytes, e: bytes, f: int):
+    def ClusterTestCluster_CommandTestStructArgumentRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, a: int, b: bool, c: int, d: bytes, e: str, f: int):
         e = e.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestStructArgumentRequest(
             device, ZCLendpoint, ZCLgroupid, a, b, c, d, len(d), e, len(e), f
@@ -5132,14 +5153,14 @@ class ChipClusters:
     def ClusterBasic_ReadAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_UserLabel(device, ZCLendpoint, ZCLgroupid)
 
-    def ClusterBasic_WriteAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+    def ClusterBasic_WriteAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: str):
         value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_Basic_UserLabel(device, ZCLendpoint, ZCLgroupid, value, len(value))
 
     def ClusterBasic_ReadAttributeLocation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_Location(device, ZCLendpoint, ZCLgroupid)
 
-    def ClusterBasic_WriteAttributeLocation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+    def ClusterBasic_WriteAttributeLocation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: str):
         value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_Basic_Location(device, ZCLendpoint, ZCLgroupid, value, len(value))
 
@@ -5209,6 +5230,15 @@ class ChipClusters:
     def ClusterBinding_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterBooleanState_ReadAttributeStateValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BooleanState_StateValue(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBooleanState_SubscribeAttributeStateValue(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_BooleanState_StateValue(device, ZCLendpoint, minInterval, maxInterval)
+
+    def ClusterBooleanState_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterBridgedDeviceBasic_ReadAttributeVendorName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName(device, ZCLendpoint, ZCLgroupid)
 
@@ -5221,7 +5251,7 @@ class ChipClusters:
     def ClusterBridgedDeviceBasic_ReadAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_UserLabel(device, ZCLendpoint, ZCLgroupid)
 
-    def ClusterBridgedDeviceBasic_WriteAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+    def ClusterBridgedDeviceBasic_WriteAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: str):
         value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_BridgedDeviceBasic_UserLabel(device, ZCLendpoint, ZCLgroupid, value, len(value))
 
@@ -6191,14 +6221,14 @@ class ChipClusters:
     def ClusterTestCluster_ReadAttributeCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_CharString(device, ZCLendpoint, ZCLgroupid)
 
-    def ClusterTestCluster_WriteAttributeCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+    def ClusterTestCluster_WriteAttributeCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: str):
         value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_CharString(device, ZCLendpoint, ZCLgroupid, value, len(value))
 
     def ClusterTestCluster_ReadAttributeLongCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_LongCharString(device, ZCLendpoint, ZCLgroupid)
 
-    def ClusterTestCluster_WriteAttributeLongCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+    def ClusterTestCluster_WriteAttributeLongCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: str):
         value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_LongCharString(device, ZCLendpoint, ZCLgroupid, value, len(value))
 
@@ -6937,6 +6967,19 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster BooleanState
+        # Cluster BooleanState ReadAttribute StateValue
+        self._chipLib.chip_ime_ReadAttribute_BooleanState_StateValue.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BooleanState_StateValue.restype = ctypes.c_uint32
+        # Cluster BooleanState SubscribeAttribute StateValue
+        self._chipLib.chip_ime_SubscribeAttribute_BooleanState_StateValue.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_BooleanState_StateValue.restype = ctypes.c_uint32
+        # Cluster BooleanState ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision.restype = ctypes.c_uint32
         # Cluster BridgedDeviceBasic
         # Cluster BridgedDeviceBasic ReadAttribute VendorName
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName.argtypes = [

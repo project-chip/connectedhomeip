@@ -43,22 +43,22 @@ using namespace ::chip::DeviceLayer::Internal;
  */
 ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 
-CHIP_ERROR ConfigurationManagerImpl::_Init()
+CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     bool failSafeArmed;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
+    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
     SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (_GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
+    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
         ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        _InitiateFactoryReset();
+        InitiateFactoryReset();
     }
     err = CHIP_NO_ERROR;
 
@@ -66,19 +66,19 @@ exit:
     return err;
 }
 
-bool ConfigurationManagerImpl::_CanFactoryReset()
+bool ConfigurationManagerImpl::CanFactoryReset()
 {
     // TODO: query the application to determine if factory reset is allowed.
     return true;
 }
 
-void ConfigurationManagerImpl::_InitiateFactoryReset()
+void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
-                                                                uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
+                                                               uint32_t & value)
 {
     CHIP_ERROR err;
 
@@ -93,8 +93,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
-                                                                 uint32_t value)
+CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
+                                                                uint32_t value)
 {
     // This method reads Chip Persisted Counter type nvm3 objects.
     // (where persistedStorageKey represents an index to the counter).

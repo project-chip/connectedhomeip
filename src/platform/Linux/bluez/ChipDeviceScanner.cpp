@@ -117,7 +117,7 @@ std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(BluezAdapter1 * ada
     return std::make_unique<ChipDeviceScanner>(manager.get(), adapter, cancellable.get(), delegate);
 }
 
-CHIP_ERROR ChipDeviceScanner::StartScan(unsigned timeoutMs)
+CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 {
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
@@ -131,7 +131,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(unsigned timeoutMs)
         return CHIP_ERROR_INTERNAL;
     }
 
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeoutMs, TimerExpiredCallback, static_cast<void *>(this));
+    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
 
     if (err != CHIP_NO_ERROR)
     {

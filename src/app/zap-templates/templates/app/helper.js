@@ -350,10 +350,7 @@ function asMEI(prefix, suffix)
  */
 async function zapTypeToClusterObjectType(type, isDecodable, options)
 {
-  if (type == 'single') {
-    return 'float';
-  }
-
+  let passByReference = false;
   async function fn(pkgId)
   {
     const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
@@ -368,13 +365,25 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     }
 
     if (await typeChecker('isStruct')) {
+      passByReference = true;
       return ns + 'Structs::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
     }
 
     return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  let promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
+    passByReference = true;
+    let listType    = isDecodable ? "DecodableList" : "List";
+    // If we did not have a namespace provided, we can assume we're inside
+    // chip::app.
+    let listNamespace = options.hash.ns ? "chip::app::" : ""
+    promise           = promise.then(typeStr => `${listNamespace}DataModel::${listType}<${typeStr}>`);
+  }
+  if (options.hash.isArgument && passByReference) {
+    promise = promise.then(typeStr => `const ${typeStr} &`);
+  }
   return templateUtil.templatePromise(this.global, promise)
 }
 

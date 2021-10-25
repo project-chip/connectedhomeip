@@ -41,29 +41,29 @@ using namespace ::chip::DeviceLayer::Internal;
  */
 ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 
-CHIP_ERROR ConfigurationManagerImpl::_Init(void)
+CHIP_ERROR ConfigurationManagerImpl::Init(void)
 {
-    return Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
+    return Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool ConfigurationManagerImpl::_CanFactoryReset(void)
+bool ConfigurationManagerImpl::CanFactoryReset(void)
 {
     return true;
 }
 
-void ConfigurationManagerImpl::_InitiateFactoryReset(void) {}
+void ConfigurationManagerImpl::InitiateFactoryReset(void) {}
 
-CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

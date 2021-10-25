@@ -60,7 +60,7 @@ namespace {{asUpperCamelCase name}} {
     struct Type {
     public:
         {{#zcl_struct_items}}
-        {{#if isArray}}DataModel::List<{{/if}}{{zapTypeToEncodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
+        {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}};
         {{/zcl_struct_items}}
 
         CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
@@ -73,7 +73,7 @@ namespace {{asUpperCamelCase name}} {
     struct DecodableType {
     public:
         {{#zcl_struct_items}}
-        {{#if isArray}}DataModel::DecodableList<{{/if}}{{zapTypeToDecodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
+        {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}};
         {{/zcl_struct_items}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
     };
@@ -106,7 +106,7 @@ public:
     static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_command_arguments}}
-    {{#if isArray}}DataModel::List<{{/if}}{{zapTypeToEncodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
+    {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}};
     {{/zcl_command_arguments}}
 
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
@@ -118,7 +118,7 @@ public:
     static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_command_arguments}}
-    {{#if isArray}}DataModel::DecodableList<{{/if}}{{zapTypeToDecodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase label}};
+    {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}};
     {{/zcl_command_arguments}}
     CHIP_ERROR Decode(TLV::TLVReader &reader);
 };
@@ -137,8 +137,8 @@ namespace Attributes {
 namespace {{asUpperCamelCase label}} {
     struct TypeInfo {
     {{#if entryType}}
-        using Type = DataModel::List<{{zapTypeToEncodableClusterObjectType entryType}}>;
-        using DecodableType = DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType entryType}}>;
+        using Type = {{zapTypeToEncodableClusterObjectType entryType}};
+        using DecodableType = {{zapTypeToDecodableClusterObjectType entryType}};
     {{else}}
         using Type = {{zapTypeToEncodableClusterObjectType type}};
         using DecodableType = {{zapTypeToDecodableClusterObjectType type}};
@@ -176,7 +176,7 @@ public:
     static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_event_fields}}
-    {{#if isArray}}DataModel::List<{{/if}}{{zapTypeToEncodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase name}};
+    {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase name}};
     {{/zcl_event_fields}}
 
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
@@ -189,7 +189,7 @@ public:
     static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_event_fields}}
-    {{#if isArray}}DataModel::DecodableList<{{/if}}{{zapTypeToDecodableClusterObjectType type}}{{#if isArray}}>{{/if}} {{asLowerCamelCase name}};
+    {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase name}};
     {{/zcl_event_fields}}
 
     CHIP_ERROR Decode(TLV::TLVReader &reader);

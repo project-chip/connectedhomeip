@@ -375,7 +375,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
         {
             if (ip6_addr_isvalid(netif_ip6_addr_state(intf, j)) && ip6_addr_islinklocal(netif_ip6_addr(intf, j)))
             {
-                (*llAddr) = IPAddress::FromIPv6(*netif_ip6_addr(intf, j));
+                (*llAddr) = IPAddress(*netif_ip6_addr(intf, j));
                 return CHIP_NO_ERROR;
             }
         }
@@ -404,7 +404,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
                 struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
                 if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
                 {
-                    (*llAddr) = IPAddress::FromIPv6((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
+                    (*llAddr) = IPAddress((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
                     break;
                 }
             }
@@ -420,7 +420,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
     in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
     VerifyOrReturnError(ip6_addr != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
 
-    *llAddr = IPAddress::FromIPv6(*ip6_addr);
+    *llAddr = IPAddress(*ip6_addr);
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
     return CHIP_NO_ERROR;
@@ -602,7 +602,8 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
 
     if (lTimerRequired)
     {
-        aSystemLayer->StartTimer(INET_TCP_IDLE_CHECK_INTERVAL, HandleTCPInactivityTimer, &lInetLayer);
+        aSystemLayer->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL), HandleTCPInactivityTimer,
+                                 &lInetLayer);
     }
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0

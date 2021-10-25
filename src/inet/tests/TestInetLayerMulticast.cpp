@@ -701,7 +701,7 @@ void DriveSend()
     else
     {
         gSendIntervalExpired = false;
-        gSystemLayer.StartTimer(gSendIntervalMs, Common::HandleSendTimerComplete, nullptr);
+        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         lStatus = DriveSendForGroups(sGroupAddresses);
         SuccessOrExit(lStatus);

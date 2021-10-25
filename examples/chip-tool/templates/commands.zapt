@@ -134,7 +134,7 @@ static void OnCharStringAttributeResponse(void * context, const chip::CharSpan v
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, const chip::app::DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> & list)
+static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
 {
     ModelCommand * command = static_cast<ModelCommand *>(context);
 
@@ -254,8 +254,7 @@ public:
         {{#chip_cluster_command_non_expanded_arguments}}
         {{#if isArray}}
         {{! TODO Implement complex types parsing in order to properly set the request parameters }}
-        {{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}} {{asLowerCamelCase label}};
-        mRequest.{{asLowerCamelCase label}} = chip::Span<{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}>(&{{asLowerCamelCase label}}, 1);
+        mRequest.{{asLowerCamelCase label}} = {{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}();
         {{/if}}
         {{/chip_cluster_command_non_expanded_arguments}}
 
@@ -340,7 +339,7 @@ public:
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    {{#if (isCharString type)}}chip::ByteSpan{{else}}{{chipType}}{{/if}} mValue;
+    {{chipType}} mValue;
 };
 
 {{/if}}

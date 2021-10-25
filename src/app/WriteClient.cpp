@@ -243,7 +243,7 @@ void WriteClient::ClearState()
 }
 
 CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
-                                         uint32_t timeout)
+                                         System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle packet;
@@ -381,7 +381,7 @@ exit:
 }
 
 CHIP_ERROR WriteClientHandle::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
-                                               uint32_t timeout)
+                                               System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = mpWriteClient->SendWriteRequest(aNodeId, aFabricIndex, apSecureSession, timeout);
 
