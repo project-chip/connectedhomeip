@@ -247,47 +247,6 @@ public:
     CHIP_ERROR ReportAttributeStateValue(Callback::Cancelable * onReportCallback);
 };
 
-class DLL_EXPORT BridgedActionsCluster : public ClusterBase
-{
-public:
-    BridgedActionsCluster() : ClusterBase(app::Clusters::BridgedActions::Id) {}
-    ~BridgedActionsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR DisableAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                             uint32_t invokeID);
-    CHIP_ERROR DisableActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         uint16_t actionID, uint32_t invokeID, uint32_t duration);
-    CHIP_ERROR EnableAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                            uint32_t invokeID);
-    CHIP_ERROR EnableActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint16_t actionID, uint32_t invokeID, uint32_t duration);
-    CHIP_ERROR InstantAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                             uint32_t invokeID);
-    CHIP_ERROR InstantActionWithTransition(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint16_t actionID, uint32_t invokeID, uint16_t transitionTime);
-    CHIP_ERROR PauseAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                           uint32_t invokeID);
-    CHIP_ERROR PauseActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint16_t actionID, uint32_t invokeID, uint32_t duration);
-    CHIP_ERROR ResumeAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                            uint32_t invokeID);
-    CHIP_ERROR StartAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                           uint32_t invokeID);
-    CHIP_ERROR StartActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint16_t actionID, uint32_t invokeID, uint32_t duration);
-    CHIP_ERROR StopAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                          uint32_t invokeID);
-
-    // Cluster Attributes
-    CHIP_ERROR ReadAttributeActionList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeEndpointList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeSetupUrl(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-
-private:
-};
-
 class DLL_EXPORT BridgedDeviceBasicCluster : public ClusterBase
 {
 public:
