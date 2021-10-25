@@ -192,7 +192,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
     // As a work-around, if the destination is an IPv6 link-local address, we bind the PCB
     // to the link local address associated with the source interface; however this is only
     // viable if the endpoint hasn't already been bound.
-    if (intfId != INET_NULL_INTERFACEID)
+    if (intfId.IsPresent())
     {
         IPAddress intfLLAddr;
         InetLayer & lInetLayer = Layer();
@@ -328,7 +328,7 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
     // TODO: Does netif_get_by_index(mTCP->netif_idx) do the right thing?  I
     // can't quite tell whether LwIP supports a specific interface id for TCP at
     // all.  For now just claim no particular interface id.
-    *retInterface = INET_NULL_INTERFACEID;
+    *retInterface = InterfaceId();
     return CHIP_NO_ERROR;
 }
 
@@ -1258,7 +1258,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
 
     ReturnErrorOnFailure(GetSocket(addrType));
 
-    if (intfId == INET_NULL_INTERFACEID)
+    if (!intfId.IsPresent())
     {
         // The behavior when connecting to an IPv6 link-local address without specifying an outbound
         // interface is ambiguous. So prevent it in all cases.
@@ -1280,7 +1280,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
             struct ::ifreq ifr;
             memset(&ifr, 0, sizeof(ifr));
 
-            ReturnErrorOnFailure(GetInterfaceName(intfId, ifr.ifr_name, sizeof(ifr.ifr_name)));
+            ReturnErrorOnFailure(intfId.GetInterfaceName(ifr.ifr_name, sizeof(ifr.ifr_name)));
 
             // Attempt to bind to the interface using SO_BINDTODEVICE which requires privileged access.
             // If the permission is denied(EACCES) because CHIP is running in a context
@@ -1325,7 +1325,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
         sa.in6.sin6_port     = htons(port);
         sa.in6.sin6_flowinfo = 0;
         sa.in6.sin6_addr     = addr.ToIPv6();
-        sa.in6.sin6_scope_id = intfId;
+        sa.in6.sin6_scope_id = intfId.GetPlatformInterface();
         sockaddrsize         = sizeof(sockaddr_in6);
         sockaddrptr          = reinterpret_cast<const sockaddr *>(&sa.in6);
     }
@@ -1439,12 +1439,12 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
     {
         if (IPAddress(sa.in6.sin6_addr).IsIPv6LinkLocal())
         {
-            *retInterface = sa.in6.sin6_scope_id;
+            *retInterface = InterfaceId(sa.in6.sin6_scope_id);
         }
         else
         {
             // TODO: Is there still a meaningful interface id in this case?
-            *retInterface = INET_NULL_INTERFACEID;
+            *retInterface = InterfaceId();
         }
         return CHIP_NO_ERROR;
     }
@@ -1453,12 +1453,12 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
     if (sa.any.sa_family == AF_INET)
     {
         // No interface id available for IPv4 sockets.
-        *retInterface = INET_NULL_INTERFACEID;
+        *retInterface = InterfaceId();
         return CHIP_NO_ERROR;
     }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    *retInterface = INET_NULL_INTERFACEID;
+    *retInterface = InterfaceId();
     return INET_ERROR_WRONG_ADDRESS_TYPE;
 }
 
@@ -1832,7 +1832,7 @@ CHIP_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
     for (InterfaceAddressIterator addrIter; addrIter.HasCurrent(); addrIter.Next())
     {
         const IPAddress curAddr     = addrIter.GetAddress();
-        const InterfaceId curIntfId = addrIter.GetInterface();
+        const InterfaceId curIntfId = addrIter.GetInterfaceId();
 
         if (curIntfId == intfId)
         {

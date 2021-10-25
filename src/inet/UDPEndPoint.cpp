@@ -93,7 +93,7 @@ CHIP_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
     CHIP_ERROR res = CHIP_NO_ERROR;
 
 #if HAVE_LWIP_UDP_BIND_NETIF
-    if (!IsInterfaceIdPresent(intfId))
+    if (!intfId.IsPresent())
         udp_bind_netif(aUDP, NULL);
     else
     {
@@ -105,7 +105,7 @@ CHIP_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
             udp_bind_netif(aUDP, netifp);
     }
 #else
-    if (!IsInterfaceIdPresent(intfId))
+    if (!intfId.IsPresent())
         aUDP->intf_filter = NULL;
     else
     {
@@ -202,9 +202,9 @@ CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addrType, InterfaceId in
 InterfaceId UDPEndPoint::GetBoundInterface()
 {
 #if HAVE_LWIP_UDP_BIND_NETIF
-    return netif_get_by_index(mUDP->netif_idx);
+    return InterfaceId(netif_get_by_index(mUDP->netif_idx));
 #else
-    return mUDP->intf_filter;
+    return InterfaceId(mUDP->intf_filter);
 #endif
 }
 
@@ -283,8 +283,9 @@ CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::Packet
         ip_addr_copy(mUDP->local_ip, lwipSrcAddr);
     }
 
-    if (intfId != INET_NULL_INTERFACEID)
-        lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
+    if (intfId.IsPresent())
+        lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort,
+                                intfId.GetPlatformInterface());
     else
         lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
 
@@ -305,7 +306,7 @@ CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::Packet
             ipX_addr_copy(mUDP->local_ip, *ip6_2_ipX(&lwipSrcAddr));
         }
 
-        if (intfId != INET_NULL_INTERFACEID)
+        if (intfId.IsPresent())
             lwipErr =
                 udp_sendto_if_ip6(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
         else
@@ -325,7 +326,7 @@ CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::Packet
             ipX_addr_copy(mUDP->local_ip, *ip_2_ipX(&lwipSrcAddr));
         }
 
-        if (intfId != INET_NULL_INTERFACEID)
+        if (intfId.IsPresent())
             lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
         else
             lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
@@ -502,7 +503,7 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
 #endif // INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1
 
-        pktInfo->Interface = ip_current_netif();
+        pktInfo->Interface = InterfaceId(ip_current_netif());
         pktInfo->SrcPort   = port;
         pktInfo->DestPort  = pcb->local_port;
     }
@@ -658,7 +659,7 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
     nw_parameters_configure_protocol_block_t configure_tls;
     nw_parameters_t parameters;
 
-    if (intfId != INET_NULL_INTERFACEID)
+    if (intfId.IsPresent())
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -679,7 +680,7 @@ CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addrType, InterfaceId in
 
 InterfaceId UDPEndPoint::GetBoundInterface()
 {
-    return INET_NULL_INTERFACEID;
+    return InterfaceId();
 }
 
 uint16_t UDPEndPoint::GetBoundPort()

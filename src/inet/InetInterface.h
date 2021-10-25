@@ -59,91 +59,96 @@ class IPAddress;
 class IPPrefix;
 
 /**
- * @typedef     InterfaceId
- *
- * @brief       Indicator for system network interfaces.
- *
- * @details
- *  Portability depends on never witnessing this alias. It may be replaced by a
- *  concrete opaque class in the future.
- *
- *  Note Well: The term "interface identifier" also conventionally refers to
- *  the lower 64 bits of an IPv6 address in all the relevant IETF standards
- *  documents, where the abbreviation "IID" is often used. In this text, the
- *  term "interface indicator" refers to values of this type alias.
+ * Indicator for system network interfaces.
  */
-
+class InterfaceId
+{
+public:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-typedef struct netif * InterfaceId;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    using PlatformType                       = struct netif *;
+    static constexpr size_t kMaxIfNameLength = 13; // Names are formatted as %c%c%d
+#endif                                             // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-typedef unsigned InterfaceId;
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+    using PlatformType                       = unsigned int;
+    static constexpr size_t kMaxIfNameLength = IF_NAMESIZE;
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-typedef int InterfaceId;
+    using PlatformType                       = int;
+    static constexpr size_t kMaxIfNameLength = Z_DEVICE_MAX_NAME_LEN;
 #endif
 
-/**
- * @def     INET_NULL_INTERFACEID
- *
- * @brief   The distinguished value indicating no network interface.
- *
- * @details
- *  Note Well: This is not the indicator of a "null" network interface. This
- *  value can be used to indicate the absence of a specific network interface,
- *  or to specify that any applicable network interface is acceptable. Usage
- *  varies depending on context.
- */
+public:
+    ~InterfaceId() = default;
 
+    constexpr InterfaceId() : mPlatformInterface(kPlatformNull) {}
+    explicit constexpr InterfaceId(PlatformType interface) : mPlatformInterface(interface) {}
+
+    constexpr InterfaceId(const InterfaceId & other) : mPlatformInterface(other.mPlatformInterface) {}
+    constexpr InterfaceId & operator=(const InterfaceId & other)
+    {
+        mPlatformInterface = other.mPlatformInterface;
+        return *this;
+    }
+
+    constexpr bool operator==(const InterfaceId & other) const { return mPlatformInterface == other.mPlatformInterface; }
+    constexpr bool operator!=(const InterfaceId & other) const { return mPlatformInterface != other.mPlatformInterface; }
+
+    /**
+     * Test for inequivalence with the null interface.
+     */
+    bool IsPresent() const { return mPlatformInterface != kPlatformNull; }
+
+    /**
+     * Get the underlying platform representation of the interface.
+     */
+    PlatformType GetPlatformInterface() const { return mPlatformInterface; }
+
+    /**
+     * Get the name of the network interface
+     *
+     * @param[in]   nameBuf     Region of memory to write the interface name.
+     * @param[in]   nameBufSize Size of the region denoted by \c nameBuf.
+     *
+     * @retval  CHIP_NO_ERROR               Successful result, interface name written.
+     * @retval  CHIP_ERROR_BUFFER_TOO_SMALL Buffer is too small for the interface name.
+     * @retval  other                       Another system or platform error.
+     *
+     *  Writes the name of the network interface as a \c NUL terminated text string at \c nameBuf.
+     *  The name of the unspecified network interface is the empty string.
+     */
+    CHIP_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize) const;
+
+    /**
+     * Search the list of network interfaces for the indicated name.
+     *
+     * @param[in]   intfName    Name of the network interface to find.
+     * @param[out]  intfId      Indicator of the network interface to assign.
+     *
+     * @retval  CHIP_NO_ERROR                   Success, network interface indicated.
+     * @retval  INET_ERROR_UNKNOWN_INTERFACE    No network interface found.
+     * @retval  other                           Another system or platform error.
+     *
+     * @note
+     *  On LwIP, this function must be called with the LwIP stack lock acquired.
+     */
+    static CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId);
+
+private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#define INET_NULL_INTERFACEID NULL
+    static constexpr PlatformType kPlatformNull = nullptr;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-#define INET_NULL_INTERFACEID 0
-#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+    static constexpr PlatformType kPlatformNull = 0;
+#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
-/**
- * @brief   Test \c ID for inequivalence with \c INET_NULL_INTERFACEID
- *
- * @details
- *  This macro resolves to an expression that evaluates \c false if the
- *  argument is equivalent to \c INET_NULL_INTERFACEID and \c true otherwise.
- */
-#define IsInterfaceIdPresent(intfId) ((intfId) != INET_NULL_INTERFACEID)
-
-/**
- * Get the name of the network interface
- *
- * @param[in]   intfId      A network interface.
- * @param[in]   nameBuf     Region of memory to write the interface name.
- * @param[in]   nameBufSize Size of the region denoted by \c nameBuf.
- *
- * @retval  CHIP_NO_ERROR               Successful result, interface name written.
- * @retval  CHIP_ERROR_BUFFER_TOO_SMALL Buffer is too small for the interface name.
- * @retval  other                       Another system or platform error.
- *
- *  Writes the name of the network interface as a \c NUL terminated text string at \c nameBuf.
- *  The name of the unspecified network interface is the empty string.
- */
-extern CHIP_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_t nameBufSize);
-
-/**
- * Search the list of network interfaces for the indicated name.
- *
- * @param[in]   intfName    Name of the network interface to find.
- * @param[out]  intfId      Indicator of the network interface to assign.
- *
- * @retval  CHIP_NO_ERROR                   Success, network interface indicated.
- * @retval  INET_ERROR_UNKNOWN_INTERFACE    No network interface found.
- * @retval  other                           Another system or platform error.
- *
- * @note
- *  On LwIP, this function must be called with the LwIP stack lock acquired.
- */
-extern CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId);
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+    static constexpr PlatformType kPlatformNull = 0;
+#endif
+    PlatformType mPlatformInterface;
+};
 
 /**
  * Compute a prefix length from a variable-length netmask.
@@ -211,19 +216,14 @@ public:
     bool Next();
 
     /**
-     * NetworkInterface InterfaceIterator::GetInterfaceId(void)
+     * InterfaceId InterfaceIterator::GetInterfaceId(void)
      *
      * Returns the network interface id at the current iterator position.
      *
      * @retval  id                   The current network interface id.
-     * @retval  NetworkInterface()   If advanced beyond the end of the list.
+     * @retval  InterfaceId()   If advanced beyond the end of the list.
      */
     InterfaceId GetInterfaceId();
-
-    /**
-     * @brief    Deprecated alias for \c GetInterfaceId(void)
-     */
-    InterfaceId GetInterface() { return GetInterfaceId(); }
 
     /**
      * Get the name of the current network interface
@@ -264,19 +264,6 @@ public:
      */
     bool HasBroadcastAddress();
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static constexpr size_t kMaxIfNameLength = 13; // Names are formatted as %c%c%d
-#elif CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-    static constexpr size_t kMaxIfNameLength = IF_NAMESIZE;
-#elif CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-    static constexpr size_t kMaxIfNameLength = Z_DEVICE_MAX_NAME_LEN;
-#elif defined(IFNAMSIZ)
-    static constexpr size_t kMaxIfNameLength = IFNAMSIZ;
-#else
-    // No constant available here - set some reasonable size
-    static constexpr size_t kMaxIfNameLength = 33;
-#endif
-
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     struct netif * mCurNetif;
@@ -292,8 +279,8 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-    InterfaceId mCurrentId     = 1;
-    net_if * mCurrentInterface = nullptr;
+    InterfaceId::PlatformType mCurrentId = 1;
+    net_if * mCurrentInterface           = nullptr;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 };
 
@@ -393,11 +380,6 @@ public:
     uint8_t GetPrefixLength();
 
     /**
-     * @brief    Deprecated alias for \c GetPrefixLength(void)
-     */
-    uint8_t GetIPv6PrefixLength() { return GetPrefixLength(); }
-
-    /**
      * @fn       void InterfaceAddressIterator::GetAddressWithPrefix(IPPrefix & addrWithPrefix)
      *
      * @brief    Returns an IPPrefix containing the address and prefix length
@@ -406,20 +388,15 @@ public:
     void GetAddressWithPrefix(IPPrefix & addrWithPrefix);
 
     /**
-     * @fn      NetworkInterface InterfaceAddressIterator::GetInterfaceId(void)
+     * @fn      InterfaceId InterfaceAddressIterator::GetInterfaceId(void)
      *
      * @brief   Returns the network interface id associated with the current
      *          interface address.
      *
-     * @return  the interface id or \c NetworkInterface() if the iterator
+     * @return  the interface id or \c InterfaceId() if the iterator
      *          is positioned beyond the end of the address list.
      */
     InterfaceId GetInterfaceId();
-
-    /**
-     * @brief    Deprecated alias for \c GetInterfaceId(void)
-     */
-    InterfaceId GetInterface() { return GetInterfaceId(); }
 
     /**
      * @fn      CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
@@ -506,7 +483,7 @@ inline bool InterfaceIterator::HasCurrent(void)
 
 inline InterfaceId InterfaceIterator::GetInterfaceId(void)
 {
-    return mCurNetif;
+    return InterfaceId(mCurNetif);
 }
 
 inline InterfaceAddressIterator::InterfaceAddressIterator(void)

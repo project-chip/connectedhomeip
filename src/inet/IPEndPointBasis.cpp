@@ -118,12 +118,11 @@ namespace chip {
 namespace Inet {
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
 static CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    VerifyOrReturnError(IsInterfaceIdPresent(aInterfaceId), INET_ERROR_UNKNOWN_INTERFACE);
-
+    VerifyOrReturnError(aInterfaceId.IsPresent(), INET_ERROR_UNKNOWN_INTERFACE);
     VerifyOrReturnError(aAddress.IsMulticast(), INET_ERROR_WRONG_ADDRESS_TYPE);
-
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -244,11 +243,11 @@ struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceI
 #if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
     NETIF_FOREACH(lRetval)
     {
-        if (lRetval == aInterfaceId)
+        if (lRetval == aInterfaceId.GetPlatformInterface())
             break;
     }
 #else  // LWIP_VERSION_MAJOR < 2 || !defined(NETIF_FOREACH)
-    for (lRetval = netif_list; lRetval != NULL && lRetval != aInterfaceId; lRetval = lRetval->next)
+    for (lRetval = netif_list; lRetval != NULL && lRetval != aInterfaceId.GetPlatformInterface(); lRetval = lRetval->next)
         ;
 #endif // LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
 
@@ -359,7 +358,7 @@ exit:
 
 void IPEndPointBasis::InitImpl()
 {
-    mBoundIntfId = INET_NULL_INTERFACEID;
+    mBoundIntfId = InterfaceId();
 }
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -374,7 +373,7 @@ static CHIP_ERROR SocketsIPv4JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
     {
         const IPAddress lCurrentAddress = lAddressIterator.GetAddress();
 
-        if (lAddressIterator.GetInterface() == aInterfaceId)
+        if (lAddressIterator.GetInterfaceId() == aInterfaceId)
         {
             if (lCurrentAddress.IsIPv4())
             {
@@ -410,8 +409,7 @@ CHIP_ERROR IPEndPointBasis::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfa
 static CHIP_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress,
                                                      int aCommand)
 {
-    VerifyOrReturnError(CanCastTo<unsigned int>(aInterfaceId), CHIP_ERROR_UNEXPECTED_EVENT);
-    const unsigned int lIfIndex = static_cast<unsigned int>(aInterfaceId);
+    const InterfaceId::PlatformType lIfIndex = aInterfaceId.GetPlatformInterface();
 
     struct ipv6_mreq lMulticastRequest;
     memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
@@ -455,14 +453,15 @@ CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & a
 
         memset(&sa, 0, sizeof(sa));
 
-        sa.sin6_family = AF_INET6;
-        sa.sin6_port   = htons(aPort);
-        sa.sin6_addr   = aAddress.ToIPv6();
-        if (!CanCastTo<decltype(sa.sin6_scope_id)>(aInterfaceId))
+        sa.sin6_family                        = AF_INET6;
+        sa.sin6_port                          = htons(aPort);
+        sa.sin6_addr                          = aAddress.ToIPv6();
+        InterfaceId::PlatformType interfaceId = aInterfaceId.GetPlatformInterface();
+        if (!CanCastTo<decltype(sa.sin6_scope_id)>(interfaceId))
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
-        sa.sin6_scope_id = static_cast<decltype(sa.sin6_scope_id)>(aInterfaceId);
+        sa.sin6_scope_id = static_cast<decltype(sa.sin6_scope_id)>(interfaceId);
 
         if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
             lRetval = CHIP_ERROR_POSIX(errno);
@@ -526,7 +525,7 @@ CHIP_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
     CHIP_ERROR lRetval = CHIP_NO_ERROR;
 
 #if HAVE_SO_BINDTODEVICE
-    if (aInterfaceId == INET_NULL_INTERFACEID)
+    if (!aInterfaceId.IsPresent())
     {
         // Stop interface-based filtering.
         if (setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, "", 0) == -1)
@@ -539,7 +538,7 @@ CHIP_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
         // Start filtering on the passed interface.
         char lInterfaceName[IF_NAMESIZE];
 
-        if (if_indextoname(aInterfaceId, lInterfaceName) == NULL)
+        if (if_indextoname(aInterfaceId.GetPlatformInterface(), lInterfaceName) == NULL)
         {
             lRetval = CHIP_ERROR_POSIX(errno);
         }
@@ -589,11 +588,12 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     msgHeader.msg_name = &peerSockAddr;
     if (mAddrType == IPAddressType::kIPv6)
     {
-        peerSockAddr.in6.sin6_family = AF_INET6;
-        peerSockAddr.in6.sin6_port   = htons(aPktInfo->DestPort);
-        peerSockAddr.in6.sin6_addr   = aPktInfo->DestAddress.ToIPv6();
-        VerifyOrReturnError(CanCastTo<decltype(peerSockAddr.in6.sin6_scope_id)>(aPktInfo->Interface), CHIP_ERROR_INCORRECT_STATE);
-        peerSockAddr.in6.sin6_scope_id = static_cast<decltype(peerSockAddr.in6.sin6_scope_id)>(aPktInfo->Interface);
+        peerSockAddr.in6.sin6_family     = AF_INET6;
+        peerSockAddr.in6.sin6_port       = htons(aPktInfo->DestPort);
+        peerSockAddr.in6.sin6_addr       = aPktInfo->DestAddress.ToIPv6();
+        InterfaceId::PlatformType intfId = aPktInfo->Interface.GetPlatformInterface();
+        VerifyOrReturnError(CanCastTo<decltype(peerSockAddr.in6.sin6_scope_id)>(intfId), CHIP_ERROR_INCORRECT_STATE);
+        peerSockAddr.in6.sin6_scope_id = static_cast<decltype(peerSockAddr.in6.sin6_scope_id)>(intfId);
         msgHeader.msg_namelen          = sizeof(sockaddr_in6);
     }
 #if INET_CONFIG_ENABLE_IPV4
@@ -612,21 +612,22 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     // for messages to multicast addresses, which under Linux
     // don't seem to get sent out the correct interface, despite
     // the socket being bound.
-    InterfaceId intfId = aPktInfo->Interface;
-    if (intfId == INET_NULL_INTERFACEID)
-        intfId = mBoundIntfId;
+    InterfaceId intf = aPktInfo->Interface;
+    if (!intf.IsPresent())
+        intf = mBoundIntfId;
 
     // If the packet should be sent over a specific interface, or with a specific source
     // address, construct an IP_PKTINFO/IPV6_PKTINFO "control message" to that effect
     // add add it to the message header.  If the local OS doesn't support IP_PKTINFO/IPV6_PKTINFO
     // fail with an error.
-    if (intfId != INET_NULL_INTERFACEID || aPktInfo->SrcAddress.Type() != IPAddressType::kAny)
+    if (intf.IsPresent() || aPktInfo->SrcAddress.Type() != IPAddressType::kAny)
     {
 #if defined(IP_PKTINFO) || defined(IPV6_PKTINFO)
         msgHeader.msg_control    = controlData;
         msgHeader.msg_controllen = sizeof(controlData);
 
-        struct cmsghdr * controlHdr = CMSG_FIRSTHDR(&msgHeader);
+        struct cmsghdr * controlHdr      = CMSG_FIRSTHDR(&msgHeader);
+        InterfaceId::PlatformType intfId = intf.GetPlatformInterface();
 
 #if INET_CONFIG_ENABLE_IPV4
 
@@ -874,12 +875,12 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
                 if (controlHdr->cmsg_level == IPPROTO_IP && controlHdr->cmsg_type == IP_PKTINFO)
                 {
                     struct in_pktinfo * inPktInfo = reinterpret_cast<struct in_pktinfo *> CMSG_DATA(controlHdr);
-                    if (!CanCastTo<InterfaceId>(inPktInfo->ipi_ifindex))
+                    if (!CanCastTo<InterfaceId::PlatformType>(inPktInfo->ipi_ifindex))
                     {
                         lStatus = CHIP_ERROR_INCORRECT_STATE;
                         break;
                     }
-                    lPacketInfo.Interface   = static_cast<InterfaceId>(inPktInfo->ipi_ifindex);
+                    lPacketInfo.Interface   = InterfaceId(static_cast<InterfaceId::PlatformType>(inPktInfo->ipi_ifindex));
                     lPacketInfo.DestAddress = IPAddress(inPktInfo->ipi_addr);
                     continue;
                 }
@@ -890,12 +891,12 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
                 if (controlHdr->cmsg_level == IPPROTO_IPV6 && controlHdr->cmsg_type == IPV6_PKTINFO)
                 {
                     struct in6_pktinfo * in6PktInfo = reinterpret_cast<struct in6_pktinfo *> CMSG_DATA(controlHdr);
-                    if (!CanCastTo<InterfaceId>(in6PktInfo->ipi6_ifindex))
+                    if (!CanCastTo<InterfaceId::PlatformType>(in6PktInfo->ipi6_ifindex))
                     {
                         lStatus = CHIP_ERROR_INCORRECT_STATE;
                         break;
                     }
-                    lPacketInfo.Interface   = static_cast<InterfaceId>(in6PktInfo->ipi6_ifindex);
+                    lPacketInfo.Interface   = InterfaceId(static_cast<InterfaceId::PlatformType>(in6PktInfo->ipi6_ifindex));
                     lPacketInfo.DestAddress = IPAddress(in6PktInfo->ipi6_addr);
                     continue;
                 }

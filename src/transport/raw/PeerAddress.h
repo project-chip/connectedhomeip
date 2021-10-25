@@ -61,9 +61,8 @@ enum class Type : uint8_t
 class PeerAddress
 {
 public:
-    PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined), mInterface(INET_NULL_INTERFACEID) {}
-    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type), mInterface(INET_NULL_INTERFACEID)
-    {}
+    PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) {}
+    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) {}
     PeerAddress(Type type) : mTransportType(type) {}
 
     PeerAddress(PeerAddress &&)      = default;
@@ -179,7 +178,7 @@ private:
     Inet::IPAddress mIPAddress   = {};
     Type mTransportType          = Type::kUndefined;
     uint16_t mPort               = CHIP_PORT; ///< Relevant for UDP data sending.
-    Inet::InterfaceId mInterface = INET_NULL_INTERFACEID;
+    Inet::InterfaceId mInterface = Inet::InterfaceId();
 };
 
 } // namespace Transport

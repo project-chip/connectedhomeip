@@ -543,9 +543,9 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 void DeviceController::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    Device * device               = nullptr;
-    Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    Device * device = nullptr;
+    Inet::InterfaceId interfaceId;
 
     err = GetDevice(nodeData.mPeerId.GetNodeId(), &device);
     SuccessOrExit(err);

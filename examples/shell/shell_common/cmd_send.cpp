@@ -232,7 +232,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     else
 #endif
     {
-        peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), INET_NULL_INTERFACEID);
+        peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), Inet::InterfaceId());
 
         err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
         SuccessOrExit(err);

@@ -74,11 +74,11 @@ static bool ParseAddressWithInterface(const char * addressString, Command::Addre
     if (result->ai_family == AF_INET6)
     {
         struct sockaddr_in6 * addr = reinterpret_cast<struct sockaddr_in6 *>(result->ai_addr);
-        address->interfaceId       = addr->sin6_scope_id;
+        address->interfaceId       = ::chip::Inet::InterfaceId(addr->sin6_scope_id);
     }
     else
     {
-        address->interfaceId = INET_NULL_INTERFACEID;
+        address->interfaceId = chip::Inet::InterfaceId();
     }
 
     return true;

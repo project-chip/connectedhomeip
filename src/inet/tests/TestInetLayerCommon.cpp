@@ -85,7 +85,7 @@ uint32_t gSendIntervalMs = 1000;
 
 const char * gInterfaceName = nullptr;
 
-InterfaceId gInterfaceId = INET_NULL_INTERFACEID;
+InterfaceId gInterfaceId = InterfaceId();
 
 uint16_t gSendSize = 59;
 
