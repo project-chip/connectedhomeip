@@ -114,7 +114,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/ota-provider/ota-provider.cpp
                ${APP_CLUSTERS}/scenes/scenes.cpp
                ${APP_CLUSTERS}/target-navigator-server/target-navigator-server.cpp
-               ${APP_CLUSTERS}/temperature-measurement-server/temperature-measurement-server.cpp
                ${APP_CLUSTERS}/tv-channel-server/tv-channel-server.cpp
                ${APP_CLUSTERS}/operational-credentials-server/operational-credentials-server.cpp
                ${APP_CLUSTERS}/test-cluster-server/test-cluster-server.cpp
