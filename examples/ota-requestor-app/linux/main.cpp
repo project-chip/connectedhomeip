@@ -80,6 +80,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "providerFabricIndex", chip::ArgParser::kArgumentRequired, kOptionProviderFabricIndex },
     { "udpPort", chip::ArgParser::kArgumentRequired, kOptionUdpPort },
     { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
+    // TODO: This can be removed once OperationalDeviceProxy can resolve the IP Address from Node ID
     { "ipaddress", chip::ArgParser::kArgumentRequired, kOptionIPAddress },
     { "delayQuery", chip::ArgParser::kArgumentRequired, kOptionDelayQuery },
     {},
@@ -252,17 +253,22 @@ void SendQueryImageCommand()
     PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
     gOperationalDeviceProxy.UpdateAddress(addr);
 
+    Server * server                             = &(Server::GetInstance());
     OperationalDeviceProxyInitParams initParams = {
-        .sessionManager = &(Server::GetInstance().GetSecureSessionManager()),
-        .exchangeMgr    = &(Server::GetInstance().GetExchangeManager()),
-        .idAllocator    = &(Server::GetInstance().GetSessionIDAllocator()),
-        .fabricsTable   = &(Server::GetInstance().GetFabricTable()),
+        .sessionManager = &(server->GetSecureSessionManager()),
+        .exchangeMgr    = &(server->GetExchangeManager()),
+        .idAllocator    = &(server->GetSessionIDAllocator()),
+        .fabricsTable   = &(server->GetFabricTable()),
     };
 
     CHIP_ERROR err              = CHIP_NO_ERROR;
     FabricIndex peerFabricIndex = providerFabricIndex;
     gOperationalDeviceProxy.Init(providerNodeId, peerFabricIndex, initParams);
     err = gOperationalDeviceProxy.Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot establish connection to peer device: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void OnStartDelayTimerHandler(Layer * systemLayer, void * appState)
@@ -299,7 +305,7 @@ int main(int argc, char * argv[])
     err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %" CHIP_ERROR_FORMAT "\n", err.Format());
+        ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %" CHIP_ERROR_FORMAT, err.Format());
         return 1;
     }
 
