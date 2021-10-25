@@ -363,46 +363,10 @@ public class ChipClusters {
 
     public static class AudioOutputListAttribute {
       public int index;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
       public int outputType;
       public String name;
 
       public AudioOutputListAttribute(int index, int outputType, String name) {
-=======
-            public int outputType;
-            public byte[] name;
-
-      public AudioOutputListAttribute(
-        int index,
-                int outputType,
-                byte[] name
-      ) {
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-      public int outputType;
-      public byte[] name;
-
-      public AudioOutputListAttribute(int index, int outputType, byte[] name) {
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-            public int outputType;
-            public byte[] name;
-
-      public AudioOutputListAttribute(
-        int index,
-                int outputType,
-                byte[] name
-      ) {
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
-      public int outputType;
-      public byte[] name;
-
-      public AudioOutputListAttribute(int index, int outputType, byte[] name) {
->>>>>>> 822f22de5 (callback generation done)
         this.index = index;
         this.outputType = outputType;
         this.name = name;
@@ -2107,27 +2071,13 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void retrieveLogsRequest(
         RetrieveLogsResponseCallback callback,
-=======
-    public void retrieveLogsRequest(
-        DefaultClusterCallback callback,
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-    public void retrieveLogsRequest(
-        DefaultClusterCallback callback,
->>>>>>> 822f22de5 (callback generation done)
         int intent,
         int requestedProtocol,
         byte[] transferFileDesignator) {
       retrieveLogsRequest(
           chipClusterPtr, callback, intent, requestedProtocol, transferFileDesignator);
-<<<<<<< HEAD
-<<<<<<< HEAD
     }
 
     private native void retrieveLogsRequest(
@@ -2142,39 +2092,6 @@ public class ChipClusters {
 
       void onError(Exception error);
     }
-=======
-    public void retrieveLogsRequest(DefaultClusterCallback callback, int intent, int requestedProtocol, byte[] transferFileDesignator) {
-      retrieveLogsRequest(chipClusterPtr, callback, intent, requestedProtocol, transferFileDesignator);
-    }
-
-    private native void retrieveLogsRequest(long chipClusterPtr, DefaultClusterCallback callback, int intent, int requestedProtocol, byte[] transferFileDesignator);
-
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-    }
-
-=======
-    }
-
->>>>>>> 822f22de5 (callback generation done)
-    private native void retrieveLogsRequest(
-        long chipClusterPtr,
-        DefaultClusterCallback callback,
-        int intent,
-        int requestedProtocol,
-        byte[] transferFileDesignator);
-<<<<<<< HEAD
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-    public void retrieveLogsRequest(DefaultClusterCallback callback, int intent, int requestedProtocol, byte[] transferFileDesignator) {
-      retrieveLogsRequest(chipClusterPtr, callback, intent, requestedProtocol, transferFileDesignator);
-    }
-
-    private native void retrieveLogsRequest(long chipClusterPtr, DefaultClusterCallback callback, int intent, int requestedProtocol, byte[] transferFileDesignator);
-
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
->>>>>>> 822f22de5 (callback generation done)
   }
 
   public static class DoorLockCluster extends BaseChipCluster {
@@ -2836,28 +2753,7 @@ public class ChipClusters {
       public String label;
       public String value;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
       public LabelListAttribute(String label, String value) {
-=======
-=======
->>>>>>> c73e7aadd (need to wait for cast-helper)
-      public LabelListAttribute(
-        byte[] label,
-        byte[] value
-      ) {
-<<<<<<< HEAD
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-      public LabelListAttribute(byte[] label, byte[] value) {
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
-      public LabelListAttribute(byte[] label, byte[] value) {
->>>>>>> 822f22de5 (callback generation done)
         this.label = label;
         this.value = value;
       }
@@ -3141,42 +3037,12 @@ public class ChipClusters {
       public int type;
 
       public NetworkInterfacesAttribute(
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
           String name,
-=======
-          byte[] name,
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-          byte[] name,
->>>>>>> 822f22de5 (callback generation done)
           boolean fabricConnected,
           boolean offPremiseServicesReachableIPv4,
           boolean offPremiseServicesReachableIPv6,
           byte[] hardwareAddress,
           int type) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> c73e7aadd (need to wait for cast-helper)
-        byte[] name,
-        boolean fabricConnected,
-                boolean offPremiseServicesReachableIPv4,
-                boolean offPremiseServicesReachableIPv6,
-                byte[] hardwareAddress,
-        int type
-              ) {
-<<<<<<< HEAD
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
->>>>>>> 822f22de5 (callback generation done)
         this.name = name;
         this.fabricConnected = fabricConnected;
         this.offPremiseServicesReachableIPv4 = offPremiseServicesReachableIPv4;
@@ -3927,53 +3793,11 @@ public class ChipClusters {
 
     public static class MediaInputListAttribute {
       public int index;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
       public int inputType;
       public String name;
       public String description;
 
       public MediaInputListAttribute(int index, int inputType, String name, String description) {
-=======
-            public int inputType;
-            public byte[] name;
-      public byte[] description;
-
-      public MediaInputListAttribute(
-        int index,
-                int inputType,
-                byte[] name,
-        byte[] description
-      ) {
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-      public int inputType;
-      public byte[] name;
-      public byte[] description;
-
-      public MediaInputListAttribute(int index, int inputType, byte[] name, byte[] description) {
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-            public int inputType;
-            public byte[] name;
-      public byte[] description;
-
-      public MediaInputListAttribute(
-        int index,
-                int inputType,
-                byte[] name,
-        byte[] description
-      ) {
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
-      public int inputType;
-      public byte[] name;
-      public byte[] description;
-
-      public MediaInputListAttribute(int index, int inputType, byte[] name, byte[] description) {
->>>>>>> 822f22de5 (callback generation done)
         this.index = index;
         this.inputType = inputType;
         this.name = name;
@@ -4975,33 +4799,8 @@ public class ChipClusters {
     }
 
     public interface NOCResponseCallback {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
       void onSuccess(int StatusCode, int FabricIndex, String DebugText);
 
-=======
-=======
->>>>>>> c73e7aadd (need to wait for cast-helper)
-      void onSuccess(
-      int StatusCode
-      , int FabricIndex
-      , byte[] DebugText
-      );
-      
-<<<<<<< HEAD
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-      void onSuccess(int StatusCode, int FabricIndex, byte[] DebugText);
-
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
-      void onSuccess(int StatusCode, int FabricIndex, byte[] DebugText);
-
->>>>>>> 822f22de5 (callback generation done)
       void onError(Exception error);
     }
 
@@ -5015,10 +4814,6 @@ public class ChipClusters {
       public int fabricIndex;
       public byte[] rootPublicKey;
       public int vendorId;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
       public long fabricId;
       public long nodeId;
       public String label;
@@ -5030,57 +4825,6 @@ public class ChipClusters {
           long fabricId,
           long nodeId,
           String label) {
-=======
-            public long fabricId;
-            public long nodeId;
-            public byte[] label;
-
-      public FabricsListAttribute(
-        int fabricIndex,
-                byte[] rootPublicKey,
-        int vendorId,
-                long fabricId,
-                long nodeId,
-                byte[] label
-      ) {
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-      public long fabricId;
-      public long nodeId;
-      public byte[] label;
-
-      public FabricsListAttribute(
-=======
-      public long fabricId;
-      public long nodeId;
-      public byte[] label;
-
-      public FabricsListAttribute(
->>>>>>> 822f22de5 (callback generation done)
-          int fabricIndex,
-          byte[] rootPublicKey,
-          int vendorId,
-          long fabricId,
-          long nodeId,
-          byte[] label) {
-<<<<<<< HEAD
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-            public long fabricId;
-            public long nodeId;
-            public byte[] label;
-
-      public FabricsListAttribute(
-        int fabricIndex,
-                byte[] rootPublicKey,
-        int vendorId,
-                long fabricId,
-                long nodeId,
-                byte[] label
-      ) {
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
->>>>>>> 822f22de5 (callback generation done)
         this.fabricIndex = fabricIndex;
         this.rootPublicKey = rootPublicKey;
         this.vendorId = vendorId;
@@ -5395,10 +5139,6 @@ public class ChipClusters {
       readMaxFlowAttribute(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void readMinConstPressureAttribute(IntegerAttributeCallback callback) {
       readMinConstPressureAttribute(chipClusterPtr, callback);
     }
@@ -5453,22 +5193,6 @@ public class ChipClusters {
     }
 
     public void readEffectiveOperationModeAttribute(IntegerAttributeCallback callback) {
-=======
-    public void readEffectiveOperationModeAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-    public void readEffectiveOperationModeAttribute(IntegerAttributeCallback callback) {
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-    public void readEffectiveOperationModeAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
-    public void readEffectiveOperationModeAttribute(IntegerAttributeCallback callback) {
->>>>>>> 822f22de5 (callback generation done)
       readEffectiveOperationModeAttribute(chipClusterPtr, callback);
     }
 
@@ -5489,10 +5213,6 @@ public class ChipClusters {
       reportCapacityAttribute(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void readSpeedAttribute(IntegerAttributeCallback callback) {
       readSpeedAttribute(chipClusterPtr, callback);
     }
@@ -5502,22 +5222,6 @@ public class ChipClusters {
     }
 
     public void readOperationModeAttribute(IntegerAttributeCallback callback) {
-=======
-    public void readOperationModeAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-    public void readOperationModeAttribute(IntegerAttributeCallback callback) {
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-    public void readOperationModeAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
-    public void readOperationModeAttribute(IntegerAttributeCallback callback) {
->>>>>>> 822f22de5 (callback generation done)
       readOperationModeAttribute(chipClusterPtr, callback);
     }
 
@@ -5525,10 +5229,6 @@ public class ChipClusters {
       writeOperationModeAttribute(chipClusterPtr, callback, value);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void readControlModeAttribute(IntegerAttributeCallback callback) {
       readControlModeAttribute(chipClusterPtr, callback);
     }
@@ -5546,22 +5246,6 @@ public class ChipClusters {
     }
 
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
->>>>>>> 822f22de5 (callback generation done)
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
@@ -5571,10 +5255,6 @@ public class ChipClusters {
     private native void readMaxSpeedAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     private native void readMaxFlowAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -5617,16 +5297,6 @@ public class ChipClusters {
     private native void reportPumpStatusAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-=======
-    private native void readMaxFlowAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-    private native void readMaxFlowAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
->>>>>>> 822f22de5 (callback generation done)
     private native void readEffectiveOperationModeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -5642,25 +5312,17 @@ public class ChipClusters {
     private native void reportCapacityAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private native void readSpeedAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readLifetimeEnergyConsumedAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
 
-=======
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
->>>>>>> 822f22de5 (callback generation done)
     private native void readOperationModeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeOperationModeAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private native void readControlModeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -5675,26 +5337,6 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
-=======
-=======
->>>>>>> c73e7aadd (need to wait for cast-helper)
-    private native void writeOperationModeAttribute(long chipClusterPtr, DefaultClusterCallback callback, int value);
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-<<<<<<< HEAD
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
->>>>>>> 822f22de5 (callback generation done)
   }
 
   public static class RelativeHumidityMeasurementCluster extends BaseChipCluster {
@@ -6150,10 +5792,6 @@ public class ChipClusters {
 
     public static class TvChannelListAttribute {
       public int majorNumber;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
       public int minorNumber;
       public String name;
       public String callSign;
@@ -6165,52 +5803,6 @@ public class ChipClusters {
           String name,
           String callSign,
           String affiliateCallSign) {
-=======
-            public int minorNumber;
-            public byte[] name;
-=======
-      public int minorNumber;
-      public byte[] name;
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-            public int minorNumber;
-            public byte[] name;
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
-      public int minorNumber;
-      public byte[] name;
->>>>>>> 822f22de5 (callback generation done)
-      public byte[] callSign;
-      public byte[] affiliateCallSign;
-
-      public TvChannelListAttribute(
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> c73e7aadd (need to wait for cast-helper)
-        int majorNumber,
-                int minorNumber,
-                byte[] name,
-        byte[] callSign,
-        byte[] affiliateCallSign
-      ) {
-<<<<<<< HEAD
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-=======
->>>>>>> 822f22de5 (callback generation done)
-          int majorNumber,
-          int minorNumber,
-          byte[] name,
-          byte[] callSign,
-          byte[] affiliateCallSign) {
-<<<<<<< HEAD
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
->>>>>>> 822f22de5 (callback generation done)
         this.majorNumber = majorNumber;
         this.minorNumber = minorNumber;
         this.name = name;
@@ -6281,39 +5873,9 @@ public class ChipClusters {
 
     public static class TargetNavigatorListAttribute {
       public int identifier;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
       public String name;
 
       public TargetNavigatorListAttribute(int identifier, String name) {
-=======
-            public byte[] name;
-
-      public TargetNavigatorListAttribute(
-        int identifier,
-                byte[] name
-      ) {
->>>>>>> 6a0263534 (basic code generation template, but not able to import to tool app)
-=======
-      public byte[] name;
-
-      public TargetNavigatorListAttribute(int identifier, byte[] name) {
->>>>>>> 76c02c598 (create new public class under chip/clusterinfo)
-=======
-            public byte[] name;
-
-      public TargetNavigatorListAttribute(
-        int identifier,
-                byte[] name
-      ) {
->>>>>>> c73e7aadd (need to wait for cast-helper)
-=======
-      public byte[] name;
-
-      public TargetNavigatorListAttribute(int identifier, byte[] name) {
->>>>>>> 822f22de5 (callback generation done)
         this.identifier = identifier;
         this.name = name;
       }
