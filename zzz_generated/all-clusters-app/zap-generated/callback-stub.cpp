@@ -59,9 +59,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BOOLEAN_STATE_CLUSTER_ID:
         emberAfBooleanStateClusterInitCallback(endpoint);
         break;
-    case ZCL_BRIDGED_ACTIONS_CLUSTER_ID:
-        emberAfBridgedActionsClusterInitCallback(endpoint);
-        break;
     case ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID:
         emberAfBridgedDeviceBasicClusterInitCallback(endpoint);
         break;
@@ -252,11 +249,6 @@ void __attribute__((weak)) emberAfBindingClusterInitCallback(EndpointId endpoint
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfBooleanStateClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfBridgedActionsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

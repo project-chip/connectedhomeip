@@ -186,18 +186,6 @@ public:
                                              uint16_t value);
 };
 
-class DLL_EXPORT BridgedActionsClusterTest : public BridgedActionsCluster
-{
-public:
-    BridgedActionsClusterTest() : BridgedActionsCluster() {}
-    ~BridgedActionsClusterTest() {}
-
-    CHIP_ERROR WriteAttributeSetupUrl(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      chip::CharSpan value);
-    CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint16_t value);
-};
-
 class DLL_EXPORT BridgedDeviceBasicClusterTest : public BridgedDeviceBasicCluster
 {
 public:

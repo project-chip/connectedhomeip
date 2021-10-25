@@ -1962,12 +1962,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t fastPollTimeoutMax)
 } // namespace Attributes
 } // namespace PollControl
 
-namespace BridgedActions {
-namespace Attributes {
-
-} // namespace Attributes
-} // namespace BridgedActions
-
 namespace Basic {
 namespace Attributes {
 
