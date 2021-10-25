@@ -137,7 +137,7 @@ void OperationalDeviceProxy::OnConnectionExpired(SessionHandle session)
 
 void OperationalDeviceProxy::OnDeviceConnectedFn(void * context, Controller::Device * device)
 {
-    VerifyOrReturn(context != nullptr, ChipLogError(OperationalDeviceProxy, "%s: invalid context", __FUNCTION__));
+    VerifyOrReturn(context != nullptr, ChipLogError(OperationalDeviceProxy, "Device connected: invalid context"));
     OperationalDeviceProxy * operationalDevice = reinterpret_cast<OperationalDeviceProxy *>(context);
 
     VerifyOrReturn(device != nullptr, ChipLogError(OperationalDeviceProxy, "%s: invalid device", __FUNCTION__));
@@ -149,7 +149,7 @@ void OperationalDeviceProxy::OnDeviceConnectedFn(void * context, Controller::Dev
 
 void OperationalDeviceProxy::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
 {
-    VerifyOrReturn(context != nullptr, ChipLogError(OperationalDeviceProxy, "%s: invalid context", __FUNCTION__));
+    VerifyOrReturn(context != nullptr, ChipLogError(OperationalDeviceProxy, "Device connection failure: invalid context"));
     OperationalDeviceProxy * operationalDevice = reinterpret_cast<OperationalDeviceProxy *>(context);
 
     operationalDevice->GetDevice().UpdateSession(false);
