@@ -30,13 +30,15 @@ from __future__ import print_function
 import asyncio
 from ctypes import *
 from .ChipStack import *
-from .clusters.CHIPClusters import *
 from .interaction_model import delegate as im
 from .exceptions import *
 from .clusters import Command as ClusterCommand
+from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
+from .clusters.CHIPClusters import *
 import enum
 import threading
+import typing
 
 
 __all__ = ["ChipDeviceController"]
@@ -134,6 +136,7 @@ class ChipDeviceController(object):
 
         im.InitIMDelegate()
         ClusterCommand.Init(self)
+        ClusterAttribute.Init()
 
         self.cbHandleKeyExchangeCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(
             HandleKeyExchangeComplete)
@@ -355,6 +358,50 @@ class ChipDeviceController(object):
         if res != 0:
             future.set_exception(self._ChipStack.ErrorToException(res))
         return await future
+
+    def WriteAttribute(self, nodeid: int, attributes):
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = self.GetConnectedDeviceSync(nodeid)
+        res = self._ChipStack.Call(
+            lambda: ClusterAttribute.WriteAttributes(
+                future, eventLoop, device, attributes)
+        )
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+        return future
+
+    def ReadAttribute(self, nodeid: int, attributes: typing.List[ClusterAttribute.AttributeReadRequest]):
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = self.GetConnectedDeviceSync(nodeid)
+        # TODO: Here, we translates multi attribute read into many individual attribute reads, this should be fixed by implementing Python's attribute read API.
+        res = []
+        for attr in attributes:
+            clusterInfo = self._Cluster.GetClusterInfoById(
+                attr.Attribute.cluster_id)
+            if not clusterInfo:
+                raise UnknownCluster(attr.Attribute.cluster_id)
+            attributeInfo = clusterInfo.get("attributes", {}).get(
+                attr.Attribute.attribute_id, None)
+            if not attributeInfo:
+                raise UnknownAttribute(
+                    clusterInfo["clusterName"], attr.Attribute.attribute_id)
+            self._Cluster.ReadAttribute(
+                device, clusterInfo["clusterName"], attributeInfo["attributeName"], attr.EndpointId, 0, False)
+            readRes = im.GetAttributeReadResponse(
+                im.DEFAULT_ATTRIBUTEREAD_APPID)
+            res.append(ClusterAttribute.AttributeReadResult(
+                Path=ClusterAttribute.AttributePath(
+                    EndpointId=attr.EndpointId, ClusterId=attr.Attribute.cluster_id, AttributeId=attr.Attribute.attribute_id),
+                Status=readRes.status,
+                Data=(attr.Attribute.FromTagDictOrRawValue(
+                    readRes.value) if readRes.value is not None else None),
+            ))
+        future.set_result(res)
+        return future
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         device = self.GetConnectedDeviceSync(nodeid)
