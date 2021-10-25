@@ -20,18 +20,12 @@
  * @brief Implementation for the Test Server Cluster
  ***************************************************************************/
 
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
@@ -94,7 +88,7 @@ EmberAfStatus writeAttribute(EndpointId endpoint, AttributeId attributeId, uint8
 {
     EmberAfAttributeSearchRecord record;
     record.endpoint         = endpoint;
-    record.clusterId        = ZCL_TEST_CLUSTER_ID;
+    record.clusterId        = TestCluster::Id;
     record.clusterMask      = CLUSTER_MASK_SERVER;
     record.manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE;
     record.attributeId      = attributeId;
@@ -434,7 +428,7 @@ void MatterTestClusterPluginServerInitCallback(void)
     for (uint8_t index = 0; index < emberAfEndpointCount(); index++)
     {
         EndpointId endpoint = emberAfEndpointFromIndex(index);
-        if (!emberAfContainsCluster(endpoint, ZCL_TEST_CLUSTER_ID))
+        if (!emberAfContainsCluster(endpoint, TestCluster::Id))
         {
             continue;
         }
