@@ -83,6 +83,9 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     ReturnErrorOnFailure(
         mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket)));
 
+    // The exchange will be automatically freed after SendMessage
+    mpExchangeCtx = nullptr;
+
     MoveToState(CommandState::CommandSent);
 
     return CHIP_NO_ERROR;
