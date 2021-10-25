@@ -138,7 +138,7 @@ public:
      *  Allocate a ReadClient that can be used to do a read interaction.  If the call succeeds, the consumer
      *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
      *
-     *  @param[inout] 	apReadClient	    A double pointer to a ReadClient that is updated to point to a valid ReadClient
+     *  @param[in,out] 	apReadClient	      A double pointer to a ReadClient that is updated to point to a valid ReadClient
      *                                      on successful completion of this function. On failure, it will be updated to point to
      *                                      nullptr.
      *  @param[in]      aInteractionType    Type of interaction (read or subscription) that the requested ReadClient should execute.
