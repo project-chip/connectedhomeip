@@ -52,5 +52,5 @@ jobs:
           - run: sudo apt-get install -fy --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev python-autopep8
           - name: Rebase and regenerate
             run: scripts/helpers/rebase_and_regenerate_zap.sh
-            with: 
+            env: 
               GITHUB_TOKEN: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
