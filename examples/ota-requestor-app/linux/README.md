@@ -65,9 +65,10 @@ In terminal 2:
 
 ### Limitations
 
--   Needs chip-tool to commission the OTA Provider device first because the Node ID
-    and IP Address of the OTA Provider must be supplied to this reference
+-   Needs chip-tool to commission the OTA Provider device first because the Node
+    ID and IP Address of the OTA Provider must be supplied to this reference
     application
 -   Does not verify QueryImageResponse message contents
--   Stores the downloaded file in the directory this reference app is launched from
+-   Stores the downloaded file in the directory this reference app is launched
+    from
 -   Does not support AnnounceOTAProvider command or OTA Requestor attributes
