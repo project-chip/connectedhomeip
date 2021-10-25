@@ -1869,6 +1869,9 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
             mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
         }
         RendezvousCleanup(CHIP_NO_ERROR);
+        if (mPairingDelegate != nullptr) {
+            mPairingDelegate->OnCommissioningComplete(device->GetDeviceId(), CHIP_NO_ERROR);
+        }
         break;
     case CommissioningStage::kSecurePairing:
     case CommissioningStage::kError:
