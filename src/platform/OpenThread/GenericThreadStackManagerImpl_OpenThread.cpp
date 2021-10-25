@@ -400,21 +400,6 @@ exit:
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadPollingConfig(
-    ConnectivityManager::ThreadPollingConfig & pollingConfig)
-{
-    pollingConfig = mPollingConfig;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadPollingConfig(
-    const ConnectivityManager::ThreadPollingConfig & pollingConfig)
-{
-    mPollingConfig = pollingConfig;
-    return Impl()->AdjustPollingInterval();
-}
-
-template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveMeshConnectivity(void)
 {
     bool res;
@@ -460,12 +445,6 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveMeshConnectivity(
     Impl()->UnlockThreadStack();
 
     return res;
-}
-
-template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnMessageLayerActivityChanged(bool messageLayerIsActive)
-{
-    Impl()->AdjustPollingInterval();
 }
 
 template <class ImplClass>
@@ -1335,7 +1314,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     RegisterOpenThreadErrorFormatter();
 
     mOTInst = NULL;
-    mPollingConfig.Clear();
 
     // If an OpenThread instance hasn't been supplied, call otInstanceInitSingle() to
     // create or acquire a singleton instance of OpenThread.
@@ -1350,6 +1328,20 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 #endif
 
     mOTInst = otInst;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    ConnectivityManager::SEDPollingConfig sedPollingConfig;
+    mPollingConfig.Clear();
+    sedPollingConfig.Clear();
+    sedPollingConfig.FastPollingIntervalMS = CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL;
+    sedPollingConfig.SlowPollingIntervalMS = CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL;
+    err                                    = _SetSEDPollingConfig(sedPollingConfig);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Sleepy end device polling config set failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+#endif
 
     // Arrange for OpenThread to call the OnOpenThreadStateChange method whenever a
     // state change occurs.  Note that we reference the OnOpenThreadStateChange method
@@ -1400,35 +1392,106 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoL
     return otIp6IsEnabled(mOTInst);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::AdjustPollingInterval(void)
+CHIP_ERROR
+GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    pollingConfig = mPollingConfig;
+    return CHIP_NO_ERROR;
+}
 
-    uint32_t newPollingIntervalMS = mPollingConfig.InactivePollingIntervalMS;
-
-    if (newPollingIntervalMS != 0)
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetSEDPollingConfig(
+    const ConnectivityManager::SEDPollingConfig & pollingConfig)
+{
+    if ((pollingConfig.SlowPollingIntervalMS < pollingConfig.FastPollingIntervalMS) || (pollingConfig.SlowPollingIntervalMS == 0) ||
+        (pollingConfig.FastPollingIntervalMS == 0))
     {
-        Impl()->LockThreadStack();
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    mPollingConfig = pollingConfig;
 
-        uint32_t curPollingIntervalMS = otLinkGetPollPeriod(mOTInst);
+    CHIP_ERROR err = SetSEDPollingMode(mPollingMode);
 
-        if (newPollingIntervalMS != curPollingIntervalMS)
-        {
-            otError otErr = otLinkSetPollPeriod(mOTInst, newPollingIntervalMS);
-            err           = MapOpenThreadError(otErr);
-        }
-
-        Impl()->UnlockThreadStack();
-
-        if (newPollingIntervalMS != curPollingIntervalMS)
-        {
-            ChipLogProgress(DeviceLayer, "OpenThread polling interval set to %" PRId32 "ms", newPollingIntervalMS);
-        }
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipDeviceEvent event;
+        event.Type = DeviceEventType::kSEDPollingIntervalChange;
+        err        = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
     }
 
     return err;
 }
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDPollingMode(ConnectivityManager::SEDPollingMode pollingType)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t interval;
+
+    if (pollingType == ConnectivityManager::SEDPollingMode::Idle)
+    {
+        interval = mPollingConfig.SlowPollingIntervalMS;
+    }
+    else if (pollingType == ConnectivityManager::SEDPollingMode::Active)
+    {
+        interval = mPollingConfig.FastPollingIntervalMS;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    mPollingMode = pollingType;
+
+    Impl()->LockThreadStack();
+
+    uint32_t curPollingIntervalMS = otLinkGetPollPeriod(mOTInst);
+
+    if (interval != curPollingIntervalMS)
+    {
+        otError otErr = otLinkSetPollPeriod(mOTInst, interval);
+        err           = MapOpenThreadError(otErr);
+    }
+
+    Impl()->UnlockThreadStack();
+
+    if (interval != curPollingIntervalMS)
+    {
+        ChipLogProgress(DeviceLayer, "OpenThread polling interval set to %" PRId32 "ms", interval);
+    }
+
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDFastPollingMode(bool onOff)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t interval;
+
+    if (onOff)
+    {
+        mFastPollingConsumers++;
+    }
+    else
+    {
+        if (mFastPollingConsumers > 0)
+            mFastPollingConsumers--;
+    }
+
+    if (mFastPollingConsumers > 0)
+    {
+        err = SetSEDPollingMode(ConnectivityManager::SEDPollingMode::Active);
+    }
+    else
+    {
+        err = SetSEDPollingMode(ConnectivityManager::SEDPollingMode::Idle);
+    }
+
+    return err;
+}
+#endif
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(void)
