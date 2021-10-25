@@ -344,8 +344,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
     mFlags.SetRaw(0);
 
-    // TODO Initialize the Chip Addressing and Routing Module.
-
     // Ensure that station mode is enabled.
     wifi_on(RTW_MODE_STA);
 
@@ -547,8 +545,6 @@ void ConnectivityManagerImpl::DriveStationState()
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
-    // TODO Invoke WARM to perform actions that occur when the WiFi station interface comes up.
-
     // Alert other components of the new state.
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
@@ -560,8 +556,6 @@ void ConnectivityManagerImpl::OnStationConnected()
 
 void ConnectivityManagerImpl::OnStationDisconnected()
 {
-    // TODO Invoke WARM to perform actions that occur when the WiFi station interface goes down.
-
     // Alert other components of the new state.
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
@@ -637,7 +631,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 {
                     haveIPv4Conn = true;
                     char addrStr[INET_ADDRSTRLEN];
-                    // ToDo: change the code to using IPv6 address
                     ip4addr_ntoa_r((const ip4_addr_t *) LwIP_GetIP(&xnetif[0]), addrStr, sizeof(addrStr));
                     IPAddress::FromString(addrStr, addr);
                 }
