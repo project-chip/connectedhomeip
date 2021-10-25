@@ -162,6 +162,8 @@ protected:
     template <typename T>
     bool CheckValueAsListLength(const char * itemName, chip::app::DataModel::DecodableList<T> list, uint64_t expectedLength)
     {
+        // We don't just use list.ComputeSize(), because we want to check that
+        // all the values in the list correctly decode to our type too.
         auto iter      = list.begin();
         uint64_t count = 0;
         while (iter.Next())
