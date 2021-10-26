@@ -176,6 +176,9 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mPeerNodeId       = LittleEndian::HostSwap64(peerNodeId);
     serializable.mLocalSessionId   = LittleEndian::HostSwap16(GetLocalSessionId());
     serializable.mPeerSessionId    = LittleEndian::HostSwap16(GetPeerSessionId());
+    // TODO: Get the fabric index
+    serializable.mLocalFabricIndex      = 0;
+    serializable.mSessionSetupTimeStamp = LittleEndian::HostSwap64(mSessionSetupTimeStamp);
 
     memcpy(serializable.mResumptionId, mResumptionId, sizeof(mResumptionId));
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
@@ -200,6 +203,9 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     SetPeerNodeId(LittleEndian::HostSwap64(serializable.mPeerNodeId));
     SetLocalSessionId(LittleEndian::HostSwap16(serializable.mLocalSessionId));
     SetPeerSessionId(LittleEndian::HostSwap16(serializable.mPeerSessionId));
+    SetSessionTimeStamp(LittleEndian::HostSwap64(serializable.mSessionSetupTimeStamp));
+    // TODO: Set the fabric index correctly
+    mLocalFabricIndex = serializable.mLocalFabricIndex;
 
     memcpy(mResumptionId, serializable.mResumptionId, sizeof(mResumptionId));
 

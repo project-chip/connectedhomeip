@@ -71,6 +71,11 @@ struct CASESessionSerializable
     uint16_t mLocalSessionId;
     uint16_t mPeerSessionId;
     uint8_t mResumptionId[kCASEResumptionIDSize];
+    FabricIndex mLocalFabricIndex;
+    uint64_t mSessionSetupTimeStamp;
+    // TODO: Use these once Auth Tags are supported in CHIP
+    uint32_t mAuthTag1;
+    uint32_t mAuthTag2;
 };
 
 class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession
@@ -276,6 +281,9 @@ private:
 
     State mState;
 
+    uint8_t mLocalFabricIndex       = 0;
+    uint64_t mSessionSetupTimeStamp = 0;
+
 protected:
     bool mCASESessionEstablished = false;
 
@@ -289,6 +297,8 @@ protected:
         return ipkListSpan;
     }
     virtual size_t GetIPKListEntries() const { return 1; }
+
+    void SetSessionTimeStamp(uint64_t timestamp) { mSessionSetupTimeStamp = timestamp; }
 };
 
 typedef struct CASESessionSerialized
