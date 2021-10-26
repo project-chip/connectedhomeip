@@ -80,7 +80,7 @@ There are three commissioning modes supported by Ameba platform:
 6. Test with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
    or
-   [Python Controller](https://github.com/hank820/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
+   [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
 
 ### BLE mode
 
@@ -100,7 +100,7 @@ There are three commissioning modes supported by Ameba platform:
 5. Test with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
    or
-   [Python Controller](https://github.com/hank820/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
+   [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
 
 ### IP mode
 
@@ -121,7 +121,7 @@ There are three commissioning modes supported by Ameba platform:
 6. Test with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
    or
-   [Python Controller](https://github.com/hank820/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
+   [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
 
 ## Cluster Control
 
@@ -136,6 +136,6 @@ to be On or Off.
           $ ./chip-tool onoff off 1
 
 -   Via
-    [Python Controller](https://github.com/hank820/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md#step-8-control-application-zcl-clusters)
+    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md#step-8-control-application-zcl-clusters)
 
           $ chip-device-ctrl > zcl OnOff Toggle 1234 1 0
