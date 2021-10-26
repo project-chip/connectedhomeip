@@ -30,6 +30,7 @@
 #include <app/util/error-mapping.h>
 #include <controller/CHIPDevice.h>
 #include <controller/InvokeInteraction.h>
+#include <controller/WriteInteraction.h>
 
 namespace chip {
 namespace Controller {
@@ -37,6 +38,8 @@ namespace Controller {
 template <typename T>
 using CommandResponseSuccessCallback = void(void * context, const T & responseObject);
 using CommandResponseFailureCallback = void(void * context, EmberAfStatus status);
+using WriteResponseSuccessCallback   = void (*)(void * context);
+using WriteResponseFailureCallback   = void (*)(void * context, EmberAfStatus status);
 
 class DLL_EXPORT ClusterBase
 {
@@ -58,6 +61,10 @@ public:
     template <typename RequestDataT, typename ResponseDataT>
     CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
                              CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb);
+
+    template <typename AttributeInfo>
+    CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
+                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}

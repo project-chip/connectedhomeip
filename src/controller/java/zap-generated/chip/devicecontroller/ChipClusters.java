@@ -766,6 +766,48 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
+  public static class BooleanStateCluster extends BaseChipCluster {
+    public BooleanStateCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    public static long clusterId() {
+      return Long.parseUnsignedLong("69");
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void readStateValueAttribute(BooleanAttributeCallback callback) {
+      readStateValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeStateValueAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeStateValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportStateValueAttribute(BooleanAttributeCallback callback) {
+      reportStateValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readStateValueAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void subscribeStateValueAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportStateValueAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class BridgedDeviceBasicCluster extends BaseChipCluster {
     public BridgedDeviceBasicCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -2030,7 +2072,7 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void retrieveLogsRequest(
-        DefaultClusterCallback callback,
+        RetrieveLogsResponseCallback callback,
         int intent,
         int requestedProtocol,
         byte[] transferFileDesignator) {
@@ -2040,10 +2082,16 @@ public class ChipClusters {
 
     private native void retrieveLogsRequest(
         long chipClusterPtr,
-        DefaultClusterCallback callback,
+        RetrieveLogsResponseCallback callback,
         int intent,
         int requestedProtocol,
         byte[] transferFileDesignator);
+
+    public interface RetrieveLogsResponseCallback {
+      void onSuccess(int status, byte[] content, long timeStamp, long timeSinceBoot);
+
+      void onError(Exception error);
+    }
   }
 
   public static class DoorLockCluster extends BaseChipCluster {
@@ -3213,6 +3261,76 @@ public class ChipClusters {
         long chipClusterPtr, DefaultClusterCallback callback, int value);
 
     private native void readIdentifyTypeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
+  public static class IlluminanceMeasurementCluster extends BaseChipCluster {
+    public IlluminanceMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    public static long clusterId() {
+      return Long.parseUnsignedLong("1024");
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void readMeasuredValueAttribute(IntegerAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportMeasuredValueAttribute(IntegerAttributeCallback callback) {
+      reportMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void readMinMeasuredValueAttribute(IntegerAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void readMaxMeasuredValueAttribute(IntegerAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void readToleranceAttribute(IntegerAttributeCallback callback) {
+      readToleranceAttribute(chipClusterPtr, callback);
+    }
+
+    public void readLightSensorTypeAttribute(IntegerAttributeCallback callback) {
+      readLightSensorTypeAttribute(chipClusterPtr, callback);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportMeasuredValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readToleranceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readLightSensorTypeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
@@ -5554,6 +5672,10 @@ public class ChipClusters {
       testAddArguments(chipClusterPtr, callback, arg1, arg2);
     }
 
+    public void testEnumsRequest(TestEnumsResponseCallback callback, int arg1, int arg2) {
+      testEnumsRequest(chipClusterPtr, callback, arg1, arg2);
+    }
+
     public void testListInt8UArgumentRequest(DefaultClusterCallback callback, int arg1) {
       testListInt8UArgumentRequest(chipClusterPtr, callback, arg1);
     }
@@ -5590,6 +5712,9 @@ public class ChipClusters {
     private native void testAddArguments(
         long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
 
+    private native void testEnumsRequest(
+        long chipClusterPtr, TestEnumsResponseCallback callback, int arg1, int arg2);
+
     private native void testListInt8UArgumentRequest(
         long chipClusterPtr, DefaultClusterCallback callback, int arg1);
 
@@ -5624,6 +5749,12 @@ public class ChipClusters {
 
     public interface TestAddArgumentsResponseCallback {
       void onSuccess(int returnValue);
+
+      void onError(Exception error);
+    }
+
+    public interface TestEnumsResponseCallback {
+      void onSuccess(int arg1, int arg2);
 
       void onError(Exception error);
     }
@@ -5852,6 +5983,14 @@ public class ChipClusters {
       writeEpochSAttribute(chipClusterPtr, callback, value);
     }
 
+    public void readVendorIdAttribute(IntegerAttributeCallback callback) {
+      readVendorIdAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeVendorIdAttribute(DefaultClusterCallback callback, int value) {
+      writeVendorIdAttribute(chipClusterPtr, callback, value);
+    }
+
     public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
       readUnsupportedAttribute(chipClusterPtr, callback);
     }
@@ -5984,6 +6123,12 @@ public class ChipClusters {
 
     private native void writeEpochSAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void readVendorIdAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeVendorIdAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
 
     private native void readUnsupportedAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);

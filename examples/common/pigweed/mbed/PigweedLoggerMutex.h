@@ -17,9 +17,35 @@
 
 #pragma once
 
-#include <app/util/af-types.h>
+#include "PigweedLogger.h"
+#include "pigweed/RpcService.h"
+#include "rtos/Mutex.h"
 
-EmberAfStatus emberAfBinaryInputBasicClusterSetPresentValueCallback(chip::EndpointId endpoint, bool presentValue);
-EmberAfStatus emberAfBinaryInputBasicClusterGetPresentValue(chip::EndpointId endpoint, bool * presentValue);
-EmberAfStatus emberAfBinaryInputBasicClusterSetOutOfServiceCallback(chip::EndpointId endpoint, bool isOutOfService);
-EmberAfStatus emberAfBinaryInputBasicClusterGetOutOfService(chip::EndpointId endpoint, bool * isOutOfService);
+namespace chip {
+namespace rpc {
+class PigweedLoggerMutex : public chip::rpc::Mutex
+{
+
+public:
+    void Lock() override
+    {
+        rtos::Mutex * mutex = PigweedLogger::GetSemaphore();
+        if (mutex)
+        {
+            mutex->lock();
+        }
+    }
+    void Unlock() override
+    {
+        rtos::Mutex * mutex = PigweedLogger::GetSemaphore();
+        if (mutex)
+        {
+            mutex->unlock();
+        }
+    }
+};
+
+extern PigweedLoggerMutex logger_mutex;
+
+} // namespace rpc
+} // namespace chip

@@ -44,7 +44,7 @@ public:
  * @brief
  *   An UnauthenticatedSession stores the binding of TransportAddress, and message counters.
  */
-class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter>
+class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
     UnauthenticatedSession(const PeerAddress & address) : mPeerAddress(address) { mLocalMessageCounter.Init(); }
@@ -82,6 +82,39 @@ template <size_t kMaxConnectionCount, Time::Source kTimeSource = Time::Source::k
 class UnauthenticatedSessionTable
 {
 public:
+    /**
+     * Get a session given the peer address. If the session doesn't exist in the cache, allocate a new entry for it.
+     *
+     * @return the session found or allocated, nullptr if not found and allocation failed.
+     */
+    CHECK_RETURN_VALUE
+    Optional<UnauthenticatedSessionHandle> FindOrAllocateEntry(const PeerAddress & address)
+    {
+        UnauthenticatedSession * result = FindEntry(address);
+        if (result != nullptr)
+            return MakeOptional<UnauthenticatedSessionHandle>(*result);
+
+        CHIP_ERROR err = AllocEntry(address, result);
+        if (err == CHIP_NO_ERROR)
+        {
+            return MakeOptional<UnauthenticatedSessionHandle>(*result);
+        }
+        else
+        {
+            return Optional<UnauthenticatedSessionHandle>::Missing();
+        }
+    }
+
+    /// Mark a session as active
+    void MarkSessionActive(UnauthenticatedSessionHandle session)
+    {
+        session->SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
+    }
+
+    /// Allows access to the underlying time source used for keeping track of connection active time
+    Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
+
+private:
     /**
      * Allocates a new session out of the internal resource pool.
      *
@@ -125,36 +158,6 @@ public:
         return result;
     }
 
-    /**
-     * Get a peer given the peer id. If the peer doesn't exist in the cache, allocate a new entry for it.
-     *
-     * @return the peer found or allocated, nullptr if not found and allocate failed.
-     */
-    CHECK_RETURN_VALUE
-    UnauthenticatedSession * FindOrAllocateEntry(const PeerAddress & address)
-    {
-        UnauthenticatedSession * result = FindEntry(address);
-        if (result != nullptr)
-            return result;
-
-        CHIP_ERROR err = AllocEntry(address, result);
-        if (err == CHIP_NO_ERROR)
-        {
-            return result;
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
-
-    /// Mark a session as active
-    void MarkSessionActive(UnauthenticatedSession & entry) { entry.SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs()); }
-
-    /// Allows access to the underlying time source used for keeping track of connection active time
-    Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
-
-private:
     UnauthenticatedSession * FindLeastRecentUsedEntry()
     {
         UnauthenticatedSession * result = nullptr;

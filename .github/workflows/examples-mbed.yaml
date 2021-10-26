@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-mbed-os:0.5.18
+            image: connectedhomeip/chip-build-mbed-os:0.5.22
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -82,6 +82,24 @@ jobs:
                     examples/lighting-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-lighting-app-example.elf \
                     /tmp/bloat_reports/
 
+            - name: Build pigweed-app example
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/mbed_example.sh -a=pigweed-app -b=$APP_TARGET -p=$APP_PROFILE
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    mbed $APP_TARGET+$APP_PROFILE pigweed-app \
+                    examples/pigweed-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-pigweed-app-example.elf \
+                    /tmp/bloat_reports/
+
+            - name: Build all-clusters-app example
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/mbed_example.sh -a=all-clusters-app -b=$APP_TARGET -p=$APP_PROFILE
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    mbed $APP_TARGET+$APP_PROFILE all-clusters-app \
+                    examples/all-clusters-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-all-clusters-app-example.elf \
+                    /tmp/bloat_reports/
+            
             - name: Build unit tests
               timeout-minutes: 10
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
@@ -93,6 +111,8 @@ jobs:
                      /tmp/output_binaries/$BUILD_TYPE-build/lock-app-$APP_TARGET-$APP_PROFILE.hex
                   cp examples/lighting-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-lighting-app-example.hex \
                      /tmp/output_binaries/$BUILD_TYPE-build/lighting-app-$APP_TARGET-$APP_PROFILE.hex
+                  cp examples/all-clusters-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-all-clusters-app-example.hex \
+                     /tmp/output_binaries/$BUILD_TYPE-build/all-clusters-app-$APP_TARGET-$APP_PROFILE.hex
 
             - name: Binary artifacts suffix
               id: outsuffix

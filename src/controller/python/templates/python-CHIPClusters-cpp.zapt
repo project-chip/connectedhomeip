@@ -88,15 +88,11 @@ void OnAttributeResponse<bool>(void * /* context */, bool value)
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, const DataModel::DecodableList<{{zapTypeToDecodableClusterObjectType type ns=parent.name}}> & list)
+static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
 {
-    uint16_t count = 0;
-    auto iter = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -110,7 +106,7 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -135,6 +131,14 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
         {{else}}
         ChipLogProgress(Zcl, "    {{asPrintFormat type}},", entry);
         {{/if}}
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -185,7 +189,7 @@ chip::ChipError::StorageType chip_ime_AppendCommand_{{asUpperCamelCase clusterNa
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::{{asUpperCamelCase clusterName}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.{{asUpperCamelCase name}}(nullptr, nullptr{{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if (isString type)}}chip::ByteSpan({{asLowerCamelCase label}}, {{asLowerCamelCase label}}_Len){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}}).AsInteger();
+    return cluster.{{asUpperCamelCase name}}(nullptr, nullptr{{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if (isOctetString type)}}chip::ByteSpan({{asLowerCamelCase label}}, {{asLowerCamelCase label}}_Len){{else if (isCharString type)}}chip::CharSpan(reinterpret_cast<const char*>({{asLowerCamelCase label}}), {{asLowerCamelCase label}}_Len){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}}).AsInteger();
 }
 {{/chip_cluster_commands}}
 
@@ -223,7 +227,7 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_{{asUpperCamelCase parent.n
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.WriteAttribute{{asUpperCamelCase name}}(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), {{#if (isString type)}} chip::ByteSpan(value, len){{else}}value{{/if}}).AsInteger();
+    return cluster.WriteAttribute{{asUpperCamelCase name}}(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), {{#if (isOctetString type)}} chip::ByteSpan(value, len){{else if (isCharString type)}} chip::CharSpan(reinterpret_cast<const char*>(value), len){{else}}value{{/if}}).AsInteger();
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}

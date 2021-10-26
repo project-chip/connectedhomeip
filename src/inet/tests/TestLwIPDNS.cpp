@@ -88,7 +88,7 @@ static void found_multi(const char * aName, ip_addr_t * aIpAddrs, uint8_t aNumIp
     {
         char addrStr[INET6_ADDRSTRLEN];
 
-        IPAddress::FromIPv4(aIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
+        IPAddress(aIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
 
         printf("\t(%d) IPv4: %s\n", i, addrStr);
     }
@@ -145,7 +145,7 @@ static void TestLwIPDNS(void)
         for (uint8_t i = 0; i < sNumIpAddrs; ++i)
         {
             char addrStr[64];
-            IPAddress::FromIPv4(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
+            IPAddress(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
             printf("\t(%d) IPv4: %s\n", i, addrStr);
         }
     }
@@ -171,7 +171,7 @@ static void TestLwIPDNS(void)
         for (i = 0; i < sNumIpAddrs; ++i)
         {
             char addrStr[64];
-            IPAddress::FromIPv4(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
+            IPAddress(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
             printf("\t(%d) IPv4: %s\n", i, addrStr);
         }
     }
@@ -197,7 +197,7 @@ static void TestLwIPDNS(void)
         for (i = 0; i < sNumIpAddrs; ++i)
         {
             char addrStr[64];
-            IPAddress::FromIPv4(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
+            IPAddress(sIpAddrs[i]).ToString(addrStr, sizeof(addrStr));
             printf("\t(%d) IPv4: %s\n", i, addrStr);
         }
     }

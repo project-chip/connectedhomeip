@@ -23,6 +23,7 @@ function getTests()
 
   const ColorControl = [
     'Test_TC_CC_1_1',
+    'Test_TC_CC_2_1',
     'Test_TC_CC_3_1',
     'Test_TC_CC_3_2',
     'Test_TC_CC_3_3',
@@ -130,6 +131,7 @@ function getTests()
     'TestDelayCommands',
     'TestLogCommands',
     'TestDescriptorCluster',
+    'TestBasicInformation',
     'TestOperationalCredentialsCluster',
   ];
 

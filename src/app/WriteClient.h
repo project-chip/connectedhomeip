@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/AttributeDataList.h>
 #include <app/MessageDef/AttributeStatusIB.h>
@@ -51,6 +52,55 @@ class InteractionModelEngine;
 class WriteClient : public Messaging::ExchangeDelegate
 {
 public:
+    class Callback
+    {
+    public:
+        virtual ~Callback() = default;
+
+        /**
+         * OnResponse will be called when a write response has been received
+         * and processed for the given path.
+         *
+         * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call before it shuts down the object.
+         *
+         * @param[in] apWriteClient: The write client object that initiated the write transaction.
+         * @param[in] aPath: The attribute path field in write response.
+         * @param[in] attributeStatus: Attribute-specific status, containing an InteractionModel::Status code as well as
+         *                             an optional cluster-specific status code.
+         */
+        virtual void OnResponse(const WriteClient * apWriteClient, const ConcreteAttributePath & aPath, StatusIB attributeStatus) {}
+
+        /**
+         * OnError will be called when an error occurs *after* a successful call to SendWriteRequest(). The following
+         * errors will be delivered through this call in the aError field:
+         *
+         * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
+         * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
+         * - CHIP_ERROR*: All other cases.
+         *
+         * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call before it shuts down the object.
+         *
+         * @param[in] apWriteClient: The write client object that initiated the attribute write transaction.
+         * @param[in] aError: A system error code that conveys the overall error code.
+         */
+        virtual void OnError(const WriteClient * apWriteClient, CHIP_ERROR aError) {}
+
+        /**
+         * OnDone will be called when WriteClient has finished all work and is reserved for future WriteClient ownership change.
+         * (#10366) Users may use this function to release their own objects related to this write interaction.
+         *
+         * This function will:
+         *      - Always be called exactly *once* for a given WriteClient instance.
+         *      - Be called even in error circumstances.
+         *      - Only be called after a successful call to SendWriteRequest as been made.
+         *
+         * @param[in] apWriteClient: The write client object of the terminated write transaction.
+         */
+        virtual void OnDone(WriteClient * apWriteClient) = 0;
+    };
+
     /**
      *  Shutdown the WriteClient. This terminates this instance
      *  of the object and releases all held resources.
@@ -61,8 +111,6 @@ public:
     CHIP_ERROR FinishAttribute();
     TLV::TLVWriter * GetAttributeDataElementTLVWriter();
 
-    uint64_t GetAppIdentifier() const { return mAppIdentifier; }
-    void SetAppIdentifier(uint64_t aAppIdentifier) { mAppIdentifier = aAppIdentifier; }
     NodeId GetSourceNodeId() const
     {
         return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSecureSession().GetPeerNodeId() : kUndefinedNodeId;
@@ -96,7 +144,7 @@ private:
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
     CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
-                                uint32_t timeout);
+                                System::Clock::Timeout timeout);
 
     /**
      *  Initialize the client object. Within the lifetime
@@ -109,8 +157,7 @@ private:
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                    uint64_t aApplicationIdentifier);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, Callback * apDelegate);
 
     virtual ~WriteClient() = default;
 
@@ -140,12 +187,11 @@ private:
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
+    Callback * mpCallback                      = nullptr;
     State mState                               = State::Uninitialized;
     System::PacketBufferTLVWriter mMessageWriter;
     WriteRequest::Builder mWriteRequestBuilder;
     uint8_t mAttributeStatusIndex = 0;
-    uint64_t mAppIdentifier       = 0;
 };
 
 class WriteClientHandle
@@ -173,12 +219,14 @@ public:
      */
     WriteClient * operator->() const { return mpWriteClient; }
 
+    WriteClient * Get() const { return mpWriteClient; }
+
     /**
      *  Finalize the message and send it to the desired node. The underlying write object will always be released, and the user
      * should not use this object after calling this function.
      */
     CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
-                                uint32_t timeout = kImMessageTimeoutMsec);
+                                System::Clock::Timeout timeout = kImMessageTimeout);
 
     /**
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put

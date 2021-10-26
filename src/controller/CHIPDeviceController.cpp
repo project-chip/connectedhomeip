@@ -1728,29 +1728,17 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(app::ReadClient * 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                                                         const app::StatusIB & aStatusIB,
-                                                                         app::AttributePathParams & aAttributePathParams,
-                                                                         uint8_t aAttributeIndex)
+void DeviceControllerInteractionModelDelegate::OnResponse(const app::WriteClient * apWriteClient,
+                                                          const app::ConcreteAttributePath & aPath, app::StatusIB attributeStatus)
 {
-    IMWriteResponseCallback(apWriteClient, chip::app::ToEmberAfStatus(aStatusIB.mStatus));
-    return CHIP_NO_ERROR;
+    IMWriteResponseCallback(apWriteClient, attributeStatus.mStatus);
+}
+void DeviceControllerInteractionModelDelegate::OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
+{
+    IMWriteResponseCallback(apWriteClient, Protocols::InteractionModel::Status::Failure);
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseProtocolError(const app::WriteClient * apWriteClient,
-                                                                                uint8_t aAttributeIndex)
-{
-    // When WriteResponseProtocolError occurred, it means server returned an invalid packet.
-    IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
-{
-    // When WriteResponseError occurred, it means we failed to receive the response from server.
-    IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
-    return CHIP_NO_ERROR;
-}
+void DeviceControllerInteractionModelDelegate::OnDone(app::WriteClient * apWriteClient) {}
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::SubscribeResponseProcessed(const app::ReadClient * apSubscribeClient)
 {
@@ -1950,7 +1938,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         {
             ChipLogError(Controller, "Unable to find country code, defaulting to WW");
         }
-        chip::ByteSpan countryCode(reinterpret_cast<uint8_t *>(countryCodeStr), actualCountryCodeSize);
+        chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);

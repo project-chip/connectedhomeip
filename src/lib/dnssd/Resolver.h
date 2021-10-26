@@ -40,7 +40,7 @@ struct ResolvedNodeData
     void LogNodeIdResolved()
     {
 #if CHIP_PROGRESS_LOGGING
-        char addrBuffer[Inet::IPAddress::kMaxStringLength + 1];
+        char addrBuffer[Inet::IPAddress::kMaxStringLength];
         mAddress.ToString(addrBuffer);
         // Would be nice to log the interface id, but sorting out how to do so
         // across our differnet InterfaceId implementations is a pain.

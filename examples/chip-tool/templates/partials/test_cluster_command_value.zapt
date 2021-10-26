@@ -1,6 +1,7 @@
 {{#if isArray}}
 
-  {{zapTypeToEncodableClusterObjectType type ns=ns}} {{asLowerCamelCase label}}List[{{definedValue.length}}];
+  {{! forceNotList=true because we really want the type of a single item here }}
+  {{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true}} {{asLowerCamelCase label}}List[{{definedValue.length}}];
   {{#each definedValue}}
   {{>commandValue ns=../ns container=(concat (asLowerCamelCase ../label) "List[" @index "]") definedValue=. type=../type ignore=true}}
   {{/each}}
@@ -19,7 +20,7 @@
 
   {{else}}
     {{container}}{{#unless ignore}}.{{asLowerCamelCase label}}{{/unless}} =
-    {{#if_is_enum type}}
+    {{#if_chip_enum type}}
       static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});
     {{else if (isCharString type)}}
       chip::Span<const char>("{{definedValue}}", strlen("{{definedValue}}"));
@@ -31,6 +32,6 @@
       {{else}}
       {{definedValue}}{{asTypeLiteralSuffix type}};
       {{/if_is_bitmap}}
-    {{/if_is_enum}}
+    {{/if_chip_enum}}
   {{/if_is_struct}}
 {{/if}}

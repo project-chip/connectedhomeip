@@ -863,6 +863,15 @@ public:
     CHIP_ERROR FindElementWithTag(Tag tagInApiForm, TLVReader & destReader) const;
 
     /**
+     * Count how many elements remain in the currently-open container.  Will
+     * fail with CHIP_ERROR_INCORRECT_STATE if not currently in a container.
+     *
+     * @param[out] size On success, set to the number of items following the
+     *                  current reader position in the container.
+     */
+    CHIP_ERROR CountRemainingInContainer(size_t * size) const;
+
+    /**
      * The profile id to be used for profile tags encoded in implicit form.
      *
      * When the reader encounters a profile-specific tag that has been encoded in implicit form, it

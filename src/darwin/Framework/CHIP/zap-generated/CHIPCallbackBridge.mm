@@ -661,6 +661,17 @@ void CHIPContentLauncherClusterLaunchURLResponseCallbackBridge::OnSuccessFn(
     });
 };
 
+void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
+    void * context, uint8_t status, chip::ByteSpan content, uint32_t timeStamp, uint32_t timeSinceBoot)
+{
+    DispatchSuccess(context, @ {
+        @"status" : [NSNumber numberWithUnsignedChar:status],
+        @"content" : [NSData dataWithBytes:content.data() length:content.size()],
+        @"timeStamp" : [NSNumber numberWithUnsignedLong:timeStamp],
+        @"timeSinceBoot" : [NSNumber numberWithUnsignedLong:timeSinceBoot],
+    });
+};
+
 void CHIPDoorLockClusterClearAllPinsResponseCallbackBridge::OnSuccessFn(void * context, uint8_t status)
 {
     DispatchSuccess(context, @ {
@@ -1239,6 +1250,14 @@ void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(v
 {
     DispatchSuccess(context, @ {
         @"returnValue" : [NSNumber numberWithUnsignedChar:returnValue],
+    });
+};
+
+void CHIPTestClusterClusterTestEnumsResponseCallbackBridge::OnSuccessFn(void * context, chip::VendorId arg1, uint8_t arg2)
+{
+    DispatchSuccess(context, @ {
+        @"arg1" : [NSNumber numberWithUnsignedShort:arg1],
+        @"arg2" : [NSNumber numberWithUnsignedChar:arg2],
     });
 };
 
