@@ -15,8 +15,6 @@
 name: ZAP - Regenerate
 
 on:
-    pull_request:
-    push:
     workflow_dispatch:
     issue_comment:
       types: [created]
@@ -31,7 +29,7 @@ jobs:
         timeout-minutes: 60
 
         runs-on: ubuntu-18.04
-        # if: (github.event.issue.pull_request != '' && contains(github.event.comment.body, '/regenerate') || (github.event_name == 'workflow_dispatch')
+        if: (github.event.issue.pull_request != '' && contains(github.event.comment.body, '/regenerate') || (github.event_name == 'workflow_dispatch')
 
         steps:
           - name: Checkout
