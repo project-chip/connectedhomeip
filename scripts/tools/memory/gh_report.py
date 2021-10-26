@@ -215,9 +215,14 @@ class SizeDatabase(memdf.util.sqlite.Database):
         r.update(json.loads(s))
         by = r.get('by', 'section')
         r['sizes'] = [{
-            'name': s[by],
-            'size': s['size']
-        } for s in r['frames'][by]]
+            'name': i[by],
+            'size': i['size']
+        } for i in r['frames'][by]]
+        for i in r['frames'].get('wr', []):
+            r['sizes'].append({
+                'name': ('(read only)', '(read/write)')[int(i['wr'])],
+                'size': i['size']
+            })
         self.add_sizes(**r)
 
     def add_sizes_from_zipfile(self, f: Union[IO, Path], origin: Dict):
@@ -279,11 +284,11 @@ class SizeDatabase(memdf.util.sqlite.Database):
         # Determine required size artifacts.
         required_artifact_ids: set[int] = set()
         for group, group_reports in size_artifacts.items():
-            logging.info('ASG: group %s', group)
+            logging.debug('ASG: group %s', group)
             for report in group_reports.values():
-                if self.config['report.pr' if report.pr else 'report.push']:
+                if self.config['report.pr' if int(report.pr) else 'report.push']:
                     if report.parent not in group_reports:
-                        logging.info('ASN:  No match for %s', report.name)
+                        logging.debug('ASN:  No match for %s', report.name)
                         continue
                     if (artifact_limit
                             and len(required_artifact_ids) >= artifact_limit):
@@ -293,9 +298,9 @@ class SizeDatabase(memdf.util.sqlite.Database):
                     parent = group_reports[report.parent]
                     required_artifact_ids.add(report.id)
                     required_artifact_ids.add(parent.id)
-                    logging.info('ASM:  Match %s', report.parent)
-                    logging.info('ASR:    %s %s', report.id, report.name)
-                    logging.info('ASP:    %s %s', parent.id, parent.name)
+                    logging.debug('ASM:  Match %s', report.parent)
+                    logging.debug('ASR:    %s %s', report.id, report.name)
+                    logging.debug('ASP:    %s %s', parent.id, parent.name)
 
         # Download and add required artifacts.
         for i in required_artifact_ids:
@@ -490,9 +495,10 @@ def gh_send_change_report(db: SizeDatabase, df: pd.DataFrame) -> bool:
                      key=lambda c: c.commit.committer.date,
                      reverse=True)
     if commits and commit != commits[0].sha:
-        logging.debug('SCS: PR #%s: not commenting for stale %s; newest is %s',
-                      pr, commit, commits[0].sha)
-        return False
+        logging.info('SCS: PR #%s: not commenting for stale %s; newest is %s',
+                     pr, commit, commits[0].sha)
+        # Return True so that the obsolete artifacts get removed.
+        return True
 
     # Check for an existing size report comment. If one exists, we'll add
     # the new report to it.
@@ -629,7 +635,7 @@ def v1_comment_write_df(db: SizeDatabase, df: pd.DataFrame,
                           'pipe',
                           hierify=True,
                           title=False,
-                          tabulate={'floatfmt': '5.1f'})
+                          floatfmt='5.1f')
 
 
 def v1_comment_summary(df: pd.DataFrame) -> str:
@@ -719,7 +725,7 @@ def main(argv):
                                dfs,
                                hierify=True,
                                title=True,
-                               tabulate={'floatfmt': '5.1f'})
+                               floatfmt='5.1f')
 
     except Exception as exception:
         raise exception
