@@ -15,6 +15,7 @@
 name: ZAP - Regenerate
 
 on:
+    pull_request:
     push:
     workflow_dispatch:
     issue_comment:
