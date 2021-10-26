@@ -30,4 +30,26 @@ public interface ServiceResolver {
       long callbackHandle,
       long contextHandle,
       ChipMdnsCallback chipMdnsCallback);
+
+  /**
+   * Publishes a service via DNS-SD.
+   *
+   * Calling the function again with the same service name, type, protocol,
+   * interface and port but different text will update the text published.
+   * This function will NOT take the ownership of service->mTextEntries memory.
+   */
+  boolean publish(
+      String serviceName,
+      String hostName,
+      String type,
+      int port,
+      String[] textEntriesKeys,
+      byte[][] textEntriesDatas,
+      String[] subTypes
+  );
+
+  /**
+   * Removes or marks all services being advertised for removal.
+   */
+  boolean remove();
 }
