@@ -17,6 +17,7 @@
  */
 
 #include <app/Command.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/util/af.h>
 
 #include "AppMain.h"
@@ -26,6 +27,20 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
+
+Identify gIdentify0 = {
+    chip::EndpointId{ 0 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+};
+
+Identify gIdentify1 = {
+    chip::EndpointId{ 1 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+};
 
 int main(int argc, char * argv[])
 {

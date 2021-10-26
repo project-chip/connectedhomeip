@@ -53,6 +53,7 @@ struct Identify
     chip::EndpointId mEndpoint;
     onIdentifyStartCb mOnIdentifyStart = nullptr;
     onIdentifyStopCb mOnIdentifyStop   = nullptr;
+    EmberAfIdentifyIdentifyType mIdentifyType;
     onEffectIdentifierCb mOnEffectIdentifier;
     EmberAfIdentifyEffectIdentifier mCurrentEffectIdentifier;
     EmberAfIdentifyEffectIdentifier mTargetEffectIdentifier;
