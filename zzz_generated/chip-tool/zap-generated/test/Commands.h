@@ -10926,8 +10926,8 @@ public:
             err = TestSendsAMoveToLevelCommand_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 10ms\n");
-            err = TestWait10ms_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 100ms\n");
+            err = TestWait100ms_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : reads current Level attribute from DUT\n");
@@ -10938,8 +10938,8 @@ public:
             err = TestSendsAMoveToLevelCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 100ms\n");
-            err = TestWait100ms_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 200ms\n");
+            err = TestWait200ms_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : reads current Level attribute from DUT\n");
@@ -10954,8 +10954,8 @@ public:
             err = TestSendsAMoveToLevelCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 1ms\n");
-            err = TestWait1ms_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 10ms\n");
+            err = TestWait10ms_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : reads current Level attribute from DUT\n");
@@ -10966,8 +10966,8 @@ public:
             err = TestResetLevelTo0_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 10ms\n");
-            err = TestWait10ms_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 100ms\n");
+            err = TestWait100ms_12();
             break;
         }
 
@@ -11092,7 +11092,7 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_2() { return WaitForMs(10); }
+    CHIP_ERROR TestWait100ms_2() { return WaitForMs(100); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_3()
     {
@@ -11138,7 +11138,7 @@ private:
 
     void OnSuccessResponse_4() { NextTest(); }
 
-    CHIP_ERROR TestWait100ms_5() { return WaitForMs(100); }
+    CHIP_ERROR TestWait200ms_5() { return WaitForMs(200); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_6()
     {
@@ -11200,7 +11200,7 @@ private:
 
     void OnSuccessResponse_8() { NextTest(); }
 
-    CHIP_ERROR TestWait1ms_9() { return WaitForMs(1); }
+    CHIP_ERROR TestWait10ms_9() { return WaitForMs(10); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
     {
@@ -11246,7 +11246,7 @@ private:
 
     void OnSuccessResponse_11() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_12() { return WaitForMs(10); }
+    CHIP_ERROR TestWait100ms_12() { return WaitForMs(100); }
 };
 
 class Test_TC_LVL_3_1 : public TestCommand
@@ -11292,8 +11292,8 @@ public:
             err = TestSendsAMoveUpCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 2500ms\n");
-            err = TestWait2500ms_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 3000ms\n");
+            err = TestWait3000ms_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : reads current level attribute from DUT\n");
@@ -11308,8 +11308,8 @@ public:
             err = TestSendsAMoveDownCommand_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 2500ms\n");
-            err = TestWait2500ms_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 3000ms\n");
+            err = TestWait3000ms_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : reads current level attribute from DUT\n");
@@ -11328,8 +11328,8 @@ public:
             err = TestSendsAMoveUpCommandAtDefaultMoveRate_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 10ms\n");
-            err = TestWait10ms_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 100ms\n");
+            err = TestWait100ms_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : reads current level attribute from DUT\n");
@@ -11509,7 +11509,7 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait2500ms_3() { return WaitForMs(2500); }
+    CHIP_ERROR TestWait3000ms_3() { return WaitForMs(3000); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
     {
@@ -11571,7 +11571,7 @@ private:
 
     void OnSuccessResponse_6() { NextTest(); }
 
-    CHIP_ERROR TestWait2500ms_7() { return WaitForMs(2500); }
+    CHIP_ERROR TestWait3000ms_7() { return WaitForMs(3000); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_8()
     {
@@ -11648,7 +11648,7 @@ private:
 
     void OnSuccessResponse_11() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_12() { return WaitForMs(10); }
+    CHIP_ERROR TestWait100ms_12() { return WaitForMs(100); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_13()
     {
