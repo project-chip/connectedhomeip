@@ -54,8 +54,8 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mDirty              = false;
     mActiveSubscription = false;
     mInteractionType    = aInteractionType;
-    mInitiatorNodeId    = apExchangeContext->GetSessionHandle().GetPeerNodeId();
-    mFabricIndex        = apExchangeContext->GetSessionHandle().GetFabricIndex();
+    mInitiatorNodeId    = apExchangeContext->GetSessionHandle().AsSecureSession()->GetPeerNodeId();
+    mFabricIndex        = apExchangeContext->GetSessionHandle().AsSecureSession()->GetFabricIndex();
 
     if (apExchangeContext != nullptr)
     {

@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,30 +14,31 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines the chip::Optional class to handle values which may
- *      or may not be present.
- *
- */
 #pragma once
+
+#include <lib/core/CHIPConfig.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 
-/// InPlace is disambiguation tags that can be passed to the constructors to indicate that the contained object should be
-/// constructed in-place
-struct InPlaceType
+class Session
 {
-    explicit InPlaceType() = default;
-};
-constexpr InPlaceType InPlace{};
+public:
+    virtual ~Session() {}
 
-template <class T>
-struct InPlaceTemplateType
-{
-    explicit InPlaceTemplateType() = default;
+    enum class SessionType : uint8_t
+    {
+        kUndefined       = 0,
+        kUnauthenticated = 1,
+        kSecure          = 2,
+    };
+
+    virtual SessionType GetSessionType() const = 0;
+#if CHIP_PROGRESS_LOGGING
+    virtual const char * GetSessionTypeString() const = 0;
+#endif
+    virtual NodeId GetPeerNodeId() const                          = 0;
+    virtual const Transport::PeerAddress & GetPeerAddress() const = 0;
 };
-template <class T>
-constexpr InPlaceTemplateType<T> InPlaceTemplate{};
 
 } // namespace chip

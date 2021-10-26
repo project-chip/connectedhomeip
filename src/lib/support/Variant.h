@@ -26,6 +26,8 @@
 #include <typeinfo>
 #include <utility>
 
+#include <lib/core/InPlace.h>
+
 namespace chip {
 
 namespace VariantInternal {
@@ -146,6 +148,13 @@ private:
 
 public:
     Variant() : mTypeId(kInvalidType) {}
+
+    template <typename T, class... Args>
+    constexpr explicit Variant(InPlaceTemplateType<T>, Args &&... args) :
+        mTypeId(VariantInternal::TupleIndexOfType<T, std::tuple<Ts...>>::value)
+    {
+        new (&mData) T(std::forward<Args>(args)...);
+    }
 
     Variant(const Variant<Ts...> & that) : mTypeId(that.mTypeId) { Curry::Copy(that.mTypeId, &that.mData, &mData); }
 

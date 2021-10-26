@@ -61,7 +61,7 @@ public:
     void OnNewConnection(SessionHandle session, ExchangeManager * mgr) override
     {
         mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-            if (context->MatchesSession(session, mgr->GetSessionManager()))
+            if (context->MatchesSession(session))
             {
                 context->OnNewConnection(session);
                 return false;
@@ -73,7 +73,7 @@ public:
     void OnConnectionExpired(SessionHandle session, ExchangeManager * mgr) override
     {
         mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-            if (context->MatchesSession(session, mgr->GetSessionManager()))
+            if (context->MatchesSession(session))
             {
                 context->OnConnectionExpired(session);
                 return false;

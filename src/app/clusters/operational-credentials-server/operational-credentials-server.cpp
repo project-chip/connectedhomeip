@@ -301,7 +301,7 @@ static FabricInfo * retrieveCurrentFabric()
         return nullptr;
     }
 
-    FabricIndex index = emberAfCurrentCommand()->source->GetSessionHandle().GetFabricIndex();
+    FabricIndex index = emberAfCurrentCommand()->source->GetSessionHandle().AsSecureSession()->GetFabricIndex();
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
@@ -371,7 +371,7 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSessionHandle().GetFabricIndex();
+        FabricIndex currentFabricIndex = ec->GetSessionHandle().AsSecureSession()->GetFabricIndex();
         ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
     }
 };
@@ -400,7 +400,7 @@ exit:
     if (err == CHIP_NO_ERROR)
     {
         chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
-        FabricIndex currentFabricIndex        = ec->GetSessionHandle().GetFabricIndex();
+        FabricIndex currentFabricIndex        = ec->GetSessionHandle().AsSecureSession()->GetFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
         {
             // If the current fabric is being removed, expiring all the secure sessions causes crashes as
@@ -697,12 +697,8 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
         // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
         // Retrieve attestation challenge
-        ByteSpan attestationChallenge = commandObj->GetExchangeContext()
-                                            ->GetExchangeMgr()
-                                            ->GetSessionManager()
-                                            ->GetSecureSession(commandObj->GetExchangeContext()->GetSessionHandle())
-                                            ->GetCryptoContext()
-                                            .GetAttestationChallenge();
+        ByteSpan attestationChallenge =
+            commandObj->GetExchangeContext()->GetSessionHandle().AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
         Hash_SHA256_stream hashStream;
         SuccessOrExit(err = hashStream.Begin());

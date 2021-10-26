@@ -89,13 +89,6 @@ public:
     }
     TransportPreference GetTransportPreference() const { return mTransportPreference; }
 
-    uint16_t GetPeerSessionId() const { return mCaseParameters.mPeerSessionId; }
-    ChannelBuilder & SetPeerSessionId(uint16_t sessionId)
-    {
-        mCaseParameters.mPeerSessionId = sessionId;
-        return *this;
-    }
-
     Optional<Inet::IPAddress> GetForcePeerAddress() const { return mForcePeerAddr; }
     ChannelBuilder & SetForcePeerAddress(Inet::IPAddress peerAddr)
     {
@@ -106,11 +99,6 @@ public:
 private:
     NodeId mPeerNodeId                       = kUndefinedNodeId;
     TransportPreference mTransportPreference = TransportPreference::kDefault;
-    struct
-    {
-        uint16_t mPeerSessionId;
-    } mCaseParameters;
-
     Optional<Inet::IPAddress> mForcePeerAddr;
 };
 

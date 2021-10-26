@@ -111,7 +111,7 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     }
 
     Messaging::ExchangeContext * exchange =
-        exchangeMgr->NewContext(SessionHandle(destination, 0, Transport::kAnyKeyId, 0), nullptr);
+        exchangeMgr->NewContext(exchangeMgr->GetSessionManager()->FindSecureSessionForNode(destination), nullptr);
     if (exchange == nullptr)
     {
         return EMBER_DELIVERY_FAILED;

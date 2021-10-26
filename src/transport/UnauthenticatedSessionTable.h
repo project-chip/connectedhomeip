@@ -25,6 +25,7 @@
 #include <system/TimeSource.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
+#include <transport/Session.h>
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
@@ -44,7 +45,7 @@ public:
  * @brief
  *   An UnauthenticatedSession stores the binding of TransportAddress, and message counters.
  */
-class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
+class UnauthenticatedSession : public Session, public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
     UnauthenticatedSession(const PeerAddress & address) : mPeerAddress(address) { mLocalMessageCounter.Init(); }
@@ -57,7 +58,13 @@ public:
     uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
     void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
 
-    const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
+    Session::SessionType GetSessionType() const override { return Session::SessionType::kUnauthenticated; }
+#if CHIP_PROGRESS_LOGGING
+    const char * GetSessionTypeString() const override { return "unauthenticated"; };
+#endif
+
+    NodeId GetPeerNodeId() const override { return kUndefinedNodeId; }
+    const PeerAddress & GetPeerAddress() const override { return mPeerAddress; }
 
     MessageCounter & GetLocalMessageCounter() { return mLocalMessageCounter; }
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }

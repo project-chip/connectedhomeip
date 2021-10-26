@@ -103,7 +103,7 @@ public:
     bool IsCasePairing();
 
     bool MatchesBuilder(const ChannelBuilder & builder);
-    bool MatchesSession(SessionHandle session, SessionManager * sessionManager);
+    bool MatchesSession(SessionHandle session);
 
     // events of ResolveDelegate, propagated from ExchangeManager
     void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const Dnssd::DnssdService & address);

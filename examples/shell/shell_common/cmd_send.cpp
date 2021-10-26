@@ -127,7 +127,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     uint32_t payloadSize = gSendArguments.GetPayloadSize();
 
     // Create a new exchange context.
-    auto * ec = gExchangeManager.NewContext(SessionHandle(kTestDeviceNodeId, 1, 1, gFabricIndex), &gMockAppDelegate);
+    auto * ec = gExchangeManager.NewContext(gSessionManager.FindSecureSessionForNode(kTestDeviceNodeId), &gMockAppDelegate);
     VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     payloadBuf = MessagePacketBuffer::New(payloadSize);

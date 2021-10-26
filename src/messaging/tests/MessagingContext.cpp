@@ -55,14 +55,12 @@ CHIP_ERROR MessagingContext::Shutdown()
 
 SessionHandle MessagingContext::GetSessionBobToAlice()
 {
-    // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
-    return SessionHandle(GetAliceNodeId(), GetBobKeyId(), GetAliceKeyId(), GetFabricIndex());
+    return SessionHandle(mSessionManager, GetBobKeyId());
 }
 
 SessionHandle MessagingContext::GetSessionAliceToBob()
 {
-    // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
-    return SessionHandle(GetBobNodeId(), GetAliceKeyId(), GetBobKeyId(), mDestFabricIndex);
+    return SessionHandle(mSessionManager, GetAliceKeyId());
 }
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)

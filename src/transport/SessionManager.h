@@ -200,8 +200,6 @@ public:
      */
     CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage);
 
-    Transport::SecureSession * GetSecureSession(SessionHandle session);
-
     /**
      * @brief
      *   Set the callback object.
@@ -271,6 +269,11 @@ public:
     // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
     SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
 
+    /// Get the raw pointer to the SecureSession.
+    // Almost all usages are private, but there is one usage by DeviceCommissioner::ValidateAttestationInfo, we should consider
+    // remove that usage
+    Transport::SecureSession * GetSecureSession(uint16_t localSessionId);
+
 private:
     /**
      *    The State of a secure transport object.
@@ -298,6 +301,8 @@ private:
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
     GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;
+
+    friend class SessionHandle;
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();

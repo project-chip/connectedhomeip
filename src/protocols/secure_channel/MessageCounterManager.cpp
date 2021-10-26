@@ -104,15 +104,21 @@ CHIP_ERROR MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext *
 
 void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * exchangeContext)
 {
-    Transport::SecureSession * state = mExchangeMgr->GetSessionManager()->GetSecureSession(exchangeContext->GetSessionHandle());
-
-    if (state != nullptr)
+    if (exchangeContext->HasSessionHandle())
     {
-        state->GetSessionMessageCounter().GetPeerMessageCounter().SyncFailed();
+        Transport::SecureSession * session = exchangeContext->GetSessionHandle().AsSecureSession();
+        if (session != nullptr)
+        {
+            session->GetSessionMessageCounter().GetPeerMessageCounter().SyncFailed();
+        }
+        else
+        {
+            ChipLogError(SecureChannel, "MCSP Timeout! Failed to clear message counter synchronization status.");
+        }
     }
     else
     {
-        ChipLogError(SecureChannel, "Timed out! Failed to clear message counter synchronization status.");
+        ChipLogError(SecureChannel, "MCSP Timeout! On a already released session.");
     }
 }
 
@@ -223,39 +229,27 @@ exit:
 CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext,
                                                          FixedByteSpan<kChallengeSize> challenge)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    Transport::SecureSession * state = nullptr;
     System::PacketBufferHandle msgBuf;
-    uint8_t * msg = nullptr;
 
-    state = mExchangeMgr->GetSessionManager()->GetSecureSession(exchangeContext->GetSessionHandle());
-    VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
+    Transport::SecureSession * session = exchangeContext->GetSessionHandle().AsSecureSession();
+    VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
 
     // Allocate new buffer.
     msgBuf = MessagePacketBuffer::New(kSyncRespMsgSize);
-    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-
-    msg = msgBuf->Start();
+    VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     {
+        uint8_t * msg = msgBuf->Start();
         Encoding::LittleEndian::BufferWriter bbuf(msg, kSyncRespMsgSize);
-        bbuf.Put32(state->GetSessionMessageCounter().GetLocalMessageCounter().Value());
+        bbuf.Put32(session->GetSessionMessageCounter().GetLocalMessageCounter().Value());
         bbuf.Put(challenge.data(), kChallengeSize);
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
     }
 
     msgBuf->SetDataLength(kSyncRespMsgSize);
 
-    err = exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp, std::move(msgBuf),
-                                       Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SecureChannel, "Failed to send message counter synchronization response with error:%s", ErrorStr(err));
-    }
-
-    return err;
+    return exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp, std::move(msgBuf),
+                                        Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
 }
 
 CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext,
@@ -288,17 +282,15 @@ CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeCo
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::SecureSession * state = nullptr;
-    uint32_t syncCounter             = 0;
+    uint32_t syncCounter = 0;
 
     const uint8_t * resp = msgBuf->Start();
     size_t resplen       = msgBuf->DataLength();
 
     ChipLogDetail(SecureChannel, "Received MsgCounterSyncResp response");
 
-    // Find an active connection to the specified peer node
-    state = mExchangeMgr->GetSessionManager()->GetSecureSession(exchangeContext->GetSessionHandle());
-    VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
+    Transport::SecureSession * session = exchangeContext->GetSessionHandle().AsSecureSession();
+    VerifyOrExit(session != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
 
     VerifyOrExit(msgBuf->DataLength() == kSyncRespMsgSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
@@ -309,12 +301,12 @@ CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeCo
     VerifyOrExit(syncCounter != 0, err = CHIP_ERROR_READ_FAILED);
 
     // Verify that the response field matches the expected Challenge field for the exchange.
-    err =
-        state->GetSessionMessageCounter().GetPeerMessageCounter().VerifyChallenge(syncCounter, FixedByteSpan<kChallengeSize>(resp));
+    err = session->GetSessionMessageCounter().GetPeerMessageCounter().VerifyChallenge(syncCounter,
+                                                                                      FixedByteSpan<kChallengeSize>(resp));
     SuccessOrExit(err);
 
     // Process all queued incoming messages after message counter synchronization is completed.
-    ProcessPendingMessages(exchangeContext->GetSessionHandle().GetPeerNodeId());
+    ProcessPendingMessages(exchangeContext->GetSessionHandle()->GetPeerNodeId());
 
 exit:
     if (err != CHIP_NO_ERROR)

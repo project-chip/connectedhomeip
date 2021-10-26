@@ -26,7 +26,6 @@ chip_test_suite("tests") {
     "TestFabricTable.cpp",
     "TestPeerConnections.cpp",
     "TestSecureSession.cpp",
-    "TestSessionHandle.cpp",
     "TestSessionManager.cpp",
   ]
 
