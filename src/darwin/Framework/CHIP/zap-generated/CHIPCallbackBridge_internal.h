@@ -332,6 +332,18 @@ public:
                                 chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list);
 };
 
+class CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>
+{
+public:
+    CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+};
+
 class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
     : public CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>
 {
@@ -1262,6 +1274,16 @@ public:
         CHIPCallbackBridge<TestClusterClusterTestAddArgumentsResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, uint8_t returnValue);
+};
+
+class CHIPTestClusterClusterTestEnumsResponseCallbackBridge : public CHIPCallbackBridge<TestClusterClusterTestEnumsResponseCallback>
+{
+public:
+    CHIPTestClusterClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterClusterTestEnumsResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::VendorId arg1, uint8_t arg2);
 };
 
 class CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge

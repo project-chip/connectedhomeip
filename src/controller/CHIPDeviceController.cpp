@@ -354,7 +354,7 @@ CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, 
     VerifyOrExit(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
     VerifyOrExit(ec != nullptr, ChipLogError(Controller, "OnMessageReceived was called with null exchange"));
 
-    index = FindDeviceIndex(ec->GetSecureSession().GetPeerNodeId());
+    index = FindDeviceIndex(ec->GetSessionHandle().GetPeerNodeId());
     VerifyOrExit(index < kNumMaxActiveDevices, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
     mActiveDevices[index].OnMessageReceived(ec, payloadHeader, std::move(msgBuf));
@@ -809,78 +809,6 @@ exit:
             FreeRendezvousSession();
         }
 
-        if (device != nullptr)
-        {
-            ReleaseDevice(device);
-            mDeviceBeingPaired = kNumMaxActiveDevices;
-        }
-    }
-
-    return err;
-}
-
-CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Transport::PeerAddress & peerAddress,
-                                                             SerializedDevice & serialized)
-{
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
-
-    SecurePairingUsingTestSecret * testSecurePairingSecret = nullptr;
-
-    // Check that the caller has provided an IP address (instead of a BLE peer address)
-    VerifyOrExit(peerAddress.GetTransportType() == Transport::Type::kUdp, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(IsOperationalNodeId(remoteDeviceId), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
-
-    testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>();
-    VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    mDeviceBeingPaired = GetInactiveDeviceIndex();
-    VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
-    device = &mActiveDevices[mDeviceBeingPaired];
-
-    testSecurePairingSecret->ToSerializable(device->GetPairing());
-
-    device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, mFabricIndex);
-
-    device->Serialize(serialized);
-
-    err = mSystemState->SessionMgr()->NewPairing(Optional<Transport::PeerAddress>::Value(peerAddress), device->GetDeviceId(),
-                                                 testSecurePairingSecret, CryptoContext::SessionRole::kInitiator, mFabricIndex);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
-        OnSessionEstablishmentError(err);
-    }
-    SuccessOrExit(err);
-
-    mPairedDevices.Insert(device->GetDeviceId());
-    mPairedDevicesUpdated = true;
-
-    // Note - This assumes storage is synchronous, the device must be in storage before we can cleanup
-    // the rendezvous session and mark pairing success
-    PersistDevice(device);
-    // Also persist the device list at this time
-    // This makes sure that a newly added device is immediately available
-    PersistDeviceList();
-
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
-    }
-
-    RendezvousCleanup(CHIP_NO_ERROR);
-
-exit:
-    if (testSecurePairingSecret != nullptr)
-    {
-        chip::Platform::Delete(testSecurePairingSecret);
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
         if (device != nullptr)
         {
             ReleaseDevice(device);
@@ -1669,7 +1597,8 @@ void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNo
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 void DeviceControllerInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSender,
-                                                          const app::ConcreteCommandPath & aPath, TLV::TLVReader * aData)
+                                                          const app::ConcreteCommandPath & aPath,
+                                                          const chip::app::StatusIB & aStatus, TLV::TLVReader * aData)
 {
     // Generally IM has more detailed errors than ember library, here we always use the, the actual handling of the
     // commands should implement full IMDelegate.
@@ -1687,7 +1616,7 @@ void DeviceControllerInteractionModelDelegate::OnResponse(app::CommandSender * a
 }
 
 void DeviceControllerInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender,
-                                                       Protocols::InteractionModel::Status aClusterStatus, CHIP_ERROR aError)
+                                                       const chip::app::StatusIB & aStatus, CHIP_ERROR aError)
 {
     // The IMDefaultResponseCallback started out life as an Ember function, so it only accepted
     // Ember status codes. Consequently, let's convert the IM code over to a meaningful Ember status before dispatching.
@@ -1696,7 +1625,7 @@ void DeviceControllerInteractionModelDelegate::OnError(const app::CommandSender 
     // well, this will be an even bigger problem.
     //
     // For now, #10331 tracks this issue.
-    IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aClusterStatus));
+    IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aStatus.mStatus));
 }
 
 void DeviceControllerInteractionModelDelegate::OnDone(app::CommandSender * apCommandSender)

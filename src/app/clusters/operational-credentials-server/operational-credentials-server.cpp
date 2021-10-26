@@ -69,6 +69,7 @@ public:
 
 private:
     CHIP_ERROR ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadRootCertificates(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -96,6 +97,24 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
     });
 }
 
+CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+        {
+            ByteSpan cert;
+
+            if (!fabricInfo.IsInitialized())
+                continue;
+
+            ReturnErrorOnFailure(fabricInfo.GetRootCert(cert));
+            ReturnErrorOnFailure(encoder.Encode(cert));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+}
+
 OperationalCredentialsAttrAccess gAttrAccess;
 
 CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -106,6 +125,9 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & 
     {
     case Attributes::FabricsList::Id: {
         return ReadFabricsList(aPath.mEndpointId, aEncoder);
+    }
+    case Attributes::TrustedRootCertificates::Id: {
+        return ReadRootCertificates(aPath.mEndpointId, aEncoder);
     }
     default:
         break;
@@ -251,7 +273,7 @@ static FabricInfo * retrieveCurrentFabric()
         return nullptr;
     }
 
-    FabricIndex index = emberAfCurrentCommand()->source->GetSecureSession().GetFabricIndex();
+    FabricIndex index = emberAfCurrentCommand()->source->GetSessionHandle().GetFabricIndex();
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
@@ -321,7 +343,7 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSecureSession().GetFabricIndex();
+        FabricIndex currentFabricIndex = ec->GetSessionHandle().GetFabricIndex();
         ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
     }
 };
@@ -350,7 +372,7 @@ exit:
     if (err == CHIP_NO_ERROR)
     {
         chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
-        FabricIndex currentFabricIndex        = ec->GetSecureSession().GetFabricIndex();
+        FabricIndex currentFabricIndex        = ec->GetSessionHandle().GetFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
         {
             // If the current fabric is being removed, expiring all the secure sessions causes crashes as
@@ -650,7 +672,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
         ByteSpan attestationChallenge = commandObj->GetExchangeContext()
                                             ->GetExchangeMgr()
                                             ->GetSessionManager()
-                                            ->GetSecureSession(commandObj->GetExchangeContext()->GetSecureSession())
+                                            ->GetSecureSession(commandObj->GetExchangeContext()->GetSessionHandle())
                                             ->GetCryptoContext()
                                             .GetAttestationChallenge();
 

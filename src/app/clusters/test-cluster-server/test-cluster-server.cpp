@@ -415,6 +415,21 @@ exit:
     return true;
 }
 
+bool emberAfTestClusterClusterTestEnumsRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+                                                       TestEnumsRequest::DecodableType const & commandData)
+{
+    TestEnumsResponse::Type response;
+    response.arg1 = commandData.arg1;
+    response.arg2 = commandData.arg2;
+
+    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
+    if (err != CHIP_NO_ERROR)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+    return true;
+}
+
 // -----------------------------------------------------------------------------
 // Plugin initialization
 

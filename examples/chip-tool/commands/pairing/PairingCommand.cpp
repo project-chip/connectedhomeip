@@ -57,9 +57,6 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::None:
         err = Unpair(remoteId);
         break;
-    case PairingMode::Bypass:
-        err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-        break;
     case PairingMode::QRCode:
         err = PairWithQRCode(remoteId);
         break;
@@ -149,12 +146,6 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
 
     mController.RegisterDeviceDiscoveryDelegate(this);
     return mController.DiscoverCommissionableNodes(filter);
-}
-
-CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress address)
-{
-    ChipSerializedDevice serializedTestDevice;
-    return mController.PairTestDeviceWithoutSecurity(remoteId, address, serializedTestDevice);
 }
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)

@@ -134,7 +134,11 @@ class {{filename}}: public TestCommand
           {{else if (isCharString type)}}
             chip::CharSpan("{{definedValue}}", strlen("{{definedValue}}"))
           {{else}}
-            {{definedValue}}{{asTypeLiteralSuffix type}}
+            {{#if_chip_enum type}}
+              static_cast<{{chipType}}>({{definedValue}}{{asTypeLiteralSuffix type}})
+            {{else}}
+              {{definedValue}}{{asTypeLiteralSuffix type}}
+            {{/if_chip_enum}}
           {{/if}};
         {{/chip_tests_item_parameters}}
 

@@ -113,7 +113,7 @@ public:
 
     NodeId GetSourceNodeId() const
     {
-        return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSecureSession().GetPeerNodeId() : kUndefinedNodeId;
+        return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSessionHandle().GetPeerNodeId() : kUndefinedNodeId;
     }
 
 private:

@@ -378,6 +378,23 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, @ { @"value" : array });
 };
 
+void CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        [array addObject:[NSData dataWithBytes:entry.data() length:entry.size()]];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
 void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
@@ -1250,6 +1267,14 @@ void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(v
 {
     DispatchSuccess(context, @ {
         @"returnValue" : [NSNumber numberWithUnsignedChar:returnValue],
+    });
+};
+
+void CHIPTestClusterClusterTestEnumsResponseCallbackBridge::OnSuccessFn(void * context, chip::VendorId arg1, uint8_t arg2)
+{
+    DispatchSuccess(context, @ {
+        @"arg1" : [NSNumber numberWithUnsignedShort:arg1],
+        @"arg2" : [NSNumber numberWithUnsignedChar:arg2],
     });
 };
 
