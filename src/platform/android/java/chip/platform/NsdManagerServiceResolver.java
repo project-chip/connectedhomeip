@@ -26,12 +26,15 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import java.util.*;
+
 public class NsdManagerServiceResolver implements ServiceResolver {
   private static final String TAG = NsdManagerServiceResolver.class.getSimpleName();
   private static final long RESOLVE_SERVICE_TIMEOUT = 30000;
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
   private Handler mainThreadHandler;
+  private List<NsdManager.RegistrationListener> mRegistrationListeners = new ArrayList<>();
 
   public NsdManagerServiceResolver(Context context) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
@@ -115,11 +118,47 @@ public class NsdManagerServiceResolver implements ServiceResolver {
 
     @Override
     public boolean publish(String serviceName, String hostName, String type, int port, String[] textEntriesKeys, byte[][] textEntriesDatas, String[] subTypes) {
-        return false;
+        NsdServiceInfo serviceInfo = new NsdServiceInfo();
+        serviceInfo.setServiceName(serviceName);
+        serviceInfo.setServiceType(type);
+        serviceInfo.setPort(port);
+        Log.i(TAG,"publish serviceName="+serviceName+" type="+type+" port="+port);
+
+        NsdManager.RegistrationListener registrationListener = new NsdManager.RegistrationListener() {
+            @Override
+            public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+                Log.w(TAG, "service " + serviceInfo.getServiceName() + " onRegistrationFailed:" + errorCode);
+            }
+
+            @Override
+            public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+                Log.w(TAG, "service " + serviceInfo.getServiceName() + " onUnregistrationFailed:" + errorCode);
+            }
+
+            @Override
+            public void onServiceRegistered(NsdServiceInfo serviceInfo) {
+                Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered:");
+            }
+
+            @Override
+            public void onServiceUnregistered(NsdServiceInfo serviceInfo) {
+                Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered:");
+            }
+        };
+        mRegistrationListeners.add(registrationListener);
+
+        nsdManager.registerService(
+                serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
+
+        return true;
     }
 
     @Override
     public boolean remove() {
-        return false;
+        for (NsdManager.RegistrationListener l:mRegistrationListeners) {
+            nsdManager.unregisterService(l);
+        }
+
+        return true;
     }
 }
