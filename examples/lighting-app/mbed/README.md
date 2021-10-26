@@ -31,22 +31,22 @@ serial port to the device. The following RPC protocols services are available:
 
 <hr>
 
-- [Overview](#overview)
-  - [Bluetooth Low Energy advertising](#bluetooth-low-energy-advertising)
-  - [Bluetooth Low Energy rendezvous](#bluetooth-low-energy-rendezvous)
-  - [WiFi provisioning](#wifi-provisioning)
-- [Run application](#run-application)
-  - [Environment setup](#environment-setup)
-  - [Building](#building)
-  - [Flashing](#flashing)
-  - [Debugging](#debugging)
-  - [Testing](#testing)
-    - [CHIP Tools](#chip-tools)
-    - [RPC console](#rpc-console)
-  - [Supported devices](#supported-devices)
-      - [Notes](#notes)
-- [Device UI](#device-ui)
-    - [Notes](#notes-1)
+-   [Overview](#overview)
+    -   [Bluetooth Low Energy advertising](#bluetooth-low-energy-advertising)
+    -   [Bluetooth Low Energy rendezvous](#bluetooth-low-energy-rendezvous)
+    -   [WiFi provisioning](#wifi-provisioning)
+-   [Run application](#run-application)
+    -   [Environment setup](#environment-setup)
+    -   [Building](#building)
+    -   [Flashing](#flashing)
+    -   [Debugging](#debugging)
+    -   [Testing](#testing)
+        -   [CHIP Tools](#chip-tools)
+        -   [RPC console](#rpc-console)
+    -   [Supported devices](#supported-devices)
+        -   [Notes](#notes)
+-   [Device UI](#device-ui)
+    -   [Notes](#notes-1)
 
 <hr>
 
@@ -123,7 +123,7 @@ example ported to the mbed-os platform.
 -   **by using generic vscode task**:
 
 ```
-Command Palette (F1) => Run Task... => Run Mbed Application => build => lighting-app => (board name) => (build profile)`
+Command Palette (F1) => Run Task... => Run Mbed Application => build => lighting-app => (board name) => (build profile)
 ```
 
 -   **by calling explicitly building script:**
@@ -153,7 +153,7 @@ image and reset the device.
 -   **by using VSCode task**:
 
 ```
-Command Palette (F1) => Run Task... -> Run Mbed application => flash => lighting-app => (board name) => (build profile)
+Command Palette (F1) => Run Task... -> Run Mbed Application => flash => lighting-app => (board name) => (build profile)
 ```
 
 -   **by calling explicitly building script:**
@@ -225,7 +225,7 @@ parameters as arguments:
 
 Example:
 
-      python -m chip_app.rpc_console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
+      python -m chip_rpc.console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
 
 To control the lighting type the following command, where you define if 'on'
 state is true or false:
