@@ -29,6 +29,7 @@ from dataclasses import dataclass
 # CommandStatus should not contain padding
 IMCommandStatus = Struct(
     "Status" / Int16ul,
+    "ClusterStatus" / Int8ul,
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "CommandId" / Int32ul,

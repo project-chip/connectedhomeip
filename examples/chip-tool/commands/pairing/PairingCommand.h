@@ -31,7 +31,6 @@
 enum class PairingMode
 {
     None,
-    Bypass,
     QRCode,
     ManualCode,
     Ble,
@@ -81,10 +80,6 @@ public:
         switch (mode)
         {
         case PairingMode::None:
-            break;
-        case PairingMode::Bypass:
-            AddArgument("device-remote-ip", &mRemoteAddr);
-            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             break;
         case PairingMode::QRCode:
         case PairingMode::ManualCode:
@@ -176,7 +171,6 @@ private:
     CHIP_ERROR PairWithQRCode(NodeId remoteId);
     CHIP_ERROR PairWithManualCode(NodeId remoteId);
     CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
-    CHIP_ERROR PairWithoutSecurity(NodeId remoteId, PeerAddress address);
     CHIP_ERROR Unpair(NodeId remoteId);
     CHIP_ERROR OpenCommissioningWindow();
 

@@ -143,6 +143,7 @@ typedef void (*TvChannelClusterChangeChannelResponseCallback)(void * context,
                                                               uint8_t ErrorType);
 typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
 typedef void (*TestClusterClusterTestAddArgumentsResponseCallback)(void * context, uint8_t returnValue);
+typedef void (*TestClusterClusterTestEnumsResponseCallback)(void * context, chip::VendorId arg1, uint8_t arg2);
 typedef void (*TestClusterClusterTestListInt8UReverseResponseCallback)(void * context,
                                                                        /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
 typedef void (*TestClusterClusterTestSpecificResponseCallback)(void * context, uint8_t returnValue);
@@ -229,6 +230,11 @@ typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & data);
+void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                             chip::Callback::Cancelable * onSuccessCallback,
+                                                                             chip::Callback::Cancelable * onFailureCallback);
+typedef void (*OperationalCredentialsTrustedRootCertificatesListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
 void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(chip::TLV::TLVReader * data,
                                                               chip::Callback::Cancelable * onSuccessCallback,
                                                               chip::Callback::Cancelable * onFailureCallback);

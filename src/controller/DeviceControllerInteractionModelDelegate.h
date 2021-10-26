@@ -20,8 +20,9 @@ class DeviceControllerInteractionModelDelegate : public chip::app::InteractionMo
                                                  public chip::app::WriteClient::Callback
 {
 public:
-    void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, TLV::TLVReader * aData) override;
-    void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aInteractionModelStatus,
+    void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
+                    const chip::app::StatusIB & aStatus, TLV::TLVReader * aData) override;
+    void OnError(const app::CommandSender * apCommandSender, const chip::app::StatusIB & aStatus,
                  CHIP_ERROR aProtocolError) override;
     void OnDone(app::CommandSender * apCommandSender) override;
 

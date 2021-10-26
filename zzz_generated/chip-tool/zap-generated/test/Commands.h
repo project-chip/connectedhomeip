@@ -3811,7 +3811,7 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t driftCompensationArgument = 0;
+        uint8_t driftCompensationArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeDriftCompensation(mOnSuccessCallback_70.Cancel(), mOnFailureCallback_70.Cancel(),
                                                        driftCompensationArgument);
@@ -10926,8 +10926,8 @@ public:
             err = TestSendsAMoveToLevelCommand_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 10ms\n");
-            err = TestWait10ms_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 100ms\n");
+            err = TestWait100ms_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : reads current Level attribute from DUT\n");
@@ -10938,8 +10938,8 @@ public:
             err = TestSendsAMoveToLevelCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 100ms\n");
-            err = TestWait100ms_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 200ms\n");
+            err = TestWait200ms_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : reads current Level attribute from DUT\n");
@@ -10954,8 +10954,8 @@ public:
             err = TestSendsAMoveToLevelCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 1ms\n");
-            err = TestWait1ms_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 10ms\n");
+            err = TestWait10ms_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : reads current Level attribute from DUT\n");
@@ -10966,8 +10966,8 @@ public:
             err = TestResetLevelTo0_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 10ms\n");
-            err = TestWait10ms_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 100ms\n");
+            err = TestWait100ms_12();
             break;
         }
 
@@ -11092,7 +11092,7 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_2() { return WaitForMs(10); }
+    CHIP_ERROR TestWait100ms_2() { return WaitForMs(100); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_3()
     {
@@ -11138,7 +11138,7 @@ private:
 
     void OnSuccessResponse_4() { NextTest(); }
 
-    CHIP_ERROR TestWait100ms_5() { return WaitForMs(100); }
+    CHIP_ERROR TestWait200ms_5() { return WaitForMs(200); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_6()
     {
@@ -11200,7 +11200,7 @@ private:
 
     void OnSuccessResponse_8() { NextTest(); }
 
-    CHIP_ERROR TestWait1ms_9() { return WaitForMs(1); }
+    CHIP_ERROR TestWait10ms_9() { return WaitForMs(10); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
     {
@@ -11246,7 +11246,7 @@ private:
 
     void OnSuccessResponse_11() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_12() { return WaitForMs(10); }
+    CHIP_ERROR TestWait100ms_12() { return WaitForMs(100); }
 };
 
 class Test_TC_LVL_3_1 : public TestCommand
@@ -11292,8 +11292,8 @@ public:
             err = TestSendsAMoveUpCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 2500ms\n");
-            err = TestWait2500ms_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 3000ms\n");
+            err = TestWait3000ms_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : reads current level attribute from DUT\n");
@@ -11308,8 +11308,8 @@ public:
             err = TestSendsAMoveDownCommand_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 2500ms\n");
-            err = TestWait2500ms_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 3000ms\n");
+            err = TestWait3000ms_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : reads current level attribute from DUT\n");
@@ -11328,8 +11328,8 @@ public:
             err = TestSendsAMoveUpCommandAtDefaultMoveRate_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 10ms\n");
-            err = TestWait10ms_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 100ms\n");
+            err = TestWait100ms_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : reads current level attribute from DUT\n");
@@ -11509,7 +11509,7 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait2500ms_3() { return WaitForMs(2500); }
+    CHIP_ERROR TestWait3000ms_3() { return WaitForMs(3000); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
     {
@@ -11571,7 +11571,7 @@ private:
 
     void OnSuccessResponse_6() { NextTest(); }
 
-    CHIP_ERROR TestWait2500ms_7() { return WaitForMs(2500); }
+    CHIP_ERROR TestWait3000ms_7() { return WaitForMs(3000); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_8()
     {
@@ -11648,7 +11648,7 @@ private:
 
     void OnSuccessResponse_11() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_12() { return WaitForMs(10); }
+    CHIP_ERROR TestWait100ms_12() { return WaitForMs(100); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_13()
     {
@@ -12469,7 +12469,7 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t startUpOnOffArgument = 0;
+        uint8_t startUpOnOffArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeStartUpOnOff(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel(),
                                                   startUpOnOffArgument);
@@ -14196,7 +14196,7 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t temperatureDisplayModeArgument = 0;
+        uint8_t temperatureDisplayModeArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeTemperatureDisplayMode(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(),
                                                             temperatureDisplayModeArgument);
@@ -14275,7 +14275,7 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t keypadLockoutArgument = 0;
+        uint8_t keypadLockoutArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeKeypadLockout(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel(),
                                                    keypadLockoutArgument);
@@ -14354,7 +14354,7 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t scheduleProgrammingVisibilityArgument = 0;
+        uint8_t scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeScheduleProgrammingVisibility(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel(),
                                                                    scheduleProgrammingVisibilityArgument);
@@ -17771,6 +17771,26 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 121 : Send Test Command to unsupported endpoint\n");
             err = TestSendTestCommandToUnsupportedEndpoint_121();
             break;
+        case 122:
+            ChipLogProgress(chipTool, " ***** Test Step 122 : Read attribute vendor_id Default Value\n");
+            err = TestReadAttributeVendorIdDefaultValue_122();
+            break;
+        case 123:
+            ChipLogProgress(chipTool, " ***** Test Step 123 : Write attribute vendor_id\n");
+            err = TestWriteAttributeVendorId_123();
+            break;
+        case 124:
+            ChipLogProgress(chipTool, " ***** Test Step 124 : Read attribute vendor_id\n");
+            err = TestReadAttributeVendorId_124();
+            break;
+        case 125:
+            ChipLogProgress(chipTool, " ***** Test Step 125 : Restore attribute vendor_id\n");
+            err = TestRestoreAttributeVendorId_125();
+            break;
+        case 126:
+            ChipLogProgress(chipTool, " ***** Test Step 126 : Send a command with a vendor_id and enum\n");
+            err = TestSendACommandWithAVendorIdAndEnum_126();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -17782,7 +17802,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 122;
+    const uint16_t mTestCount = 127;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
     chip::Callback::Callback<void (*)(void * context, bool boolean)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
@@ -18040,6 +18060,18 @@ private:
     chip::Callback::Callback<void (*)(void * context, bool unsupported)> mOnSuccessCallback_119{ OnSuccessCallback_119, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_120{ OnFailureCallback_120, this };
     chip::Callback::Callback<void (*)(void * context, bool unsupported)> mOnSuccessCallback_120{ OnSuccessCallback_120, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_122{ OnFailureCallback_122, this };
+    chip::Callback::Callback<void (*)(void * context, chip::VendorId vendorId)> mOnSuccessCallback_122{ OnSuccessCallback_122,
+                                                                                                        this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_123{ OnFailureCallback_123, this };
+    chip::Callback::Callback<void (*)(void * context, chip::VendorId vendorId)> mOnSuccessCallback_123{ OnSuccessCallback_123,
+                                                                                                        this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_124{ OnFailureCallback_124, this };
+    chip::Callback::Callback<void (*)(void * context, chip::VendorId vendorId)> mOnSuccessCallback_124{ OnSuccessCallback_124,
+                                                                                                        this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_125{ OnFailureCallback_125, this };
+    chip::Callback::Callback<void (*)(void * context, chip::VendorId vendorId)> mOnSuccessCallback_125{ OnSuccessCallback_125,
+                                                                                                        this };
 
     static void OnFailureCallback_5(void * context, uint8_t status)
     {
@@ -19202,6 +19234,46 @@ private:
     static void OnSuccessCallback_120(void * context, bool unsupported)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_120(unsupported);
+    }
+
+    static void OnFailureCallback_122(void * context, uint8_t status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_122(status);
+    }
+
+    static void OnSuccessCallback_122(void * context, chip::VendorId vendorId)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_122(vendorId);
+    }
+
+    static void OnFailureCallback_123(void * context, uint8_t status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_123(status);
+    }
+
+    static void OnSuccessCallback_123(void * context, chip::VendorId vendorId)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_123(vendorId);
+    }
+
+    static void OnFailureCallback_124(void * context, uint8_t status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_124(status);
+    }
+
+    static void OnSuccessCallback_124(void * context, chip::VendorId vendorId)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_124(vendorId);
+    }
+
+    static void OnFailureCallback_125(void * context, uint8_t status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_125(status);
+    }
+
+    static void OnSuccessCallback_125(void * context, chip::VendorId vendorId)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_125(vendorId);
     }
 
     //
@@ -20469,7 +20541,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t enum8Argument = 255;
+        uint8_t enum8Argument = static_cast<uint8_t>(255);
 
         return cluster.WriteAttributeEnum8(mOnSuccessCallback_79.Cancel(), mOnFailureCallback_79.Cancel(), enum8Argument);
     }
@@ -20499,7 +20571,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t enum8Argument = 0;
+        uint8_t enum8Argument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeEnum8(mOnSuccessCallback_81.Cancel(), mOnFailureCallback_81.Cancel(), enum8Argument);
     }
@@ -20545,7 +20617,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t enum16Argument = 65535U;
+        uint16_t enum16Argument = static_cast<uint16_t>(65535U);
 
         return cluster.WriteAttributeEnum16(mOnSuccessCallback_84.Cancel(), mOnFailureCallback_84.Cancel(), enum16Argument);
     }
@@ -20575,7 +20647,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t enum16Argument = 0U;
+        uint16_t enum16Argument = static_cast<uint16_t>(0U);
 
         return cluster.WriteAttributeEnum16(mOnSuccessCallback_86.Cancel(), mOnFailureCallback_86.Cancel(), enum16Argument);
     }
@@ -21161,6 +21233,98 @@ private:
     void OnFailureResponse_121(uint8_t status) { NextTest(); }
 
     void OnSuccessResponse_121() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadAttributeVendorIdDefaultValue_122()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeVendorId(mOnSuccessCallback_122.Cancel(), mOnFailureCallback_122.Cancel());
+    }
+
+    void OnFailureResponse_122(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_122(chip::VendorId vendorId)
+    {
+        VerifyOrReturn(CheckValue<chip::VendorId>("vendorId", vendorId, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeVendorId_123()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        chip::VendorId vendorIdArgument = static_cast<chip::VendorId>(17U);
+
+        return cluster.WriteAttributeVendorId(mOnSuccessCallback_123.Cancel(), mOnFailureCallback_123.Cancel(), vendorIdArgument);
+    }
+
+    void OnFailureResponse_123(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_123(chip::VendorId vendorId) { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeVendorId_124()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeVendorId(mOnSuccessCallback_124.Cancel(), mOnFailureCallback_124.Cancel());
+    }
+
+    void OnFailureResponse_124(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_124(chip::VendorId vendorId)
+    {
+        VerifyOrReturn(CheckValue<chip::VendorId>("vendorId", vendorId, 17U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestRestoreAttributeVendorId_125()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        chip::VendorId vendorIdArgument = static_cast<chip::VendorId>(0U);
+
+        return cluster.WriteAttributeVendorId(mOnSuccessCallback_125.Cancel(), mOnFailureCallback_125.Cancel(), vendorIdArgument);
+    }
+
+    void OnFailureResponse_125(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_125(chip::VendorId vendorId) { NextTest(); }
+
+    CHIP_ERROR TestSendACommandWithAVendorIdAndEnum_126()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type;
+        using responseType = chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType;
+
+        chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type request;
+        request.arg1 = static_cast<chip::VendorId>(20003);
+        request.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(101);
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_126(data.arg1, data.arg2);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestCluster *>(context))->OnFailureResponse_126(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_126(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_126(chip::VendorId arg1, chip::app::Clusters::TestCluster::SimpleEnum arg2)
+    {
+        VerifyOrReturn(CheckValue<chip::VendorId>("arg1", arg1, 20003U));
+
+        VerifyOrReturn(CheckValue<uint8_t>("arg2", arg2, 101));
+        NextTest();
+    }
 };
 
 class TestClusterComplexTypes : public TestCommand

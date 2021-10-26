@@ -4748,7 +4748,7 @@ class OtaSoftwareUpdateRequestor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="providerLocation", Tag=0, Type=bytes),
+                            Label="providerLocation", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="vendorId", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
@@ -4757,7 +4757,7 @@ class OtaSoftwareUpdateRequestor:
                             Label="metadataForNode", Tag=3, Type=bytes),
                     ])
 
-            providerLocation: 'bytes' = None
+            providerLocation: 'uint' = None
             vendorId: 'uint' = None
             announcementReason: 'OtaSoftwareUpdateRequestor.Enums.OTAAnnouncementReason' = None
             metadataForNode: 'bytes' = None
@@ -20413,6 +20413,25 @@ class TestCluster:
             arg1: 'bool' = None
 
         @dataclass
+        class TestEnumsResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0005
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="arg1", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="arg2", Tag=1, Type=TestCluster.Enums.SimpleEnum),
+                    ])
+
+            arg1: 'uint' = None
+            arg2: 'TestCluster.Enums.SimpleEnum' = None
+
+        @dataclass
         class TestStructArrayArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050F
             command_id: typing.ClassVar[int] = 0x0006
@@ -20554,6 +20573,25 @@ class TestCluster:
                     ])
 
             arg1: typing.List['uint'] = None
+
+        @dataclass
+        class TestEnumsRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x000E
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="arg1", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="arg2", Tag=1, Type=TestCluster.Enums.SimpleEnum),
+                    ])
+
+            arg1: 'uint' = None
+            arg2: 'TestCluster.Enums.SimpleEnum' = None
 
     class Attributes:
         class Boolean(ClusterAttributeDescriptor):
@@ -20863,6 +20901,19 @@ class TestCluster:
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x0021
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+        class VendorId(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x050F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0022
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

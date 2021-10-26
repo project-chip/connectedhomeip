@@ -836,3 +836,44 @@ tests:
       response:
           # No cluster on that endpoint, so expect an error.
           error: 1
+
+    # Tests for vendor id
+
+    - label: "Read attribute vendor_id Default Value"
+      command: "readAttribute"
+      attribute: "vendor_id"
+      response:
+          value: 0
+
+    - label: "Write attribute vendor_id"
+      command: "writeAttribute"
+      attribute: "vendor_id"
+      arguments:
+          value: 17
+
+    - label: "Read attribute vendor_id"
+      command: "readAttribute"
+      attribute: "vendor_id"
+      response:
+          value: 17
+
+    - label: "Restore attribute vendor_id"
+      command: "writeAttribute"
+      attribute: "vendor_id"
+      arguments:
+          value: 0
+
+    - label: "Send a command with a vendor_id and enum"
+      command: "testEnumsRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 20003
+              - name: "arg2"
+                value: 101
+      response:
+          values:
+              - name: "arg1"
+                value: 20003
+              - name: "arg2"
+                value: 101

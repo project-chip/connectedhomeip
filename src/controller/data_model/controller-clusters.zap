@@ -5138,6 +5138,21 @@
               "reportableChange": 0
             },
             {
+              "name": "TrustedRootCertificates",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -6705,7 +6720,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "max pressure",
+              "name": "MaxPressure",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -6720,7 +6735,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max speed",
+              "name": "MaxSpeed",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -6735,7 +6750,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max flow",
+              "name": "MaxFlow",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -6750,7 +6765,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min const pressure",
+              "name": "MinConstPressure",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -6765,7 +6780,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max const pressure",
+              "name": "MaxConstPressure",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -6780,7 +6795,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min comp pressure",
+              "name": "MinCompPressure",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -6795,7 +6810,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max comp pressure",
+              "name": "MaxCompPressure",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -6810,7 +6825,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min const speed",
+              "name": "MinConstSpeed",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -6825,7 +6840,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max const speed",
+              "name": "MaxConstSpeed",
               "code": 8,
               "mfgCode": null,
               "side": "server",
@@ -6840,7 +6855,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min const flow",
+              "name": "MinConstFlow",
               "code": 9,
               "mfgCode": null,
               "side": "server",
@@ -6855,7 +6870,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max const flow",
+              "name": "MaxConstFlow",
               "code": 10,
               "mfgCode": null,
               "side": "server",
@@ -6870,7 +6885,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min const temp",
+              "name": "MinConstTemp",
               "code": 11,
               "mfgCode": null,
               "side": "server",
@@ -6885,7 +6900,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max const temp",
+              "name": "MaxConstTemp",
               "code": 12,
               "mfgCode": null,
               "side": "server",
@@ -6900,7 +6915,7 @@
               "reportableChange": 0
             },
             {
-              "name": "pump status",
+              "name": "PumpStatus",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -6915,7 +6930,7 @@
               "reportableChange": 0
             },
             {
-              "name": "effective operation mode",
+              "name": "EffectiveOperationMode",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -6930,7 +6945,7 @@
               "reportableChange": 0
             },
             {
-              "name": "effective control mode",
+              "name": "EffectiveControlMode",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -6945,7 +6960,7 @@
               "reportableChange": 0
             },
             {
-              "name": "capacity",
+              "name": "Capacity",
               "code": 19,
               "mfgCode": null,
               "side": "server",
@@ -6960,7 +6975,7 @@
               "reportableChange": 0
             },
             {
-              "name": "speed",
+              "name": "Speed",
               "code": 20,
               "mfgCode": null,
               "side": "server",
@@ -6975,7 +6990,7 @@
               "reportableChange": 0
             },
             {
-              "name": "lifetime running hours",
+              "name": "LifetimeRunningHours",
               "code": 21,
               "mfgCode": null,
               "side": "server",
@@ -6990,7 +7005,7 @@
               "reportableChange": 0
             },
             {
-              "name": "power",
+              "name": "Power",
               "code": 22,
               "mfgCode": null,
               "side": "server",
@@ -7005,7 +7020,7 @@
               "reportableChange": 0
             },
             {
-              "name": "lifetime energy consumed",
+              "name": "LifetimeEnergyConsumed",
               "code": 23,
               "mfgCode": null,
               "side": "server",
@@ -7020,7 +7035,7 @@
               "reportableChange": 0
             },
             {
-              "name": "operation mode",
+              "name": "OperationMode",
               "code": 32,
               "mfgCode": null,
               "side": "server",
@@ -7035,7 +7050,7 @@
               "reportableChange": 0
             },
             {
-              "name": "control mode",
+              "name": "ControlMode",
               "code": 33,
               "mfgCode": null,
               "side": "server",
@@ -7050,7 +7065,7 @@
               "reportableChange": 0
             },
             {
-              "name": "alarm mask",
+              "name": "AlarmMask",
               "code": 34,
               "mfgCode": null,
               "side": "server",
@@ -10969,6 +10984,14 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
+            },
+            {
+              "name": "TestEnumsRequest",
+              "code": 14,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -11016,6 +11039,14 @@
             {
               "name": "TestListInt8UReverseResponse",
               "code": 4,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "TestEnumsResponse",
+              "code": 5,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -11371,6 +11402,21 @@
             {
               "name": "epoch_s",
               "code": 33,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "vendor_id",
+              "code": 34,
               "mfgCode": null,
               "side": "server",
               "included": 1,

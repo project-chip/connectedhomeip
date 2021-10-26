@@ -286,30 +286,6 @@ JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong ha
     wrapper->Controller()->GetConnectedDevice(nodeId, &connectedDeviceCallback->mOnSuccess, &connectedDeviceCallback->mOnFailure);
 }
 
-JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    chip::Inet::IPAddress deviceIPAddr;
-
-    ChipLogProgress(Controller, "pairTestDeviceWithoutSecurity() called with IP Address");
-
-    const char * deviceAddrStr = env->GetStringUTFChars(deviceAddr, 0);
-    deviceIPAddr.FromString(deviceAddrStr, deviceIPAddr);
-    env->ReleaseStringUTFChars(deviceAddr, deviceAddrStr);
-
-    Controller::SerializedDevice mSerializedTestDevice;
-    err = wrapper->Controller()->PairTestDeviceWithoutSecurity(kRemoteDeviceId, chip::Transport::PeerAddress::UDP(deviceIPAddr),
-                                                               mSerializedTestDevice);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to connect to device.");
-        ThrowError(env, err);
-    }
-}
-
 JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;

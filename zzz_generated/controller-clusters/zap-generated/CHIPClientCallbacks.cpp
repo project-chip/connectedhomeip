@@ -502,6 +502,31 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
 #pragma GCC diagnostic pop
 #endif // __clang__
 
+void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                             Callback::Cancelable * onSuccessCallback,
+                                                                             Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::ByteSpan> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback> * cb =
+        Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
+
 void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback)
 {
@@ -1853,6 +1878,21 @@ bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(EndpointId endpoi
     Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback> * cb =
         Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, returnValue);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestEnumsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, chip::VendorId arg1,
+                                                        uint8_t arg2)
+{
+    ChipLogProgress(Zcl, "TestEnumsResponse:");
+    ChipLogProgress(Zcl, "  arg1: %" PRIu16 "", arg1);
+    ChipLogProgress(Zcl, "  arg2: %" PRIu8 "", arg2);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestEnumsResponseCallback");
+
+    Callback::Callback<TestClusterClusterTestEnumsResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterTestEnumsResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, arg1, arg2);
     return true;
 }
 

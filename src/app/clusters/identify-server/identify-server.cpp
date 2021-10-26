@@ -88,6 +88,7 @@ static inline void reg(Identify * inst)
         if (nullptr == instances[i])
         {
             instances[i] = inst;
+            break;
         }
     }
 }
@@ -105,7 +106,7 @@ static inline void unreg(Identify * inst)
 
 void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
 {
-    (void) endpoint;
+    (void) Clusters::Identify::Attributes::IdentifyType::Set(endpoint, inst(endpoint)->mIdentifyType);
 }
 
 static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appState)
@@ -315,11 +316,10 @@ Identify::Identify(chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart,
                    EmberAfIdentifyIdentifyType identifyType, onEffectIdentifierCb onEffectIdentifier,
                    EmberAfIdentifyEffectIdentifier effectIdentifier, EmberAfIdentifyEffectVariant effectVariant) :
     mEndpoint(endpoint),
-    mOnIdentifyStart(onIdentifyStart), mOnIdentifyStop(onIdentifyStop), mOnEffectIdentifier(onEffectIdentifier),
-    mCurrentEffectIdentifier(effectIdentifier), mTargetEffectIdentifier(effectIdentifier),
+    mOnIdentifyStart(onIdentifyStart), mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType),
+    mOnEffectIdentifier(onEffectIdentifier), mCurrentEffectIdentifier(effectIdentifier), mTargetEffectIdentifier(effectIdentifier),
     mEffectVariant(static_cast<uint8_t>(effectVariant))
 {
-    (void) Clusters::Identify::Attributes::IdentifyType::Set(endpoint, identifyType);
     reg(this);
 };
 

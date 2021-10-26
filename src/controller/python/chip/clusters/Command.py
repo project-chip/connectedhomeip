@@ -19,7 +19,7 @@ from asyncio.futures import Future
 import ctypes
 from dataclasses import dataclass
 from typing import Type
-from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32,  c_uint16, py_object
+from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32, c_uint16, c_uint8, py_object
 
 from .ClusterObjects import ClusterCommand
 import chip.exceptions
@@ -35,6 +35,10 @@ class CommandPath:
     ClusterId: int
     CommandId: int
 
+@dataclass
+class Status:
+    IMStatus: int
+    ClusterStatus: int
 
 def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
     ''' Locates the right generated cluster object given a set of parameters.
@@ -63,7 +67,7 @@ class AsyncCommandTransaction:
         self._future = future
         self._expect_type = expectType
 
-    def _handleResponse(self, path: CommandPath, response: bytes):
+    def _handleResponse(self, path: CommandPath, status: Status, response: bytes):
         if (len(response) == 0):
             self._future.set_result(None)
         else:
@@ -77,13 +81,13 @@ class AsyncCommandTransaction:
                         self._expect_type.FromTLV(response))
                 except Exception as ex:
                     self._handleError(
-                        chip.interaction_model.Status.Failure, 0, ex)
+                        status, 0, ex)
             else:
                 self._future.set_result(None)
 
-    def handleResponse(self, path: CommandPath, response: bytes):
+    def handleResponse(self, path: CommandPath, status: Status, response: bytes):
         self._event_loop.call_soon_threadsafe(
-            self._handleResponse, path, response)
+            self._handleResponse, path, status, response)
 
     def _handleError(self, imError: int, chipError: int, exception: Exception):
         if exception:
@@ -95,35 +99,35 @@ class AsyncCommandTransaction:
         else:
             try:
                 self._future.set_exception(
-                    chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError)))
+                    chip.interaction_model.InteractionModelError(chip.interaction_model.Status(status.IMStatus)))
             except:
                 self._future.set_exception(chip.interaction_model.InteractionModelError(
                     chip.interaction_model.Status.Failure))
-        pass
 
-    def handleError(self, imError: int, chipError: int):
+    def handleError(self, status: Status, chipError: int):
         self._event_loop.call_soon_threadsafe(
-            self._handleError, imError, chipError, None
+            self._handleError, status, chipError, None
         )
 
 
 _OnCommandSenderResponseCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint16, c_uint32, c_uint32, c_void_p, c_uint32)
+    None, py_object, c_uint16, c_uint32, c_uint32, c_uint16, c_uint8, c_void_p, c_uint32)
 _OnCommandSenderErrorCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint16, c_uint32)
+    None, py_object, c_uint16, c_uint8, c_uint32)
 _OnCommandSenderDoneCallbackFunct = CFUNCTYPE(
     None, py_object)
 
 
 @_OnCommandSenderResponseCallbackFunct
-def _OnCommandSenderResponseCallback(closure, endpoint: int, cluster: int, command: int, payload, size):
+def _OnCommandSenderResponseCallback(closure, endpoint: int, cluster: int, command: int, imStatus: int, clusterStatus: int, payload, size):
     data = ctypes.string_at(payload, size)
-    closure.handleResponse(CommandPath(endpoint, cluster, command), data[:])
+    closure.handleResponse(CommandPath(endpoint, cluster, command), Status(
+        imStatus, clusterStatus), data[:])
 
 
 @_OnCommandSenderErrorCallbackFunct
-def _OnCommandSenderErrorCallback(closure, imerror: int, chiperror: int):
-    closure.handleError(imerror, chiperror)
+def _OnCommandSenderErrorCallback(closure, imStatus: int, clusterStatus: int, chiperror: int):
+    closure.handleError(Status(imStatus, clusterStatus), chiperror)
 
 
 @_OnCommandSenderDoneCallbackFunct

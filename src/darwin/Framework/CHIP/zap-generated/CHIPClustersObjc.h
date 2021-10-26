@@ -1119,7 +1119,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOtaSoftwareUpdateRequestor : CHIPCluster
 
-- (void)announceOtaProvider:(NSData *)providerLocation
+- (void)announceOtaProvider:(uint64_t)providerLocation
                    vendorId:(uint16_t)vendorId
          announcementReason:(uint8_t)announcementReason
             metadataForNode:(NSData *)metadataForNode
@@ -1234,6 +1234,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeSupportedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeTrustedRootCertificatesWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -1513,6 +1515,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)test:(ResponseHandler)responseHandler;
 - (void)testAddArguments:(uint8_t)arg1 arg2:(uint8_t)arg2 responseHandler:(ResponseHandler)responseHandler;
+- (void)testEnumsRequest:(uint16_t)arg1 arg2:(uint8_t)arg2 responseHandler:(ResponseHandler)responseHandler;
 - (void)testListInt8UArgumentRequest:(uint8_t)arg1 responseHandler:(ResponseHandler)responseHandler;
 - (void)testListInt8UReverseRequest:(uint8_t)arg1 responseHandler:(ResponseHandler)responseHandler;
 - (void)testListStructArgumentRequest:(uint8_t)a
@@ -1601,6 +1604,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEpochSWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeEpochSWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeVendorIdWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
