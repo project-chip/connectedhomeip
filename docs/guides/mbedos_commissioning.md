@@ -4,22 +4,22 @@
 
 <h1> Matter Arm Mbed OS provisioning guide </h1>
 
-- [Overview](#overview)
-- [Prerequisites](#prerequisites)
-- [CHIPTool for Android](#chiptool-for-android)
-  - [Building and installing](#building-and-installing)
-  - [Accessory Matter device setup](#accessory-matter-device-setup)
-  - [Device commisioning for Android](#device-commisioning-for-android)
-  - [Sending ZCL commands](#sending-zcl-commands)
-- [POSIX CLI CHIPTool](#posix-cli-chiptool)
-  - [Building](#building)
-  - [Device commisioning for CLI](#device-commisioning-for-cli)
-  - [Sending ZCL commands](#sending-zcl-commands-1)
-- [Python Device Controller](#python-device-controller)
-  - [Building and installing](#building-and-installing-1)
-  - [Device commisioning for Python Device Controller](#device-commisioning-for-python-device-controller)
-  - [Sending ZCL commands](#sending-zcl-commands-2)
-    - [ZCL commands details](#zcl-commands-details)
+-   [Overview](#overview)
+-   [Prerequisites](#prerequisites)
+-   [CHIPTool for Android](#chiptool-for-android)
+    -   [Building and installing](#building-and-installing)
+    -   [Accessory Matter device setup](#accessory-matter-device-setup)
+    -   [Device commisioning for Android](#device-commisioning-for-android)
+    -   [Sending ZCL commands](#sending-zcl-commands)
+-   [POSIX CLI CHIPTool](#posix-cli-chiptool)
+    -   [Building](#building)
+    -   [Device commisioning for CLI](#device-commisioning-for-cli)
+    -   [Sending ZCL commands](#sending-zcl-commands-1)
+-   [Python Device Controller](#python-device-controller)
+    -   [Building and installing](#building-and-installing-1)
+    -   [Device commisioning for Python Device Controller](#device-commisioning-for-python-device-controller)
+    -   [Sending ZCL commands](#sending-zcl-commands-2)
+        -   [ZCL commands details](#zcl-commands-details)
 
 <hr>
 
