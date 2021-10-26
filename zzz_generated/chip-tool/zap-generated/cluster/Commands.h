@@ -619,6 +619,34 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
     command->SetCommandExitStatus(iter.GetStatus());
 }
 
+static void OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+{
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        command->SetCommandExitStatus(err);
+        return;
+    }
+
+    ChipLogProgress(chipTool, "OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse: %zu entries", count);
+
+    auto iter  = list.begin();
+    uint16_t i = 0;
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ++i;
+        ChipLogProgress(Zcl, "  : %zu", entry.size());
+    }
+    command->SetCommandExitStatus(iter.GetStatus());
+}
+
 static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context,
                                                                   const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
@@ -14998,6 +15026,7 @@ private:
 | * FabricsList                                                       | 0x0001 |
 | * SupportedFabrics                                                  | 0x0002 |
 | * CommissionedFabrics                                               | 0x0003 |
+| * TrustedRootCertificates                                           | 0x0004 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -15330,6 +15359,41 @@ public:
 private:
     chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute TrustedRootCertificates
+ */
+class ReadOperationalCredentialsTrustedRootCertificates : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsTrustedRootCertificates() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "trusted-root-certificates");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsTrustedRootCertificates()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeTrustedRootCertificates(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>(
+            OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -26479,6 +26543,7 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<ReadOperationalCredentialsFabricsList>(),              //
         make_unique<ReadOperationalCredentialsSupportedFabrics>(),         //
         make_unique<ReadOperationalCredentialsCommissionedFabrics>(),      //
+        make_unique<ReadOperationalCredentialsTrustedRootCertificates>(),  //
         make_unique<ReadOperationalCredentialsClusterRevision>(),          //
     };
 

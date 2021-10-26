@@ -4710,6 +4710,12 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
+    public interface TrustedRootCertificatesAttributeCallback {
+      void onSuccess(List<byte[]> valueList);
+
+      void onError(Exception ex);
+    }
+
     public void readFabricsListAttribute(FabricsListAttributeCallback callback) {
       readFabricsListAttribute(chipClusterPtr, callback);
     }
@@ -4720,6 +4726,11 @@ public class ChipClusters {
 
     public void readCommissionedFabricsAttribute(IntegerAttributeCallback callback) {
       readCommissionedFabricsAttribute(chipClusterPtr, callback);
+    }
+
+    public void readTrustedRootCertificatesAttribute(
+        TrustedRootCertificatesAttributeCallback callback) {
+      readTrustedRootCertificatesAttribute(chipClusterPtr, callback);
     }
 
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
@@ -4734,6 +4745,9 @@ public class ChipClusters {
 
     private native void readCommissionedFabricsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readTrustedRootCertificatesAttribute(
+        long chipClusterPtr, TrustedRootCertificatesAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
