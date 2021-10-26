@@ -53,30 +53,7 @@ public:
     CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-ModeSelectCluster::Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, size_t labelLength, uint8_t mode,
-                                                                         uint32_t semanticTag)
-{
-    ModeSelectCluster::Structs::ModeOptionStruct::Type option;
-    option.label       = CharSpan(label, strlen(label));
-    option.mode        = mode;
-    option.semanticTag = semanticTag;
-    return option;
-}
-
 ModeSelectAttrAccess gModeSelectAttrAccess;
-
-// TODO: Add as many ModeOptions as necessary.
-ModeSelectCluster::Structs::ModeOptionStruct::Type option1 = buildModeOptionStruct("Black", 5, 0, 0);
-ModeSelectCluster::Structs::ModeOptionStruct::Type option2 = buildModeOptionStruct("White", 5, 4, 0);
-ModeSelectCluster::Structs::ModeOptionStruct::Type option3 = buildModeOptionStruct("Half-and-half", 13, 7, 0);
-
-const ModeSelectCluster::HeapBasedSupportedModesManager & gSupportedModeManager =
-    ModeSelectCluster::HeapBasedSupportedModesManager::Builder()
-        // TODO: Add as many ModeOptions as necessary.
-        .addSupportedMode((EndpointId) 0u, option1)
-        .addSupportedMode((EndpointId) 0u, option2)
-        .addSupportedMode((EndpointId) 0u, option3)
-        .build();
 
 CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -85,15 +62,20 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    
+    const ModeSelectCluster::HeapBasedSupportedModesManager& gSupportedModeManager = ModeSelectCluster::HeapBasedSupportedModesManager::getHeapBasedSupportedModesManagerInstance();
 
     if (ModeSelectCluster::Attributes::SupportedModes::Id == aPath.mAttributeId)
     {
-        const vector<ModeSelectCluster::Structs::ModeOptionStruct::Type> & supportedOptions =
-            gSupportedModeManager.getSupportedModesForEndpoint(aPath.mEndpointId);
+        const ModeSelectCluster::HeapBasedSupportedModesManager::IteratorFactory& iteratorFactory = *gSupportedModeManager.getIteratorFactory(aPath.mEndpointId);
         CHIP_ERROR err;
-        err = aEncoder.EncodeList([supportedOptions](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-            for (auto& modeOption : supportedOptions)
-            {
+        err = aEncoder.EncodeList([iteratorFactory](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+            const auto& end = *(iteratorFactory.end());
+            for (auto it = *(iteratorFactory.begin()); it != end; ++it)
+            {   
+                emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectCluster: dereferencing it");
+                emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectCluster: it= %p", (void*) it.operator->());
+                auto& modeOption = *it;
                 ReturnErrorOnFailure(encoder.Encode(modeOption));
             }
             return CHIP_NO_ERROR;
@@ -114,6 +96,7 @@ bool emberAfModeSelectClusterClusterChangeToModeCallback(
     uint8_t newMode       = commandData.newMode;
     // Check that the newMode matches one of the supported options
     const ModeSelectCluster::Structs::ModeOptionStruct::Type * modeOptionPtr;
+    const ModeSelectCluster::HeapBasedSupportedModesManager& gSupportedModeManager = ModeSelectCluster::HeapBasedSupportedModesManager::getHeapBasedSupportedModesManagerInstance();
     EmberAfStatus checkSupportedModeStatus = gSupportedModeManager.getModeOptionByMode(endpointId, newMode, modeOptionPtr);
     if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
     {

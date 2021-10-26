@@ -11,62 +11,47 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelectCluster;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
+using storage_value_type   = const ModeOptionStructType*;
 
-HeapBasedSupportedModesManager::Builder &
-HeapBasedSupportedModesManager::Builder::addSupportedMode(EndpointId endpointId, ModeOptionStructType & modeOptionStruct)
+
+Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode,
+                                                                         uint32_t semanticTag)
 {
-    if (mSupportedModesByEndpoints.end() == mSupportedModesByEndpoints.find(endpointId))
-    {
-        mSupportedModesByEndpoints.insert(
-            pair<uint8_t, vector<ModeOptionStructType> *>(endpointId, new vector<ModeOptionStructType>()));
-    }
-    mSupportedModesByEndpoints[endpointId]->push_back(modeOptionStruct);
-
-    return *this;
+    Structs::ModeOptionStruct::Type option;
+    option.label       = CharSpan(label, strlen(label));
+    option.mode        = mode;
+    option.semanticTag = semanticTag;
+    return option;
 }
 
-HeapBasedSupportedModesManager::Builder &
-HeapBasedSupportedModesManager::Builder::addSupportedMode(EndpointId endpointId, ModeOptionStructType && modeOptionStruct)
-{
-    if (mSupportedModesByEndpoints.end() == mSupportedModesByEndpoints.find(endpointId))
-    {
-        mSupportedModesByEndpoints.insert(
-            pair<uint8_t, vector<ModeOptionStructType> *>(endpointId, new vector<ModeOptionStructType>()));
-    }
-    mSupportedModesByEndpoints[endpointId]->push_back(forward<ModeOptionStructType>(modeOptionStruct));
-
-    return *this;
-}
-
-HeapBasedSupportedModesManager ModeSelectCluster::HeapBasedSupportedModesManager::Builder::build()
-{
-    map<EndpointId, const vector<ModeOptionStructType>> supportedOptions;
-    for (map<EndpointId, vector<ModeOptionStructType> *>::iterator it = mSupportedModesByEndpoints.begin();
-         it != mSupportedModesByEndpoints.end(); ++it)
-    {
-        EndpointId endpointId = it->first;
-
-        const vector<ModeOptionStructType> modeOptionsForEndpoint(*(it->second));
-        supportedOptions.insert(pair<EndpointId, const vector<ModeOptionStructType>>(endpointId, modeOptionsForEndpoint));
-    }
-
-    return HeapBasedSupportedModesManager(supportedOptions);
-}
-
-const vector<ModeOptionStructType> HeapBasedSupportedModesManager::getSupportedModesForEndpoint(EndpointId endpoint) const
-{
-    return _supportedModesForAllEndpoints.at(endpoint);
+const Structs::ModeOptionStruct::Type HeapBasedSupportedModesManager::blackOption = buildModeOptionStruct("Black", 0, 0);
+const Structs::ModeOptionStruct::Type HeapBasedSupportedModesManager::cappuccinoOption = buildModeOptionStruct("Cappuccino", 4, 0);
+const Structs::ModeOptionStruct::Type HeapBasedSupportedModesManager::espressoOption = buildModeOptionStruct("Espresso", 7, 0);
+storage_value_type HeapBasedSupportedModesManager::coffeeOptions[] = { &blackOption, &cappuccinoOption,  &espressoOption };
+const Span<storage_value_type> HeapBasedSupportedModesManager::coffeeOptionsSpan = Span<storage_value_type>(HeapBasedSupportedModesManager::coffeeOptions, 3);
+const map<EndpointId, Span<storage_value_type>> HeapBasedSupportedModesManager::optionsByEndpoints = {
+        {0, HeapBasedSupportedModesManager::coffeeOptionsSpan}
 };
+
+const HeapBasedSupportedModesManager HeapBasedSupportedModesManager::instance = HeapBasedSupportedModesManager();
+
+const HeapBasedSupportedModesManager::IteratorFactory*
+HeapBasedSupportedModesManager::getIteratorFactory(EndpointId endpointId) const
+{
+    return &(_iteratorFactoriesByEndpoints.at(endpointId));
+} 
 
 EmberAfStatus HeapBasedSupportedModesManager::getModeOptionByMode(unsigned short endpointId, unsigned char mode,
                                                                   const ModeOptionStructType *& dataPtr) const
 {
-    const vector<ModeOptionStructType> & supportedModeOptions = this->getSupportedModesForEndpoint(endpointId);
-    for (uint i = 0u; i < supportedModeOptions.size(); i++)
+    const HeapBasedSupportedModesManager::Iterator& begin = *(this->getIteratorFactory(endpointId)->begin());
+    const HeapBasedSupportedModesManager::Iterator& end = *(this->getIteratorFactory(endpointId)->end());
+    for (auto it = begin; it != end; ++it)
     {
-        if (supportedModeOptions.at(i).mode == mode)
+        auto& modeOption = *it;
+        if (modeOption.mode == mode)
         {
-            dataPtr = &(supportedModeOptions.at(i));
+            dataPtr = &modeOption;
             return EMBER_ZCL_STATUS_SUCCESS;
         }
     }
