@@ -45,10 +45,10 @@ constexpr int kEmptyFlags = 0;
 
 // For test purposes, store all subjects as node, use tags to discriminate
 // passcode/group, and don't allow 0.
-constexpr NodeId kTestSubjectMask = 0xFFFFFFFFFFFF0000;
+constexpr NodeId kTestSubjectMask     = 0xFFFFFFFFFFFF0000;
 constexpr NodeId kTestSubjectPasscode = 0xDDDDDDDDDDDD0000;
-constexpr NodeId kTestSubjectGroup = 0xEEEEEEEEEEEE0000;
-constexpr NodeId kTestSubjectEmpty = 0x0000000000000000;
+constexpr NodeId kTestSubjectGroup    = 0xEEEEEEEEEEEE0000;
+constexpr NodeId kTestSubjectEmpty    = 0x0000000000000000;
 
 constexpr SubjectId Passcode(PasscodeId passcode)
 {
