@@ -1808,6 +1808,30 @@ public class ClusterInfoMapping {
     }
   }
 
+  public class DelegatedTestEnumsResponseCallback
+      implements ChipClusters.TestClusterCluster.TestEnumsResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(int arg1, int arg2) {
+      List<Object> responseValues = new ArrayList<>();
+      responseValues.add(arg1);
+      responseValues.add(arg2);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public class DelegatedTestListInt8UReverseResponseCallback
       implements ChipClusters.TestClusterCluster.TestListInt8UReverseResponseCallback,
           DelegatedClusterCallback {
@@ -5516,7 +5540,7 @@ public class ClusterInfoMapping {
             "OtaSoftwareUpdateRequestor", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo
         otaSoftwareUpdateRequestorannounceOtaProviderproviderLocationCommandParameterInfo =
-            new CommandParameterInfo("providerLocation", byte[].class);
+            new CommandParameterInfo("providerLocation", long.class);
     otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
         "providerLocation",
         otaSoftwareUpdateRequestorannounceOtaProviderproviderLocationCommandParameterInfo);
@@ -5547,7 +5571,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
                   .announceOtaProvider(
                       (DefaultClusterCallback) callback,
-                      (byte[]) commandArguments.get("providerLocation"),
+                      (Long) commandArguments.get("providerLocation"),
                       (Integer) commandArguments.get("vendorId"),
                       (Integer) commandArguments.get("announcementReason"),
                       (byte[]) commandArguments.get("metadataForNode"));
@@ -6424,6 +6448,36 @@ public class ClusterInfoMapping {
             testClustertestAddArgumentsCommandParams);
     testClusterClusterCommandInfoMap.put(
         "testAddArguments", testClustertestAddArgumentsCommandInfo);
+    Map<String, CommandParameterInfo> testClustertestEnumsRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    // TODO: fill out parameter types
+    CommandParameterInfo testClustertestEnumsRequestCommandParameterInfo =
+        new CommandParameterInfo(
+            "TestCluster", ChipClusters.TestClusterCluster.TestEnumsResponseCallback.class);
+    CommandParameterInfo testClustertestEnumsRequestarg1CommandParameterInfo =
+        new CommandParameterInfo("arg1", int.class);
+    testClustertestEnumsRequestCommandParams.put(
+        "arg1", testClustertestEnumsRequestarg1CommandParameterInfo);
+
+    CommandParameterInfo testClustertestEnumsRequestarg2CommandParameterInfo =
+        new CommandParameterInfo("arg2", int.class);
+    testClustertestEnumsRequestCommandParams.put(
+        "arg2", testClustertestEnumsRequestarg2CommandParameterInfo);
+
+    // Populate commands
+    CommandInfo testClustertestEnumsRequestCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .testEnumsRequest(
+                      (ChipClusters.TestClusterCluster.TestEnumsResponseCallback) callback,
+                      (Integer) commandArguments.get("arg1"),
+                      (Integer) commandArguments.get("arg2"));
+            },
+            () -> new DelegatedTestEnumsResponseCallback(),
+            testClustertestEnumsRequestCommandParams);
+    testClusterClusterCommandInfoMap.put(
+        "testEnumsRequest", testClustertestEnumsRequestCommandInfo);
     Map<String, CommandParameterInfo> testClustertestListInt8UArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     // TODO: fill out parameter types

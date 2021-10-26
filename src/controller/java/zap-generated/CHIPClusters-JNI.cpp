@@ -7461,10 +7461,6 @@ private:
     jobject javaCallbackRef;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 class CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback
     : public Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>
 {
@@ -7540,20 +7536,6 @@ private:
 
 class CHIPPowerSourceActiveBatteryFaultsAttributeCallback
     : public Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>
-=======
-class CHIPPowerSourceActiveBatteryFaultsAttributeCallback : public Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-class CHIPPowerSourceActiveBatteryFaultsAttributeCallback
-    : public Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-class CHIPPowerSourceActiveBatteryFaultsAttributeCallback : public Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-class CHIPPowerSourceActiveBatteryFaultsAttributeCallback
-    : public Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>
->>>>>>> 53965f10d (callback generation done)
 {
 public:
     CHIPPowerSourceActiveBatteryFaultsAttributeCallback(jobject javaCallback) :
@@ -11258,26 +11240,8 @@ JNI_METHOD(void, ColorControlCluster, colorLoopSet)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->ColorLoopSet(onSuccess->Cancel(), onFailure->Cancel(), updateFlags, static_cast<uint8_t>(action),
                                    static_cast<uint8_t>(direction), time, startHue, optionsMask, optionsOverride);
-=======
-    err = cppCluster->ColorLoopSet(onSuccess->Cancel(), onFailure->Cancel(), updateFlags, action, direction, time, startHue, optionsMask, optionsOverride);
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err = cppCluster->ColorLoopSet(onSuccess->Cancel(), onFailure->Cancel(), updateFlags, action, direction, time, startHue,
-                                   optionsMask, optionsOverride);
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->ColorLoopSet(onSuccess->Cancel(), onFailure->Cancel(), updateFlags, action, direction, time, startHue, optionsMask, optionsOverride);
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err = cppCluster->ColorLoopSet(onSuccess->Cancel(), onFailure->Cancel(), updateFlags, action, direction, time, startHue,
-                                   optionsMask, optionsOverride);
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -11373,26 +11337,8 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHue)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, static_cast<uint8_t>(direction),
                                         transitionTime, optionsMask, optionsOverride);
-=======
-    err = cppCluster->EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, direction, transitionTime, optionsMask, optionsOverride);
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err = cppCluster->EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, direction, transitionTime,
-                                        optionsMask, optionsOverride);
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, direction, transitionTime, optionsMask, optionsOverride);
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err = cppCluster->EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, direction, transitionTime,
-                                        optionsMask, optionsOverride);
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -11489,26 +11435,8 @@ JNI_METHOD(void, ColorControlCluster, enhancedStepHue)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(stepMode), stepSize,
                                       transitionTime, optionsMask, optionsOverride);
-=======
-    err = cppCluster->EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err = cppCluster->EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask,
-                                      optionsOverride);
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err = cppCluster->EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask,
-                                      optionsOverride);
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -11603,26 +11531,8 @@ JNI_METHOD(void, ColorControlCluster, moveColorTemperature)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(moveMode), rate,
                                            colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
-=======
-    err = cppCluster->MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err = cppCluster->MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, colorTemperatureMinimum,
-                                           colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err = cppCluster->MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, colorTemperatureMinimum,
-                                           colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -11864,26 +11774,8 @@ JNI_METHOD(void, ColorControlCluster, moveToHue)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, static_cast<uint8_t>(direction), transitionTime,
                                 optionsMask, optionsOverride);
-=======
-    err = cppCluster->MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err = cppCluster->MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask,
-                                optionsOverride);
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err = cppCluster->MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask,
-                                optionsOverride);
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -12078,27 +11970,9 @@ JNI_METHOD(void, ColorControlCluster, stepColorTemperature)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(stepMode), stepSize,
                                            transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask,
                                            optionsOverride);
-=======
-    err = cppCluster->StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err = cppCluster->StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime,
-                                           colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err = cppCluster->StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime,
-                                           colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -12146,26 +12020,8 @@ JNI_METHOD(void, ColorControlCluster, stepHue)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->StepHue(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(stepMode), stepSize, transitionTime,
                               optionsMask, optionsOverride);
-=======
-    err = cppCluster->StepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err = cppCluster->StepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask,
-                              optionsOverride);
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->StepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err = cppCluster->StepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask,
-                              optionsOverride);
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -12213,26 +12069,8 @@ JNI_METHOD(void, ColorControlCluster, stepSaturation)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(stepMode), stepSize,
                                      transitionTime, optionsMask, optionsOverride);
-=======
-    err = cppCluster->StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err = cppCluster->StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask,
-                                     optionsOverride);
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err = cppCluster->StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask,
-                                     optionsOverride);
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -14598,29 +14436,9 @@ JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)
     cppCluster = reinterpret_cast<DiagnosticLogsCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->RetrieveLogsRequest(
         onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(intent), static_cast<uint8_t>(requestedProtocol),
         chip::ByteSpan((const uint8_t *) transferFileDesignatorArr.data(), transferFileDesignatorArr.size()));
-=======
-    err = cppCluster->RetrieveLogsRequest(onSuccess->Cancel(), onFailure->Cancel(), intent, requestedProtocol, chip::ByteSpan((const uint8_t*) transferFileDesignatorArr.data(), transferFileDesignatorArr.size()));
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err = cppCluster->RetrieveLogsRequest(
-        onSuccess->Cancel(), onFailure->Cancel(), intent, requestedProtocol,
-        chip::ByteSpan((const uint8_t *) transferFileDesignatorArr.data(), transferFileDesignatorArr.size()));
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->RetrieveLogsRequest(onSuccess->Cancel(), onFailure->Cancel(), intent, requestedProtocol, chip::ByteSpan((const uint8_t*) transferFileDesignatorArr.data(), transferFileDesignatorArr.size()));
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err = cppCluster->RetrieveLogsRequest(
-        onSuccess->Cancel(), onFailure->Cancel(), intent, requestedProtocol,
-        chip::ByteSpan((const uint8_t *) transferFileDesignatorArr.data(), transferFileDesignatorArr.size()));
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -15450,26 +15268,8 @@ JNI_METHOD(void, DoorLockCluster, setPin)
     cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, static_cast<uint8_t>(userStatus),
                              static_cast<uint8_t>(userType), chip::ByteSpan((const uint8_t *) pinArr.data(), pinArr.size()));
-=======
-    err = cppCluster->SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, chip::ByteSpan((const uint8_t*) pinArr.data(), pinArr.size()));
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err = cppCluster->SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-                             chip::ByteSpan((const uint8_t *) pinArr.data(), pinArr.size()));
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, chip::ByteSpan((const uint8_t*) pinArr.data(), pinArr.size()));
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err = cppCluster->SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-                             chip::ByteSpan((const uint8_t *) pinArr.data(), pinArr.size()));
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -15519,26 +15319,8 @@ JNI_METHOD(void, DoorLockCluster, setRfid)
     cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, static_cast<uint8_t>(userStatus),
                               static_cast<uint8_t>(userType), chip::ByteSpan((const uint8_t *) idArr.data(), idArr.size()));
-=======
-    err = cppCluster->SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, chip::ByteSpan((const uint8_t*) idArr.data(), idArr.size()));
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err = cppCluster->SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-                              chip::ByteSpan((const uint8_t *) idArr.data(), idArr.size()));
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, chip::ByteSpan((const uint8_t*) idArr.data(), idArr.size()));
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err = cppCluster->SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-                              chip::ByteSpan((const uint8_t *) idArr.data(), idArr.size()));
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -16943,24 +16725,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)
     cppCluster = reinterpret_cast<GeneralCommissioningCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->SetRegulatoryConfig(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(location),
-=======
-=======
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
->>>>>>> 53965f10d (callback generation done)
-<<<<<<< HEAD
-=======
->>>>>>> 8a142adbf (rebase and regenerate script file)
-    err = cppCluster->SetRegulatoryConfig(onSuccess->Cancel(), onFailure->Cancel(), location,
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
                                           chip::CharSpan(countryCodeStr.c_str(), strlen(countryCodeStr.c_str())), breadcrumb,
                                           timeoutMs);
     SuccessOrExit(err);
@@ -18459,26 +18224,8 @@ JNI_METHOD(void, LevelControlCluster, step)
     cppCluster = reinterpret_cast<LevelControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->Step(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(stepMode), stepSize, transitionTime,
                            optionMask, optionOverride);
-=======
-    err = cppCluster->Step(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    err =
-        cppCluster->Step(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->Step(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    err =
-        cppCluster->Step(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -21113,51 +20860,14 @@ JNI_METHOD(jlong, OtaSoftwareUpdateRequestorCluster, initWithDevice)(JNIEnv * en
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong providerLocation, jint vendorId, jint announcementReason,
  jbyteArray metadataForNode)
-=======
-JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray providerLocation, jint vendorId, jint announcementReason, jbyteArray metadataForNode)
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray providerLocation, jint vendorId,
- jint announcementReason, jbyteArray metadataForNode)
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray providerLocation, jint vendorId, jint announcementReason, jbyteArray metadataForNode)
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray providerLocation, jint vendorId,
- jint announcementReason, jbyteArray metadataForNode)
->>>>>>> 53965f10d (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateRequestorCluster * cppCluster;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
-    
-=======
-
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-
->>>>>>> 53965f10d (callback generation done)
-    JniByteArray providerLocationArr(env, providerLocation);
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
     JniByteArray metadataForNodeArr(env, metadataForNode);
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
@@ -21170,30 +20880,9 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
     cppCluster = reinterpret_cast<OtaSoftwareUpdateRequestorCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->AnnounceOtaProvider(onSuccess->Cancel(), onFailure->Cancel(), providerLocation,
                                           static_cast<chip::VendorId>(vendorId), static_cast<uint8_t>(announcementReason),
                                           chip::ByteSpan((const uint8_t *) metadataForNodeArr.data(), metadataForNodeArr.size()));
-=======
-    err = cppCluster->AnnounceOtaProvider(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) providerLocationArr.data(), providerLocationArr.size()), vendorId, announcementReason, chip::ByteSpan((const uint8_t*) metadataForNodeArr.data(), metadataForNodeArr.size()));
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-=======
->>>>>>> 53965f10d (callback generation done)
-    err = cppCluster->AnnounceOtaProvider(onSuccess->Cancel(), onFailure->Cancel(),
-                                          chip::ByteSpan((const uint8_t *) providerLocationArr.data(), providerLocationArr.size()),
-                                          vendorId, announcementReason,
-                                          chip::ByteSpan((const uint8_t *) metadataForNodeArr.data(), metadataForNodeArr.size()));
-<<<<<<< HEAD
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    err = cppCluster->AnnounceOtaProvider(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) providerLocationArr.data(), providerLocationArr.size()), vendorId, announcementReason, chip::ByteSpan((const uint8_t*) metadataForNodeArr.data(), metadataForNodeArr.size()));
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
->>>>>>> 53965f10d (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -22743,10 +22432,6 @@ JNI_METHOD(void, OperationalCredentialsCluster, readCommissionedFabricsAttribute
     onFailure.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, OperationalCredentialsCluster, readTrustedRootCertificatesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22777,20 +22462,6 @@ JNI_METHOD(void, OperationalCredentialsCluster, readTrustedRootCertificatesAttri
 
 JNI_METHOD(void, OperationalCredentialsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, OperationalCredentialsCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-JNI_METHOD(void, OperationalCredentialsCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-JNI_METHOD(void, OperationalCredentialsCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-JNI_METHOD(void, OperationalCredentialsCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 53965f10d (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(

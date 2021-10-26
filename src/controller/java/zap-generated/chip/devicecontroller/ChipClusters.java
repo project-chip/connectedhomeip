@@ -4360,23 +4360,9 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void announceOtaProvider(
         DefaultClusterCallback callback,
         long providerLocation,
-=======
-    public void announceOtaProvider(
-        DefaultClusterCallback callback,
-        byte[] providerLocation,
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    public void announceOtaProvider(
-        DefaultClusterCallback callback,
-        byte[] providerLocation,
->>>>>>> 53965f10d (callback generation done)
         int vendorId,
         int announcementReason,
         byte[] metadataForNode) {
@@ -4387,8 +4373,6 @@ public class ChipClusters {
           vendorId,
           announcementReason,
           metadataForNode);
-<<<<<<< HEAD
-<<<<<<< HEAD
     }
 
     private native void announceOtaProvider(
@@ -4398,38 +4382,6 @@ public class ChipClusters {
         int vendorId,
         int announcementReason,
         byte[] metadataForNode);
-=======
-    public void announceOtaProvider(DefaultClusterCallback callback, byte[] providerLocation, int vendorId, int announcementReason, byte[] metadataForNode) {
-      announceOtaProvider(chipClusterPtr, callback, providerLocation, vendorId, announcementReason, metadataForNode);
-    }
-
-    private native void announceOtaProvider(long chipClusterPtr, DefaultClusterCallback callback, byte[] providerLocation, int vendorId, int announcementReason, byte[] metadataForNode);
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    }
-
-=======
-    }
-
->>>>>>> 53965f10d (callback generation done)
-    private native void announceOtaProvider(
-        long chipClusterPtr,
-        DefaultClusterCallback callback,
-        byte[] providerLocation,
-        int vendorId,
-        int announcementReason,
-        byte[] metadataForNode);
-<<<<<<< HEAD
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    public void announceOtaProvider(DefaultClusterCallback callback, byte[] providerLocation, int vendorId, int announcementReason, byte[] metadataForNode) {
-      announceOtaProvider(chipClusterPtr, callback, providerLocation, vendorId, announcementReason, metadataForNode);
-    }
-
-    private native void announceOtaProvider(long chipClusterPtr, DefaultClusterCallback callback, byte[] providerLocation, int vendorId, int announcementReason, byte[] metadataForNode);
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
->>>>>>> 53965f10d (callback generation done)
 
     public void readDefaultOtaProviderAttribute(OctetStringAttributeCallback callback) {
       readDefaultOtaProviderAttribute(chipClusterPtr, callback);
@@ -4840,10 +4792,6 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public interface TrustedRootCertificatesAttributeCallback {
       void onSuccess(List<byte[]> valueList);
 
@@ -4851,22 +4799,6 @@ public class ChipClusters {
     }
 
     public void readFabricsListAttribute(FabricsListAttributeCallback callback) {
-=======
-    public void readFabricsListAttribute(
-      FabricsListAttributeCallback callback
-    ) {
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    public void readFabricsListAttribute(FabricsListAttributeCallback callback) {
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    public void readFabricsListAttribute(
-      FabricsListAttributeCallback callback
-    ) {
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    public void readFabricsListAttribute(FabricsListAttributeCallback callback) {
->>>>>>> 53965f10d (callback generation done)
       readFabricsListAttribute(chipClusterPtr, callback);
     }
 
@@ -4878,10 +4810,6 @@ public class ChipClusters {
       readCommissionedFabricsAttribute(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void readTrustedRootCertificatesAttribute(
         TrustedRootCertificatesAttributeCallback callback) {
       readTrustedRootCertificatesAttribute(chipClusterPtr, callback);
@@ -4905,64 +4833,6 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
-      readClusterRevisionAttribute(chipClusterPtr, callback);
-    }
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
-      readClusterRevisionAttribute(chipClusterPtr, callback);
-    }
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-  
-    private native void readFabricsListAttribute(long chipClusterPtr,
-      FabricsListAttributeCallback callback
-    );
-  
-    private native void readSupportedFabricsAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readCommissionedFabricsAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-<<<<<<< HEAD
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
-      readClusterRevisionAttribute(chipClusterPtr, callback);
-    }
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
-      readClusterRevisionAttribute(chipClusterPtr, callback);
-    }
->>>>>>> 53965f10d (callback generation done)
-
-    private native void readFabricsListAttribute(
-        long chipClusterPtr, FabricsListAttributeCallback callback);
-
-    private native void readSupportedFabricsAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void readCommissionedFabricsAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-<<<<<<< HEAD
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
->>>>>>> 53965f10d (callback generation done)
   }
 
   public static class PowerSourceCluster extends BaseChipCluster {
@@ -6058,29 +5928,10 @@ public class ChipClusters {
       testAddArguments(chipClusterPtr, callback, arg1, arg2);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void testEnumsRequest(TestEnumsResponseCallback callback, int arg1, int arg2) {
       testEnumsRequest(chipClusterPtr, callback, arg1, arg2);
     }
 
-=======
-<<<<<<< HEAD
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-<<<<<<< HEAD
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-<<<<<<< HEAD
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-<<<<<<< HEAD
->>>>>>> 53965f10d (callback generation done)
-=======
->>>>>>> 10211d582 (merge conflict)
     public void testListInt8UArgumentRequest(DefaultClusterCallback callback, int arg1) {
       testListInt8UArgumentRequest(chipClusterPtr, callback, arg1);
     }
@@ -6135,20 +5986,9 @@ public class ChipClusters {
     private native void testAddArguments(
         long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     private native void testEnumsRequest(
         long chipClusterPtr, TestEnumsResponseCallback callback, int arg1, int arg2);
 
-=======
-<<<<<<< HEAD
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-<<<<<<< HEAD
->>>>>>> 53965f10d (callback generation done)
-=======
->>>>>>> 10211d582 (merge conflict)
     private native void testListInt8UArgumentRequest(
         long chipClusterPtr, DefaultClusterCallback callback, int arg1);
 
@@ -6440,10 +6280,6 @@ public class ChipClusters {
       writeEpochSAttribute(chipClusterPtr, callback, value);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void readVendorIdAttribute(IntegerAttributeCallback callback) {
       readVendorIdAttribute(chipClusterPtr, callback);
     }
@@ -6453,22 +6289,6 @@ public class ChipClusters {
     }
 
     public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
-=======
-    public void readUnsupportedAttribute(
-      BooleanAttributeCallback callback
-    ) {
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
-    public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
-    public void readUnsupportedAttribute(
-      BooleanAttributeCallback callback
-    ) {
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
-    public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
->>>>>>> 53965f10d (callback generation done)
       readUnsupportedAttribute(chipClusterPtr, callback);
     }
 
@@ -6535,14 +6355,6 @@ public class ChipClusters {
 
     private native void readInt16sAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
->>>>>>> 53965f10d (callback generation done)
     private native void writeInt16sAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
 
@@ -6609,18 +6421,12 @@ public class ChipClusters {
     private native void writeEpochSAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, long value);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private native void readVendorIdAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeVendorIdAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
 
-=======
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
->>>>>>> 53965f10d (callback generation done)
     private native void readUnsupportedAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
 
@@ -6629,24 +6435,6 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-    private native void writeUnsupportedAttribute(long chipClusterPtr, DefaultClusterCallback callback, boolean value);
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-<<<<<<< HEAD
->>>>>>> 9c69a7c7b (basic code generation template, but not able to import to tool app)
-=======
->>>>>>> c8628a1ca (create new public class under chip/clusterinfo)
-=======
->>>>>>> a37b0f6b7 (need to wait for cast-helper)
-=======
->>>>>>> 53965f10d (callback generation done)
   }
 
   public static class ThermostatCluster extends BaseChipCluster {
