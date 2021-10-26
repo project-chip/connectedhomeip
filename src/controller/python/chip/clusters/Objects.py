@@ -20087,6 +20087,24 @@ class TestCluster:
             Arg1: 'bool' = None
 
         @dataclass
+        class TestEnumsResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0005
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="Arg1", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="Arg2", Tag=1, Type=TestCluster.Enums.SimpleEnum),
+                    ])
+
+            Arg1: 'uint' = None
+            Arg2: 'TestCluster.Enums.SimpleEnum' = None
+
+        @dataclass
         class TestStructArrayArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050F
             command_id: typing.ClassVar[int] = 0x0006
@@ -20220,6 +20238,24 @@ class TestCluster:
                     ])
 
             Arg1: typing.List['uint'] = None
+
+        @dataclass
+        class TestEnumsRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x000E
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="Arg1", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="Arg2", Tag=1, Type=TestCluster.Enums.SimpleEnum),
+                    ])
+
+            Arg1: 'uint' = None
+            Arg2: 'TestCluster.Enums.SimpleEnum' = None
 
     class Attributes:
         class Boolean(ClusterAttributeDescriptor):
@@ -20529,6 +20565,19 @@ class TestCluster:
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x0021
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+        class VendorId(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x050F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0022
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

@@ -348,6 +348,19 @@ function chip_available_cluster_commands(options)
   return promise;
 }
 
+/**
+ * Checks whether a type is an enum for purposes of its chipType.  That includes
+ * both spec-defined enum types and types that we map to enum types in our code.
+ */
+function if_chip_enum(type, options)
+{
+  if (type.toLowerCase() == 'vendor_id') {
+    return options.fn(this);
+  }
+
+  return zclHelper.if_is_enum.call(this, type, options);
+}
+
 //
 // Module exports
 //
@@ -367,3 +380,4 @@ exports.chip_attribute_list_entryTypes                       = chip_attribute_li
 exports.chip_server_cluster_attributes                       = chip_server_cluster_attributes;
 exports.chip_server_has_list_attributes                      = chip_server_has_list_attributes;
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
+exports.if_chip_enum                                         = if_chip_enum;

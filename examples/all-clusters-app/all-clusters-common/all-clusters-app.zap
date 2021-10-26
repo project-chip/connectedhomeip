@@ -14852,6 +14852,14 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 0
+            },
+            {
+              "name": "TestEnumsRequest",
+              "code": 14,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -14899,6 +14907,14 @@
             {
               "name": "TestListInt8UReverseResponse",
               "code": 4,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "TestEnumsResponse",
+              "code": 5,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
@@ -15254,6 +15270,21 @@
             {
               "name": "epoch_s",
               "code": 33,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "vendor_id",
+              "code": 34,
               "mfgCode": null,
               "side": "server",
               "included": 1,

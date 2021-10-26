@@ -4440,6 +4440,10 @@ namespace EpochS {
 static constexpr AttributeId Id = 0x00000021;
 } // namespace EpochS
 
+namespace VendorId {
+static constexpr AttributeId Id = 0x00000022;
+} // namespace VendorId
+
 namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported
