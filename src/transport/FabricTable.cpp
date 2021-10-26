@@ -181,13 +181,36 @@ exit:
     return err;
 }
 
+static void print_buffer(const uint8_t * buf, size_t len)
+{
+    char output[50];
+    int offset = 0;
+    for (unsigned int i = 0; i < len; i++)
+    {
+        if (i % 8 == 0 && offset > 0)
+        {
+            printf("%s\n", output);
+            offset = 0;
+        }
+        offset += snprintf(&output[offset], sizeof(output) - (size_t) offset, "0x%02x, ", (unsigned char) buf[i]);
+    }
+    if (offset > 0)
+    {
+        ChipLogDetail(Inet, "%s", output);
+    }
+}
+
 CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
 {
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
     MutableByteSpan compressedFabricIdSpan(compressedFabricIdBuf);
     P256PublicKey rootPubkey(GetRootPubkey());
+    ChipLogDetail(Inet, "Generating compressed fabric ID. uncompressed fabric ID 0x" ChipLogFormatX64, ChipLogValueX64(fabricId));
+    print_buffer(rootPubkey.ConstBytes(), rootPubkey.Length());
     ReturnErrorOnFailure(GenerateCompressedFabricId(rootPubkey, fabricId, compressedFabricIdSpan));
+    ChipLogDetail(Inet, "Generated compressed fabric ID");
+    print_buffer(compressedFabricIdSpan.data(), compressedFabricIdSpan.size());
 
     // Decode compressed fabric ID accounting for endianness, as GenerateCompressedFabricId()
     // returns a binary buffer and is agnostic of usage of the output as an integer type.
@@ -325,12 +348,18 @@ CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpa
 
     Encoding::LittleEndian::BufferWriter bbuf(destinationMessage, sizeof(destinationMessage));
 
+    ChipLogDetail(Inet, "GenerateDestinationID was called. Fabric ID 0x" ChipLogFormatX64 " dest node 0x" ChipLogFormatX64,
+                  ChipLogValueX64(mFabricId), ChipLogValueX64(destNodeId));
+    print_buffer(random.data(), random.size());
+
     bbuf.Put(random.data(), random.size());
     // TODO: In the current implementation this check is required because in some cases the
     //       GenerateDestinationID() is called before mRootCert is initialized and GetRootPubkey() returns
     //       empty Span.
     if (!rootPubkeySpan.empty())
     {
+        ChipLogDetail(Inet, "GenerateDestinationID root pubkey");
+        print_buffer(rootPubkeySpan.data(), rootPubkeySpan.size());
         bbuf.Put(rootPubkeySpan.data(), rootPubkeySpan.size());
     }
     bbuf.Put64(mFabricId);
@@ -339,8 +368,13 @@ CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpa
     size_t written = 0;
     VerifyOrReturnError(bbuf.Fit(written), CHIP_ERROR_BUFFER_TOO_SMALL);
 
+    ChipLogDetail(Inet, "GenerateDestinationID ipk");
+    print_buffer(ipk.data(), ipk.size());
+
     CHIP_ERROR err =
         hmac.HMAC_SHA256(ipk.data(), ipk.size(), destinationMessage, written, destinationId.data(), destinationId.size());
+    ChipLogDetail(Inet, "GenerateDestinationID output");
+    print_buffer(destinationId.data(), destinationId.size());
     return err;
 }
 
