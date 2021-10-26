@@ -68,8 +68,8 @@ void PythonInteractionModelDelegate::OnError(const app::CommandSender * apComman
     DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aStatus, aError);
 }
 
-void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
-                                                  TLV::TLVReader * apData, Protocols::InteractionModel::Status status)
+void PythonInteractionModelDelegate::OnResponse(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath,
+                                                TLV::TLVReader * apData, const app::StatusIB & status)
 {
     if (onReportDataFunct != nullptr)
     {
@@ -90,10 +90,10 @@ void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apRead
         }
         if (CHIP_NO_ERROR == err)
         {
-            AttributePath path{ .endpointId = aPath.mEndpointId, .clusterId = aPath.mClusterId, .fieldId = aPath.mFieldId };
-            onReportDataFunct(apReadClient->GetPeerNodeId(), apReadClient->GetAppIdentifier(),
+            AttributePath path{ .endpointId = aPath.mEndpointId, .clusterId = aPath.mClusterId, .fieldId = aPath.mAttributeId };
+            onReportDataFunct(apReadClient->GetPeerNodeId(), 0,
                               /* TODO: Use real SubscriptionId */ apReadClient->IsSubscriptionType() ? 1 : 0, &path, sizeof(path),
-                              writerBuffer, writer.GetLengthWritten(), to_underlying(status));
+                              writerBuffer, writer.GetLengthWritten(), to_underlying(status.mStatus));
         }
         else
         {
@@ -102,7 +102,7 @@ void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apRead
             ChipLogError(Controller, "Cannot pass TLV data to python: failed to copy TLV: %s", ErrorStr(err));
         }
     }
-    DeviceControllerInteractionModelDelegate::OnReportData(apReadClient, aPath, apData, status);
+    DeviceControllerInteractionModelDelegate::OnResponse(apReadClient, aPath, apData, status);
 }
 
 void pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(

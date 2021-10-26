@@ -97,8 +97,8 @@ public:
     void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aStatus,
                  CHIP_ERROR aError) override;
 
-    void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
-                      Protocols::InteractionModel::Status status) override;
+    void OnResponse(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,
+                    const app::StatusIB & status) override;
 
     static PythonInteractionModelDelegate & Instance();
 

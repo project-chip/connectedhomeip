@@ -389,8 +389,8 @@ public:
     // on the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
     // type-safe.
     // TODO: Implement interaction model delegate in the application.
-    void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
-                              Callback::Cancelable * onFailureCallback);
+    void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              app::TLVDataFilter tlvDataFilter = nullptr);
     void CancelIMResponseHandler(void * commandObj);
 
     void OperationalCertProvisioned();

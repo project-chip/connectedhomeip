@@ -690,7 +690,7 @@ void Device::CancelResponseHandler(uint8_t seqNum)
 }
 
 void Device::AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
-                                  Callback::Cancelable * onFailureCallback)
+                                  Callback::Cancelable * onFailureCallback, app::TLVDataFilter tlvDataFilter)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
     // there are only one active command transaction on one command sender object. This is a bit tricky, we try to assume that
@@ -698,7 +698,7 @@ void Device::AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSu
     static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
     chip::NodeId transactionId = reinterpret_cast<chip::NodeId>(commandObj);
     mCallbacksMgr.AddResponseCallback(transactionId, 0 /* seqNum, always 0 for IM before #6559 */, onSuccessCallback,
-                                      onFailureCallback);
+                                      onFailureCallback, tlvDataFilter);
 }
 
 void Device::CancelIMResponseHandler(void * commandObj)
@@ -721,25 +721,28 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
                                             Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter)
 {
     bool loadedSecureSession = false;
-    uint8_t seqNum           = GetNextSequenceNumber();
     aPath.mNodeId            = GetDeviceId();
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
 
+    app::ReadClient * readClient = nullptr;
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewReadClient(
+        &readClient, app::ReadClient::InteractionType::Read, mpIMDelegate));
+
     if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
     {
-        AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback, aTlvDataFilter);
+        AddIMResponseHandler(readClient, onSuccessCallback, onFailureCallback, aTlvDataFilter);
     }
     // The application context is used to identify different requests from client application the type of it is intptr_t, here we
     // use the seqNum.
     chip::app::ReadPrepareParams readPrepareParams(mSecureSession.Value());
     readPrepareParams.mpAttributePathParamsList    = &aPath;
     readPrepareParams.mAttributePathParamsListSize = 1;
-    CHIP_ERROR err =
-        chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, seqNum /* application context */);
+
+    CHIP_ERROR err = readClient->SendReadRequest(readPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
-        CancelResponseHandler(seqNum);
+        CancelIMResponseHandler(readClient);
     }
     return err;
 }
@@ -749,12 +752,15 @@ CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath,
                                                  Callback::Cancelable * onFailureCallback)
 {
     bool loadedSecureSession = false;
-    uint8_t seqNum           = GetNextSequenceNumber();
     aPath.mNodeId            = GetDeviceId();
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
 
-    app::AttributePathParams * path = mpIMDelegate->AllocateAttributePathParam(1, seqNum);
+    app::ReadClient * readClient = nullptr;
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewReadClient(
+        &readClient, app::ReadClient::InteractionType::Subscribe, mpIMDelegate));
+
+    app::AttributePathParams * path = mpIMDelegate->AllocateAttributePathParam(1, reinterpret_cast<uint64_t>(readClient));
 
     VerifyOrReturnError(path != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -770,17 +776,17 @@ CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath,
     params.mMaxIntervalCeilingSeconds   = mMaxIntervalCeilingSeconds;
     params.mKeepSubscriptions           = false;
 
-    CHIP_ERROR err =
-        chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(params, seqNum /* application context */);
+    CHIP_ERROR err = readClient->SendSubscribeRequest(params);
     if (err != CHIP_NO_ERROR)
     {
-        mpIMDelegate->FreeAttributePathParam(seqNum);
+        mpIMDelegate->FreeAttributePathParam(reinterpret_cast<uint64_t>(readClient));
+        readClient->Shutdown();
         return err;
     }
 
     if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
     {
-        AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+        AddIMResponseHandler(readClient, onSuccessCallback, onFailureCallback);
     }
     return CHIP_NO_ERROR;
 }

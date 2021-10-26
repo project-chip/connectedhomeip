@@ -55,6 +55,93 @@ namespace app {
 class ReadClient : public Messaging::ExchangeDelegate
 {
 public:
+    class Callback
+    {
+    public:
+        virtual ~Callback() = default;
+        /**
+         * Notification that a list of events is received on the given read client.
+         * The ReadClient object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call before it shuts down the object.
+         *
+         * @param[in]  apReadClient The read client which initialized the read transaction.
+         * @param[in]  apEventListReader  TLV reader positioned at the list that contains the events.  The
+         *                                implementation of EventStreamReceived is expected to call Next() on the reader to
+         *                                advance it to the first element of the list, then process the elements from beginning to
+         *                                the end. The callee is expected to consume all events.
+         */
+        virtual void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventList) {}
+
+        /**
+         * OnResponse will be called when a report data response has been received and processed for the given path.
+         *
+         * The ReadClient object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call before it shuts down the object.
+         *
+         * This callback will be called when:
+         *   - Receiving attribute data as response of Read interactions
+         *   - Receiving attribute data as reports of subscriptions
+         *   - Receiving attribute data as initial reports of subscriptions
+         *
+         * @param[in] apReadClient: The read client object that initiated the read transaction.
+         * @param[in] aPath: The attribute path field in report response.
+         * @param[in] apData: The attribute data of the given path, will be a nullptr if status is not Success.
+         * @param[in] aStatus: Attribute-specific status, containing an InteractionModel::Status code as well as an optional
+         *                     cluster-specific status code.
+         */
+        virtual void OnResponse(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
+                                const StatusIB & aStatus)
+        {}
+
+        /**
+         * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
+         *
+         * The ReadClient object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call before it shuts down the object.
+         *
+         * @param[in] apReadClient: The read client object that initiated the read transaction.
+         */
+        virtual void OnSubscriptionEstablished(const ReadClient * apReadClient) {}
+
+        /**
+         * OnReport will be called when a ReportDataAction message is received. This can be used as a indicator that the
+         * subscription is alive. (However, when a subscription is shutted down, OnDone will be called.)
+         *
+         * An empty report will trigger this callback, however, it does not contain any meanful payload, but this function is useful
+         * when. Users can choose not to implement this callback.
+         */
+        virtual void OnReportProcessed(const ReadClient * apReadClient) {}
+
+        /**
+         * OnError will be called when an error occurs *after* a successful call to SendReadRequest(). The following
+         * errors will be delivered through this call in the aError field:
+         *
+         * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
+         * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
+         * - CHIP_ERROR*: All other cases.
+         *
+         * The ReadClient object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call before it shuts down the object.
+         *
+         * @param[in] apReadClient: The read client object that initiated the attribute read transaction.
+         * @param[in] aError: A system error code that conveys the overall error code.
+         */
+        virtual void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) {}
+
+        /**
+         * OnDone will be called when ReadClient has finished all work and is reserved for future ReadClient ownership change.
+         * (#10366) Users may use this function to release their own objects related to this write interaction.
+         *
+         * This function will:
+         *      - Always be called exactly *once* for a given WriteClient instance.
+         *      - Be called even in error circumstances.
+         *      - Only be called after a successful call to SendWriteRequest as been made.
+         *
+         * @param[in] apReadClient: The read client object of the terminated read transaction.
+         */
+        virtual void OnDone(ReadClient * apReadClient) = 0;
+    };
+
     enum class InteractionType : uint8_t
     {
         Read,
@@ -92,7 +179,6 @@ public:
      */
     CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
     CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    uint64_t GetAppIdentifier() const { return mAppIdentifier; }
 
     auto GetSubscriptionId() const
     {
@@ -145,8 +231,7 @@ private:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                    InteractionType aInteractionType, uint64_t aAppIdentifier);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, InteractionType aInteractionType);
 
     virtual ~ReadClient() = default;
 
@@ -187,9 +272,8 @@ private:
     bool IsInitialReport() { return mInitialReport; }
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
+    Callback * mpCallback                      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
-    uint64_t mAppIdentifier                    = 0;
     bool mInitialReport                        = true;
     uint16_t mMinIntervalFloorSeconds          = 0;
     uint16_t mMaxIntervalCeilingSeconds        = 0;
