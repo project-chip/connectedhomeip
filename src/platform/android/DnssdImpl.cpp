@@ -41,7 +41,7 @@ jobject sResolverObject     = nullptr;
 jobject sMdnsCallbackObject = nullptr;
 jmethodID sResolveMethod    = nullptr;
 jmethodID sPublishMethod    = nullptr;
-jmethodID sRemoveMethod    = nullptr;
+jmethodID sRemoveMethod     = nullptr;
 } // namespace
 
 // Implemention of functions declared in lib/dnssd/platform/Dnssd.h
@@ -75,9 +75,12 @@ CHIP_ERROR ChipDnssdRemoveServices()
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
 
-    if(jret) {
+    if (jret)
+    {
         return CHIP_NO_ERROR;
-    } else {
+    }
+    else
+    {
         return CHIP_JNI_ERROR_JAVA_ERROR;
     }
 }
@@ -97,27 +100,29 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
     UtfString jniServiceType(env, serviceType.c_str());
 
     jclass stringClass = env->FindClass("java/lang/String");
-    jobjectArray keys = env->NewObjectArray(service->mTextEntrySize, stringClass, nullptr);
+    jobjectArray keys  = env->NewObjectArray(service->mTextEntrySize, stringClass, nullptr);
 
     jclass arrayElemType = env->FindClass("[B");
-    jobjectArray datas = env->NewObjectArray(service->mTextEntrySize, arrayElemType, nullptr);
+    jobjectArray datas   = env->NewObjectArray(service->mTextEntrySize, arrayElemType, nullptr);
 
-    for(size_t i=0;i < service->mTextEntrySize;i++) {
+    for (size_t i = 0; i < service->mTextEntrySize; i++)
+    {
         UtfString jniKey(env, service->mTextEntries[i].mKey);
-        env->SetObjectArrayElement(keys,i,jniKey.jniValue());
+        env->SetObjectArrayElement(keys, i, jniKey.jniValue());
 
-        ByteArray jniData(env, (const jbyte *)service->mTextEntries[i].mData, service->mTextEntries[i].mDataSize);
-        env->SetObjectArrayElement(datas,i,jniData.jniValue());
+        ByteArray jniData(env, (const jbyte *) service->mTextEntries[i].mData, service->mTextEntries[i].mDataSize);
+        env->SetObjectArrayElement(datas, i, jniData.jniValue());
     }
 
     jobjectArray subTypes = env->NewObjectArray(service->mSubTypeSize, stringClass, nullptr);
-    for(size_t i=0; i< service->mSubTypeSize; i++) {
+    for (size_t i = 0; i < service->mSubTypeSize; i++)
+    {
         UtfString jniSubType(env, service->mSubTypes[i]);
-        env->SetObjectArrayElement(subTypes,i,jniSubType.jniValue());
+        env->SetObjectArrayElement(subTypes, i, jniSubType.jniValue());
     }
 
-    jboolean jret = env->CallBooleanMethod(sResolverObject, sPublishMethod, jniName.jniValue(), jniHostName.jniValue()
-        , jniServiceType.jniValue(), service->mPort, keys, datas, subTypes);
+    jboolean jret = env->CallBooleanMethod(sResolverObject, sPublishMethod, jniName.jniValue(), jniHostName.jniValue(),
+                                           jniServiceType.jniValue(), service->mPort, keys, datas, subTypes);
 
     env->DeleteLocalRef(keys);
     env->DeleteLocalRef(datas);
@@ -131,9 +136,12 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
 
-    if(jret) {
+    if (jret)
+    {
         return CHIP_NO_ERROR;
-    } else {
+    }
+    else
+    {
         return CHIP_JNI_ERROR_JAVA_ERROR;
     }
 }
@@ -197,7 +205,9 @@ void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
         env->ExceptionClear();
     }
 
-    sPublishMethod = env->GetMethodID(resolverClass, "publish", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I[Ljava/lang/String;[[B[Ljava/lang/String;)Z");
+    sPublishMethod =
+        env->GetMethodID(resolverClass, "publish",
+                         "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I[Ljava/lang/String;[[B[Ljava/lang/String;)Z");
     if (sPublishMethod == nullptr)
     {
         ChipLogError(Discovery, "Failed to access Resolver 'publish' method");
