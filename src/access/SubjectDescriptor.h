@@ -22,8 +22,8 @@
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/GroupId.h>
-#include <lib/core/PasscodeId.h>
 #include <lib/core/NodeId.h>
+#include <lib/core/PasscodeId.h>
 
 namespace chip {
 namespace Access {
