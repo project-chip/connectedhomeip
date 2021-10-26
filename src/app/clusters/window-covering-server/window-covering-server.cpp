@@ -37,8 +37,10 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af-types.h>
@@ -51,6 +53,7 @@
 #include <app/clusters/scenes/scenes.h>
 #endif // EMBER_AF_PLUGIN_SCENES
 
+using namespace chip;
 using namespace chip::app::Clusters::WindowCovering;
 
 #define WC_PERCENT100THS_MAX 10000
@@ -378,8 +381,11 @@ void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 /**
  * @brief  Cluster UpOrOpen Command callback (from client)
  */
-bool emberAfWindowCoveringClusterUpOrOpenCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                  const Commands::UpOrOpen::DecodableType & commandData)
 {
+    EndpointId endpoint = commandPath.mEndpointId;
+
     emberAfWindowCoveringClusterPrint("UpOrOpen command received");
     if (HasFeature(endpoint, Features::Lift))
     {
@@ -396,8 +402,11 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(chip::EndpointId endpoint, chi
 /**
  * @brief  Cluster DownOrClose Command callback (from client)
  */
-bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::DownOrClose::DecodableType & commandData)
 {
+    EndpointId endpoint = commandPath.mEndpointId;
+
     emberAfWindowCoveringClusterPrint("DownOrClose command received");
     if (HasFeature(endpoint, Features::Lift))
     {
@@ -415,7 +424,8 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::EndpointId endpoint, 
  * @brief  Cluster StopMotion Command callback (from client)
  */
 bool __attribute__((weak))
-emberAfWindowCoveringClusterStopMotionCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                               const Commands::StopMotion::DecodableType & fields)
 {
     emberAfWindowCoveringClusterPrint("StopMotion command received");
 
@@ -426,9 +436,14 @@ emberAfWindowCoveringClusterStopMotionCallback(chip::EndpointId endpoint, chip::
 /**
  * @brief  Cluster GoToLiftValue Command callback (from client)
  */
-bool emberAfWindowCoveringClusterGoToLiftValueCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                       uint16_t liftValue)
+bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath,
+                                                       const Commands::GoToLiftValue::DecodableType & commandData)
 {
+    auto & liftValue = commandData.liftValue;
+
+    EndpointId endpoint = commandPath.mEndpointId;
+
     bool hasLift         = HasFeature(endpoint, Features::Lift);
     bool isPositionAware = HasFeature(endpoint, Features::PositionAware);
 
@@ -449,9 +464,15 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(chip::EndpointId endpoint
 /**
  * @brief  Cluster GoToLiftPercentage Command callback (from client)
  */
-bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                            uint8_t liftPercentageValue, uint16_t liftPercent100thsValue)
+bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler * commandObj,
+                                                            const app::ConcreteCommandPath & commandPath,
+                                                            const Commands::GoToLiftPercentage::DecodableType & commandData)
 {
+    auto & liftPercentageValue    = commandData.liftPercentageValue;
+    auto & liftPercent100thsValue = commandData.liftPercent100thsValue;
+
+    EndpointId endpoint = commandPath.mEndpointId;
+
     bool hasLift         = HasFeature(endpoint, Features::Lift);
     bool isPositionAware = HasFeature(endpoint, Features::PositionAware);
 
@@ -473,9 +494,14 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::EndpointId end
 /**
  * @brief  Cluster GoToTiltValue Command callback (from client)
  */
-bool emberAfWindowCoveringClusterGoToTiltValueCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                       uint16_t tiltValue)
+bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath,
+                                                       const Commands::GoToTiltValue::DecodableType & commandData)
 {
+    auto & tiltValue = commandData.tiltValue;
+
+    EndpointId endpoint = commandPath.mEndpointId;
+
     bool hasTilt         = HasFeature(endpoint, Features::Tilt);
     bool isPositionAware = HasFeature(endpoint, Features::PositionAware);
 
@@ -496,9 +522,15 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(chip::EndpointId endpoint
 /**
  * @brief  Cluster GoToTiltPercentage Command callback (from client)
  */
-bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                            uint8_t tiltPercentageValue, uint16_t tiltPercent100thsValue)
+bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler * commandObj,
+                                                            const app::ConcreteCommandPath & commandPath,
+                                                            const Commands::GoToTiltPercentage::DecodableType & commandData)
 {
+    auto & tiltPercentageValue    = commandData.tiltPercentageValue;
+    auto & tiltPercent100thsValue = commandData.tiltPercent100thsValue;
+
+    EndpointId endpoint = commandPath.mEndpointId;
+
     bool hasTilt         = HasFeature(endpoint, Features::Tilt);
     bool isPositionAware = HasFeature(endpoint, Features::PositionAware);
 

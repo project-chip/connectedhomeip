@@ -23,14 +23,17 @@
 #include <controller/CHIPDeviceController.h>
 
 namespace chip {
+namespace python {
+static constexpr ClusterStatus kUndefinedClusterStatus = 0xFF;
+}
 namespace Controller {
 
 // The command status will be used for python script.
 // use packed attribute so we can unpack it from python and no need to worry about padding.
 struct __attribute__((packed)) CommandStatus
 {
-    uint32_t protocolId;
-    uint16_t protocolCode;
+    Protocols::InteractionModel::Status status;
+    chip::ClusterStatus clusterStatus;
     chip::EndpointId endpointId;
     chip::ClusterId clusterId;
     chip::CommandId commandId;
@@ -40,7 +43,7 @@ struct __attribute__((packed)) CommandStatus
 static_assert(std::is_same<chip::EndpointId, uint16_t>::value && std::is_same<chip::ClusterId, uint32_t>::value &&
                   std::is_same<chip::CommandId, uint32_t>::value,
               "Members in CommandStatus does not match interaction_model/delegate.py");
-static_assert(sizeof(CommandStatus) == 4 + 2 + 2 + 4 + 4 + 1, "Size of CommandStatus might contain padding");
+static_assert(sizeof(CommandStatus) == 2 + 1 + 2 + 4 + 4 + 1, "Size of CommandStatus might contain padding");
 
 struct __attribute__((packed)) AttributePath
 {
@@ -58,8 +61,7 @@ struct __attribute__((packed)) AttributeWriteStatus
 {
     chip::NodeId nodeId;
     uint64_t appIdentifier;
-    uint32_t protocolId;
-    uint16_t protocolCode;
+    Protocols::InteractionModel::Status status;
     chip::EndpointId endpointId;
     chip::ClusterId clusterId;
     chip::FieldId fieldId;
@@ -67,7 +69,7 @@ struct __attribute__((packed)) AttributeWriteStatus
 static_assert(std::is_same<chip::EndpointId, uint16_t>::value && std::is_same<chip::ClusterId, uint32_t>::value &&
                   std::is_same<chip::FieldId, uint32_t>::value,
               "Members in AttributeWriteStatus does not match interaction_model/delegate.py");
-static_assert(sizeof(AttributeWriteStatus) == 8 + 8 + 4 + 2 + 2 + 4 + 4, "Size of AttributeWriteStatus might contain padding");
+static_assert(sizeof(AttributeWriteStatus) == 8 + 8 + 2 + 2 + 4 + 4, "Size of AttributeWriteStatus might contain padding");
 
 extern "C" {
 typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
@@ -95,21 +97,9 @@ void pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(PythonInte
 class PythonInteractionModelDelegate : public chip::Controller::DeviceControllerInteractionModelDelegate
 {
 public:
-    CHIP_ERROR CommandResponseStatus(const app::CommandSender * apCommandSender,
-                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                     const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
-                                     chip::CommandId aCommandId, uint8_t aCommandIndex) override;
-
-    CHIP_ERROR CommandResponseProtocolError(const app::CommandSender * apCommandSender, uint8_t aCommandIndex) override;
-
-    CHIP_ERROR CommandResponseError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
-
-    CHIP_ERROR CommandResponseProcessed(const app::CommandSender * apCommandSender) override;
-
-    CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                   const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                   const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
-                                   uint8_t aCommandIndex) override;
+    void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+                    TLV::TLVReader * aData) override;
+    void OnError(const app::CommandSender * apCommandSender, const app::StatusIB & aStatus, CHIP_ERROR aError) override;
 
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
                       Protocols::InteractionModel::Status status) override;

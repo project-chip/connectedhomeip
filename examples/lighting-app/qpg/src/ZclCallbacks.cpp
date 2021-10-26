@@ -21,39 +21,29 @@
 #include "AppTask.h"
 #include "LightingManager.h"
 
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app/chip-zcl-zpro-codec.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/util/af-types.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace chip::app::Clusters;
 
-void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                       uint16_t size, uint8_t * value)
 {
-    if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
-    {
-        if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
-        {
-            ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
-            return;
-        }
+    EndpointId endpoint     = attributePath.mEndpointId;
+    ClusterId clusterId     = attributePath.mClusterId;
+    AttributeId attributeId = attributePath.mAttributeId;
 
+    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
+    {
         LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, size, value);
     }
-    else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
+    else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
-        if (attributeId != ZCL_CURRENT_LEVEL_ATTRIBUTE_ID)
-        {
-            ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
-            return;
-        }
-
         if (size == 1)
         {
             ChipLogProgress(Zcl, "New level: %u", *value);
@@ -64,36 +54,35 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             ChipLogError(Zcl, "wrong length for level: %d", size);
         }
     }
-    else if (clusterId == ZCL_COLOR_CONTROL_CLUSTER_ID)
+    else if (clusterId == ColorControl::Id)
     {
         /* ignore several attributes that are currently not processed */
-        if ((attributeId == ZCL_COLOR_CONTROL_REMAINING_TIME_ATTRIBUTE_ID) ||
-            (attributeId == ZCL_COLOR_CONTROL_ENHANCED_COLOR_MODE_ATTRIBUTE_ID) ||
-            (attributeId == ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID))
+        if ((attributeId == ColorControl::Attributes::RemainingTime::Id) ||
+            (attributeId == ColorControl::Attributes::EnhancedColorMode::Id) ||
+            (attributeId == ColorControl::Attributes::ColorMode::Id))
         {
             return;
         }
 
-        if ((attributeId != ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID) &&
-            (attributeId != ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID) &&
-            (attributeId != ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID) &&
-            (attributeId != ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID))
+        if ((attributeId != ColorControl::Attributes::CurrentX::Id) && (attributeId != ColorControl::Attributes::CurrentY::Id) &&
+            (attributeId != ColorControl::Attributes::CurrentHue::Id) &&
+            (attributeId != ColorControl::Attributes::CurrentSaturation::Id))
         {
-            ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
+            ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
             return;
         }
 
         if (size == sizeof(uint16_t))
         {
             XyColor_t xy;
-            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID)
+            if (attributeId == ColorControl::Attributes::CurrentX::Id)
             {
                 xy.x = *reinterpret_cast<uint16_t *>(value);
                 // get Y from cluster value storage
                 EmberAfStatus status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
-            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID)
+            if (attributeId == ColorControl::Attributes::CurrentY::Id)
             {
                 xy.y = *reinterpret_cast<uint16_t *>(value);
                 // get X from cluster value storage
@@ -106,14 +95,14 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
         else if (size == sizeof(uint8_t))
         {
             HsvColor_t hsv;
-            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
+            if (attributeId == ColorControl::Attributes::CurrentHue::Id)
             {
                 hsv.h = *value;
                 // get saturation from cluster value storage
                 EmberAfStatus status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
-            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID)
+            if (attributeId == ColorControl::Attributes::CurrentSaturation::Id)
             {
                 hsv.s = *value;
                 // get hue from cluster value storage
@@ -130,7 +119,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     }
     else
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: %" PRIx32, clusterId);
+        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
         return;
     }
 }

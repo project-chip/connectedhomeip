@@ -20,8 +20,16 @@ function atomicType(arg)
   switch (arg.name) {
   case 'boolean':
     return 'bool';
+  case 'single':
+    return 'float';
+  case 'int40s':
+  case 'int48s':
+  case 'int56s':
   case 'int64s':
     return 'int64_t';
+  case 'int40u':
+  case 'int48u':
+  case 'int56u':
   case 'int64u':
   case 'bitmap64':
     return 'uint64_t';
@@ -49,12 +57,15 @@ function atomicType(arg)
   case 'fabric_idx':
     return 'chip::FabricIndex';
   case 'status':
-    return 'chip::StatusCode';
+    return 'chip::Protocols::InteractionModel::Status';
   case 'octet_string':
   case 'long_octet_string':
     return 'chip::ByteSpan';
+  case 'char_string':
+  case 'long_char_string':
+    return 'chip::CharSpan';
   case 'eui64':
-    return 'chip::node_id';
+    return 'chip::NodeId';
   case 'percent':
     return 'chip::Percent';
   case 'percent100ths':

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <lib/mdns/Resolver.h>
+#include <lib/dnssd/Resolver.h>
 #include <lib/support/DLLUtil.h>
 
 namespace chip {
@@ -29,7 +29,7 @@ class DLL_EXPORT DeviceDiscoveryDelegate
 {
 public:
     virtual ~DeviceDiscoveryDelegate() {}
-    virtual void OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData) = 0;
+    virtual void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) = 0;
 };
 
 } // namespace Controller

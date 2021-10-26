@@ -569,18 +569,22 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mFlags       = BitFlags<Flags>(CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0);
     mGAPConns    = 0;
 
-    ble::BLE & ble_interface = ble::BLE::Instance();
+    if (!mInitialized)
+    {
+        ble::BLE & ble_interface = ble::BLE::Instance();
 
-    ble_interface.gap().setEventHandler(&sMbedGapEventHandler);
-    ReturnErrorOnFailure(sCHIPService.init(ble_interface));
+        ble_interface.gap().setEventHandler(&sMbedGapEventHandler);
+        ReturnErrorOnFailure(sCHIPService.init(ble_interface));
 
-    ble_interface.onEventsToProcess(FunctionPointerWithContext<ble::BLE::OnEventsToProcessCallbackContext *>{
-        [](ble::BLE::OnEventsToProcessCallbackContext * context) { PlatformMgr().ScheduleWork(DoBLEProcessing, 0); } });
+        ble_interface.onEventsToProcess(FunctionPointerWithContext<ble::BLE::OnEventsToProcessCallbackContext *>{
+            [](ble::BLE::OnEventsToProcessCallbackContext * context) { PlatformMgr().ScheduleWork(DoBLEProcessing, 0); } });
 
-    mbed_err = ble_interface.init([](ble::BLE::InitializationCompleteCallbackContext * context) {
-        BLEMgrImpl().HandleInitComplete(context->error == BLE_ERROR_NONE);
-    });
-    VerifyOrReturnError(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+        mbed_err = ble_interface.init([](ble::BLE::InitializationCompleteCallbackContext * context) {
+            BLEMgrImpl().HandleInitComplete(context->error == BLE_ERROR_NONE);
+        });
+        VerifyOrReturnError(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+        mInitialized = true;
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -640,6 +644,7 @@ exit:
         ChipLogError(DeviceLayer, "BLEManager init error: %s ", ErrorStr(err));
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service.");
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+        mInitialized = false;
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }

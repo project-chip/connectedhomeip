@@ -79,7 +79,9 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mTransportMgr          = transportMgr;
     mMessageCounterManager = messageCounterManager;
 
-    mGlobalEncryptedMessageCounter.Init();
+    // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
+    (void) mGlobalEncryptedMessageCounter.Init();
+    mGlobalUnencryptedMessageCounter.Init();
 
     ScheduleExpiryTimer();
 
@@ -121,7 +123,7 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle session, PayloadHeader &
         }
 
         MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *state);
-        ReturnErrorOnFailure(SecureMessageCodec::Encode(state, payloadHeader, packetHeader, message, counter));
+        ReturnErrorOnFailure(SecureMessageCodec::Encrypt(state, payloadHeader, packetHeader, message, counter));
 
 #if CHIP_PROGRESS_LOGGING
         destination = state->GetPeerNodeId();
@@ -187,7 +189,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const Encr
     else
     {
         auto unauthenticated = session.GetUnauthenticatedSession();
-        mUnauthenticatedSessions.MarkSessionActive(unauthenticated.Get());
+        mUnauthenticatedSessions.MarkSessionActive(unauthenticated);
         destination = &unauthenticated->GetPeerAddress();
 
         ChipLogProgress(Inet,
@@ -304,8 +306,8 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
 
 void SessionManager::ScheduleExpiryTimer()
 {
-    CHIP_ERROR err =
-        mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SessionManager::ExpiryTimerCallback, this);
+    CHIP_ERROR err = mSystemLayer->StartTimer(System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS),
+                                              SessionManager::ExpiryTimerCallback, this);
 
     VerifyOrDie(err == CHIP_NO_ERROR);
 }
@@ -324,7 +326,7 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
 
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
+    if (packetHeader.IsEncrypted())
     {
         SecureMessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
@@ -337,13 +339,14 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
 void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                      System::PacketBufferHandle && msg)
 {
-    Transport::UnauthenticatedSession * session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
-    if (session == nullptr)
+    Optional<Transport::UnauthenticatedSessionHandle> optionalSession = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
+    if (!optionalSession.HasValue())
     {
         ChipLogError(Inet, "UnauthenticatedSession exhausted");
         return;
     }
 
+    Transport::UnauthenticatedSessionHandle session      = optionalSession.Value();
     SessionManagerDelegate::DuplicateMessage isDuplicate = SessionManagerDelegate::DuplicateMessage::No;
 
     // Verify message counter
@@ -355,7 +358,7 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
     }
     VerifyOrDie(err == CHIP_NO_ERROR);
 
-    mUnauthenticatedSessions.MarkSessionActive(*session);
+    mUnauthenticatedSessions.MarkSessionActive(session);
 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
@@ -372,8 +375,7 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
 
     if (mCB != nullptr)
     {
-        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(Transport::UnauthenticatedSessionHandle(*session)),
-                               peerAddress, isDuplicate, std::move(msg));
+        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(session), peerAddress, isDuplicate, std::move(msg));
     }
 }
 
@@ -396,8 +398,12 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
         ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
     }
 
+    // Decrypt and verify the message before message counter verification or any further processing.
+    VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decrypt(state, payloadHeader, packetHeader, msg),
+                 ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding"));
+
     // Verify message counter
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
+    if (packetHeader.IsSecureSessionControlMsg())
     {
         // TODO: control message counter is not implemented yet
     }
@@ -442,10 +448,6 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
 
     mPeerConnections.MarkConnectionActive(state);
 
-    // Decode the message
-    VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
-                 ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
-
     if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {
         ChipLogDetail(Inet,
@@ -460,7 +462,7 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
         }
     }
 
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
+    if (packetHeader.IsSecureSessionControlMsg())
     {
         // TODO: control message counter is not implemented yet
     }

@@ -21,7 +21,9 @@
 import os
 import sys
 from optparse import OptionParser
-from base import TestTimeout, BaseTestHelper, FailIfNot, logger
+from base import TestFail, TestTimeout, BaseTestHelper, FailIfNot, logger
+from cluster_objects import ClusterObjectTests
+import asyncio
 
 # The thread network dataset tlv for testing, splited into T-L-V.
 
@@ -123,6 +125,10 @@ def main():
     FailIfNot(test.TestSubscription(nodeid=1, endpoint=LIGHTING_ENDPOINT_ID),
               "Failed to subscribe attributes.")
 
+    logger.info("Testing another subscription that kills previous subscriptions")
+    FailIfNot(test.TestSubscription(nodeid=1, endpoint=LIGHTING_ENDPOINT_ID),
+              "Failed to subscribe attributes.")
+
     logger.info("Testing closing sessions")
     FailIfNot(test.TestCloseSession(nodeid=1), "Failed to close sessions")
 
@@ -134,6 +140,11 @@ def main():
     FailIfNot(test.TestOnOffCluster(nodeid=1,
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
+
+    # Test experimental Python cluster objects API
+    logger.info("Testing cluster objects API")
+    FailIfNot(asyncio.run(ClusterObjectTests.RunTest(test.devCtrl)),
+              "Failed when testing Python Cluster Object APIs")
 
     logger.info("Testing non-controller APIs")
     FailIfNot(test.TestNonControllerAPIs(), "Non controller API test failed")
@@ -148,4 +159,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as ex:
+        logger.exception(ex)
+        TestFail("Exception occurred when running tests.")

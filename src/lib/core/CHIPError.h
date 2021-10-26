@@ -2198,6 +2198,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_NO_SHARED_TRUSTED_ROOT                      CHIP_CORE_ERROR(0xc9)
 
+/*
+ * @def CHIP_ERROR_IM_STATUS_CODE_RECEIVED
+ *
+ * @brief
+ *   Indicates an IM status code was received. Usually accompanied with
+ *   the actual IM status code.
+ */
+#define CHIP_ERROR_IM_STATUS_CODE_RECEIVED                     CHIP_CORE_ERROR(0xca)
+
 /**
  *  @}
  */

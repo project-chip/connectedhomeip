@@ -55,7 +55,7 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
     CHIP_ERROR err;
     TLVType outerContainer;
     TLVType elemType;
-    uint64_t tlvTag;
+    Tag tlvTag;
     uint32_t tlvTagNum;
     OID attrOID;
     uint8_t asn1Tag;
@@ -564,8 +564,13 @@ exit:
 static CHIP_ERROR DecodeConvertExtension(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
     CHIP_ERROR err;
-    uint64_t extensionTagNum = TagNumFromTag(reader.GetTag());
+    Tag tlvTag;
+    uint32_t extensionTagNum;
     OID extensionOID;
+
+    tlvTag = reader.GetTag();
+    VerifyOrExit(IsContextTag(tlvTag), err = CHIP_ERROR_INVALID_TLV_TAG);
+    extensionTagNum = TagNumFromTag(tlvTag);
 
     if (extensionTagNum == kTag_FutureExtension)
     {

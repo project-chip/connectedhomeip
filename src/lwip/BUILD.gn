@@ -30,7 +30,7 @@ if (lwip_platform == "") {
 
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13x2_26x2" || lwip_platform == "efr32" ||
-           lwip_platform == "k32w" || lwip_platform == "qpg" ||
+           lwip_platform == "k32w0" || lwip_platform == "qpg" ||
            lwip_platform == "mbed" || lwip_platform == "p6",
        "Unsupported lwIP platform: ${lwip_platform}")
 
@@ -47,8 +47,8 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/efr32_sdk.gni")
 } else if (lwip_platform == "qpg") {
   import("//build_overrides/qpg_sdk.gni")
-} else if (lwip_platform == "k32w") {
-  import("//build_overrides/k32w_sdk.gni")
+} else if (lwip_platform == "k32w0") {
+  import("//build_overrides/k32w0_sdk.gni")
 } else if (lwip_platform == "p6") {
   import("//build_overrides/p6.gni")
 }
@@ -119,8 +119,8 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]
     } else if (lwip_platform == "standalone") {
       public_deps += [ "${chip_root}/src/lib/support" ]
-    } else if (lwip_platform == "k32w") {
-      public_deps += [ "${k32w_sdk_build_root}:k32w_sdk" ]
+    } else if (lwip_platform == "k32w0") {
+      public_deps += [ "${k32w0_sdk_build_root}:k32w0_sdk" ]
     }
 
     public_configs = [

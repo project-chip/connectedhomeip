@@ -83,7 +83,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writer, uint64_t tag, uint64_t & subjectOrIssuer,
+static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writer, Tag tag, uint64_t & subjectOrIssuer,
                                            Optional<uint64_t> & fabric)
 {
     CHIP_ERROR err;
@@ -541,7 +541,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1Reader & reader, TLVWriter & writer, uint64_t tag)
+CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1Reader & reader, TLVWriter & writer, Tag tag)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t rawSig[kP256_ECDSA_Signature_Length_Raw];
@@ -572,7 +572,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, uint64_t tag, uint64_t & issuer, uint64_t & subject,
+static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, Tag tag, uint64_t & issuer, uint64_t & subject,
                                      Optional<uint64_t> & fabric)
 {
     CHIP_ERROR err;

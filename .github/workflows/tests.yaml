@@ -40,7 +40,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:latest
+            image: connectedhomeip/chip-build:0.5.22
             options:
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -77,15 +77,14 @@ jobs:
             - name: Build chip-tool
               timeout-minutes: 5
               run: |
-                  # config_pair_with_random_id=false so CI runs faster.
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP} config_pair_with_random_id=false
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
             - name: Copy objdir
               run: |
                   # The idea is to not upload our objdir unless builds have
                   # actually succeeded, because that just wastes space.
                   rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Tests
-              timeout-minutes: 10
+              timeout-minutes: 20
               run: |
                   scripts/tests/test_suites.sh
             - name: Run TV Tests
@@ -162,8 +161,7 @@ jobs:
             - name: Build chip-tool
               timeout-minutes: 10
               run: |
-                  # config_pair_with_random_id=false so CI runs faster.
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP} config_pair_with_random_id=false
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
             - name: Copy objdir
               run: |
                   # The idea is to not upload our objdir unless builds have

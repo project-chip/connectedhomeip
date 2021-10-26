@@ -23,27 +23,14 @@
 
 using namespace ::chip;
 
-void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
+CHIP_ERROR ModelCommand::RunCommand()
 {
-    ChipLogDetail(Controller,
-                  "Received Cluster Command: Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " Endpoint=%" PRIx16,
-                  ChipLogValueMEI(aClusterId), ChipLogValueMEI(aCommandId), aEndPointId);
-    ChipLogError(
-        Controller,
-        "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
-}
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
 
-CHIP_ERROR ModelCommand::Run()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    auto * ctx = GetExecContext();
-
-    err = ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err = mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %" CHIP_ERROR_FORMAT,
-                              ctx->remoteId, err.Format()));
+                              mNodeId, err.Format()));
 
 exit:
     return err;

@@ -63,6 +63,10 @@ set(CHIP_CFLAG_EXCLUDES
 # Helper macros
 # ==============================================================================
 
+macro(chip_gn_arg_import FILE)
+    string(APPEND CHIP_GN_ARGS "import(\"${FILE}\")\n")
+endmacro()
+
 macro(chip_gn_arg_string ARG STRING)
     string(APPEND CHIP_GN_ARGS "${ARG} = \"${STRING}\"\n")
 endmacro()
@@ -95,6 +99,19 @@ macro(mbed_interface_library_named name)
   add_library(${name} INTERFACE)
 endmacro()
 
+# Select gnu++<YY> standard based on project configuration
+macro(mbed_get_gnu_cpp_standard VAR)
+    if (CONFIG_STD_CPP11)
+        list(APPEND ${VAR} -std=gnu++11)
+    elseif (CONFIG_STD_CPP14)
+        list(APPEND ${VAR} -std=gnu++14)
+    elseif (CONFIG_STD_CPP17)
+        list(APPEND ${VAR} -std=gnu++17)
+    elseif (CONFIG_STD_CPP2A)
+        list(APPEND ${VAR} -std=gnu++20)
+    endif()
+endmacro()
+
 # ==============================================================================
 # Prepare CHIP configuration based on the project configuration
 # ==============================================================================
@@ -111,9 +128,15 @@ foreach(NameAndValue ${ConfigContents})
   set(${Name} "${Value}")
 endforeach()
 
+if (CONFIG_CHIP_PW_RPC)
+    set(CONFIG_STD_CPP17 y)
+endif()
+
 if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../.. REALPATH)
 endif()
+
+set(GN_ROOT_TARGET ${CHIP_ROOT}/config/mbed/chip-gn)
 
 # Prepare compiler flags
 
@@ -122,6 +145,19 @@ mbed_get_lang_compile_flags(CHIP_CFLAGS_C mbed-core C)
 list(APPEND CHIP_CFLAGS_C ${CMAKE_C_FLAGS_INIT})
 mbed_get_lang_compile_flags(CHIP_CFLAGS_CC mbed-core CXX)
 list(APPEND CHIP_CFLAGS_CC ${CMAKE_CXX_FLAGS_INIT})
+
+mbed_get_target_common_compile_flags(CHIP_MBEDCMSISCM_CFLAGS mbed-cmsis-cortex-m)
+list(APPEND CHIP_CFLAGS ${CHIP_MBEDCMSISCM_CFLAGS})
+if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W")
+    mbed_get_target_common_compile_flags(CHIP_MBEDCMSISCY8_CFLAGS mbed-cy8cproto-062-4343w) 
+    list(APPEND CHIP_CFLAGS ${CHIP_MBEDCMSISCY8_CFLAGS})
+    mbed_get_target_common_compile_flags(CHIP_MBEDPSOC6_CFLAGS mbed-psoc6)
+    list(APPEND CHIP_CFLAGS ${CHIP_MBEDPSOC6_CFLAGS})
+    mbed_get_target_common_compile_flags(CHIP_MBEDCAT1_CFLAGS mbed-cat1a)
+    list(APPEND CHIP_CFLAGS ${CHIP_MBEDCAT1_CFLAGS})
+    mbed_get_target_common_compile_flags(CHIP_MBEDCMSISCY8MODUS_CFLAGS  mbed-cy8cproto-062-4343w-bsp-design-modus)
+    list(APPEND CHIP_CFLAGS ${CHIP_MBEDCMSISCY8MODUS_CFLAGS})
+endif()
 
 # Add support for Mbed Posix Socket 
 mbed_get_target_common_compile_flags(CHIP_MBEDPOSIXSOCKET_CFLAGS mbed-os-posix-socket)
@@ -151,6 +187,8 @@ if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
     mbed_get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbed-mbedtls)
     list(APPEND CHIP_CFLAGS ${CHIP_MBEDTLS_CFLAGS})
 endif()
+
+mbed_get_gnu_cpp_standard(CHIP_CFLAGS_CC)
 
 list(APPEND CHIP_CFLAGS 
     \"-D__LINUX_ERRNO_EXTENSIONS__=1\"
@@ -183,6 +221,15 @@ if (CONFIG_CHIP_LIB_SHELL)
     list(APPEND CHIP_LIBRARIES -lCHIPShell)
 endif()
 
+if (CONFIG_CHIP_PW_RPC)
+    list(APPEND CHIP_LIBRARIES -lPwRpc)
+    if (${APP_TARGET} MATCHES "pigweed-app")
+        set(CONFIG_CHIP_PW_RPC_ECHO_PROTO "y")
+    else()
+        set(CONFIG_CHIP_PW_RPC_ECHO_PROTO "n")
+    endif()
+endif(CONFIG_CHIP_PW_RPC)
+
 # Set up CHIP project configuration file
 
 set(CHIP_DEFAULT_CONFIG_FILE "<${CHIP_ROOT}/config/mbed/CHIPProjectConfig.h>")
@@ -204,6 +251,9 @@ endif()
 # ==============================================================================
 # Generate configuration for CHIP GN build system
 # ==============================================================================
+if (CONFIG_CHIP_PW_RPC)
+    chip_gn_arg_import("${GN_ROOT_TARGET}/lib/pw_rpc/pw_rpc.gni")
+endif()
 
 chip_gn_arg_flags("target_cflags"                         ${CHIP_CFLAGS})
 chip_gn_arg_lang_flags("target_cflags_c"                  ${CHIP_CFLAGS_C})
@@ -214,9 +264,14 @@ chip_gn_arg_string("mbed_cxx"                             ${CMAKE_CXX_COMPILER})
 chip_gn_arg_string("chip_project_config_include"          "${CHIP_PROJECT_CONFIG}")
 chip_gn_arg_bool  ("is_debug"                             CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_build_tests"                     CONFIG_CHIP_BUILD_TESTS)
+chip_gn_arg_bool  ("chip_monolithic_tests"                CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_with_platform_mbedtls"           CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
 chip_gn_arg_bool  ("chip_bypass_rendezvous"               CONFIG_CHIP_BYPASS_RENDEZVOUS)
+chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                CONFIG_CHIP_PW_RPC)
+if (CONFIG_CHIP_PW_RPC)
+    chip_gn_arg_bool  ("chip_build_pw_rpc_echo_proto"         CONFIG_CHIP_PW_RPC_ECHO_PROTO)
+endif(CONFIG_CHIP_PW_RPC)
 
 file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
 
@@ -228,7 +283,7 @@ ExternalProject_Add(
     PREFIX                  ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
-    CONFIGURE_COMMAND       gn --root=${CHIP_ROOT}/config/mbed/chip-gn gen --export-compile-commands --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
+    CONFIGURE_COMMAND       gn --root=${GN_ROOT_TARGET} gen --export-compile-commands --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
     BUILD_COMMAND           ninja
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
@@ -263,11 +318,8 @@ list(APPEND CHIP_INCLUDES)
 # CHIP defines
 list(APPEND CHIP_DEFINES)
 
-
 list(APPEND CHIP_INCLUDES 
     ${CHIP_ROOT}/config/mbed/mbedtls
-    ${CHIP_ROOT}/src/platform/mbed/posix/include
-    ${CHIP_ROOT}/src/platform/mbed/net/include
 )
 
 list(APPEND CHIP_DEFINES 
@@ -280,6 +332,13 @@ if (CONFIG_MBED_BSD_SOCKET_TRACE)
     )
 endif()
 
+if (CONFIG_CHIP_PW_RPC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17" PARENT_SCOPE)
+    list(APPEND CHIP_DEFINES 
+        CONFIG_CHIP_PW_RPC=1
+    )
+endif()
+
 target_include_directories(${APP_TARGET} PRIVATE 
                            ${CHIP_INCLUDES}
 )
@@ -287,3 +346,59 @@ target_include_directories(${APP_TARGET} PRIVATE
 target_compile_definitions(${APP_TARGET} PRIVATE
                            ${CHIP_DEFINES}                      
 )
+
+
+if (CONFIG_CHIP_PW_RPC)
+
+set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
+
+target_sources(${APP_TARGET} PRIVATE
+    ${CHIP_ROOT}/examples/common/pigweed/RpcService.cpp
+    ${CHIP_ROOT}/examples/common/pigweed/mbed/PigweedLoggerMutex.cpp
+    ${MBED_COMMON}/util/PigweedLogger.cpp
+)
+
+target_include_directories(${APP_TARGET} PRIVATE
+                    ${PIGWEED_ROOT}/pw_sys_io/public
+                    ${PIGWEED_ROOT}/pw_assert/public
+                    ${PIGWEED_ROOT}/pw_assert_log/public
+                    ${PIGWEED_ROOT}/pw_assert_log/public_overrides
+                    ${PIGWEED_ROOT}/pw_bytes/public
+                    ${PIGWEED_ROOT}/pw_checksum/public
+                    ${PIGWEED_ROOT}/pw_containers/public
+                    ${PIGWEED_ROOT}/pw_hdlc/public
+                    ${PIGWEED_ROOT}/pw_log/public
+                    ${PIGWEED_ROOT}/pw_log_basic/public
+                    ${PIGWEED_ROOT}/pw_log_basic/public_overrides
+                    ${PIGWEED_ROOT}/pw_span/public_overrides
+                    ${PIGWEED_ROOT}/pw_span/public
+                    ${PIGWEED_ROOT}/pw_polyfill/public
+                    ${PIGWEED_ROOT}/pw_polyfill/standard_library_public
+                    ${PIGWEED_ROOT}/pw_polyfill/public_overrides
+                    ${PIGWEED_ROOT}/pw_rpc/public
+                    ${PIGWEED_ROOT}/pw_rpc/nanopb/public
+                    ${PIGWEED_ROOT}/pw_rpc/raw/public
+                    ${PIGWEED_ROOT}/pw_protobuf/public
+                    ${PIGWEED_ROOT}/pw_status/public
+                    ${PIGWEED_ROOT}/pw_stream/public
+                    ${PIGWEED_ROOT}/pw_result/public
+                    ${PIGWEED_ROOT}/pw_varint/public
+                    ${PIGWEED_ROOT}/pw_function/public
+                    ${PIGWEED_ROOT}/pw_preprocessor/public
+                    ${PIGWEED_ROOT}/pw_rpc/system_server/public
+                    ${CHIP_ROOT}/third_party/nanopb/repo
+
+                    ${CHIP_ROOT}/examples/common
+                    ${CHIP_ROOT}/examples//common/pigweed/mbed
+                    ${MBED_COMMON}/pw_sys_io/public
+)
+
+if (CONFIG_CHIP_PW_RPC_ECHO_PROTO)
+    target_include_directories(${APP_TARGET} PRIVATE
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb_rpc
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/pwpb
+    )
+endif(CONFIG_CHIP_PW_RPC_ECHO_PROTO)
+
+endif(CONFIG_CHIP_PW_RPC) 

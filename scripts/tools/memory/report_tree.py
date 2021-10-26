@@ -170,7 +170,6 @@ def main(argv):
             tree.print()
 
     except Exception as exception:
-        status = 1
         raise exception
 
     return status

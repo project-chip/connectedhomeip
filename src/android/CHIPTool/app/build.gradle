@@ -47,25 +47,17 @@ android {
         }
     }
 
-    if (matterBuildSrcDir.isEmpty()) {
-        sourceSets {
-            main {
-                jniLibs.srcDirs = ['libs/jniLibs']
+    if (matterSdkSourceBuild.toBoolean() && !matterBuildSrcDir.isEmpty()) {
+        externalNativeBuild {
+            cmake {
+                path file(matterBuildSrcDir + '/CMakeLists.txt')
+                version '3.10.2'
             }
         }
     } else {
         sourceSets {
             main {
-                java.srcDirs = [
-                        'src/main/java/',
-                ]
-            }
-        }
-
-        externalNativeBuild {
-            cmake {
-                path file(matterBuildSrcDir + '/CMakeLists.txt')
-                version '3.10.2'
+                jniLibs.srcDirs = ['libs/jniLibs']
             }
         }
     }
@@ -77,11 +69,11 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
-    if (matterBuildSrcDir.isEmpty()) {
+    if (matterSdkSourceBuild.toBoolean() && !matterBuildSrcDir.isEmpty()) {
+        implementation project(':chip-library')
+    } else {
         // local in-source-tree copy of the dependencies. Useful for IDE compilation
         implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
-    } else {
-        implementation project(':chip-library')
     }
 
     implementation 'androidx.appcompat:appcompat:1.1.0'

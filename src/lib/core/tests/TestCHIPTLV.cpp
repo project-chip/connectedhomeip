@@ -35,13 +35,13 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 
 #include <system/TLVPacketBufferBackingStore.h>
 
+#include <stdlib.h>
 #include <string.h>
 
 using namespace chip;
@@ -62,7 +62,7 @@ static const char sLargeString [] =
     "...END";
 // clang-format on
 
-void TestAndOpenContainer(nlTestSuite * inSuite, TLVReader & reader, TLVType type, uint64_t tag, TLVReader & containerReader)
+void TestAndOpenContainer(nlTestSuite * inSuite, TLVReader & reader, TLVType type, Tag tag, TLVReader & containerReader)
 {
     NL_TEST_ASSERT(inSuite, reader.GetType() == type);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
@@ -75,7 +75,7 @@ void TestAndOpenContainer(nlTestSuite * inSuite, TLVReader & reader, TLVType typ
 }
 
 template <class T>
-void TestAndEnterContainer(nlTestSuite * inSuite, T & t, TLVType type, uint64_t tag, TLVType & outerContainerType)
+void TestAndEnterContainer(nlTestSuite * inSuite, T & t, TLVType type, Tag tag, TLVType & outerContainerType)
 {
     NL_TEST_ASSERT(inSuite, t.GetType() == type);
     NL_TEST_ASSERT(inSuite, t.GetTag() == tag);
@@ -204,14 +204,14 @@ struct TestTLVContext
     uint32_t mEvictedBytes;
 };
 
-void TestNull(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag)
+void TestNull(nlTestSuite * inSuite, TLVReader & reader, Tag tag)
 {
     NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_Null);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == 0);
 }
 
-void TestString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const char * expectedVal)
+void TestString(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const char * expectedVal)
 {
     NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_UTF8String);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
@@ -228,7 +228,7 @@ void TestString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const c
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
 }
 
-void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const char * expectedVal)
+void TestDupString(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const char * expectedVal)
 {
     NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_UTF8String);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
@@ -245,7 +245,7 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, cons
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
 }
 
-void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const uint8_t * expectedVal, uint32_t expectedLen)
+void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const uint8_t * expectedVal, uint32_t expectedLen)
 {
     NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_UTF8String);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
@@ -1695,7 +1695,7 @@ static CHIP_ERROR FindContainerWithElement(const TLVReader & aReader, size_t aDe
 {
     TLVReader reader;
     TLVReader result;
-    uint64_t * tag = static_cast<uint64_t *>(aContext);
+    Tag * tag      = static_cast<Tag *>(aContext);
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVType containerType;
 
@@ -1776,8 +1776,8 @@ void CheckCHIPTLVUtilities(nlTestSuite * inSuite, void * inContext)
 
         // position the reader on the first element
         reader1.Next();
-        uint64_t tag = ProfileTag(TestProfile_1, 1);
-        err          = chip::TLV::Utilities::Find(reader1, FindContainerWithElement, &tag, tagReader, false);
+        Tag tag = ProfileTag(TestProfile_1, 1);
+        err     = chip::TLV::Utilities::Find(reader1, FindContainerWithElement, &tag, tagReader, false);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_TLV_TAG_NOT_FOUND);
 
         tag = ProfileTag(TestProfile_2, 2);
@@ -2842,7 +2842,7 @@ void CheckStrictAliasing(nlTestSuite * inSuite, void * inContext)
     err = reader.Next();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, reader.GetTag() == 0xe00000001);
+    NL_TEST_ASSERT(inSuite, reader.GetTag() == ProfileTag(kProfile_Id, 1));
 }
 
 /**
@@ -4081,7 +4081,7 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
             {
                 uint8_t fuzzMask = sFixedFuzzMask;
                 while (fuzzMask == 0)
-                    fuzzMask = GetRandU8();
+                    fuzzMask = static_cast<uint8_t>(rand() & 0xFF);
 
                 fuzzedData[i] ^= fuzzMask;
             }

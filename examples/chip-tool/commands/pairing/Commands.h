@@ -26,12 +26,6 @@ public:
     Unpair() : PairingCommand("unpair", PairingMode::None, PairingNetworkType::None) {}
 };
 
-class PairBypass : public PairingCommand
-{
-public:
-    PairBypass() : PairingCommand("bypass", PairingMode::Bypass, PairingNetworkType::None) {}
-};
-
 class PairQRCode : public PairingCommand
 {
 public:
@@ -54,7 +48,8 @@ class PairOnNetworkShort : public PairingCommand
 {
 public:
     PairOnNetworkShort() :
-        PairingCommand("onnetwork-short", PairingMode::OnNetwork, PairingNetworkType::None, chip::Mdns::DiscoveryFilterType::kShort)
+        PairingCommand("onnetwork-short", PairingMode::OnNetwork, PairingNetworkType::None,
+                       chip::Dnssd::DiscoveryFilterType::kShort)
     {}
 };
 
@@ -62,7 +57,7 @@ class PairOnNetworkLong : public PairingCommand
 {
 public:
     PairOnNetworkLong() :
-        PairingCommand("onnetwork-long", PairingMode::OnNetwork, PairingNetworkType::None, chip::Mdns::DiscoveryFilterType::kLong)
+        PairingCommand("onnetwork-long", PairingMode::OnNetwork, PairingNetworkType::None, chip::Dnssd::DiscoveryFilterType::kLong)
     {}
 };
 
@@ -71,7 +66,7 @@ class PairOnNetworkVendor : public PairingCommand
 public:
     PairOnNetworkVendor() :
         PairingCommand("onnetwork-vendor", PairingMode::OnNetwork, PairingNetworkType::None,
-                       chip::Mdns::DiscoveryFilterType::kVendor)
+                       chip::Dnssd::DiscoveryFilterType::kVendor)
     {}
 };
 
@@ -80,7 +75,7 @@ class PairOnNetworkFabric : public PairingCommand
 public:
     PairOnNetworkFabric() :
         PairingCommand("onnetwork-fabric", PairingMode::OnNetwork, PairingNetworkType::None,
-                       chip::Mdns::DiscoveryFilterType::kCompressedFabricId)
+                       chip::Dnssd::DiscoveryFilterType::kCompressedFabricId)
     {}
 };
 
@@ -89,7 +84,7 @@ class PairOnNetworkCommissioningMode : public PairingCommand
 public:
     PairOnNetworkCommissioningMode() :
         PairingCommand("onnetwork-commissioning-mode", PairingMode::OnNetwork, PairingNetworkType::None,
-                       chip::Mdns::DiscoveryFilterType::kCommissioningMode)
+                       chip::Dnssd::DiscoveryFilterType::kCommissioningMode)
     {}
 };
 
@@ -98,7 +93,7 @@ class PairOnNetworkCommissioner : public PairingCommand
 public:
     PairOnNetworkCommissioner() :
         PairingCommand("onnetwork-commissioner", PairingMode::OnNetwork, PairingNetworkType::None,
-                       chip::Mdns::DiscoveryFilterType::kCommissioner)
+                       chip::Dnssd::DiscoveryFilterType::kCommissioner)
     {}
 };
 
@@ -107,7 +102,7 @@ class PairOnNetworkDeviceType : public PairingCommand
 public:
     PairOnNetworkDeviceType() :
         PairingCommand("onnetwork-device-type", PairingMode::OnNetwork, PairingNetworkType::None,
-                       chip::Mdns::DiscoveryFilterType::kDeviceType)
+                       chip::Dnssd::DiscoveryFilterType::kDeviceType)
     {}
 };
 
@@ -116,7 +111,7 @@ class PairOnNetworkInstanceName : public PairingCommand
 public:
     PairOnNetworkInstanceName() :
         PairingCommand("onnetwork-instance-name", PairingMode::OnNetwork, PairingNetworkType::None,
-                       chip::Mdns::DiscoveryFilterType::kInstanceName)
+                       chip::Dnssd::DiscoveryFilterType::kInstanceName)
     {}
 };
 
@@ -158,7 +153,6 @@ void registerCommandsPairing(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<Unpair>(),
-        make_unique<PairBypass>(),
         make_unique<PairQRCode>(),
         make_unique<PairManualCode>(),
         make_unique<PairBleWiFi>(),

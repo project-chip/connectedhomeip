@@ -31,7 +31,7 @@
 bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfStatus status);
 bool IMReadReportAttributesResponseCallback(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath,
                                             chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::Status status);
-bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, EmberAfStatus status);
+bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, chip::Protocols::InteractionModel::Status status);
 bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient, EmberAfStatus status);
 void LogStatus(uint8_t status);
 
@@ -48,6 +48,6 @@ typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
 typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
 typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
 typedef void (*OctetStringAttributeCallback)(void * context, const chip::ByteSpan value);
-typedef void (*CharStringAttributeCallback)(void * context, const chip::ByteSpan value);
+typedef void (*CharStringAttributeCallback)(void * context, const chip::CharSpan value);
 typedef void (*AttributeResponseFilter)(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
                                         chip::Callback::Cancelable * onFailure);

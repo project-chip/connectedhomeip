@@ -373,23 +373,23 @@ void TestQRCodeToPayloadGeneration(nlTestSuite * inSuite, void * inContext)
 
 void TestExtractPayload(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, extractPayload(string("MT:ABC")) == string("ABC"));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("MT:")) == string(""));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("H:")) == string(""));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("ASMT:")) == string(""));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("Z%MT:ABC%")) == string("ABC"));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("Z%MT:ABC")) == string("ABC"));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%Z%MT:ABC")) == string("ABC"));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%Z%MT:ABC%")) == string("ABC"));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%Z%MT:ABC%DDD")) == string("ABC"));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("MT:ABC%DDD")) == string("ABC"));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("MT:ABC%")) == string("ABC"));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%MT:")) == string(""));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%MT:%")) == string(""));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("A%")) == string(""));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("MT:%")) == string(""));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("%MT:ABC")) == string("ABC"));
-    NL_TEST_ASSERT(inSuite, extractPayload(string("ABC")) == string(""));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("MT:ABC")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("MT:")) == string(""));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("H:")) == string(""));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("ASMT:")) == string(""));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("Z%MT:ABC%")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("Z%MT:ABC")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("%Z%MT:ABC")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("%Z%MT:ABC%")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("%Z%MT:ABC%DDD")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("MT:ABC%DDD")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("MT:ABC%")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("%MT:")) == string(""));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("%MT:%")) == string(""));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("A%")) == string(""));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("MT:%")) == string(""));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("%MT:ABC")) == string("ABC"));
+    NL_TEST_ASSERT(inSuite, QRCodeSetupPayloadParser::ExtractPayload(string("ABC")) == string(""));
 }
 
 // Test Suite

@@ -176,7 +176,7 @@ CHIP_ERROR EventPath::Parser::GetEventId(chip::EventId * const apEventId) const
     return GetUnsignedInteger(kCsTag_EventId, apEventId);
 }
 
-CHIP_ERROR EventPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag)
+CHIP_ERROR EventPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
 {
     mpWriter = apWriter;
     mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_List, mOuterContainerType);

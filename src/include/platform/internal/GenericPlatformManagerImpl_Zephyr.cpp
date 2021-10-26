@@ -88,7 +88,7 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_UnlockChipStack(void)
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(uint32_t aMilliseconds)
+CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(System::Clock::Timeout delay)
 {
     // Let Systemlayer.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;

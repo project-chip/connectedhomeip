@@ -2,11 +2,11 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build examples for platform",
+            "label": "Build specific example",
             "type": "shell",
             "command": "scripts/run_in_build_env.sh",
             "args": [
-                "./scripts/build/build_examples.py --platform ${input:examplePlatform} build"
+                "./scripts/build/build_examples.py --target ${input:exampleTarget} build"
             ],
             "group": "build",
             "problemMatcher": {
@@ -14,23 +14,11 @@
             }
         },
         {
-            "label": "Build specific example (all compatible platforms)",
+            "label": "Build examples (glob)",
             "type": "shell",
             "command": "scripts/run_in_build_env.sh",
             "args": [
-                "./scripts/build/build_examples.py --app ${input:exampleApp} build"
-            ],
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc"
-            }
-        },
-        {
-            "label": "Build single example (specific board/example)",
-            "type": "shell",
-            "command": "scripts/run_in_build_env.sh",
-            "args": [
-                "./scripts/build/build_examples.py --board ${input:exampleBoard} --app ${input:exampleApp} build"
+                "./scripts/build/build_examples.py --target-glob \"${input:exampleGlob}\" build"
             ],
             "group": "build",
             "problemMatcher": {
@@ -115,29 +103,6 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Build Shell",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/shell/standalone out/shell",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": ["relative", "${workspaceFolder}/out/shell/"]
-            }
-        },
-        {
-            "label": "Build Lighting App (Linux)",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lighting-app/linux out/lighting-app",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/lighting-app/"
-                ]
-            }
-        },
-        {
             "label": "Build Minimal MDNS Example",
             "type": "shell",
             "command": "scripts/examples/gn_build_example.sh examples/minimal-mdns out/minimal_mdns 'chip_build_tools=false is_debug=false optimize_for_size=true'",
@@ -170,19 +135,6 @@
             }
         },
         {
-            "label": "Build Telink Lighting Example (TLSR9518ADK80D)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/telink_example.sh lighting-app tlsr9518adk80d",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/lighting-app/telink/build/tlsr9518adk80d"
-                ]
-            }
-        },
-        {
             "label": "Run Mbed Application",
             "type": "shell",
             "command": "scripts/examples/mbed_example.sh",
@@ -204,7 +156,7 @@
         {
             "label": "Run Mbed Unit Tests",
             "type": "shell",
-            "command": "scripts/tests/mbed_tests.sh",
+            "command": "scripts/tests/mbed/mbed_unit_tests.sh",
             "args": [
                 "-c=${input:mbedCommand}",
                 "-b=${input:mbedTarget}",
@@ -232,8 +184,13 @@
             "type": "pickString",
             "id": "mbedApp",
             "description": "What mbed application do you want to use?",
-            "options": ["lock-app", "lighting-app"],
-            "default": "shell"
+            "options": [
+                "lock-app",
+                "lighting-app",
+                "pigweed-app",
+                "all-clusters-app"
+            ],
+            "default": "lock-app"
         },
         {
             "type": "pickString",
@@ -250,77 +207,60 @@
             "default": "develop"
         },
         {
-            "id": "efr32_board",
-            "type": "pickString",
-            "description": "What's the type of your EFR32 board?",
-            "options": [
-                "BRD4304A",
-                "BRD4161A",
-                "BRD4163A",
-                "BRD4164A",
-                "BRD4166A",
-                "BRD4170A",
-                "BRD4186A",
-                "BRD4187A"
-            ],
-            "default": "BRD4166A"
+            "type": "promptString",
+            "id": "exampleGlob",
+            "description": "What applications to build (e.g. '*m5stack*' or 'esp32-*')"
         },
         {
             "type": "pickString",
-            "id": "examplePlatform",
-            "description": "Which platform would you like to build",
+            "id": "exampleTarget",
+            "description": "What target to build",
             "options": [
-                "all",
-                "android",
-                "efr32",
-                "esp32",
-                "host",
-                "nrf",
-                "qpg",
-                "infineon",
-                "telink",
-                "tizen"
-            ],
-            "default": "build"
-        },
-        {
-            "type": "pickString",
-            "id": "exampleApp",
-            "description": "Which example application would you like to build",
-            "options": [
-                "all-clusters",
-                "bridge",
-                "chip-tool",
-                "light",
-                "lock",
-                "shell",
-                "temperature-measurement",
-                "thermostat",
-                "window-covering",
-                "pump",
-                "pump-controller"
-            ],
-            "default": "build"
-        },
-        {
-            "type": "pickString",
-            "id": "exampleBoard",
-            "description": "Which example board to build for",
-            "options": [
-                "arm",
-                "arm64",
-                "brd4161a",
-                "c3devkit",
-                "devkitc",
-                "m5stack",
-                "native",
-                "nrf52840",
-                "nrf5340",
-                "qpg6100",
-                "x64",
-                "p6board"
-            ],
-            "default": "build"
+                "ameba-amebad-all-clusters",
+                "android-arm-chip-tool",
+                "android-arm64-chip-test",
+                "android-arm64-chip-tool",
+                "android-x64-chip-tool",
+                "android-x86-chip-tool",
+                "efr32-brd4161a-light",
+                "efr32-brd4161a-light-rpc",
+                "efr32-brd4161a-lock",
+                "efr32-brd4161a-window-covering",
+                "esp32-c3devkit-all-clusters",
+                "esp32-devkitc-all-clusters",
+                "esp32-devkitc-bridge",
+                "esp32-devkitc-lock",
+                "esp32-devkitc-shell",
+                "esp32-devkitc-temperature-measurement",
+                "esp32-m5stack-all-clusters",
+                "esp32-m5stack-all-clusters-rpc",
+                "infineon-p6-lock",
+                "linux-arm64-all-clusters",
+                "linux-arm64-all-clusters-ipv6only",
+                "linux-arm64-chip-tool",
+                "linux-arm64-chip-tool-ipv6only",
+                "linux-arm64-thermostat",
+                "linux-arm64-thermostat-ipv6only",
+                "linux-x64-all-clusters",
+                "linux-x64-all-clusters-ipv6only",
+                "linux-x64-chip-tool",
+                "linux-x64-chip-tool-ipv6only",
+                "linux-x64-thermostat",
+                "linux-x64-thermostat-ipv6only",
+                "nrf-nrf52840-light",
+                "nrf-nrf52840-lock",
+                "nrf-nrf52840-pump",
+                "nrf-nrf52840-pump-controller",
+                "nrf-nrf52840-shell",
+                "nrf-nrf5340-light",
+                "nrf-nrf5340-lock",
+                "nrf-nrf5340-pump",
+                "nrf-nrf5340-pump-controller",
+                "nrf-nrf5340-shell",
+                "qpg-qpg6100-lock",
+                "telink-tlsr9518adk80d-light",
+                "tizen-arm-light"
+            ]
         }
     ]
 }

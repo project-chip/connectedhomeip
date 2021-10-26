@@ -17,7 +17,9 @@
 import sys
 import subprocess
 import logging
+import time
 import click
+from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
 from multiprocessing.connection import Listener, Client
@@ -73,6 +75,7 @@ class InvalidCommand:
 
 
 SERVER_ADDRESS = "/tmp/cirque-helper.socket"
+CLIENT_WAIT_TIMEOUT_SECONDS = 5
 
 
 def CommandFactory(args):
@@ -89,12 +92,12 @@ def ServerMain(args):
         "otbr-agent": ShellCommand(["otbr-agent", "-I", "wpan0", "spinel+hdlc+uart:///dev/ttyUSB0"])
     }
 
-    for extraOption in args:
-        cmd = extraOptions.get(extraOption, InvalidCommand())
-        cmd()
-
     with Listener(SERVER_ADDRESS) as listener:
         log.info("Server running on {}".format(SERVER_ADDRESS))
+        for extraOption in args:
+            cmd = extraOptions.get(extraOption, InvalidCommand())
+            cmd()
+
         while True:
             with listener.accept() as conn:
                 log.info("Received connection")
@@ -105,6 +108,13 @@ def ServerMain(args):
 def ClientMain(args):
     if len(args) == 0:
         sys.exit(1)
+    # The server may start very slowly, wait for a few seconds to see if the server will start.
+    for _ in range(CLIENT_WAIT_TIMEOUT_SECONDS):
+        socks = Path(SERVER_ADDRESS)
+        if socks.exists():
+            break
+        time.sleep(1)
+    # If the address does not exist, Client constructor will throw an exception, so no need to add a flag.
     with Client(SERVER_ADDRESS) as conn:
         conn.send(args)
         res = conn.recv()

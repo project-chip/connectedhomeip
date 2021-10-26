@@ -321,16 +321,15 @@ bool IMDefaultResponseCallback(const app::Command * commandObj, EmberAfStatus st
     return true;
 }
 
-bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, EmberAfStatus status)
+bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, chip::Protocols::InteractionModel::Status status)
 {
     ChipLogProgress(Zcl, "WriteResponse:");
-    LogStatus(status);
+    LogIMStatus(status);
 
     Callback::Cancelable * onSuccessCallback = nullptr;
     Callback::Cancelable * onFailureCallback = nullptr;
-    NodeId sourceNodeId                      = writeClient->GetSourceNodeId();
-    uint8_t seq                              = static_cast<uint8_t>(writeClient->GetAppIdentifier());
-    CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceNodeId, seq, &onSuccessCallback, &onFailureCallback);
+    CHIP_ERROR err =
+        gCallbacks.GetResponseCallback(reinterpret_cast<NodeId>(writeClient), 0, &onSuccessCallback, &onFailureCallback);
 
     if (CHIP_NO_ERROR != err)
     {
@@ -347,7 +346,7 @@ bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, EmberAf
         return true;
     }
 
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    if (status == Protocols::InteractionModel::Status::Success)
     {
         Callback::Callback<DefaultSuccessCallback> * cb =
             Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
@@ -357,7 +356,7 @@ bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, EmberAf
     {
         Callback::Callback<DefaultFailureCallback> * cb =
             Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, static_cast<uint8_t>(status));
+        cb->mCall(cb->mContext, static_cast<uint8_t>(to_underlying(status)));
     }
 
     return true;
@@ -427,7 +426,16 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
 
 bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient, EmberAfStatus status)
 {
+    auto subscriptionId = apSubscribeClient->GetSubscriptionId();
     ChipLogProgress(Zcl, "SubscribeResponse:");
+    if (subscriptionId.HasValue())
+    {
+        ChipLogProgress(Zcl, "  SubscriptionId:        0x%" PRIx64, subscriptionId.Value());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  SubscriptionId:        <missing>");
+    }
     ChipLogProgress(Zcl, "  ApplicationIdentifier: %" PRIx64, apSubscribeClient->GetAppIdentifier());
     LogStatus(status);
 

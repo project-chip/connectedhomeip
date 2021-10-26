@@ -77,7 +77,7 @@ CHIP_ERROR AttributePath::Parser::CheckSchemaValidity() const
 
 #if CHIP_DETAIL_LOGGING
             {
-                uint64_t nodeId;
+                chip::NodeId nodeId;
                 reader.Get(nodeId);
                 PRETTY_PRINT("\tNodeId = 0x%" PRIx64 ",", nodeId);
             }
@@ -90,7 +90,7 @@ CHIP_ERROR AttributePath::Parser::CheckSchemaValidity() const
             VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                uint16_t endpointId;
+                chip::EndpointId endpointId;
                 reader.Get(endpointId);
                 PRETTY_PRINT("\tEndpointId = 0x%" PRIx16 ",", endpointId);
             }
@@ -118,9 +118,9 @@ CHIP_ERROR AttributePath::Parser::CheckSchemaValidity() const
             VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                uint8_t fieldTag;
+                chip::AttributeId fieldTag;
                 reader.Get(fieldTag);
-                PRETTY_PRINT("\tFieldTag = 0x%" PRIx8 ",", fieldTag);
+                PRETTY_PRINT("\tFieldTag = " ChipLogFormatMEI ",", ChipLogValueMEI(fieldTag));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -193,7 +193,7 @@ CHIP_ERROR AttributePath::Parser::GetListIndex(chip::ListIndex * const apListInd
     return GetUnsignedInteger(kCsTag_ListIndex, apListIndex);
 }
 
-CHIP_ERROR AttributePath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag)
+CHIP_ERROR AttributePath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
 {
     mpWriter = apWriter;
     mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_List, mOuterContainerType);

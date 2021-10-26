@@ -196,6 +196,8 @@ public:
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
 
+    size_t GetNumActiveExchanges() { return mContextPool.Allocated(); }
+
 private:
     enum class State
     {

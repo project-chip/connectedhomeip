@@ -28,7 +28,6 @@
 #include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 #include <utility>
 
 namespace chip {
@@ -46,7 +45,7 @@ bool IsVendorTag(uint8_t tag)
 // Check the Setup Payload for validity
 //
 // `vendor_id` and `product_id` are allowed all of uint16_t
-bool SetupPayload::isValidQRCodePayload()
+bool PayloadContents::isValidQRCodePayload() const
 {
     if (version >= 1 << kVersionFieldLengthInBits)
     {
@@ -83,7 +82,7 @@ bool SetupPayload::isValidQRCodePayload()
     return true;
 }
 
-bool SetupPayload::isValidManualCode()
+bool PayloadContents::isValidManualCode() const
 {
     // The discriminator for manual setup code is 4 most significant bits
     // in a regular 12 bit discriminator. Let's make sure that the provided
@@ -105,6 +104,13 @@ bool SetupPayload::isValidManualCode()
     }
 
     return true;
+}
+
+bool PayloadContents::operator==(PayloadContents & input) const
+{
+    return (this->version == input.version && this->vendorID == input.vendorID && this->productID == input.productID &&
+            this->commissioningFlow == input.commissioningFlow && this->rendezvousInformation == input.rendezvousInformation &&
+            this->discriminator == input.discriminator && this->setUpPINCode == input.setUpPINCode);
 }
 
 CHIP_ERROR SetupPayload::addOptionalVendorData(uint8_t tag, std::string data)
@@ -258,11 +264,7 @@ bool SetupPayload::operator==(SetupPayload & input)
     std::vector<OptionalQRCodeInfo> inputOptionalVendorData;
     std::vector<OptionalQRCodeInfoExtension> inputOptionalExtensionData;
 
-    VerifyOrReturnError(this->version == input.version && this->vendorID == input.vendorID && this->productID == input.productID &&
-                            this->commissioningFlow == input.commissioningFlow &&
-                            this->rendezvousInformation == input.rendezvousInformation &&
-                            this->discriminator == input.discriminator && this->setUpPINCode == input.setUpPINCode,
-                        false);
+    VerifyOrReturnError(PayloadContents::operator==(input), false);
 
     inputOptionalVendorData = input.getAllOptionalVendorData();
     VerifyOrReturnError(optionalVendorData.size() == inputOptionalVendorData.size(), false);

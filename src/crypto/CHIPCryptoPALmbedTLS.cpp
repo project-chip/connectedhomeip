@@ -112,6 +112,8 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     mbedtls_ccm_context context;
     mbedtls_ccm_init(&context);
 
+    VerifyOrExit(plaintext != nullptr || plaintext_length == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ciphertext != nullptr || plaintext_length == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE);
     VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -151,6 +153,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     mbedtls_ccm_context context;
     mbedtls_ccm_init(&context);
 
+    VerifyOrExit(plaintext != nullptr || ciphertext_len == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ciphertext != nullptr || ciphertext_len == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -203,19 +207,25 @@ CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * o
     return CHIP_NO_ERROR;
 }
 
-Hash_SHA256_stream::Hash_SHA256_stream(void) {}
-
-Hash_SHA256_stream::~Hash_SHA256_stream(void)
-{
-    Clear();
-}
-
 static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(mbedtls_sha256_context),
               "kMAX_Hash_SHA256_Context_Size is too small for the size of underlying mbedtls_sha256_context");
 
 static inline mbedtls_sha256_context * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
 {
     return SafePointerCast<mbedtls_sha256_context *>(context);
+}
+
+Hash_SHA256_stream::Hash_SHA256_stream(void)
+{
+    mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
+    mbedtls_sha256_init(context);
+}
+
+Hash_SHA256_stream::~Hash_SHA256_stream(void)
+{
+    mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
+    mbedtls_sha256_free(context);
+    Clear();
 }
 
 CHIP_ERROR Hash_SHA256_stream::Begin(void)
@@ -250,7 +260,7 @@ CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
     CHIP_ERROR result = Finish(out_buffer);
 
     // Restore context prior to finalization.
-    *context = previous_ctx;
+    mbedtls_sha256_clone(context, &previous_ctx);
 
     return result;
 }
@@ -696,7 +706,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     output.SetLength(bbuf.Needed());
 
 exit:
-    memset(privkey, 0, sizeof(privkey));
+    ClearSecretData(privkey, sizeof(privkey));
     _log_mbedTLS_error(result);
     return error;
 }
@@ -1294,7 +1304,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
+namespace {
+
+CHIP_ERROR ExtractKIDFromX509Cert(bool isSKID, const ByteSpan & certificate, MutableByteSpan & kid)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -1302,6 +1314,8 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
     unsigned char * p;
     const unsigned char * end;
     size_t len;
+
+    constexpr uint8_t sOID_Extension_SubjectKeyIdentifier[]   = { 0x55, 0x1D, 0x0E };
     constexpr uint8_t sOID_Extension_AuthorityKeyIdentifier[] = { 0x55, 0x1D, 0x23 };
 
     mbedtls_x509_crt_init(&mbed_cert);
@@ -1324,22 +1338,34 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
         result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_OID);
         VerifyOrExit(result == 0, error = CHIP_ERROR_WRONG_CERT_TYPE);
 
-        if (sizeof(sOID_Extension_AuthorityKeyIdentifier) == len && memcmp(p, sOID_Extension_AuthorityKeyIdentifier, len) == 0)
+        bool isRequiredKID = false;
+        if (isSKID)
         {
-            constexpr size_t keyid_skip = 4;
-            constexpr size_t akid_size  = 20;
+            isRequiredKID =
+                sizeof(sOID_Extension_SubjectKeyIdentifier) == len && memcmp(p, sOID_Extension_SubjectKeyIdentifier, len) == 0;
+        }
+        else
+        {
+            isRequiredKID =
+                sizeof(sOID_Extension_AuthorityKeyIdentifier) == len && memcmp(p, sOID_Extension_AuthorityKeyIdentifier, len) == 0;
+        }
+
+        if (isRequiredKID)
+        {
+            size_t keyid_skip         = isSKID ? 2 : 4;
+            constexpr size_t kid_size = 20;
 
             p += len;
             result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_OCTET_STRING);
             VerifyOrExit(result == 0, error = CHIP_ERROR_WRONG_CERT_TYPE);
 
-            VerifyOrExit((len - keyid_skip) == akid_size, error = CHIP_ERROR_WRONG_CERT_TYPE);
-            VerifyOrExit((len - keyid_skip) <= akid.size(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrExit((len - keyid_skip) == kid_size, error = CHIP_ERROR_WRONG_CERT_TYPE);
+            VerifyOrExit((len - keyid_skip) <= kid.size(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-            memcpy(akid.data(), p + keyid_skip, akid_size);
-            if (akid.size() > akid_size)
+            memcpy(kid.data(), p + keyid_skip, kid_size);
+            if (kid.size() > kid_size)
             {
-                akid.reduce_size(akid_size);
+                kid.reduce_size(kid_size);
             }
 
             break;
@@ -1360,11 +1386,23 @@ exit:
 
 #else
     (void) certificate;
-    (void) akid;
+    (void) kid;
     CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
     return error;
+}
+
+} // namespace
+
+CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & skid)
+{
+    return ExtractKIDFromX509Cert(true, certificate, skid);
+}
+
+CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
+{
+    return ExtractKIDFromX509Cert(false, certificate, akid);
 }
 
 CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)

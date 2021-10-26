@@ -18,29 +18,40 @@
 
 #pragma once
 
-#include "../common/Command.h"
+#include "../common/CHIPCommand.h"
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/DecodableList.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <zap-generated/tests/CHIPClusters.h>
+#include <lib/support/TypeTraits.h>
+#include <lib/support/UnitTestUtils.h>
+#include <type_traits>
+#include <zap-generated/tests/CHIPClustersTest.h>
 
-class TestCommand : public Command
+class TestCommand : public CHIPCommand
 {
 public:
     TestCommand(const char * commandName) :
-        Command(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+        CHIPCommand(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
-    {}
+    {
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
+    }
 
-    /////////// Command Interface /////////
-    CHIP_ERROR Run() override;
-    uint16_t GetWaitDurationInSeconds() const override { return 30; }
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }
 
     virtual void NextTest() = 0;
 
     /////////// GlobalCommands Interface /////////
-    CHIP_ERROR WaitForMs(uint32_t ms);
+    CHIP_ERROR Wait(chip::System::Clock::Timeout ms);
+    CHIP_ERROR WaitForMs(uint16_t ms) { return Wait(chip::System::Clock::Milliseconds32(ms)); }
+    CHIP_ERROR Log(const char * message);
 
 protected:
     ChipDevice * mDevice;
+    chip::NodeId mNodeId;
 
     static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
@@ -87,8 +98,11 @@ protected:
 
         return true;
     }
-    template <typename T>
-    bool CheckValue(const char * itemName, T current, T expected)
+
+    // Allow a different expected type from the actual value type, because if T
+    // is short the literal we are using is not short-typed.
+    template <typename T, typename U, typename std::enable_if_t<!std::is_enum<T>::value, int> = 0>
+    bool CheckValue(const char * itemName, T current, U expected)
     {
         if (current != expected)
         {
@@ -98,9 +112,97 @@ protected:
 
         return true;
     }
+
+    template <typename T, typename U, typename std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    bool CheckValue(const char * itemName, T current, U expected)
+    {
+        return CheckValue(itemName, to_underlying(current), expected);
+    }
+
     bool CheckValueAsList(const char * itemName, uint64_t current, uint64_t expected);
+
+    template <typename T>
+    bool CheckValueAsListHelper(const char * itemName, typename chip::app::DataModel::DecodableList<T>::Iterator iter)
+    {
+        if (iter.Next())
+        {
+            Exit(std::string(itemName) + " value mismatch: expected no more items but found " + std::to_string(iter.GetValue()));
+            return false;
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            Exit(std::string(itemName) +
+                 " value mismatch: expected no more items but got an error: " + iter.GetStatus().AsString());
+            return false;
+        }
+        return true;
+    }
+
+    template <typename T, typename U, typename... ValueTypes>
+    bool CheckValueAsListHelper(const char * itemName, typename chip::app::DataModel::DecodableList<T>::Iterator & iter,
+                                const U & firstItem, ValueTypes &&... otherItems)
+    {
+        bool haveValue = iter.Next();
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            Exit(std::string(itemName) + " value mismatch: expected " + std::to_string(firstItem) +
+                 " but got error: " + iter.GetStatus().AsString());
+            return false;
+        }
+        if (!haveValue)
+        {
+            Exit(std::string(itemName) + " value mismatch: expected " + std::to_string(firstItem) +
+                 " but found nothing or an error");
+            return false;
+        }
+        if (iter.GetValue() != firstItem)
+        {
+            Exit(std::string(itemName) + " value mismatch: expected " + std::to_string(firstItem) + " but found " +
+                 std::to_string(iter.GetValue()));
+            return false;
+        }
+        return CheckValueAsListHelper<T>(itemName, iter, std::forward<ValueTypes>(otherItems)...);
+    }
+
+    template <typename T, typename... ValueTypes>
+    bool CheckValueAsList(const char * itemName, chip::app::DataModel::DecodableList<T> list, ValueTypes &&... items)
+    {
+        auto iter = list.begin();
+        return CheckValueAsListHelper<T>(itemName, iter, std::forward<ValueTypes>(items)...);
+    }
+
+    template <typename T>
+    bool CheckValueAsListLength(const char * itemName, chip::app::DataModel::DecodableList<T> list, uint64_t expectedLength)
+    {
+        // We don't just use list.ComputeSize(), because we want to check that
+        // all the values in the list correctly decode to our type too.
+        auto iter      = list.begin();
+        uint64_t count = 0;
+        while (iter.Next())
+        {
+            ++count;
+        }
+        if (iter.GetStatus() != CHIP_NO_ERROR)
+        {
+            Exit(std::string(itemName) + " list length mismatch: expected " + std::to_string(expectedLength) + " but got an error");
+            return false;
+        }
+        return CheckValueAsList(itemName, count, expectedLength);
+    }
+
     bool CheckValueAsString(const char * itemName, chip::ByteSpan current, const char * expected);
+
+    bool CheckValueAsString(const char * itemName, chip::CharSpan current, const char * expected);
 
     chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    void Wait()
+    {
+        if (mDelayInMs)
+        {
+            chip::test_utils::SleepMillis(mDelayInMs);
+        }
+    };
+    uint64_t mDelayInMs = 0;
 };

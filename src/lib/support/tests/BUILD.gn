@@ -26,13 +26,13 @@ chip_test_suite("tests") {
     "TestBufferWriter.cpp",
     "TestBytesCircularBuffer.cpp",
     "TestBytesToHex.cpp",
-    "TestCHIPArgParser.cpp",
     "TestCHIPCounter.cpp",
     "TestCHIPMem.cpp",
     "TestCHIPMemString.cpp",
     "TestDefer.cpp",
     "TestErrorStr.cpp",
     "TestFixedBufferAllocator.cpp",
+    "TestFold.cpp",
     "TestOwnerOf.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
@@ -48,6 +48,10 @@ chip_test_suite("tests") {
     "TestZclString.cpp",
   ]
   sources = []
+
+  if (current_os != "mbed") {
+    test_sources += [ "TestCHIPArgParser.cpp" ]
+  }
 
   if (current_os == "linux" || current_os == "mac") {
     # persisted counter unit test uses file-based persistent storage

@@ -257,14 +257,6 @@ EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Com
 {
     size_t networkSeq;
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_NETWORK_ID_NOT_FOUND;
-    // TODO(cecille): This is very dangerous - need to check against real netif name, ensure no password.
-    constexpr char ethernetNetifMagicCode[] = "ETH0";
-    if (networkID.size() == sizeof(ethernetNetifMagicCode) &&
-        memcmp(networkID.data(), ethernetNetifMagicCode, networkID.size()) == 0)
-    {
-        ChipLogProgress(Zcl, "Wired network enabling requested. Assuming success.");
-        ExitNow(err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS);
-    }
 
     for (networkSeq = 0; networkSeq < kMaxNetworks; networkSeq++)
     {

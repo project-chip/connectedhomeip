@@ -19,11 +19,18 @@
 
 #pragma once
 
+#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app/EventLoggingTypes.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/util/basic-types.h>
+#include <lib/support/BitFlags.h>
+#include <protocols/interaction_model/Constants.h>
 
 namespace chip {
 namespace app {
@@ -31,147 +38,5958 @@ namespace Clusters {
 
 namespace PowerConfiguration {
 
+namespace Attributes {
+namespace MainsVoltage {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltage::Id; }
+};
+} // namespace MainsVoltage
+namespace MainsFrequency {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MainsFrequency::Id; }
+};
+} // namespace MainsFrequency
+namespace MainsAlarmMask {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MainsAlarmMask::Id; }
+};
+} // namespace MainsAlarmMask
+namespace MainsVoltageMinThreshold {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageMinThreshold::Id; }
+};
+} // namespace MainsVoltageMinThreshold
+namespace MainsVoltageMaxThreshold {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageMaxThreshold::Id; }
+};
+} // namespace MainsVoltageMaxThreshold
+namespace MainsVoltageDwellTrip {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageDwellTrip::Id; }
+};
+} // namespace MainsVoltageDwellTrip
+namespace BatteryVoltage {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltage::Id; }
+};
+} // namespace BatteryVoltage
+namespace BatteryPercentageRemaining {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageRemaining::Id; }
+};
+} // namespace BatteryPercentageRemaining
+namespace BatteryManufacturer {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryManufacturer::Id; }
+};
+} // namespace BatteryManufacturer
+namespace BatterySize {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatterySize::Id; }
+};
+} // namespace BatterySize
+namespace BatteryAhrRating {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAhrRating::Id; }
+};
+} // namespace BatteryAhrRating
+namespace BatteryQuantity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryQuantity::Id; }
+};
+} // namespace BatteryQuantity
+namespace BatteryRatedVoltage {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryRatedVoltage::Id; }
+};
+} // namespace BatteryRatedVoltage
+namespace BatteryAlarmMask {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlarmMask::Id; }
+};
+} // namespace BatteryAlarmMask
+namespace BatteryVoltageMinThreshold {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageMinThreshold::Id; }
+};
+} // namespace BatteryVoltageMinThreshold
+namespace BatteryVoltageThreshold1 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold1::Id; }
+};
+} // namespace BatteryVoltageThreshold1
+namespace BatteryVoltageThreshold2 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold2::Id; }
+};
+} // namespace BatteryVoltageThreshold2
+namespace BatteryVoltageThreshold3 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold3::Id; }
+};
+} // namespace BatteryVoltageThreshold3
+namespace BatteryPercentageMinThreshold {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageMinThreshold::Id; }
+};
+} // namespace BatteryPercentageMinThreshold
+namespace BatteryPercentageThreshold1 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold1::Id; }
+};
+} // namespace BatteryPercentageThreshold1
+namespace BatteryPercentageThreshold2 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold2::Id; }
+};
+} // namespace BatteryPercentageThreshold2
+namespace BatteryPercentageThreshold3 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold3::Id; }
+};
+} // namespace BatteryPercentageThreshold3
+namespace BatteryAlarmState {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlarmState::Id; }
+};
+} // namespace BatteryAlarmState
+namespace Battery2Voltage {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Voltage::Id; }
+};
+} // namespace Battery2Voltage
+namespace Battery2PercentageRemaining {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageRemaining::Id; }
+};
+} // namespace Battery2PercentageRemaining
+namespace Battery2Manufacturer {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Manufacturer::Id; }
+};
+} // namespace Battery2Manufacturer
+namespace Battery2Size {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Size::Id; }
+};
+} // namespace Battery2Size
+namespace Battery2AhrRating {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AhrRating::Id; }
+};
+} // namespace Battery2AhrRating
+namespace Battery2Quantity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Quantity::Id; }
+};
+} // namespace Battery2Quantity
+namespace Battery2RatedVoltage {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2RatedVoltage::Id; }
+};
+} // namespace Battery2RatedVoltage
+namespace Battery2AlarmMask {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AlarmMask::Id; }
+};
+} // namespace Battery2AlarmMask
+namespace Battery2VoltageMinThreshold {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageMinThreshold::Id; }
+};
+} // namespace Battery2VoltageMinThreshold
+namespace Battery2VoltageThreshold1 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold1::Id; }
+};
+} // namespace Battery2VoltageThreshold1
+namespace Battery2VoltageThreshold2 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold2::Id; }
+};
+} // namespace Battery2VoltageThreshold2
+namespace Battery2VoltageThreshold3 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold3::Id; }
+};
+} // namespace Battery2VoltageThreshold3
+namespace Battery2PercentageMinThreshold {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageMinThreshold::Id; }
+};
+} // namespace Battery2PercentageMinThreshold
+namespace Battery2PercentageThreshold1 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold1::Id; }
+};
+} // namespace Battery2PercentageThreshold1
+namespace Battery2PercentageThreshold2 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold2::Id; }
+};
+} // namespace Battery2PercentageThreshold2
+namespace Battery2PercentageThreshold3 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold3::Id; }
+};
+} // namespace Battery2PercentageThreshold3
+namespace Battery2AlarmState {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AlarmState::Id; }
+};
+} // namespace Battery2AlarmState
+namespace Battery3Voltage {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Voltage::Id; }
+};
+} // namespace Battery3Voltage
+namespace Battery3PercentageRemaining {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageRemaining::Id; }
+};
+} // namespace Battery3PercentageRemaining
+namespace Battery3Manufacturer {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Manufacturer::Id; }
+};
+} // namespace Battery3Manufacturer
+namespace Battery3Size {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Size::Id; }
+};
+} // namespace Battery3Size
+namespace Battery3AhrRating {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AhrRating::Id; }
+};
+} // namespace Battery3AhrRating
+namespace Battery3Quantity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Quantity::Id; }
+};
+} // namespace Battery3Quantity
+namespace Battery3RatedVoltage {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3RatedVoltage::Id; }
+};
+} // namespace Battery3RatedVoltage
+namespace Battery3AlarmMask {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AlarmMask::Id; }
+};
+} // namespace Battery3AlarmMask
+namespace Battery3VoltageMinThreshold {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageMinThreshold::Id; }
+};
+} // namespace Battery3VoltageMinThreshold
+namespace Battery3VoltageThreshold1 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold1::Id; }
+};
+} // namespace Battery3VoltageThreshold1
+namespace Battery3VoltageThreshold2 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold2::Id; }
+};
+} // namespace Battery3VoltageThreshold2
+namespace Battery3VoltageThreshold3 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold3::Id; }
+};
+} // namespace Battery3VoltageThreshold3
+namespace Battery3PercentageMinThreshold {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageMinThreshold::Id; }
+};
+} // namespace Battery3PercentageMinThreshold
+namespace Battery3PercentageThreshold1 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold1::Id; }
+};
+} // namespace Battery3PercentageThreshold1
+namespace Battery3PercentageThreshold2 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold2::Id; }
+};
+} // namespace Battery3PercentageThreshold2
+namespace Battery3PercentageThreshold3 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold3::Id; }
+};
+} // namespace Battery3PercentageThreshold3
+namespace Battery3AlarmState {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AlarmState::Id; }
+};
+} // namespace Battery3AlarmState
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace PowerConfiguration
 namespace DeviceTemperatureConfiguration {
 
+namespace Attributes {
+namespace CurrentTemperature {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTemperature::Id; }
+};
+} // namespace CurrentTemperature
+namespace MinTempExperienced {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinTempExperienced::Id; }
+};
+} // namespace MinTempExperienced
+namespace MaxTempExperienced {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxTempExperienced::Id; }
+};
+} // namespace MaxTempExperienced
+namespace OverTempTotalDwell {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OverTempTotalDwell::Id; }
+};
+} // namespace OverTempTotalDwell
+namespace DeviceTempAlarmMask {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceTempAlarmMask::Id; }
+};
+} // namespace DeviceTempAlarmMask
+namespace LowTempThreshold {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LowTempThreshold::Id; }
+};
+} // namespace LowTempThreshold
+namespace HighTempThreshold {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HighTempThreshold::Id; }
+};
+} // namespace HighTempThreshold
+namespace LowTempDwellTripPoint {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LowTempDwellTripPoint::Id; }
+};
+} // namespace LowTempDwellTripPoint
+namespace HighTempDwellTripPoint {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HighTempDwellTripPoint::Id; }
+};
+} // namespace HighTempDwellTripPoint
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace DeviceTemperatureConfiguration
 namespace Identify {
-
-} // namespace Identify
-namespace Groups {
-
-} // namespace Groups
-namespace Scenes {
-
-} // namespace Scenes
-namespace OnOff {
-// Enum for OnOffDelayedAllOffEffectVariant
-enum class OnOffDelayedAllOffEffectVariant : uint8_t
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IdentifyEffectIdentifier
+enum class IdentifyEffectIdentifier : uint8_t
 {
-    ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS                                        = 0x00,
-    ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE                                                           = 0x01,
-    ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS = 0x02,
+    kBlink         = 0x00,
+    kBreathe       = 0x01,
+    kOkay          = 0x02,
+    kChannelChange = 0x0B,
+    kFinishEffect  = 0xFE,
+    kStopEffect    = 0xFF,
 };
-// Enum for OnOffDyingLightEffectVariant
-enum class OnOffDyingLightEffectVariant : uint8_t
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IdentifyEffectIdentifier             = EmberAfIdentifyEffectIdentifier;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IdentifyEffectVariant
+enum class IdentifyEffectVariant : uint8_t
 {
-    ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND = 0x00,
+    kDefault = 0x00,
 };
-// Enum for OnOffEffectIdentifier
-enum class OnOffEffectIdentifier : uint8_t
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IdentifyEffectVariant                = EmberAfIdentifyEffectVariant;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IdentifyIdentifyType
+enum class IdentifyIdentifyType : uint8_t
 {
-    ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF = 0x00,
-    ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT     = 0x01,
+    kNone         = 0x00,
+    kVisibleLight = 0x01,
+    kVisibleLED   = 0x02,
+    kAudibleBeep  = 0x03,
+    kDisplay      = 0x04,
+    kActuator     = 0x05,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IdentifyIdentifyType                 = EmberAfIdentifyIdentifyType;
+#endif
 
-} // namespace OnOff
-namespace OnOffSwitchConfiguration {
-
-} // namespace OnOffSwitchConfiguration
-namespace LevelControl {
-
-} // namespace LevelControl
-namespace Alarms {
-
-} // namespace Alarms
-namespace Time {
-
-} // namespace Time
-namespace BinaryInputBasic {
-
-} // namespace BinaryInputBasic
-namespace PowerProfile {
-
-} // namespace PowerProfile
-namespace ApplianceControl {
-
-} // namespace ApplianceControl
-namespace Descriptor {
-
-namespace DeviceType {
-enum FieldId
+namespace Commands {
+namespace Identify {
+enum class Fields
 {
-    kTypeFieldId     = 0,
-    kRevisionFieldId = 1,
+    kIdentifyTime = 0,
 };
 
 struct Type
 {
 public:
-    uint32_t type;
-    uint16_t revision;
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Identify::Id; }
+    static constexpr ClusterId GetClusterId() { return Identify::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    uint16_t identifyTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Identify::Id; }
+    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+
+    uint16_t identifyTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Identify
+namespace IdentifyQueryResponse {
+enum class Fields
+{
+    kTimeout = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return IdentifyQueryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+
+    uint16_t timeout;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return IdentifyQueryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+
+    uint16_t timeout;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace IdentifyQueryResponse
+namespace IdentifyQuery {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return IdentifyQuery::Id; }
+    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return IdentifyQuery::Id; }
+    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace IdentifyQuery
+namespace TriggerEffect {
+enum class Fields
+{
+    kEffectIdentifier = 0,
+    kEffectVariant    = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TriggerEffect::Id; }
+    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+
+    IdentifyEffectIdentifier effectIdentifier;
+    IdentifyEffectVariant effectVariant;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TriggerEffect::Id; }
+    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+
+    IdentifyEffectIdentifier effectIdentifier;
+    IdentifyEffectVariant effectVariant;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TriggerEffect
+} // namespace Commands
+
+namespace Attributes {
+namespace IdentifyTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IdentifyTime::Id; }
+};
+} // namespace IdentifyTime
+namespace IdentifyType {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IdentifyType::Id; }
+};
+} // namespace IdentifyType
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace Identify
+namespace Groups {
+
+namespace Commands {
+namespace AddGroup {
+enum class Fields
+{
+    kGroupId   = 0,
+    kGroupName = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AddGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint16_t groupId;
+    chip::CharSpan groupName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AddGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint16_t groupId;
+    chip::CharSpan groupName;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddGroup
+namespace AddGroupResponse {
+enum class Fields
+{
+    kStatus  = 0,
+    kGroupId = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AddGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AddGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddGroupResponse
+namespace ViewGroup {
+enum class Fields
+{
+    kGroupId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ViewGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ViewGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint16_t groupId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ViewGroup
+namespace ViewGroupResponse {
+enum class Fields
+{
+    kStatus    = 0,
+    kGroupId   = 1,
+    kGroupName = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ViewGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    chip::CharSpan groupName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ViewGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    chip::CharSpan groupName;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ViewGroupResponse
+namespace GetGroupMembership {
+enum class Fields
+{
+    kGroupCount = 0,
+    kGroupList  = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetGroupMembership::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint8_t groupCount;
+    DataModel::List<uint16_t> groupList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetGroupMembership::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint8_t groupCount;
+    DataModel::DecodableList<uint16_t> groupList;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetGroupMembership
+namespace GetGroupMembershipResponse {
+enum class Fields
+{
+    kCapacity   = 0,
+    kGroupCount = 1,
+    kGroupList  = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetGroupMembershipResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint8_t capacity;
+    uint8_t groupCount;
+    DataModel::List<uint16_t> groupList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetGroupMembershipResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint8_t capacity;
+    uint8_t groupCount;
+    DataModel::DecodableList<uint16_t> groupList;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetGroupMembershipResponse
+namespace RemoveGroup {
+enum class Fields
+{
+    kGroupId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RemoveGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RemoveGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint16_t groupId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveGroup
+namespace RemoveGroupResponse {
+enum class Fields
+{
+    kStatus  = 0,
+    kGroupId = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RemoveGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RemoveGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveGroupResponse
+namespace RemoveAllGroups {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RemoveAllGroups::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RemoveAllGroups::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveAllGroups
+namespace AddGroupIfIdentifying {
+enum class Fields
+{
+    kGroupId   = 0,
+    kGroupName = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AddGroupIfIdentifying::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint16_t groupId;
+    chip::CharSpan groupName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AddGroupIfIdentifying::Id; }
+    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+
+    uint16_t groupId;
+    chip::CharSpan groupName;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddGroupIfIdentifying
+} // namespace Commands
+
+namespace Attributes {
+namespace NameSupport {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
+};
+} // namespace NameSupport
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace Groups
+namespace Scenes {
+
+// Bitmap for ScenesCopyMode
+enum class ScenesCopyMode : uint8_t
+{
+    kCopyAllScenes = 0,
+};
+
+namespace Structs {
+namespace SceneExtensionFieldSet {
+enum class Fields
+{
+    kClusterId = 0,
+    kLength    = 1,
+    kValue     = 2,
+};
+
+struct Type
+{
+public:
+    chip::ClusterId clusterId;
+    uint8_t length;
+    uint8_t value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace DeviceType
+using DecodableType = Type;
 
+} // namespace SceneExtensionFieldSet
+} // namespace Structs
+
+namespace Commands {
+namespace AddScene {
+enum class Fields
+{
+    kGroupId            = 0,
+    kSceneId            = 1,
+    kTransitionTime     = 2,
+    kSceneName          = 3,
+    kExtensionFieldSets = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AddScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    chip::CharSpan sceneName;
+    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AddScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    chip::CharSpan sceneName;
+    DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddScene
+namespace AddSceneResponse {
+enum class Fields
+{
+    kStatus  = 0,
+    kGroupId = 1,
+    kSceneId = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AddSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AddSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddSceneResponse
+namespace ViewScene {
+enum class Fields
+{
+    kGroupId = 0,
+    kSceneId = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ViewScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ViewScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ViewScene
+namespace ViewSceneResponse {
+enum class Fields
+{
+    kStatus             = 0,
+    kGroupId            = 1,
+    kSceneId            = 2,
+    kTransitionTime     = 3,
+    kSceneName          = 4,
+    kExtensionFieldSets = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ViewSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    chip::CharSpan sceneName;
+    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ViewSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    chip::CharSpan sceneName;
+    DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ViewSceneResponse
+namespace RemoveScene {
+enum class Fields
+{
+    kGroupId = 0,
+    kSceneId = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RemoveScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RemoveScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveScene
+namespace RemoveSceneResponse {
+enum class Fields
+{
+    kStatus  = 0,
+    kGroupId = 1,
+    kSceneId = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RemoveSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RemoveSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveSceneResponse
+namespace RemoveAllScenes {
+enum class Fields
+{
+    kGroupId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RemoveAllScenes::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RemoveAllScenes::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveAllScenes
+namespace RemoveAllScenesResponse {
+enum class Fields
+{
+    kStatus  = 0,
+    kGroupId = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RemoveAllScenesResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RemoveAllScenesResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveAllScenesResponse
+namespace StoreScene {
+enum class Fields
+{
+    kGroupId = 0,
+    kSceneId = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StoreScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StoreScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StoreScene
+namespace StoreSceneResponse {
+enum class Fields
+{
+    kStatus  = 0,
+    kGroupId = 1,
+    kSceneId = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StoreSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StoreSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StoreSceneResponse
+namespace RecallScene {
+enum class Fields
+{
+    kGroupId        = 0,
+    kSceneId        = 1,
+    kTransitionTime = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RecallScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RecallScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RecallScene
+namespace GetSceneMembership {
+enum class Fields
+{
+    kGroupId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetSceneMembership::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetSceneMembership::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetSceneMembership
+namespace GetSceneMembershipResponse {
+enum class Fields
+{
+    kStatus     = 0,
+    kCapacity   = 1,
+    kGroupId    = 2,
+    kSceneCount = 3,
+    kSceneList  = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetSceneMembershipResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint8_t capacity;
+    uint16_t groupId;
+    uint8_t sceneCount;
+    DataModel::List<uint8_t> sceneList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetSceneMembershipResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint8_t capacity;
+    uint16_t groupId;
+    uint8_t sceneCount;
+    DataModel::DecodableList<uint8_t> sceneList;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetSceneMembershipResponse
+namespace EnhancedAddScene {
+enum class Fields
+{
+    kGroupId            = 0,
+    kSceneId            = 1,
+    kTransitionTime     = 2,
+    kSceneName          = 3,
+    kExtensionFieldSets = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnhancedAddScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    chip::CharSpan sceneName;
+    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnhancedAddScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    chip::CharSpan sceneName;
+    DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnhancedAddScene
+namespace EnhancedAddSceneResponse {
+enum class Fields
+{
+    kStatus  = 0,
+    kGroupId = 1,
+    kSceneId = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnhancedAddSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnhancedAddSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnhancedAddSceneResponse
+namespace EnhancedViewScene {
+enum class Fields
+{
+    kGroupId = 0,
+    kSceneId = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnhancedViewScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnhancedViewScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint16_t groupId;
+    uint8_t sceneId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnhancedViewScene
+namespace EnhancedViewSceneResponse {
+enum class Fields
+{
+    kStatus             = 0,
+    kGroupId            = 1,
+    kSceneId            = 2,
+    kTransitionTime     = 3,
+    kSceneName          = 4,
+    kExtensionFieldSets = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnhancedViewSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    chip::CharSpan sceneName;
+    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnhancedViewSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    chip::CharSpan sceneName;
+    DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnhancedViewSceneResponse
+namespace CopyScene {
+enum class Fields
+{
+    kMode        = 0,
+    kGroupIdFrom = 1,
+    kSceneIdFrom = 2,
+    kGroupIdTo   = 3,
+    kSceneIdTo   = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CopyScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    chip::BitFlags<ScenesCopyMode> mode;
+    uint16_t groupIdFrom;
+    uint8_t sceneIdFrom;
+    uint16_t groupIdTo;
+    uint8_t sceneIdTo;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CopyScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    chip::BitFlags<ScenesCopyMode> mode;
+    uint16_t groupIdFrom;
+    uint8_t sceneIdFrom;
+    uint16_t groupIdTo;
+    uint8_t sceneIdTo;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CopyScene
+namespace CopySceneResponse {
+enum class Fields
+{
+    kStatus      = 0,
+    kGroupIdFrom = 1,
+    kSceneIdFrom = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CopySceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupIdFrom;
+    uint8_t sceneIdFrom;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CopySceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+
+    uint8_t status;
+    uint16_t groupIdFrom;
+    uint8_t sceneIdFrom;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CopySceneResponse
+} // namespace Commands
+
+namespace Attributes {
+namespace SceneCount {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SceneCount::Id; }
+};
+} // namespace SceneCount
+namespace CurrentScene {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentScene::Id; }
+};
+} // namespace CurrentScene
+namespace CurrentGroup {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentGroup::Id; }
+};
+} // namespace CurrentGroup
+namespace SceneValid {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SceneValid::Id; }
+};
+} // namespace SceneValid
+namespace NameSupport {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
+};
+} // namespace NameSupport
+namespace LastConfiguredBy {
+struct TypeInfo
+{
+    using Type          = chip::NodeId;
+    using DecodableType = chip::NodeId;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LastConfiguredBy::Id; }
+};
+} // namespace LastConfiguredBy
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace Scenes
+namespace OnOff {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for OnOffDelayedAllOffEffectVariant
+enum class OnOffDelayedAllOffEffectVariant : uint8_t
+{
+    kFadeToOffIn0p8Seconds                                = 0x00,
+    kNoFade                                               = 0x01,
+    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OnOffDelayedAllOffEffectVariant      = EmberAfOnOffDelayedAllOffEffectVariant;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for OnOffDyingLightEffectVariant
+enum class OnOffDyingLightEffectVariant : uint8_t
+{
+    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0x00,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OnOffDyingLightEffectVariant         = EmberAfOnOffDyingLightEffectVariant;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for OnOffEffectIdentifier
+enum class OnOffEffectIdentifier : uint8_t
+{
+    kDelayedAllOff = 0x00,
+    kDyingLight    = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OnOffEffectIdentifier                = EmberAfOnOffEffectIdentifier;
+#endif
+
+// Bitmap for OnOffControl
+enum class OnOffControl : uint8_t
+{
+    kAcceptOnlyWhenOn = 0,
+};
+
+namespace Commands {
+namespace Off {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Off::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Off::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Off
+namespace SampleMfgSpecificOffWithTransition {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOffWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOffWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SampleMfgSpecificOffWithTransition
+namespace On {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return On::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return On::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace On
+namespace SampleMfgSpecificOnWithTransition {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOnWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOnWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SampleMfgSpecificOnWithTransition
+namespace SampleMfgSpecificOnWithTransition2 {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOnWithTransition2::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOnWithTransition2::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SampleMfgSpecificOnWithTransition2
+namespace Toggle {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Toggle::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Toggle::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Toggle
+namespace SampleMfgSpecificToggleWithTransition {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SampleMfgSpecificToggleWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SampleMfgSpecificToggleWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SampleMfgSpecificToggleWithTransition
+namespace SampleMfgSpecificToggleWithTransition2 {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SampleMfgSpecificToggleWithTransition2::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SampleMfgSpecificToggleWithTransition2::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SampleMfgSpecificToggleWithTransition2
+namespace OffWithEffect {
+enum class Fields
+{
+    kEffectId      = 0,
+    kEffectVariant = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return OffWithEffect::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    OnOffEffectIdentifier effectId;
+    OnOffDelayedAllOffEffectVariant effectVariant;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return OffWithEffect::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    OnOffEffectIdentifier effectId;
+    OnOffDelayedAllOffEffectVariant effectVariant;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OffWithEffect
+namespace OnWithRecallGlobalScene {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return OnWithRecallGlobalScene::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return OnWithRecallGlobalScene::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OnWithRecallGlobalScene
+namespace OnWithTimedOff {
+enum class Fields
+{
+    kOnOffControl = 0,
+    kOnTime       = 1,
+    kOffWaitTime  = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return OnWithTimedOff::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    chip::BitFlags<OnOffControl> onOffControl;
+    uint16_t onTime;
+    uint16_t offWaitTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return OnWithTimedOff::Id; }
+    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+
+    chip::BitFlags<OnOffControl> onOffControl;
+    uint16_t onTime;
+    uint16_t offWaitTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OnWithTimedOff
+} // namespace Commands
+
+namespace Attributes {
+namespace OnOff {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnOff::Id; }
+};
+} // namespace OnOff
+namespace SampleMfgSpecificAttribute0x00000x1002 {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00000x1002::Id; }
+};
+} // namespace SampleMfgSpecificAttribute0x00000x1002
+namespace SampleMfgSpecificAttribute0x00000x1049 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00000x1049::Id; }
+};
+} // namespace SampleMfgSpecificAttribute0x00000x1049
+namespace SampleMfgSpecificAttribute0x00010x1002 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00010x1002::Id; }
+};
+} // namespace SampleMfgSpecificAttribute0x00010x1002
+namespace SampleMfgSpecificAttribute0x00010x1040 {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00010x1040::Id; }
+};
+} // namespace SampleMfgSpecificAttribute0x00010x1040
+namespace GlobalSceneControl {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::GlobalSceneControl::Id; }
+};
+} // namespace GlobalSceneControl
+namespace OnTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnTime::Id; }
+};
+} // namespace OnTime
+namespace OffWaitTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OffWaitTime::Id; }
+};
+} // namespace OffWaitTime
+namespace StartUpOnOff {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpOnOff::Id; }
+};
+} // namespace StartUpOnOff
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace OnOff
+namespace OnOffSwitchConfiguration {
+
+namespace Attributes {
+namespace SwitchType {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SwitchType::Id; }
+};
+} // namespace SwitchType
+namespace SwitchActions {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SwitchActions::Id; }
+};
+} // namespace SwitchActions
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace OnOffSwitchConfiguration
+namespace LevelControl {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for MoveMode
+enum class MoveMode : uint8_t
+{
+    kUp   = 0x00,
+    kDown = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MoveMode                             = EmberAfMoveMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for StepMode
+enum class StepMode : uint8_t
+{
+    kUp   = 0x00,
+    kDown = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using StepMode                             = EmberAfStepMode;
+#endif
+
+namespace Commands {
+namespace MoveToLevel {
+enum class Fields
+{
+    kLevel          = 0,
+    kTransitionTime = 1,
+    kOptionMask     = 2,
+    kOptionOverride = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveToLevel::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    uint8_t level;
+    uint16_t transitionTime;
+    uint8_t optionMask;
+    uint8_t optionOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveToLevel::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    uint8_t level;
+    uint16_t transitionTime;
+    uint8_t optionMask;
+    uint8_t optionOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveToLevel
+namespace Move {
+enum class Fields
+{
+    kMoveMode       = 0,
+    kRate           = 1,
+    kOptionMask     = 2,
+    kOptionOverride = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Move::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    MoveMode moveMode;
+    uint8_t rate;
+    uint8_t optionMask;
+    uint8_t optionOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Move::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    MoveMode moveMode;
+    uint8_t rate;
+    uint8_t optionMask;
+    uint8_t optionOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Move
+namespace Step {
+enum class Fields
+{
+    kStepMode       = 0,
+    kStepSize       = 1,
+    kTransitionTime = 2,
+    kOptionMask     = 3,
+    kOptionOverride = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Step::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    StepMode stepMode;
+    uint8_t stepSize;
+    uint16_t transitionTime;
+    uint8_t optionMask;
+    uint8_t optionOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Step::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    StepMode stepMode;
+    uint8_t stepSize;
+    uint16_t transitionTime;
+    uint8_t optionMask;
+    uint8_t optionOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Step
+namespace Stop {
+enum class Fields
+{
+    kOptionMask     = 0,
+    kOptionOverride = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Stop::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    uint8_t optionMask;
+    uint8_t optionOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Stop::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    uint8_t optionMask;
+    uint8_t optionOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Stop
+namespace MoveToLevelWithOnOff {
+enum class Fields
+{
+    kLevel          = 0,
+    kTransitionTime = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveToLevelWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    uint8_t level;
+    uint16_t transitionTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveToLevelWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    uint8_t level;
+    uint16_t transitionTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveToLevelWithOnOff
+namespace MoveWithOnOff {
+enum class Fields
+{
+    kMoveMode = 0,
+    kRate     = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    MoveMode moveMode;
+    uint8_t rate;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    MoveMode moveMode;
+    uint8_t rate;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveWithOnOff
+namespace StepWithOnOff {
+enum class Fields
+{
+    kStepMode       = 0,
+    kStepSize       = 1,
+    kTransitionTime = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StepWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    StepMode stepMode;
+    uint8_t stepSize;
+    uint16_t transitionTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StepWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    StepMode stepMode;
+    uint8_t stepSize;
+    uint16_t transitionTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StepWithOnOff
+namespace StopWithOnOff {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StopWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StopWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StopWithOnOff
+} // namespace Commands
+
+namespace Attributes {
+namespace CurrentLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentLevel::Id; }
+};
+} // namespace CurrentLevel
+namespace RemainingTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
+};
+} // namespace RemainingTime
+namespace MinLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinLevel::Id; }
+};
+} // namespace MinLevel
+namespace MaxLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxLevel::Id; }
+};
+} // namespace MaxLevel
+namespace CurrentFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFrequency::Id; }
+};
+} // namespace CurrentFrequency
+namespace MinFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinFrequency::Id; }
+};
+} // namespace MinFrequency
+namespace MaxFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxFrequency::Id; }
+};
+} // namespace MaxFrequency
+namespace Options {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Options::Id; }
+};
+} // namespace Options
+namespace OnOffTransitionTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnOffTransitionTime::Id; }
+};
+} // namespace OnOffTransitionTime
+namespace OnLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnLevel::Id; }
+};
+} // namespace OnLevel
+namespace OnTransitionTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnTransitionTime::Id; }
+};
+} // namespace OnTransitionTime
+namespace OffTransitionTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OffTransitionTime::Id; }
+};
+} // namespace OffTransitionTime
+namespace DefaultMoveRate {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultMoveRate::Id; }
+};
+} // namespace DefaultMoveRate
+namespace StartUpCurrentLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpCurrentLevel::Id; }
+};
+} // namespace StartUpCurrentLevel
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace LevelControl
+namespace Alarms {
+
+namespace Commands {
+namespace ResetAlarm {
+enum class Fields
+{
+    kAlarmCode = 0,
+    kClusterId = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ResetAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    uint8_t alarmCode;
+    chip::ClusterId clusterId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ResetAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    uint8_t alarmCode;
+    chip::ClusterId clusterId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetAlarm
+namespace Alarm {
+enum class Fields
+{
+    kAlarmCode = 0,
+    kClusterId = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Alarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    uint8_t alarmCode;
+    chip::ClusterId clusterId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Alarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    uint8_t alarmCode;
+    chip::ClusterId clusterId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Alarm
+namespace ResetAllAlarms {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ResetAllAlarms::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ResetAllAlarms::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetAllAlarms
+namespace GetAlarmResponse {
+enum class Fields
+{
+    kStatus    = 0,
+    kAlarmCode = 1,
+    kClusterId = 2,
+    kTimeStamp = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetAlarmResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    uint8_t status;
+    uint8_t alarmCode;
+    chip::ClusterId clusterId;
+    uint32_t timeStamp;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetAlarmResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    uint8_t status;
+    uint8_t alarmCode;
+    chip::ClusterId clusterId;
+    uint32_t timeStamp;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetAlarmResponse
+namespace GetAlarm {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetAlarm
+namespace ResetAlarmLog {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ResetAlarmLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ResetAlarmLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetAlarmLog
+} // namespace Commands
+
+namespace Attributes {
+namespace AlarmCount {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AlarmCount::Id; }
+};
+} // namespace AlarmCount
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace Alarms
+namespace Time {
+
+namespace Attributes {
+namespace Time {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Time::Id; }
+};
+} // namespace Time
+namespace TimeStatus {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimeStatus::Id; }
+};
+} // namespace TimeStatus
+namespace TimeZone {
+struct TypeInfo
+{
+    using Type          = int32_t;
+    using DecodableType = int32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimeZone::Id; }
+};
+} // namespace TimeZone
+namespace DstStart {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DstStart::Id; }
+};
+} // namespace DstStart
+namespace DstEnd {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DstEnd::Id; }
+};
+} // namespace DstEnd
+namespace DstShift {
+struct TypeInfo
+{
+    using Type          = int32_t;
+    using DecodableType = int32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DstShift::Id; }
+};
+} // namespace DstShift
+namespace StandardTime {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StandardTime::Id; }
+};
+} // namespace StandardTime
+namespace LocalTime {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LocalTime::Id; }
+};
+} // namespace LocalTime
+namespace LastSetTime {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LastSetTime::Id; }
+};
+} // namespace LastSetTime
+namespace ValidUntilTime {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ValidUntilTime::Id; }
+};
+} // namespace ValidUntilTime
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace Time
+namespace BinaryInputBasic {
+
+namespace Attributes {
+namespace ActiveText {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveText::Id; }
+};
+} // namespace ActiveText
+namespace Description {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+};
+} // namespace Description
+namespace InactiveText {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InactiveText::Id; }
+};
+} // namespace InactiveText
+namespace OutOfService {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OutOfService::Id; }
+};
+} // namespace OutOfService
+namespace Polarity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Polarity::Id; }
+};
+} // namespace Polarity
+namespace PresentValue {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PresentValue::Id; }
+};
+} // namespace PresentValue
+namespace Reliability {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Reliability::Id; }
+};
+} // namespace Reliability
+namespace StatusFlags {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StatusFlags::Id; }
+};
+} // namespace StatusFlags
+namespace ApplicationType {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationType::Id; }
+};
+} // namespace ApplicationType
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace BinaryInputBasic
+namespace PowerProfile {
+
+namespace Structs {
+namespace PowerProfileRecord {
+enum class Fields
+{
+    kPowerProfileId            = 0,
+    kEnergyPhaseId             = 1,
+    kPowerProfileRemoteControl = 2,
+    kPowerProfileState         = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+    uint8_t energyPhaseId;
+    bool powerProfileRemoteControl;
+    uint8_t powerProfileState;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace PowerProfileRecord
+namespace ScheduledPhase {
+enum class Fields
+{
+    kEnergyPhaseId = 0,
+    kScheduledTime = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t energyPhaseId;
+    uint16_t scheduledTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ScheduledPhase
+namespace TransferredPhase {
+enum class Fields
+{
+    kEnergyPhaseId      = 0,
+    kMacroPhaseId       = 1,
+    kExpectedDuration   = 2,
+    kPeakPower          = 3,
+    kEnergy             = 4,
+    kMaxActivationDelay = 5,
+};
+
+struct Type
+{
+public:
+    uint8_t energyPhaseId;
+    uint8_t macroPhaseId;
+    uint16_t expectedDuration;
+    uint16_t peakPower;
+    uint16_t energy;
+    uint16_t maxActivationDelay;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace TransferredPhase
+} // namespace Structs
+
+namespace Commands {
+namespace PowerProfileRequest {
+enum class Fields
+{
+    kPowerProfileId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PowerProfileRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PowerProfileRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PowerProfileRequest
+namespace PowerProfileNotification {
+enum class Fields
+{
+    kTotalProfileNum        = 0,
+    kPowerProfileId         = 1,
+    kNumOfTransferredPhases = 2,
+    kTransferredPhases      = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PowerProfileNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t totalProfileNum;
+    uint8_t powerProfileId;
+    uint8_t numOfTransferredPhases;
+    DataModel::List<Structs::TransferredPhase::Type> transferredPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PowerProfileNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t totalProfileNum;
+    uint8_t powerProfileId;
+    uint8_t numOfTransferredPhases;
+    DataModel::DecodableList<Structs::TransferredPhase::DecodableType> transferredPhases;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PowerProfileNotification
+namespace PowerProfileStateRequest {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PowerProfileStateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PowerProfileStateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PowerProfileStateRequest
+namespace PowerProfileResponse {
+enum class Fields
+{
+    kTotalProfileNum        = 0,
+    kPowerProfileId         = 1,
+    kNumOfTransferredPhases = 2,
+    kTransferredPhases      = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PowerProfileResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t totalProfileNum;
+    uint8_t powerProfileId;
+    uint8_t numOfTransferredPhases;
+    DataModel::List<Structs::TransferredPhase::Type> transferredPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PowerProfileResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t totalProfileNum;
+    uint8_t powerProfileId;
+    uint8_t numOfTransferredPhases;
+    DataModel::DecodableList<Structs::TransferredPhase::DecodableType> transferredPhases;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PowerProfileResponse
+namespace GetPowerProfilePriceResponse {
+enum class Fields
+{
+    kPowerProfileId     = 0,
+    kCurrency           = 1,
+    kPrice              = 2,
+    kPriceTrailingDigit = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint16_t currency;
+    uint32_t price;
+    uint8_t priceTrailingDigit;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint16_t currency;
+    uint32_t price;
+    uint8_t priceTrailingDigit;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetPowerProfilePriceResponse
+namespace PowerProfileStateResponse {
+enum class Fields
+{
+    kPowerProfileCount   = 0,
+    kPowerProfileRecords = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PowerProfileStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileCount;
+    DataModel::List<Structs::PowerProfileRecord::Type> powerProfileRecords;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PowerProfileStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileCount;
+    DataModel::DecodableList<Structs::PowerProfileRecord::DecodableType> powerProfileRecords;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PowerProfileStateResponse
+namespace GetOverallSchedulePriceResponse {
+enum class Fields
+{
+    kCurrency           = 0,
+    kPrice              = 1,
+    kPriceTrailingDigit = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetOverallSchedulePriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint16_t currency;
+    uint32_t price;
+    uint8_t priceTrailingDigit;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetOverallSchedulePriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint16_t currency;
+    uint32_t price;
+    uint8_t priceTrailingDigit;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetOverallSchedulePriceResponse
+namespace GetPowerProfilePrice {
+enum class Fields
+{
+    kPowerProfileId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetPowerProfilePrice::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetPowerProfilePrice::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetPowerProfilePrice
+namespace EnergyPhasesScheduleNotification {
+enum class Fields
+{
+    kPowerProfileId       = 0,
+    kNumOfScheduledPhases = 1,
+    kScheduledPhases      = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::DecodableList<Structs::ScheduledPhase::DecodableType> scheduledPhases;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnergyPhasesScheduleNotification
+namespace PowerProfilesStateNotification {
+enum class Fields
+{
+    kPowerProfileCount   = 0,
+    kPowerProfileRecords = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PowerProfilesStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileCount;
+    DataModel::List<Structs::PowerProfileRecord::Type> powerProfileRecords;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PowerProfilesStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileCount;
+    DataModel::DecodableList<Structs::PowerProfileRecord::DecodableType> powerProfileRecords;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PowerProfilesStateNotification
+namespace EnergyPhasesScheduleResponse {
+enum class Fields
+{
+    kPowerProfileId       = 0,
+    kNumOfScheduledPhases = 1,
+    kScheduledPhases      = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::DecodableList<Structs::ScheduledPhase::DecodableType> scheduledPhases;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnergyPhasesScheduleResponse
+namespace GetOverallSchedulePrice {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetOverallSchedulePrice::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetOverallSchedulePrice::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetOverallSchedulePrice
+namespace PowerProfileScheduleConstraintsRequest {
+enum class Fields
+{
+    kPowerProfileId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PowerProfileScheduleConstraintsRequest
+namespace EnergyPhasesScheduleRequest {
+enum class Fields
+{
+    kPowerProfileId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnergyPhasesScheduleRequest
+namespace EnergyPhasesScheduleStateRequest {
+enum class Fields
+{
+    kPowerProfileId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnergyPhasesScheduleStateRequest
+namespace EnergyPhasesScheduleStateResponse {
+enum class Fields
+{
+    kPowerProfileId       = 0,
+    kNumOfScheduledPhases = 1,
+    kScheduledPhases      = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::DecodableList<Structs::ScheduledPhase::DecodableType> scheduledPhases;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnergyPhasesScheduleStateResponse
+namespace GetPowerProfilePriceExtendedResponse {
+enum class Fields
+{
+    kPowerProfileId     = 0,
+    kCurrency           = 1,
+    kPrice              = 2,
+    kPriceTrailingDigit = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceExtendedResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint16_t currency;
+    uint32_t price;
+    uint8_t priceTrailingDigit;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceExtendedResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint16_t currency;
+    uint32_t price;
+    uint8_t priceTrailingDigit;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetPowerProfilePriceExtendedResponse
+namespace EnergyPhasesScheduleStateNotification {
+enum class Fields
+{
+    kPowerProfileId       = 0,
+    kNumOfScheduledPhases = 1,
+    kScheduledPhases      = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::DecodableList<Structs::ScheduledPhase::DecodableType> scheduledPhases;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnergyPhasesScheduleStateNotification
+namespace PowerProfileScheduleConstraintsNotification {
+enum class Fields
+{
+    kPowerProfileId = 0,
+    kStartAfter     = 1,
+    kStopBefore     = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint16_t startAfter;
+    uint16_t stopBefore;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint16_t startAfter;
+    uint16_t stopBefore;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PowerProfileScheduleConstraintsNotification
+namespace PowerProfileScheduleConstraintsResponse {
+enum class Fields
+{
+    kPowerProfileId = 0,
+    kStartAfter     = 1,
+    kStopBefore     = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint16_t startAfter;
+    uint16_t stopBefore;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t powerProfileId;
+    uint16_t startAfter;
+    uint16_t stopBefore;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PowerProfileScheduleConstraintsResponse
+namespace GetPowerProfilePriceExtended {
+enum class Fields
+{
+    kOptions               = 0,
+    kPowerProfileId        = 1,
+    kPowerProfileStartTime = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceExtended::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t options;
+    uint8_t powerProfileId;
+    uint16_t powerProfileStartTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceExtended::Id; }
+    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+
+    uint8_t options;
+    uint8_t powerProfileId;
+    uint16_t powerProfileStartTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetPowerProfilePriceExtended
+} // namespace Commands
+
+namespace Attributes {
+namespace TotalProfileNum {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TotalProfileNum::Id; }
+};
+} // namespace TotalProfileNum
+namespace MultipleScheduling {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MultipleScheduling::Id; }
+};
+} // namespace MultipleScheduling
+namespace EnergyFormatting {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnergyFormatting::Id; }
+};
+} // namespace EnergyFormatting
+namespace EnergyRemote {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnergyRemote::Id; }
+};
+} // namespace EnergyRemote
+namespace ScheduleMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleMode::Id; }
+};
+} // namespace ScheduleMode
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace PowerProfile
+namespace ApplianceControl {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ApplianceStatus
+enum class ApplianceStatus : uint8_t
+{
+    kOff                      = 0x01,
+    kStandBy                  = 0x02,
+    kProgrammed               = 0x03,
+    kProgrammedWaitingToStart = 0x04,
+    kRunning                  = 0x05,
+    kPause                    = 0x06,
+    kEndProgrammed            = 0x07,
+    kFailure                  = 0x08,
+    kProgrammeInterrupted     = 0x09,
+    kIdle                     = 0x0A,
+    kRinseHold                = 0x0B,
+    kService                  = 0x0C,
+    kSuperfreezing            = 0x0D,
+    kSupercooling             = 0x0E,
+    kSuperheating             = 0x0F,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ApplianceStatus                      = EmberAfApplianceStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for CommandIdentification
+enum class CommandIdentification : uint8_t
+{
+    kStart                = 0x01,
+    kStop                 = 0x02,
+    kPause                = 0x03,
+    kStartSuperfreezing   = 0x04,
+    kStopSuperfreezing    = 0x05,
+    kStartSupercooling    = 0x06,
+    kStopSupercooling     = 0x07,
+    kDisableGas           = 0x08,
+    kEnableGas            = 0x09,
+    kEnableEnergyControl  = 0x0A,
+    kDisableEnergyControl = 0x0B,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using CommandIdentification                = EmberAfCommandIdentification;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for WarningEvent
+enum class WarningEvent : uint8_t
+{
+    kWarning1OverallPowerAboveAvailablePowerLevel                                      = 0x00,
+    kWarning2OverallPowerAbovePowerThresholdLevel                                      = 0x01,
+    kWarning3OverallPowerBackBelowTheAvailablePowerLevel                               = 0x02,
+    kWarning4OverallPowerBackBelowThePowerThresholdLevel                               = 0x03,
+    kWarning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 0x04,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using WarningEvent                         = EmberAfWarningEvent;
+#endif
+
+// Bitmap for RemoteEnableFlagsAndDeviceStatus2
+enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t
+{
+    kRemoteEnableFlags      = 0,
+    kDeviceStatus2Structure = 4,
+};
+
+namespace Commands {
+namespace ExecutionOfACommand {
+enum class Fields
+{
+    kCommandId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ExecutionOfACommand::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    CommandIdentification commandId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ExecutionOfACommand::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    CommandIdentification commandId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ExecutionOfACommand
+namespace SignalStateResponse {
+enum class Fields
+{
+    kApplianceStatus                   = 0,
+    kRemoteEnableFlagsAndDeviceStatus2 = 1,
+    kApplianceStatus2                  = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SignalStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    ApplianceStatus applianceStatus;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    ApplianceStatus applianceStatus2;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SignalStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    ApplianceStatus applianceStatus;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    ApplianceStatus applianceStatus2;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SignalStateResponse
+namespace SignalState {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SignalState::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SignalState::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SignalState
+namespace SignalStateNotification {
+enum class Fields
+{
+    kApplianceStatus                   = 0,
+    kRemoteEnableFlagsAndDeviceStatus2 = 1,
+    kApplianceStatus2                  = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SignalStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    ApplianceStatus applianceStatus;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    ApplianceStatus applianceStatus2;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SignalStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    ApplianceStatus applianceStatus;
+    chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
+    ApplianceStatus applianceStatus2;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SignalStateNotification
+namespace WriteFunctions {
+enum class Fields
+{
+    kFunctionId       = 0,
+    kFunctionDataType = 1,
+    kFunctionData     = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return WriteFunctions::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    uint16_t functionId;
+    uint8_t functionDataType;
+    DataModel::List<uint8_t> functionData;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return WriteFunctions::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    uint16_t functionId;
+    uint8_t functionDataType;
+    DataModel::DecodableList<uint8_t> functionData;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace WriteFunctions
+namespace OverloadPauseResume {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return OverloadPauseResume::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return OverloadPauseResume::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OverloadPauseResume
+namespace OverloadPause {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return OverloadPause::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return OverloadPause::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OverloadPause
+namespace OverloadWarning {
+enum class Fields
+{
+    kWarningEvent = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return OverloadWarning::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    WarningEvent warningEvent;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return OverloadWarning::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+
+    WarningEvent warningEvent;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OverloadWarning
+} // namespace Commands
+
+namespace Attributes {
+namespace StartTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartTime::Id; }
+};
+} // namespace StartTime
+namespace FinishTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FinishTime::Id; }
+};
+} // namespace FinishTime
+namespace RemainingTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
+};
+} // namespace RemainingTime
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace ApplianceControl
+namespace Descriptor {
+
+namespace Structs {
+namespace DeviceType {
+enum class Fields
+{
+    kType     = 0,
+    kRevision = 1,
+};
+
+struct Type
+{
+public:
+    chip::DeviceTypeId type;
+    uint16_t revision;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace DeviceType
+} // namespace Structs
+
+namespace Attributes {
+namespace DeviceList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::DeviceType::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::DeviceType::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceList::Id; }
+};
+} // namespace DeviceList
+namespace ServerList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<chip::ClusterId>;
+    using DecodableType = DataModel::DecodableList<chip::ClusterId>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerList::Id; }
+};
+} // namespace ServerList
+namespace ClientList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<chip::ClusterId>;
+    using DecodableType = DataModel::DecodableList<chip::ClusterId>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientList::Id; }
+};
+} // namespace ClientList
+namespace PartsList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<chip::EndpointId>;
+    using DecodableType = DataModel::DecodableList<chip::EndpointId>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PartsList::Id; }
+};
+} // namespace PartsList
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace Descriptor
 namespace PollControl {
 
+namespace Commands {
+namespace CheckIn {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CheckIn::Id; }
+    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CheckIn::Id; }
+    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CheckIn
+namespace CheckInResponse {
+enum class Fields
+{
+    kStartFastPolling = 0,
+    kFastPollTimeout  = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CheckInResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+
+    bool startFastPolling;
+    uint16_t fastPollTimeout;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CheckInResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+
+    bool startFastPolling;
+    uint16_t fastPollTimeout;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CheckInResponse
+namespace FastPollStop {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return FastPollStop::Id; }
+    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return FastPollStop::Id; }
+    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace FastPollStop
+namespace SetLongPollInterval {
+enum class Fields
+{
+    kNewLongPollInterval = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetLongPollInterval::Id; }
+    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+
+    uint32_t newLongPollInterval;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetLongPollInterval::Id; }
+    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+
+    uint32_t newLongPollInterval;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetLongPollInterval
+namespace SetShortPollInterval {
+enum class Fields
+{
+    kNewShortPollInterval = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetShortPollInterval::Id; }
+    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+
+    uint16_t newShortPollInterval;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetShortPollInterval::Id; }
+    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+
+    uint16_t newShortPollInterval;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetShortPollInterval
+} // namespace Commands
+
+namespace Attributes {
+namespace CheckInInterval {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CheckInInterval::Id; }
+};
+} // namespace CheckInInterval
+namespace LongPollInterval {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LongPollInterval::Id; }
+};
+} // namespace LongPollInterval
+namespace ShortPollInterval {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ShortPollInterval::Id; }
+};
+} // namespace ShortPollInterval
+namespace FastPollTimeout {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FastPollTimeout::Id; }
+};
+} // namespace FastPollTimeout
+namespace CheckInIntervalMin {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CheckInIntervalMin::Id; }
+};
+} // namespace CheckInIntervalMin
+namespace LongPollIntervalMin {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LongPollIntervalMin::Id; }
+};
+} // namespace LongPollIntervalMin
+namespace FastPollTimeoutMax {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FastPollTimeoutMax::Id; }
+};
+} // namespace FastPollTimeoutMax
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace PollControl
 namespace Basic {
 
+namespace Commands {
+namespace StartUp {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StartUp
+namespace MfgSpecificPing {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MfgSpecificPing::Id; }
+    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MfgSpecificPing::Id; }
+    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MfgSpecificPing
+namespace ShutDown {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ShutDown
+namespace Leave {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Leave
+} // namespace Commands
+
+namespace Attributes {
+namespace InteractionModelVersion {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InteractionModelVersion::Id; }
+};
+} // namespace InteractionModelVersion
+namespace VendorName {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
+};
+} // namespace VendorName
+namespace VendorID {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
+};
+} // namespace VendorID
+namespace ProductName {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
+};
+} // namespace ProductName
+namespace ProductID {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductID::Id; }
+};
+} // namespace ProductID
+namespace UserLabel {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
+};
+} // namespace UserLabel
+namespace Location {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Location::Id; }
+};
+} // namespace Location
+namespace HardwareVersion {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersion::Id; }
+};
+} // namespace HardwareVersion
+namespace HardwareVersionString {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersionString::Id; }
+};
+} // namespace HardwareVersionString
+namespace SoftwareVersion {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersion::Id; }
+};
+} // namespace SoftwareVersion
+namespace SoftwareVersionString {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersionString::Id; }
+};
+} // namespace SoftwareVersionString
+namespace ManufacturingDate {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ManufacturingDate::Id; }
+};
+} // namespace ManufacturingDate
+namespace PartNumber {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
+};
+} // namespace PartNumber
+namespace ProductURL {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductURL::Id; }
+};
+} // namespace ProductURL
+namespace ProductLabel {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductLabel::Id; }
+};
+} // namespace ProductLabel
+namespace SerialNumber {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SerialNumber::Id; }
+};
+} // namespace SerialNumber
+namespace LocalConfigDisabled {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LocalConfigDisabled::Id; }
+};
+} // namespace LocalConfigDisabled
+namespace Reachable {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
+};
+} // namespace Reachable
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace Basic
 namespace OtaSoftwareUpdateProvider {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAApplyUpdateAction
 enum class OTAApplyUpdateAction : uint8_t
 {
-    OTA_APPLY_UPDATE_ACTION_PROCEED           = 0x00,
-    OTA_APPLY_UPDATE_ACTION_AWAIT_NEXT_ACTION = 0x01,
-    OTA_APPLY_UPDATE_ACTION_DISCONTINUE       = 0x02,
+    kProceed         = 0x00,
+    kAwaitNextAction = 0x01,
+    kDiscontinue     = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OTAApplyUpdateAction                 = EmberAfOTAApplyUpdateAction;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTADownloadProtocol
 enum class OTADownloadProtocol : uint8_t
 {
-    OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS  = 0x00,
-    OTA_DOWNLOAD_PROTOCOL_BDX_ASYNCHRONOUS = 0x01,
-    OTA_DOWNLOAD_PROTOCOL_HTTPS            = 0x02,
-    OTA_DOWNLOAD_PROTOCOL_VENDOR_SPECIFIC  = 0x03,
+    kBDXSynchronous  = 0x00,
+    kBDXAsynchronous = 0x01,
+    kHttps           = 0x02,
+    kVendorSpecific  = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OTADownloadProtocol                  = EmberAfOTADownloadProtocol;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAQueryStatus
 enum class OTAQueryStatus : uint8_t
 {
-    OTA_QUERY_STATUS_UPDATE_AVAILABLE = 0x00,
-    OTA_QUERY_STATUS_BUSY             = 0x01,
-    OTA_QUERY_STATUS_NOT_AVAILABLE    = 0x02,
+    kUpdateAvailable = 0x00,
+    kBusy            = 0x01,
+    kNotAvailable    = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OTAQueryStatus                       = EmberAfOTAQueryStatus;
+#endif
+
+namespace Commands {
+namespace QueryImage {
+enum class Fields
+{
+    kVendorId            = 0,
+    kProductId           = 1,
+    kHardwareVersion     = 2,
+    kSoftwareVersion     = 3,
+    kProtocolsSupported  = 4,
+    kLocation            = 5,
+    kRequestorCanConsent = 6,
+    kMetadataForProvider = 7,
 };
 
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return QueryImage::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+
+    uint16_t vendorId;
+    uint16_t productId;
+    uint16_t hardwareVersion;
+    uint32_t softwareVersion;
+    OTADownloadProtocol protocolsSupported;
+    chip::CharSpan location;
+    bool requestorCanConsent;
+    chip::ByteSpan metadataForProvider;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return QueryImage::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+
+    uint16_t vendorId;
+    uint16_t productId;
+    uint16_t hardwareVersion;
+    uint32_t softwareVersion;
+    OTADownloadProtocol protocolsSupported;
+    chip::CharSpan location;
+    bool requestorCanConsent;
+    chip::ByteSpan metadataForProvider;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace QueryImage
+namespace ApplyUpdateRequest {
+enum class Fields
+{
+    kUpdateToken = 0,
+    kNewVersion  = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ApplyUpdateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+
+    chip::ByteSpan updateToken;
+    uint32_t newVersion;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ApplyUpdateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+
+    chip::ByteSpan updateToken;
+    uint32_t newVersion;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ApplyUpdateRequest
+namespace NotifyUpdateApplied {
+enum class Fields
+{
+    kUpdateToken     = 0,
+    kSoftwareVersion = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return NotifyUpdateApplied::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+
+    chip::ByteSpan updateToken;
+    uint32_t softwareVersion;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return NotifyUpdateApplied::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+
+    chip::ByteSpan updateToken;
+    uint32_t softwareVersion;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace NotifyUpdateApplied
+namespace QueryImageResponse {
+enum class Fields
+{
+    kStatus                = 0,
+    kDelayedActionTime     = 1,
+    kImageURI              = 2,
+    kSoftwareVersion       = 3,
+    kSoftwareVersionString = 4,
+    kUpdateToken           = 5,
+    kUserConsentNeeded     = 6,
+    kMetadataForRequestor  = 7,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return QueryImageResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+
+    OTAQueryStatus status;
+    uint32_t delayedActionTime;
+    chip::CharSpan imageURI;
+    uint32_t softwareVersion;
+    chip::CharSpan softwareVersionString;
+    chip::ByteSpan updateToken;
+    bool userConsentNeeded;
+    chip::ByteSpan metadataForRequestor;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return QueryImageResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+
+    OTAQueryStatus status;
+    uint32_t delayedActionTime;
+    chip::CharSpan imageURI;
+    uint32_t softwareVersion;
+    chip::CharSpan softwareVersionString;
+    chip::ByteSpan updateToken;
+    bool userConsentNeeded;
+    chip::ByteSpan metadataForRequestor;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace QueryImageResponse
+namespace ApplyUpdateRequestResponse {
+enum class Fields
+{
+    kAction            = 0,
+    kDelayedActionTime = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ApplyUpdateRequestResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+
+    OTAApplyUpdateAction action;
+    uint32_t delayedActionTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ApplyUpdateRequestResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+
+    OTAApplyUpdateAction action;
+    uint32_t delayedActionTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ApplyUpdateRequestResponse
+} // namespace Commands
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace OtaSoftwareUpdateProvider
 namespace OtaSoftwareUpdateRequestor {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAAnnouncementReason
 enum class OTAAnnouncementReason : uint8_t
 {
-    OTA_ANNOUNCEMENT_REASON_SIMPLE_ANNOUNCEMENT     = 0x00,
-    OTA_ANNOUNCEMENT_REASON_UPDATE_AVAILABLE        = 0x01,
-    OTA_ANNOUNCEMENT_REASON_URGENT_UPDATE_AVAILABLE = 0x02,
+    kSimpleAnnouncement    = 0x00,
+    kUpdateAvailable       = 0x01,
+    kUrgentUpdateAvailable = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using OTAAnnouncementReason                = EmberAfOTAAnnouncementReason;
+#endif
+
+namespace Commands {
+namespace AnnounceOtaProvider {
+enum class Fields
+{
+    kProviderLocation   = 0,
+    kVendorId           = 1,
+    kAnnouncementReason = 2,
+    kMetadataForNode    = 3,
 };
 
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AnnounceOtaProvider::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateRequestor::Id; }
+
+    chip::NodeId providerLocation;
+    chip::VendorId vendorId;
+    OTAAnnouncementReason announcementReason;
+    chip::ByteSpan metadataForNode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AnnounceOtaProvider::Id; }
+    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateRequestor::Id; }
+
+    chip::NodeId providerLocation;
+    chip::VendorId vendorId;
+    OTAAnnouncementReason announcementReason;
+    chip::ByteSpan metadataForNode;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AnnounceOtaProvider
+} // namespace Commands
+
+namespace Attributes {
+namespace DefaultOtaProvider {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOtaProvider::Id; }
+};
+} // namespace DefaultOtaProvider
+namespace UpdatePossible {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UpdatePossible::Id; }
+};
+} // namespace UpdatePossible
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace OtaSoftwareUpdateRequestor
 namespace PowerSource {
 
+namespace Attributes {
+namespace Status {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
+};
+} // namespace Status
+namespace Order {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Order::Id; }
+};
+} // namespace Order
+namespace Description {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+};
+} // namespace Description
+namespace WiredAssessedInputVoltage {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedInputVoltage::Id; }
+};
+} // namespace WiredAssessedInputVoltage
+namespace WiredAssessedInputFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedInputFrequency::Id; }
+};
+} // namespace WiredAssessedInputFrequency
+namespace WiredCurrentType {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WiredCurrentType::Id; }
+};
+} // namespace WiredCurrentType
+namespace WiredAssessedCurrent {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedCurrent::Id; }
+};
+} // namespace WiredAssessedCurrent
+namespace WiredNominalVoltage {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WiredNominalVoltage::Id; }
+};
+} // namespace WiredNominalVoltage
+namespace WiredMaximumCurrent {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WiredMaximumCurrent::Id; }
+};
+} // namespace WiredMaximumCurrent
+namespace WiredPresent {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WiredPresent::Id; }
+};
+} // namespace WiredPresent
+namespace ActiveWiredFaults {
+struct TypeInfo
+{
+    using Type          = DataModel::List<uint8_t>;
+    using DecodableType = DataModel::DecodableList<uint8_t>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveWiredFaults::Id; }
+};
+} // namespace ActiveWiredFaults
+namespace BatteryVoltage {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltage::Id; }
+};
+} // namespace BatteryVoltage
+namespace BatteryPercentRemaining {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentRemaining::Id; }
+};
+} // namespace BatteryPercentRemaining
+namespace BatteryTimeRemaining {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryTimeRemaining::Id; }
+};
+} // namespace BatteryTimeRemaining
+namespace BatteryChargeLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeLevel::Id; }
+};
+} // namespace BatteryChargeLevel
+namespace BatteryReplacementNeeded {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplacementNeeded::Id; }
+};
+} // namespace BatteryReplacementNeeded
+namespace BatteryReplaceability {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplaceability::Id; }
+};
+} // namespace BatteryReplaceability
+namespace BatteryPresent {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPresent::Id; }
+};
+} // namespace BatteryPresent
+namespace ActiveBatteryFaults {
+struct TypeInfo
+{
+    using Type          = DataModel::List<uint8_t>;
+    using DecodableType = DataModel::DecodableList<uint8_t>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatteryFaults::Id; }
+};
+} // namespace ActiveBatteryFaults
+namespace BatteryReplacementDescription {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplacementDescription::Id; }
+};
+} // namespace BatteryReplacementDescription
+namespace BatteryCommonDesignation {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryCommonDesignation::Id; }
+};
+} // namespace BatteryCommonDesignation
+namespace BatteryANSIDesignation {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryANSIDesignation::Id; }
+};
+} // namespace BatteryANSIDesignation
+namespace BatteryIECDesignation {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryIECDesignation::Id; }
+};
+} // namespace BatteryIECDesignation
+namespace BatteryApprovedChemistry {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryApprovedChemistry::Id; }
+};
+} // namespace BatteryApprovedChemistry
+namespace BatteryCapacity {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryCapacity::Id; }
+};
+} // namespace BatteryCapacity
+namespace BatteryQuantity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryQuantity::Id; }
+};
+} // namespace BatteryQuantity
+namespace BatteryChargeState {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeState::Id; }
+};
+} // namespace BatteryChargeState
+namespace BatteryTimeToFullCharge {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryTimeToFullCharge::Id; }
+};
+} // namespace BatteryTimeToFullCharge
+namespace BatteryFunctionalWhileCharging {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryFunctionalWhileCharging::Id; }
+};
+} // namespace BatteryFunctionalWhileCharging
+namespace BatteryChargingCurrent {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargingCurrent::Id; }
+};
+} // namespace BatteryChargingCurrent
+namespace ActiveBatteryChargeFaults {
+struct TypeInfo
+{
+    using Type          = DataModel::List<uint8_t>;
+    using DecodableType = DataModel::DecodableList<uint8_t>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatteryChargeFaults::Id; }
+};
+} // namespace ActiveBatteryChargeFaults
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace PowerSource
 namespace GeneralCommissioning {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for GeneralCommissioningError
 enum class GeneralCommissioningError : uint8_t
 {
-    GENERAL_COMMISSIONING_ERROR_OK                     = 0x00,
-    GENERAL_COMMISSIONING_ERROR_VALUE_OUTSIDE_RANGE    = 0x01,
-    GENERAL_COMMISSIONING_ERROR_INVALID_AUTHENTICATION = 0x02,
+    kOk                    = 0x00,
+    kValueOutsideRange     = 0x01,
+    kInvalidAuthentication = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using GeneralCommissioningError            = EmberAfGeneralCommissioningError;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RegulatoryLocationType
 enum class RegulatoryLocationType : uint8_t
 {
-    REGULATORY_LOCATION_TYPE_INDOOR         = 0x00,
-    REGULATORY_LOCATION_TYPE_OUTDOOR        = 0x01,
-    REGULATORY_LOCATION_TYPE_INDOOR_OUTDOOR = 0x02,
+    kIndoor        = 0x00,
+    kOutdoor       = 0x01,
+    kIndoorOutdoor = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using RegulatoryLocationType               = EmberAfRegulatoryLocationType;
+#endif
 
+namespace Structs {
 namespace BasicCommissioningInfoType {
-enum FieldId
+enum class Fields
 {
-    kFailSafeExpiryLengthMsFieldId = 0,
+    kFailSafeExpiryLengthMs = 0,
 };
 
 struct Type
@@ -179,43 +5997,306 @@ struct Type
 public:
     uint32_t failSafeExpiryLengthMs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace BasicCommissioningInfoType
+using DecodableType = Type;
 
+} // namespace BasicCommissioningInfoType
+} // namespace Structs
+
+namespace Commands {
+namespace ArmFailSafe {
+enum class Fields
+{
+    kExpiryLengthSeconds = 0,
+    kBreadcrumb          = 1,
+    kTimeoutMs           = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ArmFailSafe::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    uint16_t expiryLengthSeconds;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ArmFailSafe::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    uint16_t expiryLengthSeconds;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ArmFailSafe
+namespace ArmFailSafeResponse {
+enum class Fields
+{
+    kErrorCode = 0,
+    kDebugText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ArmFailSafeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    GeneralCommissioningError errorCode;
+    chip::CharSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ArmFailSafeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    GeneralCommissioningError errorCode;
+    chip::CharSpan debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ArmFailSafeResponse
+namespace SetRegulatoryConfig {
+enum class Fields
+{
+    kLocation    = 0,
+    kCountryCode = 1,
+    kBreadcrumb  = 2,
+    kTimeoutMs   = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetRegulatoryConfig::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    RegulatoryLocationType location;
+    chip::CharSpan countryCode;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetRegulatoryConfig::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    RegulatoryLocationType location;
+    chip::CharSpan countryCode;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetRegulatoryConfig
+namespace SetRegulatoryConfigResponse {
+enum class Fields
+{
+    kErrorCode = 0,
+    kDebugText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetRegulatoryConfigResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    GeneralCommissioningError errorCode;
+    chip::CharSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetRegulatoryConfigResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    GeneralCommissioningError errorCode;
+    chip::CharSpan debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetRegulatoryConfigResponse
+namespace CommissioningComplete {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CommissioningComplete::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CommissioningComplete::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CommissioningComplete
+namespace CommissioningCompleteResponse {
+enum class Fields
+{
+    kErrorCode = 0,
+    kDebugText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CommissioningCompleteResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    GeneralCommissioningError errorCode;
+    chip::CharSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CommissioningCompleteResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+
+    GeneralCommissioningError errorCode;
+    chip::CharSpan debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CommissioningCompleteResponse
+} // namespace Commands
+
+namespace Attributes {
+namespace Breadcrumb {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Breadcrumb::Id; }
+};
+} // namespace Breadcrumb
+namespace BasicCommissioningInfoList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::BasicCommissioningInfoType::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::BasicCommissioningInfoType::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BasicCommissioningInfoList::Id; }
+};
+} // namespace BasicCommissioningInfoList
+namespace RegulatoryConfigList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<RegulatoryLocationType>;
+    using DecodableType = DataModel::DecodableList<RegulatoryLocationType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RegulatoryConfigList::Id; }
+};
+} // namespace RegulatoryConfigList
+namespace LocationCapabilityList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<RegulatoryLocationType>;
+    using DecodableType = DataModel::DecodableList<RegulatoryLocationType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LocationCapabilityList::Id; }
+};
+} // namespace LocationCapabilityList
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace GeneralCommissioning
 namespace NetworkCommissioning {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NetworkCommissioningError
 enum class NetworkCommissioningError : uint8_t
 {
-    NETWORK_COMMISSIONING_ERROR_SUCCESS                  = 0x00,
-    NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE             = 0x01,
-    NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED          = 0x02,
-    NETWORK_COMMISSIONING_ERROR_NETWORK_ID_NOT_FOUND     = 0x03,
-    NETWORK_COMMISSIONING_ERROR_DUPLICATE_NETWORK_ID     = 0x04,
-    NETWORK_COMMISSIONING_ERROR_NETWORK_NOT_FOUND        = 0x05,
-    NETWORK_COMMISSIONING_ERROR_REGULATORY_ERROR         = 0x06,
-    NETWORK_COMMISSIONING_ERROR_AUTH_FAILURE             = 0x07,
-    NETWORK_COMMISSIONING_ERROR_UNSUPPORTED_SECURITY     = 0x08,
-    NETWORK_COMMISSIONING_ERROR_OTHER_CONNECTION_FAILURE = 0x09,
-    NETWORK_COMMISSIONING_ERROR_IPV6_FAILED              = 0x0A,
-    NETWORK_COMMISSIONING_ERROR_IP_BIND_FAILED           = 0x0B,
-    NETWORK_COMMISSIONING_ERROR_LABEL9                   = 0x0C,
-    NETWORK_COMMISSIONING_ERROR_LABEL10                  = 0x0D,
-    NETWORK_COMMISSIONING_ERROR_LABEL11                  = 0x0E,
-    NETWORK_COMMISSIONING_ERROR_LABEL12                  = 0x0F,
-    NETWORK_COMMISSIONING_ERROR_LABEL13                  = 0x10,
-    NETWORK_COMMISSIONING_ERROR_LABEL14                  = 0x11,
-    NETWORK_COMMISSIONING_ERROR_LABEL15                  = 0x12,
-    NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR            = 0x13,
+    kSuccess                = 0x00,
+    kOutOfRange             = 0x01,
+    kBoundsExceeded         = 0x02,
+    kNetworkIDNotFound      = 0x03,
+    kDuplicateNetworkID     = 0x04,
+    kNetworkNotFound        = 0x05,
+    kRegulatoryError        = 0x06,
+    kAuthFailure            = 0x07,
+    kUnsupportedSecurity    = 0x08,
+    kOtherConnectionFailure = 0x09,
+    kIPV6Failed             = 0x0A,
+    kIPBindFailed           = 0x0B,
+    kLabel9                 = 0x0C,
+    kLabel10                = 0x0D,
+    kLabel11                = 0x0E,
+    kLabel12                = 0x0F,
+    kLabel13                = 0x10,
+    kLabel14                = 0x11,
+    kLabel15                = 0x12,
+    kUnknownError           = 0x13,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using NetworkCommissioningError            = EmberAfNetworkCommissioningError;
+#endif
 
+namespace Structs {
 namespace ThreadInterfaceScanResult {
-enum FieldId
+enum class Fields
 {
-    kDiscoveryResponseFieldId = 0,
+    kDiscoveryResponse = 0,
 };
 
 struct Type
@@ -223,19 +6304,21 @@ struct Type
 public:
     chip::ByteSpan discoveryResponse;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ThreadInterfaceScanResult
 namespace WiFiInterfaceScanResult {
-enum FieldId
+enum class Fields
 {
-    kSecurityFieldId      = 0,
-    kSsidFieldId          = 1,
-    kBssidFieldId         = 2,
-    kChannelFieldId       = 3,
-    kFrequencyBandFieldId = 4,
+    kSecurity      = 0,
+    kSsid          = 1,
+    kBssid         = 2,
+    kChannel       = 3,
+    kFrequencyBand = 4,
 };
 
 struct Type
@@ -247,188 +6330,1132 @@ public:
     uint8_t channel;
     uint32_t frequencyBand;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace WiFiInterfaceScanResult
+} // namespace Structs
 
-} // namespace NetworkCommissioning
-namespace DiagnosticLogs {
-// Enum for LogsIntent
-enum class LogsIntent : uint8_t
+namespace Commands {
+namespace ScanNetworks {
+enum class Fields
 {
-    LOGS_INTENT_END_USER_SUPPORT = 0x00,
-    LOGS_INTENT_NETWORK_DIAG     = 0x01,
-    LOGS_INTENT_CRASH_LOGS       = 0x02,
-};
-// Enum for LogsStatus
-enum class LogsStatus : uint8_t
-{
-    LOGS_STATUS_SUCCESS   = 0x00,
-    LOGS_STATUS_EXHAUSTED = 0x01,
-    LOGS_STATUS_NO_LOGS   = 0x02,
-    LOGS_STATUS_BUSY      = 0x03,
-    LOGS_STATUS_DENIED    = 0x04,
-};
-// Enum for LogsTransferProtocol
-enum class LogsTransferProtocol : uint8_t
-{
-    LOGS_TRANSFER_PROTOCOL_RESPONSE_PAYLOAD = 0x00,
-    LOGS_TRANSFER_PROTOCOL_BDX              = 0x01,
-};
-
-} // namespace DiagnosticLogs
-namespace GeneralDiagnostics {
-// Enum for BootReasonType
-enum class BootReasonType : uint8_t
-{
-    BOOT_REASON_TYPE_UNSPECIFIED               = 0x00,
-    BOOT_REASON_TYPE_POWER_ON_REBOOT           = 0x01,
-    BOOT_REASON_TYPE_BROWN_OUT_RESET           = 0x02,
-    BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET   = 0x03,
-    BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET   = 0x04,
-    BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED = 0x05,
-    BOOT_REASON_TYPE_SOFTWARE_RESET            = 0x06,
-};
-// Enum for HardwareFaultType
-enum class HardwareFaultType : uint8_t
-{
-    HARDWARE_FAULT_TYPE_UNSPECIFIED               = 0x00,
-    HARDWARE_FAULT_TYPE_RADIO                     = 0x01,
-    HARDWARE_FAULT_TYPE_SENSOR                    = 0x02,
-    HARDWARE_FAULT_TYPE_RESETTABLE_OVER_TEMP      = 0x03,
-    HARDWARE_FAULT_TYPE_NON_RESETTABLE_OVER_TEMP  = 0x04,
-    HARDWARE_FAULT_TYPE_POWER_SOURCE              = 0x05,
-    HARDWARE_FAULT_TYPE_VISUAL_DISPLAY_FAULT      = 0x06,
-    HARDWARE_FAULT_TYPE_AUDIO_OUTPUT_FAULT        = 0x07,
-    HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT      = 0x08,
-    HARDWARE_FAULT_TYPE_NON_VOLATILE_MEMORY_ERROR = 0x09,
-    HARDWARE_FAULT_TYPE_TAMPER_DETECTED           = 0x0A,
-};
-// Enum for InterfaceType
-enum class InterfaceType : uint8_t
-{
-    INTERFACE_TYPE_UNSPECIFIED = 0x00,
-    INTERFACE_TYPE_WI_FI       = 0x01,
-    INTERFACE_TYPE_ETHERNET    = 0x02,
-    INTERFACE_TYPE_CELLULAR    = 0x03,
-    INTERFACE_TYPE_THREAD      = 0x04,
-};
-// Enum for NetworkFaultType
-enum class NetworkFaultType : uint8_t
-{
-    NETWORK_FAULT_TYPE_UNSPECIFIED       = 0x00,
-    NETWORK_FAULT_TYPE_HARDWARE_FAILURE  = 0x01,
-    NETWORK_FAULT_TYPE_NETWORK_JAMMED    = 0x02,
-    NETWORK_FAULT_TYPE_CONNECTION_FAILED = 0x03,
-};
-// Enum for RadioFaultType
-enum class RadioFaultType : uint8_t
-{
-    RADIO_FAULT_TYPE_UNSPECIFIED    = 0x00,
-    RADIO_FAULT_TYPE_WI_FI_FAULT    = 0x01,
-    RADIO_FAULT_TYPE_CELLULAR_FAULT = 0x02,
-    RADIO_FAULT_TYPE_THREAD_FAULT   = 0x03,
-    RADIO_FAULT_TYPE_NFC_FAULT      = 0x04,
-    RADIO_FAULT_TYPE_BLE_FAULT      = 0x05,
-    RADIO_FAULT_TYPE_ETHERNET_FAULT = 0x06,
-};
-
-namespace NetworkInterfaceType {
-enum FieldId
-{
-    kNameFieldId                            = 0,
-    kFabricConnectedFieldId                 = 1,
-    kOffPremiseServicesReachableIPv4FieldId = 2,
-    kOffPremiseServicesReachableIPv6FieldId = 3,
-    kHardwareAddressFieldId                 = 4,
-    kTypeFieldId                            = 5,
+    kSsid       = 0,
+    kBreadcrumb = 1,
+    kTimeoutMs  = 2,
 };
 
 struct Type
 {
 public:
-    chip::ByteSpan name;
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ScanNetworks::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan ssid;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ScanNetworks::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan ssid;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ScanNetworks
+namespace ScanNetworksResponse {
+enum class Fields
+{
+    kErrorCode         = 0,
+    kDebugText         = 1,
+    kWifiScanResults   = 2,
+    kThreadScanResults = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ScanNetworksResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+    DataModel::List<Structs::WiFiInterfaceScanResult::Type> wifiScanResults;
+    DataModel::List<Structs::ThreadInterfaceScanResult::Type> threadScanResults;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ScanNetworksResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+    DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType> wifiScanResults;
+    DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType> threadScanResults;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ScanNetworksResponse
+namespace AddWiFiNetwork {
+enum class Fields
+{
+    kSsid        = 0,
+    kCredentials = 1,
+    kBreadcrumb  = 2,
+    kTimeoutMs   = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AddWiFiNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan ssid;
+    chip::ByteSpan credentials;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AddWiFiNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan ssid;
+    chip::ByteSpan credentials;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddWiFiNetwork
+namespace AddWiFiNetworkResponse {
+enum class Fields
+{
+    kErrorCode = 0,
+    kDebugText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AddWiFiNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AddWiFiNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddWiFiNetworkResponse
+namespace UpdateWiFiNetwork {
+enum class Fields
+{
+    kSsid        = 0,
+    kCredentials = 1,
+    kBreadcrumb  = 2,
+    kTimeoutMs   = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return UpdateWiFiNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan ssid;
+    chip::ByteSpan credentials;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return UpdateWiFiNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan ssid;
+    chip::ByteSpan credentials;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateWiFiNetwork
+namespace UpdateWiFiNetworkResponse {
+enum class Fields
+{
+    kErrorCode = 0,
+    kDebugText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return UpdateWiFiNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return UpdateWiFiNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateWiFiNetworkResponse
+namespace AddThreadNetwork {
+enum class Fields
+{
+    kOperationalDataset = 0,
+    kBreadcrumb         = 1,
+    kTimeoutMs          = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AddThreadNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan operationalDataset;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AddThreadNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan operationalDataset;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddThreadNetwork
+namespace AddThreadNetworkResponse {
+enum class Fields
+{
+    kErrorCode = 0,
+    kDebugText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AddThreadNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AddThreadNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddThreadNetworkResponse
+namespace UpdateThreadNetwork {
+enum class Fields
+{
+    kOperationalDataset = 0,
+    kBreadcrumb         = 1,
+    kTimeoutMs          = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return UpdateThreadNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan operationalDataset;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return UpdateThreadNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan operationalDataset;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateThreadNetwork
+namespace UpdateThreadNetworkResponse {
+enum class Fields
+{
+    kErrorCode = 0,
+    kDebugText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return UpdateThreadNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return UpdateThreadNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateThreadNetworkResponse
+namespace RemoveNetwork {
+enum class Fields
+{
+    kNetworkID  = 0,
+    kBreadcrumb = 1,
+    kTimeoutMs  = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RemoveNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan networkID;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RemoveNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan networkID;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveNetwork
+namespace RemoveNetworkResponse {
+enum class Fields
+{
+    kErrorCode = 0,
+    kDebugText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RemoveNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RemoveNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveNetworkResponse
+namespace EnableNetwork {
+enum class Fields
+{
+    kNetworkID  = 0,
+    kBreadcrumb = 1,
+    kTimeoutMs  = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnableNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan networkID;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnableNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan networkID;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnableNetwork
+namespace EnableNetworkResponse {
+enum class Fields
+{
+    kErrorCode = 0,
+    kDebugText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnableNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnableNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnableNetworkResponse
+namespace DisableNetwork {
+enum class Fields
+{
+    kNetworkID  = 0,
+    kBreadcrumb = 1,
+    kTimeoutMs  = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return DisableNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan networkID;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return DisableNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    chip::ByteSpan networkID;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace DisableNetwork
+namespace DisableNetworkResponse {
+enum class Fields
+{
+    kErrorCode = 0,
+    kDebugText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return DisableNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return DisableNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint8_t errorCode;
+    chip::CharSpan debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace DisableNetworkResponse
+namespace GetLastNetworkCommissioningResult {
+enum class Fields
+{
+    kTimeoutMs = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetLastNetworkCommissioningResult::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetLastNetworkCommissioningResult::Id; }
+    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+
+    uint32_t timeoutMs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetLastNetworkCommissioningResult
+} // namespace Commands
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace NetworkCommissioning
+namespace DiagnosticLogs {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for LogsIntent
+enum class LogsIntent : uint8_t
+{
+    kEndUserSupport = 0x00,
+    kNetworkDiag    = 0x01,
+    kCrashLogs      = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using LogsIntent                           = EmberAfLogsIntent;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for LogsStatus
+enum class LogsStatus : uint8_t
+{
+    kSuccess   = 0x00,
+    kExhausted = 0x01,
+    kNoLogs    = 0x02,
+    kBusy      = 0x03,
+    kDenied    = 0x04,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using LogsStatus                           = EmberAfLogsStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for LogsTransferProtocol
+enum class LogsTransferProtocol : uint8_t
+{
+    kResponsePayload = 0x00,
+    kBdx             = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using LogsTransferProtocol                 = EmberAfLogsTransferProtocol;
+#endif
+
+namespace Commands {
+namespace RetrieveLogsRequest {
+enum class Fields
+{
+    kIntent                 = 0,
+    kRequestedProtocol      = 1,
+    kTransferFileDesignator = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RetrieveLogsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return DiagnosticLogs::Id; }
+
+    LogsIntent intent;
+    LogsTransferProtocol requestedProtocol;
+    chip::ByteSpan transferFileDesignator;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RetrieveLogsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return DiagnosticLogs::Id; }
+
+    LogsIntent intent;
+    LogsTransferProtocol requestedProtocol;
+    chip::ByteSpan transferFileDesignator;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RetrieveLogsRequest
+namespace RetrieveLogsResponse {
+enum class Fields
+{
+    kStatus        = 0,
+    kContent       = 1,
+    kTimeStamp     = 2,
+    kTimeSinceBoot = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RetrieveLogsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DiagnosticLogs::Id; }
+
+    LogsStatus status;
+    chip::ByteSpan content;
+    uint32_t timeStamp;
+    uint32_t timeSinceBoot;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RetrieveLogsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DiagnosticLogs::Id; }
+
+    LogsStatus status;
+    chip::ByteSpan content;
+    uint32_t timeStamp;
+    uint32_t timeSinceBoot;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RetrieveLogsResponse
+} // namespace Commands
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace DiagnosticLogs
+namespace GeneralDiagnostics {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for BootReasonType
+enum class BootReasonType : uint8_t
+{
+    kUnspecified             = 0x00,
+    kPowerOnReboot           = 0x01,
+    kBrownOutReset           = 0x02,
+    kSoftwareWatchdogReset   = 0x03,
+    kHardwareWatchdogReset   = 0x04,
+    kSoftwareUpdateCompleted = 0x05,
+    kSoftwareReset           = 0x06,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using BootReasonType                       = EmberAfBootReasonType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for HardwareFaultType
+enum class HardwareFaultType : uint8_t
+{
+    kUnspecified            = 0x00,
+    kRadio                  = 0x01,
+    kSensor                 = 0x02,
+    kResettableOverTemp     = 0x03,
+    kNonResettableOverTemp  = 0x04,
+    kPowerSource            = 0x05,
+    kVisualDisplayFault     = 0x06,
+    kAudioOutputFault       = 0x07,
+    kUserInterfaceFault     = 0x08,
+    kNonVolatileMemoryError = 0x09,
+    kTamperDetected         = 0x0A,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using HardwareFaultType                    = EmberAfHardwareFaultType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for InterfaceType
+enum class InterfaceType : uint8_t
+{
+    kUnspecified = 0x00,
+    kWiFi        = 0x01,
+    kEthernet    = 0x02,
+    kCellular    = 0x03,
+    kThread      = 0x04,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using InterfaceType                        = EmberAfInterfaceType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for NetworkFaultType
+enum class NetworkFaultType : uint8_t
+{
+    kUnspecified      = 0x00,
+    kHardwareFailure  = 0x01,
+    kNetworkJammed    = 0x02,
+    kConnectionFailed = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using NetworkFaultType                     = EmberAfNetworkFaultType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for RadioFaultType
+enum class RadioFaultType : uint8_t
+{
+    kUnspecified   = 0x00,
+    kWiFiFault     = 0x01,
+    kCellularFault = 0x02,
+    kThreadFault   = 0x03,
+    kNFCFault      = 0x04,
+    kBLEFault      = 0x05,
+    kEthernetFault = 0x06,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using RadioFaultType                       = EmberAfRadioFaultType;
+#endif
+
+namespace Structs {
+namespace NetworkInterfaceType {
+enum class Fields
+{
+    kName                            = 0,
+    kFabricConnected                 = 1,
+    kOffPremiseServicesReachableIPv4 = 2,
+    kOffPremiseServicesReachableIPv6 = 3,
+    kHardwareAddress                 = 4,
+    kType                            = 5,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan name;
     bool fabricConnected;
     bool offPremiseServicesReachableIPv4;
     bool offPremiseServicesReachableIPv6;
     chip::ByteSpan hardwareAddress;
     InterfaceType type;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace NetworkInterfaceType
+using DecodableType = Type;
 
+} // namespace NetworkInterfaceType
+} // namespace Structs
+
+namespace Attributes {
+namespace NetworkInterfaces {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::NetworkInterfaceType::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::NetworkInterfaceType::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NetworkInterfaces::Id; }
+};
+} // namespace NetworkInterfaces
+namespace RebootCount {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RebootCount::Id; }
+};
+} // namespace RebootCount
+namespace UpTime {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UpTime::Id; }
+};
+} // namespace UpTime
+namespace TotalOperationalHours {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TotalOperationalHours::Id; }
+};
+} // namespace TotalOperationalHours
+namespace BootReasons {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BootReasons::Id; }
+};
+} // namespace BootReasons
+namespace ActiveHardwareFaults {
+struct TypeInfo
+{
+    using Type          = DataModel::List<uint8_t>;
+    using DecodableType = DataModel::DecodableList<uint8_t>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveHardwareFaults::Id; }
+};
+} // namespace ActiveHardwareFaults
+namespace ActiveRadioFaults {
+struct TypeInfo
+{
+    using Type          = DataModel::List<uint8_t>;
+    using DecodableType = DataModel::DecodableList<uint8_t>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveRadioFaults::Id; }
+};
+} // namespace ActiveRadioFaults
+namespace ActiveNetworkFaults {
+struct TypeInfo
+{
+    using Type          = DataModel::List<uint8_t>;
+    using DecodableType = DataModel::DecodableList<uint8_t>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaults::Id; }
+};
+} // namespace ActiveNetworkFaults
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace GeneralDiagnostics
 namespace SoftwareDiagnostics {
 
+namespace Structs {
 namespace ThreadMetrics {
-enum FieldId
+enum class Fields
 {
-    kIdFieldId               = 0,
-    kNameFieldId             = 1,
-    kStackFreeCurrentFieldId = 2,
-    kStackFreeMinimumFieldId = 3,
-    kStackSizeFieldId        = 4,
+    kId               = 0,
+    kName             = 1,
+    kStackFreeCurrent = 2,
+    kStackFreeMinimum = 3,
+    kStackSize        = 4,
 };
 
 struct Type
 {
 public:
     uint64_t id;
-    chip::ByteSpan name;
+    chip::CharSpan name;
     uint32_t stackFreeCurrent;
     uint32_t stackFreeMinimum;
     uint32_t stackSize;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace ThreadMetrics
+using DecodableType = Type;
 
+} // namespace ThreadMetrics
+} // namespace Structs
+
+namespace Commands {
+namespace ResetWatermarks {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ResetWatermarks::Id; }
+    static constexpr ClusterId GetClusterId() { return SoftwareDiagnostics::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ResetWatermarks::Id; }
+    static constexpr ClusterId GetClusterId() { return SoftwareDiagnostics::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetWatermarks
+} // namespace Commands
+
+namespace Attributes {
+namespace ThreadMetrics {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::ThreadMetrics::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::ThreadMetrics::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ThreadMetrics::Id; }
+};
+} // namespace ThreadMetrics
+namespace CurrentHeapFree {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapFree::Id; }
+};
+} // namespace CurrentHeapFree
+namespace CurrentHeapUsed {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapUsed::Id; }
+};
+} // namespace CurrentHeapUsed
+namespace CurrentHeapHighWatermark {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapHighWatermark::Id; }
+};
+} // namespace CurrentHeapHighWatermark
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace SoftwareDiagnostics
 namespace ThreadNetworkDiagnostics {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NetworkFault
 enum class NetworkFault : uint8_t
 {
-    NETWORK_FAULT_UNSPECIFIED      = 0x00,
-    NETWORK_FAULT_LINK_DOWN        = 0x01,
-    NETWORK_FAULT_HARDWARE_FAILURE = 0x02,
-    NETWORK_FAULT_NETWORK_JAMMED   = 0x03,
+    kUnspecified     = 0x00,
+    kLinkDown        = 0x01,
+    kHardwareFailure = 0x02,
+    kNetworkJammed   = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using NetworkFault                         = EmberAfNetworkFault;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RoutingRole
 enum class RoutingRole : uint8_t
 {
-    ROUTING_ROLE_UNSPECIFIED       = 0x00,
-    ROUTING_ROLE_UNASSIGNED        = 0x01,
-    ROUTING_ROLE_SLEEPY_END_DEVICE = 0x02,
-    ROUTING_ROLE_END_DEVICE        = 0x03,
-    ROUTING_ROLE_REED              = 0x04,
-    ROUTING_ROLE_ROUTER            = 0x05,
-    ROUTING_ROLE_LEADER            = 0x06,
+    kUnspecified     = 0x00,
+    kUnassigned      = 0x01,
+    kSleepyEndDevice = 0x02,
+    kEndDevice       = 0x03,
+    kReed            = 0x04,
+    kRouter          = 0x05,
+    kLeader          = 0x06,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using RoutingRole                          = EmberAfRoutingRole;
+#endif
 
+namespace Structs {
 namespace NeighborTable {
-enum FieldId
+enum class Fields
 {
-    kExtAddressFieldId       = 0,
-    kAgeFieldId              = 1,
-    kRloc16FieldId           = 2,
-    kLinkFrameCounterFieldId = 3,
-    kMleFrameCounterFieldId  = 4,
-    kLqiFieldId              = 5,
-    kAverageRssiFieldId      = 6,
-    kLastRssiFieldId         = 7,
-    kFrameErrorRateFieldId   = 8,
-    kMessageErrorRateFieldId = 9,
-    kRxOnWhenIdleFieldId     = 10,
-    kFullThreadDeviceFieldId = 11,
-    kFullNetworkDataFieldId  = 12,
-    kIsChildFieldId          = 13,
+    kExtAddress       = 0,
+    kAge              = 1,
+    kRloc16           = 2,
+    kLinkFrameCounter = 3,
+    kMleFrameCounter  = 4,
+    kLqi              = 5,
+    kAverageRssi      = 6,
+    kLastRssi         = 7,
+    kFrameErrorRate   = 8,
+    kMessageErrorRate = 9,
+    kRxOnWhenIdle     = 10,
+    kFullThreadDevice = 11,
+    kFullNetworkData  = 12,
+    kIsChild          = 13,
 };
 
 struct Type
@@ -449,26 +7476,28 @@ public:
     bool fullNetworkData;
     bool isChild;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace NeighborTable
 namespace OperationalDatasetComponents {
-enum FieldId
+enum class Fields
 {
-    kActiveTimestampPresentFieldId  = 0,
-    kPendingTimestampPresentFieldId = 1,
-    kMasterKeyPresentFieldId        = 2,
-    kNetworkNamePresentFieldId      = 3,
-    kExtendedPanIdPresentFieldId    = 4,
-    kMeshLocalPrefixPresentFieldId  = 5,
-    kDelayPresentFieldId            = 6,
-    kPanIdPresentFieldId            = 7,
-    kChannelPresentFieldId          = 8,
-    kPskcPresentFieldId             = 9,
-    kSecurityPolicyPresentFieldId   = 10,
-    kChannelMaskPresentFieldId      = 11,
+    kActiveTimestampPresent  = 0,
+    kPendingTimestampPresent = 1,
+    kMasterKeyPresent        = 2,
+    kNetworkNamePresent      = 3,
+    kExtendedPanIdPresent    = 4,
+    kMeshLocalPrefixPresent  = 5,
+    kDelayPresent            = 6,
+    kPanIdPresent            = 7,
+    kChannelPresent          = 8,
+    kPskcPresent             = 9,
+    kSecurityPolicyPresent   = 10,
+    kChannelMaskPresent      = 11,
 };
 
 struct Type
@@ -487,24 +7516,26 @@ public:
     bool securityPolicyPresent;
     bool channelMaskPresent;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace OperationalDatasetComponents
 namespace RouteTable {
-enum FieldId
+enum class Fields
 {
-    kExtAddressFieldId      = 0,
-    kRloc16FieldId          = 1,
-    kRouterIdFieldId        = 2,
-    kNextHopFieldId         = 3,
-    kPathCostFieldId        = 4,
-    kLQIInFieldId           = 5,
-    kLQIOutFieldId          = 6,
-    kAgeFieldId             = 7,
-    kAllocatedFieldId       = 8,
-    kLinkEstablishedFieldId = 9,
+    kExtAddress      = 0,
+    kRloc16          = 1,
+    kRouterId        = 2,
+    kNextHop         = 3,
+    kPathCost        = 4,
+    kLQIIn           = 5,
+    kLQIOut          = 6,
+    kAge             = 7,
+    kAllocated       = 8,
+    kLinkEstablished = 9,
 };
 
 struct Type
@@ -515,22 +7546,24 @@ public:
     uint8_t routerId;
     uint8_t nextHop;
     uint8_t pathCost;
-    uint8_t lQIIn;
-    uint8_t lQIOut;
+    uint8_t LQIIn;
+    uint8_t LQIOut;
     uint8_t age;
     bool allocated;
     bool linkEstablished;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace RouteTable
 namespace SecurityPolicy {
-enum FieldId
+enum class Fields
 {
-    kRotationTimeFieldId = 0,
-    kFlagsFieldId        = 1,
+    kRotationTime = 0,
+    kFlags        = 1,
 };
 
 struct Type
@@ -539,94 +7572,1558 @@ public:
     uint16_t rotationTime;
     uint16_t flags;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace SecurityPolicy
+using DecodableType = Type;
 
+} // namespace SecurityPolicy
+} // namespace Structs
+
+namespace Commands {
+namespace ResetCounts {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCounts
+} // namespace Commands
+
+namespace Attributes {
+namespace Channel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Channel::Id; }
+};
+} // namespace Channel
+namespace RoutingRole {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RoutingRole::Id; }
+};
+} // namespace RoutingRole
+namespace NetworkName {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NetworkName::Id; }
+};
+} // namespace NetworkName
+namespace PanId {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PanId::Id; }
+};
+} // namespace PanId
+namespace ExtendedPanId {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ExtendedPanId::Id; }
+};
+} // namespace ExtendedPanId
+namespace MeshLocalPrefix {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeshLocalPrefix::Id; }
+};
+} // namespace MeshLocalPrefix
+namespace OverrunCount {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
+};
+} // namespace OverrunCount
+namespace NeighborTableList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::NeighborTable::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::NeighborTable::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NeighborTableList::Id; }
+};
+} // namespace NeighborTableList
+namespace RouteTableList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::RouteTable::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::RouteTable::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RouteTableList::Id; }
+};
+} // namespace RouteTableList
+namespace PartitionId {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PartitionId::Id; }
+};
+} // namespace PartitionId
+namespace Weighting {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Weighting::Id; }
+};
+} // namespace Weighting
+namespace DataVersion {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DataVersion::Id; }
+};
+} // namespace DataVersion
+namespace StableDataVersion {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StableDataVersion::Id; }
+};
+} // namespace StableDataVersion
+namespace LeaderRouterId {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LeaderRouterId::Id; }
+};
+} // namespace LeaderRouterId
+namespace DetachedRoleCount {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DetachedRoleCount::Id; }
+};
+} // namespace DetachedRoleCount
+namespace ChildRoleCount {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChildRoleCount::Id; }
+};
+} // namespace ChildRoleCount
+namespace RouterRoleCount {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RouterRoleCount::Id; }
+};
+} // namespace RouterRoleCount
+namespace LeaderRoleCount {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LeaderRoleCount::Id; }
+};
+} // namespace LeaderRoleCount
+namespace AttachAttemptCount {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AttachAttemptCount::Id; }
+};
+} // namespace AttachAttemptCount
+namespace PartitionIdChangeCount {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PartitionIdChangeCount::Id; }
+};
+} // namespace PartitionIdChangeCount
+namespace BetterPartitionAttachAttemptCount {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BetterPartitionAttachAttemptCount::Id; }
+};
+} // namespace BetterPartitionAttachAttemptCount
+namespace ParentChangeCount {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ParentChangeCount::Id; }
+};
+} // namespace ParentChangeCount
+namespace TxTotalCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxTotalCount::Id; }
+};
+} // namespace TxTotalCount
+namespace TxUnicastCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxUnicastCount::Id; }
+};
+} // namespace TxUnicastCount
+namespace TxBroadcastCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxBroadcastCount::Id; }
+};
+} // namespace TxBroadcastCount
+namespace TxAckRequestedCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxAckRequestedCount::Id; }
+};
+} // namespace TxAckRequestedCount
+namespace TxAckedCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxAckedCount::Id; }
+};
+} // namespace TxAckedCount
+namespace TxNoAckRequestedCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxNoAckRequestedCount::Id; }
+};
+} // namespace TxNoAckRequestedCount
+namespace TxDataCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxDataCount::Id; }
+};
+} // namespace TxDataCount
+namespace TxDataPollCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxDataPollCount::Id; }
+};
+} // namespace TxDataPollCount
+namespace TxBeaconCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxBeaconCount::Id; }
+};
+} // namespace TxBeaconCount
+namespace TxBeaconRequestCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxBeaconRequestCount::Id; }
+};
+} // namespace TxBeaconRequestCount
+namespace TxOtherCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxOtherCount::Id; }
+};
+} // namespace TxOtherCount
+namespace TxRetryCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxRetryCount::Id; }
+};
+} // namespace TxRetryCount
+namespace TxDirectMaxRetryExpiryCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxDirectMaxRetryExpiryCount::Id; }
+};
+} // namespace TxDirectMaxRetryExpiryCount
+namespace TxIndirectMaxRetryExpiryCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxIndirectMaxRetryExpiryCount::Id; }
+};
+} // namespace TxIndirectMaxRetryExpiryCount
+namespace TxErrCcaCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxErrCcaCount::Id; }
+};
+} // namespace TxErrCcaCount
+namespace TxErrAbortCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxErrAbortCount::Id; }
+};
+} // namespace TxErrAbortCount
+namespace TxErrBusyChannelCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxErrBusyChannelCount::Id; }
+};
+} // namespace TxErrBusyChannelCount
+namespace RxTotalCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxTotalCount::Id; }
+};
+} // namespace RxTotalCount
+namespace RxUnicastCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxUnicastCount::Id; }
+};
+} // namespace RxUnicastCount
+namespace RxBroadcastCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxBroadcastCount::Id; }
+};
+} // namespace RxBroadcastCount
+namespace RxDataCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxDataCount::Id; }
+};
+} // namespace RxDataCount
+namespace RxDataPollCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxDataPollCount::Id; }
+};
+} // namespace RxDataPollCount
+namespace RxBeaconCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxBeaconCount::Id; }
+};
+} // namespace RxBeaconCount
+namespace RxBeaconRequestCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxBeaconRequestCount::Id; }
+};
+} // namespace RxBeaconRequestCount
+namespace RxOtherCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxOtherCount::Id; }
+};
+} // namespace RxOtherCount
+namespace RxAddressFilteredCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxAddressFilteredCount::Id; }
+};
+} // namespace RxAddressFilteredCount
+namespace RxDestAddrFilteredCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxDestAddrFilteredCount::Id; }
+};
+} // namespace RxDestAddrFilteredCount
+namespace RxDuplicatedCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxDuplicatedCount::Id; }
+};
+} // namespace RxDuplicatedCount
+namespace RxErrNoFrameCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxErrNoFrameCount::Id; }
+};
+} // namespace RxErrNoFrameCount
+namespace RxErrUnknownNeighborCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxErrUnknownNeighborCount::Id; }
+};
+} // namespace RxErrUnknownNeighborCount
+namespace RxErrInvalidSrcAddrCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxErrInvalidSrcAddrCount::Id; }
+};
+} // namespace RxErrInvalidSrcAddrCount
+namespace RxErrSecCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxErrSecCount::Id; }
+};
+} // namespace RxErrSecCount
+namespace RxErrFcsCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxErrFcsCount::Id; }
+};
+} // namespace RxErrFcsCount
+namespace RxErrOtherCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RxErrOtherCount::Id; }
+};
+} // namespace RxErrOtherCount
+namespace ActiveTimestamp {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveTimestamp::Id; }
+};
+} // namespace ActiveTimestamp
+namespace PendingTimestamp {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PendingTimestamp::Id; }
+};
+} // namespace PendingTimestamp
+namespace Delay {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Delay::Id; }
+};
+} // namespace Delay
+namespace SecurityPolicy {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::SecurityPolicy::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::SecurityPolicy::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SecurityPolicy::Id; }
+};
+} // namespace SecurityPolicy
+namespace ChannelMask {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChannelMask::Id; }
+};
+} // namespace ChannelMask
+namespace OperationalDatasetComponents {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::OperationalDatasetComponents::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::OperationalDatasetComponents::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OperationalDatasetComponents::Id; }
+};
+} // namespace OperationalDatasetComponents
+namespace ActiveNetworkFaultsList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<NetworkFault>;
+    using DecodableType = DataModel::DecodableList<NetworkFault>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaultsList::Id; }
+};
+} // namespace ActiveNetworkFaultsList
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ThreadNetworkDiagnostics
 namespace WiFiNetworkDiagnostics {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SecurityType
 enum class SecurityType : uint8_t
 {
-    SECURITY_TYPE_UNSPECIFIED = 0x00,
-    SECURITY_TYPE_NONE        = 0x01,
-    SECURITY_TYPE_WEP         = 0x02,
-    SECURITY_TYPE_WPA         = 0x03,
-    SECURITY_TYPE_WPA2        = 0x04,
-    SECURITY_TYPE_WPA3        = 0x05,
+    kUnspecified = 0x00,
+    kNone        = 0x01,
+    kWep         = 0x02,
+    kWpa         = 0x03,
+    kWpa2        = 0x04,
+    kWpa3        = 0x05,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using SecurityType                         = EmberAfSecurityType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WiFiVersionType
 enum class WiFiVersionType : uint8_t
 {
-    WI_FI_VERSION_TYPE_802__11A  = 0x00,
-    WI_FI_VERSION_TYPE_802__11B  = 0x01,
-    WI_FI_VERSION_TYPE_802__11G  = 0x02,
-    WI_FI_VERSION_TYPE_802__11N  = 0x03,
-    WI_FI_VERSION_TYPE_802__11AC = 0x04,
-    WI_FI_VERSION_TYPE_802__11AX = 0x05,
+    k80211a  = 0x00,
+    k80211b  = 0x01,
+    k80211g  = 0x02,
+    k80211n  = 0x03,
+    k80211ac = 0x04,
+    k80211ax = 0x05,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using WiFiVersionType                      = EmberAfWiFiVersionType;
+#endif
+
+namespace Commands {
+namespace ResetCounts {
+enum class Fields
+{
 };
 
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCounts
+} // namespace Commands
+
+namespace Attributes {
+namespace Bssid {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Bssid::Id; }
+};
+} // namespace Bssid
+namespace SecurityType {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SecurityType::Id; }
+};
+} // namespace SecurityType
+namespace WiFiVersion {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WiFiVersion::Id; }
+};
+} // namespace WiFiVersion
+namespace ChannelNumber {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChannelNumber::Id; }
+};
+} // namespace ChannelNumber
+namespace Rssi {
+struct TypeInfo
+{
+    using Type          = int8_t;
+    using DecodableType = int8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Rssi::Id; }
+};
+} // namespace Rssi
+namespace BeaconLostCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BeaconLostCount::Id; }
+};
+} // namespace BeaconLostCount
+namespace BeaconRxCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BeaconRxCount::Id; }
+};
+} // namespace BeaconRxCount
+namespace PacketMulticastRxCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PacketMulticastRxCount::Id; }
+};
+} // namespace PacketMulticastRxCount
+namespace PacketMulticastTxCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PacketMulticastTxCount::Id; }
+};
+} // namespace PacketMulticastTxCount
+namespace PacketUnicastRxCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PacketUnicastRxCount::Id; }
+};
+} // namespace PacketUnicastRxCount
+namespace PacketUnicastTxCount {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PacketUnicastTxCount::Id; }
+};
+} // namespace PacketUnicastTxCount
+namespace CurrentMaxRate {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMaxRate::Id; }
+};
+} // namespace CurrentMaxRate
+namespace OverrunCount {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
+};
+} // namespace OverrunCount
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace WiFiNetworkDiagnostics
 namespace EthernetNetworkDiagnostics {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for PHYRateType
 enum class PHYRateType : uint8_t
 {
-    PHY_RATE_TYPE_10_M   = 0x00,
-    PHY_RATE_TYPE_100_M  = 0x01,
-    PHY_RATE_TYPE_1000_M = 0x02,
-    PHY_RATE_TYPE_2__5_G = 0x03,
-    PHY_RATE_TYPE_5_G    = 0x04,
-    PHY_RATE_TYPE_10_G   = 0x05,
-    PHY_RATE_TYPE_40_G   = 0x06,
-    PHY_RATE_TYPE_100_G  = 0x07,
-    PHY_RATE_TYPE_200_G  = 0x08,
-    PHY_RATE_TYPE_400_G  = 0x09,
+    k10m   = 0x00,
+    k100m  = 0x01,
+    k1000m = 0x02,
+    k25g   = 0x03,
+    k5g    = 0x04,
+    k10g   = 0x05,
+    k40g   = 0x06,
+    k100g  = 0x07,
+    k200g  = 0x08,
+    k400g  = 0x09,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using PHYRateType                          = EmberAfPHYRateType;
+#endif
+
+namespace Commands {
+namespace ResetCounts {
+enum class Fields
+{
 };
 
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCounts
+} // namespace Commands
+
+namespace Attributes {
+namespace PHYRate {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PHYRate::Id; }
+};
+} // namespace PHYRate
+namespace FullDuplex {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FullDuplex::Id; }
+};
+} // namespace FullDuplex
+namespace PacketRxCount {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PacketRxCount::Id; }
+};
+} // namespace PacketRxCount
+namespace PacketTxCount {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PacketTxCount::Id; }
+};
+} // namespace PacketTxCount
+namespace TxErrCount {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TxErrCount::Id; }
+};
+} // namespace TxErrCount
+namespace CollisionCount {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CollisionCount::Id; }
+};
+} // namespace CollisionCount
+namespace OverrunCount {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
+};
+} // namespace OverrunCount
+namespace CarrierDetect {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CarrierDetect::Id; }
+};
+} // namespace CarrierDetect
+namespace TimeSinceReset {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimeSinceReset::Id; }
+};
+} // namespace TimeSinceReset
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace EthernetNetworkDiagnostics
 namespace BridgedDeviceBasic {
 
+namespace Commands {
+namespace StartUp {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StartUp
+namespace ShutDown {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ShutDown
+namespace Leave {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Leave
+namespace ReachableChanged {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ReachableChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ReachableChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ReachableChanged
+} // namespace Commands
+
+namespace Attributes {
+namespace VendorName {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
+};
+} // namespace VendorName
+namespace VendorID {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
+};
+} // namespace VendorID
+namespace ProductName {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
+};
+} // namespace ProductName
+namespace UserLabel {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
+};
+} // namespace UserLabel
+namespace HardwareVersion {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersion::Id; }
+};
+} // namespace HardwareVersion
+namespace HardwareVersionString {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersionString::Id; }
+};
+} // namespace HardwareVersionString
+namespace SoftwareVersion {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersion::Id; }
+};
+} // namespace SoftwareVersion
+namespace SoftwareVersionString {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersionString::Id; }
+};
+} // namespace SoftwareVersionString
+namespace ManufacturingDate {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ManufacturingDate::Id; }
+};
+} // namespace ManufacturingDate
+namespace PartNumber {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
+};
+} // namespace PartNumber
+namespace ProductURL {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductURL::Id; }
+};
+} // namespace ProductURL
+namespace ProductLabel {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductLabel::Id; }
+};
+} // namespace ProductLabel
+namespace SerialNumber {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SerialNumber::Id; }
+};
+} // namespace SerialNumber
+namespace Reachable {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
+};
+} // namespace Reachable
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace BridgedDeviceBasic
 namespace Switch {
 
+namespace Attributes {
+namespace NumberOfPositions {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfPositions::Id; }
+};
+} // namespace NumberOfPositions
+namespace CurrentPosition {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPosition::Id; }
+};
+} // namespace CurrentPosition
+namespace MultiPressMax {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MultiPressMax::Id; }
+};
+} // namespace MultiPressMax
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace Switch
 namespace AdministratorCommissioning {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
-    STATUS_CODE_SUCCESS       = 0x00,
-    STATUS_CODE_BUSY          = 0x01,
-    STATUS_CODE_GENERAL_ERROR = 0x02,
+    kSuccess      = 0x00,
+    kBusy         = 0x01,
+    kGeneralError = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using StatusCode                           = EmberAfStatusCode;
+#endif
+
+namespace Commands {
+namespace OpenCommissioningWindow {
+enum class Fields
+{
+    kCommissioningTimeout = 0,
+    kPAKEVerifier         = 1,
+    kDiscriminator        = 2,
+    kIterations           = 3,
+    kSalt                 = 4,
+    kPasscodeID           = 5,
 };
 
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return OpenCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+
+    uint16_t commissioningTimeout;
+    chip::ByteSpan PAKEVerifier;
+    uint16_t discriminator;
+    uint32_t iterations;
+    chip::ByteSpan salt;
+    uint16_t passcodeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return OpenCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+
+    uint16_t commissioningTimeout;
+    chip::ByteSpan PAKEVerifier;
+    uint16_t discriminator;
+    uint32_t iterations;
+    chip::ByteSpan salt;
+    uint16_t passcodeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OpenCommissioningWindow
+namespace OpenBasicCommissioningWindow {
+enum class Fields
+{
+    kCommissioningTimeout = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return OpenBasicCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+
+    uint16_t commissioningTimeout;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return OpenBasicCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+
+    uint16_t commissioningTimeout;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OpenBasicCommissioningWindow
+namespace RevokeCommissioning {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RevokeCommissioning::Id; }
+    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RevokeCommissioning::Id; }
+    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RevokeCommissioning
+} // namespace Commands
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace AdministratorCommissioning
 namespace OperationalCredentials {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NodeOperationalCertStatus
 enum class NodeOperationalCertStatus : uint8_t
 {
-    NODE_OPERATIONAL_CERT_STATUS_SUCCESS                = 0x00,
-    NODE_OPERATIONAL_CERT_STATUS_INVALID_PUBLIC_KEY     = 0x01,
-    NODE_OPERATIONAL_CERT_STATUS_INVALID_NODE_OP_ID     = 0x02,
-    NODE_OPERATIONAL_CERT_STATUS_INVALID_NOC            = 0x03,
-    NODE_OPERATIONAL_CERT_STATUS_MISSING_CSR            = 0x04,
-    NODE_OPERATIONAL_CERT_STATUS_TABLE_FULL             = 0x05,
-    NODE_OPERATIONAL_CERT_STATUS_INSUFFICIENT_PRIVILEGE = 0x08,
-    NODE_OPERATIONAL_CERT_STATUS_FABRIC_CONFLICT        = 0x09,
-    NODE_OPERATIONAL_CERT_STATUS_LABEL_CONFLICT         = 0x0A,
-    NODE_OPERATIONAL_CERT_STATUS_INVALID_FABRIC_INDEX   = 0x0B,
+    kSuccess               = 0x00,
+    kInvalidPublicKey      = 0x01,
+    kInvalidNodeOpId       = 0x02,
+    kInvalidNOC            = 0x03,
+    kMissingCsr            = 0x04,
+    kTableFull             = 0x05,
+    kInsufficientPrivilege = 0x08,
+    kFabricConflict        = 0x09,
+    kLabelConflict         = 0x0A,
+    kInvalidFabricIndex    = 0x0B,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using NodeOperationalCertStatus            = EmberAfNodeOperationalCertStatus;
+#endif
 
+namespace Structs {
 namespace FabricDescriptor {
-enum FieldId
+enum class Fields
 {
-    kFabricIndexFieldId   = 0,
-    kRootPublicKeyFieldId = 1,
-    kVendorIdFieldId      = 2,
-    kFabricIdFieldId      = 3,
-    kNodeIdFieldId        = 4,
-    kLabelFieldId         = 5,
+    kFabricIndex   = 0,
+    kRootPublicKey = 1,
+    kVendorId      = 2,
+    kFabricId      = 3,
+    kNodeId        = 4,
+    kLabel         = 5,
 };
 
 struct Type
@@ -635,20 +9132,22 @@ public:
     uint8_t fabricIndex;
     chip::ByteSpan rootPublicKey;
     uint16_t vendorId;
-    uint64_t fabricId;
-    uint64_t nodeId;
-    chip::ByteSpan label;
+    chip::FabricId fabricId;
+    chip::NodeId nodeId;
+    chip::CharSpan label;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace FabricDescriptor
 namespace NOCStruct {
-enum FieldId
+enum class Fields
 {
-    kFabricIndexFieldId = 0,
-    kNocFieldId         = 1,
+    kFabricIndex = 0,
+    kNoc         = 1,
 };
 
 struct Type
@@ -657,274 +9156,10861 @@ public:
     uint8_t fabricIndex;
     chip::ByteSpan noc;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace NOCStruct
+} // namespace Structs
 
-} // namespace OperationalCredentials
-namespace FixedLabel {
-
-namespace LabelStruct {
-enum FieldId
+namespace Commands {
+namespace AttestationRequest {
+enum class Fields
 {
-    kLabelFieldId = 0,
-    kValueFieldId = 1,
+    kAttestationNonce = 0,
 };
 
 struct Type
 {
 public:
-    chip::ByteSpan label;
-    chip::ByteSpan value;
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AttestationRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    chip::ByteSpan attestationNonce;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AttestationRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan attestationNonce;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AttestationRequest
+namespace AttestationResponse {
+enum class Fields
+{
+    kAttestationElements = 0,
+    kSignature           = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AttestationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan attestationElements;
+    chip::ByteSpan signature;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AttestationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan attestationElements;
+    chip::ByteSpan signature;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AttestationResponse
+namespace CertificateChainRequest {
+enum class Fields
+{
+    kCertificateType = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CertificateChainRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    uint8_t certificateType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CertificateChainRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    uint8_t certificateType;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CertificateChainRequest
+namespace CertificateChainResponse {
+enum class Fields
+{
+    kCertificate = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CertificateChainResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan certificate;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CertificateChainResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan certificate;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CertificateChainResponse
+namespace OpCSRRequest {
+enum class Fields
+{
+    kCSRNonce = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return OpCSRRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan CSRNonce;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return OpCSRRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan CSRNonce;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OpCSRRequest
+namespace OpCSRResponse {
+enum class Fields
+{
+    kNOCSRElements        = 0,
+    kAttestationSignature = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return OpCSRResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan NOCSRElements;
+    chip::ByteSpan attestationSignature;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return OpCSRResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan NOCSRElements;
+    chip::ByteSpan attestationSignature;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OpCSRResponse
+namespace AddNOC {
+enum class Fields
+{
+    kNOCValue      = 0,
+    kICACValue     = 1,
+    kIPKValue      = 2,
+    kCaseAdminNode = 3,
+    kAdminVendorId = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AddNOC::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan NOCValue;
+    chip::ByteSpan ICACValue;
+    chip::ByteSpan IPKValue;
+    chip::NodeId caseAdminNode;
+    uint16_t adminVendorId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AddNOC::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan NOCValue;
+    chip::ByteSpan ICACValue;
+    chip::ByteSpan IPKValue;
+    chip::NodeId caseAdminNode;
+    uint16_t adminVendorId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddNOC
+namespace UpdateNOC {
+enum class Fields
+{
+    kNOCValue  = 0,
+    kICACValue = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return UpdateNOC::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan NOCValue;
+    chip::ByteSpan ICACValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return UpdateNOC::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan NOCValue;
+    chip::ByteSpan ICACValue;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateNOC
+namespace NOCResponse {
+enum class Fields
+{
+    kStatusCode  = 0,
+    kFabricIndex = 1,
+    kDebugText   = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return NOCResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    uint8_t statusCode;
+    uint8_t fabricIndex;
+    chip::CharSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return NOCResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    uint8_t statusCode;
+    uint8_t fabricIndex;
+    chip::CharSpan debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace NOCResponse
+namespace UpdateFabricLabel {
+enum class Fields
+{
+    kLabel = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return UpdateFabricLabel::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::CharSpan label;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return UpdateFabricLabel::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::CharSpan label;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateFabricLabel
+namespace RemoveFabric {
+enum class Fields
+{
+    kFabricIndex = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RemoveFabric::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    uint8_t fabricIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RemoveFabric::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    uint8_t fabricIndex;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveFabric
+namespace AddTrustedRootCertificate {
+enum class Fields
+{
+    kRootCertificate = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AddTrustedRootCertificate::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan rootCertificate;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AddTrustedRootCertificate::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan rootCertificate;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddTrustedRootCertificate
+namespace RemoveTrustedRootCertificate {
+enum class Fields
+{
+    kTrustedRootIdentifier = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RemoveTrustedRootCertificate::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan trustedRootIdentifier;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RemoveTrustedRootCertificate::Id; }
+    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+
+    chip::ByteSpan trustedRootIdentifier;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveTrustedRootCertificate
+} // namespace Commands
+
+namespace Attributes {
+namespace FabricsList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::FabricDescriptor::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::FabricDescriptor::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FabricsList::Id; }
+};
+} // namespace FabricsList
+namespace SupportedFabrics {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedFabrics::Id; }
+};
+} // namespace SupportedFabrics
+namespace CommissionedFabrics {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CommissionedFabrics::Id; }
+};
+} // namespace CommissionedFabrics
+namespace TrustedRootCertificates {
+struct TypeInfo
+{
+    using Type          = DataModel::List<chip::ByteSpan>;
+    using DecodableType = DataModel::DecodableList<chip::ByteSpan>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TrustedRootCertificates::Id; }
+};
+} // namespace TrustedRootCertificates
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace OperationalCredentials
+namespace FixedLabel {
+
+namespace Structs {
+namespace LabelStruct {
+enum class Fields
+{
+    kLabel = 0,
+    kValue = 1,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan label;
+    chip::CharSpan value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace LabelStruct
+using DecodableType = Type;
 
+} // namespace LabelStruct
+} // namespace Structs
+
+namespace Attributes {
+namespace LabelList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::LabelStruct::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::LabelStruct::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LabelList::Id; }
+};
+} // namespace LabelList
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace FixedLabel
+namespace BooleanState {
+
+namespace Attributes {
+namespace StateValue {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StateValue::Id; }
+};
+} // namespace StateValue
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+namespace Events {
+namespace StateChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kStateValue = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000000;
+    static constexpr ClusterId GetClusterId() { return BooleanState::Id; }
+
+    bool stateValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return BooleanState::Id; }
+
+    bool stateValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace StateChange
+} // namespace Events
+} // namespace BooleanState
 namespace ShadeConfiguration {
 
+namespace Attributes {
+namespace PhysicalClosedLimit {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimit::Id; }
+};
+} // namespace PhysicalClosedLimit
+namespace MotorStepSize {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MotorStepSize::Id; }
+};
+} // namespace MotorStepSize
+namespace Status {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
+};
+} // namespace Status
+namespace ClosedLimit {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClosedLimit::Id; }
+};
+} // namespace ClosedLimit
+namespace Mode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Mode::Id; }
+};
+} // namespace Mode
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ShadeConfiguration
 namespace DoorLock {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for DoorLockOperationEventCode
+enum class DoorLockOperationEventCode : uint8_t
+{
+    kUnknownOrMfgSpecific  = 0x00,
+    kLock                  = 0x01,
+    kUnlock                = 0x02,
+    kLockInvalidPinOrId    = 0x03,
+    kLockInvalidSchedule   = 0x04,
+    kUnlockInvalidPinOrId  = 0x05,
+    kUnlockInvalidSchedule = 0x06,
+    kOneTouchLock          = 0x07,
+    kKeyLock               = 0x08,
+    kKeyUnlock             = 0x09,
+    kAutoLock              = 0x0A,
+    kScheduleLock          = 0x0B,
+    kScheduleUnlock        = 0x0C,
+    kManualLock            = 0x0D,
+    kManualUnlock          = 0x0E,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using DoorLockOperationEventCode           = EmberAfDoorLockOperationEventCode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for DoorLockProgrammingEventCode
+enum class DoorLockProgrammingEventCode : uint8_t
+{
+    kUnknownOrMfgSpecific = 0x00,
+    kMasterCodeChanged    = 0x01,
+    kPinAdded             = 0x02,
+    kPinDeleted           = 0x03,
+    kPinChanged           = 0x04,
+    kIdAdded              = 0x05,
+    kIdDeleted            = 0x06,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using DoorLockProgrammingEventCode         = EmberAfDoorLockProgrammingEventCode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for DoorLockSetPinOrIdStatus
+enum class DoorLockSetPinOrIdStatus : uint8_t
+{
+    kSuccess            = 0x00,
+    kGeneralFailure     = 0x01,
+    kMemoryFull         = 0x02,
+    kDuplicateCodeError = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using DoorLockSetPinOrIdStatus             = EmberAfDoorLockSetPinOrIdStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for DoorLockUserStatus
+enum class DoorLockUserStatus : uint8_t
+{
+    kAvailable        = 0x00,
+    kOccupiedEnabled  = 0x01,
+    kOccupiedDisabled = 0x03,
+    kNotSupported     = 0xFF,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using DoorLockUserStatus                   = EmberAfDoorLockUserStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for DoorLockUserType
+enum class DoorLockUserType : uint8_t
+{
+    kUnrestricted        = 0x00,
+    kYearDayScheduleUser = 0x01,
+    kWeekDayScheduleUser = 0x02,
+    kMasterUser          = 0x03,
+    kNonAccessUser       = 0x04,
+    kNotSupported        = 0xFF,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using DoorLockUserType                     = EmberAfDoorLockUserType;
+#endif
 
+// Bitmap for DoorLockDayOfWeek
+enum class DoorLockDayOfWeek : uint8_t
+{
+    kSunday    = 0,
+    kMonday    = 1,
+    kTuesday   = 2,
+    kWednesday = 3,
+    kThursday  = 4,
+    kFriday    = 5,
+    kSaturday  = 6,
+};
+
+namespace Commands {
+namespace LockDoor {
+enum class Fields
+{
+    kPin = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LockDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    chip::ByteSpan pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LockDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    chip::ByteSpan pin;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LockDoor
+namespace LockDoorResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LockDoorResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LockDoorResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LockDoorResponse
+namespace UnlockDoor {
+enum class Fields
+{
+    kPin = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return UnlockDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    chip::ByteSpan pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return UnlockDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    chip::ByteSpan pin;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UnlockDoor
+namespace UnlockDoorResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return UnlockDoorResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return UnlockDoorResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UnlockDoorResponse
+namespace Toggle {
+enum class Fields
+{
+    kPin = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Toggle::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    chip::CharSpan pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Toggle::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    chip::CharSpan pin;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Toggle
+namespace ToggleResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ToggleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ToggleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ToggleResponse
+namespace UnlockWithTimeout {
+enum class Fields
+{
+    kTimeoutInSeconds = 0,
+    kPin              = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return UnlockWithTimeout::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t timeoutInSeconds;
+    chip::ByteSpan pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return UnlockWithTimeout::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t timeoutInSeconds;
+    chip::ByteSpan pin;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UnlockWithTimeout
+namespace UnlockWithTimeoutResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return UnlockWithTimeoutResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return UnlockWithTimeoutResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UnlockWithTimeoutResponse
+namespace GetLogRecord {
+enum class Fields
+{
+    kLogIndex = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetLogRecord::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t logIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetLogRecord::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t logIndex;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetLogRecord
+namespace GetLogRecordResponse {
+enum class Fields
+{
+    kLogEntryId         = 0,
+    kTimestamp          = 1,
+    kEventType          = 2,
+    kSource             = 3,
+    kEventIdOrAlarmCode = 4,
+    kUserId             = 5,
+    kPin                = 6,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetLogRecordResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t logEntryId;
+    uint32_t timestamp;
+    uint8_t eventType;
+    uint8_t source;
+    uint8_t eventIdOrAlarmCode;
+    uint16_t userId;
+    chip::ByteSpan pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetLogRecordResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t logEntryId;
+    uint32_t timestamp;
+    uint8_t eventType;
+    uint8_t source;
+    uint8_t eventIdOrAlarmCode;
+    uint16_t userId;
+    chip::ByteSpan pin;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetLogRecordResponse
+namespace SetPin {
+enum class Fields
+{
+    kUserId     = 0,
+    kUserStatus = 1,
+    kUserType   = 2,
+    kPin        = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetPin::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    chip::ByteSpan pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetPin::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    chip::ByteSpan pin;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetPin
+namespace SetPinResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    DoorLockSetPinOrIdStatus status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    DoorLockSetPinOrIdStatus status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetPinResponse
+namespace GetPin {
+enum class Fields
+{
+    kUserId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetPin::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetPin::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetPin
+namespace GetPinResponse {
+enum class Fields
+{
+    kUserId     = 0,
+    kUserStatus = 1,
+    kUserType   = 2,
+    kPin        = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    chip::ByteSpan pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    chip::ByteSpan pin;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetPinResponse
+namespace ClearPin {
+enum class Fields
+{
+    kUserId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearPin::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearPin::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearPin
+namespace ClearPinResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearPinResponse
+namespace ClearAllPins {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearAllPins::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearAllPins::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearAllPins
+namespace ClearAllPinsResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearAllPinsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearAllPinsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearAllPinsResponse
+namespace SetUserStatus {
+enum class Fields
+{
+    kUserId     = 0,
+    kUserStatus = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    uint8_t userStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    uint8_t userStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetUserStatus
+namespace SetUserStatusResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetUserStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetUserStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetUserStatusResponse
+namespace GetUserStatus {
+enum class Fields
+{
+    kUserId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetUserStatus
+namespace GetUserStatusResponse {
+enum class Fields
+{
+    kUserId = 0,
+    kStatus = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetUserStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetUserStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetUserStatusResponse
+namespace SetWeekdaySchedule {
+enum class Fields
+{
+    kScheduleId  = 0,
+    kUserId      = 1,
+    kDaysMask    = 2,
+    kStartHour   = 3,
+    kStartMinute = 4,
+    kEndHour     = 5,
+    kEndMinute   = 6,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    chip::BitFlags<DoorLockDayOfWeek> daysMask;
+    uint8_t startHour;
+    uint8_t startMinute;
+    uint8_t endHour;
+    uint8_t endMinute;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    chip::BitFlags<DoorLockDayOfWeek> daysMask;
+    uint8_t startHour;
+    uint8_t startMinute;
+    uint8_t endHour;
+    uint8_t endMinute;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetWeekdaySchedule
+namespace SetWeekdayScheduleResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetWeekdayScheduleResponse
+namespace GetWeekdaySchedule {
+enum class Fields
+{
+    kScheduleId = 0,
+    kUserId     = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetWeekdaySchedule
+namespace GetWeekdayScheduleResponse {
+enum class Fields
+{
+    kScheduleId  = 0,
+    kUserId      = 1,
+    kStatus      = 2,
+    kDaysMask    = 3,
+    kStartHour   = 4,
+    kStartMinute = 5,
+    kEndHour     = 6,
+    kEndMinute   = 7,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    uint8_t status;
+    uint8_t daysMask;
+    uint8_t startHour;
+    uint8_t startMinute;
+    uint8_t endHour;
+    uint8_t endMinute;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    uint8_t status;
+    uint8_t daysMask;
+    uint8_t startHour;
+    uint8_t startMinute;
+    uint8_t endHour;
+    uint8_t endMinute;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetWeekdayScheduleResponse
+namespace ClearWeekdaySchedule {
+enum class Fields
+{
+    kScheduleId = 0,
+    kUserId     = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearWeekdaySchedule
+namespace ClearWeekdayScheduleResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearWeekdayScheduleResponse
+namespace SetYeardaySchedule {
+enum class Fields
+{
+    kScheduleId     = 0,
+    kUserId         = 1,
+    kLocalStartTime = 2,
+    kLocalEndTime   = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetYeardaySchedule
+namespace SetYeardayScheduleResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetYeardayScheduleResponse
+namespace GetYeardaySchedule {
+enum class Fields
+{
+    kScheduleId = 0,
+    kUserId     = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetYeardaySchedule
+namespace GetYeardayScheduleResponse {
+enum class Fields
+{
+    kScheduleId     = 0,
+    kUserId         = 1,
+    kStatus         = 2,
+    kLocalStartTime = 3,
+    kLocalEndTime   = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    uint8_t status;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    uint8_t status;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetYeardayScheduleResponse
+namespace ClearYeardaySchedule {
+enum class Fields
+{
+    kScheduleId = 0,
+    kUserId     = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint16_t userId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearYeardaySchedule
+namespace ClearYeardayScheduleResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearYeardayScheduleResponse
+namespace SetHolidaySchedule {
+enum class Fields
+{
+    kScheduleId                 = 0,
+    kLocalStartTime             = 1,
+    kLocalEndTime               = 2,
+    kOperatingModeDuringHoliday = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+    uint8_t operatingModeDuringHoliday;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+    uint8_t operatingModeDuringHoliday;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetHolidaySchedule
+namespace SetHolidayScheduleResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetHolidayScheduleResponse
+namespace GetHolidaySchedule {
+enum class Fields
+{
+    kScheduleId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetHolidaySchedule
+namespace GetHolidayScheduleResponse {
+enum class Fields
+{
+    kScheduleId                 = 0,
+    kStatus                     = 1,
+    kLocalStartTime             = 2,
+    kLocalEndTime               = 3,
+    kOperatingModeDuringHoliday = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint8_t status;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+    uint8_t operatingModeDuringHoliday;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    uint8_t status;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+    uint8_t operatingModeDuringHoliday;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetHolidayScheduleResponse
+namespace ClearHolidaySchedule {
+enum class Fields
+{
+    kScheduleId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t scheduleId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearHolidaySchedule
+namespace ClearHolidayScheduleResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearHolidayScheduleResponse
+namespace SetUserType {
+enum class Fields
+{
+    kUserId   = 0,
+    kUserType = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserType userType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserType userType;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetUserType
+namespace SetUserTypeResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetUserTypeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetUserTypeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetUserTypeResponse
+namespace GetUserType {
+enum class Fields
+{
+    kUserId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetUserType
+namespace GetUserTypeResponse {
+enum class Fields
+{
+    kUserId   = 0,
+    kUserType = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetUserTypeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserType userType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetUserTypeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserType userType;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetUserTypeResponse
+namespace SetRfid {
+enum class Fields
+{
+    kUserId     = 0,
+    kUserStatus = 1,
+    kUserType   = 2,
+    kId         = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    chip::ByteSpan id;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    chip::ByteSpan id;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetRfid
+namespace SetRfidResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    DoorLockSetPinOrIdStatus status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    DoorLockSetPinOrIdStatus status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetRfidResponse
+namespace GetRfid {
+enum class Fields
+{
+    kUserId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetRfid
+namespace GetRfidResponse {
+enum class Fields
+{
+    kUserId     = 0,
+    kUserStatus = 1,
+    kUserType   = 2,
+    kRfid       = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    chip::ByteSpan rfid;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    chip::ByteSpan rfid;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetRfidResponse
+namespace ClearRfid {
+enum class Fields
+{
+    kUserId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint16_t userId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearRfid
+namespace ClearRfidResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearRfidResponse
+namespace ClearAllRfids {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearAllRfids::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearAllRfids::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearAllRfids
+namespace ClearAllRfidsResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearAllRfidsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearAllRfidsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearAllRfidsResponse
+namespace OperationEventNotification {
+enum class Fields
+{
+    kSource    = 0,
+    kEventCode = 1,
+    kUserId    = 2,
+    kPin       = 3,
+    kTimeStamp = 4,
+    kData      = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return OperationEventNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t source;
+    DoorLockOperationEventCode eventCode;
+    uint16_t userId;
+    chip::ByteSpan pin;
+    uint32_t timeStamp;
+    chip::CharSpan data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return OperationEventNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t source;
+    DoorLockOperationEventCode eventCode;
+    uint16_t userId;
+    chip::ByteSpan pin;
+    uint32_t timeStamp;
+    chip::CharSpan data;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OperationEventNotification
+namespace ProgrammingEventNotification {
+enum class Fields
+{
+    kSource     = 0,
+    kEventCode  = 1,
+    kUserId     = 2,
+    kPin        = 3,
+    kUserType   = 4,
+    kUserStatus = 5,
+    kTimeStamp  = 6,
+    kData       = 7,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ProgrammingEventNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t source;
+    DoorLockProgrammingEventCode eventCode;
+    uint16_t userId;
+    chip::ByteSpan pin;
+    DoorLockUserType userType;
+    DoorLockUserStatus userStatus;
+    uint32_t timeStamp;
+    chip::CharSpan data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ProgrammingEventNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+
+    uint8_t source;
+    DoorLockProgrammingEventCode eventCode;
+    uint16_t userId;
+    chip::ByteSpan pin;
+    DoorLockUserType userType;
+    DoorLockUserStatus userStatus;
+    uint32_t timeStamp;
+    chip::CharSpan data;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ProgrammingEventNotification
+} // namespace Commands
+
+namespace Attributes {
+namespace LockState {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LockState::Id; }
+};
+} // namespace LockState
+namespace LockType {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LockType::Id; }
+};
+} // namespace LockType
+namespace ActuatorEnabled {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActuatorEnabled::Id; }
+};
+} // namespace ActuatorEnabled
+namespace DoorState {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DoorState::Id; }
+};
+} // namespace DoorState
+namespace DoorOpenEvents {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DoorOpenEvents::Id; }
+};
+} // namespace DoorOpenEvents
+namespace DoorClosedEvents {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DoorClosedEvents::Id; }
+};
+} // namespace DoorClosedEvents
+namespace OpenPeriod {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OpenPeriod::Id; }
+};
+} // namespace OpenPeriod
+namespace NumLockRecordsSupported {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumLockRecordsSupported::Id; }
+};
+} // namespace NumLockRecordsSupported
+namespace NumTotalUsersSupported {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumTotalUsersSupported::Id; }
+};
+} // namespace NumTotalUsersSupported
+namespace NumPinUsersSupported {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumPinUsersSupported::Id; }
+};
+} // namespace NumPinUsersSupported
+namespace NumRfidUsersSupported {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumRfidUsersSupported::Id; }
+};
+} // namespace NumRfidUsersSupported
+namespace NumWeekdaySchedulesSupportedPerUser {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumWeekdaySchedulesSupportedPerUser::Id; }
+};
+} // namespace NumWeekdaySchedulesSupportedPerUser
+namespace NumYeardaySchedulesSupportedPerUser {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumYeardaySchedulesSupportedPerUser::Id; }
+};
+} // namespace NumYeardaySchedulesSupportedPerUser
+namespace NumHolidaySchedulesSupportedPerUser {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumHolidaySchedulesSupportedPerUser::Id; }
+};
+} // namespace NumHolidaySchedulesSupportedPerUser
+namespace MaxPinLength {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxPinLength::Id; }
+};
+} // namespace MaxPinLength
+namespace MinPinLength {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinPinLength::Id; }
+};
+} // namespace MinPinLength
+namespace MaxRfidCodeLength {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxRfidCodeLength::Id; }
+};
+} // namespace MaxRfidCodeLength
+namespace MinRfidCodeLength {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinRfidCodeLength::Id; }
+};
+} // namespace MinRfidCodeLength
+namespace EnableLogging {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnableLogging::Id; }
+};
+} // namespace EnableLogging
+namespace Language {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Language::Id; }
+};
+} // namespace Language
+namespace LedSettings {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LedSettings::Id; }
+};
+} // namespace LedSettings
+namespace AutoRelockTime {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AutoRelockTime::Id; }
+};
+} // namespace AutoRelockTime
+namespace SoundVolume {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SoundVolume::Id; }
+};
+} // namespace SoundVolume
+namespace OperatingMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OperatingMode::Id; }
+};
+} // namespace OperatingMode
+namespace SupportedOperatingModes {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedOperatingModes::Id; }
+};
+} // namespace SupportedOperatingModes
+namespace DefaultConfigurationRegister {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultConfigurationRegister::Id; }
+};
+} // namespace DefaultConfigurationRegister
+namespace EnableLocalProgramming {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnableLocalProgramming::Id; }
+};
+} // namespace EnableLocalProgramming
+namespace EnableOneTouchLocking {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnableOneTouchLocking::Id; }
+};
+} // namespace EnableOneTouchLocking
+namespace EnableInsideStatusLed {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnableInsideStatusLed::Id; }
+};
+} // namespace EnableInsideStatusLed
+namespace EnablePrivacyModeButton {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnablePrivacyModeButton::Id; }
+};
+} // namespace EnablePrivacyModeButton
+namespace WrongCodeEntryLimit {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WrongCodeEntryLimit::Id; }
+};
+} // namespace WrongCodeEntryLimit
+namespace UserCodeTemporaryDisableTime {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UserCodeTemporaryDisableTime::Id; }
+};
+} // namespace UserCodeTemporaryDisableTime
+namespace SendPinOverTheAir {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SendPinOverTheAir::Id; }
+};
+} // namespace SendPinOverTheAir
+namespace RequirePinForRfOperation {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RequirePinForRfOperation::Id; }
+};
+} // namespace RequirePinForRfOperation
+namespace ZigbeeSecurityLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ZigbeeSecurityLevel::Id; }
+};
+} // namespace ZigbeeSecurityLevel
+namespace AlarmMask {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
+};
+} // namespace AlarmMask
+namespace KeypadOperationEventMask {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::KeypadOperationEventMask::Id; }
+};
+} // namespace KeypadOperationEventMask
+namespace RfOperationEventMask {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RfOperationEventMask::Id; }
+};
+} // namespace RfOperationEventMask
+namespace ManualOperationEventMask {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ManualOperationEventMask::Id; }
+};
+} // namespace ManualOperationEventMask
+namespace RfidOperationEventMask {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RfidOperationEventMask::Id; }
+};
+} // namespace RfidOperationEventMask
+namespace KeypadProgrammingEventMask {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::KeypadProgrammingEventMask::Id; }
+};
+} // namespace KeypadProgrammingEventMask
+namespace RfProgrammingEventMask {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RfProgrammingEventMask::Id; }
+};
+} // namespace RfProgrammingEventMask
+namespace RfidProgrammingEventMask {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RfidProgrammingEventMask::Id; }
+};
+} // namespace RfidProgrammingEventMask
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace DoorLock
 namespace WindowCovering {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WcEndProductType
 enum class WcEndProductType : uint8_t
 {
-    WC_END_PRODUCT_TYPE_ROLLER_SHADE                 = 0x00,
-    WC_END_PRODUCT_TYPE_ROMAN_SHADE                  = 0x01,
-    WC_END_PRODUCT_TYPE_BALLOON_SHADE                = 0x02,
-    WC_END_PRODUCT_TYPE_WOVEN_WOOD                   = 0x03,
-    WC_END_PRODUCT_TYPE_PLEATED_SHADE                = 0x04,
-    WC_END_PRODUCT_TYPE_CELLULAR_SHADE               = 0x05,
-    WC_END_PRODUCT_TYPE_LAYERED_SHADE                = 0x06,
-    WC_END_PRODUCT_TYPE_LAYERED_SHADE2_D             = 0x07,
-    WC_END_PRODUCT_TYPE_SHEER_SHADE                  = 0x08,
-    WC_END_PRODUCT_TYPE_TILT_ONLY_INTERIOR_BLIND     = 0x09,
-    WC_END_PRODUCT_TYPE_INTERIOR_BLIND               = 0x0A,
-    WC_END_PRODUCT_TYPE_VERTICAL_BLIND_STRIP_CURTAIN = 0x0B,
-    WC_END_PRODUCT_TYPE_INTERIOR_VENETIAN_BLIND      = 0x0C,
-    WC_END_PRODUCT_TYPE_EXTERIOR_VENETIAN_BLIND      = 0x0D,
-    WC_END_PRODUCT_TYPE_LATERAL_LEFT_CURTAIN         = 0x0E,
-    WC_END_PRODUCT_TYPE_LATERAL_RIGHT_CURTAIN        = 0x0F,
-    WC_END_PRODUCT_TYPE_CENTRAL_CURTAIN              = 0x10,
-    WC_END_PRODUCT_TYPE_ROLLER_SHUTTER               = 0x11,
-    WC_END_PRODUCT_TYPE_EXTERIOR_VERTICAL_SCREEN     = 0x12,
-    WC_END_PRODUCT_TYPE_AWNING_TERRACE_PATIO         = 0x13,
-    WC_END_PRODUCT_TYPE_AWNING_VERTICAL_SCREEN       = 0x14,
-    WC_END_PRODUCT_TYPE_TILT_ONLY_PERGOLA            = 0x15,
-    WC_END_PRODUCT_TYPE_SWINGING_SHUTTER             = 0x16,
-    WC_END_PRODUCT_TYPE_SLIDING_SHUTTER              = 0x17,
-    WC_END_PRODUCT_TYPE_UNKNOWN                      = 0xFF,
+    kRollerShade               = 0x00,
+    kRomanShade                = 0x01,
+    kBalloonShade              = 0x02,
+    kWovenWood                 = 0x03,
+    kPleatedShade              = 0x04,
+    kCellularShade             = 0x05,
+    kLayeredShade              = 0x06,
+    kLayeredShade2D            = 0x07,
+    kSheerShade                = 0x08,
+    kTiltOnlyInteriorBlind     = 0x09,
+    kInteriorBlind             = 0x0A,
+    kVerticalBlindStripCurtain = 0x0B,
+    kInteriorVenetianBlind     = 0x0C,
+    kExteriorVenetianBlind     = 0x0D,
+    kLateralLeftCurtain        = 0x0E,
+    kLateralRightCurtain       = 0x0F,
+    kCentralCurtain            = 0x10,
+    kRollerShutter             = 0x11,
+    kExteriorVerticalScreen    = 0x12,
+    kAwningTerracePatio        = 0x13,
+    kAwningVerticalScreen      = 0x14,
+    kTiltOnlyPergola           = 0x15,
+    kSwingingShutter           = 0x16,
+    kSlidingShutter            = 0x17,
+    kUnknown                   = 0xFF,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using WcEndProductType                     = EmberAfWcEndProductType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WcType
 enum class WcType : uint8_t
 {
-    WC_TYPE_ROLLERSHADE                 = 0x00,
-    WC_TYPE_ROLLERSHADE2_MOTOR          = 0x01,
-    WC_TYPE_ROLLERSHADE_EXTERIOR        = 0x02,
-    WC_TYPE_ROLLERSHADE_EXTERIOR2_MOTOR = 0x03,
-    WC_TYPE_DRAPERY                     = 0x04,
-    WC_TYPE_AWNING                      = 0x05,
-    WC_TYPE_SHUTTER                     = 0x06,
-    WC_TYPE_TILT_BLIND_TILT_ONLY        = 0x07,
-    WC_TYPE_TILT_BLIND_LIFT_AND_TILT    = 0x08,
-    WC_TYPE_PROJECTOR_SCREEN            = 0x09,
-    WC_TYPE_UNKNOWN                     = 0xFF,
+    kRollershade               = 0x00,
+    kRollershade2Motor         = 0x01,
+    kRollershadeExterior       = 0x02,
+    kRollershadeExterior2Motor = 0x03,
+    kDrapery                   = 0x04,
+    kAwning                    = 0x05,
+    kShutter                   = 0x06,
+    kTiltBlindTiltOnly         = 0x07,
+    kTiltBlindLiftAndTilt      = 0x08,
+    kProjectorScreen           = 0x09,
+    kUnknown                   = 0xFF,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using WcType                               = EmberAfWcType;
+#endif
+
+// Bitmap for WcConfigStatus
+enum class WcConfigStatus : uint8_t
+{
+    kOperational               = 0,
+    kOnline                    = 1,
+    kOpenAndUpCommandsReversed = 2,
+    kLiftPositionAware         = 3,
+    kTiltPositionAware         = 4,
+    kLiftEncoderControlled     = 5,
+    kTiltEncoderControlled     = 6,
 };
 
+// Bitmap for WcMode
+enum class WcMode : uint8_t
+{
+    kMotorDirectionReversed = 0,
+    kCalibrationMode        = 1,
+    kMaintenanceMode        = 2,
+    kLEDFeedback            = 3,
+};
+
+// Bitmap for WcOperationalStatus
+enum class WcOperationalStatus : uint8_t
+{
+    kGlobal = 0,
+    kLift   = 2,
+    kTilt   = 4,
+};
+
+// Bitmap for WcSafetyStatus
+enum class WcSafetyStatus : uint16_t
+{
+    kRemoteLockout       = 0,
+    kTamperDetection     = 1,
+    kFailedCommunication = 2,
+    kPositionFailure     = 3,
+    kThermalProtection   = 4,
+    kObstacleDetected    = 5,
+    kPower               = 6,
+    kStopInput           = 7,
+    kMotorJammed         = 8,
+    kHardwareFailure     = 9,
+    kManualOperation     = 10,
+    kProtection          = 11,
+};
+
+namespace Commands {
+namespace UpOrOpen {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return UpOrOpen::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return UpOrOpen::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpOrOpen
+namespace DownOrClose {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return DownOrClose::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return DownOrClose::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace DownOrClose
+namespace StopMotion {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StopMotion::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StopMotion::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StopMotion
+namespace GoToLiftValue {
+enum class Fields
+{
+    kLiftValue = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GoToLiftValue::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    uint16_t liftValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GoToLiftValue::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    uint16_t liftValue;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GoToLiftValue
+namespace GoToLiftPercentage {
+enum class Fields
+{
+    kLiftPercentageValue    = 0,
+    kLiftPercent100thsValue = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GoToLiftPercentage::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    uint8_t liftPercentageValue;
+    uint16_t liftPercent100thsValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GoToLiftPercentage::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    uint8_t liftPercentageValue;
+    uint16_t liftPercent100thsValue;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GoToLiftPercentage
+namespace GoToTiltValue {
+enum class Fields
+{
+    kTiltValue = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GoToTiltValue::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    uint16_t tiltValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GoToTiltValue::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    uint16_t tiltValue;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GoToTiltValue
+namespace GoToTiltPercentage {
+enum class Fields
+{
+    kTiltPercentageValue    = 0,
+    kTiltPercent100thsValue = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GoToTiltPercentage::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    uint8_t tiltPercentageValue;
+    uint16_t tiltPercent100thsValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GoToTiltPercentage::Id; }
+    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+
+    uint8_t tiltPercentageValue;
+    uint16_t tiltPercent100thsValue;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GoToTiltPercentage
+} // namespace Commands
+
+namespace Attributes {
+namespace Type {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Type::Id; }
+};
+} // namespace Type
+namespace PhysicalClosedLimitLift {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimitLift::Id; }
+};
+} // namespace PhysicalClosedLimitLift
+namespace PhysicalClosedLimitTilt {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimitTilt::Id; }
+};
+} // namespace PhysicalClosedLimitTilt
+namespace CurrentPositionLift {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLift::Id; }
+};
+} // namespace CurrentPositionLift
+namespace CurrentPositionTilt {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTilt::Id; }
+};
+} // namespace CurrentPositionTilt
+namespace NumberOfActuationsLift {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfActuationsLift::Id; }
+};
+} // namespace NumberOfActuationsLift
+namespace NumberOfActuationsTilt {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfActuationsTilt::Id; }
+};
+} // namespace NumberOfActuationsTilt
+namespace ConfigStatus {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ConfigStatus::Id; }
+};
+} // namespace ConfigStatus
+namespace CurrentPositionLiftPercentage {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercentage::Id; }
+};
+} // namespace CurrentPositionLiftPercentage
+namespace CurrentPositionTiltPercentage {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercentage::Id; }
+};
+} // namespace CurrentPositionTiltPercentage
+namespace OperationalStatus {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OperationalStatus::Id; }
+};
+} // namespace OperationalStatus
+namespace TargetPositionLiftPercent100ths {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionLiftPercent100ths::Id; }
+};
+} // namespace TargetPositionLiftPercent100ths
+namespace TargetPositionTiltPercent100ths {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionTiltPercent100ths::Id; }
+};
+} // namespace TargetPositionTiltPercent100ths
+namespace EndProductType {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EndProductType::Id; }
+};
+} // namespace EndProductType
+namespace CurrentPositionLiftPercent100ths {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercent100ths::Id; }
+};
+} // namespace CurrentPositionLiftPercent100ths
+namespace CurrentPositionTiltPercent100ths {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercent100ths::Id; }
+};
+} // namespace CurrentPositionTiltPercent100ths
+namespace InstalledOpenLimitLift {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InstalledOpenLimitLift::Id; }
+};
+} // namespace InstalledOpenLimitLift
+namespace InstalledClosedLimitLift {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InstalledClosedLimitLift::Id; }
+};
+} // namespace InstalledClosedLimitLift
+namespace InstalledOpenLimitTilt {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InstalledOpenLimitTilt::Id; }
+};
+} // namespace InstalledOpenLimitTilt
+namespace InstalledClosedLimitTilt {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InstalledClosedLimitTilt::Id; }
+};
+} // namespace InstalledClosedLimitTilt
+namespace VelocityLift {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::VelocityLift::Id; }
+};
+} // namespace VelocityLift
+namespace AccelerationTimeLift {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AccelerationTimeLift::Id; }
+};
+} // namespace AccelerationTimeLift
+namespace DecelerationTimeLift {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DecelerationTimeLift::Id; }
+};
+} // namespace DecelerationTimeLift
+namespace Mode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Mode::Id; }
+};
+} // namespace Mode
+namespace IntermediateSetpointsLift {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IntermediateSetpointsLift::Id; }
+};
+} // namespace IntermediateSetpointsLift
+namespace IntermediateSetpointsTilt {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IntermediateSetpointsTilt::Id; }
+};
+} // namespace IntermediateSetpointsTilt
+namespace SafetyStatus {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SafetyStatus::Id; }
+};
+} // namespace SafetyStatus
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace WindowCovering
 namespace BarrierControl {
 
+namespace Commands {
+namespace BarrierControlGoToPercent {
+enum class Fields
+{
+    kPercentOpen = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return BarrierControlGoToPercent::Id; }
+    static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
+
+    uint8_t percentOpen;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return BarrierControlGoToPercent::Id; }
+    static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
+
+    uint8_t percentOpen;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace BarrierControlGoToPercent
+namespace BarrierControlStop {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return BarrierControlStop::Id; }
+    static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return BarrierControlStop::Id; }
+    static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace BarrierControlStop
+} // namespace Commands
+
+namespace Attributes {
+namespace BarrierMovingState {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BarrierMovingState::Id; }
+};
+} // namespace BarrierMovingState
+namespace BarrierSafetyStatus {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BarrierSafetyStatus::Id; }
+};
+} // namespace BarrierSafetyStatus
+namespace BarrierCapabilities {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCapabilities::Id; }
+};
+} // namespace BarrierCapabilities
+namespace BarrierOpenEvents {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BarrierOpenEvents::Id; }
+};
+} // namespace BarrierOpenEvents
+namespace BarrierCloseEvents {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCloseEvents::Id; }
+};
+} // namespace BarrierCloseEvents
+namespace BarrierCommandOpenEvents {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCommandOpenEvents::Id; }
+};
+} // namespace BarrierCommandOpenEvents
+namespace BarrierCommandCloseEvents {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCommandCloseEvents::Id; }
+};
+} // namespace BarrierCommandCloseEvents
+namespace BarrierOpenPeriod {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BarrierOpenPeriod::Id; }
+};
+} // namespace BarrierOpenPeriod
+namespace BarrierClosePeriod {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BarrierClosePeriod::Id; }
+};
+} // namespace BarrierClosePeriod
+namespace BarrierPosition {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BarrierPosition::Id; }
+};
+} // namespace BarrierPosition
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace BarrierControl
 namespace PumpConfigurationAndControl {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for PumpControlMode
 enum class PumpControlMode : uint8_t
 {
-    PUMP_CONTROL_MODE_CONSTANT_SPEED        = 0x00,
-    PUMP_CONTROL_MODE_CONSTANT_PRESSURE     = 0x01,
-    PUMP_CONTROL_MODE_PROPORTIONAL_PRESSURE = 0x02,
-    PUMP_CONTROL_MODE_CONSTANT_FLOW         = 0x03,
-    PUMP_CONTROL_MODE_CONSTANT_TEMPERATURE  = 0x05,
-    PUMP_CONTROL_MODE_AUTOMATIC             = 0x07,
+    kConstantSpeed        = 0x00,
+    kConstantPressure     = 0x01,
+    kProportionalPressure = 0x02,
+    kConstantFlow         = 0x03,
+    kConstantTemperature  = 0x05,
+    kAutomatic            = 0x07,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using PumpControlMode                      = EmberAfPumpControlMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for PumpOperationMode
 enum class PumpOperationMode : uint8_t
 {
-    PUMP_OPERATION_MODE_NORMAL  = 0x00,
-    PUMP_OPERATION_MODE_MINIMUM = 0x01,
-    PUMP_OPERATION_MODE_MAXIMUM = 0x02,
-    PUMP_OPERATION_MODE_LOCAL   = 0x03,
+    kNormal  = 0x00,
+    kMinimum = 0x01,
+    kMaximum = 0x02,
+    kLocal   = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using PumpOperationMode                    = EmberAfPumpOperationMode;
+#endif
+
+// Bitmap for PumpStatus
+enum class PumpStatus : uint16_t
+{
+    kDeviceFault       = 0,
+    kSupplyfault       = 1,
+    kSpeedLow          = 2,
+    kSpeedHigh         = 3,
+    kLocalOverride     = 4,
+    kRunning           = 5,
+    kRemotePressure    = 6,
+    kRemoteFlow        = 7,
+    kRemoteTemperature = 8,
 };
 
+namespace Attributes {
+namespace MaxPressure {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxPressure::Id; }
+};
+} // namespace MaxPressure
+namespace MaxSpeed {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxSpeed::Id; }
+};
+} // namespace MaxSpeed
+namespace MaxFlow {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxFlow::Id; }
+};
+} // namespace MaxFlow
+namespace MinConstPressure {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinConstPressure::Id; }
+};
+} // namespace MinConstPressure
+namespace MaxConstPressure {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstPressure::Id; }
+};
+} // namespace MaxConstPressure
+namespace MinCompPressure {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinCompPressure::Id; }
+};
+} // namespace MinCompPressure
+namespace MaxCompPressure {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxCompPressure::Id; }
+};
+} // namespace MaxCompPressure
+namespace MinConstSpeed {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinConstSpeed::Id; }
+};
+} // namespace MinConstSpeed
+namespace MaxConstSpeed {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstSpeed::Id; }
+};
+} // namespace MaxConstSpeed
+namespace MinConstFlow {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinConstFlow::Id; }
+};
+} // namespace MinConstFlow
+namespace MaxConstFlow {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstFlow::Id; }
+};
+} // namespace MaxConstFlow
+namespace MinConstTemp {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinConstTemp::Id; }
+};
+} // namespace MinConstTemp
+namespace MaxConstTemp {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstTemp::Id; }
+};
+} // namespace MaxConstTemp
+namespace PumpStatus {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PumpStatus::Id; }
+};
+} // namespace PumpStatus
+namespace EffectiveOperationMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EffectiveOperationMode::Id; }
+};
+} // namespace EffectiveOperationMode
+namespace EffectiveControlMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EffectiveControlMode::Id; }
+};
+} // namespace EffectiveControlMode
+namespace Capacity {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Capacity::Id; }
+};
+} // namespace Capacity
+namespace Speed {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Speed::Id; }
+};
+} // namespace Speed
+namespace LifetimeRunningHours {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeRunningHours::Id; }
+};
+} // namespace LifetimeRunningHours
+namespace Power {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Power::Id; }
+};
+} // namespace Power
+namespace LifetimeEnergyConsumed {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeEnergyConsumed::Id; }
+};
+} // namespace LifetimeEnergyConsumed
+namespace OperationMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OperationMode::Id; }
+};
+} // namespace OperationMode
+namespace ControlMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ControlMode::Id; }
+};
+} // namespace ControlMode
+namespace AlarmMask {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
+};
+} // namespace AlarmMask
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+namespace Events {
+namespace SupplyVoltageLow {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000000;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SupplyVoltageLow
+namespace SupplyVoltageHigh {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000001;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SupplyVoltageHigh
+namespace PowerMissingPhase {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000002;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace PowerMissingPhase
+namespace SystemPressureLow {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000003;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000003;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SystemPressureLow
+namespace SystemPressureHigh {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000004;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000004;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SystemPressureHigh
+namespace DryRunning {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000005;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
+    static constexpr EventId eventId             = 0x00000005;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace DryRunning
+namespace MotorTemperatureHigh {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000006;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000006;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace MotorTemperatureHigh
+namespace PumpMotorFatalFailure {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000007;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
+    static constexpr EventId eventId             = 0x00000007;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace PumpMotorFatalFailure
+namespace ElectronicTemperatureHigh {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000008;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000008;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ElectronicTemperatureHigh
+namespace PumpBlocked {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000009;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
+    static constexpr EventId eventId             = 0x00000009;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace PumpBlocked
+namespace SensorFailure {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x0000000A;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x0000000A;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SensorFailure
+namespace ElectronicNonFatalFailure {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x0000000B;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x0000000B;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ElectronicNonFatalFailure
+namespace ElectronicFatalFailure {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x0000000C;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
+    static constexpr EventId eventId             = 0x0000000C;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ElectronicFatalFailure
+namespace GeneralFault {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x0000000D;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x0000000D;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace GeneralFault
+namespace Leakage {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x0000000E;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x0000000E;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace Leakage
+namespace AirDetection {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x0000000F;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x0000000F;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AirDetection
+namespace TurbineOperation {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000010;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000010;
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace TurbineOperation
+} // namespace Events
 } // namespace PumpConfigurationAndControl
 namespace Thermostat {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for SetpointAdjustMode
+enum class SetpointAdjustMode : uint8_t
+{
+    kHeatSetpoint         = 0x00,
+    kCoolSetpoint         = 0x01,
+    kHeatAndCoolSetpoints = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using SetpointAdjustMode                   = EmberAfSetpointAdjustMode;
+#endif
 
+// Bitmap for DayOfWeek
+enum class DayOfWeek : uint8_t
+{
+    kSunday         = 0,
+    kMonday         = 1,
+    kTuesday        = 2,
+    kWednesday      = 3,
+    kThursday       = 4,
+    kFriday         = 5,
+    kSaturday       = 6,
+    kAwayOrVacation = 7,
+};
+
+// Bitmap for ModeForSequence
+enum class ModeForSequence : uint8_t
+{
+    kHeatSetpointFieldPresent = 0,
+    kCoolSetpointFieldPresent = 1,
+};
+
+namespace Commands {
+namespace SetpointRaiseLower {
+enum class Fields
+{
+    kMode   = 0,
+    kAmount = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetpointRaiseLower::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    SetpointAdjustMode mode;
+    int8_t amount;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetpointRaiseLower::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    SetpointAdjustMode mode;
+    int8_t amount;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetpointRaiseLower
+namespace CurrentWeeklySchedule {
+enum class Fields
+{
+    kNumberOfTransitionsForSequence = 0,
+    kDayOfWeekForSequence           = 1,
+    kModeForSequence                = 2,
+    kPayload                        = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CurrentWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    uint8_t numberOfTransitionsForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
+    DataModel::List<uint8_t> payload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CurrentWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    uint8_t numberOfTransitionsForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
+    DataModel::DecodableList<uint8_t> payload;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CurrentWeeklySchedule
+namespace SetWeeklySchedule {
+enum class Fields
+{
+    kNumberOfTransitionsForSequence = 0,
+    kDayOfWeekForSequence           = 1,
+    kModeForSequence                = 2,
+    kPayload                        = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    uint8_t numberOfTransitionsForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
+    DataModel::List<uint8_t> payload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    uint8_t numberOfTransitionsForSequence;
+    chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
+    chip::BitFlags<ModeForSequence> modeForSequence;
+    DataModel::DecodableList<uint8_t> payload;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetWeeklySchedule
+namespace RelayStatusLog {
+enum class Fields
+{
+    kTimeOfDay            = 0,
+    kRelayStatus          = 1,
+    kLocalTemperature     = 2,
+    kHumidityInPercentage = 3,
+    kSetpoint             = 4,
+    kUnreadEntries        = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RelayStatusLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    uint16_t timeOfDay;
+    uint16_t relayStatus;
+    int16_t localTemperature;
+    uint8_t humidityInPercentage;
+    int16_t setpoint;
+    uint16_t unreadEntries;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RelayStatusLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    uint16_t timeOfDay;
+    uint16_t relayStatus;
+    int16_t localTemperature;
+    uint8_t humidityInPercentage;
+    int16_t setpoint;
+    uint16_t unreadEntries;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RelayStatusLog
+namespace GetWeeklySchedule {
+enum class Fields
+{
+    kDaysToReturn = 0,
+    kModeToReturn = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    chip::BitFlags<DayOfWeek> daysToReturn;
+    chip::BitFlags<ModeForSequence> modeToReturn;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    chip::BitFlags<DayOfWeek> daysToReturn;
+    chip::BitFlags<ModeForSequence> modeToReturn;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetWeeklySchedule
+namespace ClearWeeklySchedule {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ClearWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ClearWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearWeeklySchedule
+namespace GetRelayStatusLog {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetRelayStatusLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetRelayStatusLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetRelayStatusLog
+} // namespace Commands
+
+namespace Attributes {
+namespace LocalTemperature {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LocalTemperature::Id; }
+};
+} // namespace LocalTemperature
+namespace OutdoorTemperature {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OutdoorTemperature::Id; }
+};
+} // namespace OutdoorTemperature
+namespace Occupancy {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
+};
+} // namespace Occupancy
+namespace AbsMinHeatSetpointLimit {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AbsMinHeatSetpointLimit::Id; }
+};
+} // namespace AbsMinHeatSetpointLimit
+namespace AbsMaxHeatSetpointLimit {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AbsMaxHeatSetpointLimit::Id; }
+};
+} // namespace AbsMaxHeatSetpointLimit
+namespace AbsMinCoolSetpointLimit {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AbsMinCoolSetpointLimit::Id; }
+};
+} // namespace AbsMinCoolSetpointLimit
+namespace AbsMaxCoolSetpointLimit {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AbsMaxCoolSetpointLimit::Id; }
+};
+} // namespace AbsMaxCoolSetpointLimit
+namespace PiCoolingDemand {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PiCoolingDemand::Id; }
+};
+} // namespace PiCoolingDemand
+namespace PiHeatingDemand {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PiHeatingDemand::Id; }
+};
+} // namespace PiHeatingDemand
+namespace HvacSystemTypeConfiguration {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HvacSystemTypeConfiguration::Id; }
+};
+} // namespace HvacSystemTypeConfiguration
+namespace LocalTemperatureCalibration {
+struct TypeInfo
+{
+    using Type          = int8_t;
+    using DecodableType = int8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LocalTemperatureCalibration::Id; }
+};
+} // namespace LocalTemperatureCalibration
+namespace OccupiedCoolingSetpoint {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedCoolingSetpoint::Id; }
+};
+} // namespace OccupiedCoolingSetpoint
+namespace OccupiedHeatingSetpoint {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedHeatingSetpoint::Id; }
+};
+} // namespace OccupiedHeatingSetpoint
+namespace UnoccupiedCoolingSetpoint {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedCoolingSetpoint::Id; }
+};
+} // namespace UnoccupiedCoolingSetpoint
+namespace UnoccupiedHeatingSetpoint {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedHeatingSetpoint::Id; }
+};
+} // namespace UnoccupiedHeatingSetpoint
+namespace MinHeatSetpointLimit {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinHeatSetpointLimit::Id; }
+};
+} // namespace MinHeatSetpointLimit
+namespace MaxHeatSetpointLimit {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxHeatSetpointLimit::Id; }
+};
+} // namespace MaxHeatSetpointLimit
+namespace MinCoolSetpointLimit {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinCoolSetpointLimit::Id; }
+};
+} // namespace MinCoolSetpointLimit
+namespace MaxCoolSetpointLimit {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxCoolSetpointLimit::Id; }
+};
+} // namespace MaxCoolSetpointLimit
+namespace MinSetpointDeadBand {
+struct TypeInfo
+{
+    using Type          = int8_t;
+    using DecodableType = int8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinSetpointDeadBand::Id; }
+};
+} // namespace MinSetpointDeadBand
+namespace RemoteSensing {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RemoteSensing::Id; }
+};
+} // namespace RemoteSensing
+namespace ControlSequenceOfOperation {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ControlSequenceOfOperation::Id; }
+};
+} // namespace ControlSequenceOfOperation
+namespace SystemMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SystemMode::Id; }
+};
+} // namespace SystemMode
+namespace AlarmMask {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
+};
+} // namespace AlarmMask
+namespace ThermostatRunningMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatRunningMode::Id; }
+};
+} // namespace ThermostatRunningMode
+namespace StartOfWeek {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartOfWeek::Id; }
+};
+} // namespace StartOfWeek
+namespace NumberOfWeeklyTransitions {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfWeeklyTransitions::Id; }
+};
+} // namespace NumberOfWeeklyTransitions
+namespace NumberOfDailyTransitions {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfDailyTransitions::Id; }
+};
+} // namespace NumberOfDailyTransitions
+namespace TemperatureSetpointHold {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHold::Id; }
+};
+} // namespace TemperatureSetpointHold
+namespace TemperatureSetpointHoldDuration {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHoldDuration::Id; }
+};
+} // namespace TemperatureSetpointHoldDuration
+namespace ThermostatProgrammingOperationMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatProgrammingOperationMode::Id; }
+};
+} // namespace ThermostatProgrammingOperationMode
+namespace HvacRelayState {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HvacRelayState::Id; }
+};
+} // namespace HvacRelayState
+namespace SetpointChangeSource {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeSource::Id; }
+};
+} // namespace SetpointChangeSource
+namespace SetpointChangeAmount {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeAmount::Id; }
+};
+} // namespace SetpointChangeAmount
+namespace SetpointChangeSourceTimestamp {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeSourceTimestamp::Id; }
+};
+} // namespace SetpointChangeSourceTimestamp
+namespace AcType {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcType::Id; }
+};
+} // namespace AcType
+namespace AcCapacity {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcCapacity::Id; }
+};
+} // namespace AcCapacity
+namespace AcRefrigerantType {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcRefrigerantType::Id; }
+};
+} // namespace AcRefrigerantType
+namespace AcCompressor {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressor::Id; }
+};
+} // namespace AcCompressor
+namespace AcErrorCode {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcErrorCode::Id; }
+};
+} // namespace AcErrorCode
+namespace AcLouverPosition {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcLouverPosition::Id; }
+};
+} // namespace AcLouverPosition
+namespace AcCoilTemperature {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcCoilTemperature::Id; }
+};
+} // namespace AcCoilTemperature
+namespace AcCapacityFormat {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcCapacityFormat::Id; }
+};
+} // namespace AcCapacityFormat
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace Thermostat
 namespace FanControl {
 
+namespace Attributes {
+namespace FanMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FanMode::Id; }
+};
+} // namespace FanMode
+namespace FanModeSequence {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FanModeSequence::Id; }
+};
+} // namespace FanModeSequence
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace FanControl
 namespace DehumidificationControl {
 
+namespace Attributes {
+namespace RelativeHumidity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidity::Id; }
+};
+} // namespace RelativeHumidity
+namespace DehumidificationCooling {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationCooling::Id; }
+};
+} // namespace DehumidificationCooling
+namespace RhDehumidificationSetpoint {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RhDehumidificationSetpoint::Id; }
+};
+} // namespace RhDehumidificationSetpoint
+namespace RelativeHumidityMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidityMode::Id; }
+};
+} // namespace RelativeHumidityMode
+namespace DehumidificationLockout {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationLockout::Id; }
+};
+} // namespace DehumidificationLockout
+namespace DehumidificationHysteresis {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationHysteresis::Id; }
+};
+} // namespace DehumidificationHysteresis
+namespace DehumidificationMaxCool {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationMaxCool::Id; }
+};
+} // namespace DehumidificationMaxCool
+namespace RelativeHumidityDisplay {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidityDisplay::Id; }
+};
+} // namespace RelativeHumidityDisplay
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace DehumidificationControl
 namespace ThermostatUserInterfaceConfiguration {
 
+namespace Attributes {
+namespace TemperatureDisplayMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureDisplayMode::Id; }
+};
+} // namespace TemperatureDisplayMode
+namespace KeypadLockout {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::KeypadLockout::Id; }
+};
+} // namespace KeypadLockout
+namespace ScheduleProgrammingVisibility {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleProgrammingVisibility::Id; }
+};
+} // namespace ScheduleProgrammingVisibility
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ThermostatUserInterfaceConfiguration
 namespace ColorControl {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ColorLoopAction
+enum class ColorLoopAction : uint8_t
+{
+    kDeactivate                            = 0x00,
+    kActivateFromColorLoopStartEnhancedHue = 0x01,
+    kActivateFromEnhancedCurrentHue        = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ColorLoopAction                      = EmberAfColorLoopAction;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ColorLoopDirection
+enum class ColorLoopDirection : uint8_t
+{
+    kDecrementHue = 0x00,
+    kIncrementHue = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ColorLoopDirection                   = EmberAfColorLoopDirection;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ColorMode
+enum class ColorMode : uint8_t
+{
+    kCurrentHueAndCurrentSaturation = 0x00,
+    kCurrentXAndCurrentY            = 0x01,
+    kColorTemperature               = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ColorMode                            = EmberAfColorMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for HueDirection
+enum class HueDirection : uint8_t
+{
+    kShortestDistance = 0x00,
+    kLongestDistance  = 0x01,
+    kUp               = 0x02,
+    kDown             = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using HueDirection                         = EmberAfHueDirection;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for HueMoveMode
+enum class HueMoveMode : uint8_t
+{
+    kStop = 0x00,
+    kUp   = 0x01,
+    kDown = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using HueMoveMode                          = EmberAfHueMoveMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for HueStepMode
+enum class HueStepMode : uint8_t
+{
+    kUp   = 0x01,
+    kDown = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using HueStepMode                          = EmberAfHueStepMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for SaturationMoveMode
+enum class SaturationMoveMode : uint8_t
+{
+    kStop = 0x00,
+    kUp   = 0x01,
+    kDown = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using SaturationMoveMode                   = EmberAfSaturationMoveMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for SaturationStepMode
+enum class SaturationStepMode : uint8_t
+{
+    kUp   = 0x01,
+    kDown = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using SaturationStepMode                   = EmberAfSaturationStepMode;
+#endif
 
+// Bitmap for ColorCapabilities
+enum class ColorCapabilities : uint16_t
+{
+    kHueSaturationSupported    = 0,
+    kEnhancedHueSupported      = 1,
+    kColorLoopSupported        = 2,
+    kXYAttributesSupported     = 3,
+    kColorTemperatureSupported = 4,
+};
+
+// Bitmap for ColorLoopUpdateFlags
+enum class ColorLoopUpdateFlags : uint8_t
+{
+    kUpdateAction    = 0,
+    kUpdateDirection = 1,
+    kUpdateTime      = 2,
+    kUpdateStartHue  = 3,
+};
+
+namespace Commands {
+namespace MoveToHue {
+enum class Fields
+{
+    kHue             = 0,
+    kDirection       = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveToHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint8_t hue;
+    HueDirection direction;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveToHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint8_t hue;
+    HueDirection direction;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveToHue
+namespace MoveHue {
+enum class Fields
+{
+    kMoveMode        = 0,
+    kRate            = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueMoveMode moveMode;
+    uint8_t rate;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueMoveMode moveMode;
+    uint8_t rate;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveHue
+namespace StepHue {
+enum class Fields
+{
+    kStepMode        = 0,
+    kStepSize        = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StepHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueStepMode stepMode;
+    uint8_t stepSize;
+    uint8_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StepHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueStepMode stepMode;
+    uint8_t stepSize;
+    uint8_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StepHue
+namespace MoveToSaturation {
+enum class Fields
+{
+    kSaturation      = 0,
+    kTransitionTime  = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveToSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint8_t saturation;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveToSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint8_t saturation;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveToSaturation
+namespace MoveSaturation {
+enum class Fields
+{
+    kMoveMode        = 0,
+    kRate            = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    SaturationMoveMode moveMode;
+    uint8_t rate;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    SaturationMoveMode moveMode;
+    uint8_t rate;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveSaturation
+namespace StepSaturation {
+enum class Fields
+{
+    kStepMode        = 0,
+    kStepSize        = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StepSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    SaturationStepMode stepMode;
+    uint8_t stepSize;
+    uint8_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StepSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    SaturationStepMode stepMode;
+    uint8_t stepSize;
+    uint8_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StepSaturation
+namespace MoveToHueAndSaturation {
+enum class Fields
+{
+    kHue             = 0,
+    kSaturation      = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveToHueAndSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint8_t hue;
+    uint8_t saturation;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveToHueAndSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint8_t hue;
+    uint8_t saturation;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveToHueAndSaturation
+namespace MoveToColor {
+enum class Fields
+{
+    kColorX          = 0,
+    kColorY          = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveToColor::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint16_t colorX;
+    uint16_t colorY;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveToColor::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint16_t colorX;
+    uint16_t colorY;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveToColor
+namespace MoveColor {
+enum class Fields
+{
+    kRateX           = 0,
+    kRateY           = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveColor::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    int16_t rateX;
+    int16_t rateY;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveColor::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    int16_t rateX;
+    int16_t rateY;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveColor
+namespace StepColor {
+enum class Fields
+{
+    kStepX           = 0,
+    kStepY           = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StepColor::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    int16_t stepX;
+    int16_t stepY;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StepColor::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    int16_t stepX;
+    int16_t stepY;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StepColor
+namespace MoveToColorTemperature {
+enum class Fields
+{
+    kColorTemperature = 0,
+    kTransitionTime   = 1,
+    kOptionsMask      = 2,
+    kOptionsOverride  = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveToColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint16_t colorTemperature;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveToColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint16_t colorTemperature;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveToColorTemperature
+namespace EnhancedMoveToHue {
+enum class Fields
+{
+    kEnhancedHue     = 0,
+    kDirection       = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnhancedMoveToHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint16_t enhancedHue;
+    HueDirection direction;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnhancedMoveToHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint16_t enhancedHue;
+    HueDirection direction;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnhancedMoveToHue
+namespace EnhancedMoveHue {
+enum class Fields
+{
+    kMoveMode        = 0,
+    kRate            = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnhancedMoveHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueMoveMode moveMode;
+    uint16_t rate;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnhancedMoveHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueMoveMode moveMode;
+    uint16_t rate;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnhancedMoveHue
+namespace EnhancedStepHue {
+enum class Fields
+{
+    kStepMode        = 0,
+    kStepSize        = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnhancedStepHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueStepMode stepMode;
+    uint16_t stepSize;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnhancedStepHue::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueStepMode stepMode;
+    uint16_t stepSize;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnhancedStepHue
+namespace EnhancedMoveToHueAndSaturation {
+enum class Fields
+{
+    kEnhancedHue     = 0,
+    kSaturation      = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EnhancedMoveToHueAndSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint16_t enhancedHue;
+    uint8_t saturation;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EnhancedMoveToHueAndSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint16_t enhancedHue;
+    uint8_t saturation;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnhancedMoveToHueAndSaturation
+namespace ColorLoopSet {
+enum class Fields
+{
+    kUpdateFlags     = 0,
+    kAction          = 1,
+    kDirection       = 2,
+    kTime            = 3,
+    kStartHue        = 4,
+    kOptionsMask     = 5,
+    kOptionsOverride = 6,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ColorLoopSet::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    chip::BitFlags<ColorLoopUpdateFlags> updateFlags;
+    ColorLoopAction action;
+    ColorLoopDirection direction;
+    uint16_t time;
+    uint16_t startHue;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ColorLoopSet::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    chip::BitFlags<ColorLoopUpdateFlags> updateFlags;
+    ColorLoopAction action;
+    ColorLoopDirection direction;
+    uint16_t time;
+    uint16_t startHue;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ColorLoopSet
+namespace StopMoveStep {
+enum class Fields
+{
+    kOptionsMask     = 0,
+    kOptionsOverride = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StopMoveStep::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StopMoveStep::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StopMoveStep
+namespace MoveColorTemperature {
+enum class Fields
+{
+    kMoveMode                = 0,
+    kRate                    = 1,
+    kColorTemperatureMinimum = 2,
+    kColorTemperatureMaximum = 3,
+    kOptionsMask             = 4,
+    kOptionsOverride         = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MoveColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueMoveMode moveMode;
+    uint16_t rate;
+    uint16_t colorTemperatureMinimum;
+    uint16_t colorTemperatureMaximum;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MoveColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueMoveMode moveMode;
+    uint16_t rate;
+    uint16_t colorTemperatureMinimum;
+    uint16_t colorTemperatureMaximum;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MoveColorTemperature
+namespace StepColorTemperature {
+enum class Fields
+{
+    kStepMode                = 0,
+    kStepSize                = 1,
+    kTransitionTime          = 2,
+    kColorTemperatureMinimum = 3,
+    kColorTemperatureMaximum = 4,
+    kOptionsMask             = 5,
+    kOptionsOverride         = 6,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StepColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueStepMode stepMode;
+    uint16_t stepSize;
+    uint16_t transitionTime;
+    uint16_t colorTemperatureMinimum;
+    uint16_t colorTemperatureMaximum;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StepColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+
+    HueStepMode stepMode;
+    uint16_t stepSize;
+    uint16_t transitionTime;
+    uint16_t colorTemperatureMinimum;
+    uint16_t colorTemperatureMaximum;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StepColorTemperature
+} // namespace Commands
+
+namespace Attributes {
+namespace CurrentHue {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHue::Id; }
+};
+} // namespace CurrentHue
+namespace CurrentSaturation {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentSaturation::Id; }
+};
+} // namespace CurrentSaturation
+namespace RemainingTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
+};
+} // namespace RemainingTime
+namespace CurrentX {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentX::Id; }
+};
+} // namespace CurrentX
+namespace CurrentY {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentY::Id; }
+};
+} // namespace CurrentY
+namespace DriftCompensation {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DriftCompensation::Id; }
+};
+} // namespace DriftCompensation
+namespace CompensationText {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CompensationText::Id; }
+};
+} // namespace CompensationText
+namespace ColorTemperature {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorTemperature::Id; }
+};
+} // namespace ColorTemperature
+namespace ColorMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorMode::Id; }
+};
+} // namespace ColorMode
+namespace ColorControlOptions {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorControlOptions::Id; }
+};
+} // namespace ColorControlOptions
+namespace NumberOfPrimaries {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfPrimaries::Id; }
+};
+} // namespace NumberOfPrimaries
+namespace Primary1X {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary1X::Id; }
+};
+} // namespace Primary1X
+namespace Primary1Y {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary1Y::Id; }
+};
+} // namespace Primary1Y
+namespace Primary1Intensity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary1Intensity::Id; }
+};
+} // namespace Primary1Intensity
+namespace Primary2X {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary2X::Id; }
+};
+} // namespace Primary2X
+namespace Primary2Y {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary2Y::Id; }
+};
+} // namespace Primary2Y
+namespace Primary2Intensity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary2Intensity::Id; }
+};
+} // namespace Primary2Intensity
+namespace Primary3X {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary3X::Id; }
+};
+} // namespace Primary3X
+namespace Primary3Y {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary3Y::Id; }
+};
+} // namespace Primary3Y
+namespace Primary3Intensity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary3Intensity::Id; }
+};
+} // namespace Primary3Intensity
+namespace Primary4X {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary4X::Id; }
+};
+} // namespace Primary4X
+namespace Primary4Y {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary4Y::Id; }
+};
+} // namespace Primary4Y
+namespace Primary4Intensity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary4Intensity::Id; }
+};
+} // namespace Primary4Intensity
+namespace Primary5X {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary5X::Id; }
+};
+} // namespace Primary5X
+namespace Primary5Y {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary5Y::Id; }
+};
+} // namespace Primary5Y
+namespace Primary5Intensity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary5Intensity::Id; }
+};
+} // namespace Primary5Intensity
+namespace Primary6X {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary6X::Id; }
+};
+} // namespace Primary6X
+namespace Primary6Y {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary6Y::Id; }
+};
+} // namespace Primary6Y
+namespace Primary6Intensity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Primary6Intensity::Id; }
+};
+} // namespace Primary6Intensity
+namespace WhitePointX {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WhitePointX::Id; }
+};
+} // namespace WhitePointX
+namespace WhitePointY {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WhitePointY::Id; }
+};
+} // namespace WhitePointY
+namespace ColorPointRX {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRX::Id; }
+};
+} // namespace ColorPointRX
+namespace ColorPointRY {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRY::Id; }
+};
+} // namespace ColorPointRY
+namespace ColorPointRIntensity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRIntensity::Id; }
+};
+} // namespace ColorPointRIntensity
+namespace ColorPointGX {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGX::Id; }
+};
+} // namespace ColorPointGX
+namespace ColorPointGY {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGY::Id; }
+};
+} // namespace ColorPointGY
+namespace ColorPointGIntensity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGIntensity::Id; }
+};
+} // namespace ColorPointGIntensity
+namespace ColorPointBX {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBX::Id; }
+};
+} // namespace ColorPointBX
+namespace ColorPointBY {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBY::Id; }
+};
+} // namespace ColorPointBY
+namespace ColorPointBIntensity {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBIntensity::Id; }
+};
+} // namespace ColorPointBIntensity
+namespace EnhancedCurrentHue {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnhancedCurrentHue::Id; }
+};
+} // namespace EnhancedCurrentHue
+namespace EnhancedColorMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnhancedColorMode::Id; }
+};
+} // namespace EnhancedColorMode
+namespace ColorLoopActive {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopActive::Id; }
+};
+} // namespace ColorLoopActive
+namespace ColorLoopDirection {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopDirection::Id; }
+};
+} // namespace ColorLoopDirection
+namespace ColorLoopTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopTime::Id; }
+};
+} // namespace ColorLoopTime
+namespace ColorLoopStartEnhancedHue {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopStartEnhancedHue::Id; }
+};
+} // namespace ColorLoopStartEnhancedHue
+namespace ColorLoopStoredEnhancedHue {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopStoredEnhancedHue::Id; }
+};
+} // namespace ColorLoopStoredEnhancedHue
+namespace ColorCapabilities {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorCapabilities::Id; }
+};
+} // namespace ColorCapabilities
+namespace ColorTempPhysicalMin {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMin::Id; }
+};
+} // namespace ColorTempPhysicalMin
+namespace ColorTempPhysicalMax {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMax::Id; }
+};
+} // namespace ColorTempPhysicalMax
+namespace CoupleColorTempToLevelMinMireds {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CoupleColorTempToLevelMinMireds::Id; }
+};
+} // namespace CoupleColorTempToLevelMinMireds
+namespace StartUpColorTemperatureMireds {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpColorTemperatureMireds::Id; }
+};
+} // namespace StartUpColorTemperatureMireds
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ColorControl
 namespace BallastConfiguration {
 
+namespace Attributes {
+namespace PhysicalMinLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalMinLevel::Id; }
+};
+} // namespace PhysicalMinLevel
+namespace PhysicalMaxLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalMaxLevel::Id; }
+};
+} // namespace PhysicalMaxLevel
+namespace BallastStatus {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BallastStatus::Id; }
+};
+} // namespace BallastStatus
+namespace MinLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinLevel::Id; }
+};
+} // namespace MinLevel
+namespace MaxLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxLevel::Id; }
+};
+} // namespace MaxLevel
+namespace PowerOnLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnLevel::Id; }
+};
+} // namespace PowerOnLevel
+namespace PowerOnFadeTime {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnFadeTime::Id; }
+};
+} // namespace PowerOnFadeTime
+namespace IntrinsicBallastFactor {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBallastFactor::Id; }
+};
+} // namespace IntrinsicBallastFactor
+namespace BallastFactorAdjustment {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BallastFactorAdjustment::Id; }
+};
+} // namespace BallastFactorAdjustment
+namespace LampQuality {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LampQuality::Id; }
+};
+} // namespace LampQuality
+namespace LampType {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LampType::Id; }
+};
+} // namespace LampType
+namespace LampManufacturer {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LampManufacturer::Id; }
+};
+} // namespace LampManufacturer
+namespace LampRatedHours {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LampRatedHours::Id; }
+};
+} // namespace LampRatedHours
+namespace LampBurnHours {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHours::Id; }
+};
+} // namespace LampBurnHours
+namespace LampAlarmMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LampAlarmMode::Id; }
+};
+} // namespace LampAlarmMode
+namespace LampBurnHoursTripPoint {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHoursTripPoint::Id; }
+};
+} // namespace LampBurnHoursTripPoint
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace BallastConfiguration
 namespace IlluminanceMeasurement {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for LightSensorType
+enum class LightSensorType : uint8_t
+{
+    kPhotodiode = 0x00,
+    kCmos       = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using LightSensorType                      = EmberAfLightSensorType;
+#endif
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace LightSensorType {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LightSensorType::Id; }
+};
+} // namespace LightSensorType
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace IlluminanceMeasurement
-namespace IlluminanceLevelSensing {
-
-} // namespace IlluminanceLevelSensing
 namespace TemperatureMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace TemperatureMeasurement
 namespace PressureMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace ScaledValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ScaledValue::Id; }
+};
+} // namespace ScaledValue
+namespace MinScaledValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinScaledValue::Id; }
+};
+} // namespace MinScaledValue
+namespace MaxScaledValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxScaledValue::Id; }
+};
+} // namespace MaxScaledValue
+namespace ScaledTolerance {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ScaledTolerance::Id; }
+};
+} // namespace ScaledTolerance
+namespace Scale {
+struct TypeInfo
+{
+    using Type          = int8_t;
+    using DecodableType = int8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Scale::Id; }
+};
+} // namespace Scale
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace PressureMeasurement
 namespace FlowMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace FlowMeasurement
 namespace RelativeHumidityMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace RelativeHumidityMeasurement
 namespace OccupancySensing {
 
+namespace Attributes {
+namespace Occupancy {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
+};
+} // namespace Occupancy
+namespace OccupancySensorType {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorType::Id; }
+};
+} // namespace OccupancySensorType
+namespace OccupancySensorTypeBitmap {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorTypeBitmap::Id; }
+};
+} // namespace OccupancySensorTypeBitmap
+namespace PirOccupiedToUnoccupiedDelay {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PirOccupiedToUnoccupiedDelay::Id; }
+};
+} // namespace PirOccupiedToUnoccupiedDelay
+namespace PirUnoccupiedToOccupiedDelay {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PirUnoccupiedToOccupiedDelay::Id; }
+};
+} // namespace PirUnoccupiedToOccupiedDelay
+namespace PirUnoccupiedToOccupiedThreshold {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PirUnoccupiedToOccupiedThreshold::Id; }
+};
+} // namespace PirUnoccupiedToOccupiedThreshold
+namespace UltrasonicOccupiedToUnoccupiedDelay {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id; }
+};
+} // namespace UltrasonicOccupiedToUnoccupiedDelay
+namespace UltrasonicUnoccupiedToOccupiedDelay {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id; }
+};
+} // namespace UltrasonicUnoccupiedToOccupiedDelay
+namespace UltrasonicUnoccupiedToOccupiedThreshold {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id; }
+};
+} // namespace UltrasonicUnoccupiedToOccupiedThreshold
+namespace PhysicalContactOccupiedToUnoccupiedDelay {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id; }
+};
+} // namespace PhysicalContactOccupiedToUnoccupiedDelay
+namespace PhysicalContactUnoccupiedToOccupiedDelay {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id; }
+};
+} // namespace PhysicalContactUnoccupiedToOccupiedDelay
+namespace PhysicalContactUnoccupiedToOccupiedThreshold {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id; }
+};
+} // namespace PhysicalContactUnoccupiedToOccupiedThreshold
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace OccupancySensing
 namespace CarbonMonoxideConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace CarbonMonoxideConcentrationMeasurement
 namespace CarbonDioxideConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace CarbonDioxideConcentrationMeasurement
 namespace EthyleneConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace EthyleneConcentrationMeasurement
 namespace EthyleneOxideConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace EthyleneOxideConcentrationMeasurement
 namespace HydrogenConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace HydrogenConcentrationMeasurement
 namespace HydrogenSulphideConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace HydrogenSulphideConcentrationMeasurement
 namespace NitricOxideConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace NitricOxideConcentrationMeasurement
 namespace NitrogenDioxideConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace NitrogenDioxideConcentrationMeasurement
 namespace OxygenConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace OxygenConcentrationMeasurement
 namespace OzoneConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace OzoneConcentrationMeasurement
 namespace SulfurDioxideConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace SulfurDioxideConcentrationMeasurement
 namespace DissolvedOxygenConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace DissolvedOxygenConcentrationMeasurement
 namespace BromateConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace BromateConcentrationMeasurement
 namespace ChloraminesConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ChloraminesConcentrationMeasurement
 namespace ChlorineConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ChlorineConcentrationMeasurement
 namespace FecalColiformAndEColiConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace FecalColiformAndEColiConcentrationMeasurement
 namespace FluorideConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace FluorideConcentrationMeasurement
 namespace HaloaceticAcidsConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace HaloaceticAcidsConcentrationMeasurement
 namespace TotalTrihalomethanesConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace TotalTrihalomethanesConcentrationMeasurement
 namespace TotalColiformBacteriaConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace TotalColiformBacteriaConcentrationMeasurement
 namespace TurbidityConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace TurbidityConcentrationMeasurement
 namespace CopperConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace CopperConcentrationMeasurement
 namespace LeadConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace LeadConcentrationMeasurement
 namespace ManganeseConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ManganeseConcentrationMeasurement
 namespace SulfateConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace SulfateConcentrationMeasurement
 namespace BromodichloromethaneConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace BromodichloromethaneConcentrationMeasurement
 namespace BromoformConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace BromoformConcentrationMeasurement
 namespace ChlorodibromomethaneConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ChlorodibromomethaneConcentrationMeasurement
 namespace ChloroformConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ChloroformConcentrationMeasurement
 namespace SodiumConcentrationMeasurement {
 
+namespace Attributes {
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+};
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+struct TypeInfo
+{
+    using Type          = float;
+    using DecodableType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+};
+} // namespace Tolerance
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace SodiumConcentrationMeasurement
 namespace IasZone {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IasEnrollResponseCode
+enum class IasEnrollResponseCode : uint8_t
+{
+    kSuccess        = 0x00,
+    kNotSupported   = 0x01,
+    kNoEnrollPermit = 0x02,
+    kTooManyZones   = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasEnrollResponseCode                = EmberAfIasEnrollResponseCode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IasZoneType
+enum class IasZoneType : uint16_t
+{
+    kStandardCie             = 0x00,
+    kMotionSensor            = 0x0D,
+    kContactSwitch           = 0x15,
+    kFireSensor              = 0x28,
+    kWaterSensor             = 0x2A,
+    kGasSensor               = 0x2B,
+    kPersonalEmergencyDevice = 0x2C,
+    kVibrationMovementSensor = 0x2D,
+    kRemoteControl           = 0x10F,
+    kKeyFob                  = 0x115,
+    kKeypad                  = 0x21D,
+    kStandardWarningDevice   = 0x225,
+    kGlassBreakSensor        = 0x226,
+    kCarbonMonoxideSensor    = 0x227,
+    kSecurityRepeater        = 0x229,
+    kInvalidZoneType         = 0xFFFF,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasZoneType                          = EmberAfIasZoneType;
+#endif
 
+// Bitmap for IasZoneStatus
+enum class IasZoneStatus : uint16_t
+{
+    kAlarm1             = 0,
+    kAlarm2             = 1,
+    kTamper             = 2,
+    kBattery            = 3,
+    kSupervisionReports = 4,
+    kRestoreReports     = 5,
+    kTrouble            = 6,
+    kAc                 = 7,
+    kTest               = 8,
+    kBatteryDefect      = 9,
+};
+
+namespace Commands {
+namespace ZoneEnrollResponse {
+enum class Fields
+{
+    kEnrollResponseCode = 0,
+    kZoneId             = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ZoneEnrollResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    IasEnrollResponseCode enrollResponseCode;
+    uint8_t zoneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ZoneEnrollResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    IasEnrollResponseCode enrollResponseCode;
+    uint8_t zoneId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ZoneEnrollResponse
+namespace ZoneStatusChangeNotification {
+enum class Fields
+{
+    kZoneStatus     = 0,
+    kExtendedStatus = 1,
+    kZoneId         = 2,
+    kDelay          = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ZoneStatusChangeNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    chip::BitFlags<IasZoneStatus> zoneStatus;
+    uint8_t extendedStatus;
+    uint8_t zoneId;
+    uint16_t delay;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ZoneStatusChangeNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    chip::BitFlags<IasZoneStatus> zoneStatus;
+    uint8_t extendedStatus;
+    uint8_t zoneId;
+    uint16_t delay;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ZoneStatusChangeNotification
+namespace InitiateNormalOperationMode {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return InitiateNormalOperationMode::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return InitiateNormalOperationMode::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace InitiateNormalOperationMode
+namespace ZoneEnrollRequest {
+enum class Fields
+{
+    kZoneType         = 0,
+    kManufacturerCode = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ZoneEnrollRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    IasZoneType zoneType;
+    uint16_t manufacturerCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ZoneEnrollRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    IasZoneType zoneType;
+    uint16_t manufacturerCode;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ZoneEnrollRequest
+namespace InitiateTestMode {
+enum class Fields
+{
+    kTestModeDuration            = 0,
+    kCurrentZoneSensitivityLevel = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return InitiateTestMode::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    uint8_t testModeDuration;
+    uint8_t currentZoneSensitivityLevel;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return InitiateTestMode::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    uint8_t testModeDuration;
+    uint8_t currentZoneSensitivityLevel;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace InitiateTestMode
+namespace InitiateNormalOperationModeResponse {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return InitiateNormalOperationModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return InitiateNormalOperationModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace InitiateNormalOperationModeResponse
+namespace InitiateTestModeResponse {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return InitiateTestModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return InitiateTestModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace InitiateTestModeResponse
+} // namespace Commands
+
+namespace Attributes {
+namespace ZoneState {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ZoneState::Id; }
+};
+} // namespace ZoneState
+namespace ZoneType {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ZoneType::Id; }
+};
+} // namespace ZoneType
+namespace ZoneStatus {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ZoneStatus::Id; }
+};
+} // namespace ZoneStatus
+namespace IasCieAddress {
+struct TypeInfo
+{
+    using Type          = chip::NodeId;
+    using DecodableType = chip::NodeId;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IasCieAddress::Id; }
+};
+} // namespace IasCieAddress
+namespace ZoneId {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ZoneId::Id; }
+};
+} // namespace ZoneId
+namespace NumberOfZoneSensitivityLevelsSupported {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfZoneSensitivityLevelsSupported::Id; }
+};
+} // namespace NumberOfZoneSensitivityLevelsSupported
+namespace CurrentZoneSensitivityLevel {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentZoneSensitivityLevel::Id; }
+};
+} // namespace CurrentZoneSensitivityLevel
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace IasZone
 namespace IasAce {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IasAceAlarmStatus
+enum class IasAceAlarmStatus : uint8_t
+{
+    kNoAlarm        = 0x00,
+    kBurglar        = 0x01,
+    kFire           = 0x02,
+    kEmergency      = 0x03,
+    kPolicePanic    = 0x04,
+    kFirePanic      = 0x05,
+    kEmergencyPanic = 0x06,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAceAlarmStatus                    = EmberAfIasAceAlarmStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IasAceArmMode
+enum class IasAceArmMode : uint8_t
+{
+    kDisarm                 = 0x00,
+    kArmDayHomeZonesOnly    = 0x01,
+    kArmNightSleepZonesOnly = 0x02,
+    kArmAllZones            = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAceArmMode                        = EmberAfIasAceArmMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IasAceArmNotification
+enum class IasAceArmNotification : uint8_t
+{
+    kAllZonesDisarmed         = 0x00,
+    kOnlyDayHomeZonesArmed    = 0x01,
+    kOnlyNightSleepZonesArmed = 0x02,
+    kAllZonesArmed            = 0x03,
+    kInvalidArmDisarmCode     = 0x04,
+    kNotReadyToArm            = 0x05,
+    kAlreadyDisarmed          = 0x06,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAceArmNotification                = EmberAfIasAceArmNotification;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IasAceAudibleNotification
+enum class IasAceAudibleNotification : uint8_t
+{
+    kMute         = 0x00,
+    kDefaultSound = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAceAudibleNotification            = EmberAfIasAceAudibleNotification;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IasAceBypassResult
+enum class IasAceBypassResult : uint8_t
+{
+    kZoneBypassed         = 0x00,
+    kZoneNotBypassed      = 0x01,
+    kNotAllowed           = 0x02,
+    kInvalidZoneId        = 0x03,
+    kUnknownZoneId        = 0x04,
+    kInvalidArmDisarmCode = 0x05,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAceBypassResult                   = EmberAfIasAceBypassResult;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IasAcePanelStatus
+enum class IasAcePanelStatus : uint8_t
+{
+    kPanelDisarmed = 0x00,
+    kArmedStay     = 0x01,
+    kArmedNight    = 0x02,
+    kArmedAway     = 0x03,
+    kExitDelay     = 0x04,
+    kEntryDelay    = 0x05,
+    kNotReadyToArm = 0x06,
+    kInAlarm       = 0x07,
+    kArmingStay    = 0x08,
+    kArmingNight   = 0x09,
+    kArmingAway    = 0x0A,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasAcePanelStatus                    = EmberAfIasAcePanelStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for IasZoneType
+enum class IasZoneType : uint16_t
+{
+    kStandardCie             = 0x00,
+    kMotionSensor            = 0x0D,
+    kContactSwitch           = 0x15,
+    kFireSensor              = 0x28,
+    kWaterSensor             = 0x2A,
+    kGasSensor               = 0x2B,
+    kPersonalEmergencyDevice = 0x2C,
+    kVibrationMovementSensor = 0x2D,
+    kRemoteControl           = 0x10F,
+    kKeyFob                  = 0x115,
+    kKeypad                  = 0x21D,
+    kStandardWarningDevice   = 0x225,
+    kGlassBreakSensor        = 0x226,
+    kCarbonMonoxideSensor    = 0x227,
+    kSecurityRepeater        = 0x229,
+    kInvalidZoneType         = 0xFFFF,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using IasZoneType                          = EmberAfIasZoneType;
+#endif
 
+// Bitmap for IasZoneStatus
+enum class IasZoneStatus : uint16_t
+{
+    kAlarm1             = 0,
+    kAlarm2             = 1,
+    kTamper             = 2,
+    kBattery            = 3,
+    kSupervisionReports = 4,
+    kRestoreReports     = 5,
+    kTrouble            = 6,
+    kAc                 = 7,
+    kTest               = 8,
+    kBatteryDefect      = 9,
+};
+
+namespace Structs {
+namespace IasAceZoneStatusResult {
+enum class Fields
+{
+    kZoneId     = 0,
+    kZoneStatus = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t zoneId;
+    chip::BitFlags<IasZoneStatus> zoneStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace IasAceZoneStatusResult
+} // namespace Structs
+
+namespace Commands {
+namespace Arm {
+enum class Fields
+{
+    kArmMode       = 0,
+    kArmDisarmCode = 1,
+    kZoneId        = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Arm::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    IasAceArmMode armMode;
+    chip::CharSpan armDisarmCode;
+    uint8_t zoneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Arm::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    IasAceArmMode armMode;
+    chip::CharSpan armDisarmCode;
+    uint8_t zoneId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Arm
+namespace ArmResponse {
+enum class Fields
+{
+    kArmNotification = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ArmResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    IasAceArmNotification armNotification;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ArmResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    IasAceArmNotification armNotification;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ArmResponse
+namespace Bypass {
+enum class Fields
+{
+    kNumberOfZones = 0,
+    kZoneIds       = 1,
+    kArmDisarmCode = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Bypass::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t numberOfZones;
+    DataModel::List<uint8_t> zoneIds;
+    chip::CharSpan armDisarmCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Bypass::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t numberOfZones;
+    DataModel::DecodableList<uint8_t> zoneIds;
+    chip::CharSpan armDisarmCode;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Bypass
+namespace GetZoneIdMapResponse {
+enum class Fields
+{
+    kSection0  = 0,
+    kSection1  = 1,
+    kSection2  = 2,
+    kSection3  = 3,
+    kSection4  = 4,
+    kSection5  = 5,
+    kSection6  = 6,
+    kSection7  = 7,
+    kSection8  = 8,
+    kSection9  = 9,
+    kSection10 = 10,
+    kSection11 = 11,
+    kSection12 = 12,
+    kSection13 = 13,
+    kSection14 = 14,
+    kSection15 = 15,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetZoneIdMapResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint16_t section0;
+    uint16_t section1;
+    uint16_t section2;
+    uint16_t section3;
+    uint16_t section4;
+    uint16_t section5;
+    uint16_t section6;
+    uint16_t section7;
+    uint16_t section8;
+    uint16_t section9;
+    uint16_t section10;
+    uint16_t section11;
+    uint16_t section12;
+    uint16_t section13;
+    uint16_t section14;
+    uint16_t section15;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetZoneIdMapResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint16_t section0;
+    uint16_t section1;
+    uint16_t section2;
+    uint16_t section3;
+    uint16_t section4;
+    uint16_t section5;
+    uint16_t section6;
+    uint16_t section7;
+    uint16_t section8;
+    uint16_t section9;
+    uint16_t section10;
+    uint16_t section11;
+    uint16_t section12;
+    uint16_t section13;
+    uint16_t section14;
+    uint16_t section15;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetZoneIdMapResponse
+namespace Emergency {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Emergency::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Emergency::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Emergency
+namespace GetZoneInformationResponse {
+enum class Fields
+{
+    kZoneId      = 0,
+    kZoneType    = 1,
+    kIeeeAddress = 2,
+    kZoneLabel   = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetZoneInformationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t zoneId;
+    IasZoneType zoneType;
+    chip::NodeId ieeeAddress;
+    chip::CharSpan zoneLabel;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetZoneInformationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t zoneId;
+    IasZoneType zoneType;
+    chip::NodeId ieeeAddress;
+    chip::CharSpan zoneLabel;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetZoneInformationResponse
+namespace Fire {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Fire::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Fire::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Fire
+namespace ZoneStatusChanged {
+enum class Fields
+{
+    kZoneId              = 0,
+    kZoneStatus          = 1,
+    kAudibleNotification = 2,
+    kZoneLabel           = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ZoneStatusChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t zoneId;
+    uint16_t zoneStatus;
+    IasAceAudibleNotification audibleNotification;
+    chip::CharSpan zoneLabel;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ZoneStatusChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t zoneId;
+    uint16_t zoneStatus;
+    IasAceAudibleNotification audibleNotification;
+    chip::CharSpan zoneLabel;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ZoneStatusChanged
+namespace Panic {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Panic::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Panic::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Panic
+namespace PanelStatusChanged {
+enum class Fields
+{
+    kPanelStatus         = 0,
+    kSecondsRemaining    = 1,
+    kAudibleNotification = 2,
+    kAlarmStatus         = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return PanelStatusChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    IasAcePanelStatus panelStatus;
+    uint8_t secondsRemaining;
+    IasAceAudibleNotification audibleNotification;
+    IasAceAlarmStatus alarmStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return PanelStatusChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    IasAcePanelStatus panelStatus;
+    uint8_t secondsRemaining;
+    IasAceAudibleNotification audibleNotification;
+    IasAceAlarmStatus alarmStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PanelStatusChanged
+namespace GetZoneIdMap {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetZoneIdMap::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetZoneIdMap::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetZoneIdMap
+namespace GetPanelStatusResponse {
+enum class Fields
+{
+    kPanelStatus         = 0,
+    kSecondsRemaining    = 1,
+    kAudibleNotification = 2,
+    kAlarmStatus         = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetPanelStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    IasAcePanelStatus panelStatus;
+    uint8_t secondsRemaining;
+    IasAceAudibleNotification audibleNotification;
+    IasAceAlarmStatus alarmStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetPanelStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    IasAcePanelStatus panelStatus;
+    uint8_t secondsRemaining;
+    IasAceAudibleNotification audibleNotification;
+    IasAceAlarmStatus alarmStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetPanelStatusResponse
+namespace GetZoneInformation {
+enum class Fields
+{
+    kZoneId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetZoneInformation::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t zoneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetZoneInformation::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t zoneId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetZoneInformation
+namespace SetBypassedZoneList {
+enum class Fields
+{
+    kNumberOfZones = 0,
+    kZoneIds       = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SetBypassedZoneList::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t numberOfZones;
+    DataModel::List<uint8_t> zoneIds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SetBypassedZoneList::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t numberOfZones;
+    DataModel::DecodableList<uint8_t> zoneIds;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetBypassedZoneList
+namespace GetPanelStatus {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetPanelStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetPanelStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetPanelStatus
+namespace BypassResponse {
+enum class Fields
+{
+    kNumberOfZones = 0,
+    kBypassResult  = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return BypassResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t numberOfZones;
+    DataModel::List<IasAceBypassResult> bypassResult;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return BypassResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t numberOfZones;
+    DataModel::DecodableList<IasAceBypassResult> bypassResult;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace BypassResponse
+namespace GetBypassedZoneList {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetBypassedZoneList::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetBypassedZoneList::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetBypassedZoneList
+namespace GetZoneStatusResponse {
+enum class Fields
+{
+    kZoneStatusComplete = 0,
+    kNumberOfZones      = 1,
+    kZoneStatusResult   = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetZoneStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    bool zoneStatusComplete;
+    uint8_t numberOfZones;
+    DataModel::List<Structs::IasAceZoneStatusResult::Type> zoneStatusResult;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetZoneStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    bool zoneStatusComplete;
+    uint8_t numberOfZones;
+    DataModel::DecodableList<Structs::IasAceZoneStatusResult::DecodableType> zoneStatusResult;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetZoneStatusResponse
+namespace GetZoneStatus {
+enum class Fields
+{
+    kStartingZoneId     = 0,
+    kMaxNumberOfZoneIds = 1,
+    kZoneStatusMaskFlag = 2,
+    kZoneStatusMask     = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetZoneStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t startingZoneId;
+    uint8_t maxNumberOfZoneIds;
+    bool zoneStatusMaskFlag;
+    uint16_t zoneStatusMask;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetZoneStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+
+    uint8_t startingZoneId;
+    uint8_t maxNumberOfZoneIds;
+    bool zoneStatusMaskFlag;
+    uint16_t zoneStatusMask;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetZoneStatus
+} // namespace Commands
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace IasAce
 namespace IasWd {
 
+// Bitmap for SquawkInfo
+enum class SquawkInfo : uint8_t
+{
+    kMode   = 4,
+    kStrobe = 3,
+    kLevel  = 0,
+};
+
+// Bitmap for WarningInfo
+enum class WarningInfo : uint8_t
+{
+    kMode       = 4,
+    kStrobe     = 2,
+    kSirenLevel = 0,
+};
+
+namespace Commands {
+namespace StartWarning {
+enum class Fields
+{
+    kWarningInfo     = 0,
+    kWarningDuration = 1,
+    kStrobeDutyCycle = 2,
+    kStrobeLevel     = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StartWarning::Id; }
+    static constexpr ClusterId GetClusterId() { return IasWd::Id; }
+
+    chip::BitFlags<WarningInfo> warningInfo;
+    uint16_t warningDuration;
+    uint8_t strobeDutyCycle;
+    uint8_t strobeLevel;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StartWarning::Id; }
+    static constexpr ClusterId GetClusterId() { return IasWd::Id; }
+
+    chip::BitFlags<WarningInfo> warningInfo;
+    uint16_t warningDuration;
+    uint8_t strobeDutyCycle;
+    uint8_t strobeLevel;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StartWarning
+namespace Squawk {
+enum class Fields
+{
+    kSquawkInfo = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Squawk::Id; }
+    static constexpr ClusterId GetClusterId() { return IasWd::Id; }
+
+    chip::BitFlags<SquawkInfo> squawkInfo;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Squawk::Id; }
+    static constexpr ClusterId GetClusterId() { return IasWd::Id; }
+
+    chip::BitFlags<SquawkInfo> squawkInfo;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Squawk
+} // namespace Commands
+
+namespace Attributes {
+namespace MaxDuration {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxDuration::Id; }
+};
+} // namespace MaxDuration
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace IasWd
 namespace WakeOnLan {
 
+namespace Attributes {
+namespace WakeOnLanMacAddress {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WakeOnLanMacAddress::Id; }
+};
+} // namespace WakeOnLanMacAddress
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace WakeOnLan
 namespace TvChannel {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for TvChannelErrorType
 enum class TvChannelErrorType : uint8_t
 {
-    TV_CHANNEL_ERROR_TYPE_MULTIPLE_MATCHES = 0x00,
-    TV_CHANNEL_ERROR_TYPE_NO_MATCHES       = 0x01,
+    kMultipleMatches = 0x00,
+    kNoMatches       = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using TvChannelErrorType                   = EmberAfTvChannelErrorType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for TvChannelLineupInfoType
 enum class TvChannelLineupInfoType : uint8_t
 {
-    TV_CHANNEL_LINEUP_INFO_TYPE_MSO = 0x00,
+    kMso = 0x00,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using TvChannelLineupInfoType              = EmberAfTvChannelLineupInfoType;
+#endif
 
+namespace Structs {
 namespace TvChannelInfo {
-enum FieldId
+enum class Fields
 {
-    kMajorNumberFieldId       = 0,
-    kMinorNumberFieldId       = 1,
-    kNameFieldId              = 2,
-    kCallSignFieldId          = 3,
-    kAffiliateCallSignFieldId = 4,
+    kMajorNumber       = 0,
+    kMinorNumber       = 1,
+    kName              = 2,
+    kCallSign          = 3,
+    kAffiliateCallSign = 4,
 };
 
 struct Type
@@ -932,93 +20018,401 @@ struct Type
 public:
     uint16_t majorNumber;
     uint16_t minorNumber;
-    chip::ByteSpan name;
-    chip::ByteSpan callSign;
-    chip::ByteSpan affiliateCallSign;
+    chip::CharSpan name;
+    chip::CharSpan callSign;
+    chip::CharSpan affiliateCallSign;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace TvChannelInfo
 namespace TvChannelLineupInfo {
-enum FieldId
+enum class Fields
 {
-    kOperatorNameFieldId   = 0,
-    kLineupNameFieldId     = 1,
-    kPostalCodeFieldId     = 2,
-    kLineupInfoTypeFieldId = 3,
+    kOperatorName   = 0,
+    kLineupName     = 1,
+    kPostalCode     = 2,
+    kLineupInfoType = 3,
 };
 
 struct Type
 {
 public:
-    Span<const char> operatorName;
-    Span<const char> lineupName;
-    Span<const char> postalCode;
+    chip::CharSpan operatorName;
+    chip::CharSpan lineupName;
+    chip::CharSpan postalCode;
     TvChannelLineupInfoType lineupInfoType;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace TvChannelLineupInfo
+using DecodableType = Type;
 
+} // namespace TvChannelLineupInfo
+} // namespace Structs
+
+namespace Commands {
+namespace ChangeChannel {
+enum class Fields
+{
+    kMatch = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ChangeChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+
+    chip::CharSpan match;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ChangeChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+
+    chip::CharSpan match;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeChannel
+namespace ChangeChannelResponse {
+enum class Fields
+{
+    kChannelMatch = 0,
+    kErrorType    = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ChangeChannelResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+
+    DataModel::List<Structs::TvChannelInfo::Type> channelMatch;
+    TvChannelErrorType errorType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ChangeChannelResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+
+    DataModel::DecodableList<Structs::TvChannelInfo::DecodableType> channelMatch;
+    TvChannelErrorType errorType;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeChannelResponse
+namespace ChangeChannelByNumber {
+enum class Fields
+{
+    kMajorNumber = 0,
+    kMinorNumber = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ChangeChannelByNumber::Id; }
+    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+
+    uint16_t majorNumber;
+    uint16_t minorNumber;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ChangeChannelByNumber::Id; }
+    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+
+    uint16_t majorNumber;
+    uint16_t minorNumber;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeChannelByNumber
+namespace SkipChannel {
+enum class Fields
+{
+    kCount = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SkipChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+
+    uint16_t count;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SkipChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+
+    uint16_t count;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SkipChannel
+} // namespace Commands
+
+namespace Attributes {
+namespace TvChannelList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::TvChannelInfo::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::TvChannelInfo::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TvChannelList::Id; }
+};
+} // namespace TvChannelList
+namespace TvChannelLineup {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TvChannelLineup::Id; }
+};
+} // namespace TvChannelLineup
+namespace CurrentTvChannel {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTvChannel::Id; }
+};
+} // namespace CurrentTvChannel
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace TvChannel
 namespace TargetNavigator {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NavigateTargetStatus
 enum class NavigateTargetStatus : uint8_t
 {
-    NAVIGATE_TARGET_STATUS_SUCCESS           = 0x00,
-    NAVIGATE_TARGET_STATUS_APP_NOT_AVAILABLE = 0x01,
-    NAVIGATE_TARGET_STATUS_SYSTEM_BUSY       = 0x02,
+    kSuccess         = 0x00,
+    kAppNotAvailable = 0x01,
+    kSystemBusy      = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using NavigateTargetStatus                 = EmberAfNavigateTargetStatus;
+#endif
 
+namespace Structs {
 namespace NavigateTargetTargetInfo {
-enum FieldId
+enum class Fields
 {
-    kIdentifierFieldId = 0,
-    kNameFieldId       = 1,
+    kIdentifier = 0,
+    kName       = 1,
 };
 
 struct Type
 {
 public:
     uint8_t identifier;
-    chip::ByteSpan name;
+    chip::CharSpan name;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace NavigateTargetTargetInfo
+using DecodableType = Type;
 
+} // namespace NavigateTargetTargetInfo
+} // namespace Structs
+
+namespace Commands {
+namespace NavigateTarget {
+enum class Fields
+{
+    kTarget = 0,
+    kData   = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return NavigateTarget::Id; }
+    static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
+
+    uint8_t target;
+    chip::CharSpan data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return NavigateTarget::Id; }
+    static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
+
+    uint8_t target;
+    chip::CharSpan data;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace NavigateTarget
+namespace NavigateTargetResponse {
+enum class Fields
+{
+    kStatus = 0,
+    kData   = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return NavigateTargetResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
+
+    NavigateTargetStatus status;
+    chip::CharSpan data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return NavigateTargetResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
+
+    NavigateTargetStatus status;
+    chip::CharSpan data;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace NavigateTargetResponse
+} // namespace Commands
+
+namespace Attributes {
+namespace TargetNavigatorList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::NavigateTargetTargetInfo::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::NavigateTargetTargetInfo::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TargetNavigatorList::Id; }
+};
+} // namespace TargetNavigatorList
+namespace CurrentNavigatorTarget {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentNavigatorTarget::Id; }
+};
+} // namespace CurrentNavigatorTarget
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace TargetNavigator
 namespace MediaPlayback {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MediaPlaybackState
 enum class MediaPlaybackState : uint8_t
 {
-    MEDIA_PLAYBACK_STATE_PLAYING     = 0x00,
-    MEDIA_PLAYBACK_STATE_PAUSED      = 0x01,
-    MEDIA_PLAYBACK_STATE_NOT_PLAYING = 0x02,
-    MEDIA_PLAYBACK_STATE_BUFFERING   = 0x03,
+    kPlaying    = 0x00,
+    kPaused     = 0x01,
+    kNotPlaying = 0x02,
+    kBuffering  = 0x03,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MediaPlaybackState                   = EmberAfMediaPlaybackState;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MediaPlaybackStatus
 enum class MediaPlaybackStatus : uint8_t
 {
-    MEDIA_PLAYBACK_STATUS_SUCCESS                   = 0x00,
-    MEDIA_PLAYBACK_STATUS_INVALID_STATE_FOR_COMMAND = 0x01,
-    MEDIA_PLAYBACK_STATUS_NOT_ALLOWED               = 0x02,
-    MEDIA_PLAYBACK_STATUS_NOT_ACTIVE                = 0x03,
-    MEDIA_PLAYBACK_STATUS_SPEED_OUT_OF_RANGE        = 0x04,
-    MEDIA_PLAYBACK_STATUS_SEEK_OUT_OF_RANGE         = 0x05,
+    kSuccess                = 0x00,
+    kInvalidStateForCommand = 0x01,
+    kNotAllowed             = 0x02,
+    kNotActive              = 0x03,
+    kSpeedOutOfRange        = 0x04,
+    kSeekOutOfRange         = 0x05,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MediaPlaybackStatus                  = EmberAfMediaPlaybackStatus;
+#endif
 
+namespace Structs {
 namespace MediaPlaybackPosition {
-enum FieldId
+enum class Fields
 {
-    kUpdatedAtFieldId = 0,
-    kPositionFieldId  = 1,
+    kUpdatedAt = 0,
+    kPosition  = 1,
 };
 
 struct Type
@@ -1027,38 +20421,737 @@ public:
     uint64_t updatedAt;
     uint64_t position;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace MediaPlaybackPosition
+using DecodableType = Type;
 
+} // namespace MediaPlaybackPosition
+} // namespace Structs
+
+namespace Commands {
+namespace MediaPlay {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaPlay::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaPlay::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaPlay
+namespace MediaPlayResponse {
+enum class Fields
+{
+    kMediaPlaybackStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaPlayResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaPlayResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaPlayResponse
+namespace MediaPause {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaPause::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaPause::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaPause
+namespace MediaPauseResponse {
+enum class Fields
+{
+    kMediaPlaybackStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaPauseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaPauseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaPauseResponse
+namespace MediaStop {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaStop::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaStop::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaStop
+namespace MediaStopResponse {
+enum class Fields
+{
+    kMediaPlaybackStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaStopResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaStopResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaStopResponse
+namespace MediaStartOver {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaStartOver::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaStartOver::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaStartOver
+namespace MediaStartOverResponse {
+enum class Fields
+{
+    kMediaPlaybackStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaStartOverResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaStartOverResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaStartOverResponse
+namespace MediaPrevious {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaPrevious::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaPrevious::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaPrevious
+namespace MediaPreviousResponse {
+enum class Fields
+{
+    kMediaPlaybackStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaPreviousResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaPreviousResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaPreviousResponse
+namespace MediaNext {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaNext::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaNext::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaNext
+namespace MediaNextResponse {
+enum class Fields
+{
+    kMediaPlaybackStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaNextResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaNextResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaNextResponse
+namespace MediaRewind {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaRewind::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaRewind::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaRewind
+namespace MediaRewindResponse {
+enum class Fields
+{
+    kMediaPlaybackStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaRewindResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaRewindResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaRewindResponse
+namespace MediaFastForward {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaFastForward::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaFastForward::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaFastForward
+namespace MediaFastForwardResponse {
+enum class Fields
+{
+    kMediaPlaybackStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaFastForwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaFastForwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaFastForwardResponse
+namespace MediaSkipForward {
+enum class Fields
+{
+    kDeltaPositionMilliseconds = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaSkipForward::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    uint64_t deltaPositionMilliseconds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaSkipForward::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    uint64_t deltaPositionMilliseconds;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaSkipForward
+namespace MediaSkipForwardResponse {
+enum class Fields
+{
+    kMediaPlaybackStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaSkipForwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaSkipForwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaSkipForwardResponse
+namespace MediaSkipBackward {
+enum class Fields
+{
+    kDeltaPositionMilliseconds = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaSkipBackward::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    uint64_t deltaPositionMilliseconds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaSkipBackward::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    uint64_t deltaPositionMilliseconds;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaSkipBackward
+namespace MediaSkipBackwardResponse {
+enum class Fields
+{
+    kMediaPlaybackStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaSkipBackwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaSkipBackwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaSkipBackwardResponse
+namespace MediaSeek {
+enum class Fields
+{
+    kPosition = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaSeek::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    uint64_t position;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaSeek::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    uint64_t position;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaSeek
+namespace MediaSeekResponse {
+enum class Fields
+{
+    kMediaPlaybackStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MediaSeekResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MediaSeekResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+
+    MediaPlaybackStatus mediaPlaybackStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MediaSeekResponse
+} // namespace Commands
+
+namespace Attributes {
+namespace PlaybackState {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PlaybackState::Id; }
+};
+} // namespace PlaybackState
+namespace StartTime {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartTime::Id; }
+};
+} // namespace StartTime
+namespace Duration {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Duration::Id; }
+};
+} // namespace Duration
+namespace PositionUpdatedAt {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PositionUpdatedAt::Id; }
+};
+} // namespace PositionUpdatedAt
+namespace Position {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Position::Id; }
+};
+} // namespace Position
+namespace PlaybackSpeed {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PlaybackSpeed::Id; }
+};
+} // namespace PlaybackSpeed
+namespace SeekRangeEnd {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeEnd::Id; }
+};
+} // namespace SeekRangeEnd
+namespace SeekRangeStart {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeStart::Id; }
+};
+} // namespace SeekRangeStart
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace MediaPlayback
 namespace MediaInput {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MediaInputType
 enum class MediaInputType : uint8_t
 {
-    MEDIA_INPUT_TYPE_INTERNAL  = 0x00,
-    MEDIA_INPUT_TYPE_AUX       = 0x01,
-    MEDIA_INPUT_TYPE_COAX      = 0x02,
-    MEDIA_INPUT_TYPE_COMPOSITE = 0x03,
-    MEDIA_INPUT_TYPE_HDMI      = 0x04,
-    MEDIA_INPUT_TYPE_INPUT     = 0x05,
-    MEDIA_INPUT_TYPE_LINE      = 0x06,
-    MEDIA_INPUT_TYPE_OPTICAL   = 0x07,
-    MEDIA_INPUT_TYPE_VIDEO     = 0x08,
-    MEDIA_INPUT_TYPE_SCART     = 0x09,
-    MEDIA_INPUT_TYPE_USB       = 0x0A,
-    MEDIA_INPUT_TYPE_OTHER     = 0x0B,
+    kInternal  = 0x00,
+    kAux       = 0x01,
+    kCoax      = 0x02,
+    kComposite = 0x03,
+    kHdmi      = 0x04,
+    kInput     = 0x05,
+    kLine      = 0x06,
+    kOptical   = 0x07,
+    kVideo     = 0x08,
+    kScart     = 0x09,
+    kUsb       = 0x0A,
+    kOther     = 0x0B,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MediaInputType                       = EmberAfMediaInputType;
+#endif
 
+namespace Structs {
 namespace MediaInputInfo {
-enum FieldId
+enum class Fields
 {
-    kIndexFieldId       = 0,
-    kInputTypeFieldId   = 1,
-    kNameFieldId        = 2,
-    kDescriptionFieldId = 3,
+    kIndex       = 0,
+    kInputType   = 1,
+    kName        = 2,
+    kDescription = 3,
 };
 
 struct Type
@@ -1066,289 +21159,794 @@ struct Type
 public:
     uint8_t index;
     MediaInputType inputType;
-    chip::ByteSpan name;
-    chip::ByteSpan description;
+    chip::CharSpan name;
+    chip::CharSpan description;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace MediaInputInfo
+} // namespace Structs
 
-} // namespace MediaInput
-namespace LowPower {
-
-} // namespace LowPower
-namespace KeypadInput {
-// Enum for KeypadInputCecKeyCode
-enum class KeypadInputCecKeyCode : uint8_t
+namespace Commands {
+namespace SelectInput {
+enum class Fields
 {
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT                       = 0x00,
-    KEYPAD_INPUT_CEC_KEY_CODE_UP                           = 0x01,
-    KEYPAD_INPUT_CEC_KEY_CODE_DOWN                         = 0x02,
-    KEYPAD_INPUT_CEC_KEY_CODE_LEFT                         = 0x03,
-    KEYPAD_INPUT_CEC_KEY_CODE_RIGHT                        = 0x04,
-    KEYPAD_INPUT_CEC_KEY_CODE_RIGHT_UP                     = 0x05,
-    KEYPAD_INPUT_CEC_KEY_CODE_RIGHT_DOWN                   = 0x06,
-    KEYPAD_INPUT_CEC_KEY_CODE_LEFT_UP                      = 0x07,
-    KEYPAD_INPUT_CEC_KEY_CODE_LEFT_DOWN                    = 0x08,
-    KEYPAD_INPUT_CEC_KEY_CODE_ROOT_MENU                    = 0x09,
-    KEYPAD_INPUT_CEC_KEY_CODE_SETUP_MENU                   = 0x0A,
-    KEYPAD_INPUT_CEC_KEY_CODE_CONTENTS_MENU                = 0x0B,
-    KEYPAD_INPUT_CEC_KEY_CODE_FAVORITE_MENU                = 0x0C,
-    KEYPAD_INPUT_CEC_KEY_CODE_EXIT                         = 0x0D,
-    KEYPAD_INPUT_CEC_KEY_CODE_MEDIA_TOP_MENU               = 0x10,
-    KEYPAD_INPUT_CEC_KEY_CODE_MEDIA_CONTEXT_SENSITIVE_MENU = 0x11,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBER_ENTRY_MODE            = 0x1D,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBER11                     = 0x1E,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBER12                     = 0x1F,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBER0_OR_NUMBER10          = 0x20,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS1                     = 0x21,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS2                     = 0x22,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS3                     = 0x23,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS4                     = 0x24,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS5                     = 0x25,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS6                     = 0x26,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS7                     = 0x27,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS8                     = 0x28,
-    KEYPAD_INPUT_CEC_KEY_CODE_NUMBERS9                     = 0x29,
-    KEYPAD_INPUT_CEC_KEY_CODE_DOT                          = 0x2A,
-    KEYPAD_INPUT_CEC_KEY_CODE_ENTER                        = 0x2B,
-    KEYPAD_INPUT_CEC_KEY_CODE_CLEAR                        = 0x2C,
-    KEYPAD_INPUT_CEC_KEY_CODE_NEXT_FAVORITE                = 0x2F,
-    KEYPAD_INPUT_CEC_KEY_CODE_CHANNEL_UP                   = 0x30,
-    KEYPAD_INPUT_CEC_KEY_CODE_CHANNEL_DOWN                 = 0x31,
-    KEYPAD_INPUT_CEC_KEY_CODE_PREVIOUS_CHANNEL             = 0x32,
-    KEYPAD_INPUT_CEC_KEY_CODE_SOUND_SELECT                 = 0x33,
-    KEYPAD_INPUT_CEC_KEY_CODE_INPUT_SELECT                 = 0x34,
-    KEYPAD_INPUT_CEC_KEY_CODE_DISPLAY_INFORMATION          = 0x35,
-    KEYPAD_INPUT_CEC_KEY_CODE_HELP                         = 0x36,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAGE_UP                      = 0x37,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAGE_DOWN                    = 0x38,
-    KEYPAD_INPUT_CEC_KEY_CODE_POWER                        = 0x40,
-    KEYPAD_INPUT_CEC_KEY_CODE_VOLUME_UP                    = 0x41,
-    KEYPAD_INPUT_CEC_KEY_CODE_VOLUME_DOWN                  = 0x42,
-    KEYPAD_INPUT_CEC_KEY_CODE_MUTE                         = 0x43,
-    KEYPAD_INPUT_CEC_KEY_CODE_PLAY                         = 0x44,
-    KEYPAD_INPUT_CEC_KEY_CODE_STOP                         = 0x45,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAUSE                        = 0x46,
-    KEYPAD_INPUT_CEC_KEY_CODE_RECORD                       = 0x47,
-    KEYPAD_INPUT_CEC_KEY_CODE_REWIND                       = 0x48,
-    KEYPAD_INPUT_CEC_KEY_CODE_FAST_FORWARD                 = 0x49,
-    KEYPAD_INPUT_CEC_KEY_CODE_EJECT                        = 0x4A,
-    KEYPAD_INPUT_CEC_KEY_CODE_FORWARD                      = 0x4B,
-    KEYPAD_INPUT_CEC_KEY_CODE_BACKWARD                     = 0x4C,
-    KEYPAD_INPUT_CEC_KEY_CODE_STOP_RECORD                  = 0x4D,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAUSE_RECORD                 = 0x4E,
-    KEYPAD_INPUT_CEC_KEY_CODE_RESERVED                     = 0x4F,
-    KEYPAD_INPUT_CEC_KEY_CODE_ANGLE                        = 0x50,
-    KEYPAD_INPUT_CEC_KEY_CODE_SUB_PICTURE                  = 0x51,
-    KEYPAD_INPUT_CEC_KEY_CODE_VIDEO_ON_DEMAND              = 0x52,
-    KEYPAD_INPUT_CEC_KEY_CODE_ELECTRONIC_PROGRAM_GUIDE     = 0x53,
-    KEYPAD_INPUT_CEC_KEY_CODE_TIMER_PROGRAMMING            = 0x54,
-    KEYPAD_INPUT_CEC_KEY_CODE_INITIAL_CONFIGURATION        = 0x55,
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT_BROADCAST_TYPE        = 0x56,
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT_SOUND_PRESENTATION    = 0x57,
-    KEYPAD_INPUT_CEC_KEY_CODE_PLAY_FUNCTION                = 0x60,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAUSE_PLAY_FUNCTION          = 0x61,
-    KEYPAD_INPUT_CEC_KEY_CODE_RECORD_FUNCTION              = 0x62,
-    KEYPAD_INPUT_CEC_KEY_CODE_PAUSE_RECORD_FUNCTION        = 0x63,
-    KEYPAD_INPUT_CEC_KEY_CODE_STOP_FUNCTION                = 0x64,
-    KEYPAD_INPUT_CEC_KEY_CODE_MUTE_FUNCTION                = 0x65,
-    KEYPAD_INPUT_CEC_KEY_CODE_RESTORE_VOLUME_FUNCTION      = 0x66,
-    KEYPAD_INPUT_CEC_KEY_CODE_TUNE_FUNCTION                = 0x67,
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT_MEDIA_FUNCTION        = 0x68,
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT_AV_INPUT_FUNCTION     = 0x69,
-    KEYPAD_INPUT_CEC_KEY_CODE_SELECT_AUDIO_INPUT_FUNCTION  = 0x6A,
-    KEYPAD_INPUT_CEC_KEY_CODE_POWER_TOGGLE_FUNCTION        = 0x6B,
-    KEYPAD_INPUT_CEC_KEY_CODE_POWER_OFF_FUNCTION           = 0x6C,
-    KEYPAD_INPUT_CEC_KEY_CODE_POWER_ON_FUNCTION            = 0x6D,
-    KEYPAD_INPUT_CEC_KEY_CODE_F1_BLUE                      = 0x71,
-    KEYPAD_INPUT_CEC_KEY_CODE_F2_RED                       = 0x72,
-    KEYPAD_INPUT_CEC_KEY_CODE_F3_GREEN                     = 0x73,
-    KEYPAD_INPUT_CEC_KEY_CODE_F4_YELLOW                    = 0x74,
-    KEYPAD_INPUT_CEC_KEY_CODE_F5                           = 0x75,
-    KEYPAD_INPUT_CEC_KEY_CODE_DATA                         = 0x76,
-};
-// Enum for KeypadInputStatus
-enum class KeypadInputStatus : uint8_t
-{
-    KEYPAD_INPUT_STATUS_SUCCESS                      = 0x00,
-    KEYPAD_INPUT_STATUS_UNSUPPORTED_KEY              = 0x01,
-    KEYPAD_INPUT_STATUS_INVALID_KEY_IN_CURRENT_STATE = 0x02,
-};
-
-} // namespace KeypadInput
-namespace ContentLauncher {
-// Enum for ContentLaunchMetricType
-enum class ContentLaunchMetricType : uint8_t
-{
-    CONTENT_LAUNCH_METRIC_TYPE_PIXELS     = 0x00,
-    CONTENT_LAUNCH_METRIC_TYPE_PERCENTAGE = 0x01,
-};
-// Enum for ContentLaunchParameterEnum
-enum class ContentLaunchParameterEnum : uint8_t
-{
-    CONTENT_LAUNCH_PARAMETER_ENUM_ACTOR       = 0x00,
-    CONTENT_LAUNCH_PARAMETER_ENUM_CHANNEL     = 0x01,
-    CONTENT_LAUNCH_PARAMETER_ENUM_CHARACTER   = 0x02,
-    CONTENT_LAUNCH_PARAMETER_ENUM_EVENT       = 0x03,
-    CONTENT_LAUNCH_PARAMETER_ENUM_FRANCHISE   = 0x04,
-    CONTENT_LAUNCH_PARAMETER_ENUM_GENRE       = 0x05,
-    CONTENT_LAUNCH_PARAMETER_ENUM_LEAGUE      = 0x06,
-    CONTENT_LAUNCH_PARAMETER_ENUM_POPULARITY  = 0x07,
-    CONTENT_LAUNCH_PARAMETER_ENUM_SPORT       = 0x08,
-    CONTENT_LAUNCH_PARAMETER_ENUM_SPORTS_TEAM = 0x09,
-    CONTENT_LAUNCH_PARAMETER_ENUM_VIDEO       = 0x0A,
-};
-// Enum for ContentLaunchStatus
-enum class ContentLaunchStatus : uint8_t
-{
-    CONTENT_LAUNCH_STATUS_SUCCESS           = 0x00,
-    CONTENT_LAUNCH_STATUS_URL_NOT_AVAILABLE = 0x01,
-    CONTENT_LAUNCH_STATUS_AUTH_FAILED       = 0x02,
-};
-// Enum for ContentLaunchStreamingType
-enum class ContentLaunchStreamingType : uint8_t
-{
-    CONTENT_LAUNCH_STREAMING_TYPE_DASH = 0x00,
-    CONTENT_LAUNCH_STREAMING_TYPE_HLS  = 0x01,
-};
-
-namespace ContentLaunchAdditionalInfo {
-enum FieldId
-{
-    kNameFieldId  = 0,
-    kValueFieldId = 1,
+    kIndex = 0,
 };
 
 struct Type
 {
 public:
-    Span<const char> name;
-    Span<const char> value;
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SelectInput::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    uint8_t index;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SelectInput::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+
+    uint8_t index;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SelectInput
+namespace ShowInputStatus {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ShowInputStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ShowInputStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ShowInputStatus
+namespace HideInputStatus {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return HideInputStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return HideInputStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace HideInputStatus
+namespace RenameInput {
+enum class Fields
+{
+    kIndex = 0,
+    kName  = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RenameInput::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+
+    uint8_t index;
+    chip::CharSpan name;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RenameInput::Id; }
+    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+
+    uint8_t index;
+    chip::CharSpan name;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RenameInput
+} // namespace Commands
+
+namespace Attributes {
+namespace MediaInputList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::MediaInputInfo::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::MediaInputInfo::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MediaInputList::Id; }
+};
+} // namespace MediaInputList
+namespace CurrentMediaInput {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMediaInput::Id; }
+};
+} // namespace CurrentMediaInput
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace MediaInput
+namespace LowPower {
+
+namespace Commands {
+namespace Sleep {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Sleep::Id; }
+    static constexpr ClusterId GetClusterId() { return LowPower::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Sleep::Id; }
+    static constexpr ClusterId GetClusterId() { return LowPower::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Sleep
+} // namespace Commands
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace LowPower
+namespace KeypadInput {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for KeypadInputCecKeyCode
+enum class KeypadInputCecKeyCode : uint8_t
+{
+    kSelect                    = 0x00,
+    kUp                        = 0x01,
+    kDown                      = 0x02,
+    kLeft                      = 0x03,
+    kRight                     = 0x04,
+    kRightUp                   = 0x05,
+    kRightDown                 = 0x06,
+    kLeftUp                    = 0x07,
+    kLeftDown                  = 0x08,
+    kRootMenu                  = 0x09,
+    kSetupMenu                 = 0x0A,
+    kContentsMenu              = 0x0B,
+    kFavoriteMenu              = 0x0C,
+    kExit                      = 0x0D,
+    kMediaTopMenu              = 0x10,
+    kMediaContextSensitiveMenu = 0x11,
+    kNumberEntryMode           = 0x1D,
+    kNumber11                  = 0x1E,
+    kNumber12                  = 0x1F,
+    kNumber0OrNumber10         = 0x20,
+    kNumbers1                  = 0x21,
+    kNumbers2                  = 0x22,
+    kNumbers3                  = 0x23,
+    kNumbers4                  = 0x24,
+    kNumbers5                  = 0x25,
+    kNumbers6                  = 0x26,
+    kNumbers7                  = 0x27,
+    kNumbers8                  = 0x28,
+    kNumbers9                  = 0x29,
+    kDot                       = 0x2A,
+    kEnter                     = 0x2B,
+    kClear                     = 0x2C,
+    kNextFavorite              = 0x2F,
+    kChannelUp                 = 0x30,
+    kChannelDown               = 0x31,
+    kPreviousChannel           = 0x32,
+    kSoundSelect               = 0x33,
+    kInputSelect               = 0x34,
+    kDisplayInformation        = 0x35,
+    kHelp                      = 0x36,
+    kPageUp                    = 0x37,
+    kPageDown                  = 0x38,
+    kPower                     = 0x40,
+    kVolumeUp                  = 0x41,
+    kVolumeDown                = 0x42,
+    kMute                      = 0x43,
+    kPlay                      = 0x44,
+    kStop                      = 0x45,
+    kPause                     = 0x46,
+    kRecord                    = 0x47,
+    kRewind                    = 0x48,
+    kFastForward               = 0x49,
+    kEject                     = 0x4A,
+    kForward                   = 0x4B,
+    kBackward                  = 0x4C,
+    kStopRecord                = 0x4D,
+    kPauseRecord               = 0x4E,
+    kReserved                  = 0x4F,
+    kAngle                     = 0x50,
+    kSubPicture                = 0x51,
+    kVideoOnDemand             = 0x52,
+    kElectronicProgramGuide    = 0x53,
+    kTimerProgramming          = 0x54,
+    kInitialConfiguration      = 0x55,
+    kSelectBroadcastType       = 0x56,
+    kSelectSoundPresentation   = 0x57,
+    kPlayFunction              = 0x60,
+    kPausePlayFunction         = 0x61,
+    kRecordFunction            = 0x62,
+    kPauseRecordFunction       = 0x63,
+    kStopFunction              = 0x64,
+    kMuteFunction              = 0x65,
+    kRestoreVolumeFunction     = 0x66,
+    kTuneFunction              = 0x67,
+    kSelectMediaFunction       = 0x68,
+    kSelectAvInputFunction     = 0x69,
+    kSelectAudioInputFunction  = 0x6A,
+    kPowerToggleFunction       = 0x6B,
+    kPowerOffFunction          = 0x6C,
+    kPowerOnFunction           = 0x6D,
+    kF1Blue                    = 0x71,
+    kF2Red                     = 0x72,
+    kF3Green                   = 0x73,
+    kF4Yellow                  = 0x74,
+    kF5                        = 0x75,
+    kData                      = 0x76,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using KeypadInputCecKeyCode                = EmberAfKeypadInputCecKeyCode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for KeypadInputStatus
+enum class KeypadInputStatus : uint8_t
+{
+    kSuccess                  = 0x00,
+    kUnsupportedKey           = 0x01,
+    kInvalidKeyInCurrentState = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using KeypadInputStatus                    = EmberAfKeypadInputStatus;
+#endif
+
+namespace Commands {
+namespace SendKey {
+enum class Fields
+{
+    kKeyCode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SendKey::Id; }
+    static constexpr ClusterId GetClusterId() { return KeypadInput::Id; }
+
+    KeypadInputCecKeyCode keyCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SendKey::Id; }
+    static constexpr ClusterId GetClusterId() { return KeypadInput::Id; }
+
+    KeypadInputCecKeyCode keyCode;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SendKey
+namespace SendKeyResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SendKeyResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return KeypadInput::Id; }
+
+    KeypadInputStatus status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SendKeyResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return KeypadInput::Id; }
+
+    KeypadInputStatus status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SendKeyResponse
+} // namespace Commands
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace KeypadInput
+namespace ContentLauncher {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ContentLaunchMetricType
+enum class ContentLaunchMetricType : uint8_t
+{
+    kPixels     = 0x00,
+    kPercentage = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ContentLaunchMetricType              = EmberAfContentLaunchMetricType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ContentLaunchParameterEnum
+enum class ContentLaunchParameterEnum : uint8_t
+{
+    kActor      = 0x00,
+    kChannel    = 0x01,
+    kCharacter  = 0x02,
+    kEvent      = 0x03,
+    kFranchise  = 0x04,
+    kGenre      = 0x05,
+    kLeague     = 0x06,
+    kPopularity = 0x07,
+    kSport      = 0x08,
+    kSportsTeam = 0x09,
+    kVideo      = 0x0A,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ContentLaunchParameterEnum           = EmberAfContentLaunchParameterEnum;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ContentLaunchStatus
+enum class ContentLaunchStatus : uint8_t
+{
+    kSuccess         = 0x00,
+    kUrlNotAvailable = 0x01,
+    kAuthFailed      = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ContentLaunchStatus                  = EmberAfContentLaunchStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ContentLaunchStreamingType
+enum class ContentLaunchStreamingType : uint8_t
+{
+    kDash = 0x00,
+    kHls  = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ContentLaunchStreamingType           = EmberAfContentLaunchStreamingType;
+#endif
+
+namespace Structs {
+namespace ContentLaunchAdditionalInfo {
+enum class Fields
+{
+    kName  = 0,
+    kValue = 1,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan name;
+    chip::CharSpan value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ContentLaunchAdditionalInfo
 namespace ContentLaunchParamater {
-enum FieldId
+enum class Fields
 {
-    kTypeFieldId           = 0,
-    kValueFieldId          = 1,
-    kExternalIDListFieldId = 2,
+    kType           = 0,
+    kValue          = 1,
+    kExternalIDList = 2,
 };
 
 struct Type
 {
 public:
     ContentLaunchParameterEnum type;
-    Span<const char> value;
-    DataModel::List<ContentLaunchAdditionalInfo::Type> externalIDList;
+    chip::CharSpan value;
+    DataModel::List<Structs::ContentLaunchAdditionalInfo::Type> externalIDList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
 {
 public:
     ContentLaunchParameterEnum type;
-    Span<const char> value;
-    DataModel::DecodableList<ContentLaunchAdditionalInfo::Type> externalIDList;
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    chip::CharSpan value;
+    DataModel::DecodableList<Structs::ContentLaunchAdditionalInfo::DecodableType> externalIDList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
 } // namespace ContentLaunchParamater
 namespace ContentLaunchBrandingInformation {
-enum FieldId
+enum class Fields
 {
-    kProviderNameFieldId = 0,
-    kBackgroundFieldId   = 1,
-    kLogoFieldId         = 2,
-    kProgressBarFieldId  = 3,
-    kSplashFieldId       = 4,
-    kWaterMarkFieldId    = 5,
+    kProviderName = 0,
+    kBackground   = 1,
+    kLogo         = 2,
+    kProgressBar  = 3,
+    kSplash       = 4,
+    kWaterMark    = 5,
 };
 
 struct Type
 {
 public:
-    Span<const char> providerName;
+    chip::CharSpan providerName;
     uint8_t background;
     uint8_t logo;
     uint8_t progressBar;
     uint8_t splash;
     uint8_t waterMark;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace ContentLaunchBrandingInformation
 namespace ContentLaunchDimension {
-enum FieldId
+enum class Fields
 {
-    kWidthFieldId  = 0,
-    kHeightFieldId = 1,
-    kMetricFieldId = 2,
+    kWidth  = 0,
+    kHeight = 1,
+    kMetric = 2,
 };
 
 struct Type
 {
 public:
-    Span<const char> width;
-    Span<const char> height;
+    chip::CharSpan width;
+    chip::CharSpan height;
     ContentLaunchMetricType metric;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace ContentLaunchDimension
 namespace ContentLaunchStyleInformation {
-enum FieldId
+enum class Fields
 {
-    kImageUrlFieldId = 0,
-    kColorFieldId    = 1,
-    kSizeFieldId     = 2,
+    kImageUrl = 0,
+    kColor    = 1,
+    kSize     = 2,
 };
 
 struct Type
 {
 public:
-    Span<const char> imageUrl;
-    Span<const char> color;
+    chip::CharSpan imageUrl;
+    chip::CharSpan color;
     uint8_t size;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace ContentLaunchStyleInformation
+using DecodableType = Type;
 
+} // namespace ContentLaunchStyleInformation
+} // namespace Structs
+
+namespace Commands {
+namespace LaunchContent {
+enum class Fields
+{
+    kAutoPlay = 0,
+    kData     = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LaunchContent::Id; }
+    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+
+    bool autoPlay;
+    chip::CharSpan data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LaunchContent::Id; }
+    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+
+    bool autoPlay;
+    chip::CharSpan data;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LaunchContent
+namespace LaunchContentResponse {
+enum class Fields
+{
+    kData                = 0,
+    kContentLaunchStatus = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LaunchContentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+
+    chip::CharSpan data;
+    ContentLaunchStatus contentLaunchStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LaunchContentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+
+    chip::CharSpan data;
+    ContentLaunchStatus contentLaunchStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LaunchContentResponse
+namespace LaunchURL {
+enum class Fields
+{
+    kContentURL    = 0,
+    kDisplayString = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LaunchURL::Id; }
+    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+
+    chip::CharSpan contentURL;
+    chip::CharSpan displayString;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LaunchURL::Id; }
+    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+
+    chip::CharSpan contentURL;
+    chip::CharSpan displayString;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LaunchURL
+namespace LaunchURLResponse {
+enum class Fields
+{
+    kData                = 0,
+    kContentLaunchStatus = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LaunchURLResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+
+    chip::CharSpan data;
+    ContentLaunchStatus contentLaunchStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LaunchURLResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+
+    chip::CharSpan data;
+    ContentLaunchStatus contentLaunchStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LaunchURLResponse
+} // namespace Commands
+
+namespace Attributes {
+namespace AcceptsHeaderList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<chip::ByteSpan>;
+    using DecodableType = DataModel::DecodableList<chip::ByteSpan>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptsHeaderList::Id; }
+};
+} // namespace AcceptsHeaderList
+namespace SupportedStreamingTypes {
+struct TypeInfo
+{
+    using Type          = DataModel::List<ContentLaunchStreamingType>;
+    using DecodableType = DataModel::DecodableList<ContentLaunchStreamingType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedStreamingTypes::Id; }
+};
+} // namespace SupportedStreamingTypes
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ContentLauncher
 namespace AudioOutput {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for AudioOutputType
 enum class AudioOutputType : uint8_t
 {
-    AUDIO_OUTPUT_TYPE_HDMI      = 0x00,
-    AUDIO_OUTPUT_TYPE_BT        = 0x01,
-    AUDIO_OUTPUT_TYPE_OPTICAL   = 0x02,
-    AUDIO_OUTPUT_TYPE_HEADPHONE = 0x03,
-    AUDIO_OUTPUT_TYPE_INTERNAL  = 0x04,
-    AUDIO_OUTPUT_TYPE_OTHER     = 0x05,
+    kHdmi      = 0x00,
+    kBt        = 0x01,
+    kOptical   = 0x02,
+    kHeadphone = 0x03,
+    kInternal  = 0x04,
+    kOther     = 0x05,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using AudioOutputType                      = EmberAfAudioOutputType;
+#endif
 
+namespace Structs {
 namespace AudioOutputInfo {
-enum FieldId
+enum class Fields
 {
-    kIndexFieldId      = 0,
-    kOutputTypeFieldId = 1,
-    kNameFieldId       = 2,
+    kIndex      = 0,
+    kOutputType = 1,
+    kName       = 2,
 };
 
 struct Type
@@ -1356,76 +21954,570 @@ struct Type
 public:
     uint8_t index;
     AudioOutputType outputType;
-    chip::ByteSpan name;
+    chip::CharSpan name;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace AudioOutputInfo
+using DecodableType = Type;
 
+} // namespace AudioOutputInfo
+} // namespace Structs
+
+namespace Commands {
+namespace SelectOutput {
+enum class Fields
+{
+    kIndex = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return SelectOutput::Id; }
+    static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
+
+    uint8_t index;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return SelectOutput::Id; }
+    static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
+
+    uint8_t index;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SelectOutput
+namespace RenameOutput {
+enum class Fields
+{
+    kIndex = 0,
+    kName  = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return RenameOutput::Id; }
+    static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
+
+    uint8_t index;
+    chip::CharSpan name;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return RenameOutput::Id; }
+    static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
+
+    uint8_t index;
+    chip::CharSpan name;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RenameOutput
+} // namespace Commands
+
+namespace Attributes {
+namespace AudioOutputList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::AudioOutputInfo::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::AudioOutputInfo::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AudioOutputList::Id; }
+};
+} // namespace AudioOutputList
+namespace CurrentAudioOutput {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentAudioOutput::Id; }
+};
+} // namespace CurrentAudioOutput
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace AudioOutput
 namespace ApplicationLauncher {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ApplicationLauncherStatus
 enum class ApplicationLauncherStatus : uint8_t
 {
-    APPLICATION_LAUNCHER_STATUS_SUCCESS           = 0x00,
-    APPLICATION_LAUNCHER_STATUS_APP_NOT_AVAILABLE = 0x01,
-    APPLICATION_LAUNCHER_STATUS_SYSTEM_BUSY       = 0x02,
+    kSuccess         = 0x00,
+    kAppNotAvailable = 0x01,
+    kSystemBusy      = 0x02,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ApplicationLauncherStatus            = EmberAfApplicationLauncherStatus;
+#endif
 
+namespace Structs {
 namespace ApplicationLauncherApp {
-enum FieldId
+enum class Fields
 {
-    kCatalogVendorIdFieldId = 0,
-    kApplicationIdFieldId   = 1,
+    kCatalogVendorId = 0,
+    kApplicationId   = 1,
 };
 
 struct Type
 {
 public:
     uint16_t catalogVendorId;
-    Span<const char> applicationId;
+    chip::CharSpan applicationId;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace ApplicationLauncherApp
+using DecodableType = Type;
 
+} // namespace ApplicationLauncherApp
+} // namespace Structs
+
+namespace Commands {
+namespace LaunchApp {
+enum class Fields
+{
+    kData            = 0,
+    kCatalogVendorId = 1,
+    kApplicationId   = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LaunchApp::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
+
+    chip::CharSpan data;
+    uint16_t catalogVendorId;
+    chip::CharSpan applicationId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LaunchApp::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
+
+    chip::CharSpan data;
+    uint16_t catalogVendorId;
+    chip::CharSpan applicationId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LaunchApp
+namespace LaunchAppResponse {
+enum class Fields
+{
+    kStatus = 0,
+    kData   = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LaunchAppResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
+
+    ApplicationLauncherStatus status;
+    chip::CharSpan data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LaunchAppResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
+
+    ApplicationLauncherStatus status;
+    chip::CharSpan data;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LaunchAppResponse
+} // namespace Commands
+
+namespace Attributes {
+namespace ApplicationLauncherList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<uint16_t>;
+    using DecodableType = DataModel::DecodableList<uint16_t>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationLauncherList::Id; }
+};
+} // namespace ApplicationLauncherList
+namespace CatalogVendorId {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CatalogVendorId::Id; }
+};
+} // namespace CatalogVendorId
+namespace ApplicationId {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationId::Id; }
+};
+} // namespace ApplicationId
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ApplicationBasicStatus
 enum class ApplicationBasicStatus : uint8_t
 {
-    APPLICATION_BASIC_STATUS_STOPPED                  = 0x00,
-    APPLICATION_BASIC_STATUS_ACTIVE_VISIBLE_FOCUS     = 0x01,
-    APPLICATION_BASIC_STATUS_ACTIVE_HIDDEN            = 0x02,
-    APPLICATION_BASIC_STATUS_ACTIVE_VISIBLE_NOT_FOCUS = 0x03,
+    kStopped               = 0x00,
+    kActiveVisibleFocus    = 0x01,
+    kActiveHidden          = 0x02,
+    kActiveVisibleNotFocus = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ApplicationBasicStatus               = EmberAfApplicationBasicStatus;
+#endif
+
+namespace Commands {
+namespace ChangeStatus {
+enum class Fields
+{
+    kStatus = 0,
 };
 
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return ChangeStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
+
+    ApplicationBasicStatus status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return ChangeStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
+
+    ApplicationBasicStatus status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeStatus
+} // namespace Commands
+
+namespace Attributes {
+namespace VendorName {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
+};
+} // namespace VendorName
+namespace VendorId {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::VendorId::Id; }
+};
+} // namespace VendorId
+namespace ApplicationName {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationName::Id; }
+};
+} // namespace ApplicationName
+namespace ProductId {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductId::Id; }
+};
+} // namespace ProductId
+namespace ApplicationId {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationId::Id; }
+};
+} // namespace ApplicationId
+namespace CatalogVendorId {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CatalogVendorId::Id; }
+};
+} // namespace CatalogVendorId
+namespace ApplicationStatus {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationStatus::Id; }
+};
+} // namespace ApplicationStatus
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ApplicationBasic
 namespace AccountLogin {
 
+namespace Commands {
+namespace GetSetupPIN {
+enum class Fields
+{
+    kTempAccountIdentifier = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetSetupPIN::Id; }
+    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+
+    chip::CharSpan tempAccountIdentifier;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetSetupPIN::Id; }
+    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+
+    chip::CharSpan tempAccountIdentifier;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetSetupPIN
+namespace GetSetupPINResponse {
+enum class Fields
+{
+    kSetupPIN = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetSetupPINResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+
+    chip::CharSpan setupPIN;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetSetupPINResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+
+    chip::CharSpan setupPIN;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetSetupPINResponse
+namespace Login {
+enum class Fields
+{
+    kTempAccountIdentifier = 0,
+    kSetupPIN              = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Login::Id; }
+    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+
+    chip::CharSpan tempAccountIdentifier;
+    chip::CharSpan setupPIN;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Login::Id; }
+    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+
+    chip::CharSpan tempAccountIdentifier;
+    chip::CharSpan setupPIN;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Login
+} // namespace Commands
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace AccountLogin
 namespace TestCluster {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SimpleEnum
 enum class SimpleEnum : uint8_t
 {
-    SIMPLE_ENUM_UNSPECIFIED = 0x00,
-    SIMPLE_ENUM_VALUE_A     = 0x01,
-    SIMPLE_ENUM_VALUE_B     = 0x02,
-    SIMPLE_ENUM_VALUE_C     = 0x03,
+    kUnspecified = 0x00,
+    kValueA      = 0x01,
+    kValueB      = 0x02,
+    kValueC      = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using SimpleEnum                           = EmberAfSimpleEnum;
+#endif
+
+// Bitmap for SimpleBitmap
+enum class SimpleBitmap : uint8_t
+{
+    kValueA = 0,
+    kValueB = 1,
+    kValueC = 2,
 };
 
+namespace Structs {
 namespace SimpleStruct {
-enum FieldId
+enum class Fields
 {
-    kAFieldId = 0,
-    kBFieldId = 1,
-    kCFieldId = 2,
-    kDFieldId = 3,
-    kEFieldId = 4,
+    kA = 0,
+    kB = 1,
+    kC = 2,
+    kD = 3,
+    kE = 4,
+    kF = 5,
 };
 
 struct Type
@@ -1435,19 +22527,22 @@ public:
     bool b;
     SimpleEnum c;
     chip::ByteSpan d;
-    Span<const char> e;
+    chip::CharSpan e;
+    chip::BitFlags<SimpleBitmap> f;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace SimpleStruct
 namespace NestedStruct {
-enum FieldId
+enum class Fields
 {
-    kAFieldId = 0,
-    kBFieldId = 1,
-    kCFieldId = 2,
+    kA = 0,
+    kB = 1,
+    kC = 2,
 };
 
 struct Type
@@ -1455,23 +22550,25 @@ struct Type
 public:
     uint8_t a;
     bool b;
-    SimpleStruct::Type c;
+    Structs::SimpleStruct::Type c;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace NestedStruct
 namespace NestedStructList {
-enum FieldId
+enum class Fields
 {
-    kAFieldId = 0,
-    kBFieldId = 1,
-    kCFieldId = 2,
-    kDFieldId = 3,
-    kEFieldId = 4,
-    kFFieldId = 5,
-    kGFieldId = 6,
+    kA = 0,
+    kB = 1,
+    kC = 2,
+    kD = 3,
+    kE = 4,
+    kF = 5,
+    kG = 6,
 };
 
 struct Type
@@ -1479,14 +22576,13 @@ struct Type
 public:
     uint8_t a;
     bool b;
-    SimpleStruct::Type c;
-    DataModel::List<SimpleStruct::Type> d;
+    Structs::SimpleStruct::Type c;
+    DataModel::List<Structs::SimpleStruct::Type> d;
     DataModel::List<uint32_t> e;
     DataModel::List<chip::ByteSpan> f;
     DataModel::List<uint8_t> g;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
@@ -1494,45 +22590,42 @@ struct DecodableType
 public:
     uint8_t a;
     bool b;
-    SimpleStruct::Type c;
-    DataModel::DecodableList<SimpleStruct::Type> d;
+    Structs::SimpleStruct::DecodableType c;
+    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> d;
     DataModel::DecodableList<uint32_t> e;
     DataModel::DecodableList<chip::ByteSpan> f;
     DataModel::DecodableList<uint8_t> g;
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
 } // namespace NestedStructList
 namespace DoubleNestedStructList {
-enum FieldId
+enum class Fields
 {
-    kAFieldId = 0,
+    kA = 0,
 };
 
 struct Type
 {
 public:
-    DataModel::List<NestedStructList::Type> a;
+    DataModel::List<Structs::NestedStructList::Type> a;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<NestedStructList::DecodableType> a;
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    DataModel::DecodableList<Structs::NestedStructList::DecodableType> a;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
 } // namespace DoubleNestedStructList
 namespace TestListStructOctet {
-enum FieldId
+enum class Fields
 {
-    kFabricIndexFieldId     = 0,
-    kOperationalCertFieldId = 1,
+    kFabricIndex     = 0,
+    kOperationalCert = 1,
 };
 
 struct Type
@@ -1541,163 +22634,3661 @@ public:
     uint64_t fabricIndex;
     chip::ByteSpan operationalCert;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace TestListStructOctet
+using DecodableType = Type;
 
+} // namespace TestListStructOctet
+} // namespace Structs
+
+namespace Commands {
+namespace Test {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Test::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Test::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Test
+namespace TestSpecificResponse {
+enum class Fields
+{
+    kReturnValue = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestSpecificResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    uint8_t returnValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestSpecificResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    uint8_t returnValue;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestSpecificResponse
+namespace TestNotHandled {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestNotHandled::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestNotHandled::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNotHandled
+namespace TestAddArgumentsResponse {
+enum class Fields
+{
+    kReturnValue = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestAddArgumentsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    uint8_t returnValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestAddArgumentsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    uint8_t returnValue;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestAddArgumentsResponse
+namespace TestSpecific {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestSpecific
+namespace TestSimpleArgumentResponse {
+enum class Fields
+{
+    kReturnValue = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestSimpleArgumentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    bool returnValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestSimpleArgumentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    bool returnValue;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestSimpleArgumentResponse
+namespace TestUnknownCommand {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestUnknownCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestUnknownCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestUnknownCommand
+namespace TestStructArrayArgumentResponse {
+enum class Fields
+{
+    kArg1 = 0,
+    kArg2 = 1,
+    kArg3 = 2,
+    kArg4 = 3,
+    kArg5 = 4,
+    kArg6 = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestStructArrayArgumentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<Structs::NestedStructList::Type> arg1;
+    DataModel::List<Structs::SimpleStruct::Type> arg2;
+    DataModel::List<SimpleEnum> arg3;
+    DataModel::List<bool> arg4;
+    SimpleEnum arg5;
+    bool arg6;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestStructArrayArgumentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<Structs::NestedStructList::DecodableType> arg1;
+    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg2;
+    DataModel::DecodableList<SimpleEnum> arg3;
+    DataModel::DecodableList<bool> arg4;
+    SimpleEnum arg5;
+    bool arg6;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestStructArrayArgumentResponse
+namespace TestAddArguments {
+enum class Fields
+{
+    kArg1 = 0,
+    kArg2 = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestAddArguments::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    uint8_t arg1;
+    uint8_t arg2;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestAddArguments::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    uint8_t arg1;
+    uint8_t arg2;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestAddArguments
+namespace TestListInt8UReverseResponse {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListInt8UReverseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<uint8_t> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListInt8UReverseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<uint8_t> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListInt8UReverseResponse
+namespace TestSimpleArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestSimpleArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    bool arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestSimpleArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    bool arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestSimpleArgumentRequest
+namespace TestEnumsResponse {
+enum class Fields
+{
+    kArg1 = 0,
+    kArg2 = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestEnumsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    chip::VendorId arg1;
+    SimpleEnum arg2;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestEnumsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    chip::VendorId arg1;
+    SimpleEnum arg2;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestEnumsResponse
+namespace TestStructArrayArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+    kArg2 = 1,
+    kArg3 = 2,
+    kArg4 = 3,
+    kArg5 = 4,
+    kArg6 = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestStructArrayArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<Structs::NestedStructList::Type> arg1;
+    DataModel::List<Structs::SimpleStruct::Type> arg2;
+    DataModel::List<SimpleEnum> arg3;
+    DataModel::List<bool> arg4;
+    SimpleEnum arg5;
+    bool arg6;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestStructArrayArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<Structs::NestedStructList::DecodableType> arg1;
+    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg2;
+    DataModel::DecodableList<SimpleEnum> arg3;
+    DataModel::DecodableList<bool> arg4;
+    SimpleEnum arg5;
+    bool arg6;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestStructArrayArgumentRequest
+namespace TestStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::SimpleStruct::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::SimpleStruct::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestStructArgumentRequest
+namespace TestNestedStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestNestedStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStruct::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestNestedStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStruct::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNestedStructArgumentRequest
+namespace TestListStructArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<Structs::SimpleStruct::Type> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListStructArgumentRequest
+namespace TestListInt8UArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListInt8UArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<uint8_t> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListInt8UArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<uint8_t> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListInt8UArgumentRequest
+namespace TestNestedStructListArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStructList::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    Structs::NestedStructList::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNestedStructListArgumentRequest
+namespace TestListNestedStructListArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<Structs::NestedStructList::Type> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<Structs::NestedStructList::DecodableType> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListNestedStructListArgumentRequest
+namespace TestListInt8UReverseRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestListInt8UReverseRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::List<uint8_t> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestListInt8UReverseRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    DataModel::DecodableList<uint8_t> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestListInt8UReverseRequest
+namespace TestEnumsRequest {
+enum class Fields
+{
+    kArg1 = 0,
+    kArg2 = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return TestEnumsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    chip::VendorId arg1;
+    SimpleEnum arg2;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return TestEnumsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    chip::VendorId arg1;
+    SimpleEnum arg2;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestEnumsRequest
+} // namespace Commands
+
+namespace Attributes {
+namespace Boolean {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Boolean::Id; }
+};
+} // namespace Boolean
+namespace Bitmap8 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap8::Id; }
+};
+} // namespace Bitmap8
+namespace Bitmap16 {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap16::Id; }
+};
+} // namespace Bitmap16
+namespace Bitmap32 {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap32::Id; }
+};
+} // namespace Bitmap32
+namespace Bitmap64 {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap64::Id; }
+};
+} // namespace Bitmap64
+namespace Int8u {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int8u::Id; }
+};
+} // namespace Int8u
+namespace Int16u {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int16u::Id; }
+};
+} // namespace Int16u
+namespace Int32u {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int32u::Id; }
+};
+} // namespace Int32u
+namespace Int64u {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int64u::Id; }
+};
+} // namespace Int64u
+namespace Int8s {
+struct TypeInfo
+{
+    using Type          = int8_t;
+    using DecodableType = int8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int8s::Id; }
+};
+} // namespace Int8s
+namespace Int16s {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int16s::Id; }
+};
+} // namespace Int16s
+namespace Int32s {
+struct TypeInfo
+{
+    using Type          = int32_t;
+    using DecodableType = int32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int32s::Id; }
+};
+} // namespace Int32s
+namespace Int64s {
+struct TypeInfo
+{
+    using Type          = int64_t;
+    using DecodableType = int64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int64s::Id; }
+};
+} // namespace Int64s
+namespace Enum8 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Enum8::Id; }
+};
+} // namespace Enum8
+namespace Enum16 {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Enum16::Id; }
+};
+} // namespace Enum16
+namespace OctetString {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OctetString::Id; }
+};
+} // namespace OctetString
+namespace ListInt8u {
+struct TypeInfo
+{
+    using Type          = DataModel::List<uint8_t>;
+    using DecodableType = DataModel::DecodableList<uint8_t>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ListInt8u::Id; }
+};
+} // namespace ListInt8u
+namespace ListOctetString {
+struct TypeInfo
+{
+    using Type          = DataModel::List<chip::ByteSpan>;
+    using DecodableType = DataModel::DecodableList<chip::ByteSpan>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ListOctetString::Id; }
+};
+} // namespace ListOctetString
+namespace ListStructOctetString {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::TestListStructOctet::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::TestListStructOctet::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ListStructOctetString::Id; }
+};
+} // namespace ListStructOctetString
+namespace LongOctetString {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LongOctetString::Id; }
+};
+} // namespace LongOctetString
+namespace CharString {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CharString::Id; }
+};
+} // namespace CharString
+namespace LongCharString {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LongCharString::Id; }
+};
+} // namespace LongCharString
+namespace EpochUs {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EpochUs::Id; }
+};
+} // namespace EpochUs
+namespace EpochS {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EpochS::Id; }
+};
+} // namespace EpochS
+namespace VendorId {
+struct TypeInfo
+{
+    using Type          = chip::VendorId;
+    using DecodableType = chip::VendorId;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::VendorId::Id; }
+};
+} // namespace VendorId
+namespace Unsupported {
+struct TypeInfo
+{
+    using Type          = bool;
+    using DecodableType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Unsupported::Id; }
+};
+} // namespace Unsupported
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+namespace Events {
+namespace TestEvent {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kArg1 = 1,
+    kArg2 = 2,
+    kArg3 = 3,
+    kArg4 = 4,
+    kArg5 = 5,
+    kArg6 = 6,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000001;
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    uint8_t arg1;
+    SimpleEnum arg2;
+    bool arg3;
+    Structs::SimpleStruct::Type arg4;
+    DataModel::List<Structs::SimpleStruct::Type> arg5;
+    DataModel::List<SimpleEnum> arg6;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+
+    uint8_t arg1;
+    SimpleEnum arg2;
+    bool arg3;
+    Structs::SimpleStruct::DecodableType arg4;
+    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg5;
+    DataModel::DecodableList<SimpleEnum> arg6;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace TestEvent
+} // namespace Events
 } // namespace TestCluster
 namespace Messaging {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for EventId
 enum class EventId : uint8_t
 {
-    EVENT_ID_METER_COVER_REMOVED                   = 0x00,
-    EVENT_ID_METER_COVER_CLOSED                    = 0x01,
-    EVENT_ID_STRONG_MAGNETIC_FIELD                 = 0x02,
-    EVENT_ID_NO_STRONG_MAGNETIC_FIELD              = 0x03,
-    EVENT_ID_BATTERY_FAILURE                       = 0x04,
-    EVENT_ID_LOW_BATTERY                           = 0x05,
-    EVENT_ID_PROGRAM_MEMORY_ERROR                  = 0x06,
-    EVENT_ID_RAM_ERROR                             = 0x07,
-    EVENT_ID_NV_MEMORY_ERROR                       = 0x08,
-    EVENT_ID_MEASUREMENT_SYSTEM_ERROR              = 0x09,
-    EVENT_ID_WATCHDOG_ERROR                        = 0x0A,
-    EVENT_ID_SUPPLY_DISCONNECT_FAILURE             = 0x0B,
-    EVENT_ID_SUPPLY_CONNECT_FAILURE                = 0x0C,
-    EVENT_ID_MEASURMENT_SOFTWARE_CHANGED           = 0x0D,
-    EVENT_ID_DST_ENABLED                           = 0x0E,
-    EVENT_ID_DST_DISABLED                          = 0x0F,
-    EVENT_ID_CLOCK_ADJ_BACKWARD                    = 0x10,
-    EVENT_ID_CLOCK_ADJ_FORWARD                     = 0x11,
-    EVENT_ID_CLOCK_INVALID                         = 0x12,
-    EVENT_ID_COMMS_ERROR_HAN                       = 0x13,
-    EVENT_ID_COMMS_OK_HAN                          = 0x14,
-    EVENT_ID_FRAUD_ATTEMPT                         = 0x15,
-    EVENT_ID_POWER_LOSS                            = 0x16,
-    EVENT_ID_INCORRECT_PROTOCOL                    = 0x17,
-    EVENT_ID_UNUSUAL_HAN_TRAFFIC                   = 0x18,
-    EVENT_ID_UNEXPECTED_CLOCK_CHANGE               = 0x19,
-    EVENT_ID_COMMS_USING_UNAUTHENTICATED_COMPONENT = 0x1A,
-    EVENT_ID_ERROR_REG_CLEAR                       = 0x1B,
-    EVENT_ID_ALARM_REG_CLEAR                       = 0x1C,
-    EVENT_ID_UNEXPECTED_HW_RESET                   = 0x1D,
-    EVENT_ID_UNEXPECTED_PROGRAM_EXECUTION          = 0x1E,
-    EVENT_ID_EVENT_LOG_CLEARED                     = 0x1F,
-    EVENT_ID_MANUAL_DISCONNECT                     = 0x20,
-    EVENT_ID_MANUAL_CONNECT                        = 0x21,
-    EVENT_ID_REMOTE_DISCONNECTION                  = 0x22,
-    EVENT_ID_LOCAL_DISCONNECTION                   = 0x23,
-    EVENT_ID_LIMIT_THRESHOLD_EXCEEDED              = 0x24,
-    EVENT_ID_LIMIT_THRESHOLD_OK                    = 0x25,
-    EVENT_ID_LIMIT_THRESHOLD_CHANGED               = 0x26,
-    EVENT_ID_MAXIMUM_DEMAND_EXCEEDED               = 0x27,
-    EVENT_ID_PROFILE_CLEARED                       = 0x28,
-    EVENT_ID_FIRMWARE_READY_FOR_ACTIVATION         = 0x29,
-    EVENT_ID_FIRMWARE_ACTIVATED                    = 0x2A,
-    EVENT_ID_PATCH_FAILURE                         = 0x2B,
-    EVENT_ID_TOU_TARIFF_ACTIVATION                 = 0x2C,
-    EVENT_ID_8X8_TARIFFACTIVATED                   = 0x2D,
-    EVENT_ID_SINGLE_TARIFF_RATE_ACTIVATED          = 0x2E,
-    EVENT_ID_ASYNCHRONOUS_BILLING_OCCURRED         = 0x2F,
-    EVENT_ID_SYNCHRONOUS_BILLING_OCCURRED          = 0x30,
-    EVENT_ID_INCORRECT_POLARITY                    = 0x80,
-    EVENT_ID_CURRENT_NO_VOLTAGE                    = 0x81,
-    EVENT_ID_UNDER_VOLTAGE                         = 0x82,
-    EVENT_ID_OVER_VOLTAGE                          = 0x83,
-    EVENT_ID_NORMAL_VOLTAGE                        = 0x84,
-    EVENT_ID_PF_BELOW_THRESHOLD                    = 0x85,
-    EVENT_ID_PF_ABOVE_THRESHOLD                    = 0x86,
-    EVENT_ID_TERMINAL_COVER_REMOVED                = 0x87,
-    EVENT_ID_TERMINAL_COVER_CLOSED                 = 0x88,
-    EVENT_ID_REVERSE_FLOW                          = 0xA0,
-    EVENT_ID_TILT_TAMPER                           = 0xA1,
-    EVENT_ID_BATTERY_COVER_REMOVED                 = 0xA2,
-    EVENT_ID_BATTERY_COVER_CLOSED                  = 0xA3,
-    EVENT_ID_EXCESS_FLOW                           = 0xA4,
-    EVENT_ID_CREDIT_OK                             = 0xC0,
-    EVENT_ID_LOW_CREDIT                            = 0xC1,
-    EVENT_ID_EMERGENCY_CREDIT_IN_USE               = 0xC0,
-    EVENT_ID_EMERGENCY_CREDIT_EXHAUSTED            = 0xC1,
-    EVENT_ID_ZERO_CREDIT_EC_NOT_SELECTED           = 0xC2,
-    EVENT_ID_SUPPLY_ON                             = 0xC3,
-    EVENT_ID_SUPPLY_OFF_AARMED                     = 0xC4,
-    EVENT_ID_SUPPLY_OFF                            = 0xC5,
-    EVENT_ID_DISCOUNT_APPLIED                      = 0xC6,
-    EVENT_ID_MANUFACTURER_SPECIFIC_A               = 0xE0,
-    EVENT_ID_MANUFACTURER_SPECIFIC_B               = 0xE1,
-    EVENT_ID_MANUFACTURER_SPECIFIC_C               = 0xE2,
-    EVENT_ID_MANUFACTURER_SPECIFIC_D               = 0xE3,
-    EVENT_ID_MANUFACTURER_SPECIFIC_E               = 0xE4,
-    EVENT_ID_MANUFACTURER_SPECIFIC_F               = 0xE5,
-    EVENT_ID_MANUFACTURER_SPECIFIC_G               = 0xE6,
-    EVENT_ID_MANUFACTURER_SPECIFIC_H               = 0xE7,
-    EVENT_ID_MANUFACTURER_SPECIFIC_I               = 0xE8,
+    kMeterCoverRemoved                  = 0x00,
+    kMeterCoverClosed                   = 0x01,
+    kStrongMagneticField                = 0x02,
+    kNoStrongMagneticField              = 0x03,
+    kBatteryFailure                     = 0x04,
+    kLowBattery                         = 0x05,
+    kProgramMemoryError                 = 0x06,
+    kRamError                           = 0x07,
+    kNvMemoryError                      = 0x08,
+    kMeasurementSystemError             = 0x09,
+    kWatchdogError                      = 0x0A,
+    kSupplyDisconnectFailure            = 0x0B,
+    kSupplyConnectFailure               = 0x0C,
+    kMeasurmentSoftwareChanged          = 0x0D,
+    kDstEnabled                         = 0x0E,
+    kDstDisabled                        = 0x0F,
+    kClockAdjBackward                   = 0x10,
+    kClockAdjForward                    = 0x11,
+    kClockInvalid                       = 0x12,
+    kCommsErrorHan                      = 0x13,
+    kCommsOkHan                         = 0x14,
+    kFraudAttempt                       = 0x15,
+    kPowerLoss                          = 0x16,
+    kIncorrectProtocol                  = 0x17,
+    kUnusualHanTraffic                  = 0x18,
+    kUnexpectedClockChange              = 0x19,
+    kCommsUsingUnauthenticatedComponent = 0x1A,
+    kErrorRegClear                      = 0x1B,
+    kAlarmRegClear                      = 0x1C,
+    kUnexpectedHwReset                  = 0x1D,
+    kUnexpectedProgramExecution         = 0x1E,
+    kEventLogCleared                    = 0x1F,
+    kManualDisconnect                   = 0x20,
+    kManualConnect                      = 0x21,
+    kRemoteDisconnection                = 0x22,
+    kLocalDisconnection                 = 0x23,
+    kLimitThresholdExceeded             = 0x24,
+    kLimitThresholdOk                   = 0x25,
+    kLimitThresholdChanged              = 0x26,
+    kMaximumDemandExceeded              = 0x27,
+    kProfileCleared                     = 0x28,
+    kFirmwareReadyForActivation         = 0x29,
+    kFirmwareActivated                  = 0x2A,
+    kPatchFailure                       = 0x2B,
+    kTouTariffActivation                = 0x2C,
+    k8x8Tariffactivated                 = 0x2D,
+    kSingleTariffRateActivated          = 0x2E,
+    kAsynchronousBillingOccurred        = 0x2F,
+    kSynchronousBillingOccurred         = 0x30,
+    kIncorrectPolarity                  = 0x80,
+    kCurrentNoVoltage                   = 0x81,
+    kUnderVoltage                       = 0x82,
+    kOverVoltage                        = 0x83,
+    kNormalVoltage                      = 0x84,
+    kPfBelowThreshold                   = 0x85,
+    kPfAboveThreshold                   = 0x86,
+    kTerminalCoverRemoved               = 0x87,
+    kTerminalCoverClosed                = 0x88,
+    kReverseFlow                        = 0xA0,
+    kTiltTamper                         = 0xA1,
+    kBatteryCoverRemoved                = 0xA2,
+    kBatteryCoverClosed                 = 0xA3,
+    kExcessFlow                         = 0xA4,
+    kCreditOk                           = 0xC0,
+    kLowCredit                          = 0xC1,
+    kEmergencyCreditInUse               = 0xC0,
+    kEmergencyCreditExhausted           = 0xC1,
+    kZeroCreditEcNotSelected            = 0xC2,
+    kSupplyOn                           = 0xC3,
+    kSupplyOffAarmed                    = 0xC4,
+    kSupplyOff                          = 0xC5,
+    kDiscountApplied                    = 0xC6,
+    kManufacturerSpecificA              = 0xE0,
+    kManufacturerSpecificB              = 0xE1,
+    kManufacturerSpecificC              = 0xE2,
+    kManufacturerSpecificD              = 0xE3,
+    kManufacturerSpecificE              = 0xE4,
+    kManufacturerSpecificF              = 0xE5,
+    kManufacturerSpecificG              = 0xE6,
+    kManufacturerSpecificH              = 0xE7,
+    kManufacturerSpecificI              = 0xE8,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using EventId                              = EmberAfEventId;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlConfirmation
 enum class MessagingControlConfirmation : uint8_t
 {
-    MESSAGING_CONTROL_CONFIRMATION_NOT_REQUIRED = 0x00,
-    MESSAGING_CONTROL_CONFIRMATION_REQUIRED     = 0x80,
+    kNotRequired = 0x00,
+    kRequired    = 0x80,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MessagingControlConfirmation         = EmberAfMessagingControlConfirmation;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlEnhancedConfirmation
 enum class MessagingControlEnhancedConfirmation : uint8_t
 {
-    MESSAGING_CONTROL_ENHANCED_CONFIRMATION_NOT_REQUIRED = 0x00,
-    MESSAGING_CONTROL_ENHANCED_CONFIRMATION_REQUIRED     = 0x20,
+    kNotRequired = 0x00,
+    kRequired    = 0x20,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MessagingControlEnhancedConfirmation = EmberAfMessagingControlEnhancedConfirmation;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlImportance
 enum class MessagingControlImportance : uint8_t
 {
-    MESSAGING_CONTROL_IMPORTANCE_LOW      = 0x00,
-    MESSAGING_CONTROL_IMPORTANCE_MEDIUM   = 0x04,
-    MESSAGING_CONTROL_IMPORTANCE_HIGH     = 0x08,
-    MESSAGING_CONTROL_IMPORTANCE_CRITICAL = 0x0C,
+    kLow      = 0x00,
+    kMedium   = 0x04,
+    kHigh     = 0x08,
+    kCritical = 0x0C,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MessagingControlImportance           = EmberAfMessagingControlImportance;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlTransmission
 enum class MessagingControlTransmission : uint8_t
 {
-    MESSAGING_CONTROL_TRANSMISSION_NORMAL               = 0x00,
-    MESSAGING_CONTROL_TRANSMISSION_NORMAL_AND_ANONYMOUS = 0x01,
-    MESSAGING_CONTROL_TRANSMISSION_ANONYMOUS            = 0x02,
-    MESSAGING_CONTROL_TRANSMISSION_RESERVED             = 0x03,
+    kNormal             = 0x00,
+    kNormalAndAnonymous = 0x01,
+    kAnonymous          = 0x02,
+    kReserved           = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using MessagingControlTransmission         = EmberAfMessagingControlTransmission;
+#endif
+
+// Bitmap for MessagingConfirmationControl
+enum class MessagingConfirmationControl : uint8_t
+{
+    kNoReturned  = 0,
+    kYesReturned = 1,
 };
 
+// Bitmap for MessagingControlMask
+enum class MessagingControlMask : uint8_t
+{
+    kTransMechanism              = 0,
+    kMessageUrgency              = 2,
+    kEnhancedConfirmationRequest = 5,
+    kMessageConfirmation         = 7,
+};
+
+// Bitmap for MessagingExtendedControlMask
+enum class MessagingExtendedControlMask : uint8_t
+{
+    kMessageConfirmationStatus = 0,
+};
+
+namespace Commands {
+namespace DisplayMessage {
+enum class Fields
+{
+    kMessageId                      = 0,
+    kMessageControl                 = 1,
+    kStartTime                      = 2,
+    kDurationInMinutes              = 3,
+    kMessage                        = 4,
+    kOptionalExtendedMessageControl = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return DisplayMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t messageId;
+    chip::BitFlags<MessagingControlMask> messageControl;
+    uint32_t startTime;
+    uint16_t durationInMinutes;
+    chip::CharSpan message;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return DisplayMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t messageId;
+    chip::BitFlags<MessagingControlMask> messageControl;
+    uint32_t startTime;
+    uint16_t durationInMinutes;
+    chip::CharSpan message;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace DisplayMessage
+namespace GetLastMessage {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetLastMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetLastMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetLastMessage
+namespace CancelMessage {
+enum class Fields
+{
+    kMessageId      = 0,
+    kMessageControl = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CancelMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t messageId;
+    chip::BitFlags<MessagingControlMask> messageControl;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CancelMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t messageId;
+    chip::BitFlags<MessagingControlMask> messageControl;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CancelMessage
+namespace MessageConfirmation {
+enum class Fields
+{
+    kMessageId                  = 0,
+    kConfirmationTime           = 1,
+    kMessageConfirmationControl = 2,
+    kMessageResponse            = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return MessageConfirmation::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t messageId;
+    uint32_t confirmationTime;
+    uint8_t messageConfirmationControl;
+    chip::ByteSpan messageResponse;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return MessageConfirmation::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t messageId;
+    uint32_t confirmationTime;
+    uint8_t messageConfirmationControl;
+    chip::ByteSpan messageResponse;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace MessageConfirmation
+namespace DisplayProtectedMessage {
+enum class Fields
+{
+    kMessageId                      = 0,
+    kMessageControl                 = 1,
+    kStartTime                      = 2,
+    kDurationInMinutes              = 3,
+    kMessage                        = 4,
+    kOptionalExtendedMessageControl = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return DisplayProtectedMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t messageId;
+    chip::BitFlags<MessagingControlMask> messageControl;
+    uint32_t startTime;
+    uint16_t durationInMinutes;
+    chip::CharSpan message;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return DisplayProtectedMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t messageId;
+    chip::BitFlags<MessagingControlMask> messageControl;
+    uint32_t startTime;
+    uint16_t durationInMinutes;
+    chip::CharSpan message;
+    chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace DisplayProtectedMessage
+namespace GetMessageCancellation {
+enum class Fields
+{
+    kEarliestImplementationTime = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetMessageCancellation::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t earliestImplementationTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetMessageCancellation::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t earliestImplementationTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetMessageCancellation
+namespace CancelAllMessages {
+enum class Fields
+{
+    kImplementationDateTime = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CancelAllMessages::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t implementationDateTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CancelAllMessages::Id; }
+    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+
+    uint32_t implementationDateTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CancelAllMessages
+} // namespace Commands
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace Messaging
 namespace ApplianceIdentification {
 
+namespace Attributes {
+namespace BasicIdentification {
+struct TypeInfo
+{
+    using Type          = uint64_t;
+    using DecodableType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BasicIdentification::Id; }
+};
+} // namespace BasicIdentification
+namespace CompanyName {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CompanyName::Id; }
+};
+} // namespace CompanyName
+namespace CompanyId {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CompanyId::Id; }
+};
+} // namespace CompanyId
+namespace BrandName {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BrandName::Id; }
+};
+} // namespace BrandName
+namespace BrandId {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BrandId::Id; }
+};
+} // namespace BrandId
+namespace Model {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Model::Id; }
+};
+} // namespace Model
+namespace PartNumber {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
+};
+} // namespace PartNumber
+namespace ProductRevision {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductRevision::Id; }
+};
+} // namespace ProductRevision
+namespace SoftwareRevision {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareRevision::Id; }
+};
+} // namespace SoftwareRevision
+namespace ProductTypeName {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductTypeName::Id; }
+};
+} // namespace ProductTypeName
+namespace ProductTypeId {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductTypeId::Id; }
+};
+} // namespace ProductTypeId
+namespace CecedSpecificationVersion {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CecedSpecificationVersion::Id; }
+};
+} // namespace CecedSpecificationVersion
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ApplianceIdentification
 namespace MeterIdentification {
 
+namespace Attributes {
+namespace CompanyName {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CompanyName::Id; }
+};
+} // namespace CompanyName
+namespace MeterTypeId {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeterTypeId::Id; }
+};
+} // namespace MeterTypeId
+namespace DataQualityId {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DataQualityId::Id; }
+};
+} // namespace DataQualityId
+namespace CustomerName {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CustomerName::Id; }
+};
+} // namespace CustomerName
+namespace Model {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Model::Id; }
+};
+} // namespace Model
+namespace PartNumber {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
+};
+} // namespace PartNumber
+namespace ProductRevision {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductRevision::Id; }
+};
+} // namespace ProductRevision
+namespace SoftwareRevision {
+struct TypeInfo
+{
+    using Type          = chip::ByteSpan;
+    using DecodableType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareRevision::Id; }
+};
+} // namespace SoftwareRevision
+namespace UtilityName {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UtilityName::Id; }
+};
+} // namespace UtilityName
+namespace Pod {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Pod::Id; }
+};
+} // namespace Pod
+namespace AvailablePower {
+struct TypeInfo
+{
+    using Type          = int32_t;
+    using DecodableType = int32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AvailablePower::Id; }
+};
+} // namespace AvailablePower
+namespace PowerThreshold {
+struct TypeInfo
+{
+    using Type          = int32_t;
+    using DecodableType = int32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerThreshold::Id; }
+};
+} // namespace PowerThreshold
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace MeterIdentification
 namespace ApplianceEventsAndAlert {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for EventIdentification
+enum class EventIdentification : uint8_t
+{
+    kEndOfCycle         = 0x01,
+    kTemperatureReached = 0x04,
+    kEndOfCooking       = 0x05,
+    kSwitchingOff       = 0x06,
+    kWrongData          = 0x07,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using EventIdentification                  = EmberAfEventIdentification;
+#endif
 
+// Bitmap for AlertCount
+enum class AlertCount : uint8_t
+{
+    kNumberOfAlerts = 0,
+    kTypeOfAlert    = 4,
+};
+
+// Bitmap for AlertStructure
+enum class AlertStructure : uint32_t
+{
+    kAlertId          = 0,
+    kCategory         = 8,
+    kPresenceRecovery = 12,
+};
+
+namespace Commands {
+namespace GetAlerts {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetAlerts::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetAlerts::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetAlerts
+namespace GetAlertsResponse {
+enum class Fields
+{
+    kAlertsCount     = 0,
+    kAlertStructures = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetAlertsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::List<chip::BitFlags<AlertStructure>> alertStructures;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetAlertsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::DecodableList<chip::BitFlags<AlertStructure>> alertStructures;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetAlertsResponse
+namespace AlertsNotification {
+enum class Fields
+{
+    kAlertsCount     = 0,
+    kAlertStructures = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return AlertsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::List<chip::BitFlags<AlertStructure>> alertStructures;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return AlertsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+
+    chip::BitFlags<AlertCount> alertsCount;
+    DataModel::DecodableList<chip::BitFlags<AlertStructure>> alertStructures;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AlertsNotification
+namespace EventsNotification {
+enum class Fields
+{
+    kEventHeader = 0,
+    kEventId     = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return EventsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+
+    uint8_t eventHeader;
+    EventIdentification eventId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return EventsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+
+    uint8_t eventHeader;
+    EventIdentification eventId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EventsNotification
+} // namespace Commands
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ApplianceEventsAndAlert
 namespace ApplianceStatistics {
 
+namespace Commands {
+namespace LogNotification {
+enum class Fields
+{
+    kTimeStamp  = 0,
+    kLogId      = 1,
+    kLogLength  = 2,
+    kLogPayload = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LogNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    uint32_t timeStamp;
+    uint32_t logId;
+    uint32_t logLength;
+    DataModel::List<uint8_t> logPayload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LogNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    uint32_t timeStamp;
+    uint32_t logId;
+    uint32_t logLength;
+    DataModel::DecodableList<uint8_t> logPayload;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LogNotification
+namespace LogRequest {
+enum class Fields
+{
+    kLogId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LogRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    uint32_t logId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LogRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    uint32_t logId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LogRequest
+namespace LogResponse {
+enum class Fields
+{
+    kTimeStamp  = 0,
+    kLogId      = 1,
+    kLogLength  = 2,
+    kLogPayload = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LogResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    uint32_t timeStamp;
+    uint32_t logId;
+    uint32_t logLength;
+    DataModel::List<uint8_t> logPayload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LogResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    uint32_t timeStamp;
+    uint32_t logId;
+    uint32_t logLength;
+    DataModel::DecodableList<uint8_t> logPayload;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LogResponse
+namespace LogQueueRequest {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LogQueueRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LogQueueRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LogQueueRequest
+namespace LogQueueResponse {
+enum class Fields
+{
+    kLogQueueSize = 0,
+    kLogIds       = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return LogQueueResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    uint8_t logQueueSize;
+    DataModel::List<uint32_t> logIds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return LogQueueResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    uint8_t logQueueSize;
+    DataModel::DecodableList<uint32_t> logIds;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace LogQueueResponse
+namespace StatisticsAvailable {
+enum class Fields
+{
+    kLogQueueSize = 0,
+    kLogIds       = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return StatisticsAvailable::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    uint8_t logQueueSize;
+    DataModel::List<uint32_t> logIds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return StatisticsAvailable::Id; }
+    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+
+    uint8_t logQueueSize;
+    DataModel::DecodableList<uint32_t> logIds;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StatisticsAvailable
+} // namespace Commands
+
+namespace Attributes {
+namespace LogMaxSize {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LogMaxSize::Id; }
+};
+} // namespace LogMaxSize
+namespace LogQueueMaxSize {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LogQueueMaxSize::Id; }
+};
+} // namespace LogQueueMaxSize
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ApplianceStatistics
 namespace ElectricalMeasurement {
 
+namespace Commands {
+namespace GetProfileInfoResponseCommand {
+enum class Fields
+{
+    kProfileCount          = 0,
+    kProfileIntervalPeriod = 1,
+    kMaxNumberOfIntervals  = 2,
+    kListOfAttributes      = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetProfileInfoResponseCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+
+    uint8_t profileCount;
+    uint8_t profileIntervalPeriod;
+    uint8_t maxNumberOfIntervals;
+    DataModel::List<uint16_t> listOfAttributes;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetProfileInfoResponseCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+
+    uint8_t profileCount;
+    uint8_t profileIntervalPeriod;
+    uint8_t maxNumberOfIntervals;
+    DataModel::DecodableList<uint16_t> listOfAttributes;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetProfileInfoResponseCommand
+namespace GetProfileInfoCommand {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetProfileInfoCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetProfileInfoCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetProfileInfoCommand
+namespace GetMeasurementProfileResponseCommand {
+enum class Fields
+{
+    kStartTime                  = 0,
+    kStatus                     = 1,
+    kProfileIntervalPeriod      = 2,
+    kNumberOfIntervalsDelivered = 3,
+    kAttributeId                = 4,
+    kIntervals                  = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetMeasurementProfileResponseCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+
+    uint32_t startTime;
+    uint8_t status;
+    uint8_t profileIntervalPeriod;
+    uint8_t numberOfIntervalsDelivered;
+    uint16_t attributeId;
+    DataModel::List<uint8_t> intervals;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetMeasurementProfileResponseCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+
+    uint32_t startTime;
+    uint8_t status;
+    uint8_t profileIntervalPeriod;
+    uint8_t numberOfIntervalsDelivered;
+    uint16_t attributeId;
+    DataModel::DecodableList<uint8_t> intervals;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetMeasurementProfileResponseCommand
+namespace GetMeasurementProfileCommand {
+enum class Fields
+{
+    kAttributeId       = 0,
+    kStartTime         = 1,
+    kNumberOfIntervals = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return GetMeasurementProfileCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+
+    uint16_t attributeId;
+    uint32_t startTime;
+    uint8_t numberOfIntervals;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return GetMeasurementProfileCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+
+    uint16_t attributeId;
+    uint32_t startTime;
+    uint8_t numberOfIntervals;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetMeasurementProfileCommand
+} // namespace Commands
+
+namespace Attributes {
+namespace MeasurementType {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementType::Id; }
+};
+} // namespace MeasurementType
+namespace DcVoltage {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltage::Id; }
+};
+} // namespace DcVoltage
+namespace DcVoltageMin {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMin::Id; }
+};
+} // namespace DcVoltageMin
+namespace DcVoltageMax {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMax::Id; }
+};
+} // namespace DcVoltageMax
+namespace DcCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrent::Id; }
+};
+} // namespace DcCurrent
+namespace DcCurrentMin {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMin::Id; }
+};
+} // namespace DcCurrentMin
+namespace DcCurrentMax {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMax::Id; }
+};
+} // namespace DcCurrentMax
+namespace DcPower {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcPower::Id; }
+};
+} // namespace DcPower
+namespace DcPowerMin {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMin::Id; }
+};
+} // namespace DcPowerMin
+namespace DcPowerMax {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMax::Id; }
+};
+} // namespace DcPowerMax
+namespace DcVoltageMultiplier {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMultiplier::Id; }
+};
+} // namespace DcVoltageMultiplier
+namespace DcVoltageDivisor {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageDivisor::Id; }
+};
+} // namespace DcVoltageDivisor
+namespace DcCurrentMultiplier {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMultiplier::Id; }
+};
+} // namespace DcCurrentMultiplier
+namespace DcCurrentDivisor {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentDivisor::Id; }
+};
+} // namespace DcCurrentDivisor
+namespace DcPowerMultiplier {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMultiplier::Id; }
+};
+} // namespace DcPowerMultiplier
+namespace DcPowerDivisor {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerDivisor::Id; }
+};
+} // namespace DcPowerDivisor
+namespace AcFrequency {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequency::Id; }
+};
+} // namespace AcFrequency
+namespace AcFrequencyMin {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMin::Id; }
+};
+} // namespace AcFrequencyMin
+namespace AcFrequencyMax {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMax::Id; }
+};
+} // namespace AcFrequencyMax
+namespace NeutralCurrent {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NeutralCurrent::Id; }
+};
+} // namespace NeutralCurrent
+namespace TotalActivePower {
+struct TypeInfo
+{
+    using Type          = int32_t;
+    using DecodableType = int32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TotalActivePower::Id; }
+};
+} // namespace TotalActivePower
+namespace TotalReactivePower {
+struct TypeInfo
+{
+    using Type          = int32_t;
+    using DecodableType = int32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TotalReactivePower::Id; }
+};
+} // namespace TotalReactivePower
+namespace TotalApparentPower {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TotalApparentPower::Id; }
+};
+} // namespace TotalApparentPower
+namespace Measured1stHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Measured1stHarmonicCurrent::Id; }
+};
+} // namespace Measured1stHarmonicCurrent
+namespace Measured3rdHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Measured3rdHarmonicCurrent::Id; }
+};
+} // namespace Measured3rdHarmonicCurrent
+namespace Measured5thHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Measured5thHarmonicCurrent::Id; }
+};
+} // namespace Measured5thHarmonicCurrent
+namespace Measured7thHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Measured7thHarmonicCurrent::Id; }
+};
+} // namespace Measured7thHarmonicCurrent
+namespace Measured9thHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Measured9thHarmonicCurrent::Id; }
+};
+} // namespace Measured9thHarmonicCurrent
+namespace Measured11thHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Measured11thHarmonicCurrent::Id; }
+};
+} // namespace Measured11thHarmonicCurrent
+namespace MeasuredPhase1stHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase1stHarmonicCurrent::Id; }
+};
+} // namespace MeasuredPhase1stHarmonicCurrent
+namespace MeasuredPhase3rdHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase3rdHarmonicCurrent::Id; }
+};
+} // namespace MeasuredPhase3rdHarmonicCurrent
+namespace MeasuredPhase5thHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase5thHarmonicCurrent::Id; }
+};
+} // namespace MeasuredPhase5thHarmonicCurrent
+namespace MeasuredPhase7thHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase7thHarmonicCurrent::Id; }
+};
+} // namespace MeasuredPhase7thHarmonicCurrent
+namespace MeasuredPhase9thHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase9thHarmonicCurrent::Id; }
+};
+} // namespace MeasuredPhase9thHarmonicCurrent
+namespace MeasuredPhase11thHarmonicCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase11thHarmonicCurrent::Id; }
+};
+} // namespace MeasuredPhase11thHarmonicCurrent
+namespace AcFrequencyMultiplier {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMultiplier::Id; }
+};
+} // namespace AcFrequencyMultiplier
+namespace AcFrequencyDivisor {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyDivisor::Id; }
+};
+} // namespace AcFrequencyDivisor
+namespace PowerMultiplier {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerMultiplier::Id; }
+};
+} // namespace PowerMultiplier
+namespace PowerDivisor {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerDivisor::Id; }
+};
+} // namespace PowerDivisor
+namespace HarmonicCurrentMultiplier {
+struct TypeInfo
+{
+    using Type          = int8_t;
+    using DecodableType = int8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HarmonicCurrentMultiplier::Id; }
+};
+} // namespace HarmonicCurrentMultiplier
+namespace PhaseHarmonicCurrentMultiplier {
+struct TypeInfo
+{
+    using Type          = int8_t;
+    using DecodableType = int8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PhaseHarmonicCurrentMultiplier::Id; }
+};
+} // namespace PhaseHarmonicCurrentMultiplier
+namespace InstantaneousVoltage {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousVoltage::Id; }
+};
+} // namespace InstantaneousVoltage
+namespace InstantaneousLineCurrent {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousLineCurrent::Id; }
+};
+} // namespace InstantaneousLineCurrent
+namespace InstantaneousActiveCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousActiveCurrent::Id; }
+};
+} // namespace InstantaneousActiveCurrent
+namespace InstantaneousReactiveCurrent {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousReactiveCurrent::Id; }
+};
+} // namespace InstantaneousReactiveCurrent
+namespace InstantaneousPower {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousPower::Id; }
+};
+} // namespace InstantaneousPower
+namespace RmsVoltage {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltage::Id; }
+};
+} // namespace RmsVoltage
+namespace RmsVoltageMin {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMin::Id; }
+};
+} // namespace RmsVoltageMin
+namespace RmsVoltageMax {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMax::Id; }
+};
+} // namespace RmsVoltageMax
+namespace RmsCurrent {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrent::Id; }
+};
+} // namespace RmsCurrent
+namespace RmsCurrentMin {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMin::Id; }
+};
+} // namespace RmsCurrentMin
+namespace RmsCurrentMax {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMax::Id; }
+};
+} // namespace RmsCurrentMax
+namespace ActivePower {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePower::Id; }
+};
+} // namespace ActivePower
+namespace ActivePowerMin {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMin::Id; }
+};
+} // namespace ActivePowerMin
+namespace ActivePowerMax {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMax::Id; }
+};
+} // namespace ActivePowerMax
+namespace ReactivePower {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePower::Id; }
+};
+} // namespace ReactivePower
+namespace ApparentPower {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPower::Id; }
+};
+} // namespace ApparentPower
+namespace PowerFactor {
+struct TypeInfo
+{
+    using Type          = int8_t;
+    using DecodableType = int8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactor::Id; }
+};
+} // namespace PowerFactor
+namespace AverageRmsVoltageMeasurementPeriod {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriod::Id; }
+};
+} // namespace AverageRmsVoltageMeasurementPeriod
+namespace AverageRmsUnderVoltageCounter {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounter::Id; }
+};
+} // namespace AverageRmsUnderVoltageCounter
+namespace RmsExtremeOverVoltagePeriod {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriod::Id; }
+};
+} // namespace RmsExtremeOverVoltagePeriod
+namespace RmsExtremeUnderVoltagePeriod {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriod::Id; }
+};
+} // namespace RmsExtremeUnderVoltagePeriod
+namespace RmsVoltageSagPeriod {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriod::Id; }
+};
+} // namespace RmsVoltageSagPeriod
+namespace RmsVoltageSwellPeriod {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriod::Id; }
+};
+} // namespace RmsVoltageSwellPeriod
+namespace AcVoltageMultiplier {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageMultiplier::Id; }
+};
+} // namespace AcVoltageMultiplier
+namespace AcVoltageDivisor {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageDivisor::Id; }
+};
+} // namespace AcVoltageDivisor
+namespace AcCurrentMultiplier {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentMultiplier::Id; }
+};
+} // namespace AcCurrentMultiplier
+namespace AcCurrentDivisor {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentDivisor::Id; }
+};
+} // namespace AcCurrentDivisor
+namespace AcPowerMultiplier {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcPowerMultiplier::Id; }
+};
+} // namespace AcPowerMultiplier
+namespace AcPowerDivisor {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcPowerDivisor::Id; }
+};
+} // namespace AcPowerDivisor
+namespace OverloadAlarmsMask {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OverloadAlarmsMask::Id; }
+};
+} // namespace OverloadAlarmsMask
+namespace VoltageOverload {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::VoltageOverload::Id; }
+};
+} // namespace VoltageOverload
+namespace CurrentOverload {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentOverload::Id; }
+};
+} // namespace CurrentOverload
+namespace AcOverloadAlarmsMask {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcOverloadAlarmsMask::Id; }
+};
+} // namespace AcOverloadAlarmsMask
+namespace AcVoltageOverload {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageOverload::Id; }
+};
+} // namespace AcVoltageOverload
+namespace AcCurrentOverload {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentOverload::Id; }
+};
+} // namespace AcCurrentOverload
+namespace AcActivePowerOverload {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcActivePowerOverload::Id; }
+};
+} // namespace AcActivePowerOverload
+namespace AcReactivePowerOverload {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcReactivePowerOverload::Id; }
+};
+} // namespace AcReactivePowerOverload
+namespace AverageRmsOverVoltage {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltage::Id; }
+};
+} // namespace AverageRmsOverVoltage
+namespace AverageRmsUnderVoltage {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltage::Id; }
+};
+} // namespace AverageRmsUnderVoltage
+namespace RmsExtremeOverVoltage {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltage::Id; }
+};
+} // namespace RmsExtremeOverVoltage
+namespace RmsExtremeUnderVoltage {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltage::Id; }
+};
+} // namespace RmsExtremeUnderVoltage
+namespace RmsVoltageSag {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSag::Id; }
+};
+} // namespace RmsVoltageSag
+namespace RmsVoltageSwell {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwell::Id; }
+};
+} // namespace RmsVoltageSwell
+namespace LineCurrentPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LineCurrentPhaseB::Id; }
+};
+} // namespace LineCurrentPhaseB
+namespace ActiveCurrentPhaseB {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCurrentPhaseB::Id; }
+};
+} // namespace ActiveCurrentPhaseB
+namespace ReactiveCurrentPhaseB {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReactiveCurrentPhaseB::Id; }
+};
+} // namespace ReactiveCurrentPhaseB
+namespace RmsVoltagePhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltagePhaseB::Id; }
+};
+} // namespace RmsVoltagePhaseB
+namespace RmsVoltageMinPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMinPhaseB::Id; }
+};
+} // namespace RmsVoltageMinPhaseB
+namespace RmsVoltageMaxPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMaxPhaseB::Id; }
+};
+} // namespace RmsVoltageMaxPhaseB
+namespace RmsCurrentPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentPhaseB::Id; }
+};
+} // namespace RmsCurrentPhaseB
+namespace RmsCurrentMinPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMinPhaseB::Id; }
+};
+} // namespace RmsCurrentMinPhaseB
+namespace RmsCurrentMaxPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMaxPhaseB::Id; }
+};
+} // namespace RmsCurrentMaxPhaseB
+namespace ActivePowerPhaseB {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerPhaseB::Id; }
+};
+} // namespace ActivePowerPhaseB
+namespace ActivePowerMinPhaseB {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMinPhaseB::Id; }
+};
+} // namespace ActivePowerMinPhaseB
+namespace ActivePowerMaxPhaseB {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMaxPhaseB::Id; }
+};
+} // namespace ActivePowerMaxPhaseB
+namespace ReactivePowerPhaseB {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePowerPhaseB::Id; }
+};
+} // namespace ReactivePowerPhaseB
+namespace ApparentPowerPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPowerPhaseB::Id; }
+};
+} // namespace ApparentPowerPhaseB
+namespace PowerFactorPhaseB {
+struct TypeInfo
+{
+    using Type          = int8_t;
+    using DecodableType = int8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactorPhaseB::Id; }
+};
+} // namespace PowerFactorPhaseB
+namespace AverageRmsVoltageMeasurementPeriodPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::Id; }
+};
+} // namespace AverageRmsVoltageMeasurementPeriodPhaseB
+namespace AverageRmsOverVoltageCounterPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltageCounterPhaseB::Id; }
+};
+} // namespace AverageRmsOverVoltageCounterPhaseB
+namespace AverageRmsUnderVoltageCounterPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounterPhaseB::Id; }
+};
+} // namespace AverageRmsUnderVoltageCounterPhaseB
+namespace RmsExtremeOverVoltagePeriodPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriodPhaseB::Id; }
+};
+} // namespace RmsExtremeOverVoltagePeriodPhaseB
+namespace RmsExtremeUnderVoltagePeriodPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriodPhaseB::Id; }
+};
+} // namespace RmsExtremeUnderVoltagePeriodPhaseB
+namespace RmsVoltageSagPeriodPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriodPhaseB::Id; }
+};
+} // namespace RmsVoltageSagPeriodPhaseB
+namespace RmsVoltageSwellPeriodPhaseB {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriodPhaseB::Id; }
+};
+} // namespace RmsVoltageSwellPeriodPhaseB
+namespace LineCurrentPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LineCurrentPhaseC::Id; }
+};
+} // namespace LineCurrentPhaseC
+namespace ActiveCurrentPhaseC {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCurrentPhaseC::Id; }
+};
+} // namespace ActiveCurrentPhaseC
+namespace ReactiveCurrentPhaseC {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReactiveCurrentPhaseC::Id; }
+};
+} // namespace ReactiveCurrentPhaseC
+namespace RmsVoltagePhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltagePhaseC::Id; }
+};
+} // namespace RmsVoltagePhaseC
+namespace RmsVoltageMinPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMinPhaseC::Id; }
+};
+} // namespace RmsVoltageMinPhaseC
+namespace RmsVoltageMaxPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMaxPhaseC::Id; }
+};
+} // namespace RmsVoltageMaxPhaseC
+namespace RmsCurrentPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentPhaseC::Id; }
+};
+} // namespace RmsCurrentPhaseC
+namespace RmsCurrentMinPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMinPhaseC::Id; }
+};
+} // namespace RmsCurrentMinPhaseC
+namespace RmsCurrentMaxPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMaxPhaseC::Id; }
+};
+} // namespace RmsCurrentMaxPhaseC
+namespace ActivePowerPhaseC {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerPhaseC::Id; }
+};
+} // namespace ActivePowerPhaseC
+namespace ActivePowerMinPhaseC {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMinPhaseC::Id; }
+};
+} // namespace ActivePowerMinPhaseC
+namespace ActivePowerMaxPhaseC {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMaxPhaseC::Id; }
+};
+} // namespace ActivePowerMaxPhaseC
+namespace ReactivePowerPhaseC {
+struct TypeInfo
+{
+    using Type          = int16_t;
+    using DecodableType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePowerPhaseC::Id; }
+};
+} // namespace ReactivePowerPhaseC
+namespace ApparentPowerPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPowerPhaseC::Id; }
+};
+} // namespace ApparentPowerPhaseC
+namespace PowerFactorPhaseC {
+struct TypeInfo
+{
+    using Type          = int8_t;
+    using DecodableType = int8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactorPhaseC::Id; }
+};
+} // namespace PowerFactorPhaseC
+namespace AverageRmsVoltageMeasurementPeriodPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::Id; }
+};
+} // namespace AverageRmsVoltageMeasurementPeriodPhaseC
+namespace AverageRmsOverVoltageCounterPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltageCounterPhaseC::Id; }
+};
+} // namespace AverageRmsOverVoltageCounterPhaseC
+namespace AverageRmsUnderVoltageCounterPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounterPhaseC::Id; }
+};
+} // namespace AverageRmsUnderVoltageCounterPhaseC
+namespace RmsExtremeOverVoltagePeriodPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriodPhaseC::Id; }
+};
+} // namespace RmsExtremeOverVoltagePeriodPhaseC
+namespace RmsExtremeUnderVoltagePeriodPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriodPhaseC::Id; }
+};
+} // namespace RmsExtremeUnderVoltagePeriodPhaseC
+namespace RmsVoltageSagPeriodPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriodPhaseC::Id; }
+};
+} // namespace RmsVoltageSagPeriodPhaseC
+namespace RmsVoltageSwellPeriodPhaseC {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriodPhaseC::Id; }
+};
+} // namespace RmsVoltageSwellPeriodPhaseC
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace ElectricalMeasurement
 namespace Binding {
 
+namespace Commands {
+namespace Bind {
+enum class Fields
+{
+    kNodeId     = 0,
+    kGroupId    = 1,
+    kEndpointId = 2,
+    kClusterId  = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Bind::Id; }
+    static constexpr ClusterId GetClusterId() { return Binding::Id; }
+
+    chip::NodeId nodeId;
+    chip::GroupId groupId;
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Bind::Id; }
+    static constexpr ClusterId GetClusterId() { return Binding::Id; }
+
+    chip::NodeId nodeId;
+    chip::GroupId groupId;
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Bind
+namespace Unbind {
+enum class Fields
+{
+    kNodeId     = 0,
+    kGroupId    = 1,
+    kEndpointId = 2,
+    kClusterId  = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Unbind::Id; }
+    static constexpr ClusterId GetClusterId() { return Binding::Id; }
+
+    chip::NodeId nodeId;
+    chip::GroupId groupId;
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Unbind::Id; }
+    static constexpr ClusterId GetClusterId() { return Binding::Id; }
+
+    chip::NodeId nodeId;
+    chip::GroupId groupId;
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Unbind
+} // namespace Commands
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace Binding
 namespace GroupKeyManagement {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for GroupKeySecurityPolicy
 enum class GroupKeySecurityPolicy : uint8_t
 {
-    GROUP_KEY_SECURITY_POLICY_STANDARD    = 0x00,
-    GROUP_KEY_SECURITY_POLICY_LOW_LATENCY = 0x01,
+    kStandard   = 0x00,
+    kLowLatency = 0x01,
 };
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using GroupKeySecurityPolicy               = EmberAfGroupKeySecurityPolicy;
+#endif
 
+namespace Structs {
 namespace GroupKey {
-enum FieldId
+enum class Fields
 {
-    kVendorIdFieldId               = 0,
-    kGroupKeyIndexFieldId          = 1,
-    kGroupKeyRootFieldId           = 2,
-    kGroupKeyEpochStartTimeFieldId = 3,
-    kGroupKeySecurityPolicyFieldId = 4,
+    kVendorId               = 0,
+    kGroupKeyIndex          = 1,
+    kGroupKeyRoot           = 2,
+    kGroupKeyEpochStartTime = 3,
+    kGroupKeySecurityPolicy = 4,
 };
 
 struct Type
@@ -1709,17 +26300,19 @@ public:
     uint64_t groupKeyEpochStartTime;
     GroupKeySecurityPolicy groupKeySecurityPolicy;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace GroupKey
 namespace GroupState {
-enum FieldId
+enum class Fields
 {
-    kVendorIdFieldId         = 0,
-    kVendorGroupIdFieldId    = 1,
-    kGroupKeySetIndexFieldId = 2,
+    kVendorId         = 0,
+    kVendorGroupId    = 1,
+    kGroupKeySetIndex = 2,
 };
 
 struct Type
@@ -1729,18 +26322,209 @@ public:
     uint16_t vendorGroupId;
     uint16_t groupKeySetIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace GroupState
+using DecodableType = Type;
 
+} // namespace GroupState
+} // namespace Structs
+
+namespace Attributes {
+namespace Groups {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::GroupState::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::GroupState::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Groups::Id; }
+};
+} // namespace Groups
+namespace GroupKeys {
+struct TypeInfo
+{
+    using Type          = DataModel::List<Structs::GroupKey::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::GroupKey::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeys::Id; }
+};
+} // namespace GroupKeys
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace GroupKeyManagement
 namespace SampleMfgSpecificCluster {
 
+namespace Commands {
+namespace CommandOne {
+enum class Fields
+{
+    kArgOne = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CommandOne::Id; }
+    static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster::Id; }
+
+    uint8_t argOne;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CommandOne::Id; }
+    static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster::Id; }
+
+    uint8_t argOne;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CommandOne
+} // namespace Commands
+
+namespace Attributes {
+namespace EmberSampleAttribute {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute::Id; }
+};
+} // namespace EmberSampleAttribute
+namespace EmberSampleAttribute2 {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute2::Id; }
+};
+} // namespace EmberSampleAttribute2
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace SampleMfgSpecificCluster
 namespace SampleMfgSpecificCluster2 {
 
+namespace Commands {
+namespace CommandTwo {
+enum class Fields
+{
+    kArgOne = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return CommandTwo::Id; }
+    static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster2::Id; }
+
+    uint8_t argOne;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return CommandTwo::Id; }
+    static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster2::Id; }
+
+    uint8_t argOne;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CommandTwo
+} // namespace Commands
+
+namespace Attributes {
+namespace EmberSampleAttribute3 {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute3::Id; }
+};
+} // namespace EmberSampleAttribute3
+namespace EmberSampleAttribute4 {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute4::Id; }
+};
+} // namespace EmberSampleAttribute4
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
 } // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters

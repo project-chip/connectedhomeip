@@ -22,9 +22,19 @@ using chip::Callback::Cancelable;
 
 {{#chip_cluster_commands}}
 {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}DefaultSuccess{{/if}}{{/inline}}
-{{#*inline "callbackParams"}}{{#chip_cluster_command_arguments}}, {{#if (isString type)}}[self asSpan:{{/if}}{{asLowerCamelCase label}}{{#if (isString type)}}]{{/if}}{{/chip_cluster_command_arguments}}{{/inline}}
+{{#*inline "callbackParams"}}{{#chip_cluster_command_arguments_with_structs_expanded}},
+  {{#if_chip_enum type}}
+    static_cast<{{chipType}}>({{asLowerCamelCase label}})
+  {{else if (isOctetString type)}}
+    [self asByteSpan:{{asLowerCamelCase label}}]
+  {{else if (isCharString type)}}
+    [self asCharSpan:{{asLowerCamelCase label}}]
+  {{else}}
+    {{asLowerCamelCase label}}
+  {{/if_chip_enum}}
+{{/chip_cluster_command_arguments_with_structs_expanded}}{{/inline}}
 {{#if (zcl_command_arguments_count this.id)}}
-- (void){{asLowerCamelCase name}}:{{#chip_cluster_command_arguments}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler
+- (void){{asLowerCamelCase name}}:{{#chip_cluster_command_arguments_with_structs_expanded}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_cluster_command_arguments_with_structs_expanded}}responseHandler:(ResponseHandler)responseHandler
 {{else}}
 - (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler
 {{/if}}
@@ -47,7 +57,17 @@ using chip::Callback::Cancelable;
 
 {{#if isWritableAttribute}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
-{{#*inline "callbackParams"}}, {{#if (isString type)}}[self asSpan:{{/if}}value{{#if (isString type)}}]{{/if}}{{/inline}}
+{{#*inline "callbackParams"}},
+  {{#if_chip_enum type}}
+    static_cast<{{chipType}}>(value)
+  {{else if (isOctetString type)}}
+    [self asByteSpan:value]
+  {{else if (isCharString type)}}
+    [self asCharSpan:value]
+  {{else}}
+    value
+  {{/if_chip_enum}}
+{{/inline}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {

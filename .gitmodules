@@ -17,7 +17,7 @@
 [submodule "mbedtls"]
 	path = third_party/mbedtls/repo
 	url = https://github.com/ARMmbed/mbedtls.git
-	branch  = mbedtls-2.25
+	branch  = mbedtls-2.25.0
 [submodule "qrcode"]
 	path = examples/common/QRCode/repo
 	url = https://github.com/nayuki/QR-Code-generator.git
@@ -86,11 +86,7 @@
 [submodule "third_party/mbed-os/repo"]
 	path = third_party/mbed-os/repo
 	url = https://github.com/ARMmbed/mbed-os.git
-	branch  = feature-chip
-[submodule "third_party/wifi-ism43362/repo"]
-	path = third_party/wifi-ism43362/repo
-	url = https://github.com/ATmobica/wifi-ism43362.git
-	branch  = master
+	branch = master
 [submodule "third_party/mbed-os-posix-socket/repo"]
 	path = third_party/mbed-os-posix-socket/repo
 	url = https://github.com/ARMmbed/mbed-os-posix-socket.git

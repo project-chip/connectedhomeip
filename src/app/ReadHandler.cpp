@@ -48,11 +48,15 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mCurrentPriority           = PriorityLevel::Invalid;
     mInitialReport             = true;
     MoveToState(HandlerState::Initialized);
-    mpDelegate       = apDelegate;
-    mSubscriptionId  = 0;
-    mHoldReport      = false;
-    mDirty           = false;
-    mInteractionType = aInteractionType;
+    mpDelegate          = apDelegate;
+    mSubscriptionId     = 0;
+    mHoldReport         = false;
+    mDirty              = false;
+    mActiveSubscription = false;
+    mInteractionType    = aInteractionType;
+    mInitiatorNodeId    = apExchangeContext->GetSessionHandle().GetPeerNodeId();
+    mFabricIndex        = apExchangeContext->GetSessionHandle().GetFabricIndex();
+
     if (apExchangeContext != nullptr)
     {
         apExchangeContext->SetDelegate(this);
@@ -67,7 +71,12 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     {
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
             OnRefreshSubscribeTimerSyncCallback, this);
+        if (mpDelegate != nullptr)
+        {
+            mpDelegate->SubscriptionTerminated(this);
+        }
     }
+
     if (aOptions == ShutdownOptions::AbortCurrentExchange)
     {
         if (mpExchangeCtx != nullptr)
@@ -96,6 +105,8 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     mpDelegate                 = nullptr;
     mHoldReport                = false;
     mDirty                     = false;
+    mActiveSubscription        = false;
+    mInitiatorNodeId           = kUndefinedNodeId;
 }
 
 CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayload)
@@ -149,12 +160,15 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
             InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
             if (IsInitialReport())
             {
-                err = SendSubscribeResponse();
+                err           = SendSubscribeResponse();
+                mpExchangeCtx = nullptr;
                 SuccessOrExit(err);
+                mActiveSubscription = true;
             }
             else
             {
                 MoveToState(HandlerState::GeneratingReports);
+                mpExchangeCtx = nullptr;
             }
         }
         else
@@ -180,16 +194,15 @@ exit:
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
 {
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     if (IsInitialReport())
     {
-        VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mSessionHandle.SetValue(mpExchangeCtx->GetSecureSession());
+        mSessionHandle.SetValue(mpExchangeCtx->GetSessionHandle());
     }
     else
     {
+        VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
         mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Value(), this);
-        mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
+        mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     MoveToState(HandlerState::AwaitingReportResponse);
@@ -543,7 +556,6 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
     ReturnLogErrorOnFailure(subscribeRequestParser.GetMinIntervalSeconds(&mMinIntervalFloorSeconds));
     ReturnLogErrorOnFailure(subscribeRequestParser.GetMaxIntervalSeconds(&mMaxIntervalCeilingSeconds));
-
     ReturnLogErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
 
     MoveToState(HandlerState::GeneratingReports);
@@ -572,7 +584,7 @@ CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
         OnRefreshSubscribeTimerSyncCallback, this);
     mHoldReport = true;
     return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        mMinIntervalFloorSeconds * kMillisecondsPerSecond, OnRefreshSubscribeTimerSyncCallback, this);
+        System::Clock::Seconds16(mMinIntervalFloorSeconds), OnRefreshSubscribeTimerSyncCallback, this);
 }
 } // namespace app
 } // namespace chip

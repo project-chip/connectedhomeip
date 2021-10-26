@@ -23,8 +23,10 @@
 
 #include <app/ClusterInfo.h>
 #include <app/Command.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -76,6 +78,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_VENDOR_ID_ATTRIBUTE_TYPE:   // Vendor Id
     case ZCL_ENUM16_ATTRIBUTE_TYPE:      // 16-bit enumeration
     case ZCL_BITMAP16_ATTRIBUTE_TYPE:    // 16-bit bitmap
+    case ZCL_STATUS_ATTRIBUTE_TYPE:      // Status Code
         static_assert(std::is_same<chip::EndpointId, uint16_t>::value,
                       "chip::EndpointId is expected to be uint8_t, change this when necessary");
         static_assert(std::is_same<chip::GroupId, uint16_t>::value,
@@ -89,7 +92,6 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_COMMAND_ID_ATTRIBUTE_TYPE: // Command Id
     case ZCL_TRANS_ID_ATTRIBUTE_TYPE:   // Transaction Id
     case ZCL_DEVTYPE_ID_ATTRIBUTE_TYPE: // Device Type Id
-    case ZCL_STATUS_ATTRIBUTE_TYPE:     // Status Code
     case ZCL_DATA_VER_ATTRIBUTE_TYPE:   // Data Version
     case ZCL_BITMAP32_ATTRIBUTE_TYPE:   // 32-bit bitmap
     case ZCL_EPOCH_S_ATTRIBUTE_TYPE:    // Epoch Seconds
@@ -107,8 +109,6 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::TransactionId is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::DeviceTypeId, uint32_t>::value,
                       "chip::DeviceTypeId is expected to be uint32_t, change this when necessary");
-        static_assert(std::is_same<chip::StatusCode, uint32_t>::value,
-                      "chip::StatusCode is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::DataVersion, uint32_t>::value,
                       "chip::DataVersion is expected to be uint32_t, change this when necessary");
         return ZCL_INT32U_ATTRIBUTE_TYPE;
@@ -133,17 +133,17 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
 
 } // namespace
 
-void SetupEmberAfObjects(Command * command, ClusterId clusterId, CommandId commandId, EndpointId endpointId)
+void SetupEmberAfObjects(Command * command, const ConcreteCommandPath & commandPath)
 {
     Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
 
-    imCompatibilityEmberApsFrame.clusterId           = clusterId;
-    imCompatibilityEmberApsFrame.destinationEndpoint = endpointId;
+    imCompatibilityEmberApsFrame.clusterId           = commandPath.mClusterId;
+    imCompatibilityEmberApsFrame.destinationEndpoint = commandPath.mEndpointId;
     imCompatibilityEmberApsFrame.sourceEndpoint      = 1; // source endpoint is fixed to 1 for now.
     imCompatibilityEmberApsFrame.sequence =
         (commandExchangeCtx != nullptr ? static_cast<uint8_t>(commandExchangeCtx->GetExchangeId() & 0xFF) : 0);
 
-    imCompatibilityEmberAfCluster.commandId      = commandId;
+    imCompatibilityEmberAfCluster.commandId      = commandPath.mCommandId;
     imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;
     imCompatibilityEmberAfCluster.interPanHeader = &imCompatibilityInterpanHeader;
     imCompatibilityEmberAfCluster.source         = commandExchangeCtx;
@@ -160,17 +160,10 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
         return false;
     }
 
-    chip::app::CommandPathParams returnStatusParam = { imCompatibilityEmberApsFrame.destinationEndpoint,
-                                                       0, // GroupId
-                                                       imCompatibilityEmberApsFrame.clusterId,
-                                                       imCompatibilityEmberAfCluster.commandId,
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    chip::app::ConcreteCommandPath commandPath(imCompatibilityEmberApsFrame.destinationEndpoint,
+                                               imCompatibilityEmberApsFrame.clusterId, imCompatibilityEmberAfCluster.commandId);
 
-    CHIP_ERROR err = currentCommandObject->AddStatusCode(
-        returnStatusParam,
-        status == EMBER_ZCL_STATUS_SUCCESS ? chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess
-                                           : chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,
-        chip::Protocols::InteractionModel::Id, static_cast<Protocols::InteractionModel::Status>(ToInteractionModelStatus(status)));
+    CHIP_ERROR err = currentCommandObject->AddStatus(commandPath, ToInteractionModelStatus(status));
     return CHIP_NO_ERROR == err;
 }
 
@@ -187,30 +180,28 @@ namespace {
 uint8_t attributeData[kAttributeReadBufferSize];
 } // namespace
 
-bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
+bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // TODO: Currently, we are using cluster catalog from the ember library, this should be modified or replaced after several
     // updates to Commands.
-    return emberAfContainsServer(aEndPointId, aClusterId);
+    return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 }
 
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     ChipLogDetail(DataManagement,
-                  "Received Cluster Command: Cluster=" ChipLogFormatMEI " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx16
-                  " AttributeId=%" PRIx32 " ListIndex=%" PRIx16,
-                  ChipLogValueMEI(aClusterInfo.mClusterId), ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId,
-                  aClusterInfo.mFieldId, aClusterInfo.mListIndex);
+                  "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
+                  ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
 
-    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
+    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
     if (attrOverride != nullptr)
     {
-        bool dataRead;
         // TODO: We should probably clone the writer and convert failures here
         // into status responses, unless our caller already does that.
-        ReturnErrorOnFailure(attrOverride->Read(aClusterInfo, AttributeValueEncoder(apWriter), &dataRead));
+        AttributeValueEncoder valueEncoder(apWriter);
+        ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
 
-        if (dataRead)
+        if (valueEncoder.TriedEncode())
         {
             if (apDataExists != nullptr)
             {
@@ -228,8 +219,8 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
 
     EmberAfAttributeType attributeType;
     EmberAfStatus status;
-    status = emberAfReadAttribute(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId, CLUSTER_MASK_SERVER,
-                                  attributeData, sizeof(attributeData), &attributeType);
+    status = emberAfReadAttribute(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, attributeData,
+                                  sizeof(attributeData), &attributeType);
 
     if (apDataExists != nullptr)
     {
@@ -350,13 +341,23 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         break;
     }
     case ZCL_ARRAY_ATTRIBUTE_TYPE: {
+        // We only get here for attributes of list type that have no override
+        // registered.  There should not be any nonempty lists like that.
+        uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
+        if (size != 2)
+        {
+            // The value returned by emberAfAttributeValueSize for a list
+            // includes the space needed to store the list length (2 bytes) plus
+            // the space needed to store the actual list items.  We expect it to
+            // return 2 here, indicating a zero-length list.  If it doesn't,
+            // something has gone wrong.
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        // Just encode an empty array.
         TLV::TLVType containerType;
         ReturnErrorOnFailure(
-            apWriter->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_List, containerType));
-        // TODO: Encode data in TLV, now raw buffers
-        ReturnErrorOnFailure(apWriter->PutBytes(
-            TLV::AnonymousTag, attributeData,
-            emberAfAttributeValueSize(aClusterInfo.mClusterId, aClusterInfo.mFieldId, attributeType, attributeData)));
+            apWriter->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_Array, containerType));
         ReturnErrorOnFailure(apWriter->EndContainer(containerType));
         break;
     }
@@ -463,8 +464,6 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(Cluste
         return Protocols::InteractionModel::Status::InvalidValue;
     }
 
-    // TODO (#8442): emberAfWriteAttributeExternal is doing additional ACL check, however true ACL support is missing in ember /
-    // IM. Should invesgate this function and integrate ACL support with related interactions.
     return ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
                                                                   aClusterInfo.mFieldId, CLUSTER_MASK_SERVER, 0, attributeData,
                                                                   attributeMetadata->attributeType));
@@ -480,24 +479,24 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
-    return apWriteHandler->AddAttributeStatusCode(attributePathParams,
-                                                  imCode == Protocols::InteractionModel::Status::Success
-                                                      ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
-                                                      : Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                                  Protocols::SecureChannel::Id, imCode);
+    return apWriteHandler->AddStatus(attributePathParams, imCode);
 }
 } // namespace app
 } // namespace chip
 
-void InteractionModelReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                                      uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type,
-                                                      uint8_t * data)
+void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                            uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
 {
     IgnoreUnusedVariable(manufacturerCode);
     IgnoreUnusedVariable(type);
     IgnoreUnusedVariable(data);
     IgnoreUnusedVariable(mask);
 
+    MatterReportingAttributeChangeCallback(endpoint, clusterId, attributeId);
+}
+
+void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
+{
     ClusterInfo info;
     info.mClusterId  = clusterId;
     info.mFieldId    = attributeId;

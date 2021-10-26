@@ -73,6 +73,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
+using chip::Inet::IPPrefix;
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -114,7 +116,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ProcessThreadActivity
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveRouteToAddress(const IPAddress & destAddr)
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveRouteToAddress(const Inet::IPAddress & destAddr)
 {
     bool res = false;
 
@@ -832,7 +834,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDia
  */
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(
-    AttributeId attributeId, const app::AttributeValueEncoder & encoder)
+    AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
     CHIP_ERROR err;
 
@@ -1506,7 +1508,7 @@ exit:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
-static_assert(OPENTHREAD_API_VERSION >= 120, "SRP Client requires a more recent OpenThread version");
+static_assert(OPENTHREAD_API_VERSION >= 156, "SRP Client requires a more recent OpenThread version");
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotification(otError aError,
@@ -1519,6 +1521,19 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
     {
     case OT_ERROR_NONE: {
         ChipLogProgress(DeviceLayer, "OnSrpClientNotification: Last requested operation completed successfully");
+
+        if (aHostInfo)
+        {
+            if (aHostInfo->mState == OT_SRP_CLIENT_ITEM_STATE_REMOVED)
+            {
+                // Clear memory for removed host
+                memset(ThreadStackMgrImpl().mSrpClient.mHostName, 0, sizeof(ThreadStackMgrImpl().mSrpClient.mHostName));
+
+                ThreadStackMgrImpl().mSrpClient.mIsInitialized = true;
+                ThreadStackMgrImpl().mSrpClient.mInitializedCallback(ThreadStackMgrImpl().mSrpClient.mCallbackContext,
+                                                                     CHIP_NO_ERROR);
+            }
+        }
 
         if (aRemovedServices)
         {
@@ -1610,7 +1625,7 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(const char * aInstanceName, const char * aName,
                                                                                uint16_t aPort,
                                                                                const Span<const char * const> & aSubTypes,
-                                                                               const Span<const Mdns::TextEntry> & aTxtEntries,
+                                                                               const Span<const Dnssd::TextEntry> & aTxtEntries,
                                                                                uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval)
 {
     CHIP_ERROR error                         = CHIP_NO_ERROR;
@@ -1620,6 +1635,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
 
     Impl()->LockThreadStack();
 
+    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
     VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1655,7 +1671,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     srpService->mService.mName         = alloc.Clone(aName);
     srpService->mService.mPort         = aPort;
 
-#if OPENTHREAD_API_VERSION >= 132
     VerifyOrExit(aSubTypes.size() < ArraySize(srpService->mSubTypes), error = CHIP_ERROR_BUFFER_TOO_SMALL);
     entryId = 0;
 
@@ -1666,13 +1681,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
 
     srpService->mSubTypes[entryId]      = nullptr;
     srpService->mService.mSubTypeLabels = srpService->mSubTypes;
-#endif
 
     // Initialize TXT entries
     VerifyOrExit(aTxtEntries.size() <= ArraySize(srpService->mTxtEntries), error = CHIP_ERROR_BUFFER_TOO_SMALL);
     entryId = 0;
 
-    for (const chip::Mdns::TextEntry & entry : aTxtEntries)
+    for (const chip::Dnssd::TextEntry & entry : aTxtEntries)
     {
         using OtTxtValueLength = decltype(srpService->mTxtEntries[entryId].mValueLength);
         static_assert(SrpClient::kServiceBufferSize <= std::numeric_limits<OtTxtValueLength>::max(),
@@ -1712,6 +1726,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
     CHIP_ERROR error                         = CHIP_NO_ERROR;
     typename SrpClient::Service * srpService = nullptr;
 
+    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+
     Impl()->LockThreadStack();
 
     VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -1739,19 +1755,39 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveAllSrpServices()
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_InvalidateAllSrpServices()
+{
+    Impl()->LockThreadStack();
+
+    for (typename SrpClient::Service & service : mSrpClient.mServices)
+    {
+        if (service.IsUsed())
+        {
+            service.mIsInvalid = true;
+        }
+    }
+
+    Impl()->UnlockThreadStack();
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSrpServices()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 
     for (typename SrpClient::Service & service : mSrpClient.mServices)
     {
-        if (!service.IsUsed())
-            continue;
-
-        error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
-        SuccessOrExit(error);
+        if (service.IsUsed() && service.mIsInvalid)
+        {
+            ChipLogProgress(DeviceLayer, "removing srp service: %s.%s", service.mService.mInstanceName, service.mService.mName);
+            error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
+            SuccessOrExit(error);
+        }
     }
 
 exit:
@@ -1766,10 +1802,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
     CHIP_ERROR error = CHIP_NO_ERROR;
     Inet::IPAddress hostAddress;
 
+    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+
     Impl()->LockThreadStack();
 
     VerifyOrExit(aHostName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aHostName) <= SrpClient::kMaxHostNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(strlen(aHostName) <= Dnssd::kHostNameMaxLength, error = CHIP_ERROR_INVALID_STRING_LENGTH);
 
     // Avoid adding the same host name multiple times
     if (strcmp(mSrpClient.mHostName, aHostName) != 0)
@@ -1793,13 +1831,50 @@ exit:
     return error;
 }
 
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ClearSrpHost(const char * aHostName)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    Impl()->LockThreadStack();
+
+    VerifyOrExit(aHostName, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(strlen(aHostName) <= Dnssd::kHostNameMaxLength, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(mSrpClient.mInitializedCallback, error = CHIP_ERROR_INCORRECT_STATE);
+
+    // Add host and remove it with notifying SRP server to clean old information related to the host.
+    // Avoid adding the same host name multiple times
+    if (strcmp(mSrpClient.mHostName, aHostName) != 0)
+    {
+        strcpy(mSrpClient.mHostName, aHostName);
+        error = MapOpenThreadError(otSrpClientSetHostName(mOTInst, mSrpClient.mHostName));
+        SuccessOrExit(error);
+    }
+    error = MapOpenThreadError(otSrpClientRemoveHostAndServices(mOTInst, false, true));
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    return error;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetSrpDnsCallbacks(DnsAsyncReturnCallback aInitCallback,
+                                                                                    DnsAsyncReturnCallback aErrorCallback,
+                                                                                    void * aContext)
+{
+    mSrpClient.mInitializedCallback = aInitCallback;
+    mSrpClient.mCallbackContext     = aContext;
+    return CHIP_NO_ERROR;
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsResponseToMdnsData(
-    otDnsServiceInfo & serviceInfo, const char * serviceType, chip::Mdns::MdnsService & mdnsService,
+    otDnsServiceInfo & serviceInfo, const char * serviceType, chip::Dnssd::DnssdService & mdnsService,
     DnsServiceTxtEntries & serviceTxtEntries)
 {
-    char protocol[chip::Mdns::kMdnsProtocolTextMaxSize + 1];
+    char protocol[chip::Dnssd::kDnssdProtocolTextMaxSize + 1];
 
     if (strchr(serviceInfo.mHostNameBuffer, '.') == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -1830,21 +1905,21 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     // Append string terminating character.
     protocol[substringSize] = '\0';
 
-    if (strncmp(protocol, "_udp", chip::Mdns::kMdnsProtocolTextMaxSize) == 0)
+    if (strncmp(protocol, "_udp", chip::Dnssd::kDnssdProtocolTextMaxSize) == 0)
     {
-        mdnsService.mProtocol = chip::Mdns::MdnsServiceProtocol::kMdnsProtocolUdp;
+        mdnsService.mProtocol = chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolUdp;
     }
-    else if (strncmp(protocol, "_tcp", chip::Mdns::kMdnsProtocolTextMaxSize) == 0)
+    else if (strncmp(protocol, "_tcp", chip::Dnssd::kDnssdProtocolTextMaxSize) == 0)
     {
-        mdnsService.mProtocol = chip::Mdns::MdnsServiceProtocol::kMdnsProtocolTcp;
+        mdnsService.mProtocol = chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolTcp;
     }
     else
     {
-        mdnsService.mProtocol = chip::Mdns::MdnsServiceProtocol::kMdnsProtocolUnknown;
+        mdnsService.mProtocol = chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolUnknown;
     }
     mdnsService.mPort        = serviceInfo.mPort;
     mdnsService.mInterface   = INET_NULL_INTERFACEID;
-    mdnsService.mAddressType = Inet::kIPAddressType_IPv6;
+    mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
     mdnsService.mAddress     = chip::Optional<chip::Inet::IPAddress>(ToIPAddress(serviceInfo.mHostAddress));
 
     otDnsTxtEntryIterator iterator;
@@ -1879,10 +1954,10 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
 {
     CHIP_ERROR error;
     DnsResult browseResult;
-    // type buffer size is kMdnsTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
-    char type[chip::Mdns::kMdnsTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
-    // hostname buffer size is kMdnsHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
-    char hostname[chip::Mdns::kMdnsHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    // type buffer size is kDnssdTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
+    char type[Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    // hostname buffer size is kHostNameMaxLength + . + kMaxDomainNameSize + . + termination character
+    char hostname[Dnssd::kHostNameMaxLength + SrpClient::kMaxDomainNameSize + 3];
     // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
     // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
     uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
@@ -1950,8 +2025,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsBrowse(const
     mDnsBrowseCallback = aCallback;
 
     // Append default SRP domain name to the service name.
-    // fullServiceName buffer size is kMdnsFullTypeAndProtocolMaxSize + . + kDefaultDomainNameSize + null-terminator.
-    char fullServiceName[Mdns::kMdnsFullTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
+    // fullServiceName buffer size is kDnssdFullTypeAndProtocolMaxSize + . + kDefaultDomainNameSize + null-terminator.
+    char fullServiceName[Dnssd::kDnssdFullTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
     snprintf(fullServiceName, sizeof(fullServiceName), "%s.%s", aServiceName, SrpClient::kDefaultDomainName);
 
     error = MapOpenThreadError(otDnsClientBrowse(mOTInst, fullServiceName, OnDnsBrowseResult, aContext, /* config */ nullptr));
@@ -1969,10 +2044,10 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
 {
     CHIP_ERROR error;
     DnsResult resolveResult;
-    // type buffer size is kMdnsTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
-    char type[chip::Mdns::kMdnsTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
-    // hostname buffer size is kMdnsHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
-    char hostname[chip::Mdns::kMdnsHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    // type buffer size is kDnssdTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
+    char type[Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    // hostname buffer size is kHostNameMaxLength + . + kMaxDomainNameSize + . + termination character
+    char hostname[Dnssd::kHostNameMaxLength + SrpClient::kMaxDomainNameSize + 3];
     // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
     // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
     uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
@@ -2024,8 +2099,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsResolve(cons
     mDnsResolveCallback = aCallback;
 
     // Append default SRP domain name to the service name.
-    // fullServiceName buffer size is kMdnsTypeAndProtocolMaxSize + . separator + kDefaultDomainNameSize + termination character.
-    char fullServiceName[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
+    // fullServiceName buffer size is kDnssdTypeAndProtocolMaxSize + . separator + kDefaultDomainNameSize + termination character.
+    char fullServiceName[Dnssd::kDnssdTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
     snprintf(fullServiceName, sizeof(fullServiceName), "%s.%s", aServiceName, SrpClient::kDefaultDomainName);
 
     error = MapOpenThreadError(

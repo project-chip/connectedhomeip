@@ -27,9 +27,6 @@
 // Include module header
 #include <system/SystemError.h>
 
-// Include common private header
-#include "SystemLayerPrivate.h"
-
 #include <lib/support/DLLUtil.h>
 #include <lib/support/ErrorStr.h>
 

@@ -132,6 +132,35 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     int result               = 1;
     const EVP_CIPHER * type  = nullptr;
 
+    // Placeholder location for avoiding null params for plaintexts when
+    // size is zero.
+    uint8_t placeholder_empty_plaintext = 0;
+
+    // Ciphertext block to hold a finalized ciphertext block if output
+    // `ciphertext` buffer is nullptr or plaintext_length is zero (i.e.
+    // we are only doing auth and don't care about output).
+    uint8_t placeholder_ciphertext[kAES_CCM256_Block_Length];
+    bool ciphertext_was_null = (ciphertext == nullptr);
+
+    if (plaintext_length == 0)
+    {
+        if (plaintext == nullptr)
+        {
+            plaintext = &placeholder_empty_plaintext;
+        }
+        // Make sure we have at least 1 full block size buffer for the
+        // extraction of final block (required by OpenSSL EVP_EncryptFinal_ex)
+        if (ciphertext_was_null)
+        {
+            ciphertext = &placeholder_ciphertext[0];
+        }
+    }
+
+    VerifyOrExit((key_length == kAES_CCM128_Key_Length) || (key_length == kAES_CCM256_Key_Length),
+                 error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit((plaintext_length != 0) || ciphertext_was_null, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(plaintext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ciphertext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -140,8 +169,9 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // 16 bytes key for AES-CCM-128
-    type = (key_length == 16) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
+    // TODO: Remove suport for AES-256 since not in 1.0
+    // Determine crypto type by key length
+    type = (key_length == kAES_CCM128_Key_Length) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
 
     context = EVP_CIPHER_CTX_new();
     VerifyOrExit(context != nullptr, error = CHIP_ERROR_INTERNAL);
@@ -180,14 +210,13 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     result = EVP_EncryptUpdate(context, Uint8::to_uchar(ciphertext), &bytesWritten, Uint8::to_const_uchar(plaintext),
                                static_cast<int>(plaintext_length));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(bytesWritten >= 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit((ciphertext_was_null && bytesWritten == 0) || (bytesWritten >= 0), error = CHIP_ERROR_INTERNAL);
     ciphertext_length = static_cast<unsigned int>(bytesWritten);
 
     // Finalize encryption
     result = EVP_EncryptFinal_ex(context, ciphertext + ciphertext_length, &bytesWritten);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(bytesWritten >= 0, error = CHIP_ERROR_INTERNAL);
-    ciphertext_length += static_cast<unsigned int>(bytesWritten);
+    VerifyOrExit(bytesWritten >= 0 && bytesWritten <= static_cast<int>(plaintext_length), error = CHIP_ERROR_INTERNAL);
 
     // Get tag
     VerifyOrExit(CanCastTo<int>(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -214,6 +243,34 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     int result               = 1;
     const EVP_CIPHER * type  = nullptr;
 
+    // Placeholder location for avoiding null params for ciphertext when
+    // size is zero.
+    uint8_t placeholder_empty_ciphertext = 0;
+
+    // Plaintext block to hold a finalized plaintext block if output
+    // `plaintext` buffer is nullptr or ciphertext_length is zero (i.e.
+    // we are only doing auth and don't care about output).
+    uint8_t placeholder_plaintext[kAES_CCM256_Block_Length];
+    bool plaintext_was_null = (plaintext == nullptr);
+
+    if (ciphertext_length == 0)
+    {
+        if (ciphertext == nullptr)
+        {
+            ciphertext = &placeholder_empty_ciphertext;
+        }
+        // Make sure we have at least 1 full block size buffer for the
+        // extraction of final block (required by OpenSSL EVP_DecryptFinal_ex)
+        if (plaintext_was_null)
+        {
+            plaintext = &placeholder_plaintext[0];
+        }
+    }
+
+    VerifyOrExit((key_length == kAES_CCM128_Key_Length) || (key_length == kAES_CCM256_Key_Length),
+                 error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ciphertext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(plaintext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -221,8 +278,9 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // 16 bytes key for AES-CCM-128
-    type = (key_length == 16) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
+    // TODO: Remove suport for AES-256 since not in 1.0
+    // Determine crypto type by key length
+    type = (key_length == kAES_CCM128_Key_Length) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
 
     context = EVP_CIPHER_CTX_new();
     VerifyOrExit(context != nullptr, error = CHIP_ERROR_INTERNAL);
@@ -252,6 +310,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     VerifyOrExit(CanCastTo<int>(ciphertext_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     result = EVP_DecryptUpdate(context, nullptr, &bytesOutput, nullptr, static_cast<int>(ciphertext_length));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(bytesOutput <= static_cast<int>(ciphertext_length), error = CHIP_ERROR_INTERNAL);
 
     // Pass in aad
     if (aad_length > 0 && aad != nullptr)
@@ -259,12 +318,17 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
         VerifyOrExit(CanCastTo<int>(aad_length), error = CHIP_ERROR_INVALID_ARGUMENT);
         result = EVP_DecryptUpdate(context, nullptr, &bytesOutput, Uint8::to_const_uchar(aad), static_cast<int>(aad_length));
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(bytesOutput <= static_cast<int>(aad_length), error = CHIP_ERROR_INTERNAL);
     }
 
     // Pass in ciphertext. We wont get anything if validation fails.
     VerifyOrExit(CanCastTo<int>(ciphertext_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     result = EVP_DecryptUpdate(context, Uint8::to_uchar(plaintext), &bytesOutput, Uint8::to_const_uchar(ciphertext),
                                static_cast<int>(ciphertext_length));
+    if (plaintext_was_null)
+    {
+        VerifyOrExit(bytesOutput <= static_cast<int>(sizeof(placeholder_plaintext)), error = CHIP_ERROR_INTERNAL);
+    }
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -940,7 +1004,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     }
 
 exit:
-    memset(privkey, 0, sizeof(privkey));
+    ClearSecretData(privkey, sizeof(privkey));
     _logSSLError();
     return error;
 }
@@ -998,7 +1062,6 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     ec_key       = nullptr;
 
 exit:
-
     if (ec_key != nullptr)
     {
         EC_KEY_free(ec_key);
@@ -1670,27 +1733,44 @@ exit:
     return err;
 }
 
-CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
+namespace {
+
+CHIP_ERROR ExtractKIDFromX509Cert(bool isSKID, const ByteSpan & certificate, MutableByteSpan & kid)
 {
     CHIP_ERROR err                       = CHIP_NO_ERROR;
     X509 * x509certificate               = nullptr;
     const unsigned char * pCertificate   = certificate.data();
     const unsigned char ** ppCertificate = &pCertificate;
-    const ASN1_OCTET_STRING * akidString = nullptr;
+    const ASN1_OCTET_STRING * kidString  = nullptr;
 
     x509certificate = d2i_X509(NULL, ppCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    akidString = X509_get0_authority_key_id(x509certificate);
+    kidString = isSKID ? X509_get0_subject_key_id(x509certificate) : X509_get0_authority_key_id(x509certificate);
+    VerifyOrExit(kidString != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(kidString->length <= static_cast<int>(kid.size()), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(CanCastTo<size_t>(kidString->length), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(akidString->length == static_cast<int>(akid.size()), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    memcpy(kid.data(), kidString->data, static_cast<size_t>(kidString->length));
 
-    memcpy(akid.data(), akidString->data, static_cast<size_t>(akidString->length));
+    kid.reduce_size(static_cast<size_t>(kidString->length));
 
 exit:
     X509_free(x509certificate);
 
     return err;
+}
+
+} // namespace
+
+CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & skid)
+{
+    return ExtractKIDFromX509Cert(true, certificate, skid);
+}
+
+CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
+{
+    return ExtractKIDFromX509Cert(false, certificate, akid);
 }
 
 CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)

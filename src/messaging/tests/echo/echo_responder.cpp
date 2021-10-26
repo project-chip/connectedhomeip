@@ -85,9 +85,9 @@ int main(int argc, char * argv[])
     {
         err = gTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer)
 #if INET_CONFIG_ENABLE_IPV4
-                                   .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                                   .SetAddressType(chip::Inet::IPAddressType::kIPv4)
 #else
-                                   .SetAddressType(chip::Inet::kIPAddressType_IPv6)
+                                   .SetAddressType(chip::Inet::IPAddressType::kIPv6)
 #endif
         );
         SuccessOrExit(err);
@@ -97,13 +97,8 @@ int main(int argc, char * argv[])
     }
     else
     {
-        err = gUDPManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
-#if INET_CONFIG_ENABLE_IPV4
-                                   .SetAddressType(chip::Inet::kIPAddressType_IPv4)
-#else
-                                   .SetAddressType(chip::Inet::kIPAddressType_IPv6)
-#endif
-        );
+        err = gUDPManager.Init(
+            chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::IPAddressType::kIPv6));
         SuccessOrExit(err);
 
         err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);

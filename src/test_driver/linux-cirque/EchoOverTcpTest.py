@@ -40,6 +40,7 @@ DEVICE_CONFIG = {
         'base_image': 'connectedhomeip/chip-cirque-device-base',
         'capability': ['Thread', 'Interactive', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
+        'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     },
@@ -48,6 +49,7 @@ DEVICE_CONFIG = {
         'base_image': 'connectedhomeip/chip-cirque-device-base',
         'capability': ['Thread', 'Interactive', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
+        'docker_network': 'Ipv6',
         'traffic_control': {'latencyMs': 100},
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     }
@@ -71,7 +73,7 @@ class TestEchoOverTCP(CHIPVirtualHome):
         self.run_data_model_test()
 
     def run_data_model_test(self):
-        resp_ips = [device['description']['ipv4_addr'] for device in self.non_ap_devices
+        resp_ips = [device['description']['ipv6_addr'] for device in self.non_ap_devices
                     if device['type'] == 'CHIP-Echo-Responder']
         resp_ids = [device['id'] for device in self.non_ap_devices
                     if device['type'] == 'CHIP-Echo-Responder']

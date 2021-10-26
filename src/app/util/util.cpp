@@ -47,10 +47,10 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/print-cluster.h>
-#include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af-main.h>
 #include <app/util/af.h>
+#include <zap-generated/PluginApplicationCallbacks.h>
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -122,31 +122,9 @@ uint8_t emberAfResponseType = ZCL_UTIL_RESP_NORMAL;
 
 static EmberAfInterpanHeader interpanResponseHeader;
 
-static const uint8_t emberAfAnalogDiscreteThresholds[] = { 0x07, EMBER_AF_DATA_TYPE_NONE,   0x1F, EMBER_AF_DATA_TYPE_DISCRETE,
-                                                           0x2F, EMBER_AF_DATA_TYPE_ANALOG, 0x37, EMBER_AF_DATA_TYPE_DISCRETE,
-                                                           0x3F, EMBER_AF_DATA_TYPE_ANALOG, 0x57, EMBER_AF_DATA_TYPE_DISCRETE,
-                                                           0xDF, EMBER_AF_DATA_TYPE_NONE,   0xE7, EMBER_AF_DATA_TYPE_ANALOG,
-                                                           0xFF, EMBER_AF_DATA_TYPE_NONE };
-
 uint8_t emAfExtendedPanId[EXTENDED_PAN_ID_SIZE] = {
     0, 0, 0, 0, 0, 0, 0, 0,
 };
-
-#ifdef EMBER_AF_PLUGIN_BARRIER_CONTROL_SERVER
-void emberAfPluginBarrierControlServerInitCallback(void);
-#endif
-#ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
-void emberAfPluginDoorLockServerInitCallback(void);
-#endif
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-void emberAfPluginDescriptorServerInitCallback(void);
-#endif
-#ifdef ZCL_USING_TEST_CLUSTER_SERVER
-void emberAfPluginTestClusterServerInitCallback(void);
-#endif
-#ifdef ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
-void emberAfPluginOperationalCredentialsServerInitCallback(void);
-#endif
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -296,24 +274,7 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
     // initialize event management system
     emAfInitEvents();
 
-    // Initialize the reporting plugin
-    emberAfPluginReportingInitCallback();
-
-#ifdef EMBER_AF_PLUGIN_BARRIER_CONTROL_SERVER
-    emberAfPluginBarrierControlServerInitCallback();
-#endif
-#ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
-    emberAfPluginDoorLockServerInitCallback();
-#endif
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-    emberAfPluginDescriptorServerInitCallback();
-#endif
-#ifdef ZCL_USING_TEST_CLUSTER_SERVER
-    emberAfPluginTestClusterServerInitCallback();
-#endif
-#ifdef ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
-    emberAfPluginOperationalCredentialsServerInitCallback();
-#endif
+    MATTER_PLUGINS_INIT
 
     emAfCallInits();
 }
@@ -335,23 +296,6 @@ void emberAfTick(void)
 // ****************************************
 void emberAfStackDown(void)
 {
-    // (Case 14696) Clearing the report table is only necessary if the stack is
-    // going down for good; if we're rejoining, leave the table intact since we'll
-    // be right back, hopefully.
-    // (Issue 77101) Also don't clear the table if the stack has gone down as a
-    // a result of losing its parent or some other transient state where a future
-    // rejoin is expected to get us back online.
-    if ((false)
-        // emberStackIsPerformingRejoin() == false
-        // && emberNetworkState() == EMBER_NO_NETWORK
-    )
-    {
-        // the report table should be cleared when the stack comes down.
-        // going to a new network means new report devices should be discovered.
-        // if the table isnt cleared the device keeps trying to send messages.
-        emberAfClearReportTableCallback();
-    }
-
     emberAfRegistrationAbortCallback();
 }
 
@@ -394,7 +338,7 @@ void emberAfDecodeAndPrintClusterWithMfgCode(ClusterId cluster, uint16_t mfgCode
     if (index == 0xFFFF)
     {
         static_assert(sizeof(ClusterId) == 4, "Adjust the print formatting");
-        emberAfPrint(emberAfPrintActiveArea, "(Unknown clus. [0x%4x])", cluster);
+        emberAfPrint(emberAfPrintActiveArea, "(Unknown clus. [" ChipLogFormatMEI "])", ChipLogValueMEI(cluster));
     }
     else
     {
@@ -432,15 +376,16 @@ static void printIncomingZclMessage(const EmberAfClusterCommand * cmd)
     if (emberAfPrintReceivedMessages)
     {
         // emberAfAppPrint("\r\nT%4x:", emberAfGetCurrentTime());
-        emberAfAppPrint("RX len %d, ep %x, clus 0x%2x ", cmd->bufLen, cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId);
+        emberAfAppPrint("RX len %d, ep %x, clus " ChipLogFormatMEI " ", cmd->bufLen, cmd->apsFrame->destinationEndpoint,
+                        ChipLogValueMEI(cmd->apsFrame->clusterId));
         emberAfAppDebugExec(emberAfDecodeAndPrintClusterWithMfgCode(cmd->apsFrame->clusterId, cmd->mfgCode));
         if (cmd->mfgSpecific)
         {
             emberAfAppPrint(" mfgId %2x", cmd->mfgCode);
         }
-        emberAfAppPrint(" FC %x seq %x cmd %x payload[",
+        emberAfAppPrint(" FC %x seq %x cmd " ChipLogFormatMEI " payload[",
                         cmd->buffer[0], // frame control
-                        cmd->seqNum, cmd->commandId);
+                        cmd->seqNum, ChipLogValueMEI(cmd->commandId));
         emberAfAppFlush();
         emberAfAppPrintBuffer(cmd->buffer + cmd->payloadStartIndex,                        // message
                               static_cast<uint16_t>(cmd->bufLen - cmd->payloadStartIndex), // length
@@ -457,14 +402,16 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 
     if (index == 0xFFFF)
     {
-        emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
+        emberAfDebugPrint("Drop cluster " ChipLogFormatMEI " command " ChipLogFormatMEI, ChipLogValueMEI(cmd->apsFrame->clusterId),
+                          ChipLogValueMEI(cmd->commandId));
         emberAfDebugPrint(" due to invalid endpoint: ");
         emberAfDebugPrintln("0x%x", cmd->apsFrame->destinationEndpoint);
         return false;
     }
     else if (emberAfNetworkIndexFromEndpointIndex(index) != cmd->networkIndex)
     {
-        emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
+        emberAfDebugPrint("Drop cluster " ChipLogFormatMEI " command " ChipLogFormatMEI, ChipLogValueMEI(cmd->apsFrame->clusterId),
+                          ChipLogValueMEI(cmd->commandId));
         emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "network");
         emberAfDebugPrintln("%d", cmd->networkIndex);
         return false;
@@ -551,12 +498,6 @@ bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType ty
 
     printIncomingZclMessage(&curCmd);
     prepareForResponse(&curCmd);
-
-    if (emberAfPreCommandReceivedCallback(&curCmd))
-    {
-        msgHandled = true;
-        goto kickout;
-    }
 
     if (interPanHeader != NULL && !(interPanHeader->options & EMBER_AF_INTERPAN_OPTION_MAC_HAS_LONG_ADDRESS))
     {
@@ -1019,20 +960,6 @@ int8_t emberAfCompareDates(EmberAfDate* date1, EmberAfDate* date2)
   return (val1 == val2) ? 0 : ((val1 < val2) ? -1 : 1);
 }
 #endif
-
-// returns the type that the attribute is, either EMBER_AF_DATA_TYPE_ANALOG,
-// EMBER_AF_DATA_TYPE_DISCRETE, or EMBER_AF_DATA_TYPE_NONE. This is based on table
-// 2.15 from the ZCL spec 075123r02
-uint8_t emberAfGetAttributeAnalogOrDiscreteType(uint8_t dataType)
-{
-    unsigned index = 0;
-
-    while (emberAfAnalogDiscreteThresholds[index] < dataType)
-    {
-        index += 2;
-    }
-    return emberAfAnalogDiscreteThresholds[index + 1];
-}
 
 // Zigbee spec says types between signed 8 bit and signed 64 bit
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType)

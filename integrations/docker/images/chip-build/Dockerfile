@@ -86,7 +86,7 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && pip3 install attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas \
+    && pip3 install attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate \
     && : # last line
 
 # build and install gn

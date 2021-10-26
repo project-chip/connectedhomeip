@@ -21,17 +21,16 @@
 
 using namespace ::chip;
 
-CHIP_ERROR DiscoverCommissionablesCommand::Run()
+CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()
 {
-    GetExecContext()->commissioner->RegisterDeviceDiscoveryDelegate(this);
-
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint64_t) 0);
-    return GetExecContext()->commissioner->DiscoverCommissionableNodes(filter);
+    mController.RegisterDeviceDiscoveryDelegate(this);
+    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
+    return mController.DiscoverCommissionableNodes(filter);
 }
 
-void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData)
+void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
-    char rotatingId[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
+    char rotatingId[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
     Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
 
     ChipLogProgress(Discovery, "Discovered Node: ");
@@ -48,7 +47,7 @@ void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Mdns::Discov
     ChipLogProgress(Discovery, "\tPairing Hint\t\t0x%x", nodeData.pairingHint);
     for (int i = 0; i < nodeData.numIPs; i++)
     {
-        char buf[chip::Inet::kMaxIPAddressStringLength];
+        char buf[chip::Inet::IPAddress::kMaxStringLength];
         nodeData.ipAddress[i].ToString(buf);
 
         ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", i, buf);

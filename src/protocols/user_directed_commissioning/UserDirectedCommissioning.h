@@ -27,7 +27,7 @@
 
 #include "UDCClients.h"
 #include <lib/core/CHIPCore.h>
-#include <lib/mdns/Resolver.h>
+#include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -177,7 +177,7 @@ public:
      *  @param[in]    nodeData        DNS-SD response data.
      *
      */
-    void OnCommissionableNodeFound(const Mdns::DiscoveredNodeData & nodeData);
+    void OnCommissionableNodeFound(const Dnssd::DiscoveredNodeData & nodeData);
 
     /**
      * Get the cache of UDC Clients

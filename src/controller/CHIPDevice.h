@@ -29,8 +29,8 @@
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
+#include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
-#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/DeviceControllerInteractionModelDelegate.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
@@ -76,6 +76,13 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
                                         Transport::BLE<kMaxBlePendingPackets> /* BLE */
 #endif
                                         >;
+
+using DeviceIPTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                          ,
+                                          Transport::UDP /* IPv4 */
+#endif
+                                          >;
 
 struct ControllerDeviceInitParams
 {
@@ -309,6 +316,24 @@ public:
     CHIP_ERROR OpenPairingWindow(uint16_t timeout, CommissioningWindowOption option, SetupPayload & setupPayload);
 
     /**
+     * @brief
+     *   Compute a PASE verifier and passcode ID for the desired setup pincode.
+     *
+     *   This can be used to open a commissioning window on the device for
+     *   additional administrator commissioning.
+     *
+     * @param[in] iterations      The number of iterations to use when generating the verifier
+     * @param[in] setupPincode    The desired PIN code to use
+     * @param[in] salt            The 16-byte salt for verifier computation
+     * @param[out] outVerifier    The PASEVerifier to be populated on success
+     * @param[out] outPasscodeId  The passcode ID to be populated on success
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
+                                   uint32_t & outPasscodeId);
+
+    /**
      *  In case there exists an open session to the device, mark it as expired.
      */
     CHIP_ERROR CloseSession();
@@ -364,9 +389,9 @@ public:
     // on the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
     // type-safe.
     // TODO: Implement interaction model delegate in the application.
-    void AddIMResponseHandler(app::CommandSender * commandObj, Callback::Cancelable * onSuccessCallback,
+    void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
                               Callback::Cancelable * onFailureCallback);
-    void CancelIMResponseHandler(app::CommandSender * commandObj);
+    void CancelIMResponseHandler(void * commandObj);
 
     void OperationalCertProvisioned();
     bool IsOperationalCertProvisioned() const { return mDeviceOperationalCertProvisioned; }
@@ -437,6 +462,8 @@ public:
      */
     CHIP_ERROR EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+
+    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() { return mpIMDelegate; };
 
 private:
     enum class ConnectionState

@@ -40,13 +40,12 @@ static_library("ESP32") {
     "LwIPCoreLock.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
-    "SoftwareUpdateManagerImpl.h",
     "SystemTimeSupport.cpp",
     "bluedroid/BLEManagerImpl.cpp",
     "nimble/BLEManagerImpl.cpp",
   ]
 
-  deps = [ "${chip_root}/src/lib/mdns:platform_header" ]
+  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
 
   public_deps = [
     "${chip_root}/src/crypto",

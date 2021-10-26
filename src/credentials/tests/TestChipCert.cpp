@@ -155,6 +155,11 @@ static void TestChipCert_ChipToX509(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, expectedOutCert.data_equal(outCert));
     }
+
+    // Error Case:
+    MutableByteSpan outCert(outCertBuf);
+    err = ConvertChipCertToX509Cert(ByteSpan(sTestCert_Node01_01_Err01_Chip, sTestCert_Node01_01_Err01_Chip_Len), outCert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_TLV_TAG);
 }
 
 static void TestChipCert_X509ToChip(nlTestSuite * inSuite, void * inContext)

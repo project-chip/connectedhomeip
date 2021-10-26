@@ -20,8 +20,10 @@
 #pragma once
 
 #include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/Command.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model/DecodableList.h>
 #include <app/util/af-enums.h>
 #include <app/util/attribute-filter.h>
 #include <app/util/im-client-callbacks.h>
@@ -32,14 +34,12 @@
 // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
 // instead of IM status code.
 // #6308 should handle IM error code on the application side, either modify this function or remove this.
-typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint16_t minInterval, uint16_t maxInterval);
-typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
 
 // Cluster Specific Response Callbacks
 typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback)(void * context, uint8_t action,
                                                                                    uint32_t delayedActionTime);
 typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(
-    void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-    uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
+    void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI, uint32_t softwareVersion,
+    chip::CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 
 // List specific responses

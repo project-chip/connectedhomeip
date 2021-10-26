@@ -36,8 +36,6 @@ buildconfig_header("inet_buildconfig") {
   defines = [
     "INET_CONFIG_TEST=${chip_build_tests}",
     "INET_CONFIG_ENABLE_IPV4=${chip_inet_config_enable_ipv4}",
-    "INET_CONFIG_ENABLE_DNS_RESOLVER=${chip_inet_config_enable_dns_resolver}",
-    "INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS=${chip_inet_config_enable_async_dns_sockets}",
     "INET_CONFIG_ENABLE_TCP_ENDPOINT=${chip_inet_config_enable_tcp_endpoint}",
     "INET_CONFIG_ENABLE_UDP_ENDPOINT=${chip_inet_config_enable_udp_endpoint}",
     "HAVE_LWIP_RAW_BIND_NETIF=true",
@@ -90,7 +88,6 @@ static_library("inet") {
     "InetLayer.h",
     "InetLayerBasis.h",
     "InetLayerEvents.h",
-    "InetUtils.cpp",
     "arpa-inet-compatibility.h",
   ]
 
@@ -117,20 +114,6 @@ static_library("inet") {
     sources += [
       "UDPEndPoint.cpp",
       "UDPEndPoint.h",
-    ]
-  }
-
-  if (chip_inet_config_enable_dns_resolver) {
-    sources += [
-      "DNSResolver.cpp",
-      "DNSResolver.h",
-    ]
-  }
-
-  if (chip_inet_config_enable_async_dns_sockets) {
-    sources += [
-      "AsyncDNSResolverSockets.cpp",
-      "AsyncDNSResolverSockets.h",
     ]
   }
 

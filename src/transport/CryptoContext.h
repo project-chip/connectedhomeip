@@ -36,6 +36,7 @@ class DLL_EXPORT CryptoContext
 {
 public:
     CryptoContext();
+    ~CryptoContext();
     CryptoContext(CryptoContext &&)      = default;
     CryptoContext(const CryptoContext &) = default;
     CryptoContext & operator=(const CryptoContext &) = default;
@@ -68,8 +69,8 @@ public:
      * @param role               Role of the new session (initiator or responder)
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
-                    const ByteSpan & salt, SessionInfoType infoType, SessionRole role);
+    CHIP_ERROR InitFromKeyPair(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
+                               const ByteSpan & salt, SessionInfoType infoType, SessionRole role);
 
     /**
      * @brief
@@ -113,7 +114,7 @@ public:
     CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                        const MessageAuthenticationCode & mac) const;
 
-    ByteSpan GetAttestationChallenge() const { return ByteSpan(mKeys[kAttestationChallengeKey], kAES_CCM128_Key_Length); }
+    ByteSpan GetAttestationChallenge() const { return ByteSpan(mKeys[kAttestationChallengeKey], Crypto::kAES_CCM128_Key_Length); }
 
     /**
      * @brief
@@ -125,9 +126,7 @@ public:
     size_t EncryptionOverhead();
 
 private:
-    static constexpr size_t kAES_CCM128_Key_Length = 16;
-
-    typedef uint8_t CryptoKey[kAES_CCM128_Key_Length];
+    typedef uint8_t CryptoKey[Crypto::kAES_CCM128_Key_Length];
 
     enum KeyUsage
     {

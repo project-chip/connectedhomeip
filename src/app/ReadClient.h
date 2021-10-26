@@ -94,6 +94,12 @@ public:
     CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     uint64_t GetAppIdentifier() const { return mAppIdentifier; }
 
+    auto GetSubscriptionId() const
+    {
+        using returnType = Optional<decltype(mSubscriptionId)>;
+        return mInteractionType == InteractionType::Subscribe ? returnType(mSubscriptionId) : returnType::Missing();
+    }
+
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
@@ -121,6 +127,16 @@ private:
      *  of this instance, this method is invoked once after object
      *  construction until a call to Shutdown is made to terminate the
      *  instance.
+     *
+     *  The following callbacks are expected to be invoked on the InteractionModelDelegate:
+     *      - EventStreamReceived
+     *      - OnReportData
+     *      - ReportProcessed
+     *      - ReadError
+     *      - ReadDone
+     *
+     *  When processing subscriptions, these callbacks are invoked as well:
+     *      - SubscribeResponseProcessed
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.

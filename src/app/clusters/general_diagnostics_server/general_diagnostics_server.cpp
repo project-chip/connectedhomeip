@@ -18,7 +18,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
@@ -36,16 +35,16 @@ public:
     // Register for the GeneralDiagnostics cluster on all endpoints.
     GeneralDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &), const AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &), AttributeValueEncoder & aEncoder);
 };
 
 template <typename T>
 CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &),
-                                                        const AttributeValueEncoder & aEncoder)
+                                                        AttributeValueEncoder & aEncoder)
 {
     T data;
     CHIP_ERROR err = (DeviceLayer::PlatformMgr().*getter)(data);
@@ -63,16 +62,15 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMana
 
 GeneralDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR GeneralDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead)
+CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aClusterInfo.mClusterId != GeneralDiagnostics::Id)
+    if (aPath.mClusterId != GeneralDiagnostics::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    *aDataRead = true;
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case RebootCount::Id: {
         return ReadIfSupported(&PlatformManager::GetRebootCount, aEncoder);
@@ -87,7 +85,6 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const A
         return ReadIfSupported(&PlatformManager::GetBootReasons, aEncoder);
     }
     default: {
-        *aDataRead = false;
         break;
     }
     }

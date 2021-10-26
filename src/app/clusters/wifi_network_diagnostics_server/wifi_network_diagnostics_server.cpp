@@ -16,11 +16,12 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
-#include <app/MessageDef/AttributeDataElement.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
@@ -29,6 +30,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WiFiNetworkDiagnostics;
 using namespace chip::app::Clusters::WiFiNetworkDiagnostics::Attributes;
 using chip::DeviceLayer::ConnectivityManager;
 
@@ -40,16 +42,16 @@ public:
     // Register for the WiFiNetworkDiagnostics cluster on all endpoints.
     WiFiDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), WiFiNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &), const AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &), AttributeValueEncoder & aEncoder);
 };
 
 template <typename T>
 CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &),
-                                                     const AttributeValueEncoder & aEncoder)
+                                                     AttributeValueEncoder & aEncoder)
 {
     T data;
     CHIP_ERROR err = (DeviceLayer::ConnectivityMgr().*getter)(data);
@@ -67,18 +69,17 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityMan
 
 WiFiDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead)
+CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aClusterInfo.mClusterId != WiFiNetworkDiagnostics::Id)
+    if (aPath.mClusterId != WiFiNetworkDiagnostics::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    *aDataRead = true;
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
-    case SecurityType::Id: {
+    case Attributes::SecurityType::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiSecurityType, aEncoder);
     }
     case WiFiVersion::Id: {
@@ -115,7 +116,6 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const Attr
         return ReadIfSupported(&ConnectivityManager::GetWiFiOverrunCount, aEncoder);
     }
     default: {
-        *aDataRead = false;
         break;
     }
     }
@@ -123,8 +123,11 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const Attr
 }
 } // anonymous namespace
 
-bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
+                                                             const app::ConcreteCommandPath & commandPath,
+                                                             const Commands::ResetCounts::DecodableType & commandData)
 {
+    EndpointId endpoint  = commandPath.mEndpointId;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     VerifyOrExit(DeviceLayer::ConnectivityMgr().ResetWiFiNetworkDiagnosticsCounts() == CHIP_NO_ERROR,

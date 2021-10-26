@@ -2,41 +2,41 @@
 
 Want to contribute? Great! First, read this page (including the small print at
 the end). By submitting a pull request, you represent that you have the right to
-license your contribution to the Connectivity Standards Alliance and the community, and agree by
-submitting the patch that your contributions are licensed under the
-[Apache 2.0 license](./LICENSE). Before submitting the pull request, please make
-sure you have tested your changes and that they follow the project guidelines
-for contributing code.
+license your contribution to the Connectivity Standards Alliance and the
+community, and agree by submitting the patch that your contributions are
+licensed under the [Apache 2.0 license](./LICENSE). Before submitting the pull
+request, please make sure you have tested your changes and that they follow the
+project guidelines for contributing code.
 
 # Contributing as an Open Source Contributor
 
 As an open source contributor you can report bugs and request features in the
 [Issue Tracker](https://github.com/project-chip/connectedhomeip/issues), as well
-as contribute bug fixes and features that do not impact Matter
-specification as a pull request. For example: ports of Matter to add APIs
-to alternative programming languages (e.g. Java, JS), hardware ports, or an
-optimized implementation of existing functionality. For features that impact the
-specification, please join Matter work group within the Connectivity Standards Alliance.
-The requirements to become an open source contributor of the
-[Project CHIP Repository](https://github.com/project-chip/connectedhomeip) are:
+as contribute bug fixes and features that do not impact Matter specification as
+a pull request. For example: ports of Matter to add APIs to alternative
+programming languages (e.g. Java, JS), hardware ports, or an optimized
+implementation of existing functionality. For features that impact the
+specification, please join Matter work group within the Connectivity Standards
+Alliance. The requirements to become an open source contributor of the
+[Matter Repository](https://github.com/project-chip/connectedhomeip) are:
 
 -   Agree to the [Code of Conduct](./CODE_OF_CONDUCT.md)
 -   Agree to the [License](./LICENSE)
 -   Have signed the
-    [Zigbee Project CHIP Working Group CLA](https://gist.github.com/clapre/65aa9fc63981da765039e0bb7e8701be)
+    [Matter Working Group CLA](https://gist.github.com/clapre/65aa9fc63981da765039e0bb7e8701be)
 
-# Contributing as a Connectivity Standards Alliance Project CHIP Working Group Member
+# Contributing as a Connectivity Standards Alliance Matter Working Group Member
 
-As a participant of the Connectivity Standards Alliance Project CHIP Working Group, you can
-attend Working Group meetings, propose changes to the Matter
+As a participant of the Connectivity Standards Alliance Matter Working Group,
+you can attend Working Group meetings, propose changes to the Matter
 specification, and contribute code for approved updates to the specification.
 The requirements to become a member of the
-[Project CHIP Repository](https://github.com/project-chip/connectedhomeip) are:
+[Matter Repository](https://github.com/project-chip/connectedhomeip) are:
 
 -   Must be a [Participant member](http://www.zigbeealliance.org/join) or higher
     of the Connectivity Standards Alliance
--   Must be a Project CHIP Working Group member
--   Have signed the Alliance Project CHIP Working Group CLA
+-   Must be a Matter Working Group member
+-   Have signed the Alliance Matter Working Group CLA
 -   Have approval from your company's official approver
 
 # Bugs
@@ -67,15 +67,14 @@ new feature:
 
 # Contributing Code
 
-Project CHIP follows the "Fork-and-Pull" model for accepting contributions.
+Matter follows the "Fork-and-Pull" model for accepting contributions.
 
 ### Initial Setup
 
 Setup your GitHub fork and continuous-integration services:
 
-1. Fork the
-   [Project CHIP repository](https://github.com/project-chip/connectedhomeip) by
-   clicking "Fork" on the web UI.
+1. Fork the [Matter repository](https://github.com/project-chip/connectedhomeip)
+   by clicking "Fork" on the web UI.
 
 2. All contributions must pass all checks and reviews to be accepted.
 
@@ -165,8 +164,8 @@ on occasion.
 
 #### Documentation Best Practices
 
-Project CHIP uses Doxygen to markup (or markdown) all C, C++, Objective C,
-Objective C++, Perl, Python, and Java code. Read our
+Matter uses Doxygen to markup (or markdown) all C, C++, Objective C, Objective
+C++, Perl, Python, and Java code. Read our
 [Doxygen Best Practices, Conventions, and Style](https://github.com/project-chip/connectedhomeip/blob/master/docs/style/DOXYGEN.adoc)
 
 #### Submit Pull Request
@@ -193,3 +192,79 @@ into master
 Documentation undergoes the same review process as code See the
 [Documentation Style Guide](https://github.com/project-chip/connectedhomeip/blob/master/docs/STYLE_GUIDE.md)
 for more information on how to author and format documentation for contribution.
+
+## Merge Processes
+
+Merges require at least 3 approvals from unique require-reviewers lists, and all
+CI tests passing.
+
+### Shorter Reviews
+
+Development Lead & Vice Leads can merge a change with fewer then the required
+approvals have been submitted.
+
+A separate "fast track" label will be created that will only require a single
+checkbox to be set, this label shall only be set by the Development Lead, and/or
+Vice Lead (unless they’re both unavailable, in which case a replacement can be
+temporarily appointed)
+
+"Day" here means "business day" (i.e. PRs on friday do not get fast-tracked
+faster).
+
+### Fast track types
+
+### Trivial changes
+
+Small changes or changes that do not affect the main functionality of the code
+can be fast tracked immediately. Examples:
+
+-   Adding/removing documentation (.md files)
+-   Adding tests (may include small reorganization/method adding/changes to
+    enable testability):
+    -   certification tests
+    -   stability tests
+    -   integration tests
+    -   functional tests
+    -   Test scripts
+    -   Additional tests following a pattern (e.g. YAML tests)
+-   Adding/updating/fixing tooling to aid in development
+-   Re-running code generation
+-   Code readability refactors:
+    -   renaming enum/classes/structure members
+    -   moving constant header location
+    -   Obviously trivial build rule changes (e.g. adding missing files to build
+        rules)
+    -   Changing comments
+    -   Adding/removing includes (include what you need and only what you need
+        rules)
+-   Pulling new third-party repo files
+-   Platform vendors/maintainers adding platform features/logic/bug fixes to
+    their own platforms
+-   Most changes to existing docker files (pulling new versions, reorganizing)
+-   Most changes to new dockerfile version in workflows
+
+#### Fast track changes
+
+Larger functionality changes are allowed to be fast tracked with these
+requirements/restrictions:
+
+-   Require at least 1 day to have passed since the creation of the PR
+-   Require at least 1 checkmark from someone familiar with the code or problem
+    space
+    -   This requirement shall be dropped after a PR is 3 days old with stale or
+        no feedback.
+-   Code is sufficiently covered by automated tests (or impossible to
+    automatically test with a very solid reason for this - e.g. changes to BLE
+    parameters cannot be automatically tested, but should have been manually
+    verified)
+
+Fast tracking these changes will involve resolving any obviously 'resolved'
+comments (judgment call here: were they replied to or addressed) and merging the
+change.
+
+Any "request for changes" marker will always be respected unless obviously
+resolved (i.e. author marked "requesting changes because of X and X was done in
+the PR")
+
+-   This requirement shall be dropped after a PR is 3 days old with stale or no
+    feedback.

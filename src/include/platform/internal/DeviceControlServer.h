@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <lib/support/Span.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
@@ -33,10 +34,10 @@ class DeviceControlServer final
 public:
     // ===== Members for internal use by other Device Layer components.
 
-    CHIP_ERROR ArmFailSafe(uint16_t expiryLengthSeconds);
+    CHIP_ERROR ArmFailSafe(System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
     CHIP_ERROR CommissioningComplete();
-    CHIP_ERROR SetRegulatoryConfig(uint8_t location, const char * countryCode, uint64_t breadcrumb);
+    CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb);
 
     CHIP_ERROR EnableNetworkForOperational(ByteSpan networkID);
 

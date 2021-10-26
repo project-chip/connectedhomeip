@@ -53,10 +53,9 @@ void DeviceControlServer::CommissioningFailedTimerComplete()
     }
 }
 
-CHIP_ERROR DeviceControlServer::ArmFailSafe(uint16_t expiryLengthSeconds)
+CHIP_ERROR DeviceControlServer::ArmFailSafe(System::Clock::Timeout expiryLength)
 {
-    uint32_t timerMs = expiryLengthSeconds * 1000;
-    DeviceLayer::SystemLayer().StartTimer(timerMs, HandleArmFailSafe, this);
+    DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
 
@@ -75,14 +74,14 @@ CHIP_ERROR DeviceControlServer::CommissioningComplete()
     return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const char * countryCode, uint64_t breadcrumb)
+CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = ConfigurationMgr().StoreRegulatoryLocation(location);
     SuccessOrExit(err);
 
-    err = ConfigurationMgr().StoreCountryCode(countryCode, strlen(countryCode));
+    err = ConfigurationMgr().StoreCountryCode(countryCode.data(), countryCode.size());
     SuccessOrExit(err);
 
     err = ConfigurationMgr().StoreBreadcrumb(breadcrumb);

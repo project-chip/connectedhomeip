@@ -21,15 +21,16 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <string>
 
 using namespace chip;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::MediaInput;
 
 bool mediaInputClusterSelectInput(uint8_t input);
 bool mediaInputClusterShowInputStatus();
@@ -38,16 +39,18 @@ bool mediaInputClusterRenameInput(uint8_t input, std::string name);
 
 static void storeCurrentInput(EndpointId endpoint, uint8_t currentInput)
 {
-    EmberAfStatus status = emberAfWriteServerAttribute(
-        endpoint, ZCL_MEDIA_INPUT_CLUSTER_ID, ZCL_MEDIA_INPUT_CURRENT_INPUT_ATTRIBUTE_ID, &currentInput, ZCL_INT8U_ATTRIBUTE_TYPE);
+    EmberAfStatus status = Attributes::CurrentMediaInput::Set(endpoint, currentInput);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store media playback attribute.");
     }
 }
 
-bool emberAfMediaInputClusterSelectInputCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t input)
+bool emberAfMediaInputClusterSelectInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                 const Commands::SelectInput::DecodableType & commandData)
 {
+    auto & input = commandData.index;
+
     bool success         = mediaInputClusterSelectInput(input);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     if (success)
@@ -58,7 +61,8 @@ bool emberAfMediaInputClusterSelectInputCallback(EndpointId endpoint, app::Comma
     return true;
 }
 
-bool emberAfMediaInputClusterShowInputStatusCallback(EndpointId endpoint, app::CommandHandler * command)
+bool emberAfMediaInputClusterShowInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::ShowInputStatus::DecodableType & commandData)
 {
     bool success         = mediaInputClusterShowInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -66,7 +70,8 @@ bool emberAfMediaInputClusterShowInputStatusCallback(EndpointId endpoint, app::C
     return true;
 }
 
-bool emberAfMediaInputClusterHideInputStatusCallback(EndpointId endpoint, app::CommandHandler * command)
+bool emberAfMediaInputClusterHideInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::HideInputStatus::DecodableType & commandData)
 {
     bool success         = mediaInputClusterHideInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -74,10 +79,14 @@ bool emberAfMediaInputClusterHideInputStatusCallback(EndpointId endpoint, app::C
     return true;
 }
 
-bool emberAfMediaInputClusterRenameInputCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t input, uint8_t * name)
+bool emberAfMediaInputClusterRenameInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                 const Commands::RenameInput::DecodableType & commandData)
 {
+    auto & input = commandData.index;
+    auto & name  = commandData.name;
+
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string nameString(reinterpret_cast<char *>(name));
+    std::string nameString(name.data(), name.size());
     bool success         = mediaInputClusterRenameInput(input, nameString);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);

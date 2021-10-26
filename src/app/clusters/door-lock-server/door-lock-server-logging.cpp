@@ -42,14 +42,17 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/util/af.h>
 #include <assert.h>
 
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::DoorLock;
 
 static EmberAfPluginDoorLockServerLogEntry entries[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_LOG_ENTRIES];
 static uint8_t nextEntryId = 1;
@@ -117,8 +120,12 @@ bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoo
     return true;
 }
 
-bool emberAfDoorLockClusterGetLogRecordCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint16_t entryId)
+bool emberAfDoorLockClusterGetLogRecordCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                const Commands::GetLogRecord::DecodableType & commandData)
 {
+    // Note: we make a copy of the entry id, because we will be modifying it.
+    uint16_t entryId = commandData.logIndex;
+
     EmberStatus status;
     EmberAfPluginDoorLockServerLogEntry entry;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -138,14 +145,14 @@ bool emberAfDoorLockClusterGetLogRecordCallback(EndpointId endpoint, app::Comman
                                                  (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-            VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), entry.logEntryId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), entry.timestamp));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(2), entry.eventType));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(3), entry.source));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(4), entry.eventId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(5), entry.userId));
-            SuccessOrExit(err = writer->PutBytes(TLV::ContextTag(6), entry.pin + 1, entry.pin[0]));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(6), ByteSpan::fromZclString(entry.pin)));
             SuccessOrExit(err = commandObj->FinishCommand());
         }
     }

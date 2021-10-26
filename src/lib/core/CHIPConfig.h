@@ -864,6 +864,28 @@
 #endif
 
 /**
+ *  @def CHIP_CONFIG_SHA256_CONTEXT_SIZE
+ *
+ *  @brief
+ *    Size of the statically allocated context for SHA256 operations in CryptoPAL
+ *
+ *    The default size is based on the Worst software implementation, OpenSSL. A
+ *    static assert will tell us if we are wrong, since `typedef SHA_LONG unsigned
+ *    int` is default.
+ *      SHA_LONG h[8];
+ *      SHA_LONG Nl, Nh;
+ *      SHA_LONG data[SHA_LBLOCK]; // SHA_LBLOCK is 16 for SHA256
+ *      unsigned int num, md_len;
+ *
+ *    We also have to account for possibly some custom extensions on some targets,
+ *    especially for mbedTLS, so an extra sizeof(uint64_t) is added to account.
+ *
+ */
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t))
+#endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
+
+/**
  *  @name chip key export protocol configuration.
  *
  *  @brief
@@ -1387,14 +1409,21 @@
 #endif // CHIP_CONFIG_SECURITY_TEST_MODE
 
 /**
- *  @def CHIP_CONFIG_ENABLE_DNS_RESOLVER
+ *  @def CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
  *
  *  @brief
- *    Enable support for resolving hostnames with a DNS resolver.
+ *    Shared secret to use for unit tests or when CHIP_CONFIG_SECURITY_TEST_MODE is enabled.
+ *
+ *    This parameter is 32 bytes to maximize entropy passed to the CryptoContext::InitWithSecret KDF,
+ *    and can be initialized either as a raw string or array of bytes. The default test secret of
+ *    "Test secret for key derivation." results in the following encryption keys:
+ *
+ *              5E DE D2 44 E5 53 2B 3C DC 23 40 9D BA D0 52 D2
+ *              A9 E0 11 B1 73 7C 6D 4B 70 E4 C0 A2 FE 66 04 76
  */
-#ifndef CHIP_CONFIG_ENABLE_DNS_RESOLVER
-#define CHIP_CONFIG_ENABLE_DNS_RESOLVER (INET_CONFIG_ENABLE_DNS_RESOLVER)
-#endif // CHIP_CONFIG_ENABLE_DNS_RESOLVER
+#ifndef CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
+#define CHIP_CONFIG_TEST_SHARED_SECRET_VALUE "Test secret for key derivation."
+#endif // CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
 
 /**
  *  @def CHIP_CONFIG_RESOLVE_IPADDR_LITERAL
@@ -2540,6 +2569,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
 #define CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS 2
+#endif
+
+/**
+ * @def CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+ *
+ * @brief Enable or disable attribute read with complex type.
+ *
+ */
+#ifndef CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+#define CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ 1
 #endif
 
 /**

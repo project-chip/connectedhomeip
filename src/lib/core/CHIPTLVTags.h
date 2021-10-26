@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace chip {
 namespace TLV {
 
@@ -50,7 +52,7 @@ enum TLVTagFields
     kProfileNumShift  = 32,
     kTagNumMask       = 0x00000000FFFFFFFFULL,
     kSpecialTagMarker = 0xFFFFFFFF00000000ULL,
-    kContextTagMaxNum = 256
+    kContextTagMaxNum = UINT8_MAX
 };
 
 // TODO: Move to private namespace
@@ -208,7 +210,7 @@ inline bool IsProfileTag(Tag tag)
  */
 inline bool IsContextTag(Tag tag)
 {
-    return (tag & kProfileIdMask) == kSpecialTagMarker && TagNumFromTag(tag) < kContextTagMaxNum;
+    return (tag & kProfileIdMask) == kSpecialTagMarker && TagNumFromTag(tag) <= kContextTagMaxNum;
 }
 
 // TODO: move to private namespace

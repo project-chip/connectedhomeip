@@ -16,11 +16,12 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
-#include <app/MessageDef/AttributeDataElement.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
@@ -29,6 +30,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::EthernetNetworkDiagnostics;
 using namespace chip::app::Clusters::EthernetNetworkDiagnostics::Attributes;
 using chip::DeviceLayer::ConnectivityManager;
 
@@ -40,25 +42,55 @@ public:
     // Register for the EthernetNetworkDiagnostics cluster on all endpoints.
     EthernetDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), EthernetNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(uint64_t &), const AttributeValueEncoder & aEncoder);
+    template <typename T>
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &), AttributeValueEncoder & aEncoder);
 };
+
+template <typename T>
+CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &),
+                                                         AttributeValueEncoder & aEncoder)
+{
+    T data;
+    CHIP_ERROR err = (DeviceLayer::ConnectivityMgr().*getter)(data);
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        data = 0;
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    return aEncoder.Encode(data);
+}
 
 EthernetDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead)
+CHIP_ERROR EthernetDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aClusterInfo.mClusterId != EthernetNetworkDiagnostics::Id)
+    if (aPath.mClusterId != EthernetNetworkDiagnostics::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    *aDataRead = true;
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
+    case PHYRate::Id: {
+        return ReadIfSupported(&ConnectivityManager::GetEthPHYRate, aEncoder);
+    }
+    case FullDuplex::Id: {
+        return ReadIfSupported(&ConnectivityManager::GetEthFullDuplex, aEncoder);
+    }
+    case CarrierDetect::Id: {
+        return ReadIfSupported(&ConnectivityManager::GetEthCarrierDetect, aEncoder);
+    }
+    case TimeSinceReset::Id: {
+        return ReadIfSupported(&ConnectivityManager::GetEthTimeSinceReset, aEncoder);
+    }
     case PacketRxCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthPacketRxCount, aEncoder);
     }
@@ -75,33 +107,18 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const 
         return ReadIfSupported(&ConnectivityManager::GetEthOverrunCount, aEncoder);
     }
     default: {
-        *aDataRead = false;
         break;
     }
     }
     return CHIP_NO_ERROR;
 }
-
-CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(uint64_t &),
-                                                         const AttributeValueEncoder & aEncoder)
-{
-    uint64_t data;
-    CHIP_ERROR err = (DeviceLayer::ConnectivityMgr().*getter)(data);
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        data = 0;
-    }
-    else if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-
-    return aEncoder.Encode(data);
-}
 } // anonymous namespace
 
-bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
+                                                                 const app::ConcreteCommandPath & commandPath,
+                                                                 const Commands::ResetCounts::DecodableType & commandData)
 {
+    EndpointId endpoint  = commandPath.mEndpointId;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     VerifyOrExit(DeviceLayer::ConnectivityMgr().ResetEthNetworkDiagnosticsCounts() == CHIP_NO_ERROR,

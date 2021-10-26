@@ -26,7 +26,7 @@
 1. Run build script:
 
     ```
-    ./scripts/build/build_examples.py --app light --platform telink build
+    ./scripts/build/build_examples.py --target telink-tlsr9518adk80d-light build
     ```
 
 1. Exit docker container and collect build artifacts. Firmware binary would be
@@ -163,11 +163,12 @@ following states:
 1. Pair with device
 
     ```
-    ${CHIP_TOOL_DIR}/chip-tool pairing bypass ${IP_ADDRESS_OF_CHIP_DEVICE} 5540
+    ${CHIP_TOOL_DIR}/chip-tool pairing bypass ${NODE_ID_TO_ASSIGN} ${IP_ADDRESS_OF_CHIP_DEVICE} 5540
     ```
 
     here:
 
+    - \${NODE_ID_TO_ASSIGN} is the node id to assign to the lightbulb
     - `${IP_ADDRESS_OF_CHIP_DEVICE}` is IPv6 address of CHIP device
     - **5540** is the standard CHIP TCP port
 

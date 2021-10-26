@@ -60,7 +60,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
     // loop, since the contextTags come before the profileTags)
     while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
     {
-        uint64_t tag = tlvReader.GetTag();
+        TLV::Tag tag = tlvReader.GetTag();
 
         if (TLV::IsContextTag(tag))
         {

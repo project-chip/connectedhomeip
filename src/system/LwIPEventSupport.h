@@ -31,9 +31,7 @@ class PlatformEventing
 public:
     static CHIP_ERROR ScheduleLambdaBridge(System::Layer & aLayer, const LambdaBridge & bridge);
     static CHIP_ERROR PostEvent(System::Layer & aLayer, Object & aTarget, EventType aType, uintptr_t aArgument);
-    static CHIP_ERROR DispatchEvents(System::Layer & aLayer);
-    static CHIP_ERROR DispatchEvent(System::Layer & aLayer, Event aEvent);
-    static CHIP_ERROR StartTimer(System::Layer & aLayer, uint32_t aMilliseconds);
+    static CHIP_ERROR StartTimer(System::Layer & aLayer, System::Clock::Timeout aTimeout);
 };
 
 } // namespace System

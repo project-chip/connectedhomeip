@@ -127,6 +127,14 @@ public:
 
     Iterator begin() const { return Iterator(mReader); }
 
+    /*
+     * Compute the size of the list.  This can fail if the TLV is malformed.  If
+     * this succeeds, that does not guarantee that the individual items can be
+     * successfully decoded; consumers should check Iterator::GetStatus() when
+     * actually decoding them.
+     */
+    CHIP_ERROR ComputeSize(size_t * size) const { return mReader.CountRemainingInContainer(size); }
+
 private:
     TLV::TLVReader mReader;
 };
@@ -134,6 +142,8 @@ private:
 template <typename X>
 CHIP_ERROR Decode(TLV::TLVReader & reader, DecodableList<X> & x)
 {
+    VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
+
     TLV::TLVType type;
 
     ReturnErrorOnFailure(reader.EnterContainer(type));

@@ -23,32 +23,21 @@
 #include <string>
 
 using namespace ::chip;
+using namespace ::chip::Encoding;
 using namespace ::chip::SetupPayloadData;
 
 CHIP_ERROR AdditionalDataParseCommand::Run()
 {
-    AdditionalDataPayload resultPayload;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(strlen(mPayload) % 2 == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
 
-    if (strlen(mPayload) % 2 != 0)
-    {
-        return CHIP_ERROR_INVALID_STRING_LENGTH;
-    }
     size_t additionalDataPayloadBytesLength = strlen(mPayload) / 2;
     std::unique_ptr<uint8_t[]> additionalDataPayloadBytes(new uint8_t[additionalDataPayloadBytesLength]);
 
-    size_t bufferSize =
-        chip::Encoding::HexToBytes(mPayload, strlen(mPayload), additionalDataPayloadBytes.get(), additionalDataPayloadBytesLength);
-
-    err = AdditionalDataPayloadParser(additionalDataPayloadBytes.get(), bufferSize).populatePayload(resultPayload);
-    SuccessOrExit(err);
+    AdditionalDataPayload resultPayload;
+    size_t bufferSize = HexToBytes(mPayload, strlen(mPayload), additionalDataPayloadBytes.get(), additionalDataPayloadBytesLength);
+    ReturnErrorOnFailure(AdditionalDataPayloadParser(additionalDataPayloadBytes.get(), bufferSize).populatePayload(resultPayload));
 
     ChipLogProgress(chipTool, "AdditionalDataParseCommand, RotatingDeviceId=%s", resultPayload.rotatingDeviceId.c_str());
 
-exit:
-    if (err == CHIP_NO_ERROR)
-    {
-        SetCommandExitStatus(CHIP_NO_ERROR);
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }

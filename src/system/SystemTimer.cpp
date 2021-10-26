@@ -26,9 +26,6 @@
 // Include module header
 #include <system/SystemTimer.h>
 
-// Include common private header
-#include "SystemLayerPrivate.h"
-
 // Include local headers
 #include <string.h>
 
@@ -79,7 +76,7 @@ namespace System {
 
 ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
 
-Timer * Timer::New(System::Layer & systemLayer, uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
+Timer * Timer::New(System::Layer & systemLayer, System::Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     Timer * timer = Timer::sPool.TryCreate();
     if (timer == nullptr)
@@ -90,7 +87,7 @@ Timer * Timer::New(System::Layer & systemLayer, uint32_t delayMilliseconds, Time
     {
         timer->AppState     = appState;
         timer->mSystemLayer = &systemLayer;
-        timer->mAwakenTime  = Clock::AddOffset(SystemClock().GetMonotonicMilliseconds(), delayMilliseconds);
+        timer->mAwakenTime  = SystemClock().GetMonotonicTimestamp() + delay;
         if (!__sync_bool_compare_and_swap(&timer->mOnComplete, nullptr, onComplete))
         {
             chipDie();
@@ -139,7 +136,7 @@ void Timer::HandleComplete()
 Timer * Timer::List::Add(Timer * add)
 {
     VerifyOrDie(add != mHead);
-    if (mHead == NULL || Clock::IsEarlier(add->mAwakenTime, mHead->mAwakenTime))
+    if (mHead == NULL || (add->mAwakenTime < mHead->mAwakenTime))
     {
         add->mNextTimer = mHead;
         mHead           = add;
@@ -150,7 +147,7 @@ Timer * Timer::List::Add(Timer * add)
         while (lTimer->mNextTimer)
         {
             VerifyOrDie(lTimer->mNextTimer != add);
-            if (Clock::IsEarlier(add->mAwakenTime, lTimer->mNextTimer->mAwakenTime))
+            if (add->mAwakenTime < lTimer->mNextTimer->mAwakenTime)
             {
                 // found the insert location.
                 break;
@@ -226,9 +223,9 @@ Timer * Timer::List::PopEarliest()
     return earliest;
 }
 
-Timer * Timer::List::PopIfEarlier(Clock::MonotonicMilliseconds t)
+Timer * Timer::List::PopIfEarlier(Clock::Timestamp t)
 {
-    if ((mHead == nullptr) || !Clock::IsEarlier(mHead->mAwakenTime, t))
+    if ((mHead == nullptr) || !(mHead->mAwakenTime < t))
     {
         return nullptr;
     }
@@ -238,15 +235,15 @@ Timer * Timer::List::PopIfEarlier(Clock::MonotonicMilliseconds t)
     return earliest;
 }
 
-Timer * Timer::List::ExtractEarlier(Clock::MonotonicMilliseconds t)
+Timer * Timer::List::ExtractEarlier(Clock::Timestamp t)
 {
-    if ((mHead == nullptr) || !Clock::IsEarlier(mHead->mAwakenTime, t))
+    if ((mHead == nullptr) || !(mHead->mAwakenTime < t))
     {
         return nullptr;
     }
     Timer * begin = mHead;
     Timer * end   = mHead;
-    while ((end->mNextTimer != nullptr) && Clock::IsEarlier(end->mNextTimer->mAwakenTime, t))
+    while ((end->mNextTimer != nullptr) && (end->mNextTimer->mAwakenTime < t))
     {
         end = end->mNextTimer;
     }

@@ -83,9 +83,9 @@ public:
         return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
     }
 
-    static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, pthread_mutex_t * stackLock,
-                                                        chip::NodeId nodeId, chip::System::Layer * systemLayer,
-                                                        chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
+    static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
+                                                        chip::System::Layer * systemLayer, chip::Inet::InetLayer * inetLayer,
+                                                        CHIP_ERROR * errInfoOnFailure);
 
     CHIP_ERROR GenerateNOCChainAfterValidation(chip::NodeId nodeId, chip::FabricId fabricId,
                                                const chip::Crypto::P256PublicKey & ephemeralKey, chip::MutableByteSpan & rcac,
@@ -102,8 +102,6 @@ private:
     ChipDeviceControllerPtr mController;
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
-    pthread_mutex_t * mStackLock;
-
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
 
@@ -113,8 +111,7 @@ private:
     chip::FabricId mNextFabricId      = 0;
     bool mNodeIdRequested             = false;
 
-    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, pthread_mutex_t * stackLock) :
-        mController(std::move(controller)), mStackLock(stackLock)
+    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller))
     {
         chip::CalendarToChipEpochTime(2021, 06, 10, 0, 0, 0, mNow);
     }

@@ -3,6 +3,9 @@
 #include "platform/mbed_toolchain.h"
 #include "platform/mbed_wait_api.h"
 
+// Import monotonic clock function for CHIP
+uint64_t get_clock_monotonic();
+
 // TODO: Remove!
 // This file is a temporary workaround until atomic integration has been solved
 
@@ -66,7 +69,19 @@ void usleep(unsigned int usec)
 
     if (ms)
     {
+        uint64_t start = get_clock_monotonic();
         thread_sleep_for(ms);
+        uint64_t end = get_clock_monotonic();
+
+        uint64_t delta = (uint64_t)(end - start);
+        if (delta >= usec)
+        {
+            return;
+        }
+        else
+        {
+            us = (unsigned int) (usec - delta);
+        }
     }
 
     if (us)

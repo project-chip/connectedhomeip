@@ -339,8 +339,10 @@ class SecurePairingUsingTestSecret : public PairingSession
 public:
     SecurePairingUsingTestSecret()
     {
-        SetLocalSessionId(0);
-        SetPeerSessionId(0);
+        // Do not set to 0 to prevent unwanted unsecured session
+        // since the session type is unknown.
+        SetLocalSessionId(1);
+        SetPeerSessionId(1);
     }
 
     SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId)
@@ -375,7 +377,7 @@ public:
     const char * GetR2ISessionInfo() const override { return "r2i"; }
 
 private:
-    const char * kTestSecret = "Test secret for key derivation";
+    const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
 };
 
 typedef struct PASESessionSerialized

@@ -18,6 +18,7 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <enum name="IdentifyIdentifyType" type="ENUM8">
+    <cluster code="0x0003"/>
     <item name="None" value="0x00"/>
     <item name="VisibleLight" value="0x01"/>
     <item name="VisibleLED" value="0x02"/>
@@ -27,6 +28,7 @@ limitations under the License.
   </enum>
 
   <enum name="IdentifyEffectIdentifier" type="ENUM8">
+    <cluster code="0x0003"/>
     <item name="Blink" value="0x00"/>
     <item name="Breathe" value="0x01"/>
     <item name="Okay" value="0x02"/>
@@ -36,6 +38,7 @@ limitations under the License.
   </enum>
 
   <enum name="IdentifyEffectVariant" type="ENUM8">
+    <cluster code="0x0003"/>
     <item name="Default" value="0x00"/>
   </enum>
 

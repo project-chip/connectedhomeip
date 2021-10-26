@@ -53,6 +53,7 @@
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::System;
+using namespace chip::System::Clock::Literals;
 
 #define TOOL_NAME "TestInetEndPoint"
 
@@ -87,10 +88,6 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     TCPEndPoint * testTCPEP = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR err = CHIP_NO_ERROR;
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    IPAddress testDestAddr = IPAddress::Any;
-    char testHostName[20]  = "www.nest.com";
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
     // Deinit system layer and network
     ShutdownNetwork();
@@ -109,101 +106,12 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-    err = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
+    err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    err = gInet.ResolveHostAddress(testHostName, 1, &testDestAddr, HandleDNSResolveComplete, nullptr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
     // then init network
     InitSystemLayer();
     InitNetwork();
-}
-
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-// Test Inet ResolveHostAddress functionality
-static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
-{
-    char testHostName1[20] = "www.google.com";
-    char testHostName2[20] = "127.0.0.1";
-    char testHostName3[20] = "";
-    char testHostName4[260];
-    IPAddress testDestAddr[1] = { IPAddress::Any };
-    CHIP_ERROR err;
-    constexpr uint32_t kSleepTimeMilliseconds = 10;
-
-    memset(testHostName4, 'w', sizeof(testHostName4));
-    testHostName4[259] = '\0';
-
-    callbackHandlerCalled = false;
-    err = gInet.ResolveHostAddress(testHostName1, 1, testDestAddr, HandleDNSResolveComplete, &callbackHandlerCalled);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        while (!callbackHandlerCalled)
-        {
-            ServiceNetwork(kSleepTimeMilliseconds);
-        }
-    }
-
-    callbackHandlerCalled = false;
-    err = gInet.ResolveHostAddress(testHostName2, 1, testDestAddr, HandleDNSResolveComplete, &callbackHandlerCalled);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        while (!callbackHandlerCalled)
-        {
-            ServiceNetwork(kSleepTimeMilliseconds);
-        }
-    }
-
-    callbackHandlerCalled = false;
-    err = gInet.ResolveHostAddress(testHostName3, 1, testDestAddr, HandleDNSResolveComplete, &callbackHandlerCalled);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        while (!callbackHandlerCalled)
-        {
-            ServiceNetwork(kSleepTimeMilliseconds);
-        }
-    }
-
-    err = gInet.ResolveHostAddress(testHostName2, 0, testDestAddr, HandleDNSResolveComplete, &callbackHandlerCalled);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
-
-    err = gInet.ResolveHostAddress(testHostName4, 1, testDestAddr, HandleDNSResolveComplete, &callbackHandlerCalled);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_HOST_NAME_TOO_LONG);
-}
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
-// Test Inet ParseHostPortAndInterface
-static void TestParseHost(nlTestSuite * inSuite, void * inContext)
-{
-    char correctHostNames[7][30] = {
-        "10.0.0.1", "10.0.0.1:3000", "www.google.com", "www.google.com:3000", "[fd00:0:1:1::1]:3000", "[fd00:0:1:1::1]:300%wpan0",
-        "%wpan0"
-    };
-    char invalidHostNames[4][30] = { "[fd00::1]5", "[fd00:0:1:1::1:3000", "10.0.0.1:1234567", "10.0.0.1:er31" };
-    const char * host;
-    const char * intf;
-    uint16_t port, hostlen, intflen;
-    CHIP_ERROR err;
-
-    for (char * correctHostName : correctHostNames)
-    {
-        err = ParseHostPortAndInterface(correctHostName, uint16_t(strlen(correctHostName)), host, hostlen, port, intf, intflen);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    }
-    for (char * invalidHostName : invalidHostNames)
-    {
-        err = ParseHostPortAndInterface(invalidHostName, uint16_t(strlen(invalidHostName)), host, hostlen, port, intf, intflen);
-        NL_TEST_ASSERT(inSuite, err == INET_ERROR_INVALID_HOST_NAME);
-    }
 }
 
 static void TestInetError(nlTestSuite * inSuite, void * inContext)
@@ -333,32 +241,32 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     // UdpEndPoint special cases to cover the error branch
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-    err = testUDPEP->Bind(kIPAddressType_Unknown, addr_any, 3000);
+    err = testUDPEP->Bind(IPAddressType::kUnknown, addr_any, 3000);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
-    err = testUDPEP->Bind(kIPAddressType_Unknown, addr, 3000);
+    err = testUDPEP->Bind(IPAddressType::kUnknown, addr, 3000);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 #if INET_CONFIG_ENABLE_IPV4
-    err = testUDPEP->Bind(kIPAddressType_IPv4, addr, 3000);
+    err = testUDPEP->Bind(IPAddressType::kIPv4, addr, 3000);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    err            = testUDPEP->Bind(kIPAddressType_IPv6, addr, 3000, intId);
-    err            = testUDPEP->BindInterface(kIPAddressType_IPv6, intId);
+    err            = testUDPEP->Bind(IPAddressType::kIPv6, addr, 3000, intId);
+    err            = testUDPEP->BindInterface(IPAddressType::kIPv6, intId);
     InterfaceId id = testUDPEP->GetBoundInterface();
     NL_TEST_ASSERT(inSuite, id == intId);
 
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
-    err = testUDPEP->Bind(kIPAddressType_IPv6, addr, 3000, intId);
+    err = testUDPEP->Bind(IPAddressType::kIPv6, addr, 3000, intId);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-    err = testUDPEP->BindInterface(kIPAddressType_IPv6, intId);
+    err = testUDPEP->BindInterface(IPAddressType::kIPv6, intId);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
     testUDPEP->Free();
 
     err = gInet.NewUDPEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 #if INET_CONFIG_ENABLE_IPV4
-    err = testUDPEP->Bind(kIPAddressType_IPv4, addr_v4, 3000, intId);
+    err = testUDPEP->Bind(IPAddressType::kIPv4, addr_v4, 3000, intId);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
     buf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     err = testUDPEP->SendTo(addr_v4, 3000, std::move(buf));
@@ -383,17 +291,17 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = testTCPEP1->GetLocalInfo(nullptr, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
-    err = testTCPEP1->Bind(kIPAddressType_Unknown, addr_any, 3000, true);
+    err = testTCPEP1->Bind(IPAddressType::kUnknown, addr_any, 3000, true);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 #if INET_CONFIG_ENABLE_IPV4
-    err = testTCPEP1->Bind(kIPAddressType_IPv4, addr, 3000, true);
+    err = testTCPEP1->Bind(IPAddressType::kIPv4, addr, 3000, true);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 #endif // INET_CONFIG_ENABLE_IPV4
-    err = testTCPEP1->Bind(kIPAddressType_Unknown, addr, 3000, true);
+    err = testTCPEP1->Bind(IPAddressType::kUnknown, addr, 3000, true);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 
-    err = testTCPEP1->Bind(kIPAddressType_IPv6, addr_any, 3000, true);
-    err = testTCPEP1->Bind(kIPAddressType_IPv6, addr_any, 3000, true);
+    err = testTCPEP1->Bind(IPAddressType::kIPv6, addr_any, 3000, true);
+    err = testTCPEP1->Bind(IPAddressType::kIPv6, addr_any, 3000, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
     err = testTCPEP1->Listen(4);
 #if INET_CONFIG_ENABLE_IPV4
@@ -426,14 +334,14 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     // Verify same aComplete and aAppState args do not exhaust timer pool
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
     {
-        err = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
+        err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
     char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
-        err = gSystemLayer.StartTimer(10, HandleTimer, &numTimersTest[i]);
+        err = gSystemLayer.StartTimer(10_ms32, HandleTimer, &numTimersTest[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
 #endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
@@ -466,10 +374,6 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPre),
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-                                 NL_TEST_DEF("InetEndPoint::ResolveHostAddress", TestResolveHostAddress),
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-                                 NL_TEST_DEF("InetEndPoint::TestParseHost", TestParseHost),
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
                                  NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),

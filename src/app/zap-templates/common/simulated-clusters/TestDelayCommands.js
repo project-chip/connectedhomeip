@@ -26,7 +26,7 @@
 
 const WaitForMs = {
   name : 'WaitForMs',
-  arguments : [ { name : 'ms' } ],
+  arguments : [ { type : 'INT32U', name : 'ms' } ],
   response : { arguments : [] }
 };
 

@@ -28,7 +28,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <ota-provider-common/BdxOtaSender.h>
@@ -55,9 +54,9 @@ constexpr uint16_t kOptionQueryImageBehavior   = 'q';
 constexpr uint16_t kOptionDelayedActionTimeSec = 'd';
 
 // Arbitrary BDX Transfer Params
-constexpr uint32_t kMaxBdxBlockSize = 1024;
-constexpr uint32_t kBdxTimeoutMs    = 5 * 60 * 1000; // OTA Spec mandates >= 5 minutes
-constexpr uint32_t kBdxPollFreqMs   = 500;
+constexpr uint32_t kMaxBdxBlockSize                 = 1024;
+constexpr chip::System::Clock::Timeout kBdxTimeout  = chip::System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
+constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
 OTAProviderExample::queryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
@@ -189,7 +188,7 @@ int main(int argc, char * argv[])
     BitFlags<TransferControlFlags> bdxFlags;
     bdxFlags.Set(TransferControlFlags::kReceiverDrive);
     err = bdxServer.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
-                                       kMaxBdxBlockSize, kBdxTimeoutMs, kBdxPollFreqMs);
+                                       kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "failed to init BDX server: %s", chip::ErrorStr(err));

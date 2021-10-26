@@ -1,9 +1,9 @@
-# CHIP Shell Reference
+# Matter Shell Reference
 
 The `chip-shell` firmware exposes configuration and management APIs via a
-command line interface (CLI). Use the shell CLI to experiment with CHIP
-interactively, which can also be used with additional application code. The CHIP
-functional test scripts use the shell CLI to execute test cases.
+command line interface (CLI). Use the shell CLI to experiment with Matter
+interactively, which can also be used with additional application code. The
+Matter functional test scripts use the shell CLI to execute test cases.
 
 ## Separator and escaping characters
 
@@ -26,7 +26,7 @@ Done
 >
 ```
 
-## CHIP Shell Command List
+## Matter Shell Command List
 
 -   [base64](#base64-decode-b64_string)
 -   [device](README_DEVICE.md)
@@ -38,7 +38,7 @@ Done
 -   [rand](#rand)
 -   [version](#version)
 
-## CHIP Shell Command Details
+## Matter Shell Command Details
 
 ### help
 
@@ -111,7 +111,7 @@ Done
 
 ### version
 
-Output the version of the CHIP stack.
+Output the version of the Matter stack.
 
 ```bash
 > version

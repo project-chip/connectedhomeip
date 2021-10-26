@@ -77,12 +77,12 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
 {
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; ++i)
     {
-        const chip::Mdns::DiscoveredNodeData * dnsSdInfo = commissionableNodeCtrl->GetDiscoveredCommissioner(i);
+        const chip::Dnssd::DiscoveredNodeData * dnsSdInfo = commissionableNodeCtrl->GetDiscoveredCommissioner(i);
         if (dnsSdInfo == nullptr)
         {
             continue;
         }
-        char rotatingId[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
+        char rotatingId[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
         Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissioner %d", i);
@@ -116,7 +116,7 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
         ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
         for (int j = 0; j < dnsSdInfo->numIPs; ++j)
         {
-            char buf[chip::Inet::kMaxIPAddressStringLength];
+            char buf[chip::Inet::IPAddress::kMaxStringLength];
             dnsSdInfo->ipAddress[j].ToString(buf);
             ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", j, buf);
         }

@@ -28,7 +28,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-tizen:latest
+            image: connectedhomeip/chip-build-tizen:0.5.22
             options: --user root
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
@@ -41,4 +41,4 @@ jobs:
                   submodules: true
             - name: Build example Tizen lighting app
               run:
-                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py --platform tizen build"
+                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target-glob 'tizen-*' build"

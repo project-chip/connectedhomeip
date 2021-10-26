@@ -29,10 +29,10 @@
 
 namespace chip {
 
-namespace Mdns {
+namespace Dnssd {
 struct TextEntry;
-struct MdnsService;
-} // namespace Mdns
+struct DnssdService;
+} // namespace Dnssd
 
 namespace DeviceLayer {
 
@@ -60,10 +60,14 @@ class GenericThreadStackManagerImpl_FreeRTOS;
 } // namespace Internal
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
-// Declaration of callback types corresponding to MdnsResolveCallback and MdnsBrowseCallback to avoid circular including.
-using DnsResolveCallback = void (*)(void * context, chip::Mdns::MdnsService * result, CHIP_ERROR error);
-using DnsBrowseCallback  = void (*)(void * context, chip::Mdns::MdnsService * services, size_t servicesSize, CHIP_ERROR error);
+// Declaration of callback types corresponding to DnssdResolveCallback and DnssdBrowseCallback to avoid circular including.
+using DnsResolveCallback = void (*)(void * context, chip::Dnssd::DnssdService * result, CHIP_ERROR error);
+using DnsBrowseCallback  = void (*)(void * context, chip::Dnssd::DnssdService * services, size_t servicesSize, CHIP_ERROR error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+using DnsAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 /**
  * Provides features for initializing and interacting with the Thread stack on
@@ -96,11 +100,14 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
-                             const Span<const char * const> & aSubTypes, const Span<const Mdns::TextEntry> & aTxtEntries,
+                             const Span<const char * const> & aSubTypes, const Span<const Dnssd::TextEntry> & aTxtEntries,
                              uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
-    CHIP_ERROR RemoveAllSrpServices();
+    CHIP_ERROR InvalidateAllSrpServices(); ///< Mark all SRP services as invalid
+    CHIP_ERROR RemoveInvalidSrpServices(); ///< Remove SRP services marked as invalid
     CHIP_ERROR SetupSrpHost(const char * aHostName);
+    CHIP_ERROR ClearSrpHost(const char * aHostName);
+    CHIP_ERROR SetSrpDnsCallbacks(DnsAsyncReturnCallback aInitCallback, DnsAsyncReturnCallback aErrorCallback, void * aContext);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
     CHIP_ERROR DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext);
@@ -109,7 +116,7 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     void ResetThreadNetworkDiagnosticsCounts(void);
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
+    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -247,7 +254,7 @@ inline CHIP_ERROR ThreadStackManager::SetThreadEnabled(bool val)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 inline CHIP_ERROR ThreadStackManager::AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
                                                     const Span<const char * const> & aSubTypes,
-                                                    const Span<const Mdns::TextEntry> & aTxtEntries, uint32_t aLeaseInterval = 0,
+                                                    const Span<const Dnssd::TextEntry> & aTxtEntries, uint32_t aLeaseInterval = 0,
                                                     uint32_t aKeyLeaseInterval = 0)
 {
     return static_cast<ImplClass *>(this)->_AddSrpService(aInstanceName, aName, aPort, aSubTypes, aTxtEntries, aLeaseInterval,
@@ -259,14 +266,30 @@ inline CHIP_ERROR ThreadStackManager::RemoveSrpService(const char * aInstanceNam
     return static_cast<ImplClass *>(this)->_RemoveSrpService(aInstanceName, aName);
 }
 
-inline CHIP_ERROR ThreadStackManager::RemoveAllSrpServices()
+inline CHIP_ERROR ThreadStackManager::InvalidateAllSrpServices()
 {
-    return static_cast<ImplClass *>(this)->_RemoveAllSrpServices();
+    return static_cast<ImplClass *>(this)->_InvalidateAllSrpServices();
+}
+
+inline CHIP_ERROR ThreadStackManager::RemoveInvalidSrpServices()
+{
+    return static_cast<ImplClass *>(this)->_RemoveInvalidSrpServices();
 }
 
 inline CHIP_ERROR ThreadStackManager::SetupSrpHost(const char * aHostName)
 {
     return static_cast<ImplClass *>(this)->_SetupSrpHost(aHostName);
+}
+
+inline CHIP_ERROR ThreadStackManager::ClearSrpHost(const char * aHostName)
+{
+    return static_cast<ImplClass *>(this)->_ClearSrpHost(aHostName);
+}
+
+inline CHIP_ERROR ThreadStackManager::SetSrpDnsCallbacks(DnsAsyncReturnCallback aInitCallback,
+                                                         DnsAsyncReturnCallback aErrorCallback, void * aContext)
+{
+    return static_cast<ImplClass *>(this)->_SetSrpDnsCallbacks(aInitCallback, aErrorCallback, aContext);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
@@ -393,7 +416,7 @@ inline void ThreadStackManager::ResetThreadNetworkDiagnosticsCounts()
  *         All other errors should be treated as a read error and reported as such.
  */
 inline CHIP_ERROR ThreadStackManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                 const app::AttributeValueEncoder & encoder)
+                                                                                 app::AttributeValueEncoder & encoder)
 {
     return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }

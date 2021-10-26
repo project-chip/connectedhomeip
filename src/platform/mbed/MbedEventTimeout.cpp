@@ -13,5 +13,10 @@ void MbedEventTimeout::AttachTimeout(Callback<void()> func, std::chrono::microse
     mTimeout.attach(func, t);
 }
 
+void MbedEventTimeout::DetachTimeout()
+{
+    mTimeout.detach();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

@@ -32,74 +32,52 @@ namespace Controller {
 
 PythonInteractionModelDelegate gPythonInteractionModelDelegate;
 
-CHIP_ERROR PythonInteractionModelDelegate::CommandResponseStatus(const CommandSender * apCommandSender,
-                                                                 const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                                                 const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                                                                 chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
-                                                                 chip::CommandId aCommandId, uint8_t aCommandIndex)
+void PythonInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
+                                                const app::StatusIB & aStatus, TLV::TLVReader * aData)
 {
-    CommandStatus status{ aProtocolId, aProtocolCode, aEndpointId, aClusterId, aCommandId, aCommandIndex };
+    CommandStatus status{
+        aStatus.mStatus,
+        aStatus.mClusterStatus.HasValue() ? aStatus.mClusterStatus.Value() : chip::python::kUndefinedClusterStatus,
+        aPath.mEndpointId,
+        aPath.mClusterId,
+        aPath.mCommandId,
+        1
+    }; // This indicates the index of the command if multiple command/status payloads are present in the
+       // message. For now, we don't support this in the IM layer, so just always set this to 1.
     if (commandResponseStatusFunct != nullptr)
     {
         commandResponseStatusFunct(reinterpret_cast<uint64_t>(apCommandSender), &status, sizeof(status));
     }
-    // For OpCred callbacks.
-    DeviceControllerInteractionModelDelegate::CommandResponseStatus(apCommandSender, aGeneralCode, aProtocolId, aProtocolCode,
-                                                                    aEndpointId, aClusterId, aCommandId, aCommandIndex);
-    return CHIP_NO_ERROR;
-}
 
-CHIP_ERROR PythonInteractionModelDelegate::CommandResponseProtocolError(const CommandSender * apCommandSender,
-                                                                        uint8_t aCommandIndex)
-{
-    if (commandResponseProtocolErrorFunct != nullptr)
+    DeviceControllerInteractionModelDelegate::OnResponse(apCommandSender, aPath, aStatus, aData);
+
+    if (commandResponseErrorFunct != nullptr)
     {
-        commandResponseProtocolErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), aCommandIndex);
+        commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), CHIP_NO_ERROR.AsInteger());
     }
-    DeviceControllerInteractionModelDelegate::CommandResponseProtocolError(apCommandSender, aCommandIndex);
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PythonInteractionModelDelegate::CommandResponseError(const CommandSender * apCommandSender, CHIP_ERROR aError)
+void PythonInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender, const app::StatusIB & aStatus,
+                                             CHIP_ERROR aError)
 {
+    CommandStatus status{ aStatus.mStatus,
+                          aStatus.mClusterStatus.HasValue() ? aStatus.mClusterStatus.Value()
+                                                            : chip::python::kUndefinedClusterStatus,
+                          0,
+                          0,
+                          0,
+                          1 };
+
+    if (commandResponseStatusFunct != nullptr)
+    {
+        commandResponseStatusFunct(reinterpret_cast<uint64_t>(apCommandSender), &status, sizeof(status));
+    }
+
     if (commandResponseErrorFunct != nullptr)
     {
         commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), aError.AsInteger());
     }
-    if (aError != CHIP_NO_ERROR)
-    {
-        DeviceControllerInteractionModelDelegate::CommandResponseError(apCommandSender, aError);
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PythonInteractionModelDelegate::CommandResponseProcessed(const app::CommandSender * apCommandSender)
-{
-    this->CommandResponseError(apCommandSender, CHIP_NO_ERROR);
-    DeviceControllerInteractionModelDelegate::CommandResponseProcessed(apCommandSender);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PythonInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                                               const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                                               const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                                                               app::AttributePathParams & aAttributePathParams,
-                                                               uint8_t aCommandIndex)
-{
-    if (onWriteResponseFunct != nullptr)
-    {
-        AttributeWriteStatus status{ apWriteClient->GetSourceNodeId(),
-                                     apWriteClient->GetAppIdentifier(),
-                                     aProtocolId,
-                                     aProtocolCode,
-                                     aAttributePathParams.mEndpointId,
-                                     aAttributePathParams.mClusterId,
-                                     aAttributePathParams.mFieldId };
-        onWriteResponseFunct(&status, sizeof(status));
-    }
-    DeviceControllerInteractionModelDelegate::WriteResponseStatus(apWriteClient, aGeneralCode, aProtocolId, aProtocolCode,
-                                                                  aAttributePathParams, aCommandIndex);
-    return CHIP_NO_ERROR;
+    DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aStatus, aError);
 }
 
 void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
@@ -182,8 +160,8 @@ chip::ChipError::StorageType pychip_InteractionModel_GetCommandSenderHandle(uint
 {
     chip::app::CommandSender * commandSenderObj = nullptr;
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&commandSenderObj);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+    commandSenderObj = new chip::app::CommandSender(nullptr, nullptr);
+    VerifyOrReturnError(commandSenderObj != nullptr, (CHIP_ERROR_NO_MEMORY).AsInteger());
     *commandSender = reinterpret_cast<uint64_t>(commandSenderObj);
     return CHIP_NO_ERROR.AsInteger();
 }

@@ -76,6 +76,7 @@ static void TestCopyString(nlTestSuite * inSuite, void * inContext)
 {
     constexpr char testWord[] = "testytest";
     ByteSpan testWordSpan     = ByteSpan(reinterpret_cast<const uint8_t *>(testWord), sizeof(testWord) - 1);
+    CharSpan testWordSpan2(testWord, sizeof(testWord) - 1);
     TestBuffers<sizeof(testWord)> testBuffers;
 
     // CopyString with explicit size
@@ -108,6 +109,22 @@ static void TestCopyString(nlTestSuite * inSuite, void * inContext)
     CopyString(testBuffers.tooSmallBuf, testWordSpan);
     CopyString(testBuffers.wayTooSmallBuf, testWordSpan);
     CopyString(testBuffers.tooBigBuf, testWordSpan);
+    testBuffers.CheckCorrectness(inSuite, testWord);
+
+    // CopyString with explicit size from CharSpan
+    testBuffers.Reset();
+    CopyString(testBuffers.correctSizeBuf, sizeof(testBuffers.correctSizeBuf), testWordSpan2);
+    CopyString(testBuffers.tooSmallBuf, sizeof(testBuffers.tooSmallBuf), testWordSpan2);
+    CopyString(testBuffers.wayTooSmallBuf, sizeof(testBuffers.wayTooSmallBuf), testWordSpan2);
+    CopyString(testBuffers.tooBigBuf, sizeof(testBuffers.tooBigBuf), testWordSpan2);
+    testBuffers.CheckCorrectness(inSuite, testWord);
+
+    // CopyString with array size from CharSpan
+    testBuffers.Reset();
+    CopyString(testBuffers.correctSizeBuf, testWordSpan2);
+    CopyString(testBuffers.tooSmallBuf, testWordSpan2);
+    CopyString(testBuffers.wayTooSmallBuf, testWordSpan2);
+    CopyString(testBuffers.tooBigBuf, testWordSpan2);
     testBuffers.CheckCorrectness(inSuite, testWord);
 }
 

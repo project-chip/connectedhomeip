@@ -88,7 +88,7 @@ public:
 
     void _ResetThreadNetworkDiagnosticsCounts();
 
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     ~ThreadStackManagerImpl() = default;
 

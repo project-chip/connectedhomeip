@@ -104,7 +104,6 @@ public:
     static CHIP_ERROR Init(void);
 
     // Configuration methods used by the GenericConfigurationManagerImpl<> template.
-    static uint16_t GetSettingsMaxValueLength(uint16_t Key);
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);

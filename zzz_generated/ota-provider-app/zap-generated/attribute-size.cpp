@@ -21,6 +21,7 @@
 #include <app/util/af.h>
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -78,6 +79,30 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x0030: // General Commissioning Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0001: // BasicCommissioningInfoList
+        {
+            entryLength = 4;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _BasicCommissioningInfoType
+            _BasicCommissioningInfoType * entry = reinterpret_cast<_BasicCommissioningInfoType *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->FailSafeExpiryLengthMs,
+                           write ? (uint8_t *) &entry->FailSafeExpiryLengthMs : src, write, &entryOffset,
+                           sizeof(entry->FailSafeExpiryLengthMs)); // INT32U
+            break;
+        }
+        }
+        break;
+    }
     case 0x003E: // Operational Credentials Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -110,8 +135,9 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             copyListMember(write ? dest : (uint8_t *) &entry->FabricId, write ? (uint8_t *) &entry->FabricId : src, write,
                            &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
             copyListMember(write ? dest : (uint8_t *) &entry->NodeId, write ? (uint8_t *) &entry->NodeId : src, write, &entryOffset,
-                           sizeof(entry->NodeId)); // NODE_ID
-            ByteSpan * LabelSpan = &entry->Label;  // OCTET_STRING
+                           sizeof(entry->NodeId));                                                       // NODE_ID
+            ByteSpan LabelSpanStorage(Uint8::from_const_char(entry->Label.data()), entry->Label.size()); // CHAR_STRING
+            ByteSpan * LabelSpan = &LabelSpanStorage;
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, LabelSpan) : ReadByteSpan(src + entryOffset, 34, LabelSpan)))
             {
@@ -170,6 +196,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x0030: // General Commissioning Cluster
+        switch (attributeId)
+        {
+        case 0x0001: // BasicCommissioningInfoList
+            // Struct _BasicCommissioningInfoType
+            entryLength = 4;
+            break;
+        }
+        break;
     case 0x003E: // Operational Credentials Cluster
         switch (attributeId)
         {

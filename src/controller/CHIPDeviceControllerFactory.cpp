@@ -113,10 +113,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.transportMgr = chip::Platform::New<DeviceTransportMgr>();
 
     ReturnErrorOnFailure(stateParams.transportMgr->Init(
-        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
+        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::IPAddressType::kIPv6).SetListenPort(mListenPort)
 #if INET_CONFIG_ENABLE_IPV4
             ,
-        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(mListenPort)
+        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(mListenPort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
             ,
@@ -151,7 +151,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
 void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     controllerParams.deviceAddressUpdateDelegate = params.deviceAddressUpdateDelegate;
 #endif
     controllerParams.operationalCredentialsDelegate = params.operationalCredentialsDelegate;
@@ -235,11 +235,10 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
 #endif
 
-    // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
-    // if (mExchangeMgr != nullptr)
-    // {
-    //     mExchangeMgr->Shutdown();
-    // }
+    if (mExchangeMgr != nullptr)
+    {
+        mExchangeMgr->Shutdown();
+    }
     if (mSessionMgr != nullptr)
     {
         mSessionMgr->Shutdown();

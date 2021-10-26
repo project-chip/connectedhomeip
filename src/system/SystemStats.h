@@ -37,9 +37,11 @@
 #include <lib/support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/init.h>
 #include <lwip/mem.h>
 #include <lwip/opt.h>
 #include <lwip/pbuf.h>
+#include <lwip/stats.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include <stdint.h>
@@ -63,9 +65,6 @@ enum
 #endif
 #if INET_CONFIG_NUM_UDP_ENDPOINTS
     kInetLayer_NumUDPEps,
-#endif
-#if INET_CONFIG_NUM_DNS_RESOLVERS
-    kInetLayer_NumDNSResolvers,
 #endif
     kExchangeMgr_NumContexts,
     kExchangeMgr_NumUMHandlers,

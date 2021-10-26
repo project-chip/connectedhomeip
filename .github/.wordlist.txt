@@ -28,11 +28,16 @@ AE
 aef
 algs
 alloc
+ameba
+Ameba
+amebad
+amebaiot
 AnnounceOTAProvider
 APIs
 apk
 AppConfig
 ApplicationBasic
+ApplicationIdentifier
 ApplicationLauncher
 approver
 appspot
@@ -43,13 +48,16 @@ args
 argv
 armeabi
 armv
+asdk
 ASYNC
 att
 attId
+attributeValue
 attrListName
 attrMask
 attSizeBytes
 attType
+ATW
 AudioOutput
 auth
 autoconnect
@@ -123,6 +131,7 @@ cgroup
 changeset
 characterised
 CharString
+checkmark
 ChipBLEMgr
 CHIPCirqueTest
 CHIPCryptoPALHsm
@@ -136,6 +145,7 @@ ChipImInitiator
 ChipImResponder
 ChipLight
 ChipMessageLayer
+CHIPTest
 CHIPTool
 chmod
 chrpath
@@ -156,6 +166,7 @@ clusterListName
 ClusterRevision
 ClusterTestGeneration
 cmake
+CMD
 CMSIS
 CMVH
 cn
@@ -197,6 +208,7 @@ cpuapp
 cpython
 crypto
 cryptographic
+CSA
 csu
 csv
 ctl
@@ -249,6 +261,7 @@ DevKitM
 df
 dfu
 DHCP
+DHCPC
 DHCPv
 dhrishi
 dialout
@@ -264,6 +277,8 @@ DISTRO
 Distutils
 DK
 DL
+DM
+DMG
 DNS
 Dnsmasq
 dnsmasqd
@@ -310,6 +325,7 @@ EndpointId
 endpointName
 eno
 entrypoint
+enum
 env
 esd
 ESPPORT
@@ -430,6 +446,7 @@ Impl
 ImplClass
 implementers
 imx
+imxlinux
 indexhtml
 Inet
 InetLayer
@@ -437,8 +454,8 @@ Infineon
 ini
 init
 inlined
-instantiation
 installDebug
+instantiation
 integrations
 IntelliSense
 InteractionModelVersion
@@ -532,7 +549,10 @@ matterBuildSrcDir
 matterc
 matterd
 MatterLock
+matterSdkSourceBuild
+matterUTestLib
 MaxInterval
+MaxIntervalCeilingSeconds
 MaxRtrAdvInterval
 mbedTLS
 mcu
@@ -562,6 +582,7 @@ MicroSD
 middleware
 Minicom
 MinInterval
+MinIntervalFloorSeconds
 MinRtrAdvInterval
 mkdir
 mlan
@@ -648,6 +669,7 @@ PacketBuffer
 PAI
 PairDevice
 PAKE
+pankore
 param
 params
 PartNumber
@@ -668,6 +690,7 @@ PID
 Pigweed
 PinCode
 pkgconfig
+plaintext
 PlatformManager
 PlatformManagerImpl
 plt
@@ -756,6 +779,7 @@ RPi
 rsn
 RSSI
 rsync
+RTL
 rtld
 RTOS
 RTT
@@ -773,8 +797,8 @@ ScriptBinding
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -786,6 +810,7 @@ SERIALDEVICE
 SerialNumber
 ServiceId
 SetDns
+SetpointRaiseLower
 SetUpPINCode
 SetupQRCode
 sexualized
@@ -828,6 +853,8 @@ subdirectory
 submodule
 submodules
 subprocess
+SubscribeResponse
+SubscriptionId
 sudo
 svg
 SVR
@@ -850,6 +877,7 @@ TCP
 teardown
 Telink
 TemperatureMeasurement
+testability
 TestArray
 TestCluster
 TestEmptyString
@@ -896,8 +924,10 @@ TvChannel
 txt
 uart
 UART
+udhcpc
 UDP
 UDPEndPoint
+udpPort
 ug
 ui
 uint
@@ -959,12 +989,14 @@ wrover
 WS
 WSL
 WSTK
+xa
 xab
 xaver
 xbef
 xcd
 Xcode
 xd
+xdeadbeefcafe
 xds
 xdsdfu
 xef
@@ -991,6 +1023,7 @@ zaptool
 ZCL
 zclconfigure
 zclread
+zclsubscribe
 zclwrite
 ZephyrConfig
 zephyrproject

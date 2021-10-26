@@ -48,14 +48,8 @@ static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 constexpr char kFabricTableKeyPrefix[] = "Fabric";
 constexpr char kFabricTableCountKey[]  = "NumFabrics";
 
-struct AccessControlList
-{
-    uint32_t placeholder;
-};
-
 /**
  * Defines state of a pairing established by a fabric.
- * ACL data can be mutated throughout the lifetime of the fabric pairing.
  * Node ID is only settable using the device operational credentials.
  *
  * Information contained within the state:
@@ -64,7 +58,6 @@ struct AccessControlList
  *   - Vendor Id
  *   - Fabric Id
  *   - Device operational credentials
- *   - Access control list
  */
 class DLL_EXPORT FabricInfo
 {
@@ -75,11 +68,10 @@ public:
         mFabric = kUndefinedFabricIndex;
     }
 
-    // Returns a pointer to a null terminated char array
-    const uint8_t * GetFabricLabel() const { return Uint8::from_const_char(mFabricLabel); };
+    // Returns a span into our internal storage.
+    CharSpan GetFabricLabel() const { return CharSpan(mFabricLabel, strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes)); }
 
-    // Expects a pointer to a null terminated char array
-    CHIP_ERROR SetFabricLabel(const uint8_t * fabricLabel);
+    CHIP_ERROR SetFabricLabel(const CharSpan & fabricLabel);
 
     ~FabricInfo()
     {
@@ -120,10 +112,6 @@ public:
     CHIP_ERROR SetICACert(const chip::ByteSpan & cert) { return SetCert(mICACert, cert); }
     CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert) { return SetCert(mNOCCert, cert); }
 
-    const AccessControlList & GetACL() const { return mACL; }
-    AccessControlList & GetACL() { return mACL; }
-    void SetACL(const AccessControlList & acl) { mACL = acl; }
-
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
 
     CHIP_ERROR GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
@@ -135,7 +123,7 @@ public:
     // TODO - Refactor storing and loading of fabric info from persistent storage.
     //        The op cert array doesn't need to be in RAM except when it's being
     //        transmitted to peer node during CASE session setup.
-    CHIP_ERROR GetRootCert(ByteSpan & cert)
+    CHIP_ERROR GetRootCert(ByteSpan & cert) const
     {
         ReturnErrorCodeIf(mRootCert.empty(), CHIP_ERROR_INCORRECT_STATE);
         cert = mRootCert;
@@ -204,8 +192,6 @@ private:
     FabricIndex mFabric                                 = kUndefinedFabricIndex;
     uint16_t mVendorId                                  = kUndefinedVendorId;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
-
-    AccessControlList mACL;
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
     Crypto::P256KeypairHSM * mOperationalKey = nullptr;

@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 
@@ -33,6 +34,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_BASIC_CLUSTER_ID:
         emberAfBasicClusterInitCallback(endpoint);
+        break;
+    case ZCL_DESCRIPTOR_CLUSTER_ID:
+        emberAfDescriptorClusterInitCallback(endpoint);
         break;
     case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
         emberAfDiagnosticLogsClusterInitCallback(endpoint);
@@ -76,6 +80,11 @@ void __attribute__((weak)) emberAfAdministratorCommissioningClusterInitCallback(
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfDescriptorClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -251,126 +260,6 @@ bool __attribute__((weak)) emberAfDefaultResponseCallback(ClusterId clusterId, C
     return false;
 }
 
-/** @brief Configure Reporting Response
- *
- * This function is called by the application framework when a Configure
- * Reporting Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute status records.  Ver.:
- * always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool __attribute__((weak)) emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
-}
-
-/** @brief Read Reporting Configuration Response
- *
- * This function is called by the application framework when a Read Reporting
- * Configuration Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute reporting configuration
- * records.  Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool __attribute__((weak)) emberAfReadReportingConfigurationResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
-}
-
-/** @brief Discover Attributes Response
- *
- * This function is called by the application framework when a Discover
- * Attributes Response or Discover Attributes Extended Response command is
- * received from an external device.  The Discover Attributes Response command
- * contains a bool indicating if discovery is complete and a list of zero or
- * more attribute identifier/type records. The final argument indicates whether
- * the response is in the extended format or not.  The application should return
- * true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param discoveryComplete Indicates whether there are more attributes to be
- * discovered.  true if there are no more attributes to be discovered.  Ver.:
- * always
- * @param buffer Buffer containing the list of attribute identifier/type
- * records.  Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- * @param extended Indicates whether the response is in the extended format or
- * not.  Ver.: always
- */
-bool __attribute__((weak)) emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discoveryComplete, uint8_t * buffer,
-                                                                     uint16_t bufLen, bool extended)
-{
-    return false;
-}
-
-/** @brief Discover Commands Generated Response
- *
- * This function is called by the framework when Discover Commands Generated
- * Response is received.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param manufacturerCode Manufacturer code  Ver.: always
- * @param discoveryComplete Indicates whether there are more commands to be
- * discovered.  Ver.: always
- * @param commandIds Buffer containing the list of command identifiers.  Ver.:
- * always
- * @param commandIdCount The length of bytes of the list, whish is the same as
- * the number of identifiers.  Ver.: always
- */
-bool __attribute__((weak))
-emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
-                                                 CommandId * commandIds, uint16_t commandIdCount)
-{
-    return false;
-}
-
-/** @brief Discover Commands Received Response
- *
- * This function is called by the framework when Discover Commands Received
- * Response is received.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param manufacturerCode Manufacturer code  Ver.: always
- * @param discoveryComplete Indicates whether there are more commands to be
- * discovered.  Ver.: always
- * @param commandIds Buffer containing the list of command identifiers.  Ver.:
- * always
- * @param commandIdCount The length of bytes of the list, whish is the same as
- * the number of identifiers.  Ver.: always
- */
-bool __attribute__((weak))
-emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
-                                                CommandId * commandIds, uint16_t commandIdCount)
-{
-    return false;
-}
-
-/** @brief Pre Command Received
- *
- * This callback is the second in the Application Framework's message processing
- * chain. At this point in the processing of incoming over-the-air messages, the
- * application has determined that the incoming message is a ZCL command. It
- * parses enough of the message to populate an EmberAfClusterCommand struct. The
- * Application Framework defines this struct value in a local scope to the
- * command processing but also makes it available through a global pointer
- * called emberAfCurrentCommand, in app/framework/util/util.c. When command
- * processing is complete, this pointer is cleared.
- *
- * @param cmd   Ver.: always
- */
-bool __attribute__((weak)) emberAfPreCommandReceivedCallback(EmberAfClusterCommand * cmd)
-{
-    return false;
-}
-
 /** @brief Pre Message Send
  *
  * This function is called by the framework when it is about to pass a message
@@ -418,50 +307,6 @@ bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestinati
 {
     return false;
 }
-
-/** @brief Pre Attribute Change
- *
- * This function is called by the application framework before it changes an
- * attribute value.  The value passed into this callback is the value to which
- * the attribute is to be set by the framework.  The application should return
- * ::EMBER_ZCL_STATUS_SUCCESS to permit the change or any other ::EmberAfStatus
- * to reject it.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param size   Ver.: always
- * @param value   Ver.: always
- */
-EmberAfStatus __attribute__((weak))
-emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                  uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
-{
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
-/** @brief Post Attribute Change
- *
- * This function is called by the application framework after it changes an
- * attribute value. The value passed into this callback is the value to which
- * the attribute was set by the framework.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param size   Ver.: always
- * @param value   Ver.: always
- */
-void __attribute__((weak))
-emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                   uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
-{}
 
 /** @brief External Attribute Read
  *
@@ -561,22 +406,6 @@ emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, 
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-/** @brief Report Attributes
- *
- * This function is called by the application framework when a Report Attributes
- * command is received from an external device.  The application should return
- * true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this command.  Ver.: always
- * @param buffer Buffer containing the list of attribute report records.  Ver.:
- * always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool __attribute__((weak)) emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
-}
-
 /** @brief Get Current Time
  *
  * This callback is called when device attempts to get current time from the
@@ -648,3 +477,40 @@ bool __attribute__((weak)) emberAfStartMoveCallback()
 {
     return false;
 }
+
+/** @brief Pre Attribute Change
+ *
+ * This function is called by the application framework before it changes an
+ * attribute value.  The value passed into this callback is the value to which
+ * the attribute is to be set by the framework.  The application should return
+ * chip::Protocols::InteractionModel::Status::Success to permit the change or
+ * any other code to reject it.
+ *
+ * @param attributePath
+ * @param mask
+ * @param type
+ * @param size
+ * @param value
+ */
+chip::Protocols::InteractionModel::Status __attribute__((weak))
+MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
+                                 uint8_t * value)
+{
+    return chip::Protocols::InteractionModel::Status::Success;
+}
+
+/** @brief Post Attribute Change
+ *
+ * This function is called by the application framework after it changes an
+ * attribute value. The value passed into this callback is the value to which
+ * the attribute was set by the framework.
+ *
+ * @param attributePath
+ * @param mask
+ * @param type
+ * @param size
+ * @param value
+ */
+void __attribute__((weak)) MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask,
+                                                             uint8_t type, uint16_t size, uint8_t * value)
+{}

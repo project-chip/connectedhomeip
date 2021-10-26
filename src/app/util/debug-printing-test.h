@@ -155,8 +155,6 @@
 #define EMBER_AF_PRINT_APP 0x0D80
 #define EMBER_AF_PRINT_SECURITY 0x0E01
 #define EMBER_AF_PRINT_ATTRIBUTES 0x0E02
-#define EMBER_AF_PRINT_REPORTING 0x0E04
-#define EMBER_AF_PRINT_SERVICE_DISCOVERY 0x0E08
 #define EMBER_AF_PRINT_REGISTRATION 0x0E10
 #define EMBER_AF_PRINT_ZDO 0x0E20
 #define EMBER_AF_PRINT_CUSTOM1 0x0E40
@@ -195,8 +193,8 @@
             "Appliance Identification", "Meter Identification", "Appliance Events and Alert", "Appliance Statistics",              \
             "Electrical Measurement", "Diagnostics", "ZLL Commissioning", "Sample Mfg Specific Cluster",                           \
             "Sample Mfg Specific Cluster 2", "Configuration Cluster", "MFGLIB Cluster", "SL Works With All Hubs", "Core", "Debug", \
-            "Application", "Security", "Attributes", "Reporting", "Service discovery", "Registration",                             \
-            "ZDO (ZigBee Device Object)", "Custom messages (1)", "Custom messages (2)", "Custom messages (3)"                      \
+            "Application", "Security", "Attributes", "Service discovery", "Registration", "ZDO (ZigBee Device Object)",            \
+            "Custom messages (1)", "Custom messages (2)", "Custom messages (3)"                                                    \
     }
 
 #define EMBER_AF_PRINT_NAME_NUMBER 121

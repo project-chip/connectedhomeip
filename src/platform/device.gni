@@ -16,7 +16,8 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/ble/ble.gni")
 
 declare_args() {
-  # Device platform layer: cc13x2_26x2, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w, qpg, tizen, none.
+  # Device platform layer: cc13x2_26x2, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w0, qpg, tizen, none.
+
   chip_device_platform = "auto"
   chip_platform_target = ""
 
@@ -44,13 +45,13 @@ declare_args() {
   # Enable openthread support.
   chip_enable_openthread =
       chip_device_platform == "linux" || chip_device_platform == "qpg" ||
-      chip_device_platform == "cc13x2_26x2" || chip_device_platform == "k32w"
+      chip_device_platform == "cc13x2_26x2" || chip_device_platform == "k32w0"
 
   # Enable wifi support.
   chip_enable_wifi =
       chip_device_platform == "linux" || chip_device_platform == "esp32" ||
       chip_device_platform == "mbed" || chip_device_platform == "tizen" ||
-      chip_device_platform == "android"
+      chip_device_platform == "android" || chip_device_platform == "ameba"
 
   # Enable ble support.
   if (chip_device_platform == "fake") {
@@ -96,8 +97,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "nrfconnect"
 } else if (chip_device_platform == "qpg") {
   _chip_device_layer = "qpg"
-} else if (chip_device_platform == "k32w") {
-  _chip_device_layer = "K32W"
+} else if (chip_device_platform == "k32w0") {
+  _chip_device_layer = "nxp/k32w/k32w0"
 } else if (chip_device_platform == "telink") {
   _chip_device_layer = "telink"
 } else if (chip_device_platform == "mbed") {
@@ -106,6 +107,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "P6"
 } else if (chip_device_platform == "android") {
   _chip_device_layer = "android"
+} else if (chip_device_platform == "ameba") {
+  _chip_device_layer = "Ameba"
 }
 
 if (chip_device_platform != "external") {
@@ -145,7 +148,8 @@ assert(
         chip_device_platform == "esp32" || chip_device_platform == "external" ||
         chip_device_platform == "linux" || chip_device_platform == "tizen" ||
         chip_device_platform == "nrfconnect" ||
-        chip_device_platform == "k32w" || chip_device_platform == "qpg" ||
+        chip_device_platform == "k32w0" || chip_device_platform == "qpg" ||
         chip_device_platform == "telink" || chip_device_platform == "mbed" ||
-        chip_device_platform == "p6" || chip_device_platform == "android",
+        chip_device_platform == "p6" || chip_device_platform == "android" ||
+        chip_device_platform == "ameba",
     "Please select a valid value for chip_device_platform")

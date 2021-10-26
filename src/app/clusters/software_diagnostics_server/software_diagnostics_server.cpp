@@ -16,11 +16,12 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
-#include <app/MessageDef/AttributeDataElement.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
@@ -29,6 +30,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::SoftwareDiagnostics;
 using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
 using chip::DeviceLayer::PlatformManager;
 
@@ -40,24 +42,23 @@ public:
     // Register for the SoftwareDiagnostics cluster on all endpoints.
     SoftwareDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), const AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), AttributeValueEncoder & aEncoder);
 };
 
 SoftwareDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead)
+CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aClusterInfo.mClusterId != SoftwareDiagnostics::Id)
+    if (aPath.mClusterId != SoftwareDiagnostics::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    *aDataRead = true;
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case CurrentHeapFree::Id: {
         return ReadIfSupported(&PlatformManager::GetCurrentHeapFree, aEncoder);
@@ -69,7 +70,6 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const 
         return ReadIfSupported(&PlatformManager::GetCurrentHeapHighWatermark, aEncoder);
     }
     default: {
-        *aDataRead = false;
         break;
     }
     }
@@ -77,7 +77,7 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const 
 }
 
 CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &),
-                                                         const AttributeValueEncoder & aEncoder)
+                                                         AttributeValueEncoder & aEncoder)
 {
     uint64_t data;
     CHIP_ERROR err = (DeviceLayer::PlatformMgr().*getter)(data);
@@ -94,8 +94,12 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMan
 }
 } // anonymous namespace
 
-bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath,
+                                                              const Commands::ResetWatermarks::DecodableType & commandData)
 {
+    EndpointId endpoint = commandPath.mEndpointId;
+
     uint64_t currentHeapUsed;
 
     EmberAfStatus status = SoftwareDiagnostics::Attributes::CurrentHeapUsed::Get(endpoint, &currentHeapUsed);

@@ -165,9 +165,13 @@ public:
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
     void ResetThreadNetworkDiagnosticsCounts();
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
+    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     // Ethernet network diagnostics methods
+    CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
+    CHIP_ERROR GetEthFullDuplex(bool & fullDuplex);
+    CHIP_ERROR GetEthCarrierDetect(bool & carrierDetect);
+    CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset);
     CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount);
     CHIP_ERROR GetEthPacketTxCount(uint64_t & packetTxCount);
     CHIP_ERROR GetEthTxErrCount(uint64_t & txErrCount);
@@ -386,6 +390,26 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
 }
 
+inline CHIP_ERROR ConnectivityManager::GetEthPHYRate(uint8_t & pHYRate)
+{
+    return static_cast<ImplClass *>(this)->_GetEthPHYRate(pHYRate);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetEthFullDuplex(bool & fullDuplex)
+{
+    return static_cast<ImplClass *>(this)->_GetEthFullDuplex(fullDuplex);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetEthCarrierDetect(bool & carrierDetect)
+{
+    return static_cast<ImplClass *>(this)->_GetEthCarrierDetect(carrierDetect);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetEthTimeSinceReset(uint64_t & timeSinceReset)
+{
+    return static_cast<ImplClass *>(this)->_GetEthTimeSinceReset(timeSinceReset);
+}
+
 inline CHIP_ERROR ConnectivityManager::GetEthPacketRxCount(uint64_t & packetRxCount)
 {
     return static_cast<ImplClass *>(this)->_GetEthPacketRxCount(packetRxCount);
@@ -555,7 +579,7 @@ inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
  *         All other errors should be treated as a read error and reported as such.
  */
 inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                  const app::AttributeValueEncoder & encoder)
+                                                                                  app::AttributeValueEncoder & encoder)
 {
     return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }

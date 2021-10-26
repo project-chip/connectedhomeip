@@ -22,11 +22,14 @@
  *
  */
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <transport/CryptoContext.h>
 #include <transport/raw/MessageHeader.h>
+
+#include <lib/support/BytesToHex.h>
 
 #include <string.h>
 
@@ -34,7 +37,7 @@ namespace chip {
 
 namespace {
 
-constexpr size_t kAESCCMIVLen = 12;
+constexpr size_t kAESCCMIVLen = 13;
 constexpr size_t kMaxAADLen   = 128;
 
 /* Session Establish Key Info */
@@ -55,6 +58,14 @@ using HKDF_sha_crypto = HKDF_sha;
 
 CryptoContext::CryptoContext() : mKeyAvailable(false) {}
 
+CryptoContext::~CryptoContext()
+{
+    for (auto & key : mKeys)
+    {
+        ClearSecretData(key, sizeof(CryptoKey));
+    }
+}
+
 CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
 {
     HKDF_sha_crypto mHKDF;
@@ -72,8 +83,33 @@ CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan
         infoLen = sizeof(RSEKeysInfo);
     }
 
+#if CHIP_CONFIG_SECURITY_TEST_MODE
+
+    // If enabled, override the generated session key with a known key pair
+    // to allow man-in-the-middle session key recovery for testing purposes.
+
+#define TEST_SECRET_SIZE 32
+    constexpr uint8_t kTestSharedSecret[TEST_SECRET_SIZE] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
+    static_assert(sizeof(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE) == TEST_SECRET_SIZE,
+                  "CHIP_CONFIG_TEST_SHARED_SECRET_VALUE must be 32 bytes");
+    const ByteSpan & testSalt = ByteSpan(nullptr, 0);
+    (void) info;
+    (void) infoLen;
+
+#pragma message                                                                                                                    \
+    "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  Node can only communicate with other nodes built with this flag set."
+    ChipLogError(SecureChannel,
+                 "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  "
+                 "Node can only communicate with other nodes built with this flag set.");
+
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(kTestSharedSecret, TEST_SECRET_SIZE, testSalt.data(), testSalt.size(), SEKeysInfo,
+                                           sizeof(SEKeysInfo), &mKeys[0][0], sizeof(mKeys)));
+#else
+
     ReturnErrorOnFailure(
         mHKDF.HKDF_SHA256(secret.data(), secret.size(), salt.data(), salt.size(), info, infoLen, &mKeys[0][0], sizeof(mKeys)));
+
+#endif
 
     mKeyAvailable = true;
     mSessionRole  = role;
@@ -81,8 +117,9 @@ CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CryptoContext::Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
-                               const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
+CHIP_ERROR CryptoContext::InitFromKeyPair(const Crypto::P256Keypair & local_keypair,
+                                          const Crypto::P256PublicKey & remote_public_key, const ByteSpan & salt,
+                                          SessionInfoType infoType, SessionRole role)
 {
 
     VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
@@ -100,8 +137,9 @@ CHIP_ERROR CryptoContext::GetIV(const PacketHeader & header, uint8_t * iv, size_
 
     Encoding::LittleEndian::BufferWriter bbuf(iv, len);
 
-    bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
+    bbuf.Put8(header.GetSecurityFlags());
     bbuf.Put32(header.GetMessageCounter());
+    bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
 
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
@@ -126,9 +164,8 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
                                   MessageAuthenticationCode & mac) const
 {
 
-    constexpr Header::SessionType sessionType = Header::SessionType::kAESCCMTagLen16;
+    const size_t taglen = header.MICTagLength();
 
-    const size_t taglen = MessageAuthenticationCode::TagLenForSessionType(sessionType);
     VerifyOrDie(taglen <= kMaxTagLen);
 
     VerifyOrReturnError(mKeyAvailable, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
@@ -154,10 +191,10 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
         usage = kI2RKey;
     }
 
-    ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], kAES_CCM128_Key_Length, IV, sizeof(IV),
-                                         output, tag, taglen));
+    ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], Crypto::kAES_CCM128_Key_Length, IV,
+                                         sizeof(IV), output, tag, taglen));
 
-    mac.SetTag(&header, sessionType, tag, taglen);
+    mac.SetTag(&header, tag, taglen);
 
     return CHIP_NO_ERROR;
 }
@@ -165,7 +202,7 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
 CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                                   const MessageAuthenticationCode & mac) const
 {
-    const size_t taglen = MessageAuthenticationCode::TagLenForSessionType(header.GetSessionType());
+    const size_t taglen = header.MICTagLength();
     const uint8_t * tag = mac.GetTag();
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
@@ -189,8 +226,8 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
         usage = kR2IKey;
     }
 
-    return AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage], kAES_CCM128_Key_Length, IV, sizeof(IV),
-                           output);
+    return AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage], Crypto::kAES_CCM128_Key_Length, IV,
+                           sizeof(IV), output);
 }
 
 } // namespace chip

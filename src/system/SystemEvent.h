@@ -54,9 +54,5 @@ typedef CHIP_SYSTEM_CONFIG_EVENT_TYPE EventType;
  */
 typedef CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE Event;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
 } // namespace System
 } // namespace chip

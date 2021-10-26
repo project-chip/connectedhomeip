@@ -30,7 +30,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:latest
+            image: connectedhomeip/chip-build:0.5.22
 
         steps:
             - name: Checkout
@@ -49,8 +49,8 @@ jobs:
                     --report-increases 1 \
                     --report-pr \
                     --github-comment \
-                    --github-limit-artifact-pages 5 \
-                    --github-limit-artifacts 50 \
-                    --github-limit-comments 2 \
+                    --github-limit-artifact-pages 50 \
+                    --github-limit-artifacts 500 \
+                    --github-limit-comments 20 \
                     --github-repository project-chip/connectedhomeip \
                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"

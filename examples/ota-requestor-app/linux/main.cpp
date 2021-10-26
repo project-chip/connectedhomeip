@@ -16,16 +16,19 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/enums.h>
+#include <app/server/Server.h>
 #include <app/util/util.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeDelegate.h>
@@ -38,6 +41,7 @@
 #include <zap-generated/CHIPClusters.h>
 
 #include "BDXDownloader.h"
+#include "ExampleOTARequestor.h"
 #include "ExampleSelfCommissioning.h"
 #include "PersistentStorage.h"
 
@@ -45,6 +49,7 @@
 #include <iostream>
 
 using chip::ByteSpan;
+using chip::CharSpan;
 using chip::EndpointId;
 using chip::VendorId;
 using chip::ArgParser::HelpOptions;
@@ -63,11 +68,11 @@ using chip::Controller::OnDeviceConnectionFailure;
 chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
 Device * providerDevice                        = nullptr;
 BdxDownloader bdxDownloader;
-void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-                          uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
+void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, CharSpan imageURI, uint32_t softwareVersion,
+                          CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
                           chip::ByteSpan metadataForRequestor)
 {
-    ChipLogDetail(SoftwareUpdate, "%s", __FUNCTION__);
+    ChipLogDetail(SoftwareUpdate, "QueryImageResponse responded with action %" PRIu8, status);
 
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = chip::bdx::TransferControlFlags::kReceiverDrive;
@@ -94,7 +99,8 @@ void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedAction
     bdxDownloader.SetInitialExchange(exchangeCtx);
 
     // This will kick of a timer which will regularly check for updates to the bdx::TransferSession state machine.
-    bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions, 20000);
+    bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions,
+                                   chip::System::Clock::Seconds16(20));
 }
 
 void OnQueryFailure(void * context, uint8_t status)
@@ -120,15 +126,15 @@ void OnConnection(void * context, Device * device)
     constexpr uint16_t kExampleSoftwareVersion = 0;
     constexpr uint8_t kExampleProtocolsSupported =
         EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS; // TODO: support this as a list once ember adds list support
-    const uint8_t locationBuf[] = { 'U', 'S' };
-    ByteSpan exampleLocation(locationBuf);
+    const char locationBuf[] = { 'U', 'S' };
+    CharSpan exampleLocation(locationBuf);
     constexpr bool kExampleClientCanConsent = false;
     ByteSpan metadata;
 
     err = cluster.Associate(device, kOtaProviderEndpoint);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Associate() failed: %s", chip::ErrorStr(err));
+        ChipLogError(SoftwareUpdate, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
     err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleHWVersion,
@@ -136,13 +142,13 @@ void OnConnection(void * context, Device * device)
                              metadata);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "QueryImage() failed: %s", chip::ErrorStr(err));
+        ChipLogError(SoftwareUpdate, "QueryImage() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
 void OnConnectFail(void * context, chip::NodeId deviceId, CHIP_ERROR error)
 {
-    ChipLogError(SoftwareUpdate, "failed to connect to 0x%" PRIX64 ": %s", deviceId, chip::ErrorStr(error));
+    ChipLogError(SoftwareUpdate, "failed to connect to 0x%" PRIX64 ": %" CHIP_ERROR_FORMAT, deviceId, error.Format());
 }
 
 Callback<OnDeviceConnected> mConnectionCallback(OnConnection, nullptr);
@@ -160,7 +166,12 @@ chip::Protocols::Id FromFullyQualified(uint32_t rawProtocolId)
 }
 
 constexpr uint16_t kOptionProviderLocation = 'p';
-chip::NodeId providerNodeId                = 0x0;
+constexpr uint16_t kOptionUdpPort          = 'u';
+constexpr uint16_t kOptionDiscriminator    = 'd';
+
+chip::NodeId providerNodeId  = 0x0;
+uint16_t requestorSecurePort = 0;
+uint16_t setupDiscriminator  = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -174,6 +185,24 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             PrintArgError("%s: unable to parse Node ID: %s\n", aProgram, aValue);
         }
         break;
+    case kOptionUdpPort:
+        requestorSecurePort = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+
+        if (requestorSecurePort == 0)
+        {
+            PrintArgError("%s: Input ERROR: udpPort may not be zero\n", aProgram);
+            retval = false;
+        }
+        break;
+    case kOptionDiscriminator:
+        setupDiscriminator = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+
+        if (setupDiscriminator > 0xFFF)
+        {
+            PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
+            retval = false;
+        }
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -185,15 +214,23 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 OptionDef cmdLineOptionsDef[] = {
     { "providerLocation", chip::ArgParser::kArgumentRequired, kOptionProviderLocation },
+    { "udpPort", chip::ArgParser::kArgumentRequired, kOptionUdpPort },
+    { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
     {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -p <node ID>\n"
-                             "  --providerLocation <node ID>\n"
+                             "  -p/--providerLocation <node ID>\n"
                              "        Node ID of the OTA Provider to connect to (hex format)\n\n"
                              "        This assumes that you've already commissioned the OTA Provider node with chip-tool.\n"
-                             "        See README.md for more info.\n" };
+                             "        See README.md for more info.\n"
+                             "  -u/--udpPort <UDP port number>\n"
+                             "        UDP Port that the Requestor listens on for secure connections.\n"
+                             "        When this parameter is present the Requestor skips self-commissioning.\n"
+                             "        See README.md for more info.\n"
+                             "  -d/--discriminator <discriminator>\n"
+                             "        A 12-bit value used to discern between multiple commissionable CHIP device"
+                             "        advertisements. Default value is 3840\n" };
 
 HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
 
@@ -225,35 +262,64 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     err = mStorage.Init();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %" CHIP_ERROR_FORMAT, err.Format()));
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", chip::ErrorStr(err)));
+    err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(SoftwareUpdate, "Setup discriminator set to: %d \n", setupDiscriminator);
+    }
+    else
+    {
+        ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %" CHIP_ERROR_FORMAT "\n", err.Format());
+        goto exit;
+    }
 
-    // Until #9518 is fixed, the only way to open a CASE session to another node is to commission it first using the
-    // DeviceController API. Thus, the ota-requestor-app must do self commissioning and then read CASE credentials from persistent
-    // storage to connect to the Provider node. See README.md for instructions.
-    // NOTE: Controller is initialized in this call
-    err = DoExampleSelfCommissioning(mController, &mOpCredsIssuer, &mStorage, mStorage.GetLocalNodeId(), mStorage.GetListenPort());
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "example self-commissioning failed: %s", chip::ErrorStr(err)));
+    // When the udpPort command line parameter is not present the Requestor self-commissions and automatically requests
+    // an image from the Provider. When the parameter is present the Requestor initializes like any other application and
+    // does not perform any automatic actions.
+    if (requestorSecurePort != 0)
+    {
+        uint16_t unsecurePort = CHIP_UDC_PORT;
 
-    err = chip::Controller::DeviceControllerFactory::GetInstance().ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "ServiceEvents() failed: %s", chip::ErrorStr(err)));
+        ChipLogProgress(SoftwareUpdate, "Initializing the Application Server. Listening on UDP port %d", requestorSecurePort);
 
-    ChipLogProgress(SoftwareUpdate, "Attempting to connect to device 0x%" PRIX64, providerNodeId);
+        // Init ZCL Data Model and CHIP App Server
+        chip::Server::GetInstance().Init(nullptr, requestorSecurePort, unsecurePort);
 
-    // WARNING: In order for this to work, you must first commission the OTA Provider device using chip-tool.
-    // Currently, that pairing action will persist the CASE session in persistent memory, which will then be read by the following
-    // call.
-    err = mController.GetDevice(providerNodeId, &providerDevice);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "No device found: %s", chip::ErrorStr(err)));
+        // Initialize device attestation config
+        SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    }
+    else
+    {
+        // Until #9518 is fixed, the only way to open a CASE session to another node is to commission it first using the
+        // DeviceController API. Thus, the ota-requestor-app must do self commissioning and then read CASE credentials from
+        // persistent storage to connect to the Provider node. See README.md for instructions. NOTE: Controller is initialized in
+        // this call
+        err = DoExampleSelfCommissioning(mController, &mOpCredsIssuer, &mStorage, mStorage.GetLocalNodeId(),
+                                         mStorage.GetListenPort());
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogError(SoftwareUpdate, "example self-commissioning failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = providerDevice->EstablishConnectivity(&mConnectionCallback, &mConnectFailCallback);
+        err = chip::Controller::DeviceControllerFactory::GetInstance().ServiceEvents();
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "ServiceEvents() failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
+        ChipLogProgress(SoftwareUpdate, "Attempting to connect to device 0x%" PRIX64, providerNodeId);
+
+        // WARNING: In order for this to work, you must first commission the OTA Provider device using chip-tool.
+        // Currently, that pairing action will persist the CASE session in persistent memory, which will then be read by the
+        // following call.
+        err = mController.GetDevice(providerNodeId, &providerDevice);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "No device found: %" CHIP_ERROR_FORMAT, err.Format()));
+
+        err = providerDevice->EstablishConnectivity(&mConnectionCallback, &mConnectFailCallback);
+    }
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
-    ChipLogDetail(SoftwareUpdate, "%s", ErrorStr(err));
+    ChipLogDetail(SoftwareUpdate, "%" CHIP_ERROR_FORMAT, err.Format());
     return 0;
 }

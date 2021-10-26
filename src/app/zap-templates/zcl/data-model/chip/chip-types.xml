@@ -21,6 +21,7 @@ limitations under the License.
     <type id="0x10" description="Boolean"                  name="boolean"           size="1"  discrete="true" />
     <type id="0x18" description="8-bit bitmap"             name="bitmap8"           size="1"  discrete="true" />
     <type id="0x19" description="16-bit bitmap"            name="bitmap16"          size="2"  discrete="true" />
+    <type id="0x1A" description="24-bit bitmap"            name="bitmap24"          size="3"  discrete="true" />
     <type id="0x1B" description="32-bit bitmap"            name="bitmap32"          size="4"  discrete="true" />
     <type id="0x1F" description="64-bit bitmap"            name="bitmap64"          size="8"  discrete="true" />
     <type id="0x20" description="Unsigned 8-bit integer"   name="int8u"             size="1"  analog="true"   />
@@ -70,7 +71,7 @@ limitations under the License.
     <type id="0xF2" description="Device Type ID"           name="devtype_id"        size="4"  discrete="true" />
     <type id="0xF3" description="Fabric ID"                name="fabric_id"         size="8"  discrete="true" />
     <type id="0xF4" description="Group ID"                 name="group_id"          size="2"  discrete="true" />
-    <type id="0xF5" description="Status Code"              name="status"            size="4"  discrete="true" />
+    <type id="0xF5" description="Status Code"              name="status"            size="2"  discrete="true" />
     <type id="0xF6" description="Data Version"             name="data_ver"          size="4"  discrete="true" />
     <type id="0xF7" description="Event Number"             name="event_no"          size="8"  discrete="true" />
     <type id="0xF8" description="Endpoint Number"          name="endpoint_no"       size="2"  discrete="true" />

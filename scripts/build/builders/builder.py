@@ -27,10 +27,9 @@ class Builder(ABC):
 
     """
 
-    def __init__(self, root, runner, output_prefix: str = 'out'):
+    def __init__(self, root, runner):
         self.root = os.path.abspath(root)
         self._runner = runner
-        self.output_prefix = output_prefix
         self._enable_flashbundle = False
 
         # Set post-init once actual build target is known
@@ -91,8 +90,8 @@ class Builder(ABC):
         if self._enable_flashbundle:
             self._generate_flashbundle()
 
-    def _Execute(self, cmdarray, cwd=None, title=None):
-        self._runner.Run(cmdarray, cwd=cwd, title=title)
+    def _Execute(self, cmdarray, title=None):
+        self._runner.Run(cmdarray, title=title)
 
     def CompressArtifacts(self, target_file: str):
         with tarfile.open(target_file, "w:gz") as tar:
@@ -116,9 +115,3 @@ class Builder(ABC):
 
             shutil.copyfile(source_name, target_full_name)
             shutil.copymode(source_name, target_full_name)
-
-    def SetIdentifier(self, platform: str, board: str, app: str, enable_rpcs: bool = False):
-        self.identifier = '-'.join([platform, board, app])
-        if enable_rpcs:
-            self.identifier = self.identifier + "-rpc"
-        self.output_dir = os.path.join(self.output_prefix, self.identifier)

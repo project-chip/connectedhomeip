@@ -541,7 +541,7 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     CancelLivenessCheckTimer();
     ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %d seconds", mMaxIntervalCeilingSeconds);
     CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        mMaxIntervalCeilingSeconds * kMillisecondsPerSecond, OnLivenessTimeoutCallback, this);
+        System::Clock::Seconds16(mMaxIntervalCeilingSeconds), OnLivenessTimeoutCallback, this);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -641,6 +641,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     request.MinIntervalSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
         .MaxIntervalSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds)
+        .KeepSubscriptions(aReadPrepareParams.mKeepSubscriptions)
         .EndOfSubscribeRequest();
     SuccessOrExit(err = request.GetError());
 
@@ -649,7 +650,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHandle, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
+    mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));

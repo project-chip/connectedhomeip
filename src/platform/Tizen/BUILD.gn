@@ -52,6 +52,8 @@ static_library("Tizen") {
     "PosixConfig.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
+    "WiFiManager.cpp",
+    "WiFiManager.h",
   ]
 
   deps = [ "${chip_root}/src/setup_payload" ]
@@ -64,8 +66,8 @@ static_library("Tizen") {
   public_configs = []
 
   if (chip_mdns == "platform") {
-    sources += [ "MdnsImpl.cpp" ]
+    sources += [ "DnssdImpl.cpp" ]
 
-    deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
+    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
   }
 }

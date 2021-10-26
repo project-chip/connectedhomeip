@@ -22,82 +22,87 @@
 
 #include <AppConfig.h>
 #include <WindowApp.h>
-#include <app-common/zap-generated/attribute-id.h>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
-#include <app/util/af-types.h>
 #include <app/util/af.h>
 
-using namespace chip::app::Clusters::WindowCovering;
+using namespace ::chip;
+using namespace ::chip::app::Clusters::WindowCovering;
 
-void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
-    if (ZCL_WINDOW_COVERING_CLUSTER_ID == clusterId)
+    if (attributePath.mClusterId == Id)
     {
-        WindowApp & app = WindowApp::Instance();
-        uint16_t current;
-        uint16_t target;
-
-        switch (attributeId)
-        {
-        case ZCL_WC_TYPE_ATTRIBUTE_ID:
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::CoverTypeChange, endpoint));
-            break;
-
-        case ZCL_WC_CURRENT_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID:
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftChanged, endpoint));
-            break;
-
-        case ZCL_WC_CURRENT_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID:
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltChanged, endpoint));
-            break;
-
-        case ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID:
-            Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &target);
-            Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, &current);
-            if (current > target)
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftDown, endpoint));
-            }
-            else if (current < target)
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftUp, endpoint));
-            }
-            break;
-
-        case ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID:
-            Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &target);
-            Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, &current);
-            if (current > target)
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltDown, endpoint));
-            }
-            else if (current < target)
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltUp, endpoint));
-            }
-            break;
-
-        default:
-            break;
-        }
+        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
     }
-    else
+
+    WindowApp & app     = WindowApp::Instance();
+    EndpointId endpoint = attributePath.mEndpointId;
+    uint16_t current;
+    uint16_t target;
+
+    switch (attributePath.mAttributeId)
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: %ld", clusterId);
+    case Attributes::Type::Id:
+        app.PostEvent(WindowApp::Event(WindowApp::EventId::CoverTypeChange, endpoint));
+        break;
+
+    case Attributes::CurrentPositionLiftPercent100ths::Id:
+        app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftChanged, endpoint));
+        break;
+
+    case Attributes::CurrentPositionTiltPercent100ths::Id:
+        app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltChanged, endpoint));
+        break;
+
+    case Attributes::TargetPositionLiftPercent100ths::Id:
+        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &target);
+        Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, &current);
+        if (current > target)
+        {
+            app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftDown, endpoint));
+        }
+        else if (current < target)
+        {
+            app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftUp, endpoint));
+        }
+        break;
+
+    case Attributes::TargetPositionTiltPercent100ths::Id:
+        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &target);
+        Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, &current);
+        if (current > target)
+        {
+            app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltDown, endpoint));
+        }
+        else if (current < target)
+        {
+            app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltUp, endpoint));
+        }
+        break;
+
+    default:
+        break;
     }
 }
 
 /**
  * @brief  Cluster StopMotion Command callback (from client)
  */
-bool emberAfWindowCoveringClusterStopMotionCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+bool emberAfWindowCoveringClusterStopMotionCallback(chip::app::CommandHandler * commandObj,
+                                                    const chip::app::ConcreteCommandPath & commandPath,
+                                                    const Commands::StopMotion::DecodableType & commandData)
 {
     ChipLogProgress(Zcl, "StopMotion command received");
-    WindowApp::Instance().PostEvent(WindowApp::Event(WindowApp::EventId::StopMotion, endpoint));
+    WindowApp::Instance().PostEvent(WindowApp::Event(WindowApp::EventId::StopMotion, commandPath.mEndpointId));
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }

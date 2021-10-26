@@ -16,7 +16,7 @@
  */
 
 #include <inet/Inet.h>
-#include <lib/mdns/minimal/Server.h>
+#include <lib/dnssd/minimal_mdns/Server.h>
 
 namespace MdnsExample {
 
@@ -40,7 +40,7 @@ public:
         {
 #if INET_CONFIG_ENABLE_IPV4
             *id   = INET_NULL_INTERFACEID;
-            *type = chip::Inet::kIPAddressType_IPv4;
+            *type = chip::Inet::IPAddressType::kIPv4;
 #endif
             mState = State::kIpV6;
 
@@ -57,7 +57,7 @@ public:
         }
 
         *id   = mIterator.GetInterfaceId();
-        *type = chip::Inet::kIPAddressType_IPv6;
+        *type = chip::Inet::IPAddressType::kIPv6;
 
         for (mIterator.Next(); SkipCurrentInterface(); mIterator.Next())
         {

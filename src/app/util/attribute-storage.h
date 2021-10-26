@@ -43,6 +43,7 @@
 
 //#include PLATFORM_HEADER
 #include <app/AttributeAccessInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/util/af.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
@@ -89,8 +90,8 @@
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(attrListName) EmberAfAttributeMetadata attrListName[] = {
 
-#define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(clusterRevision)                                                                        \
-    , { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(clusterRevision) } /* cluster revision */                               \
+#define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
+    , { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() } /* cluster revision */            \
     }
 
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
@@ -120,8 +121,6 @@ void emAfCallInits(void);
 
 // Initial configuration
 void emberAfEndpointConfigure(void);
-bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, chip::ClusterId clusterId, uint8_t * buffer,
-                              uint16_t bufferLength, uint16_t * bufferIndex, uint8_t startId, uint8_t maxIdCount);
 
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write, int32_t index = -1);
@@ -200,13 +199,11 @@ void emAfSaveAttributeToToken(uint8_t * data, chip::EndpointId endpoint, chip::C
                               EmberAfAttributeMetadata * metadata);
 
 // Calls the attribute changed callback
-void emAfClusterAttributeChangedCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                         uint8_t clientServerMask, uint16_t manufacturerCode);
+void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t clientServerMask);
 
 // Calls the attribute changed callback for a specific cluster.
-EmberAfStatus emAfClusterPreAttributeChangedCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                     chip::AttributeId attributeId, uint8_t clientServerMask,
-                                                     uint16_t manufacturerCode, EmberAfAttributeType attributeType, uint16_t size,
+EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     uint8_t clientServerMask, EmberAfAttributeType attributeType, uint16_t size,
                                                      uint8_t * value);
 
 // Calls the default response callback for a specific cluster, and wraps emberAfClusterDefaultResponseWithMfgCodeCallback

@@ -1,0 +1,55 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: ZAP - Regenerate
+
+on:
+    workflow_dispatch:
+    issue_comment:
+      types: [created]
+
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    zap_regenerate:
+        name: ZAP - Regenerate
+        timeout-minutes: 60
+
+        runs-on: ubuntu-18.04
+        if: (github.event.issue.pull_request != '' && contains(github.event.comment.body, '/regenerate')) || (github.event_name == 'workflow_dispatch')
+
+        steps:
+          - name: Checkout the latest code
+            uses: actions/checkout@v2
+            with:
+              token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
+              fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
+          - name: Use Node.js 14.x
+            uses: actions/setup-node@v2
+            with:
+              node-version: '14'
+          - name: Use Java 
+            uses: actions/setup-java@v2
+            with:
+              distribution: 'zulu'
+              java-version: '11'
+              java-package: jre
+          - run: sudo apt-get update
+          - run: sudo apt-get install -fy --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev python-autopep8
+          - name: Rebase and regenerate
+            run: scripts/helpers/rebase_and_regenerate_zap.sh
+            env:
+              GITHUB_TOKEN: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}

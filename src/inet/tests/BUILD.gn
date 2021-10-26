@@ -34,13 +34,16 @@ static_library("helpers") {
     "TestInetCommonOptions.cpp",
     "TestInetCommonOptions.h",
     "TestInetCommonPosix.cpp",
-    "TestInetLayer.cpp",
     "TestInetLayerCommon.cpp",
     "TestSetupFaultInjection.h",
     "TestSetupFaultInjectionPosix.cpp",
     "TestSetupSignalling.h",
     "TestSetupSignallingPosix.cpp",
   ]
+
+  if (current_os != "mbed") {
+    sources += [ "TestInetLayer.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 
@@ -77,9 +80,8 @@ chip_test_suite("tests") {
   # This fails on Raspberry Pi (Linux arm64), so only enable on Linux
   # x64.
   if (current_os != "mac" && current_os != "zephyr" &&
-      chip_device_platform != "esp32" && current_cpu == "x64") {
-    test_sources += [ "TestInetLayerDNS.cpp" ]
-
+      chip_device_platform != "esp32" && current_cpu == "x64" &&
+      chip_device_platform != "ameba") {
     # TODO: This test does not seem executed
     sources += [ "TestLwIPDNS.cpp" ]
   }

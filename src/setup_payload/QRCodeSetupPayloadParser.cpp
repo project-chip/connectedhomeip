@@ -34,7 +34,6 @@
 #include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <protocols/Protocols.h>
@@ -65,7 +64,7 @@ static CHIP_ERROR readBits(std::vector<uint8_t> buf, size_t & index, uint64_t & 
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR openTLVContainer(TLV::ContiguousBufferTLVReader & reader, TLV::TLVType type, uint64_t tag,
+static CHIP_ERROR openTLVContainer(TLV::ContiguousBufferTLVReader & reader, TLV::TLVType type, TLV::Tag tag,
                                    TLV::ContiguousBufferTLVReader & containerReader)
 {
     VerifyOrReturnError(reader.GetType() == type, CHIP_ERROR_INVALID_ARGUMENT);
@@ -283,7 +282,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, cons
     return parseTLVFields(outPayload, tlvArray.Get(), tlvBytesLength);
 }
 
-static std::string extractPayload(std::string inString)
+std::string QRCodeSetupPayloadParser::ExtractPayload(std::string inString)
 {
     std::string chipSegment;
     char delimiter = '%';
@@ -328,7 +327,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     size_t indexToReadFrom = 0;
     uint64_t dest;
 
-    std::string payload = extractPayload(mBase38Representation);
+    std::string payload = ExtractPayload(mBase38Representation);
     VerifyOrReturnError(payload.length() != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(base38Decode(payload, buf));

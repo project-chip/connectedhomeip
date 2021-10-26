@@ -40,14 +40,12 @@
  ******************************************************************************/
 #include "on-off-server.h"
 
-#include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af.h>
 
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/reporting/reporting.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -63,6 +61,8 @@
 #endif
 
 using namespace chip;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::OnOff;
 
 #ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
 static bool areStartUpOnOffServerAttributesTokenized(EndpointId endpoint);
@@ -76,9 +76,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t c
     emberAfOnOffClusterPrintln("On/Off set value: %x %x", endpoint, command);
 
     // read current on/off value
-    status = emberAfReadAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                  (uint8_t *) &currentValue, sizeof(currentValue),
-                                  NULL); // data type
+    status = Attributes::OnOff::Get(endpoint, &currentValue);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfOnOffClusterPrintln("ERR: reading on/off %x", status);
@@ -86,7 +84,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t c
     }
 
     // if the value is already what we want to set it to then do nothing
-    if ((!currentValue && command == ZCL_OFF_COMMAND_ID) || (currentValue && command == ZCL_ON_COMMAND_ID))
+    if ((!currentValue && command == Commands::Off::Id) || (currentValue && command == Commands::On::Id))
     {
         emberAfOnOffClusterPrintln("On/off already set to new value");
         return EMBER_ZCL_STATUS_SUCCESS;
@@ -105,8 +103,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t c
     if (newValue)
     {
         // write the new on/off value
-        status = emberAfWriteAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                       (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+        status = Attributes::OnOff::Set(endpoint, newValue);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
@@ -116,7 +113,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t c
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         // If initiatedByLevelChange is false, then we assume that the level change
         // ZCL stuff has not happened and we do it here
-        if (!initiatedByLevelChange && emberAfContainsServer(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID))
+        if (!initiatedByLevelChange && emberAfContainsServer(endpoint, LevelControl::Id))
         {
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
@@ -127,15 +124,14 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t c
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         // If initiatedByLevelChange is false, then we assume that the level change
         // ZCL stuff has not happened and we do it here
-        if (!initiatedByLevelChange && emberAfContainsServer(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID))
+        if (!initiatedByLevelChange && emberAfContainsServer(endpoint, LevelControl::Id))
         {
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
 #endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
         // write the new on/off value
-        status = emberAfWriteAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                       (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+        status = Attributes::OnOff::Set(endpoint, newValue);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
@@ -154,7 +150,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t c
     // the scene has been changed (the value of on/off has changed) so
     // the current scene as descibed in the attribute table is invalid,
     // so mark it as invalid (just writes the valid/invalid attribute)
-    if (emberAfContainsServer(endpoint, ZCL_SCENES_CLUSTER_ID))
+    if (emberAfContainsServer(endpoint, Scenes::Id))
     {
         emberAfScenesClusterMakeInvalidCallback(endpoint);
     }
@@ -165,9 +161,10 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t c
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-bool emberAfOnOffClusterOffCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfOnOffClusterOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                    const Commands::Off::DecodableType & commandData)
 {
-    EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_OFF_COMMAND_ID, false);
+    EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), Commands::Off::Id, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -178,9 +175,10 @@ bool emberAfOnOffClusterOffCallback(EndpointId endpoint, app::CommandHandler * c
     return true;
 }
 
-bool emberAfOnOffClusterOnCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfOnOffClusterOnCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                   const Commands::On::DecodableType & commandData)
 {
-    EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_ON_COMMAND_ID, false);
+    EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), Commands::On::Id, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -191,9 +189,10 @@ bool emberAfOnOffClusterOnCallback(EndpointId endpoint, app::CommandHandler * co
     return true;
 }
 
-bool emberAfOnOffClusterToggleCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfOnOffClusterToggleCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                       const Commands::Toggle::DecodableType & commandData)
 {
-    EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_TOGGLE_COMMAND_ID, false);
+    EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), Commands::Toggle::Id, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -229,14 +228,12 @@ void emberAfOnOffClusterServerInitCallback(EndpointId endpoint)
 
         // Initialize startUpOnOff to No action value 0xFE
         uint8_t startUpOnOff = 0xFE;
-        EmberAfStatus status = emberAfReadAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_START_UP_ON_OFF_ATTRIBUTE_ID,
-                                                    CLUSTER_MASK_SERVER, (uint8_t *) &startUpOnOff, sizeof(startUpOnOff), NULL);
+        EmberAfStatus status = Attributes::StartUpOnOff::Get(endpoint, &startUpOnOff);
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
             // Initialise updated value to 0
             bool updatedOnOff = 0;
-            status            = emberAfReadAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                          (uint8_t *) &updatedOnOff, sizeof(updatedOnOff), NULL);
+            status            = Attributes::OnOff::Get(endpoint, &udpateOnOff);
             if (status == EMBER_ZCL_STATUS_SUCCESS)
             {
                 switch (startUpOnOff)
@@ -257,8 +254,7 @@ void emberAfOnOffClusterServerInitCallback(EndpointId endpoint)
                     // no action.
                     break;
                 }
-                status = emberAfWriteAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                               (uint8_t *) &updatedOnOff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+                status = Attributes::OnOff::Set(endpoint, updatedOnOff);
             }
         }
     }
@@ -271,15 +267,15 @@ static bool areStartUpOnOffServerAttributesTokenized(EndpointId endpoint)
 {
     EmberAfAttributeMetadata * metadata;
 
-    metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+    metadata = emberAfLocateAttributeMetadata(endpoint, OnOff::Id, Attributes::OnOff::Id, CLUSTER_MASK_SERVER,
                                               EMBER_AF_NULL_MANUFACTURER_CODE);
     if (!emberAfAttributeIsTokenized(metadata))
     {
         return false;
     }
 
-    metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_START_UP_ON_OFF_ATTRIBUTE_ID,
-                                              CLUSTER_MASK_SERVER, EMBER_AF_NULL_MANUFACTURER_CODE);
+    metadata = emberAfLocateAttributeMetadata(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id, CLUSTER_MASK_SERVER,
+                                              EMBER_AF_NULL_MANUFACTURER_CODE);
     if (!emberAfAttributeIsTokenized(metadata))
     {
         return false;

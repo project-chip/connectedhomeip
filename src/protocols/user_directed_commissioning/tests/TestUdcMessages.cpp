@@ -2,6 +2,7 @@
 
 #include <nlunit-test.h>
 
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -69,13 +70,13 @@ void TestUDCServerUserConfirmationProvider(nlTestSuite * inSuite, void * inConte
     // setup for tests
     udcServer.SetUDCClientProcessingState((char *) instanceName1, UDCClientProcessingState::kUserDeclined);
 
-    Mdns::DiscoveredNodeData nodeData1;
+    Dnssd::DiscoveredNodeData nodeData1;
     nodeData1.port         = 5540;
     nodeData1.ipAddress[0] = address;
     nodeData1.numIPs       = 1;
     strncpy((char *) nodeData1.instanceName, instanceName1, sizeof(nodeData1.instanceName));
 
-    Mdns::DiscoveredNodeData nodeData2;
+    Dnssd::DiscoveredNodeData nodeData2;
     nodeData2.port              = 5540;
     nodeData2.ipAddress[0]      = address;
     nodeData2.numIPs            = 1;
@@ -139,8 +140,8 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
     udcServer.SetUDCClientProcessingState((char *) instanceName1, UDCClientProcessingState::kUserDeclined);
 
     // encode our client message
-    char nameBuffer[Mdns::kMaxInstanceNameSize + 1] = "Chris";
-    System::PacketBufferHandle payloadBuf           = MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
+    char nameBuffer[Dnssd::Commissionable::kInstanceNameMaxLength + 1] = "Chris";
+    System::PacketBufferHandle payloadBuf = MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
     udcClient.EncodeUDCMessage(std::move(payloadBuf));
 
     // prepare peerAddress for handleMessage
@@ -188,8 +189,8 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
 
 void TestUserDirectedCommissioningClientMessage(nlTestSuite * inSuite, void * inContext)
 {
-    char nameBuffer[Mdns::kMaxInstanceNameSize + 1] = "Chris";
-    System::PacketBufferHandle payloadBuf           = MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
+    char nameBuffer[Dnssd::Commissionable::kInstanceNameMaxLength + 1] = "Chris";
+    System::PacketBufferHandle payloadBuf = MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
     UserDirectedCommissioningClient udcClient;
 
     // obtain the UDC message
@@ -198,7 +199,7 @@ void TestUserDirectedCommissioningClientMessage(nlTestSuite * inSuite, void * in
     // check the packet header fields
     PacketHeader packetHeader;
     packetHeader.DecodeAndConsume(payloadBuf);
-    NL_TEST_ASSERT(inSuite, !packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage));
+    NL_TEST_ASSERT(inSuite, !packetHeader.IsEncrypted());
 
     // check the payload header fields
     PayloadHeader payloadHeader;
@@ -209,9 +210,8 @@ void TestUserDirectedCommissioningClientMessage(nlTestSuite * inSuite, void * in
     NL_TEST_ASSERT(inSuite, payloadHeader.IsInitiator());
 
     // check the payload
-    char instanceName[chip::Mdns::kMaxInstanceNameSize + 1];
-    size_t instanceNameLength = (payloadBuf->DataLength() > (chip::Mdns::kMaxInstanceNameSize)) ? chip::Mdns::kMaxInstanceNameSize
-                                                                                                : payloadBuf->DataLength();
+    char instanceName[Dnssd::Commissionable::kInstanceNameMaxLength + 1];
+    size_t instanceNameLength = std::min<size_t>(payloadBuf->DataLength(), Dnssd::Commissionable::kInstanceNameMaxLength);
     payloadBuf->Read(Uint8::from_char(instanceName), instanceNameLength);
     instanceName[instanceNameLength] = '\0';
     ChipLogProgress(Inet, "UDC instance=%s", instanceName);

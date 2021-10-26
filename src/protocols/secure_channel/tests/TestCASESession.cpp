@@ -405,6 +405,10 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     PacketHeader header;
     MessageAuthenticationCode mac;
 
+    header.SetSessionId(1);
+    NL_TEST_ASSERT(inSuite, header.IsEncrypted() == true);
+    NL_TEST_ASSERT(inSuite, header.MICTagLength() == 16);
+
     // Let's try encrypting using original session, and decrypting using deserialized
     {
         CryptoContext session1;
@@ -446,7 +450,7 @@ struct Sigma1Params
     static constexpr uint8_t initiatorEphPubKeyTag = 4;
     static constexpr uint8_t resumptionIdTag       = 6;
     static constexpr uint8_t initiatorResumeMICTag = 7;
-    static constexpr uint64_t NumToTag(uint8_t num) { return TLV::ContextTag(num); }
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ContextTag(num); }
 
     static constexpr bool includeStructEnd = true;
 
@@ -479,7 +483,9 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
     if (Params::resumptionIdLen != 0)
     {
         uint8_t resumptionId[Params::resumptionIdLen];
-        memset(resumptionId, 4, Params::resumptionIdLen);
+
+        // to fix _FORTIFY_SOURCE issue, _FORTIFY_SOURCE=2 by default on Android
+        (&memset)(resumptionId, 4, Params::resumptionIdLen);
         ReturnErrorOnFailure(
             writer.Put(Params::NumToTag(Params::resumptionIdTag), ByteSpan(resumptionId, Params::resumptionIdLen)));
     }
@@ -487,7 +493,8 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
     if (Params::initiatorResumeMICLen != 0)
     {
         uint8_t initiatorResumeMIC[Params::initiatorResumeMICLen];
-        memset(initiatorResumeMIC, 5, Params::initiatorResumeMICLen);
+        // to fix _FORTIFY_SOURCE issue, _FORTIFY_SOURCE=2 by default on Android
+        (&memset)(initiatorResumeMIC, 5, Params::initiatorResumeMICLen);
         ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::initiatorResumeMICTag),
                                         ByteSpan(initiatorResumeMIC, Params::initiatorResumeMICLen)));
     }
@@ -541,7 +548,7 @@ struct Sigma1NoStructEnd : public BadSigma1ParamsBase
 
 struct Sigma1WrongTags : public BadSigma1ParamsBase
 {
-    static constexpr uint64_t NumToTag(uint8_t num) { return TLV::ProfileTag(0, num); }
+    static constexpr TLV::Tag NumToTag(uint8_t num) { return TLV::ProfileTag(0, num); }
 };
 
 struct Sigma1TooLongRandom : public BadSigma1ParamsBase

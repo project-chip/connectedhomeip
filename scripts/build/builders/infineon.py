@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 from enum import Enum, auto
 
@@ -48,13 +47,11 @@ class InfineonBuilder(GnBuilder):
     def __init__(self,
                  root,
                  runner,
-                 output_prefix: str,
                  app: InfineonApp = InfineonApp.LOCK,
                  board: InfineonBoard = InfineonBoard.P6BOARD):
         super(InfineonBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExampleName(), 'p6'),
-            runner=runner,
-            output_prefix=output_prefix)
+            runner=runner)
 
         self.app = app
         self.board = board

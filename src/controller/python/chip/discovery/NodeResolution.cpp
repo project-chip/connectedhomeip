@@ -16,14 +16,14 @@
  */
 
 #include <chip/internal/ChipThreadWork.h>
-#include <lib/mdns/Resolver.h>
+#include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <type_traits>
 
 using namespace chip;
-using namespace chip::Mdns;
+using namespace chip::Dnssd;
 
 static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
 
@@ -32,8 +32,6 @@ namespace {
 // callback types shared with python code (see ptyhon code in chip.discovery.types)
 using DiscoverSuccessCallback = void (*)(uint64_t fabricId, uint64_t nodeId, uint32_t interfaceId, const char * ip, uint16_t port);
 using DiscoverFailureCallback = void (*)(uint64_t fabricId, uint64_t nodeId, ChipError::StorageType error_code);
-
-constexpr uint16_t kMdnsPort = 5353;
 
 class PythonResolverDelegate : public ResolverDelegate
 {
@@ -95,14 +93,12 @@ extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, ui
     CHIP_ERROR result = CHIP_NO_ERROR;
 
     chip::python::ChipMainThreadScheduleAndWait([&] {
-        result = Resolver::Instance().StartResolver(&chip::DeviceLayer::InetLayer, kMdnsPort);
+        result = Resolver::Instance().Init(&chip::DeviceLayer::InetLayer);
         ReturnOnFailure(result);
-
-        result = Resolver::Instance().SetResolverDelegate(&gPythonResolverDelegate);
-        ReturnOnFailure(result);
+        Resolver::Instance().SetResolverDelegate(&gPythonResolverDelegate);
 
         result = Resolver::Instance().ResolveNodeId(chip::PeerId().SetCompressedFabricId(fabricId).SetNodeId(nodeId),
-                                                    chip::Inet::IPAddressType::kIPAddressType_Any);
+                                                    chip::Inet::IPAddressType::kAny);
     });
 
     return result.AsInteger();

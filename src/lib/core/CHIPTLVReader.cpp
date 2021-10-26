@@ -298,6 +298,19 @@ CHIP_ERROR TLVReader::Get(ByteSpan & v)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TLVReader::Get(CharSpan & v)
+{
+    if (!TLVTypeIsUTF8String(ElementType()))
+    {
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+    }
+
+    const uint8_t * bytes;
+    ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
+    v = CharSpan(Uint8::to_const_char(bytes), GetLength());
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, size_t bufSize)
 {
     if (!TLVTypeIsString(ElementType()))
@@ -505,7 +518,7 @@ CHIP_ERROR TLVReader::Next()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Next(uint64_t expectedTag)
+CHIP_ERROR TLVReader::Next(Tag expectedTag)
 {
     CHIP_ERROR err = Next();
     if (err != CHIP_NO_ERROR)
@@ -515,7 +528,7 @@ CHIP_ERROR TLVReader::Next(uint64_t expectedTag)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Next(TLVType expectedType, uint64_t expectedTag)
+CHIP_ERROR TLVReader::Next(TLVType expectedType, Tag expectedTag)
 {
     CHIP_ERROR err = Next(expectedTag);
     if (err != CHIP_NO_ERROR)
@@ -771,7 +784,7 @@ CHIP_ERROR TLVReader::VerifyElement()
     return CHIP_NO_ERROR;
 }
 
-uint64_t TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
+Tag TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
 {
     uint16_t vendorId;
     uint16_t profileNum;
@@ -912,7 +925,7 @@ TLVElementType TLVReader::ElementType() const
     return static_cast<TLVElementType>(mControlByte & kTLVTypeMask);
 }
 
-CHIP_ERROR TLVReader::FindElementWithTag(const uint64_t tag, TLVReader & destReader) const
+CHIP_ERROR TLVReader::FindElementWithTag(Tag tag, TLVReader & destReader) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -936,6 +949,28 @@ exit:
     return err;
 }
 
+CHIP_ERROR TLVReader::CountRemainingInContainer(size_t * size) const
+{
+    if (mContainerType == kTLVType_NotSpecified)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    TLVReader tempReader(*this);
+    size_t count = 0;
+    CHIP_ERROR err;
+    while ((err = tempReader.Next()) == CHIP_NO_ERROR)
+    {
+        ++count;
+    };
+    if (err == CHIP_END_OF_TLV)
+    {
+        *size = count;
+        return CHIP_NO_ERROR;
+    }
+    return err;
+}
+
 CHIP_ERROR ContiguousBufferTLVReader::OpenContainer(ContiguousBufferTLVReader & containerReader)
 {
     // We are going to initialize containerReader by calling our superclass
@@ -949,15 +984,7 @@ CHIP_ERROR ContiguousBufferTLVReader::OpenContainer(ContiguousBufferTLVReader & 
 
 CHIP_ERROR ContiguousBufferTLVReader::GetStringView(Span<const char> & data)
 {
-    if (!TLVTypeIsUTF8String(ElementType()))
-    {
-        return CHIP_ERROR_WRONG_TLV_TYPE;
-    }
-
-    const uint8_t * bytes;
-    ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
-    data = Span<const char>(Uint8::to_const_char(bytes), GetLength());
-    return CHIP_NO_ERROR;
+    return Get(data);
 }
 
 CHIP_ERROR ContiguousBufferTLVReader::GetByteView(ByteSpan & data)

@@ -135,7 +135,6 @@ static_library("system") {
     "SystemLayerImpl${chip_system_config_event_loop}.cpp",
     "SystemLayerImpl${chip_system_config_event_loop}.h",
     "SystemLayerImpl.h",
-    "SystemLayerPrivate.h",
     "SystemMutex.cpp",
     "SystemMutex.h",
     "SystemObject.cpp",

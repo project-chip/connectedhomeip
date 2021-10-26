@@ -15,14 +15,14 @@
     ],
     "templates": [
         {
-            "path": "../../../zap-templates/templates/app/tests/CHIPClusters.zapt",
+            "path": "../../../zap-templates/templates/app/tests/CHIPClustersTest.zapt",
             "name": "Tests C++ API Header",
-            "output": "tests/CHIPClusters.h"
+            "output": "tests/CHIPClustersTest.h"
         },
         {
             "path": "../../../zap-templates/templates/app/tests/CHIPClusters-src.zapt",
             "name": "Tests C++ API",
-            "output": "tests/CHIPClusters.cpp"
+            "output": "tests/CHIPClustersTest.cpp"
         }
     ]
 }

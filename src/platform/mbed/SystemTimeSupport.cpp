@@ -30,28 +30,47 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "platform/mbed_rtc_time.h"
+#include "platform/mbed_thread.h"
+#include "platform/mbed_wait_api.h"
 #include <Kernel.h>
+#include <drivers/LowPowerTimer.h>
 
 namespace chip {
 namespace System {
+namespace Clock {
 
 namespace Internal {
 ClockImpl gClockImpl;
 } // namespace Internal
 
+namespace {
+mbed::LowPowerTimer timer()
+{
+    static mbed::LowPowerTimer t;
+    t.start();
+    return t;
+}
+} // namespace
+
+extern "C" uint64_t get_clock_monotonic()
+{
+    return timer().elapsed_time().count();
+}
+
 // Platform-specific function for getting monotonic system time in microseconds.
 // Returns elapsed time in microseconds since an arbitrary, platform-defined epoch.
-Clock::MonotonicMicroseconds ClockImpl::GetMonotonicMicroseconds()
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
-    return rtos::Kernel::get_ms_count() * kMicrosecondsPerMillisecond;
+    return Microseconds64(get_clock_monotonic());
 }
 
 // Platform-specific function for getting monotonic system time in milliseconds.
 // Return elapsed time in milliseconds since an arbitrary, platform-defined epoch.
-Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMilliseconds()
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
-    return rtos::Kernel::get_ms_count();
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
+} // namespace Clock
 } // namespace System
 } // namespace chip

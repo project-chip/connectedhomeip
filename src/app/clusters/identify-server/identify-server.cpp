@@ -38,11 +38,13 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 
 #include <app/util/af.h>
 #include <app/util/common.h>
@@ -60,6 +62,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters::Identify;
 
 static std::array<Identify *, EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT> instances = { 0 };
 
@@ -143,10 +146,11 @@ static inline void identify_deactivate(Identify * identify)
     }
 }
 
-void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
+void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    if (attributeId == Clusters::Identify::Attributes::IdentifyTime::Id)
+    if (attributePath.mAttributeId == Clusters::Identify::Attributes::IdentifyTime::Id)
     {
+        EndpointId endpoint = attributePath.mEndpointId;
         Identify * identify = inst(endpoint);
         uint16_t identifyTime;
 
@@ -165,7 +169,7 @@ void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, A
                 /* finish identify process */
                 if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT == identify->mCurrentEffectIdentifier && identifyTime > 0)
                 {
-                    (void) chip::DeviceLayer::SystemLayer().StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick,
+                    (void) chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onIdentifyClusterTick,
                                                                        identify);
                     return;
                 }
@@ -192,7 +196,7 @@ void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, A
                 /* we only start if both callbacks are set */
                 identify_activate(identify);
 
-                (void) chip::DeviceLayer::SystemLayer().StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick, identify);
+                (void) chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onIdentifyClusterTick, identify);
                 return;
             }
             else
@@ -205,15 +209,22 @@ void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, A
     }
 }
 
-bool emberAfIdentifyClusterIdentifyCallback(EndpointId endpoint, CommandHandler * commandObj, uint16_t identifyTime)
+bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                            const Commands::Identify::DecodableType & commandData)
 {
+    auto & identifyTime = commandData.identifyTime;
+
     // cmd Identify
     return EMBER_SUCCESS ==
-        emberAfSendImmediateDefaultResponse(Clusters::Identify::Attributes::IdentifyTime::Set(endpoint, identifyTime));
+        emberAfSendImmediateDefaultResponse(
+               Clusters::Identify::Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime));
 }
 
-bool emberAfIdentifyClusterIdentifyQueryCallback(EndpointId endpoint, CommandHandler * commandObj)
+bool emberAfIdentifyClusterIdentifyQueryCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                 const Commands::IdentifyQuery::DecodableType & commandData)
 {
+    EndpointId endpoint = commandPath.mEndpointId;
+
     // cmd IdentifyQuery
     uint16_t identifyTime  = 0;
     EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
@@ -252,7 +263,7 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(EndpointId endpoint, CommandHan
         VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), identifyTime));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
@@ -265,9 +276,14 @@ exit:
     return true;
 }
 
-bool emberAfIdentifyClusterTriggerEffectCallback(EndpointId endpoint, CommandHandler * commandObj, uint8_t effectIdentifier,
-                                                 uint8_t effectVariant)
+bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                 const Commands::TriggerEffect::DecodableType & commandData)
 {
+    auto & effectIdentifier = commandData.effectIdentifier;
+    auto & effectVariant    = commandData.effectVariant;
+
+    EndpointId endpoint = commandPath.mEndpointId;
+
     // cmd TriggerEffect
     Identify * identify                      = inst(endpoint);
     uint16_t identifyTime                    = 0;

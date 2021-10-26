@@ -16,27 +16,14 @@
  *    limitations under the License.
  */
 
-#include <cassert>
-#include <iostream>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
-
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app/Command.h>
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/util/af-types.h>
-#include <app/util/af.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/RandUtils.h>
-
 #include "AppMain.h"
 
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/Command.h>
+#include <app/util/af.h>
+
 #include <iostream>
-#include <lib/support/ErrorStr.h>
 
 #include "include/application-launcher/ApplicationLauncherManager.h"
 #include "include/audio-output/AudioOutputManager.h"
@@ -50,10 +37,6 @@
 using namespace chip;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
-
-void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
-{}
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 {

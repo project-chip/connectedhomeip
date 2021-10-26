@@ -28,7 +28,6 @@
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 
 chip::Shell::Engine sShellBase64Commands;
 

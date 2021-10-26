@@ -27,7 +27,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <lib/support/StackLock.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
@@ -36,7 +35,7 @@
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
-#include "MdnsImpl.h"
+#include "DnssdImpl.h"
 
 using namespace chip;
 
@@ -101,7 +100,7 @@ void AndroidChipPlatformJNI_OnUnload(JavaVM * jvm, void * reserved)
 JNI_METHOD(void, nativeSetBLEManager)(JNIEnv *, jobject, jobject manager)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     chip::DeviceLayer::Internal::BLEMgrImpl().InitializeWithObject(manager);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 }
@@ -109,6 +108,7 @@ JNI_METHOD(void, nativeSetBLEManager)(JNIEnv *, jobject, jobject manager)
 JNI_METHOD(void, handleWriteConfirmation)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
+    chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
     chip::Ble::ChipBleUUID svcUUID;
@@ -124,6 +124,7 @@ JNI_METHOD(void, handleWriteConfirmation)
 JNI_METHOD(void, handleIndicationReceived)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId, jbyteArray value)
 {
+    chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
     const auto valueBegin               = env->GetByteArrayElements(value, nullptr);
     const auto valueLength              = env->GetArrayLength(value);
@@ -148,6 +149,7 @@ exit:
 JNI_METHOD(void, handleSubscribeComplete)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
+    chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
     chip::Ble::ChipBleUUID svcUUID;
@@ -163,6 +165,7 @@ JNI_METHOD(void, handleSubscribeComplete)
 JNI_METHOD(void, handleUnsubscribeComplete)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
+    chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
     chip::Ble::ChipBleUUID svcUUID;
@@ -177,6 +180,7 @@ JNI_METHOD(void, handleUnsubscribeComplete)
 
 JNI_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
 {
+    chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectionError(connObj, BLE_ERROR_APP_CLOSED_CONNECTION);
@@ -185,29 +189,29 @@ JNI_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
 // for KeyValueStoreManager
 JNI_METHOD(void, setKeyValueStoreManager)(JNIEnv * env, jclass self, jobject manager)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeWithObject(manager);
 }
 
 // for ConfigurationManager
 JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject manager)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     chip::DeviceLayer::ConfigurationMgrImpl().InitializeWithObject(manager);
 }
 
 // for ServiceResolver
 JNI_METHOD(void, nativeSetServiceResolver)(JNIEnv * env, jclass self, jobject resolver, jobject chipMdnsCallback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    chip::Mdns::InitializeWithObjects(resolver, chipMdnsCallback);
+    chip::DeviceLayer::StackLock lock;
+    chip::Dnssd::InitializeWithObjects(resolver, chipMdnsCallback);
 }
 
 JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)
 (JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring address, jint port, jlong callbackHandle,
  jlong contextHandle)
 {
-    using ::chip::Mdns::HandleResolve;
+    using ::chip::Dnssd::HandleResolve;
     HandleResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
 }
 

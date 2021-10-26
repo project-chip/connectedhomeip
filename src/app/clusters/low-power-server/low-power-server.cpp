@@ -22,14 +22,18 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::LowPower;
 
 bool lowPowerClusterSleep();
 
-bool emberAfLowPowerClusterSleepCallback(EndpointId endpoint, app::CommandHandler * command)
+bool emberAfLowPowerClusterSleepCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                         const Commands::Sleep::DecodableType & commandData)
 {
     bool success         = lowPowerClusterSleep();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;

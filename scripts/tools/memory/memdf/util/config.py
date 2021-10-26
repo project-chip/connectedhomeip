@@ -231,10 +231,16 @@ class Config:
             action(self, key)
 
         # Configure logging.
-        verbose = self.get('verbose', 0)
-        level = (logging.DEBUG if verbose > 1 else
-                 logging.INFO if verbose else logging.WARNING)
-        logging.basicConfig(level=level)
+        if self.get('log-level') is None:
+            verbose = self.get('verbose', 0)
+            self.put('log-level',
+                     (logging.DEBUG if verbose > 1 else
+                      logging.INFO if verbose else logging.WARNING))
+        else:
+            self.put('log-level',
+                     getattr(logging, self.get('log-level').upper()))
+        logging.basicConfig(level=self.get('log-level'),
+                            format=self.get('log-format'))
 
         memdf.util.pretty.debug(self.d)
         return self
@@ -285,6 +291,17 @@ class ParseSizeAction(argparse.Action):
 
 # Config description of options shared by all tools.
 CONFIG: ConfigDescription = {
+    'log-level': {
+        'help': 'Set logging level',
+        'metavar': 'LEVEL',
+        'default': None,
+        'choices': ['critical', 'error', 'warning', 'info', 'debug'],
+    },
+    'log-format': {
+        'help': 'Set logging format',
+        'metavar': 'FORMAT',
+        'default': '%(message)s',
+    },
     'verbose': {
         'help': 'Show informational messages; repeat for debugging messages',
         'default': 0,
