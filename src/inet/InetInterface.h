@@ -92,6 +92,8 @@ public:
         return *this;
     }
 
+    static constexpr InterfaceId Null() { return InterfaceId(); }
+
     constexpr bool operator==(const InterfaceId & other) const { return mPlatformInterface == other.mPlatformInterface; }
     constexpr bool operator!=(const InterfaceId & other) const { return mPlatformInterface != other.mPlatformInterface; }
 

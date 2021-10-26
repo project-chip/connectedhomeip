@@ -358,7 +358,7 @@ exit:
 
 void IPEndPointBasis::InitImpl()
 {
-    mBoundIntfId = InterfaceId();
+    mBoundIntfId = InterfaceId::Null();
 }
 
 #if INET_CONFIG_ENABLE_IPV4

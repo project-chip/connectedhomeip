@@ -63,7 +63,7 @@ struct ResolvedNodeData
 
     PeerId mPeerId;
     Inet::IPAddress mAddress               = Inet::IPAddress::Any;
-    Inet::InterfaceId mInterfaceId         = Inet::InterfaceId();
+    Inet::InterfaceId mInterfaceId         = Inet::InterfaceId::Null();
     uint16_t mPort                         = 0;
     char mHostName[kHostNameMaxLength + 1] = {};
     bool mSupportsTcp                      = false;

@@ -162,7 +162,7 @@ CHIP_ERROR EstablishSecureSession()
     else
     {
         peerAddr = chip::Optional<chip::Transport::PeerAddress>::Value(
-            chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, chip::Inet::InterfaceId()));
+            chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, chip::Inet::InterfaceId::Null()));
     }
 
     // Attempt to connect to the peer.

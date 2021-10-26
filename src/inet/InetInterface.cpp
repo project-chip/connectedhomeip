@@ -114,7 +114,7 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
             return CHIP_NO_ERROR;
         }
     }
-    interface = InterfaceId();
+    interface = InterfaceId::Null();
     return INET_ERROR_UNKNOWN_INTERFACE;
 }
 
@@ -252,7 +252,7 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 
 InterfaceId InterfaceAddressIterator::GetInterfaceId()
 {
-    return HasCurrent() ? mIntfIter.GetInterfaceId() : InterfaceId();
+    return HasCurrent() ? mIntfIter.GetInterfaceId() : InterfaceId::Null();
 }
 
 CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
@@ -546,7 +546,7 @@ bool InterfaceIterator::Next()
 
 InterfaceId InterfaceIterator::GetInterfaceId()
 {
-    return HasCurrent() ? InterfaceId(mIntfArray[mCurIntf].if_index) : InterfaceId();
+    return HasCurrent() ? InterfaceId(mIntfArray[mCurIntf].if_index) : InterfaceId::Null();
 }
 
 CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
@@ -678,7 +678,7 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 
 InterfaceId InterfaceAddressIterator::GetInterfaceId()
 {
-    return HasCurrent() ? InterfaceId(if_nametoindex(mCurAddr->ifa_name)) : InterfaceId();
+    return HasCurrent() ? InterfaceId(if_nametoindex(mCurAddr->ifa_name)) : InterfaceId::Null();
 }
 
 CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
@@ -746,7 +746,7 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
             return CHIP_NO_ERROR;
         }
     }
-    interface = InterfaceId();
+    interface = InterfaceId::Null();
     return INET_ERROR_UNKNOWN_INTERFACE;
 }
 
@@ -765,7 +765,7 @@ bool InterfaceIterator::Next()
 
 InterfaceId InterfaceIterator::GetInterfaceId(void)
 {
-    return HasCurrent() ? InterfaceId(mCurrentId) : InterfaceId();
+    return HasCurrent() ? InterfaceId(mCurrentId) : InterfaceId::Null();
 }
 
 CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
@@ -837,7 +837,7 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 
 InterfaceId InterfaceAddressIterator::GetInterfaceId()
 {
-    return HasCurrent() ? mIntfIter.GetInterfaceId() : InterfaceId();
+    return HasCurrent() ? mIntfIter.GetInterfaceId() : InterfaceId::Null();
 }
 
 CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)

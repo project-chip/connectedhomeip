@@ -154,7 +154,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
     Shutdown(); // ensure everything starts fresh
 
     size_t endpointIndex                = 0;
-    chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId();
+    chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
     chip::Inet::IPAddressType addressType;
 
     ShutdownOnError autoShutdown(this);
@@ -234,7 +234,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
             continue;
         }
 
-        if ((info->interfaceId != interface) && (info->interfaceId != chip::Inet::InterfaceId()))
+        if ((info->interfaceId != interface) && (info->interfaceId != chip::Inet::InterfaceId::Null()))
         {
             continue;
         }

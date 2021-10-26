@@ -77,7 +77,7 @@ private:
     Inet::InetLayer * mLayer         = nullptr;                    ///< Associated inet layer
     Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
     uint16_t mListenPort             = CHIP_PORT;                  ///< TCP listen port
-    Inet::InterfaceId mInterfaceId   = Inet::InterfaceId();        ///< Interface to listen on
+    Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();  ///< Interface to listen on
 };
 
 /**

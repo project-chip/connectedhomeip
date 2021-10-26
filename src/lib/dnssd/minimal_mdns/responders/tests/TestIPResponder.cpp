@@ -57,7 +57,7 @@ InterfaceId FindValidInterfaceId()
             return it.GetInterfaceId();
         }
     }
-    return InterfaceId();
+    return InterfaceId::Null();
 }
 
 #if INET_CONFIG_ENABLE_IPV4

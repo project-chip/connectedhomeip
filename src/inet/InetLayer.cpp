@@ -537,7 +537,7 @@ CHIP_ERROR InetLayer::GetInterfaceFromAddr(const IPAddress & addr, InterfaceId &
         }
     }
 
-    intfId = InterfaceId();
+    intfId = InterfaceId::Null();
 
     return CHIP_NO_ERROR;
 }
@@ -675,7 +675,7 @@ void IPPacketInfo::Clear()
 {
     SrcAddress  = IPAddress::Any;
     DestAddress = IPAddress::Any;
-    Interface   = InterfaceId();
+    Interface   = InterfaceId::Null();
     SrcPort     = 0;
     DestPort    = 0;
 }

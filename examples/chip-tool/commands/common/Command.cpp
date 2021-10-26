@@ -78,7 +78,7 @@ static bool ParseAddressWithInterface(const char * addressString, Command::Addre
     }
     else
     {
-        address->interfaceId = chip::Inet::InterfaceId();
+        address->interfaceId = chip::Inet::InterfaceId::Null();
     }
 
     return true;

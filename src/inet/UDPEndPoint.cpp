@@ -680,7 +680,7 @@ CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addrType, InterfaceId in
 
 InterfaceId UDPEndPoint::GetBoundInterface()
 {
-    return InterfaceId();
+    return InterfaceId::Null();
 }
 
 uint16_t UDPEndPoint::GetBoundPort()

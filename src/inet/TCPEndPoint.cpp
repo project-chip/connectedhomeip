@@ -328,7 +328,7 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
     // TODO: Does netif_get_by_index(mTCP->netif_idx) do the right thing?  I
     // can't quite tell whether LwIP supports a specific interface id for TCP at
     // all.  For now just claim no particular interface id.
-    *retInterface = InterfaceId();
+    *retInterface = InterfaceId::Null();
     return CHIP_NO_ERROR;
 }
 
@@ -1444,7 +1444,7 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
         else
         {
             // TODO: Is there still a meaningful interface id in this case?
-            *retInterface = InterfaceId();
+            *retInterface = InterfaceId::Null();
         }
         return CHIP_NO_ERROR;
     }
@@ -1453,12 +1453,12 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
     if (sa.any.sa_family == AF_INET)
     {
         // No interface id available for IPv4 sockets.
-        *retInterface = InterfaceId();
+        *retInterface = InterfaceId::Null();
         return CHIP_NO_ERROR;
     }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    *retInterface = InterfaceId();
+    *retInterface = InterfaceId::Null();
     return INET_ERROR_WRONG_ADDRESS_TYPE;
 }
 

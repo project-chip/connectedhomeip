@@ -615,7 +615,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             CopyTypeWithoutProtocol(service.mType, type);
             service.mProtocol    = GetProtocolInType(type);
             service.mAddressType = ToAddressType(protocol);
-            service.mInterface   = Inet::InterfaceId();
+            service.mInterface   = Inet::InterfaceId::Null();
             if (interface != AVAHI_IF_UNSPEC)
             {
                 service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
@@ -700,7 +700,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         result.mProtocol    = GetProtocolInType(type);
         result.mPort        = port;
         result.mAddressType = ToAddressType(protocol);
-        result.mInterface   = Inet::InterfaceId();
+        result.mInterface   = Inet::InterfaceId::Null();
         if (interface != AVAHI_IF_UNSPEC)
         {
             result.mInterface = static_cast<chip::Inet::InterfaceId>(interface);

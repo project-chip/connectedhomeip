@@ -39,7 +39,7 @@ public:
         if (mState == State::kIpV4)
         {
 #if INET_CONFIG_ENABLE_IPV4
-            *id   = Inet::InterfaceId();
+            *id   = Inet::InterfaceId::Null();
             *type = chip::Inet::IPAddressType::kIPv4;
 #endif
             mState = State::kIpV6;

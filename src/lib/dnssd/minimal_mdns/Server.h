@@ -44,7 +44,7 @@ void GetIpv4Into(chip::Inet::IPAddress & dest);
 /// interface matters (e.g. FF02::FB will care over which IPv6 interface it is sent)
 ///
 /// For MDNS in particular, you may want:
-///  - IPv4 listen on InterfaceId()
+///  - IPv4 listen on InterfaceId::Null()
 ///  - IPv6 listen on every specific interface id available (except local loopback and other
 ///    not usable interfaces like docker)
 class ListenIterator
@@ -77,7 +77,7 @@ class ServerBase
 public:
     struct EndpointInfo
     {
-        chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId();
+        chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
         chip::Inet::IPAddressType addressType;
         chip::Inet::UDPEndPoint * udp = nullptr;
     };

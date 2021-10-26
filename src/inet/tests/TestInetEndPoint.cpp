@@ -136,10 +136,10 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     err = InterfaceId::InterfaceNameToId("0", intId);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 
-    err = InterfaceId().GetInterfaceName(intName, 0);
+    err = InterfaceId::Null().GetInterfaceName(intName, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    err = InterfaceId().GetInterfaceName(intName, sizeof(intName));
+    err = InterfaceId::Null().GetInterfaceName(intName, sizeof(intName));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR && intName[0] == '\0');
 
     err = gInet.GetInterfaceFromAddr(addr, intId);
@@ -169,7 +169,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
         gInet.MatchLocalIPv6Subnet(addr);
     }
     NL_TEST_ASSERT(inSuite, !intIterator.Next());
-    NL_TEST_ASSERT(inSuite, intIterator.GetInterfaceId() == InterfaceId());
+    NL_TEST_ASSERT(inSuite, intIterator.GetInterfaceId() == InterfaceId::Null());
     NL_TEST_ASSERT(inSuite, intIterator.GetInterfaceName(intName, sizeof(intName)) == CHIP_ERROR_INCORRECT_STATE);
     NL_TEST_ASSERT(inSuite, !intIterator.SupportsMulticast());
     NL_TEST_ASSERT(inSuite, !intIterator.HasBroadcastAddress());
@@ -201,7 +201,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !addrIterator.Next());
     addrIterator.GetAddressWithPrefix(addrWithPrefix);
     NL_TEST_ASSERT(inSuite, addrWithPrefix.IsZero());
-    NL_TEST_ASSERT(inSuite, addrIterator.GetInterfaceId() == InterfaceId());
+    NL_TEST_ASSERT(inSuite, addrIterator.GetInterfaceId() == InterfaceId::Null());
     NL_TEST_ASSERT(inSuite, addrIterator.GetInterfaceName(intName, sizeof(intName)) == CHIP_ERROR_INCORRECT_STATE);
     NL_TEST_ASSERT(inSuite, !addrIterator.SupportsMulticast());
     NL_TEST_ASSERT(inSuite, !addrIterator.HasBroadcastAddress());
@@ -229,7 +229,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = gInet.NewTCPEndPoint(&testTCPEP1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = gInet.GetLinkLocalAddr(InterfaceId(), &addr);
+    err = gInet.GetLinkLocalAddr(InterfaceId::Null(), &addr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = gInet.GetInterfaceFromAddr(addr, intId);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
