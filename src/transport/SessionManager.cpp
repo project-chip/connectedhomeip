@@ -388,7 +388,7 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
 }
 
 void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                           System::PacketBufferHandle && msg)
+                                                  System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -502,12 +502,12 @@ exit:
 }
 
 void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                           System::PacketBufferHandle && msg)
+                                                System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
     SessionManagerDelegate::DuplicateMessage isDuplicate = SessionManagerDelegate::DuplicateMessage::No;
-    //Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
+    // Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
@@ -517,7 +517,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     // Trial decryption with GroupDataProvider. TODO: Implement the GroupDataProvider Class
     // VerifyOrExit(CHIP_NO_ERROR == groups->DecryptMessage(packetHeader, payloadHeader, msg),
     //     ChipLogError(Inet, "Secure transport received group message, but failed to decode it, discarding"));
-
 
     if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {
@@ -556,7 +555,6 @@ exit:
         mCB->OnReceiveError(err, peerAddress);
     }
 }
-
 
 void SessionManager::HandleConnectionExpired(const Transport::SecureSession & state)
 {
