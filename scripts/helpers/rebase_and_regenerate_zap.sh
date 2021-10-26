@@ -103,6 +103,7 @@ git rebase origin/$BASE_BRANCH
 # push back
 git push --force-with-lease fork fork/$HEAD_BRANCH:$HEAD_BRANCH
 
+git submodule update --init --recursive third_party/zap/
 
 cd third_party/zap/repo/
 npm ci
