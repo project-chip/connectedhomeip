@@ -4280,7 +4280,7 @@ public class ChipClusters {
 
     public void announceOtaProvider(
         DefaultClusterCallback callback,
-        byte[] providerLocation,
+        long providerLocation,
         int vendorId,
         int announcementReason,
         byte[] metadataForNode) {
@@ -4296,7 +4296,7 @@ public class ChipClusters {
     private native void announceOtaProvider(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        byte[] providerLocation,
+        long providerLocation,
         int vendorId,
         int announcementReason,
         byte[] metadataForNode);
@@ -5672,6 +5672,10 @@ public class ChipClusters {
       testAddArguments(chipClusterPtr, callback, arg1, arg2);
     }
 
+    public void testEnumsRequest(TestEnumsResponseCallback callback, int arg1, int arg2) {
+      testEnumsRequest(chipClusterPtr, callback, arg1, arg2);
+    }
+
     public void testListInt8UArgumentRequest(DefaultClusterCallback callback, int arg1) {
       testListInt8UArgumentRequest(chipClusterPtr, callback, arg1);
     }
@@ -5708,6 +5712,9 @@ public class ChipClusters {
     private native void testAddArguments(
         long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
 
+    private native void testEnumsRequest(
+        long chipClusterPtr, TestEnumsResponseCallback callback, int arg1, int arg2);
+
     private native void testListInt8UArgumentRequest(
         long chipClusterPtr, DefaultClusterCallback callback, int arg1);
 
@@ -5742,6 +5749,12 @@ public class ChipClusters {
 
     public interface TestAddArgumentsResponseCallback {
       void onSuccess(int returnValue);
+
+      void onError(Exception error);
+    }
+
+    public interface TestEnumsResponseCallback {
+      void onSuccess(int arg1, int arg2);
 
       void onError(Exception error);
     }
@@ -5970,6 +5983,14 @@ public class ChipClusters {
       writeEpochSAttribute(chipClusterPtr, callback, value);
     }
 
+    public void readVendorIdAttribute(IntegerAttributeCallback callback) {
+      readVendorIdAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeVendorIdAttribute(DefaultClusterCallback callback, int value) {
+      writeVendorIdAttribute(chipClusterPtr, callback, value);
+    }
+
     public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
       readUnsupportedAttribute(chipClusterPtr, callback);
     }
@@ -6102,6 +6123,12 @@ public class ChipClusters {
 
     private native void writeEpochSAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void readVendorIdAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeVendorIdAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
 
     private native void readUnsupportedAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);

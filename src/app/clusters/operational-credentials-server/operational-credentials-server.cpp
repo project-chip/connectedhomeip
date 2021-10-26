@@ -251,7 +251,7 @@ static FabricInfo * retrieveCurrentFabric()
         return nullptr;
     }
 
-    FabricIndex index = emberAfCurrentCommand()->source->GetSecureSession().GetFabricIndex();
+    FabricIndex index = emberAfCurrentCommand()->source->GetSessionHandle().GetFabricIndex();
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
@@ -321,7 +321,7 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSecureSession().GetFabricIndex();
+        FabricIndex currentFabricIndex = ec->GetSessionHandle().GetFabricIndex();
         ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
     }
 };
@@ -350,7 +350,7 @@ exit:
     if (err == CHIP_NO_ERROR)
     {
         chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
-        FabricIndex currentFabricIndex        = ec->GetSecureSession().GetFabricIndex();
+        FabricIndex currentFabricIndex        = ec->GetSessionHandle().GetFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
         {
             // If the current fabric is being removed, expiring all the secure sessions causes crashes as
@@ -650,7 +650,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
         ByteSpan attestationChallenge = commandObj->GetExchangeContext()
                                             ->GetExchangeMgr()
                                             ->GetSessionManager()
-                                            ->GetSecureSession(commandObj->GetExchangeContext()->GetSecureSession())
+                                            ->GetSecureSession(commandObj->GetExchangeContext()->GetSessionHandle())
                                             ->GetCryptoContext()
                                             .GetAttestationChallenge();
 

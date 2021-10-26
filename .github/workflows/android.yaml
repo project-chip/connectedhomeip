@@ -25,7 +25,7 @@ concurrency:
 jobs:
     android:
         name: Build Android
-        timeout-minutes: 60
+        timeout-minutes: 75
 
         env:
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/

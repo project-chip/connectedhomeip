@@ -10434,6 +10434,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t epochS)
 
 } // namespace EpochS
 
+namespace VendorId {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * vendorId)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) vendorId, sizeof(*vendorId));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId vendorId)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &vendorId,
+                                       ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
+}
+
+} // namespace VendorId
+
 namespace Unsupported {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * unsupported)

@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
@@ -40,6 +41,7 @@
 #include <zap-generated/CHIPClusters.h>
 
 #include "BDXDownloader.h"
+#include "ExampleOTARequestor.h"
 #include "ExampleSelfCommissioning.h"
 #include "PersistentStorage.h"
 
@@ -70,7 +72,7 @@ void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedAction
                           CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
                           chip::ByteSpan metadataForRequestor)
 {
-    ChipLogDetail(SoftwareUpdate, "%s", __FUNCTION__);
+    ChipLogDetail(SoftwareUpdate, "QueryImageResponse responded with action %" PRIu8, status);
 
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = chip::bdx::TransferControlFlags::kReceiverDrive;
@@ -132,7 +134,7 @@ void OnConnection(void * context, Device * device)
     err = cluster.Associate(device, kOtaProviderEndpoint);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Associate() failed: %s", chip::ErrorStr(err));
+        ChipLogError(SoftwareUpdate, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
     err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleHWVersion,
@@ -140,13 +142,13 @@ void OnConnection(void * context, Device * device)
                              metadata);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "QueryImage() failed: %s", chip::ErrorStr(err));
+        ChipLogError(SoftwareUpdate, "QueryImage() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
 void OnConnectFail(void * context, chip::NodeId deviceId, CHIP_ERROR error)
 {
-    ChipLogError(SoftwareUpdate, "failed to connect to 0x%" PRIX64 ": %s", deviceId, chip::ErrorStr(error));
+    ChipLogError(SoftwareUpdate, "failed to connect to 0x%" PRIX64 ": %" CHIP_ERROR_FORMAT, deviceId, error.Format());
 }
 
 Callback<OnDeviceConnected> mConnectionCallback(OnConnection, nullptr);
@@ -260,11 +262,9 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     err = mStorage.Init();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %" CHIP_ERROR_FORMAT, err.Format()));
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
-
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", chip::ErrorStr(err)));
 
     err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
     if (err == CHIP_NO_ERROR)
@@ -273,7 +273,7 @@ int main(int argc, char * argv[])
     }
     else
     {
-        ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %s \n", chip::ErrorStr(err));
+        ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %" CHIP_ERROR_FORMAT "\n", err.Format());
         goto exit;
     }
 
@@ -301,10 +301,10 @@ int main(int argc, char * argv[])
         err = DoExampleSelfCommissioning(mController, &mOpCredsIssuer, &mStorage, mStorage.GetLocalNodeId(),
                                          mStorage.GetListenPort());
         VerifyOrExit(err == CHIP_NO_ERROR,
-                     ChipLogError(SoftwareUpdate, "example self-commissioning failed: %s", chip::ErrorStr(err)));
+                     ChipLogError(SoftwareUpdate, "example self-commissioning failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
         err = chip::Controller::DeviceControllerFactory::GetInstance().ServiceEvents();
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "ServiceEvents() failed: %s", chip::ErrorStr(err)));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "ServiceEvents() failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
         ChipLogProgress(SoftwareUpdate, "Attempting to connect to device 0x%" PRIX64, providerNodeId);
 
@@ -312,7 +312,7 @@ int main(int argc, char * argv[])
         // Currently, that pairing action will persist the CASE session in persistent memory, which will then be read by the
         // following call.
         err = mController.GetDevice(providerNodeId, &providerDevice);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "No device found: %s", chip::ErrorStr(err)));
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "No device found: %" CHIP_ERROR_FORMAT, err.Format()));
 
         err = providerDevice->EstablishConnectivity(&mConnectionCallback, &mConnectFailCallback);
     }
@@ -320,6 +320,6 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
-    ChipLogDetail(SoftwareUpdate, "%s", ErrorStr(err));
+    ChipLogDetail(SoftwareUpdate, "%" CHIP_ERROR_FORMAT, err.Format());
     return 0;
 }
