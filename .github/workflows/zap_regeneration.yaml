@@ -53,4 +53,4 @@ jobs:
           - name: Rebase and regenerate
             run: scripts/helpers/rebase_and_regenerate_zap.sh
             env: 
-              GITHUB_TOKEN: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
