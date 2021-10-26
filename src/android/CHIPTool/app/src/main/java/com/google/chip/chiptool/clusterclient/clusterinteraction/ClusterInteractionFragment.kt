@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,11 +23,13 @@ import kotlinx.coroutines.cancel
 <<<<<<< HEAD
 import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
+import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import java.lang.Exception
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.endpointList
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getClusterMappingBtn
 import kotlinx.coroutines.launch
 
+<<<<<<< HEAD
 =======
 import
 >>>>>>> 505e97db3 (change package)
@@ -40,6 +41,9 @@ import kotlinx.coroutines.launch
 >>>>>>> a4fd0282e (no error code generation)
 
 class ClusterInteractionFragment : Fragment() {
+=======
+class ClusterInteractionFragment : Fragment(){
+>>>>>>> f5940e9dd (recycler view for endpoint display and test cluster detail screen done)
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
 
@@ -69,11 +73,13 @@ class ClusterInteractionFragment : Fragment() {
       clusterMap = ClusterInfoMapping().clusterMap;
       getClusterMappingBtn.setOnClickListener { scope.launch { getClusterMapping() } }
       var dataList: List<EndpointItem> = ArrayList<EndpointItem>()
-      for (i in 0 until 40) {
+      // TODO: Dynamically retrieve endpoint information using descriptor cluster
+      // hardcode the endpoint for now
+      for (i in 0 until 7) {
         dataList += EndpointItem(i)
       }
 
-      endpointList.adapter = EndpointAdapter(dataList)
+      endpointList.adapter = EndpointAdapter(dataList, endpointListener())
       endpointList.layoutManager = LinearLayoutManager(requireContext())
     }
   }
@@ -200,5 +206,23 @@ class ClusterInteractionFragment : Fragment() {
   companion object {
     private const val TAG = "ClusterInteractionFragment"
     fun newInstance(): ClusterInteractionFragment = ClusterInteractionFragment()
+  }
+
+  private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
+    val fragmentTransaction = requireActivity().supportFragmentManager
+      .beginTransaction()
+      .replace(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
+
+    if (showOnBack) {
+      fragmentTransaction.addToBackStack(null)
+    }
+
+    fragmentTransaction.commit()
+  }
+  inner class endpointListener: EndpointAdapter.OnItemClickListener {
+    override fun onItemClick(position: Int) {
+      Toast.makeText(requireContext(), "Item $position clicked", Toast.LENGTH_SHORT).show()
+      showFragment(ClusterDetailFragment.newInstance(), true)
+    }
   }
 }
