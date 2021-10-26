@@ -25,6 +25,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventDataElement.h>
+#include <app/tests/AppTestContext.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -33,25 +34,13 @@
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
-#include <messaging/tests/MessagingContext.h>
+
 #include <nlunit-test.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
-#include <protocols/secure_channel/PASESession.h>
-#include <system/SystemPacketBuffer.h>
-#include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SessionManager.h>
-#include <transport/raw/UDP.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
+
 #include <type_traits>
 
 namespace {
-chip::TransportMgrBase gTransportManager;
-chip::Test::LoopbackTransport gLoopback;
-chip::Test::IOContext gIOContext;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
 uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
@@ -64,20 +53,40 @@ chip::EventId kTestEventIdDebug       = 1;
 chip::EventId kTestEventIdCritical    = 2;
 uint8_t kTestFieldValue1              = 1;
 chip::TLV::Tag kTestEventTag          = chip::TLV::ContextTag(1);
-using TestContext                     = chip::Test::MessagingContext;
-TestContext sContext;
 
-void InitializeEventLogging(chip::Messaging::ExchangeManager & aExchangeManager)
+class TestContext : public chip::Test::AppContext
 {
-    chip::app::LogStorageResources logStorageResources[] = {
-        { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Debug },
-        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Info },
-        { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
-    };
+public:
+    static int Initialize(void * context)
+    {
+        if (AppContext::Initialize(context) != SUCCESS)
+            return FAILURE;
 
-    chip::app::EventManagement::CreateEventManagement(&aExchangeManager, ArraySize(logStorageResources), gCircularEventBuffer,
-                                                      logStorageResources);
-}
+        auto * ctx = static_cast<TestContext *>(context);
+
+        chip::app::LogStorageResources logStorageResources[] = {
+            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Debug },
+            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Info },
+            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
+        };
+
+        chip::app::EventManagement::CreateEventManagement(
+            &ctx->GetExchangeManager(), ArraySize(logStorageResources), gCircularEventBuffer,
+            logStorageResources);
+
+        return SUCCESS;
+    }
+
+    static int Finalize(void * context)
+    {
+        chip::app::EventManagement::DestroyEventManagement();
+
+        if (AppContext::Finalize(context) != SUCCESS)
+            return FAILURE;
+
+        return SUCCESS;
+    }
+};
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
 {
@@ -1125,49 +1134,23 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-int Initialize(void * aContext);
-int Finalize(void * aContext);
 
 // clang-format off
 nlTestSuite sSuite =
 {
-        "TestReadInteraction",
-        &sTests[0],
-        Initialize,
-        Finalize
+    "TestReadInteraction",
+    &sTests[0],
+    TestContext::Initialize,
+    TestContext::Finalize
 };
 // clang-format on
-
-int Initialize(void * aContext)
-{
-    // Initialize System memory and resources
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gTransportManager.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
-
-    auto * ctx = static_cast<TestContext *>(aContext);
-    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportManager, &gIOContext) == CHIP_NO_ERROR, FAILURE);
-
-    InitializeEventLogging(ctx->GetExchangeManager());
-    gTransportManager.SetSessionManager(&ctx->GetSecureSessionManager());
-    return SUCCESS;
-}
-
-int Finalize(void * aContext)
-{
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    gIOContext.Shutdown();
-    chip::Platform::MemoryShutdown();
-    chip::app::EventManagement::DestroyEventManagement();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
-}
 
 } // namespace
 
 int TestReadInteraction()
 {
-    nlTestRunner(&sSuite, &sContext);
-
+    TestContext gContext;
+    nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }
 

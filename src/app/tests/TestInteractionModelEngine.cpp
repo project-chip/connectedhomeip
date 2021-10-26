@@ -23,6 +23,7 @@
  */
 
 #include <app/InteractionModelEngine.h>
+#include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -30,26 +31,12 @@
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
-#include <protocols/secure_channel/PASESession.h>
-#include <system/SystemLayerImpl.h>
-#include <system/SystemPacketBuffer.h>
-#include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SessionManager.h>
-#include <transport/raw/UDP.h>
 
 #include <nlunit-test.h>
 
-namespace {
-static chip::System::LayerImpl gSystemLayer;
-static chip::SessionManager gSessionManager;
-static chip::Messaging::ExchangeManager gExchangeManager;
-static chip::secure_channel::MessageCounterManager gMessageCounterManager;
-static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-} // namespace
+using TestContext = chip::Test::AppContext;
 
 namespace chip {
 namespace app {
@@ -75,8 +62,9 @@ int TestInteractionModelEngine::GetClusterInfoListLength(ClusterInfo * apCluster
 
 void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuite, void * apContext)
 {
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
+    err            = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ClusterInfo * clusterInfoList = nullptr;
     ClusterInfo clusterInfo1;
@@ -105,8 +93,9 @@ void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuit
 
 void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite, void * apContext)
 {
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
+    err            = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ClusterInfo clusterInfoList[2];
 
@@ -131,25 +120,6 @@ void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * 
 } // namespace chip
 
 namespace {
-void InitializeChip(nlTestSuite * apSuite)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-
-    err = chip::Platform::MemoryInit();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    gSystemLayer.Init();
-
-    err = gSessionManager.Init(&gSystemLayer, &gTransportManager, &gMessageCounterManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = gExchangeManager.Init(&gSessionManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = gMessageCounterManager.Init(&gExchangeManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-}
 
 // clang-format off
 const nlTest sTests[] =
@@ -159,27 +129,24 @@ const nlTest sTests[] =
                 NL_TEST_SENTINEL()
         };
 // clang-format on
+
+// clang-format off
+nlTestSuite sSuite =
+{
+    "TestInteractionModelEngine",
+    &sTests[0],
+    TestContext::Initialize,
+    TestContext::Finalize
+};
+// clang-format on
+
 } // namespace
 
 int TestInteractionModelEngine()
 {
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "TestInteractionModelEngine",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
-
-    InitializeChip(&theSuite);
-
-    nlTestRunner(&theSuite, nullptr);
-
-    gSystemLayer.Shutdown();
-
-    return (nlTestRunnerStats(&theSuite));
+    TestContext gContext;
+    nlTestRunner(&sSuite, &gContext);
+    return (nlTestRunnerStats(&sSuite));
 }
 
 CHIP_REGISTER_TEST_SUITE(TestInteractionModelEngine)

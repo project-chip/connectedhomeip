@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
+#include <app/tests/AppTestContext.h>
 #include <controller/ReadInteraction.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -25,18 +26,12 @@
 #include <messaging/tests/MessagingContext.h>
 #include <nlunit-test.h>
 
+using TestContext = chip::Test::AppContext;
+
 using namespace chip;
 using namespace chip::app::Clusters;
 
 namespace {
-chip::TransportMgrBase gTransportManager;
-chip::Test::LoopbackTransport gLoopback;
-chip::Test::IOContext gIOContext;
-chip::Messaging::ExchangeManager * gExchangeManager;
-secure_channel::MessageCounterManager gMessageCounterManager;
-
-using TestContext = chip::Test::MessagingContext;
-TestContext sContext;
 
 constexpr EndpointId kTestEndpointId = 1;
 
@@ -147,14 +142,14 @@ void TestReadInteraction::TestDataResponse(nlTestSuite * apSuite, void * apConte
                                              CHIP_ERROR aError) { onFailureCbInvoked = true; };
 
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-        gExchangeManager, sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
 
     NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
-    NL_TEST_ASSERT(apSuite, gExchangeManager->GetNumActiveExchanges() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestAttributeError(nlTestSuite * apSuite, void * apContext)
@@ -180,14 +175,14 @@ void TestReadInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCon
     };
 
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-        gExchangeManager, sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
-    NL_TEST_ASSERT(apSuite, gExchangeManager->GetNumActiveExchanges() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContext)
@@ -213,12 +208,12 @@ void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContex
     };
 
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-        gExchangeManager, sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 1);
-    NL_TEST_ASSERT(apSuite, gExchangeManager->GetNumActiveExchanges() == 2);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
 
-    gExchangeManager->OnConnectionExpired(ctx.GetSessionBobToAlice());
+    ctx.GetExchangeManager().OnConnectionExpired(ctx.GetSessionBobToAlice());
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
@@ -226,18 +221,18 @@ void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContex
     //
     // TODO: Figure out why I cannot enable this line below.
     //
-    // NL_TEST_ASSERT(apSuite, gExchangeManager->GetNumActiveExchanges() == 1);
+    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
 
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
 
-    gExchangeManager->OnConnectionExpired(ctx.GetSessionAliceToBob());
+    ctx.GetExchangeManager().OnConnectionExpired(ctx.GetSessionAliceToBob());
 
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
 
     //
     // TODO: Figure out why I cannot enable this line below.
     //
-    // NL_TEST_ASSERT(apSuite, gExchangeManager->GetNumActiveExchanges() == 0);
+    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 // clang-format off
@@ -250,51 +245,22 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-int Initialize(void * aContext);
-int Finalize(void * aContext);
-
 // clang-format off
 nlTestSuite sSuite =
 {
-        "TestRead",
-        &sTests[0],
-        Initialize,
-        Finalize
+    "TestRead",
+    &sTests[0],
+    TestContext::Initialize,
+    TestContext::Finalize
 };
 // clang-format on
-
-int Initialize(void * aContext)
-{
-    // Initialize System memory and resources
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gTransportManager.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
-
-    auto * ctx = static_cast<TestContext *>(aContext);
-    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportManager, &gIOContext) == CHIP_NO_ERROR, FAILURE);
-
-    gTransportManager.SetSessionManager(&ctx->GetSecureSessionManager());
-    gExchangeManager = &ctx->GetExchangeManager();
-    VerifyOrReturnError(
-        chip::app::InteractionModelEngine::GetInstance()->Init(&ctx->GetExchangeManager(), nullptr) == CHIP_NO_ERROR, FAILURE);
-    return SUCCESS;
-}
-
-int Finalize(void * aContext)
-{
-    // Shutdown will ensure no leaked exchange context.
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    gIOContext.Shutdown();
-    chip::Platform::MemoryShutdown();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
-}
 
 } // namespace
 
 int TestReadInteractionTest()
 {
-    nlTestRunner(&sSuite, &sContext);
-
+    TestContext gContext;
+    nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }
 
