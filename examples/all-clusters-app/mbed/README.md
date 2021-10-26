@@ -18,21 +18,21 @@ paired into an existing Matter network and can be controlled by this network.
 
 <hr>
 
-- [Overview](#overview)
-  - [Bluetooth Low Energy advertising](#bluetooth-low-energy-advertising)
-  - [Bluetooth Low Energy rendezvous](#bluetooth-low-energy-rendezvous)
-  - [WiFi provisioning](#wifi-provisioning)
-- [Run application](#run-application)
-  - [Environment setup](#environment-setup)
-  - [Building](#building)
-  - [Flashing](#flashing)
-  - [Debugging](#debugging)
-  - [Testing](#testing)
-    - [CHIP Tools](#chip-tools)
-  - [Supported devices](#supported-devices)
-      - [Notes](#notes)
-- [Device UI](#device-ui)
-    - [Notes](#notes-1)
+-   [Overview](#overview)
+    -   [Bluetooth Low Energy advertising](#bluetooth-low-energy-advertising)
+    -   [Bluetooth Low Energy rendezvous](#bluetooth-low-energy-rendezvous)
+    -   [WiFi provisioning](#wifi-provisioning)
+-   [Run application](#run-application)
+    -   [Environment setup](#environment-setup)
+    -   [Building](#building)
+    -   [Flashing](#flashing)
+    -   [Debugging](#debugging)
+    -   [Testing](#testing)
+        -   [CHIP Tools](#chip-tools)
+    -   [Supported devices](#supported-devices)
+        -   [Notes](#notes)
+-   [Device UI](#device-ui)
+    -   [Notes](#notes-1)
 
 <hr>
 

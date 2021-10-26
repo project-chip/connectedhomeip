@@ -21,18 +21,18 @@ serial port to the device. The following RPC protocols services are available:
 
 <hr>
 
-- [Overview](#overview)
-- [Run application](#run-application)
-  - [Environment setup](#environment-setup)
-  - [Building](#building)
-  - [Flashing](#flashing)
-  - [Debugging](#debugging)
-  - [Testing](#testing)
-    - [RPC console](#rpc-console)
-  - [Supported devices](#supported-devices)
-      - [Notes](#notes)
-- [Device UI](#device-ui)
-    - [Notes](#notes-1)
+-   [Overview](#overview)
+-   [Run application](#run-application)
+    -   [Environment setup](#environment-setup)
+    -   [Building](#building)
+    -   [Flashing](#flashing)
+    -   [Debugging](#debugging)
+    -   [Testing](#testing)
+        -   [RPC console](#rpc-console)
+    -   [Supported devices](#supported-devices)
+        -   [Notes](#notes)
+-   [Device UI](#device-ui)
+    -   [Notes](#notes-1)
 
 <hr>
 
