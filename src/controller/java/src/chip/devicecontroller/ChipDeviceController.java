@@ -100,10 +100,6 @@ public class ChipDeviceController {
     unpairDevice(deviceControllerPtr, deviceId);
   }
 
-  public void pairTestDeviceWithoutSecurity(String ipAddress) {
-    pairTestDeviceWithoutSecurity(deviceControllerPtr, ipAddress);
-  }
-
   /**
    * Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error.
    *
@@ -252,8 +248,6 @@ public class ChipDeviceController {
 
   private native void getConnectedDevicePointer(
       long deviceControllerPtr, long deviceId, long callbackHandle);
-
-  private native void pairTestDeviceWithoutSecurity(long deviceControllerPtr, String ipAddress);
 
   private native boolean disconnectDevice(long deviceControllerPtr, long deviceId);
 
