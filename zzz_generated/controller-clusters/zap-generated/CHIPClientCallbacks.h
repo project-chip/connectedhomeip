@@ -230,6 +230,11 @@ typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & data);
+void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                             chip::Callback::Cancelable * onSuccessCallback,
+                                                                             chip::Callback::Cancelable * onFailureCallback);
+typedef void (*OperationalCredentialsTrustedRootCertificatesListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
 void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(chip::TLV::TLVReader * data,
                                                               chip::Callback::Cancelable * onSuccessCallback,
                                                               chip::Callback::Cancelable * onFailureCallback);

@@ -78,6 +78,10 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
     if (current_os == "zephyr" || current_os == "android") {
       test_sources += [ "TestKeyValueStoreMgr.cpp" ]
     }
+
+    if (chip_device_platform == "linux") {
+      test_sources += [ "TestConnectivityMgr.cpp" ]
+    }
   }
 } else {
   import("${chip_root}/build/chip/chip_test_group.gni")

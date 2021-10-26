@@ -123,7 +123,7 @@ public:
     // TODO - Refactor storing and loading of fabric info from persistent storage.
     //        The op cert array doesn't need to be in RAM except when it's being
     //        transmitted to peer node during CASE session setup.
-    CHIP_ERROR GetRootCert(ByteSpan & cert)
+    CHIP_ERROR GetRootCert(ByteSpan & cert) const
     {
         ReturnErrorCodeIf(mRootCert.empty(), CHIP_ERROR_INCORRECT_STATE);
         cert = mRootCert;
