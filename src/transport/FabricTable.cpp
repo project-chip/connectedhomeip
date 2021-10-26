@@ -207,7 +207,7 @@ CHIP_ERROR FabricInfo::DeleteFromStorage(FabricStorage * storage, FabricIndex fa
     err = storage->SyncDelete(fabricIndex, key);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Discovery, "Fabric %d is not yet configured", ifabricIndexd);
+        ChipLogDetail(Discovery, "Fabric %d is not yet configured", fabricIndex);
     }
     return err;
 }
@@ -598,6 +598,15 @@ CHIP_ERROR FabricTable::SetFabricDelegate(FabricTableDelegate * delegate)
     mDelegate = delegate;
     ChipLogDetail(Discovery, "Set the fabric pairing table delegate");
     return CHIP_NO_ERROR;
+}
+
+std::string SimpleFabricStorage::formatKey(FabricIndex fabricIndex, const char * key)
+{
+    char fabricPrefix[fabricPrefixSize];
+    snprintf(fabricPrefix, fabricPrefixSize, "F%02X/", fabricIndex);
+    std::string formattedKey = fabricPrefix;
+    formattedKey += key;
+    return formattedKey;
 }
 
 } // namespace chip

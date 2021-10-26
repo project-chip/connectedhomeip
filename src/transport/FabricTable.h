@@ -73,6 +73,9 @@ public:
  * @brief A default implementation of Fabric storage that preserves legacy behavior of using
  *        the Persistent storage delegate directly.
  *
+ *        This class automatically prefixes the Fabric Storage Keys with the FabricIndex.
+ *        The keys are formatted like so: "F%02X/" + key.
+ *
  */
 class DLL_EXPORT SimpleFabricStorage : public FabricStorage
 {
@@ -91,22 +94,30 @@ public:
     CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
     {
         VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mStorage->SyncSetKeyValue(key, buffer, size);
+        std::string formattedKey = formatKey(fabricIndex, key);
+        return mStorage->SyncSetKeyValue(formattedKey.c_str(), buffer, size);
     };
 
     CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override
     {
         VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mStorage->SyncGetKeyValue(key, buffer, size);
+        std::string formattedKey = formatKey(fabricIndex, key);
+        return mStorage->SyncGetKeyValue(formattedKey.c_str(), buffer, size);
     };
 
     CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override
     {
         VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mStorage->SyncDeleteKeyValue(key);
+        std::string formattedKey = formatKey(fabricIndex, key);
+        return mStorage->SyncDeleteKeyValue(formattedKey.c_str());
     };
 
 private:
+    // FabricPrefix is of the format "F%02X/"
+    const static int fabricPrefixSize = 5;
+    // Returns a string that adds a FabricIndex prefix to the Key
+    std::string formatKey(FabricIndex fabricIndex, const char * key);
+
     PersistentStorageDelegate * mStorage = nullptr;
 };
 
