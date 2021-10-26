@@ -22,30 +22,32 @@
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/GroupId.h>
+#include <lib/core/PasscodeId.h>
 #include <lib/core/NodeId.h>
 
 namespace chip {
 namespace Access {
 
-typedef uint64_t CatId;
-typedef uint16_t PasscodeId;
-
-// Can store a PasscodeId, NodeId, CatId, GroupId, etc. as appropriate.
-typedef NodeId SubjectId;
+union SubjectId
+{
+    PasscodeId passcode;
+    NodeId node;
+    GroupId group;
+};
 
 struct SubjectDescriptor
 {
-    // Holds PasscodeId if kPase, NodeId if kCase, GroupId if kGroup
-    SubjectId subject = 0;
+    // Holds FabricIndex of fabric, 0 if no fabric.
+    FabricIndex fabricIndex = 0;
 
-    // Holds (optional) CAT1/CAT2 if kCase
-    SubjectId catSubjects[2] = {};
-
-    // Holds AuthMode of subject(s), kNone if no access
+    // Holds AuthMode of subject(s), kNone if no access.
     AuthMode authMode = AuthMode::kNone;
 
-    // Holds FabricIndex of fabric, 0 if no fabric
-    FabricIndex fabricIndex = 0;
+    // NOTE: due to packing there should be free bytes here
+
+    // Holds subjects according to auth mode, and the latter two are only valid
+    // if auth mode is CASE.
+    SubjectId subjects[3] = {};
 };
 
 } // namespace Access

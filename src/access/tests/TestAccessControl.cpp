@@ -43,44 +43,38 @@ constexpr size_t kTargetsPerEntry  = 3;
 // Used to detect empty subjects, targets, etc.
 constexpr int kEmptyFlags = 0;
 
-struct TestSubject
-{
-    enum Flag
-    {
-        kPasscode = 1 << 0,
-        kNode     = 1 << 1,
-        kCAT1     = 1 << 2,
-        kCAT2     = 1 << 3,
-        kGroup    = 1 << 4,
-    };
+// For test purposes, store all subjects as node, use tags to discriminate
+// passcode/group, and don't allow 0.
+constexpr NodeId kTestSubjectMask = 0xFFFFFFFFFFFF0000;
+constexpr NodeId kTestSubjectPasscode = 0xDDDDDDDDDDDD0000;
+constexpr NodeId kTestSubjectGroup = 0xEEEEEEEEEEEE0000;
+constexpr NodeId kTestSubjectEmpty = 0x0000000000000000;
 
-    int flags = kEmptyFlags;
-    SubjectId id;
-};
-
-TestSubject Passcode(PasscodeId id)
+constexpr SubjectId Passcode(PasscodeId passcode)
 {
-    return { .flags = TestSubject::kPasscode, .id = id };
+    // For test purposes, stuff passcode into node with tag
+    return { .node = kTestSubjectPasscode | passcode };
 }
 
-TestSubject Node(NodeId id)
+constexpr SubjectId Node(NodeId node)
 {
-    return { .flags = TestSubject::kNode, .id = id };
+    return { .node = node };
 }
 
-TestSubject CAT1(CatId id)
+constexpr SubjectId CAT1(NodeId node)
 {
-    return { .flags = TestSubject::kCAT1, .id = id };
+    return { .node = node };
 }
 
-TestSubject CAT2(CatId id)
+constexpr SubjectId CAT2(NodeId node)
 {
-    return { .flags = TestSubject::kCAT2, .id = id };
+    return { .node = node };
 }
 
-TestSubject Group(GroupId id)
+constexpr SubjectId Group(GroupId group)
 {
-    return { .flags = TestSubject::kGroup, .id = id };
+    // For test purposes, stuff group into node with tag
+    return { .node = kTestSubjectGroup | group };
 }
 
 struct TestTarget
@@ -118,7 +112,7 @@ struct TestEntryDelegate
     FabricIndex fabricIndex = 0;
     AuthMode authMode       = AuthMode::kNone;
     Privilege privilege     = Privilege::kView;
-    TestSubject subjects[kSubjectsPerEntry + 1];
+    SubjectId subjects[kSubjectsPerEntry + 1];
     TestTarget targets[kTargetsPerEntry + 1];
     const char * tag = "";
     bool touched     = false;
@@ -264,13 +258,34 @@ public:
 
     bool MatchesSubject(SubjectId subject) const override
     {
-        TestSubject * p = delegate->subjects;
-        if (p->flags == kEmptyFlags)
+        SubjectId * p = delegate->subjects;
+        if (p->node == kTestSubjectEmpty)
             return true;
-        for (; p->flags != kEmptyFlags; ++p)
+        for (; p->node != kTestSubjectEmpty; ++p)
         {
-            if (p->id == subject)
-                return true;
+            // Don't call ::MatchesSubject because of special storage/tags
+            if ((p->node & kTestSubjectMask) == kTestSubjectPasscode)
+            {
+                if ((p->node & ~kTestSubjectMask) == subject.passcode)
+                {
+                    return true;
+                }
+            }
+            else if ((p->node & kTestSubjectMask) == kTestSubjectGroup)
+            {
+                if ((p->node & ~kTestSubjectMask) == subject.group)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                // TODO: handle CASE Authenticated Tags (CAT1/CAT2)
+                if (p->node == subject.node)
+                {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -403,49 +418,49 @@ void TestCheck(nlTestSuite * inSuite, void * inContext)
     } checks[] = {
         // clang-format off
         {
-            { .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 1 },
+            { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { Node(0x1122334455667788) } },
             { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
             Privilege::kAdminister,
             CHIP_NO_ERROR,
             "1-admin",
         },
         {
-            { .subject = 0x1111222233334444, .authMode = AuthMode::kCase, .fabricIndex = 1 },
+            { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { Node(0x1111222233334444) } },
             { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
             Privilege::kAdminister,
             CHIP_ERROR_ACCESS_DENIED,
             "(end)",
         },
         {
-            { .subject = 0x0000000000000000, .authMode = AuthMode::kPase, .fabricIndex = 1 },
+            { .fabricIndex = 1, .authMode = AuthMode::kPase, .subjects = { Passcode(kDefaultCommissioningPasscodeId) } },
             { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
             Privilege::kAdminister,
             CHIP_ERROR_ACCESS_DENIED,
             "(end)",
         },
         {
-            { .subject = 0x8877665544332211, .authMode = AuthMode::kCase, .fabricIndex = 2 },
+            { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { Node(0x8877665544332211) } },
             { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
             Privilege::kAdminister,
             CHIP_NO_ERROR,
             "2-admin",
         },
         {
-            { .subject = 0x1122334455667788, .authMode = AuthMode::kCase, .fabricIndex = 2 },
+            { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { Node(0x1122334455667788) } },
             { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
             Privilege::kAdminister,
             CHIP_ERROR_ACCESS_DENIED,
             "(end)",
         },
         {
-            { .subject = 0x0000000000000000, .authMode = AuthMode::kPase, .fabricIndex = 2 },
+            { .fabricIndex = 2, .authMode = AuthMode::kPase, .subjects = { Passcode(kDefaultCommissioningPasscodeId) } },
             { .endpoint = kEndpoint1, .cluster = kOnOffCluster },
             Privilege::kAdminister,
             CHIP_ERROR_ACCESS_DENIED,
             "(end)",
         },
         {
-            { .subject = 0x0000000000000000, .authMode = AuthMode::kPase, .fabricIndex = 1 },
+            { .fabricIndex = 1, .authMode = AuthMode::kPase, .subjects = { Passcode(kDefaultCommissioningPasscodeId) } },
             { .endpoint = kEndpoint2, .cluster = kOnOffCluster },
             Privilege::kView,
             CHIP_NO_ERROR,

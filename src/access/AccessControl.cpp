@@ -83,7 +83,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         if (!entry->MatchesAuthMode(subjectDescriptor.authMode))
             continue;
         ChipLogDetail(DataManagement, "  --> matched authmode");
-        if (!entry->MatchesSubject(subjectDescriptor.subject))
+        if (!entry->MatchesSubject(subjectDescriptor.subjects[0]))
             continue;
         ChipLogDetail(DataManagement, "  --> matched subject");
         if (!entry->MatchesTarget(requestPath.endpoint, requestPath.cluster))
