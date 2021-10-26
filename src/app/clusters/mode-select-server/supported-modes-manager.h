@@ -77,10 +77,9 @@ public:
     /**
      * Given the endpointId, returns all its supported modes options.
      * @param endpointId
-     * @return
+     * @return The iterator facotry for the endpoint, or nullptr if the endpoint doesn't support ModeSelectCluster.
      */
-    // virtual const std::vector<ModeOptionStructType> getSupportedModesForEndpoint(EndpointId endpointId) const = 0;
-    virtual const ModeOptionStructIteratorFactory* getIteratorFactory(EndpointId endpointId) const = 0;
+    virtual const ModeOptionStructIteratorFactory * getIteratorFactory(EndpointId endpointId) const = 0;
 
     /**
      * Given the endpointId and a mode value, find the ModeOptionStruct that matches the mode.

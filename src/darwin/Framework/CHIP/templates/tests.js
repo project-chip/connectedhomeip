@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-function getTests()
-{
+function getTests() {
   const BinaryInput = [
     'Test_TC_BI_1_1',
   ];
@@ -117,6 +116,7 @@ function getTests()
     'TestDescriptorCluster',
     'TestBasicInformation',
     'TestOperationalCredentialsCluster',
+    'TestModeSelectCluster',
   ];
 
   const Subscriptions = [

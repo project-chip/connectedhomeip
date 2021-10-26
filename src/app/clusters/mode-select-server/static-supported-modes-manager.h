@@ -33,7 +33,7 @@ namespace ModeSelectCluster {
  * This implementation statically defines the options.
  */
 
-class HeapBasedSupportedModesManager : public chip::app::Clusters::ModeSelectCluster::SupportedModesManager
+class StaticSupportedModesManager : public chip::app::Clusters::ModeSelectCluster::SupportedModesManager
 {
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
     using storage_value_type        = const ModeOptionStructType*;
@@ -49,8 +49,7 @@ class HeapBasedSupportedModesManager : public chip::app::Clusters::ModeSelectClu
 
 
 public:
-
-    static const HeapBasedSupportedModesManager instance;
+    static const StaticSupportedModesManager instance;
 
     struct Iterator: public chip::app::Clusters::ModeSelectCluster::SupportedModesManager::ModeOptionStructIterator
     {
@@ -107,15 +106,17 @@ public:
 
     EmberAfStatus getModeOptionByMode(EndpointId endpointId, uint8_t mode, const ModeOptionStructType *& dataPtr) const override;
 
-    ~HeapBasedSupportedModesManager() {};
+    ~StaticSupportedModesManager(){};
 
-    HeapBasedSupportedModesManager(): HeapBasedSupportedModesManager(&optionsByEndpoints) {}
+    StaticSupportedModesManager() : StaticSupportedModesManager(&optionsByEndpoints) {}
 
-    static inline const HeapBasedSupportedModesManager& getHeapBasedSupportedModesManagerInstance() { return instance; }
+    static inline const StaticSupportedModesManager & getStaticSupportedModesManagerInstance() { return instance; }
 
 private:
-    HeapBasedSupportedModesManager(const std::map<EndpointId, Span<storage_value_type>>* const supportedModes): _iteratorFactoriesByEndpoints(std::map<EndpointId, IteratorFactory>()) {
-        for(auto& entry: *supportedModes)
+    StaticSupportedModesManager(const std::map<EndpointId, Span<storage_value_type>> * const supportedModes) :
+        _iteratorFactoriesByEndpoints(std::map<EndpointId, IteratorFactory>())
+    {
+        for (auto & entry : *supportedModes)
         {
             _iteratorFactoriesByEndpoints.insert(std::pair<EndpointId, IteratorFactory>(entry.first, IteratorFactory(entry.second)));
         }

@@ -16,40 +16,39 @@
  */
 
 // Import helpers from zap core
-const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
+const zapPath = '../../../../../third_party/zap/repo/dist/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const zclHelper = require(zapPath + 'generator/helper-zcl.js')
 
 const ChipTypesHelper = require('../../../../../src/app/zap-templates/common/ChipTypesHelper.js');
-const StringHelper    = require('../../../../../src/app/zap-templates/common/StringHelper.js');
+const StringHelper = require('../../../../../src/app/zap-templates/common/StringHelper.js');
 
 // Ideally those clusters clusters endpoints should be retrieved from the
 // descriptor cluster.
-function asExpectedEndpointForCluster(clusterName)
-{
+function asExpectedEndpointForCluster(clusterName) {
   switch (clusterName) {
-  case 'AdministratorCommissioning':
-  case 'Basic':
-  case 'Descriptor':
-  case 'GeneralCommissioning':
-  case 'GeneralDiagnostics':
-  case 'SoftwareDiagnostics':
-  case 'ThreadNetworkDiagnostics':
-  case 'EthernetNetworkDiagnostics':
-  case 'WiFiNetworkDiagnostics':
-  case 'GroupKeyManagement':
-  case 'NetworkCommissioning':
-  case 'OperationalCredentials':
-  case 'TrustedRootCertificates':
-  case 'OtaSoftwareUpdateProvider':
-  case 'OtaSoftwareUpdateRequestor':
-    return 0;
+    case 'AdministratorCommissioning':
+    case 'Basic':
+    case 'Descriptor':
+    case 'GeneralCommissioning':
+    case 'GeneralDiagnostics':
+    case 'SoftwareDiagnostics':
+    case 'ThreadNetworkDiagnostics':
+    case 'EthernetNetworkDiagnostics':
+    case 'WiFiNetworkDiagnostics':
+    case 'GroupKeyManagement':
+    case 'NetworkCommissioning':
+    case 'OperationalCredentials':
+    case 'TrustedRootCertificates':
+    case 'OtaSoftwareUpdateProvider':
+    case 'OtaSoftwareUpdateRequestor':
+    case 'ModeSelectCluster':
+      return 0;
   }
   return 1;
 }
 
-function asTestValue()
-{
+function asTestValue() {
   if (StringHelper.isOctetString(this.type)) {
     return '[@"Test" dataUsingEncoding:NSUTF8StringEncoding]';
   } else if (StringHelper.isCharString(this.type)) {
@@ -59,8 +58,7 @@ function asTestValue()
   }
 }
 
-function asObjectiveCBasicType(type)
-{
+function asObjectiveCBasicType(type) {
   if (StringHelper.isOctetString(type)) {
     return 'NSData *';
   } else if (StringHelper.isCharString(type)) {
@@ -70,15 +68,13 @@ function asObjectiveCBasicType(type)
   }
 }
 
-function asObjectiveCNumberType(label, type, asLowerCased)
-{
-  function fn(pkgId)
-  {
-    const options = { 'hash' : {} };
+function asObjectiveCNumberType(label, type, asLowerCased) {
+  function fn(pkgId) {
+    const options = { 'hash': {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options)
-        .then(zclType => {
-          const basicType = ChipTypesHelper.asBasicType(zclType);
-          switch (basicType) {
+      .then(zclType => {
+        const basicType = ChipTypesHelper.asBasicType(zclType);
+        switch (basicType) {
           case 'bool':
             return 'Bool';
           case 'uint8_t':
@@ -100,25 +96,24 @@ function asObjectiveCNumberType(label, type, asLowerCased)
           default:
             error = label + ': Unhandled underlying type ' + zclType + ' for original type ' + type;
             throw error;
-          }
-        })
-        .then(typeName => asLowerCased ? (typeName[0].toLowerCase() + typeName.substring(1)) : typeName);
+        }
+      })
+      .then(typeName => asLowerCased ? (typeName[0].toLowerCase() + typeName.substring(1)) : typeName);
   }
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asTestIndex(index)
-{
+function asTestIndex(index) {
   return index.toString().padStart(6, 0);
 }
 
 //
 // Module exports
 //
-exports.asObjectiveCBasicType        = asObjectiveCBasicType;
-exports.asObjectiveCNumberType       = asObjectiveCNumberType;
+exports.asObjectiveCBasicType = asObjectiveCBasicType;
+exports.asObjectiveCNumberType = asObjectiveCNumberType;
 exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
-exports.asTestIndex                  = asTestIndex;
-exports.asTestValue                  = asTestValue;
+exports.asTestIndex = asTestIndex;
+exports.asTestValue = asTestValue;
