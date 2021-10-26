@@ -16,15 +16,19 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/util/attribute-storage.h>
+#include <platform/ConnectivityManager.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
+using chip::DeviceLayer::ConnectivityMgr;
 using chip::DeviceLayer::PlatformManager;
 
 namespace {
@@ -40,6 +44,7 @@ public:
 private:
     template <typename T>
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &), AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 };
 
 template <typename T>
@@ -60,6 +65,27 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMana
     return aEncoder.Encode(data);
 }
 
+CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
+{
+    DeviceLayer::NetworkInterface * netifs;
+
+    ReturnErrorOnFailure(ConnectivityMgr().GetNetworkInterfaces(&netifs));
+
+    CHIP_ERROR err = aEncoder.EncodeList([&netifs](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
+        {
+            GeneralDiagnostics::Structs::NetworkInterfaceType::Type * networkInterface = ifp;
+            ReturnErrorOnFailure(encoder.Encode(*networkInterface));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+
+    ConnectivityMgr().ReleaseNetworkInterfaces(netifs);
+
+    return err;
+}
+
 GeneralDiagosticsAttrAccess gAttrAccess;
 
 CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -72,6 +98,9 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath
 
     switch (aPath.mAttributeId)
     {
+    case NetworkInterfaces::Id: {
+        return ReadNetworkInterfaces(aEncoder);
+    }
     case RebootCount::Id: {
         return ReadIfSupported(&PlatformManager::GetRebootCount, aEncoder);
     }
