@@ -3268,14 +3268,14 @@ using chip::Callback::Cancelable;
     return &_cppCluster;
 }
 
-- (void)announceOtaProvider:(NSData *)providerLocation
+- (void)announceOtaProvider:(uint64_t)providerLocation
                    vendorId:(uint16_t)vendorId
          announcementReason:(uint8_t)announcementReason
             metadataForNode:(NSData *)metadataForNode
             responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.AnnounceOtaProvider(success, failure, [self asByteSpan:providerLocation], vendorId,
+        return self.cppCluster.AnnounceOtaProvider(success, failure, providerLocation, static_cast<chip::VendorId>(vendorId),
             static_cast<uint8_t>(announcementReason), [self asByteSpan:metadataForNode]);
     });
 }

@@ -13951,7 +13951,7 @@ class OtaSoftwareUpdateRequestorAnnounceOtaProvider : public ModelCommand
 public:
     OtaSoftwareUpdateRequestorAnnounceOtaProvider() : ModelCommand("announce-ota-provider")
     {
-        AddArgument("ProviderLocation", &mRequest.providerLocation);
+        AddArgument("ProviderLocation", 0, UINT64_MAX, &mRequest.providerLocation);
         AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
         AddArgument(
             "AnnouncementReason", 0, UINT8_MAX,

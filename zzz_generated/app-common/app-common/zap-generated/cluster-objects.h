@@ -5556,8 +5556,8 @@ public:
     static constexpr CommandId GetCommandId() { return AnnounceOtaProvider::Id; }
     static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateRequestor::Id; }
 
-    chip::ByteSpan providerLocation;
-    uint16_t vendorId;
+    chip::NodeId providerLocation;
+    chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
     chip::ByteSpan metadataForNode;
 
@@ -5570,8 +5570,8 @@ public:
     static constexpr CommandId GetCommandId() { return AnnounceOtaProvider::Id; }
     static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateRequestor::Id; }
 
-    chip::ByteSpan providerLocation;
-    uint16_t vendorId;
+    chip::NodeId providerLocation;
+    chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
     chip::ByteSpan metadataForNode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);

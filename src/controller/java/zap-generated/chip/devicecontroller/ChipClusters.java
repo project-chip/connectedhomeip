@@ -4280,7 +4280,7 @@ public class ChipClusters {
 
     public void announceOtaProvider(
         DefaultClusterCallback callback,
-        byte[] providerLocation,
+        long providerLocation,
         int vendorId,
         int announcementReason,
         byte[] metadataForNode) {
@@ -4296,7 +4296,7 @@ public class ChipClusters {
     private native void announceOtaProvider(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        byte[] providerLocation,
+        long providerLocation,
         int vendorId,
         int announcementReason,
         byte[] metadataForNode);

@@ -20675,14 +20675,13 @@ JNI_METHOD(jlong, OtaSoftwareUpdateRequestorCluster, initWithDevice)(JNIEnv * en
 }
 
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray providerLocation, jint vendorId,
- jint announcementReason, jbyteArray metadataForNode)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong providerLocation, jint vendorId, jint announcementReason,
+ jbyteArray metadataForNode)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateRequestorCluster * cppCluster;
 
-    JniByteArray providerLocationArr(env, providerLocation);
     JniByteArray metadataForNodeArr(env, metadataForNode);
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
@@ -20695,9 +20694,8 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
     cppCluster = reinterpret_cast<OtaSoftwareUpdateRequestorCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->AnnounceOtaProvider(onSuccess->Cancel(), onFailure->Cancel(),
-                                          chip::ByteSpan((const uint8_t *) providerLocationArr.data(), providerLocationArr.size()),
-                                          vendorId, static_cast<uint8_t>(announcementReason),
+    err = cppCluster->AnnounceOtaProvider(onSuccess->Cancel(), onFailure->Cancel(), providerLocation,
+                                          static_cast<chip::VendorId>(vendorId), static_cast<uint8_t>(announcementReason),
                                           chip::ByteSpan((const uint8_t *) metadataForNodeArr.data(), metadataForNodeArr.size()));
     SuccessOrExit(err);
 
