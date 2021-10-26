@@ -112,4 +112,14 @@ public class NsdManagerServiceResolver implements ServiceResolver {
         });
     mainThreadHandler.postDelayed(timeoutRunnable, RESOLVE_SERVICE_TIMEOUT);
   }
+
+    @Override
+    public boolean publish(String serviceName, String hostName, String type, int port, String[] textEntriesKeys, byte[][] textEntriesDatas, String[] subTypes) {
+        return false;
+    }
+
+    @Override
+    public boolean remove() {
+        return false;
+    }
 }
