@@ -65,13 +65,13 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 100ms"
+    - label: "Wait 120ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 100
+                value: 120
 
     - label: "reads current Level attribute from DUT"
       command: "readAttribute"
