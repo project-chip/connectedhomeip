@@ -289,11 +289,12 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
         {
             return CHIP_ERROR_POSIX(errno);
         }
-        if (strlen(intfName) >= nameBufSize)
+        size_t nameLength = strlen(intfName);
+        if (nameLength >= nameBufSize)
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        strcpy(nameBuf, intfName);
+        strncpy(nameBuf, intfName, nameLength + 1);
         return CHIP_NO_ERROR;
     }
     if (nameBufSize < 1)
@@ -718,11 +719,12 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
             return CHIP_ERROR_INCORRECT_STATE;
         }
         const char * name = net_if_get_device(currentInterface)->name;
-        if (strlen(name) >= nameBufSize)
+        size_t nameLength = strlen(name);
+        if (nameLength >= nameBufSize)
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        strcpy(nameBuf, name);
+        strncpy(nameBuf, name, nameLength + 1);
         return CHIP_NO_ERROR;
     }
     if (nameBufSize < 1)
