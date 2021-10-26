@@ -89,7 +89,7 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
     }
 
     mProviderNodeId      = providerLocation;
-    mProviderFabricIndex = commandObj->GetExchangeContext()->GetSecureSession().GetFabricIndex();
+    mProviderFabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
 
     FabricInfo * providerFabric = GetProviderFabricInfo();
     if (providerFabric == nullptr)
