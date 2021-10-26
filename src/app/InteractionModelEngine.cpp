@@ -296,8 +296,8 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     for (auto & readHandler : mReadHandlers)
     {
         if (!readHandler.IsFree() && readHandler.IsSubscriptionType() &&
-            readHandler.GetInitiatorNodeId() == apExchangeContext->GetSecureSession().GetPeerNodeId() &&
-            readHandler.GetFabricIndex() == apExchangeContext->GetSecureSession().GetFabricIndex())
+            readHandler.GetInitiatorNodeId() == apExchangeContext->GetSessionHandle().GetPeerNodeId() &&
+            readHandler.GetFabricIndex() == apExchangeContext->GetSessionHandle().GetFabricIndex())
         {
             bool keepSubscriptions = true;
             System::PacketBufferTLVReader reader;
