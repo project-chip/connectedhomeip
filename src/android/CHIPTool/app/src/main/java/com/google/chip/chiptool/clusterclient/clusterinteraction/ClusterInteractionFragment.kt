@@ -75,7 +75,7 @@ class ClusterInteractionFragment : Fragment(){
       var dataList: List<EndpointItem> = ArrayList<EndpointItem>()
       // TODO: Dynamically retrieve endpoint information using descriptor cluster
       // hardcode the endpoint for now
-      for (i in 0 until 7) {
+      for (i in 0 until 2) {
         dataList += EndpointItem(i)
       }
 
