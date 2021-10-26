@@ -62,7 +62,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    
+
     const ModeSelectCluster::HeapBasedSupportedModesManager& gSupportedModeManager = ModeSelectCluster::HeapBasedSupportedModesManager::getHeapBasedSupportedModesManagerInstance();
 
     if (ModeSelectCluster::Attributes::SupportedModes::Id == aPath.mAttributeId)
@@ -72,7 +72,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
         err = aEncoder.EncodeList([iteratorFactory](const TagBoundEncoder & encoder) -> CHIP_ERROR {
             const auto& end = *(iteratorFactory.end());
             for (auto it = *(iteratorFactory.begin()); it != end; ++it)
-            {   
+            {
                 emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectCluster: dereferencing it");
                 emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectCluster: it= %p", (void*) it.operator->());
                 auto& modeOption = *it;

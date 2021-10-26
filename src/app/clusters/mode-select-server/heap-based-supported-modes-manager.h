@@ -70,7 +70,7 @@ public:
         base_iterator_type& operator++() override { ++mPtr; return *this; }
 
         bool operator== (const base_iterator_type& other) const override
-        { 
+        {
             // Warning: we are not doing type check
             // TODO: use of typeid requires -frtti
             // if (typeid(other) != typeid(*this))

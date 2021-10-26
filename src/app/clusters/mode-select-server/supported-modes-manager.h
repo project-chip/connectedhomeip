@@ -66,7 +66,7 @@ public:
     struct ModeOptionStructIteratorFactory
     {
         using const_pointer = const ModeOptionStructIterator*;
-        
+
 
         virtual const_pointer begin() const = 0;
         virtual const_pointer end() const = 0;

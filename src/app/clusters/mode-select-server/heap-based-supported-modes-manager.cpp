@@ -39,7 +39,7 @@ const HeapBasedSupportedModesManager::IteratorFactory*
 HeapBasedSupportedModesManager::getIteratorFactory(EndpointId endpointId) const
 {
     return &(_iteratorFactoriesByEndpoints.at(endpointId));
-} 
+}
 
 EmberAfStatus HeapBasedSupportedModesManager::getModeOptionByMode(unsigned short endpointId, unsigned char mode,
                                                                   const ModeOptionStructType *& dataPtr) const
