@@ -46,30 +46,28 @@ public:
         using iterator_category = std::forward_iterator_tag;
         using difference_type   = std::ptrdiff_t;
         using value_type        = const ModeOptionStructType;
-        using pointer           = value_type*;
-        using reference         = value_type&;
+        using pointer           = value_type *;
+        using reference         = value_type &;
 
         virtual reference operator*() const = 0;
-        virtual pointer operator->() = 0;
-        virtual pointer operator->() const = 0;
+        virtual pointer operator->()        = 0;
+        virtual pointer operator->() const  = 0;
 
         // Prefix increment
-        virtual ModeOptionStructIterator& operator++() = 0;
+        virtual ModeOptionStructIterator & operator++() = 0;
 
-        virtual bool operator== (const ModeOptionStructIterator& other) const = 0;
-        virtual bool operator!= (const ModeOptionStructIterator& other) const = 0;
-
+        virtual bool operator==(const ModeOptionStructIterator & other) const = 0;
+        virtual bool operator!=(const ModeOptionStructIterator & other) const = 0;
 
         virtual ~ModeOptionStructIterator() {}
     };
 
     struct ModeOptionStructIteratorFactory
     {
-        using const_pointer = const ModeOptionStructIterator*;
-
+        using const_pointer = const ModeOptionStructIterator *;
 
         virtual const_pointer begin() const = 0;
-        virtual const_pointer end() const = 0;
+        virtual const_pointer end() const   = 0;
 
         virtual ~ModeOptionStructIteratorFactory() {}
     };
@@ -80,7 +78,7 @@ public:
      * @return
      */
     // virtual const std::vector<ModeOptionStructType> getSupportedModesForEndpoint(EndpointId endpointId) const = 0;
-    virtual const ModeOptionStructIteratorFactory* getIteratorFactory(EndpointId endpointId) const = 0;
+    virtual const ModeOptionStructIteratorFactory * getIteratorFactory(EndpointId endpointId) const = 0;
 
     /**
      * Given the endpointId and a mode value, find the ModeOptionStruct that matches the mode.
@@ -91,9 +89,7 @@ public:
      */
     virtual EmberAfStatus getModeOptionByMode(EndpointId endpointId, uint8_t mode, const ModeOptionStructType *& dataPtr) const = 0;
 
-    virtual ~SupportedModesManager(){}
-
-
+    virtual ~SupportedModesManager() {}
 };
 
 } // namespace ModeSelectCluster
