@@ -49,7 +49,7 @@ static constexpr int16_t kAnyMessageType = -1;
  *    It works on be behalf of higher layers, creating ExchangeContexts and
  *    handling the registration/unregistration of unsolicited message handlers.
  */
-class DLL_EXPORT ExchangeManager : public SessionMessageDelegate, public SessionReleaseDelegate
+class DLL_EXPORT ExchangeManager : public SessionMessageDelegate
 {
     friend class ExchangeContext;
 
@@ -193,10 +193,6 @@ public:
 
     size_t GetNumActiveExchanges() { return mContextPool.Allocated(); }
 
-    // TODO: this should be test only, after OnSessionReleased is move to SessionHandle within the exchange context
-    // Expire all exchanges associated with the given session
-    void ExpireExchangesForSession(const SessionHandle & session);
-
 private:
     enum class State
     {
@@ -244,8 +240,6 @@ private:
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const SessionHandle & session,
                            const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                            System::PacketBufferHandle && msgBuf) override;
-
-    void OnSessionReleased(const SessionHandle & session) override;
 };
 
 } // namespace Messaging

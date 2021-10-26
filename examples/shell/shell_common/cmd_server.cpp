@@ -101,8 +101,8 @@ static CHIP_ERROR CmdAppServerUdcPort(int argc, char ** argv)
 static bool PrintServerSession(void * context, SessionHandle & session)
 {
     streamer_printf(streamer_get(), "session id=0x%04x peerSessionId=0x%04x peerNodeId=0x%016" PRIx64 " fabricIdx=%d\r\n",
-                    session.GetLocalSessionId().Value(), session.GetPeerSessionId().Value(), session.GetPeerNodeId(),
-                    session.GetFabricIndex());
+                    session->AsSecureSession()->GetLocalSessionId(), session->AsSecureSession()->GetPeerSessionId(), session->AsSecureSession()->GetPeerNodeId(),
+                    session->AsSecureSession()->GetFabricIndex());
     return true;
 }
 

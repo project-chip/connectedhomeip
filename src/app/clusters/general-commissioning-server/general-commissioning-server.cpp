@@ -120,8 +120,8 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     const Commands::CommissioningComplete::DecodableType & commandData)
 {
     SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
-    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetFabricIndex(handle.GetFabricIndex());
-    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetPeerNodeId(handle.GetPeerNodeId());
+    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetFabricIndex(handle->AsSecureSession()->GetFabricIndex());
+    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetPeerNodeId(handle->AsSecureSession()->GetPeerNodeId());
 
     CHIP_ERROR err = DeviceLayer::DeviceControlServer::DeviceControlSvr().CommissioningComplete();
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
