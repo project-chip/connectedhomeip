@@ -22,10 +22,16 @@ import("${chip_root}/build/chip/tests.gni")
 
 declare_args() {
   chip_build_pw_rpc_lib = false
+  chip_build_example_bridge_callbacks = false
 }
 
 group("esp32") {
   deps = [ "${chip_root}/src/lib" ]
+
+  if (chip_build_example_bridge_callbacks) {
+     deps += [ "${chip_root}/examples/all-clusters-app/callbacks/bridge" ]
+
+  }
 
   if (chip_build_pw_rpc_lib) {
     deps += [ "//lib/pw_rpc" ]

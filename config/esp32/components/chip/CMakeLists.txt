@@ -85,6 +85,10 @@ if(CONFIG_ENABLE_PW_RPC)
     chip_gn_arg_append("pw_build_LINK_DEPS"                 "[\"\$dir_pw_assert:impl\", \"\$dir_pw_log:impl\"]")
 endif()
 
+if(CONFIG_ENABLE_BRIDGE_CALLBACKS)
+    chip_gn_arg_append("chip_build_example_bridge_callbacks" "true")
+endif()
+
 if (NOT CONFIG_USE_MINIMAL_MDNS)
     chip_gn_arg_append("chip_mdns"                          "\"platform\"")
 endif()
@@ -148,6 +152,10 @@ set(chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a")
 
 if(CONFIG_ENABLE_PW_RPC)
     list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
+endif()
+
+if(CONFIG_ENABLE_BRIDGE_CALLBACKS)
+    list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/BridgeImpl.a")
 endif()
 
 externalproject_add(

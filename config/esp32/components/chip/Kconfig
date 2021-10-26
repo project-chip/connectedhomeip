@@ -84,6 +84,12 @@ menu "CHIP Core"
             help
                 Link the application with the library containing Pigweed RPC functionalities
 
+        config ENABLE_BRIDGE_CALLBACKS
+            bool "Link in example bridge callbacks"
+            default n
+            help
+                Link the default bridge callbacks in the examples folder
+
         config USE_MINIMAL_MDNS
             bool "Use the minimal mDNS implementation shipped in the CHIP library"
             default y
