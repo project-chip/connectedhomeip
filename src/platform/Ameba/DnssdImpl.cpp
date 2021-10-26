@@ -56,12 +56,12 @@ exit:
     return error;
 }
 
-const char * GetProtocolString(DnssdServiceProtocol  protocol)
+const char * GetProtocolString(DnssdServiceProtocol protocol)
 {
     return protocol == DnssdServiceProtocol::kDnssdProtocolTcp ? "_tcp" : "_udp";
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService  * service)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -103,7 +103,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * /*service*/, chip::Inet::InterfaceId /*interface*/, DnssdResolveCallback /*callback*/,
-                           void * /*context*/)
+                            void * /*context*/)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
