@@ -43,7 +43,6 @@ jobs:
             image: connectedhomeip/chip-build-mbed-os:0.5.22
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/output_binaries:/tmp/output_binaries"
 
         steps:
             - name: Checkout
@@ -103,34 +102,6 @@ jobs:
             - name: Build unit tests
               timeout-minutes: 10
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
-
-            - name: Copy aside build products
-              run: |
-                  mkdir -p /tmp/output_binaries/$BUILD_TYPE-build
-                  cp examples/lock-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-lock-app-example.hex \
-                     /tmp/output_binaries/$BUILD_TYPE-build/lock-app-$APP_TARGET-$APP_PROFILE.hex
-                  cp examples/lighting-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-lighting-app-example.hex \
-                     /tmp/output_binaries/$BUILD_TYPE-build/lighting-app-$APP_TARGET-$APP_PROFILE.hex
-                  cp examples/all-clusters-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-all-clusters-app-example.hex \
-                     /tmp/output_binaries/$BUILD_TYPE-build/all-clusters-app-$APP_TARGET-$APP_PROFILE.hex
-
-            - name: Binary artifacts suffix
-              id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
-              if: ${{ !env.ACT }}
-              with:
-                  cond: ${{ github.event.pull_request.number == '' }}
-                  if_true: "${{ github.sha }}"
-                  if_false: "pull-${{ github.event.pull_request.number }}"
-
-            - name: Uploading binaries as artifacts
-              uses: actions/upload-artifact@v2
-              if: ${{ !env.ACT }}
-              with:
-                  name:
-                      ${{ env.BUILD_TYPE }}-binaries-${{ env.APP_TARGET }}-${{ env.APP_PROFILE }}-build-${{
-                      steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
 
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
