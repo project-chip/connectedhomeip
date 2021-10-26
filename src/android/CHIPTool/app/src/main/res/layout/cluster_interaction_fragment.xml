@@ -27,6 +27,7 @@
       android:id="@+id/endpointList"
       android:layout_width="409dp"
       android:layout_height="549dp"
+      android:clipToPadding="false"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/getClusterMappingBtn" />
 
