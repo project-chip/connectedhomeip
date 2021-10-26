@@ -310,6 +310,14 @@ void emberAfFixedLabelClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfBooleanStateClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Mode Select Cluster Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfModeSelectClusterClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Shade Configuration Cluster Init
  *
  * Cluster Init
@@ -4335,6 +4343,112 @@ void emberAfBooleanStateClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfBooleanStateClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Mode Select Cluster Cluster
+//
+
+/** @brief Mode Select Cluster Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfModeSelectClusterClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Mode Select Cluster Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfModeSelectClusterClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Mode Select Cluster Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterModeSelectClusterClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Mode Select Cluster Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterModeSelectClusterClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Mode Select Cluster Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfModeSelectClusterClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                              EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                              EmberStatus status);
+
+/** @brief Mode Select Cluster Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfModeSelectClusterClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                              EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                              EmberStatus status);
+
+/** @brief Mode Select Cluster Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterModeSelectClusterClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Mode Select Cluster Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterModeSelectClusterClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Mode Select Cluster Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfModeSelectClusterClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Mode Select Cluster Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfModeSelectClusterClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Shade Configuration Cluster
@@ -12892,6 +13006,12 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::DecodableType & commandData);
+/**
+ * @brief Mode Select Cluster Cluster ChangeToMode Command callback (from client)
+ */
+bool emberAfModeSelectClusterClusterChangeToModeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ModeSelectCluster::Commands::ChangeToMode::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */

@@ -763,6 +763,16 @@ static constexpr CommandId Id = 0x0000000C;
 } // namespace Commands
 } // namespace OperationalCredentials
 
+namespace ModeSelectCluster {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+} // namespace Commands
+} // namespace ModeSelectCluster
+
 namespace DoorLock {
 namespace Commands {
 

@@ -208,6 +208,14 @@ typedef struct _MediaPlaybackPosition
     uint64_t position;
 } MediaPlaybackPosition;
 
+// Struct for ModeOptionStruct
+typedef struct _ModeOptionStruct
+{
+    chip::CharSpan Label;
+    uint8_t Mode;
+    uint32_t SemanticTag;
+} ModeOptionStruct;
+
 // Struct for NOCStruct
 typedef struct _NOCStruct
 {
@@ -345,6 +353,13 @@ typedef struct _SecurityPolicy
     uint16_t RotationTime;
     uint16_t Flags;
 } SecurityPolicy;
+
+// Struct for SemanticTag
+typedef struct _SemanticTag
+{
+    uint16_t MfgCode;
+    uint16_t Value;
+} SemanticTag;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
