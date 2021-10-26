@@ -119,9 +119,9 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
     jboolean jret = env->CallBooleanMethod(sResolverObject, sPublishMethod, jniName.jniValue(), jniHostName.jniValue()
         , jniServiceType.jniValue(), service->mPort, keys, datas, subTypes);
 
-    env->DeleteGlobalRef(keys);
-    env->DeleteGlobalRef(datas);
-    env->DeleteGlobalRef(subTypes);
+    env->DeleteLocalRef(keys);
+    env->DeleteLocalRef(datas);
+    env->DeleteLocalRef(subTypes);
 
     if (env->ExceptionCheck())
     {
