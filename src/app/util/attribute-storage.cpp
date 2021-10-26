@@ -44,6 +44,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <app-common/zap-generated/attribute-type.h>
@@ -1150,6 +1151,19 @@ EmberAfCluster * emberAfGetNthCluster(EndpointId endpoint, uint8_t n, bool serve
     return NULL;
 }
 
+// Returns the cluster id of Nth server or client cluster,
+// depending on server toggle.
+// Returns EMBER_AF_INVALID_CLUSTER_ID if cluster does not exist.
+Optional<ClusterId> emberAfGetNthClusterId(EndpointId endpoint, uint8_t n, bool server)
+{
+    EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, n, server);
+    if (cluster == nullptr)
+    {
+        return Optional<ClusterId>::Missing();
+    }
+    return Optional<ClusterId>(cluster->clusterId);
+}
+
 // Returns number of clusters put into the passed cluster list
 // for the given endpoint and client/server polarity
 uint8_t emberAfGetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterList, uint8_t listLen, bool server)
@@ -1363,4 +1377,37 @@ app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointI
     }
 
     return nullptr;
+}
+
+uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
+{
+    EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    VerifyOrReturnError(clusterObj != nullptr, 0);
+    return clusterObj->attributeCount;
+}
+
+uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                     chip::AttributeId attributeId)
+{
+    EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    VerifyOrReturnError(clusterObj != nullptr, UINT16_MAX);
+
+    for (uint16_t i = 0; i < clusterObj->attributeCount; i++)
+    {
+        if (clusterObj->attributes[i].attributeId == attributeId)
+        {
+            return i;
+        }
+    }
+    return UINT16_MAX;
+}
+
+Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, ClusterId cluster, uint16_t attributeIndex)
+{
+    EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    if (clusterObj == nullptr || clusterObj->attributeCount <= attributeIndex)
+    {
+        return Optional<AttributeId>::Missing();
+    }
+    return Optional<AttributeId>(clusterObj->attributes[attributeIndex].attributeId);
 }

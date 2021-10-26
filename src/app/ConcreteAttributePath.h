@@ -28,6 +28,11 @@ namespace app {
  */
 struct ConcreteAttributePath
 {
+    static constexpr EndpointId kInvalidEndpointId   = 0xFFFF;
+    static constexpr ClusterId kInvalidClusterId     = 0xFFFF'FFFF;
+    static constexpr AttributeId kInvalidAttributeId = 0xFFFF'FFFF;
+
+    ConcreteAttributePath() {}
     ConcreteAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         mEndpointId(aEndpointId), mClusterId(aClusterId), mAttributeId(aAttributeId)
     {}
@@ -37,9 +42,9 @@ struct ConcreteAttributePath
         return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mAttributeId == other.mAttributeId;
     }
 
-    EndpointId mEndpointId   = 0;
-    ClusterId mClusterId     = 0;
-    AttributeId mAttributeId = 0;
+    EndpointId mEndpointId   = kInvalidEndpointId;
+    ClusterId mClusterId     = kInvalidClusterId;
+    AttributeId mAttributeId = kInvalidAttributeId;
 };
 } // namespace app
 } // namespace chip
