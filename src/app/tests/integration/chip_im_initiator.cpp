@@ -126,15 +126,12 @@ void HandleSubscribeReportComplete()
 
 class MockInteractionModelApp : public chip::app::InteractionModelDelegate,
                                 public ::chip::app::CommandSender::Callback,
-                                public ::chip::app::WriteClient::Callback
+                                public ::chip::app::WriteClient::Callback,
+                                public ::chip::app::ReadClient::Callback
 {
 public:
-    CHIP_ERROR EventStreamReceived(const chip::Messaging::ExchangeContext * apExchangeContext,
-                                   chip::TLV::TLVReader * apEventListReader) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR ReportProcessed(const chip::app::ReadClient * apReadClient) override
+    void OnEventData(const chip::app::ReadClient * apReadClient, chip::TLV::TLVReader & apEventListReader) override {}
+    void OnSubscriptionEstablished(const chip::app::ReadClient * apReadClient) override
     {
         if (apReadClient->IsSubscriptionType())
         {
@@ -144,22 +141,21 @@ public:
                 HandleSubscribeReportComplete();
             }
         }
-
-        return CHIP_NO_ERROR;
     }
+    void OnAttributeData(const chip::app::ReadClient * apReadClient, const chip::app::ConcreteAttributePath & aPath,
+                         chip::TLV::TLVReader * aData, const chip::app::StatusIB & status) override
+    {}
 
-    CHIP_ERROR ReadError(chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    void OnError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
         printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format());
-        return CHIP_NO_ERROR;
     }
-    CHIP_ERROR ReadDone(chip::app::ReadClient * apReadClient) override
+    void OnDone(chip::app::ReadClient * apReadClient) override
     {
         if (!apReadClient->IsSubscriptionType())
         {
             HandleReadComplete();
         }
-        return CHIP_NO_ERROR;
     }
 
     void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
@@ -322,7 +318,7 @@ CHIP_ERROR SendReadRequest()
     readPrepareParams.mAttributePathParamsListSize = 1;
     readPrepareParams.mpEventPathParamsList        = eventPathParams;
     readPrepareParams.mEventPathParamsListSize     = 2;
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &gMockDelegate);
     SuccessOrExit(err);
 
 exit:
@@ -407,7 +403,7 @@ CHIP_ERROR SendSubscribeRequest()
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(readPrepareParams);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(readPrepareParams, &gMockDelegate);
     SuccessOrExit(err);
 
     gSubCount++;

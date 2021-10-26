@@ -101,8 +101,8 @@ public:
                     TLV::TLVReader * aData) override;
     void OnError(const app::CommandSender * apCommandSender, const app::StatusIB & aStatus, CHIP_ERROR aError) override;
 
-    void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
-                      Protocols::InteractionModel::Status status) override;
+    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & status) override;
 
     static PythonInteractionModelDelegate & Instance();
 
