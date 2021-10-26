@@ -44,7 +44,7 @@ public:
     /**
      * Allocates a new secure session out of the internal resource pool.
      *
-     * @param sessionType secure session type
+     * @param secureSessionType secure session type
      * @param localSessionId represents the encryption key ID assigned by local node
      * @param peerNodeId represents peer Node's ID
      * @param peerCATs represents peer CASE Authenticated Tags
