@@ -64,12 +64,14 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     CHIP_ERROR err = CHIP_ERROR_ACCESS_DENIED;
 
     EntryIterator * iterator = mDataProvider.Entries(subjectDescriptor.fabricIndex);
+    // TODO: check error (but can't until we have an implementation)
 #if 0
     ReturnErrorCodeIf(iterator == nullptr, CHIP_ERROR_INTERNAL);
 #else
-    // TODO: until we have an actual implementation, allow access
     ReturnErrorCodeIf(iterator == nullptr, CHIP_NO_ERROR);
 #endif
+
+    // TODO: a few more cases (PASE commissioning, CASE Authenticated Tags, etc.)
 
     while (auto entry = iterator->Next())
     {
@@ -81,7 +83,6 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         if (!entry->MatchesAuthMode(subjectDescriptor.authMode))
             continue;
         ChipLogDetail(DataManagement, "  --> matched authmode");
-        // TODO: check CATs (subject1, subject2)
         if (!entry->MatchesSubject(subjectDescriptor.subject))
             continue;
         ChipLogDetail(DataManagement, "  --> matched subject");
