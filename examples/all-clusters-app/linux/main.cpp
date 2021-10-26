@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/Command.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/util/af.h>
