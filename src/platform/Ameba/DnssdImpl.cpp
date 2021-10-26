@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "lib/mdns/platform/Mdns.h"
+#include "lib/dnssd/platform/Dnssd.h"
 #include "platform/CHIPDeviceLayer.h"
 #include "support/CHIPMem.h"
 #include "support/CodeUtils.h"
@@ -36,9 +36,9 @@ static constexpr size_t kMaxResults     = 20;
 } // namespace
 
 namespace chip {
-namespace Mdns {
+namespace Dnssd {
 
-CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
+CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int ameba_error  = 0;
@@ -56,12 +56,12 @@ exit:
     return error;
 }
 
-const char * GetProtocolString(MdnsServiceProtocol protocol)
+const char * GetProtocolString(DnssdServiceProtocol protocol)
 {
-    return protocol == MdnsServiceProtocol::kMdnsProtocolTcp ? "_tcp" : "_udp";
+    return protocol == DnssdServiceProtocol::kDnssdProtocolTcp ? "_tcp" : "_udp";
 }
 
-CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -90,28 +90,23 @@ exit:
     return error;
 }
 
-CHIP_ERROR ChipMdnsStopPublish()
+CHIP_ERROR ChipDnssdStopPublish()
 {
     mDNSResponderDeinit();
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
+CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context);
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ChipMdnsBrowse(const char * /*type*/, MdnsServiceProtocol /*protocol*/, chip::Inet::IPAddressType addressType,
-                          chip::Inet::InterfaceId /*interface*/, MdnsBrowseCallback /*callback*/, void * /*context*/)
+CHIP_ERROR ChipDnssdResolve(DnssdService * /*service*/, chip::Inet::InterfaceId /*interface*/, DnssdResolveCallback /*callback*/,
+                            void * /*context*/)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ChipMdnsResolve(MdnsService * /*service*/, chip::Inet::InterfaceId /*interface*/, MdnsResolveCallback /*callback*/,
-                           void * /*context*/)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-} // namespace Mdns
+} // namespace Dnssd
 } // namespace chip
