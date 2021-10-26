@@ -1856,6 +1856,21 @@ bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(EndpointId endpoi
     return true;
 }
 
+bool emberAfTestClusterClusterTestEnumsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, chip::VendorId arg1,
+                                                        uint8_t arg2)
+{
+    ChipLogProgress(Zcl, "TestEnumsResponse:");
+    ChipLogProgress(Zcl, "  arg1: %" PRIu16 "", arg1);
+    ChipLogProgress(Zcl, "  arg2: %" PRIu8 "", arg2);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestEnumsResponseCallback");
+
+    Callback::Callback<TestClusterClusterTestEnumsResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterTestEnumsResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, arg1, arg2);
+    return true;
+}
+
 bool emberAfTestClusterClusterTestListInt8UReverseResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                                    /* TYPE WARNING: array array defaults to */ uint8_t * arg1)
 {

@@ -2677,27 +2677,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t lightSensorType);
 } // namespace Attributes
 } // namespace IlluminanceMeasurement
 
-namespace IlluminanceLevelSensing {
-namespace Attributes {
-
-namespace LevelStatus {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * levelStatus); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t levelStatus);
-} // namespace LevelStatus
-
-namespace LightSensorType {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * lightSensorType); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t lightSensorType);
-} // namespace LightSensorType
-
-namespace IlluminanceLevelTarget {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * illuminanceLevelTarget); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t illuminanceLevelTarget);
-} // namespace IlluminanceLevelTarget
-
-} // namespace Attributes
-} // namespace IlluminanceLevelSensing
-
 namespace TemperatureMeasurement {
 namespace Attributes {
 
@@ -3951,6 +3930,11 @@ namespace EpochS {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * epochS); // epoch_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t epochS);
 } // namespace EpochS
+
+namespace VendorId {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * vendorId); // vendor_id
+EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId vendorId);
+} // namespace VendorId
 
 namespace Unsupported {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * unsupported); // boolean

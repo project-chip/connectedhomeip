@@ -15,9 +15,9 @@
 name: ZAP - Regenerate
 
 on:
-    # push:
-    # pull_request:
     workflow_dispatch:
+    issue_comment:
+      types: [created]
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -29,67 +29,27 @@ jobs:
         timeout-minutes: 60
 
         runs-on: ubuntu-18.04
-        if: github.actor != 'restyled-io[bot]'
+        if: (github.event.issue.pull_request != '' && contains(github.event.comment.body, '/regenerate')) || (github.event_name == 'workflow_dispatch')
 
-        # container:
-        #     image: connectedhomeip/chip-build:latest
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-              with:
-                  # token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
-                  # ref: ${{ github.head_ref }}
-                  submodules: true
-            - name: Use Node.js 14.x
-              uses: actions/setup-node@v2
-              with:
-                node-version: '14'
-            - name: Use Java 
-              uses: actions/setup-java@v2
-              with:
-                distribution: 'zulu'
-                java-version: '11'
-                java-package: jre
-            - run: sudo apt-get update
-            - run: sudo apt-get install -fy --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev python-autopep8
-            - name: Setup ZAP
-              timeout-minutes: 5
-              run: |
-                cd third_party/zap/repo/
-                npm ci
-                npm run version-stamp
-                npm rebuild canvas --update-binary
-                npm run build-spa
-            - name: Generate all
-              timeout-minutes: 5
-              run: scripts/tools/zap_regen_all.py
-            - name: Check for uncommited changes
-              run: git status
-                # git diff
-                # git add .
-                # git diff-index HEAD --
-                # git diff-index --quiet HEAD --
-            - name: Add generated paths
-              run: |
-                git add zzz_generated/*
-                git add src/darwin/Framework/*
-                git add src/controller/python/chip/clusters/*
-                git add src/controller/java/zap-generated/*
-            - uses: GuillaumeFalourd/git-commit-push@v1
-              with:
-                # email: ${{ github.actor }}@users.noreply.github.com
-                # name: ${{ github.actor }}
-                commit_message: Adding ZAP Generated Files
-                # target_branch: target_branch_name
-                # files: file1 file2 directory1 directory2/file3
-                # remote_repository: https://github.com/owner/another_repository
-                access_token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
-                # force: true
-                # empty: true
-                # tags: true
-            # - name: Commit newly generated changes
-            #   uses: stefanzweifel/git-auto-commit-action@v4
-            #   with:
-            #     commit_message: Auto-regenerated ZAP Changes
-            #     file_pattern: "zzz_generated/* src/darwin/Framework/* src/controller/python/chip/clusters/* src/controller/java/zap-generated/*"
-            #     # branch: ${{ github.head_ref }}
+          - name: Checkout
+            uses: actions/checkout@v2
+            with:
+              #token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
+              fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
+          - name: Use Node.js 14.x
+            uses: actions/setup-node@v2
+            with:
+              node-version: '14'
+          - name: Use Java 
+            uses: actions/setup-java@v2
+            with:
+              distribution: 'zulu'
+              java-version: '11'
+              java-package: jre
+          - run: sudo apt-get update
+          - run: sudo apt-get install -fy --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev python-autopep8
+          - name: Rebase and regenerate
+            run: scripts/helpers/rebase_and_regenerate_zap.sh
+            env:
+              GITHUB_TOKEN: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}

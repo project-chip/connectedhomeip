@@ -949,6 +949,28 @@ exit:
     return err;
 }
 
+CHIP_ERROR TLVReader::CountRemainingInContainer(size_t * size) const
+{
+    if (mContainerType == kTLVType_NotSpecified)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    TLVReader tempReader(*this);
+    size_t count = 0;
+    CHIP_ERROR err;
+    while ((err = tempReader.Next()) == CHIP_NO_ERROR)
+    {
+        ++count;
+    };
+    if (err == CHIP_END_OF_TLV)
+    {
+        *size = count;
+        return CHIP_NO_ERROR;
+    }
+    return err;
+}
+
 CHIP_ERROR ContiguousBufferTLVReader::OpenContainer(ContiguousBufferTLVReader & containerReader)
 {
     // We are going to initialize containerReader by calling our superclass

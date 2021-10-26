@@ -105,13 +105,9 @@ static void
 OnApplicationLauncherApplicationLauncherListListAttributeResponse(void * context,
                                                                   const chip::app::DataModel::DecodableList<uint16_t> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -125,13 +121,21 @@ OnApplicationLauncherApplicationLauncherListListAttributeResponse(void * context
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu16 ",", entry);
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -148,13 +152,9 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -168,7 +168,7 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -179,6 +179,14 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
         ChipLogProgress(Zcl, "      outputType: %" PRIu8 ",", entry.outputType);
         ChipLogProgress(Zcl, "      name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -194,13 +202,9 @@ static void
 OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context,
                                                         const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -214,13 +218,21 @@ OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context,
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %s,", ByteSpanToString(entry).c_str());
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -235,13 +247,9 @@ static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -255,13 +263,21 @@ static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -277,13 +293,9 @@ static void OnDescriptorDeviceListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -297,7 +309,7 @@ static void OnDescriptorDeviceListListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -307,6 +319,14 @@ static void OnDescriptorDeviceListListAttributeResponse(
         ChipLogProgress(Zcl, "      type: %" PRIu32 ",", entry.type);
         ChipLogProgress(Zcl, "      revision: %" PRIu16 ",", entry.revision);
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -321,13 +341,9 @@ chip::Callback::Callback<DescriptorDeviceListListAttributeCallback> gDescriptorD
 static void OnDescriptorServerListListAttributeResponse(void * context,
                                                         const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -341,13 +357,21 @@ static void OnDescriptorServerListListAttributeResponse(void * context,
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu32 ",", entry);
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -362,13 +386,9 @@ chip::Callback::Callback<DescriptorServerListListAttributeCallback> gDescriptorS
 static void OnDescriptorClientListListAttributeResponse(void * context,
                                                         const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -382,13 +402,21 @@ static void OnDescriptorClientListListAttributeResponse(void * context,
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu32 ",", entry);
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -403,13 +431,9 @@ chip::Callback::Callback<DescriptorClientListListAttributeCallback> gDescriptorC
 static void OnDescriptorPartsListListAttributeResponse(void * context,
                                                        const chip::app::DataModel::DecodableList<chip::EndpointId> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -423,13 +447,21 @@ static void OnDescriptorPartsListListAttributeResponse(void * context,
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu16 ",", entry);
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -445,13 +477,9 @@ static void OnFixedLabelLabelListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -465,7 +493,7 @@ static void OnFixedLabelLabelListListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -475,6 +503,14 @@ static void OnFixedLabelLabelListListAttributeResponse(
         ChipLogProgress(Zcl, "      label: %.*s,", static_cast<int>(entry.label.size()), entry.label.data());
         ChipLogProgress(Zcl, "      value: %.*s,", static_cast<int>(entry.value.size()), entry.value.data());
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -491,13 +527,9 @@ static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeRespons
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -511,7 +543,7 @@ static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeRespons
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -520,6 +552,14 @@ static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeRespons
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      FailSafeExpiryLengthMs: %" PRIu32 ",", entry.failSafeExpiryLengthMs);
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -537,13 +577,9 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -557,7 +593,7 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -571,6 +607,14 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
         ChipLogProgress(Zcl, "      HardwareAddress: %s,", ByteSpanToString(entry.hardwareAddress).c_str());
         ChipLogProgress(Zcl, "      Type: %" PRIu8 ",", entry.type);
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -586,13 +630,9 @@ static void OnGroupKeyManagementGroupsListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -606,7 +646,7 @@ static void OnGroupKeyManagementGroupsListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -617,6 +657,14 @@ static void OnGroupKeyManagementGroupsListAttributeResponse(
         ChipLogProgress(Zcl, "      VendorGroupId: %" PRIu16 ",", entry.vendorGroupId);
         ChipLogProgress(Zcl, "      GroupKeySetIndex: %" PRIu16 ",", entry.groupKeySetIndex);
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -632,13 +680,9 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -652,7 +696,7 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -665,6 +709,14 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(
         ChipLogProgress(Zcl, "      GroupKeyEpochStartTime: %" PRIu64 ",", entry.groupKeyEpochStartTime);
         ChipLogProgress(Zcl, "      GroupKeySecurityPolicy: %" PRIu8 ",", entry.groupKeySecurityPolicy);
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -680,13 +732,9 @@ static void OnMediaInputMediaInputListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -700,7 +748,7 @@ static void OnMediaInputMediaInputListListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -712,6 +760,14 @@ static void OnMediaInputMediaInputListListAttributeResponse(
         ChipLogProgress(Zcl, "      name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "      description: %.*s,", static_cast<int>(entry.description.size()), entry.description.data());
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -728,13 +784,9 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -748,7 +800,7 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -763,6 +815,14 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
         ChipLogProgress(Zcl, "      Label: %.*s,", static_cast<int>(entry.label.size()), entry.label.data());
         ChipLogProgress(Zcl, "    },");
     }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
 
     if (count > 0)
         ChipLogProgress(Zcl, "  ]");
@@ -775,13 +835,9 @@ chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>
 static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context,
                                                                   const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -795,13 +851,21 @@ static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -817,13 +881,9 @@ static void OnTvChannelTvChannelListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -837,7 +897,7 @@ static void OnTvChannelTvChannelListListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -851,6 +911,14 @@ static void OnTvChannelTvChannelListListAttributeResponse(
         ChipLogProgress(Zcl, "      affiliateCallSign: %.*s,", static_cast<int>(entry.affiliateCallSign.size()),
                         entry.affiliateCallSign.data());
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -867,13 +935,9 @@ static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -887,7 +951,7 @@ static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -897,6 +961,14 @@ static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
         ChipLogProgress(Zcl, "      identifier: %" PRIu8 ",", entry.identifier);
         ChipLogProgress(Zcl, "      name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -909,13 +981,9 @@ chip::Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback
     gTargetNavigatorTargetNavigatorListListAttributeCallback{ OnTargetNavigatorTargetNavigatorListListAttributeResponse, nullptr };
 static void OnTestClusterListInt8uListAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -929,13 +997,21 @@ static void OnTestClusterListInt8uListAttributeResponse(void * context, const ch
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -950,13 +1026,9 @@ chip::Callback::Callback<TestClusterListInt8uListAttributeCallback> gTestCluster
 static void OnTestClusterListOctetStringListAttributeResponse(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -970,13 +1042,21 @@ static void OnTestClusterListOctetStringListAttributeResponse(void * context,
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %s,", ByteSpanToString(entry).c_str());
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -992,13 +1072,9 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -1012,7 +1088,7 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -1022,6 +1098,14 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(
         ChipLogProgress(Zcl, "      fabricIndex: %" PRIu64 ",", entry.fabricIndex);
         ChipLogProgress(Zcl, "      operationalCert: %s,", ByteSpanToString(entry.operationalCert).c_str());
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -1037,13 +1121,9 @@ static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -1057,7 +1137,7 @@ static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -1080,6 +1160,14 @@ static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
         ChipLogProgress(Zcl, "      IsChild: %d,", entry.isChild);
         ChipLogProgress(Zcl, "    },");
     }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
 
     if (count > 0)
         ChipLogProgress(Zcl, "  ]");
@@ -1096,13 +1184,9 @@ static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
         list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -1116,7 +1200,7 @@ static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -1135,6 +1219,14 @@ static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(
         ChipLogProgress(Zcl, "      LinkEstablished: %d,", entry.linkEstablished);
         ChipLogProgress(Zcl, "    },");
     }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
 
     if (count > 0)
         ChipLogProgress(Zcl, "  ]");
@@ -1150,13 +1242,9 @@ static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -1170,7 +1258,7 @@ static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -1180,6 +1268,14 @@ static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(
         ChipLogProgress(Zcl, "      RotationTime: %" PRIu16 ",", entry.rotationTime);
         ChipLogProgress(Zcl, "      Flags: %" PRIu16 ",", entry.flags);
         ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -1196,13 +1292,9 @@ static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeR
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -1216,7 +1308,7 @@ static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeR
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
@@ -1237,6 +1329,14 @@ static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeR
         ChipLogProgress(Zcl, "      ChannelMaskPresent: %d,", entry.channelMaskPresent);
         ChipLogProgress(Zcl, "    },");
     }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
 
     if (count > 0)
         ChipLogProgress(Zcl, "  ]");
@@ -1251,13 +1351,9 @@ chip::Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsLis
 static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeResponse(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list)
 {
-    uint16_t count = 0;
-    auto iter      = list.begin();
-    while (iter.Next())
-    {
-        ++count;
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
     {
         if (gFailureResponseDelegate != nullptr)
         {
@@ -1271,13 +1367,21 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
     if (count > 0)
         ChipLogProgress(Zcl, "  [");
 
-    iter = list.begin();
+    auto iter = list.begin();
     while (iter.Next())
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
 #endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
     }
 
     if (count > 0)
@@ -4221,6 +4325,83 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_Identify_ClusterRevision(chi
 }
 
 // End of Cluster Identify
+// Cluster IlluminanceMeasurement
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_IlluminanceMeasurement_MeasuredValue(chip::Controller::Device * device,
+                                                                                         chip::EndpointId ZCLendpointId,
+                                                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IlluminanceMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMeasuredValue(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_IlluminanceMeasurement_MeasuredValue(chip::Controller::Device * device,
+                                                                                              chip::EndpointId ZCLendpointId,
+                                                                                              uint16_t minInterval,
+                                                                                              uint16_t maxInterval)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IlluminanceMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .SubscribeAttributeMeasuredValue(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                         maxInterval)
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_IlluminanceMeasurement_MinMeasuredValue(chip::Controller::Device * device,
+                                                                                            chip::EndpointId ZCLendpointId,
+                                                                                            chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IlluminanceMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMinMeasuredValue(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_IlluminanceMeasurement_MaxMeasuredValue(chip::Controller::Device * device,
+                                                                                            chip::EndpointId ZCLendpointId,
+                                                                                            chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IlluminanceMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMaxMeasuredValue(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_IlluminanceMeasurement_Tolerance(chip::Controller::Device * device,
+                                                                                     chip::EndpointId ZCLendpointId,
+                                                                                     chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IlluminanceMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTolerance(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_IlluminanceMeasurement_LightSensorType(chip::Controller::Device * device,
+                                                                                           chip::EndpointId ZCLendpointId,
+                                                                                           chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IlluminanceMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeLightSensorType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_IlluminanceMeasurement_ClusterRevision(chip::Controller::Device * device,
+                                                                                           chip::EndpointId ZCLendpointId,
+                                                                                           chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IlluminanceMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+// End of Cluster IlluminanceMeasurement
 // Cluster KeypadInput
 
 chip::ChipError::StorageType chip_ime_AppendCommand_KeypadInput_SendKey(chip::Controller::Device * device,
@@ -5002,15 +5183,14 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_Cl
 // Cluster OtaSoftwareUpdateRequestor
 
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * providerLocation,
-    uint32_t providerLocation_Len, uint16_t vendorId, uint8_t announcementReason, const uint8_t * metadataForNode,
-    uint32_t metadataForNode_Len)
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, chip::NodeId providerLocation,
+    chip::VendorId vendorId, uint8_t announcementReason, const uint8_t * metadataForNode, uint32_t metadataForNode_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .AnnounceOtaProvider(nullptr, nullptr, chip::ByteSpan(providerLocation, providerLocation_Len), vendorId, announcementReason,
+        .AnnounceOtaProvider(nullptr, nullptr, providerLocation, vendorId, announcementReason,
                              chip::ByteSpan(metadataForNode, metadataForNode_Len))
         .AsInteger();
 }
@@ -6398,6 +6578,15 @@ chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestAddArguments
     cluster.Associate(device, ZCLendpointId);
     return cluster.TestAddArguments(nullptr, nullptr, arg1, arg2).AsInteger();
 }
+chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestEnumsRequest(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                 chip::VendorId arg1, uint8_t arg2)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TestEnumsRequest(nullptr, nullptr, arg1, arg2).AsInteger();
+}
 chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestListInt8UArgumentRequest(chip::Controller::Device * device,
                                                                                              chip::EndpointId ZCLendpointId,
                                                                                              chip::GroupId, uint8_t arg1)
@@ -6909,6 +7098,25 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_EpochS(chip::Co
     chip::Controller::TestClusterCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.WriteAttributeEpochS(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_VendorId(chip::Controller::Device * device,
+                                                                         chip::EndpointId ZCLendpointId,
+                                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeVendorId(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_VendorId(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                          chip::VendorId value)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.WriteAttributeVendorId(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_Unsupported(chip::Controller::Device * device,
                                                                             chip::EndpointId ZCLendpointId,

@@ -155,10 +155,7 @@ static constexpr chip::ClusterId ZCL_COLOR_CONTROL_CLUSTER_ID = 0x0300;
 static constexpr chip::ClusterId ZCL_BALLAST_CONFIGURATION_CLUSTER_ID = 0x0301;
 
 // Definitions for cluster: Illuminance Measurement
-static constexpr chip::ClusterId ZCL_ILLUM_MEASUREMENT_CLUSTER_ID = 0x0400;
-
-// Definitions for cluster: Illuminance Level Sensing
-static constexpr chip::ClusterId ZCL_ILLUM_LEVEL_SENSING_CLUSTER_ID = 0x0401;
+static constexpr chip::ClusterId ZCL_ILLUMINANCE_MEASUREMENT_CLUSTER_ID = 0x0400;
 
 // Definitions for cluster: Temperature Measurement
 static constexpr chip::ClusterId ZCL_TEMP_MEASUREMENT_CLUSTER_ID = 0x0402;

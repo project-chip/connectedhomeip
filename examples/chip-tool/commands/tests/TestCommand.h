@@ -22,7 +22,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/DecodableList.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <lib/support/TypeTraits.h>
 #include <lib/support/UnitTestUtils.h>
+#include <type_traits>
 #include <zap-generated/tests/CHIPClustersTest.h>
 
 class TestCommand : public CHIPCommand
@@ -96,8 +98,11 @@ protected:
 
         return true;
     }
-    template <typename T>
-    bool CheckValue(const char * itemName, T current, T expected)
+
+    // Allow a different expected type from the actual value type, because if T
+    // is short the literal we are using is not short-typed.
+    template <typename T, typename U, typename std::enable_if_t<!std::is_enum<T>::value, int> = 0>
+    bool CheckValue(const char * itemName, T current, U expected)
     {
         if (current != expected)
         {
@@ -107,6 +112,13 @@ protected:
 
         return true;
     }
+
+    template <typename T, typename U, typename std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    bool CheckValue(const char * itemName, T current, U expected)
+    {
+        return CheckValue(itemName, to_underlying(current), expected);
+    }
+
     bool CheckValueAsList(const char * itemName, uint64_t current, uint64_t expected);
 
     template <typename T>
@@ -162,6 +174,8 @@ protected:
     template <typename T>
     bool CheckValueAsListLength(const char * itemName, chip::app::DataModel::DecodableList<T> list, uint64_t expectedLength)
     {
+        // We don't just use list.ComputeSize(), because we want to check that
+        // all the values in the list correctly decode to our type too.
         auto iter      = list.begin();
         uint64_t count = 0;
         while (iter.Next())
