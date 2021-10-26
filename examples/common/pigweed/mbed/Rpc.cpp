@@ -17,7 +17,6 @@
  */
 
 #include "Rpc.h"
-#include "AppTask.h"
 #include "PigweedLogger.h"
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
@@ -37,6 +36,7 @@
 #endif
 
 #ifdef CHIP_PW_RPC_COMMON_PROTO
+#include "AppTask.h"
 #include "rpc_services/Button.h"
 #include "rpc_services/Device.h"
 #endif
@@ -56,7 +56,6 @@ namespace chip {
 namespace rpc {
 
 #ifdef CHIP_PW_RPC_COMMON_PROTO
-#include "AppTask.h"
 class MbedButton final : public Button
 {
 public:
