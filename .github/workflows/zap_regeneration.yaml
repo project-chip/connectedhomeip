@@ -15,9 +15,9 @@
 name: ZAP - Regenerate
 
 on:
-    push:
-    pull_request:
     workflow_dispatch:
+    issue_comment:
+      types: [created]
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -29,13 +29,14 @@ jobs:
         timeout-minutes: 60
 
         runs-on: ubuntu-18.04
-        if: github.actor != 'restyled-io[bot]'
+        if: (github.event.issue.pull_request != '' && contains(github.event.comment.body, '/regenerate')) || (github.event_name == 'workflow_dispatch')
 
-        # container:
-        #     image: connectedhomeip/chip-build:latest
         steps:
           - name: Checkout
             uses: actions/checkout@v2
+            with:
+              token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
+              fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
           - name: Use Node.js 14.x
             uses: actions/setup-node@v2
             with:
@@ -50,5 +51,5 @@ jobs:
           - run: sudo apt-get install -fy --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev python-autopep8
           - name: Rebase and regenerate
             run: scripts/helpers/rebase_and_regenerate_zap.sh
-            env: 
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            env:
+              GITHUB_TOKEN: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
