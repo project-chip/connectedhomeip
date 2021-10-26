@@ -332,6 +332,18 @@ public:
                                 chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list);
 };
 
+class CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>
+{
+public:
+    CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+};
+
 class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
     : public CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>
 {
