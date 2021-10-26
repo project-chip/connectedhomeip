@@ -271,9 +271,9 @@ private:
 
     static CHIP_ERROR GenerateKey(FabricIndex id, char * key, size_t len);
 
-    CHIP_ERROR StoreIntoKVS(FabricStorage * kvs);
-    CHIP_ERROR FetchFromKVS(FabricStorage * kvs);
-    static CHIP_ERROR DeleteFromKVS(FabricStorage * kvs, FabricIndex id);
+    CHIP_ERROR CommitToStorage(FabricStorage * storage);
+    CHIP_ERROR LoadFromStorage(FabricStorage * storage);
+    static CHIP_ERROR DeleteFromStorage(FabricStorage * storage, FabricIndex fabricIndex);
 
     void ReleaseCert(MutableByteSpan & cert);
     void ReleaseOperationalCerts()
