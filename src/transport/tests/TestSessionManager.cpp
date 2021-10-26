@@ -106,8 +106,6 @@ public:
     bool LargeMessageSent = false;
 };
 
-TestSessMgrCallback callback;
-
 void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -131,6 +129,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     uint16_t payload_len = sizeof(PAYLOAD);
 
+    TestSessMgrCallback callback;
     callback.LargeMessageSent = false;
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
@@ -218,6 +217,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     uint16_t payload_len = sizeof(PAYLOAD);
 
+    TestSessMgrCallback callback;
     callback.LargeMessageSent = false;
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
@@ -274,8 +274,8 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Reset receive side message counter, or duplicated message will be denied.
-    Transport::SecureSession * state = sessionManager.GetSecureSession(callback.mRemoteToLocalSession.Value());
-    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
+    Transport::SecureSession * session = callback.mRemoteToLocalSession.Value().AsSecureSession();
+    session->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
@@ -291,6 +291,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     uint16_t payload_len = sizeof(PAYLOAD);
 
+    TestSessMgrCallback callback;
     callback.LargeMessageSent = false;
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
@@ -350,12 +351,12 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     /* -------------------------------------------------------------------------------------------*/
     // Reset receive side message counter, or duplicated message will be denied.
-    Transport::SecureSession * state = sessionManager.GetSecureSession(callback.mRemoteToLocalSession.Value());
-    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
+    Transport::SecureSession * session = callback.mRemoteToLocalSession.Value().AsSecureSession();
+    session->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     PacketHeader packetHeader;
 
-    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
+    session->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     // Change Message ID
     EncryptedPacketBufferHandle badMessageCounterMsg = preparedMessage.CloneData();
@@ -371,7 +372,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     /* -------------------------------------------------------------------------------------------*/
-    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
+    session->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     // Change Key ID
     EncryptedPacketBufferHandle badKeyIdMsg = preparedMessage.CloneData();
@@ -385,7 +386,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     /* -------------------------------------------------------------------------------------------*/
-    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
+    session->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
@@ -414,6 +415,7 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    TestSessMgrCallback callback;
     callback.mSuite = inSuite;
 
     sessionManager.SetDelegate(&callback);

@@ -105,10 +105,10 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     // If sending via UDP and NoAutoRequestAck send flag is not specificed,
     // request reliable transmission.
-    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    const Transport::PeerAddress & peerAddress = GetSessionHandle()->GetPeerAddress();
     // Treat unknown peer address as "not UDP", because we have no idea whether
     // it's safe to do MRP there.
-    bool isUDPTransport                = peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
+    bool isUDPTransport                = peerAddress.GetTransportType() == Transport::Type::kUdp;
     bool reliableTransmissionRequested = isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
     // If a response message is expected...
@@ -295,7 +295,7 @@ bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & 
         (mExchangeId == payloadHeader.GetExchangeID())
 
         // AND The Session ID associated with the incoming message matches the Session ID associated with the exchange.
-        && (mSession.HasValue() && mSession.Value().MatchIncomingSession(session))
+        && (mSession.HasValue() && mSession.Value() == session)
 
         // TODO: This check should be already implied by the equality of session check,
         // It should be removed after we have implemented the temporary node id for PASE and CASE sessions

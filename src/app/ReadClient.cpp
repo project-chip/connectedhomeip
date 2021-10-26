@@ -178,7 +178,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
-    mPeerNodeId = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
+    mPeerNodeId = aReadPrepareParams.mSessionHandle->GetPeerNodeId();
 
     MoveToState(ClientState::AwaitingInitialReport);
 
@@ -656,7 +656,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
-    mPeerNodeId = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
+    mPeerNodeId = aReadPrepareParams.mSessionHandle->GetPeerNodeId();
     MoveToState(ClientState::AwaitingInitialReport);
 
 exit:

@@ -76,9 +76,8 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
     {
         if (mSecureSession.HasValue())
         {
-            Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
             // Check if the connection state has the correct transport information
-            if (secureSession->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
+            if (mSecureSession.Value()->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
             {
                 mState = ConnectionState::NotConnected;
                 ReturnErrorOnFailure(LoadSecureSessionParameters());
@@ -127,7 +126,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     // trigger the CASE based secure session.
     if (mSecureSession.HasValue())
     {
-        Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
+        Transport::SecureSession * secureSession = mSecureSession.Value().AsSecureSession();
         const uint32_t localMessageCounter       = secureSession->GetSessionMessageCounter().GetLocalMessageCounter().Value();
         const uint32_t peerMessageCounter        = secureSession->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
 
@@ -269,7 +268,7 @@ void Device::OnNewConnection(SessionHandle session)
     // Reset the message counters here because this is the first time we get a handle to the secure session.
     // Since CHIPDevices can be serialized/deserialized in the middle of what is conceptually a single PASE session
     // we need to restore the session counters along with the session information.
-    Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
+    Transport::SecureSession * secureSession = mSecureSession.Value().AsSecureSession();
     VerifyOrReturn(secureSession != nullptr);
     MessageCounter & localCounter = secureSession->GetSessionMessageCounter().GetLocalMessageCounter();
     if (localCounter.SetCounter(mLocalMessageCounter) != CHIP_NO_ERROR)
@@ -397,8 +396,7 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, CommissioningWindowOption
 
 void Device::UpdateSession(bool connected)
 {
-    SessionHandle session =
-        SessionHandle(mDeviceId, mCASESession.GetLocalSessionId(), mCASESession.GetPeerSessionId(), mFabricIndex);
+    SessionHandle session = SessionHandle(*mSessionManager, mCASESession.GetLocalSessionId());
     if (connected)
     {
         OnNewConnection(session);
@@ -437,7 +435,7 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
         return CHIP_NO_ERROR;
     }
 
-    Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
+    Transport::SecureSession * secureSession = mSecureSession.Value().AsSecureSession();
     secureSession->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;

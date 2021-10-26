@@ -48,10 +48,7 @@ bool ChannelContext::MatchNodeId(NodeId nodeId)
     case ChannelState::kPreparing:
         return nodeId == GetPrepareVars().mBuilder.GetPeerNodeId();
     case ChannelState::kReady: {
-        auto state = mExchangeManager->GetSessionManager()->GetSecureSession(GetReadyVars().mSession);
-        if (state == nullptr)
-            return false;
-        return nodeId == state->GetPeerNodeId();
+        return nodeId == GetReadyVars().mSession->GetPeerNodeId();
     }
     default:
         return false;
@@ -73,10 +70,7 @@ bool ChannelContext::MatchTransport(Transport::Type transport)
         }
         return false;
     case ChannelState::kReady: {
-        auto state = mExchangeManager->GetSessionManager()->GetSecureSession(GetReadyVars().mSession);
-        if (state == nullptr)
-            return false;
-        return transport == state->GetPeerAddress().GetTransportType();
+        return transport == GetReadyVars().mSession->GetPeerAddress().GetTransportType();
     }
     default:
         return false;
@@ -121,7 +115,7 @@ bool ChannelContext::IsCasePairing()
     return mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kCasePairing;
 }
 
-bool ChannelContext::MatchesSession(SessionHandle session, SessionManager * sessionManager)
+bool ChannelContext::MatchesSession(SessionHandle session)
 {
     switch (mState)
     {
@@ -129,9 +123,7 @@ bool ChannelContext::MatchesSession(SessionHandle session, SessionManager * sess
         switch (GetPrepareVars().mState)
         {
         case PrepareState::kCasePairing: {
-            auto state = sessionManager->GetSecureSession(session);
-            return (state->GetPeerNodeId() == GetPrepareVars().mBuilder.GetPeerNodeId() &&
-                    state->GetPeerSessionId() == GetPrepareVars().mBuilder.GetPeerSessionId());
+            return session->GetPeerNodeId() == GetPrepareVars().mBuilder.GetPeerNodeId();
         }
         default:
             return false;

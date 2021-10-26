@@ -436,7 +436,7 @@ typedef struct
  */
 struct EmberAfClusterCommand
 {
-    chip::NodeId SourceNodeId() const { return source->GetSessionHandle().GetPeerNodeId(); }
+    chip::NodeId SourceNodeId() const { return source->GetSessionHandle()->GetPeerNodeId(); }
 
     /**
      * APS frame for the incoming message

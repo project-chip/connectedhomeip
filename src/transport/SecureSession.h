@@ -23,6 +23,7 @@
 
 #include <app/util/basic-types.h>
 #include <transport/CryptoContext.h>
+#include <transport/Session.h>
 #include <transport/SessionMessageCounter.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
@@ -43,10 +44,8 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
  *   - LastActivityTimeMs is a monotonic timestamp of when this connection was
  *     last used. Inactive connections can expire.
  *   - CryptoContext contains the encryption context of a connection
- *
- * TODO: to add any message ACK information
  */
-class SecureSession
+class SecureSession : public Session
 {
 public:
     SecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric, uint64_t currentTime) :
@@ -60,11 +59,15 @@ public:
     SecureSession & operator=(const SecureSession &) = delete;
     SecureSession & operator=(SecureSession &&) = delete;
 
-    const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-    PeerAddress & GetPeerAddress() { return mPeerAddress; }
+    Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
+#if CHIP_PROGRESS_LOGGING
+    const char * GetSessionTypeString() const override { return "secure"; };
+#endif
+
+    const PeerAddress & GetPeerAddress() const override { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
-    NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    NodeId GetPeerNodeId() const override { return mPeerNodeId; }
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
     FabricIndex GetFabricIndex() const { return mFabric; }

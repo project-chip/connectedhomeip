@@ -354,7 +354,7 @@ CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, 
     VerifyOrExit(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
     VerifyOrExit(ec != nullptr, ChipLogError(Controller, "OnMessageReceived was called with null exchange"));
 
-    index = FindDeviceIndex(ec->GetSessionHandle().GetPeerNodeId());
+    index = FindDeviceIndex(ec->GetSessionHandle()->GetPeerNodeId());
     VerifyOrExit(index < kNumMaxActiveDevices, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
     mActiveDevices[index].OnMessageReceived(ec, payloadHeader, std::move(msgBuf));
@@ -373,7 +373,7 @@ void DeviceController::OnNewConnection(SessionHandle session, Messaging::Exchang
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
 
-    uint16_t index = FindDeviceIndex(mgr->GetSessionManager()->GetSecureSession(session)->GetPeerNodeId());
+    uint16_t index = FindDeviceIndex(session->GetPeerNodeId());
     VerifyOrReturn(index < kNumMaxActiveDevices,
                    ChipLogDetail(Controller, "OnNewConnection was called for unknown device, ignoring it."));
 
@@ -1142,8 +1142,7 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
 
     // Retrieve attestation challenge
     ByteSpan attestationChallenge = mSystemState->SessionMgr()
-                                        ->GetSecureSession({ mPairingSession.GetPeerNodeId(), mPairingSession.GetLocalSessionId(),
-                                                             mPairingSession.GetPeerSessionId(), mFabricIndex })
+                                        ->GetSecureSession(mPairingSession.GetLocalSessionId())
                                         ->GetCryptoContext()
                                         .GetAttestationChallenge();
 

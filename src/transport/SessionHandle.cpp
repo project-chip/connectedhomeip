@@ -23,20 +23,29 @@ namespace chip {
 
 using namespace Transport;
 
-const PeerAddress * SessionHandle::GetPeerAddress(SessionManager * sessionManager) const
-{
-    if (IsSecure())
+Session * SessionHandle::operator->() const {
+    if (mSession.Is<VariantSecureSession>())
     {
-        SecureSession * state = sessionManager->GetSecureSession(*this);
-        if (state == nullptr)
-        {
-            return nullptr;
-        }
-
-        return &state->GetPeerAddress();
+        return AsSecureSession();
+    }
+    else if (mSession.Is<VariantUnauthenticatedSession>())
+    {
+        return &AsUnauthenticatedSession().Get();
     }
 
-    return &GetUnauthenticatedSession()->GetPeerAddress();
+    VerifyOrDie(false);
+    return nullptr;
+}
+
+Transport::SecureSession * SessionHandle::AsSecureSession() const
+{
+    const VariantSecureSession & session = mSession.Get<VariantSecureSession>();
+    return session.mSessionManager.GetSecureSession(session.mLocalSessionId);
+}
+
+Transport::UnauthenticatedSessionHandle SessionHandle::AsUnauthenticatedSession() const
+{
+    return mSession.Get<VariantUnauthenticatedSession>().mUnauthenticatedSessionHandle;
 }
 
 } // namespace chip

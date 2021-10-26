@@ -329,7 +329,7 @@ void StartPinging(streamer_t * stream, char * destination)
     err = EstablishSecureSession(stream, GetEchoPeerAddress());
     SuccessOrExit(err);
 
-    err = gEchoClient.Init(&gExchangeManager, SessionHandle(kTestDeviceNodeId, 1, 1, gFabricIndex));
+    err = gEchoClient.Init(&gExchangeManager, gSessionManager.FindSecureSessionForNode(kTestDeviceNodeId));
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.
