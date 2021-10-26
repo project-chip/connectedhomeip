@@ -81,6 +81,11 @@ docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$
         docker-squash "$ORG"/"$IMAGE":"$VERSION" -t "$ORG"/"$IMAGE":latest
 }
 
+[[ ${*/--slim//} != "${*}" ]] && {
+    command -v docker-slim >/dev/null &&
+        docker-slim build "$ORG"/"$IMAGE":"$VERSION" --http-probe=false --continue-after 1 --tag "$ORG"/"$IMAGE":latest
+}
+
 [[ ${*/--push//} != "${*}" ]] && {
     docker push "$ORG"/"$IMAGE":"$VERSION"
     [[ ${*/--latest//} != "${*}" ]] && {
