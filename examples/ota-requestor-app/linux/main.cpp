@@ -325,6 +325,5 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
-
     return 0;
 }
