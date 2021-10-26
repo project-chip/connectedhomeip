@@ -35,7 +35,7 @@ jobs:
           - name: Checkout
             uses: actions/checkout@v2
             with:
-              token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
+              #token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
               fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
           - name: Use Node.js 14.x
             uses: actions/setup-node@v2
