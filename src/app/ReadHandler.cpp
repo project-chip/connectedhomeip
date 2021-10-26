@@ -54,8 +54,6 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mDirty              = false;
     mActiveSubscription = false;
     mInteractionType    = aInteractionType;
-    mInitiatorNodeId    = apExchangeContext->GetSessionHandle().GetPeerNodeId();
-    mFabricIndex        = apExchangeContext->GetSessionHandle().GetFabricIndex();
 
     if (apExchangeContext != nullptr)
     {
@@ -106,7 +104,6 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     mHoldReport                = false;
     mDirty                     = false;
     mActiveSubscription        = false;
-    mInitiatorNodeId           = kUndefinedNodeId;
 }
 
 CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayload)

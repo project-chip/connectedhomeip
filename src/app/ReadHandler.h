@@ -133,8 +133,9 @@ public:
     void SetDirty() { mDirty = true; }
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
-    NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+    bool MatchSession(const SessionHandle & session) const {
+        return mSessionHandle.HasValue() && mSessionHandle.Value() == session;
+    }
 
 private:
     friend class TestReadInteraction;
@@ -192,8 +193,6 @@ private:
     bool mHoldReport         = false;
     bool mDirty              = false;
     bool mActiveSubscription = false;
-    NodeId mInitiatorNodeId  = kUndefinedNodeId;
-    FabricIndex mFabricIndex = 0;
 };
 } // namespace app
 } // namespace chip
