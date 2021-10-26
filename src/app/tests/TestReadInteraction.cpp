@@ -70,9 +70,8 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
         };
 
-        chip::app::EventManagement::CreateEventManagement(
-            &ctx->GetExchangeManager(), ArraySize(logStorageResources), gCircularEventBuffer,
-            logStorageResources);
+        chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
+                                                          gCircularEventBuffer, logStorageResources);
 
         return SUCCESS;
     }
@@ -1133,7 +1132,6 @@ const nlTest sTests[] =
     NL_TEST_SENTINEL()
 };
 // clang-format on
-
 
 // clang-format off
 nlTestSuite sSuite =

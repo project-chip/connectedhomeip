@@ -71,8 +71,9 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
         };
 
-        chip::app::EventManagement::CreateEventManagement(
-            &ctx->GetExchangeManager(), sizeof(logStorageResources) / sizeof(logStorageResources[0]), gCircularEventBuffer, logStorageResources);
+        chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(),
+                                                          sizeof(logStorageResources) / sizeof(logStorageResources[0]),
+                                                          gCircularEventBuffer, logStorageResources);
 
         return SUCCESS;
     }
@@ -87,7 +88,6 @@ public:
         return SUCCESS;
     }
 };
-
 
 void SimpleDumpWriter(const char * aFormat, ...)
 {
@@ -283,7 +283,6 @@ static void CheckLogEventWithDiscardLowEvent(nlTestSuite * apSuite, void * apCon
 
 const nlTest sTests[] = { NL_TEST_DEF("CheckLogEventWithEvictToNextBuffer", CheckLogEventWithEvictToNextBuffer),
                           NL_TEST_DEF("CheckLogEventWithDiscardLowEvent", CheckLogEventWithDiscardLowEvent), NL_TEST_SENTINEL() };
-
 
 // clang-format off
 nlTestSuite sSuite =

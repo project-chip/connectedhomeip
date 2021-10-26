@@ -63,8 +63,8 @@ int TestInteractionModelEngine::GetClusterInfoListLength(ClusterInfo * apCluster
 void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), nullptr);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ClusterInfo * clusterInfoList = nullptr;
     ClusterInfo clusterInfo1;
@@ -94,8 +94,8 @@ void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuit
 void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), nullptr);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ClusterInfo clusterInfoList[2];
 
