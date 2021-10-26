@@ -33,6 +33,7 @@ target_compile_options(app PRIVATE -Werror)
 
 target_include_directories(app PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
+                           ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common                           
                            ${APP_ROOT}/shell_common/include)
 
 target_sources(app PRIVATE
