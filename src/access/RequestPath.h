@@ -25,7 +25,7 @@ namespace Access {
 
 struct RequestPath
 {
-    // TODO: don't worry about node for now (proxy source)
+    // NOTE: eventually this will likely also contain node, for proxying
     EndpointId endpoint = 0;
     ClusterId cluster   = 0;
 };
