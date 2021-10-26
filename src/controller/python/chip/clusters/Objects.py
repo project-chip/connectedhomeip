@@ -1743,7 +1743,7 @@ class Scenes:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="mode", Tag=0, Type=int),
+                            Label="mode", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="groupIdFrom", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
@@ -1754,7 +1754,7 @@ class Scenes:
                             Label="sceneIdTo", Tag=4, Type=uint),
                     ])
 
-            mode: 'int' = None
+            mode: 'uint' = None
             groupIdFrom: 'uint' = None
             sceneIdFrom: 'uint' = None
             groupIdTo: 'uint' = None
@@ -2044,14 +2044,14 @@ class OnOff:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="onOffControl", Tag=0, Type=int),
+                            Label="onOffControl", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="onTime", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="offWaitTime", Tag=2, Type=uint),
                     ])
 
-            onOffControl: 'int' = None
+            onOffControl: 'uint' = None
             onTime: 'uint' = None
             offWaitTime: 'uint' = None
 
@@ -3759,13 +3759,13 @@ class ApplianceControl:
                         ClusterObjectFieldDescriptor(
                             Label="applianceStatus", Tag=0, Type=ApplianceControl.Enums.ApplianceStatus),
                         ClusterObjectFieldDescriptor(
-                            Label="remoteEnableFlagsAndDeviceStatus2", Tag=1, Type=int),
+                            Label="remoteEnableFlagsAndDeviceStatus2", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="applianceStatus2", Tag=2, Type=ApplianceControl.Enums.ApplianceStatus),
                     ])
 
             applianceStatus: 'ApplianceControl.Enums.ApplianceStatus' = None
-            remoteEnableFlagsAndDeviceStatus2: 'int' = None
+            remoteEnableFlagsAndDeviceStatus2: 'uint' = None
             applianceStatus2: 'ApplianceControl.Enums.ApplianceStatus' = None
 
         @dataclass
@@ -3793,13 +3793,13 @@ class ApplianceControl:
                         ClusterObjectFieldDescriptor(
                             Label="applianceStatus", Tag=0, Type=ApplianceControl.Enums.ApplianceStatus),
                         ClusterObjectFieldDescriptor(
-                            Label="remoteEnableFlagsAndDeviceStatus2", Tag=1, Type=int),
+                            Label="remoteEnableFlagsAndDeviceStatus2", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="applianceStatus2", Tag=2, Type=ApplianceControl.Enums.ApplianceStatus),
                     ])
 
             applianceStatus: 'ApplianceControl.Enums.ApplianceStatus' = None
-            remoteEnableFlagsAndDeviceStatus2: 'int' = None
+            remoteEnableFlagsAndDeviceStatus2: 'uint' = None
             applianceStatus2: 'ApplianceControl.Enums.ApplianceStatus' = None
 
         @dataclass
@@ -9261,7 +9261,7 @@ class DoorLock:
                         ClusterObjectFieldDescriptor(
                             Label="userId", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="daysMask", Tag=2, Type=int),
+                            Label="daysMask", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="startHour", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(
@@ -9274,7 +9274,7 @@ class DoorLock:
 
             scheduleId: 'uint' = None
             userId: 'uint' = None
-            daysMask: 'int' = None
+            daysMask: 'uint' = None
             startHour: 'uint' = None
             startMinute: 'uint' = None
             endHour: 'uint' = None
@@ -11618,16 +11618,16 @@ class Thermostat:
                         ClusterObjectFieldDescriptor(
                             Label="numberOfTransitionsForSequence", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="dayOfWeekForSequence", Tag=1, Type=int),
+                            Label="dayOfWeekForSequence", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="modeForSequence", Tag=2, Type=int),
+                            Label="modeForSequence", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="payload", Tag=3, Type=uint, IsArray=True),
                     ])
 
             numberOfTransitionsForSequence: 'uint' = None
-            dayOfWeekForSequence: 'int' = None
-            modeForSequence: 'int' = None
+            dayOfWeekForSequence: 'uint' = None
+            modeForSequence: 'uint' = None
             payload: typing.List['uint'] = None
 
         @dataclass
@@ -11643,16 +11643,16 @@ class Thermostat:
                         ClusterObjectFieldDescriptor(
                             Label="numberOfTransitionsForSequence", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="dayOfWeekForSequence", Tag=1, Type=int),
+                            Label="dayOfWeekForSequence", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="modeForSequence", Tag=2, Type=int),
+                            Label="modeForSequence", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="payload", Tag=3, Type=uint, IsArray=True),
                     ])
 
             numberOfTransitionsForSequence: 'uint' = None
-            dayOfWeekForSequence: 'int' = None
-            modeForSequence: 'int' = None
+            dayOfWeekForSequence: 'uint' = None
+            modeForSequence: 'uint' = None
             payload: typing.List['uint'] = None
 
         @dataclass
@@ -11697,13 +11697,13 @@ class Thermostat:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="daysToReturn", Tag=0, Type=int),
+                            Label="daysToReturn", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="modeToReturn", Tag=1, Type=int),
+                            Label="modeToReturn", Tag=1, Type=uint),
                     ])
 
-            daysToReturn: 'int' = None
-            modeToReturn: 'int' = None
+            daysToReturn: 'uint' = None
+            modeToReturn: 'uint' = None
 
         @dataclass
         class ClearWeeklySchedule(ClusterCommand):
@@ -13038,7 +13038,7 @@ class ColorControl:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="updateFlags", Tag=0, Type=int),
+                            Label="updateFlags", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="action", Tag=1, Type=ColorControl.Enums.ColorLoopAction),
                         ClusterObjectFieldDescriptor(
@@ -13053,7 +13053,7 @@ class ColorControl:
                             Label="optionsOverride", Tag=6, Type=uint),
                     ])
 
-            updateFlags: 'int' = None
+            updateFlags: 'uint' = None
             action: 'ColorControl.Enums.ColorLoopAction' = None
             direction: 'ColorControl.Enums.ColorLoopDirection' = None
             time: 'uint' = None
@@ -17360,7 +17360,7 @@ class IasZone:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="zoneStatus", Tag=0, Type=int),
+                            Label="zoneStatus", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="extendedStatus", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
@@ -17369,7 +17369,7 @@ class IasZone:
                             Label="delay", Tag=3, Type=uint),
                     ])
 
-            zoneStatus: 'int' = None
+            zoneStatus: 'uint' = None
             extendedStatus: 'uint' = None
             zoneId: 'uint' = None
             delay: 'uint' = None
@@ -17649,11 +17649,11 @@ class IasAce:
                         ClusterObjectFieldDescriptor(
                             Label="zoneId", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="zoneStatus", Tag=1, Type=int),
+                            Label="zoneStatus", Tag=1, Type=uint),
                     ])
 
             zoneId: 'uint' = None
-            zoneStatus: 'int' = None
+            zoneStatus: 'uint' = None
 
     class Commands:
         @dataclass
@@ -18094,7 +18094,7 @@ class IasWd:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="warningInfo", Tag=0, Type=int),
+                            Label="warningInfo", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="warningDuration", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
@@ -18103,7 +18103,7 @@ class IasWd:
                             Label="strobeLevel", Tag=3, Type=uint),
                     ])
 
-            warningInfo: 'int' = None
+            warningInfo: 'uint' = None
             warningDuration: 'uint' = None
             strobeDutyCycle: 'uint' = None
             strobeLevel: 'uint' = None
@@ -18119,10 +18119,10 @@ class IasWd:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="squawkInfo", Tag=0, Type=int),
+                            Label="squawkInfo", Tag=0, Type=uint),
                     ])
 
-            squawkInfo: 'int' = None
+            squawkInfo: 'uint' = None
 
     class Attributes:
         class MaxDuration(ClusterAttributeDescriptor):
@@ -20148,7 +20148,7 @@ class TestCluster:
                         ClusterObjectFieldDescriptor(
                             Label="e", Tag=4, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="f", Tag=5, Type=int),
+                            Label="f", Tag=5, Type=uint),
                     ])
 
             a: 'uint' = None
@@ -20156,7 +20156,7 @@ class TestCluster:
             c: 'TestCluster.Enums.SimpleEnum' = None
             d: 'bytes' = None
             e: 'str' = None
-            f: 'int' = None
+            f: 'uint' = None
 
         @dataclass
         class NestedStruct(ClusterObject):
@@ -21030,7 +21030,7 @@ class Messaging:
                         ClusterObjectFieldDescriptor(
                             Label="messageId", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="messageControl", Tag=1, Type=int),
+                            Label="messageControl", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="startTime", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(
@@ -21038,15 +21038,15 @@ class Messaging:
                         ClusterObjectFieldDescriptor(
                             Label="message", Tag=4, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="optionalExtendedMessageControl", Tag=5, Type=int),
+                            Label="optionalExtendedMessageControl", Tag=5, Type=uint),
                     ])
 
             messageId: 'uint' = None
-            messageControl: 'int' = None
+            messageControl: 'uint' = None
             startTime: 'uint' = None
             durationInMinutes: 'uint' = None
             message: 'str' = None
-            optionalExtendedMessageControl: 'int' = None
+            optionalExtendedMessageControl: 'uint' = None
 
         @dataclass
         class GetLastMessage(ClusterCommand):
@@ -21073,11 +21073,11 @@ class Messaging:
                         ClusterObjectFieldDescriptor(
                             Label="messageId", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="messageControl", Tag=1, Type=int),
+                            Label="messageControl", Tag=1, Type=uint),
                     ])
 
             messageId: 'uint' = None
-            messageControl: 'int' = None
+            messageControl: 'uint' = None
 
         @dataclass
         class MessageConfirmation(ClusterCommand):
@@ -21117,7 +21117,7 @@ class Messaging:
                         ClusterObjectFieldDescriptor(
                             Label="messageId", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="messageControl", Tag=1, Type=int),
+                            Label="messageControl", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="startTime", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(
@@ -21125,15 +21125,15 @@ class Messaging:
                         ClusterObjectFieldDescriptor(
                             Label="message", Tag=4, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="optionalExtendedMessageControl", Tag=5, Type=int),
+                            Label="optionalExtendedMessageControl", Tag=5, Type=uint),
                     ])
 
             messageId: 'uint' = None
-            messageControl: 'int' = None
+            messageControl: 'uint' = None
             startTime: 'uint' = None
             durationInMinutes: 'uint' = None
             message: 'str' = None
-            optionalExtendedMessageControl: 'int' = None
+            optionalExtendedMessageControl: 'uint' = None
 
         @dataclass
         class GetMessageCancellation(ClusterCommand):
@@ -21607,13 +21607,13 @@ class ApplianceEventsAndAlert:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="alertsCount", Tag=0, Type=int),
+                            Label="alertsCount", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="alertStructures", Tag=1, Type=int, IsArray=True),
+                            Label="alertStructures", Tag=1, Type=uint, IsArray=True),
                     ])
 
-            alertsCount: 'int' = None
-            alertStructures: typing.List['int'] = None
+            alertsCount: 'uint' = None
+            alertStructures: typing.List['uint'] = None
 
         @dataclass
         class AlertsNotification(ClusterCommand):
@@ -21626,13 +21626,13 @@ class ApplianceEventsAndAlert:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="alertsCount", Tag=0, Type=int),
+                            Label="alertsCount", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="alertStructures", Tag=1, Type=int, IsArray=True),
+                            Label="alertStructures", Tag=1, Type=uint, IsArray=True),
                     ])
 
-            alertsCount: 'int' = None
-            alertStructures: typing.List['int'] = None
+            alertsCount: 'uint' = None
+            alertStructures: typing.List['uint'] = None
 
         @dataclass
         class EventsNotification(ClusterCommand):

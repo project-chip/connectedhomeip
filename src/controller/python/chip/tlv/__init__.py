@@ -30,7 +30,7 @@ from __future__ import print_function
 
 import struct
 from collections import Mapping, Sequence, OrderedDict
-
+from enum import Enum
 
 TLV_TYPE_SIGNED_INTEGER = 0x00
 TLV_TYPE_UNSIGNED_INTEGER = 0x04
@@ -182,6 +182,8 @@ class TLVWriter(object):
         """
         if val is None:
             self.putNull(tag)
+        elif isinstance(val, Enum):
+            self.putUnsignedInt(tag, val)
         elif isinstance(val, bool):
             self.putBool(tag, val)
         elif isinstance(val, uint):

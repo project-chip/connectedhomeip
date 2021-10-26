@@ -225,6 +225,7 @@ tests:
               - name: "arg1"
                 value: [1, 2, 3, 4, 5, 6, 7, 8, 9]
       response:
+          command: "testListInt8UReverseResponse"
           values:
               - name: "arg1"
                 value: [9, 8, 7, 6, 5, 4, 3, 2, 1]

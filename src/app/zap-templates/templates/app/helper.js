@@ -434,7 +434,7 @@ function zapTypeToPythonClusterObjectType(type, options)
     }
 
     if (await typeChecker('isBitmap')) {
-      return 'int';
+      return 'uint';
     }
 
     if (await typeChecker('isStruct')) {
