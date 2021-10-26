@@ -3432,6 +3432,12 @@ class ChipClusters:
                 "type": "int",
                 "writable": True,
             },
+            0x00000019: {
+                "attributeName": "MinSetpointDeadBand",
+                "attributeId": 0x00000019,
+                "type": "int",
+                "writable": True,
+            },
             0x0000001B: {
                 "attributeName": "ControlSequenceOfOperation",
                 "attributeId": 0x0000001B,
@@ -6396,6 +6402,12 @@ class ChipClusters:
     def ClusterThermostat_WriteAttributeMaxCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid, value)
 
+    def ClusterThermostat_ReadAttributeMinSetpointDeadBand(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_MinSetpointDeadBand(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterThermostat_WriteAttributeMinSetpointDeadBand(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_MinSetpointDeadBand(device, ZCLendpoint, ZCLgroupid, value)
+
     def ClusterThermostat_ReadAttributeControlSequenceOfOperation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation(device, ZCLendpoint, ZCLgroupid)
 
@@ -9117,6 +9129,14 @@ class ChipClusters:
         self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
         self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute MinSetpointDeadBand
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinSetpointDeadBand.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinSetpointDeadBand.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute MinSetpointDeadBand
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinSetpointDeadBand.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int8]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinSetpointDeadBand.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute ControlSequenceOfOperation
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

@@ -6279,6 +6279,14 @@ public class ChipClusters {
       writeMaxCoolSetpointLimitAttribute(chipClusterPtr, callback, value);
     }
 
+    public void readMinSetpointDeadBandAttribute(IntegerAttributeCallback callback) {
+      readMinSetpointDeadBandAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeMinSetpointDeadBandAttribute(DefaultClusterCallback callback, int value) {
+      writeMinSetpointDeadBandAttribute(chipClusterPtr, callback, value);
+    }
+
     public void readControlSequenceOfOperationAttribute(IntegerAttributeCallback callback) {
       readControlSequenceOfOperationAttribute(chipClusterPtr, callback);
     }
@@ -6371,6 +6379,12 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeMaxCoolSetpointLimitAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readMinSetpointDeadBandAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeMinSetpointDeadBandAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
 
     private native void readControlSequenceOfOperationAttribute(
