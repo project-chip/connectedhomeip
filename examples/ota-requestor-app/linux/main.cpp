@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <fstream>
 #include <app-common/zap-generated/callback.h>
 #include <app/device/OperationalDeviceProxy.h>
 #include <app/server/Server.h>
@@ -52,6 +53,10 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
 void OnConnectionFailure(void * context, OperationalDeviceProxy * operationalDeviceProxy, CHIP_ERROR error);
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 
+void OnBlockReceived(void *context, chip::bdx::TransferSession::BlockData & blockdata);
+void OnTransferComplete(void *context);
+void OnTransferFailed(void *context);
+
 // TODO: would be nicer to encapsulate these globals and the callbacks in some sort of class
 OperationalDeviceProxy gOperationalDeviceProxy;
 ExchangeContext * exchangeCtx = nullptr;
@@ -60,6 +65,10 @@ Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback> mQueryImage
 Callback<DefaultFailureCallback> mOnQueryFailureCallback(OnQueryImageFailure, nullptr);
 Callback<OnOperationalDeviceConnected> mOnConnectedCallback(OnConnected, nullptr);
 Callback<OnOperationalDeviceConnectionFailure> mOnConnectionFailureCallback(OnConnectionFailure, nullptr);
+
+Callback<OnBdxBlockReceived> mOnBlockReceived(OnBlockReceived, nullptr);
+Callback<OnBdxTransferComplete> mOnTransferComplete(OnTransferComplete, nullptr);
+Callback<OnBdxTransferFailed> mOnTransferFailed(OnTransferFailed, nullptr);
 
 constexpr uint16_t kOptionProviderNodeId      = 'n';
 constexpr uint16_t kOptionProviderFabricIndex = 'f';
@@ -74,6 +83,7 @@ FabricIndex providerFabricIndex = 1;
 uint16_t requestorSecurePort    = 0;
 uint16_t setupDiscriminator     = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
 uint16_t delayQueryTimeInSec    = 0;
+const char outFilePath[] = "test-ota-out.txt";
 
 OptionDef cmdLineOptionsDef[] = {
     { "providerNodeId", chip::ArgParser::kArgumentRequired, kOptionProviderNodeId },
@@ -137,6 +147,12 @@ void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedAction
     }
 
     bdxDownloader.SetInitialExchange(exchangeCtx);
+
+    BdxDownloaderCallbacks bdxCallbacks;
+    bdxCallbacks.onBlockReceived    = &mOnBlockReceived;
+    bdxCallbacks.onTransferComplete = &mOnTransferComplete;
+    bdxCallbacks.onTransferFailed   = &mOnTransferFailed;
+    bdxDownloader.SetCallbacks(bdxCallbacks);
 
     // This will kick of a timer which will regularly check for updates to the bdx::TransferSession state machine.
     bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions,
@@ -242,6 +258,22 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     }
 
     return (retval);
+}
+
+void OnBlockReceived(void *context, chip::bdx::TransferSession::BlockData & blockdata)
+{
+    std::ofstream otaFile(outFilePath, std::ifstream::out | std::ifstream::ate | std::ifstream::app);
+    otaFile.write(reinterpret_cast<const char *>(blockdata.Data), static_cast<std::streamsize>(blockdata.Length));
+}
+
+void OnTransferComplete(void *context)
+{
+    ChipLogDetail(SoftwareUpdate, "Transfer complete! Contents written/appended to %s", outFilePath);
+}
+
+void OnTransferFailed(void *context)
+{
+    ChipLogDetail(SoftwareUpdate, "Transfer Failed");
 }
 
 void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::FabricIndex peerFabricIndex = providerFabricIndex)
