@@ -263,6 +263,9 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only reconfigure'
 
+# Generating infineon-p6-all-clusters
+gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters
+
 # Generating infineon-p6-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
 
@@ -682,6 +685,9 @@ rm -f examples/all-clusters-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only build'
+
+# Building infineon-p6-all-clusters
+ninja -C {out}/infineon-p6-all-clusters
 
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock

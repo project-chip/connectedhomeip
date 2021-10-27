@@ -235,6 +235,7 @@
                 "esp32-devkitc-temperature-measurement",
                 "esp32-m5stack-all-clusters",
                 "esp32-m5stack-all-clusters-rpc",
+                "infineon-p6-all-clusters",
                 "infineon-p6-lock",
                 "linux-arm64-all-clusters",
                 "linux-arm64-all-clusters-ipv6only",
