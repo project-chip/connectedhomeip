@@ -67,20 +67,26 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMana
 
 CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     DeviceLayer::NetworkInterface * netifs;
 
-    ReturnErrorOnFailure(ConnectivityMgr().GetNetworkInterfaces(&netifs));
+    if (ConnectivityMgr().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
+    {
+        err = aEncoder.EncodeList([&netifs](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+            for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
+            {
+                ReturnErrorOnFailure(encoder.Encode(*ifp));
+            }
 
-    CHIP_ERROR err = aEncoder.EncodeList([&netifs](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-        for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
-        {
-            ReturnErrorOnFailure(encoder.Encode(*ifp));
-        }
+            return CHIP_NO_ERROR;
+        });
 
-        return CHIP_NO_ERROR;
-    });
-
-    ConnectivityMgr().ReleaseNetworkInterfaces(netifs);
+        ConnectivityMgr().ReleaseNetworkInterfaces(netifs);
+    }
+    else
+    {
+        err = aEncoder.Encode(DataModel::List<EndpointId>());
+    }
 
     return err;
 }
