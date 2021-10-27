@@ -232,6 +232,12 @@
 #define CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER
 #endif
 
+#if defined(ZCL_USING_MODE_SELECT_CLUSTER_SERVER) || defined(ZCL_USING_MODE_SELECT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER { ZCL_MODE_SELECT_CLUSTER_ID, 80, "Mode Select" },
+#else
+#define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_SHADE_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_SHADE_CONFIG_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER { ZCL_SHADE_CONFIG_CLUSTER_ID, 256, "Shade Configuration" },
 #else
@@ -773,6 +779,7 @@
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
+    CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
