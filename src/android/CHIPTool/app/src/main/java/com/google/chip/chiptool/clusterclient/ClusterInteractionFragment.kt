@@ -7,25 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-import com.google.chip.chiptool.SelectActionFragment
-import com.google.chip.chiptool.util.DeviceIdUtil
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
-import kotlinx.android.synthetic.main.cluster_interaction_fragment.*
-import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.updateAddressBtn
-import kotlinx.android.synthetic.main.on_off_client_fragment.commandStatusTv
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 
-class ClusterInteractionFragment: Fragment() {
+class ClusterInteractionFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
 
@@ -38,36 +29,13 @@ class ClusterInteractionFragment: Fragment() {
   ): View {
     return inflater.inflate(R.layout.cluster_interaction_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
-      updateAddressBtn.setOnClickListener { updateAddressClick() }
-} }
-
-  private fun updateAddressClick() {
-    try{
-      deviceController.updateDevice(
-        fabricId.text.toString().toULong().toLong(),
-        deviceId.text.toString().toULong().toLong()
-      )
-      showMessage("Address update started")
-    } catch (ex: Exception) {
-      showMessage("Address update failed: $ex")
     }
   }
 
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread {
-      Toast.makeText(
-        requireContext(),
-        msg,
-        Toast.LENGTH_SHORT).show()
+      Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
     }
-  }
-
-  override fun onStart() {
-    super.onStart()
-    // TODO: use the fabric ID that was used to commission the device
-    val testFabricId = "5544332211"
-    fabricId.setText(testFabricId)
-    deviceId.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {

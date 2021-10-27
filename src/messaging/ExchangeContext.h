@@ -61,7 +61,7 @@ class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public Referen
     friend class ExchangeContextDeletor;
 
 public:
-    typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
+    typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
 
     ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator, ExchangeDelegate * delegate);
 
@@ -149,8 +149,8 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    SessionHandle GetSecureSession() { return mSecureSession.Value(); }
-    bool HasSecureSession() const { return mSecureSession.HasValue(); }
+    SessionHandle GetSessionHandle() { return mSession.Value(); }
+    bool HasSessionHandle() const { return mSession.HasValue(); }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -165,14 +165,14 @@ public:
     void SetResponseTimeout(Timeout timeout);
 
 private:
-    Timeout mResponseTimeout       = 0; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
+    Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
 
     ExchangeMessageDispatch * mDispatch = nullptr;
 
-    Optional<SessionHandle> mSecureSession; // The connection state
-    uint16_t mExchangeId;                   // Assigned exchange ID.
+    Optional<SessionHandle> mSession; // The connection state
+    uint16_t mExchangeId;             // Assigned exchange ID.
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over

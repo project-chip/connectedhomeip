@@ -70,6 +70,8 @@ const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNam
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 
+uint16_t PosixConfig::mPosixSetupDiscriminator = 0xF00; // CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+
 CHIP_ERROR PosixConfig::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -88,9 +90,12 @@ exit:
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
 
-exit:
+    if (key == kConfigKey_SetupDiscriminator)
+    {
+        val = mPosixSetupDiscriminator;
+        return CHIP_NO_ERROR;
+    }
     return err;
 }
 
@@ -133,9 +138,12 @@ exit:
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
 
-exit:
+    if (key == kConfigKey_SetupDiscriminator)
+    {
+        mPosixSetupDiscriminator = val;
+        return CHIP_NO_ERROR;
+    }
     return err;
 }
 

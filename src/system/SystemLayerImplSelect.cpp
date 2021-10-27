@@ -30,8 +30,6 @@
 
 #include <errno.h>
 
-#define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
-
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING && !defined(PTHREAD_NULL)
 #define PTHREAD_NULL 0
@@ -40,9 +38,11 @@
 namespace chip {
 namespace System {
 
+constexpr Clock::Seconds64 kDefaultMinSleepPeriod{ 60 * 60 * 24 * 30 }; // Month [sec]
+
 CHIP_ERROR LayerImplSelect::Init()
 {
-    VerifyOrReturnError(!mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     RegisterPOSIXErrorFormatter();
 
@@ -60,13 +60,13 @@ CHIP_ERROR LayerImplSelect::Init()
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
     ReturnErrorOnFailure(mWakeEvent.Open(*this));
 
-    VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LayerImplSelect::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.Shutdown(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
 
     Timer * timer;
     while ((timer = mTimerList.PopEarliest()) != nullptr)
@@ -84,6 +84,8 @@ CHIP_ERROR LayerImplSelect::Shutdown()
         timer->Release();
     }
     mWakeEvent.Close(*this);
+
+    mLayerState.SetShutdown();
     mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }
@@ -114,15 +116,15 @@ void LayerImplSelect::Signal()
     }
 }
 
-CHIP_ERROR LayerImplSelect::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delayMilliseconds = 0);
+    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = System::Clock::Zero);
 
     CancelTimer(onComplete, appState);
 
-    Timer * timer = Timer::New(*this, delayMilliseconds, onComplete, appState);
+    Timer * timer = Timer::New(*this, delay, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -130,14 +132,16 @@ CHIP_ERROR LayerImplSelect::StartTimer(uint32_t delayMilliseconds, TimerComplete
     if (dispatchQueue)
     {
         (void) mTimerList.Add(timer);
-        dispatch_source_t timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatchQueue);
+        dispatch_source_t timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, DISPATCH_TIMER_STRICT, dispatchQueue);
         if (timerSource == nullptr)
         {
             chipDie();
         }
 
         timer->mTimerSource = timerSource;
-        dispatch_source_set_timer(timerSource, dispatch_walltime(NULL, delayMilliseconds * NSEC_PER_MSEC), 0, 100 * NSEC_PER_MSEC);
+        dispatch_source_set_timer(
+            timerSource, dispatch_walltime(NULL, static_cast<int64_t>(Clock::Milliseconds64(delay).count() * NSEC_PER_MSEC)), 0,
+            2 * NSEC_PER_MSEC);
         dispatch_source_set_event_handler(timerSource, ^{
             dispatch_source_cancel(timerSource);
             dispatch_release(timerSource);
@@ -184,7 +188,7 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
 
     CancelTimer(onComplete, appState);
 
-    Timer * timer = Timer::New(*this, 0, onComplete, appState);
+    Timer * timer = Timer::New(*this, Clock::Zero, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -326,19 +330,17 @@ void LayerImplSelect::PrepareEvents()
 {
     assertChipStackLockedByCurrentThread();
 
-    constexpr Clock::MonotonicMilliseconds kMaxTimeout =
-        static_cast<Clock::MonotonicMilliseconds>(DEFAULT_MIN_SLEEP_PERIOD) * kMillisecondsPerSecond;
-    const Clock::MonotonicMilliseconds currentTime = SystemClock().GetMonotonicMilliseconds();
-    Clock::MonotonicMilliseconds awakenTime        = currentTime + kMaxTimeout;
+    const Clock::Timestamp currentTime = SystemClock().GetMonotonicTimestamp();
+    Clock::Timestamp awakenTime        = currentTime + kDefaultMinSleepPeriod;
 
     Timer * timer = mTimerList.Earliest();
-    if (timer && Clock::IsEarlier(timer->AwakenTime(), awakenTime))
+    if (timer && timer->AwakenTime() < awakenTime)
     {
         awakenTime = timer->AwakenTime();
     }
 
-    const Clock::MonotonicMilliseconds sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : 0;
-    Clock::MillisecondsToTimeval(sleepTime, mNextTimeout);
+    const Clock::Timestamp sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : Clock::Zero;
+    Clock::ToTimeval(sleepTime, mNextTimeout);
 
     mMaxFd = -1;
     FD_ZERO(&mSelected.mReadSet);
@@ -385,7 +387,7 @@ void LayerImplSelect::HandleEvents()
 
     // Obtain the list of currently expired timers. Any new timers added by timer callback are NOT handled on this pass,
     // since that could result in infinite handling of new timers blocking any other progress.
-    Timer::List expiredTimers(mTimerList.ExtractEarlier(1 + SystemClock().GetMonotonicMilliseconds()));
+    Timer::List expiredTimers(mTimerList.ExtractEarlier(Clock::Timeout(1) + SystemClock().GetMonotonicTimestamp()));
     Timer * timer = nullptr;
     while ((timer = expiredTimers.PopEarliest()) != nullptr)
     {

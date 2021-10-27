@@ -37,10 +37,7 @@
 #include <app/util/af.h>
 
 #include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -94,7 +91,7 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, uint8_t optionM
     //        (FALSE).
     //      - The value of the ExecuteIfOff bit is 0."
 
-    if (!emberAfContainsServer(endpoint, ZCL_ON_OFF_CLUSTER_ID))
+    if (!emberAfContainsServer(endpoint, OnOff::Id))
     {
         return true;
     }
@@ -257,7 +254,7 @@ uint16_t ColorControlServer::computeTransitionTimeFromStateAndRate(ColorControlS
  */
 EmberEventControl * ColorControlServer::getEventControl(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
     return &eventControls[index];
 }
 
@@ -357,7 +354,7 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
  */
 ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTransitionState(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
     return &colorHueTransitionStates[index];
 }
 
@@ -369,7 +366,7 @@ ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTra
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getSaturationTransitionState(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
     return &colorSatTransitionStates[index];
 }
 
@@ -1520,7 +1517,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransitionState(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
     return &colorXtransitionStates[index];
 }
 
@@ -1532,7 +1529,7 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransition
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getYTransitionState(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
     return &colorYtransitionStates[index];
 }
 
@@ -1815,7 +1812,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransitionState(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
     return &colorTempTransitionStates[index];
 }
 
@@ -2231,7 +2228,7 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
     // Control cluster is equal to 0, there SHALL be no link between color
     // temperature and current level.
 
-    if (!emberAfContainsServer(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID))
+    if (!emberAfContainsServer(endpoint, ColorControl::Id))
     {
         return;
     }
@@ -2440,7 +2437,7 @@ bool emberAfColorControlClusterColorLoopSetCallback(app::CommandHandler * comman
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
-    return ColorControlServer::Instance().colorLoopCommand(updateFlags, action, direction, time, startHue, optionsMask,
+    return ColorControlServer::Instance().colorLoopCommand(updateFlags.Raw(), action, direction, time, startHue, optionsMask,
                                                            optionsOverride);
 }
 

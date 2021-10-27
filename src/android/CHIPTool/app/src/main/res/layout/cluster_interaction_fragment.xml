@@ -1,41 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-  <EditText
-      android:id="@+id/fabricId"
-      android:layout_width="wrap_content"
+  <androidx.fragment.app.FragmentContainerView
+      android:id="@+id/addressUpdateFragment"
+      android:name="com.google.chip.chiptool.clusterclient.AddressUpdateFragment"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_alignParentStart="true"
-      android:hint="@string/enter_fabric_id_hint_text"
-      android:inputType="text"
-      android:textSize="20sp"
+      app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+      app:layout_constraintEnd_toEndOf="parent"/>
 
-  <EditText
-      android:id="@+id/deviceId"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_alignParentEnd="true"
-      android:layout_toEndOf="@id/fabricId"
-      android:hint="@string/enter_device_id_hint_text"
-      android:inputType="text"
-      android:textSize="20sp"
-      app:layout_constraintStart_toEndOf="@+id/fabricId"
-      app:layout_constraintTop_toTopOf="parent" />
-  <Button
-      android:id="@+id/updateAddressBtn"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="23dp"
-      android:text="Enroll"
-      app:layout_constraintStart_toEndOf="@+id/deviceId"
-      app:layout_constraintTop_toTopOf="parent" />
   <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/endpointList"
       android:layout_width="match_parent"
@@ -43,8 +20,6 @@
       android:clipToPadding="false"
       android:layout_marginTop="48dp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/fabricId" />
-
-
+      app:layout_constraintTop_toBottomOf="@+id/addressUpdateFragment" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

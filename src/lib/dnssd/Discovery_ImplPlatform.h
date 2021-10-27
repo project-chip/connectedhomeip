@@ -81,7 +81,7 @@ private:
     bool mIsOperationalPublishing        = false;
     bool mIsCommissionableNodePublishing = false;
     bool mIsCommissionerPublishing       = false;
-    uint64_t mCommissionInstanceName;
+    uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
 
     bool mDnssdInitialized               = false;
     ResolverDelegate * mResolverDelegate = nullptr;

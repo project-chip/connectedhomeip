@@ -36,7 +36,7 @@ public:
         chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
         ChipLogProgress(chipTool, "Dnssd: Searching for NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
         return chip::Dnssd::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(remoteId).SetCompressedFabricId(fabricId),
-                                                               chip::Inet::kIPAddressType_Any);
+                                                               chip::Inet::IPAddressType::kAny);
     }
 
     void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override
@@ -78,8 +78,8 @@ public:
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
         ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " Compressed FabricId: %" PRIx64 " ...", remoteId,
-                        GetExecContext()->commissioner->GetCompressedFabricId());
-        return GetExecContext()->commissioner->UpdateDevice(remoteId);
+                        mController.GetCompressedFabricId());
+        return mController.UpdateDevice(remoteId);
     }
 
     /////////// DeviceAddressUpdateDelegate Interface /////////

@@ -73,6 +73,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
+using chip::Inet::IPPrefix;
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -114,7 +116,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ProcessThreadActivity
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveRouteToAddress(const IPAddress & destAddr)
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveRouteToAddress(const Inet::IPAddress & destAddr)
 {
     bool res = false;
 
@@ -1805,7 +1807,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
     Impl()->LockThreadStack();
 
     VerifyOrExit(aHostName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aHostName) <= SrpClient::kMaxHostNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(strlen(aHostName) <= Dnssd::kHostNameMaxLength, error = CHIP_ERROR_INVALID_STRING_LENGTH);
 
     // Avoid adding the same host name multiple times
     if (strcmp(mSrpClient.mHostName, aHostName) != 0)
@@ -1837,7 +1839,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ClearSrpHost(co
     Impl()->LockThreadStack();
 
     VerifyOrExit(aHostName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aHostName) <= SrpClient::kMaxHostNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(strlen(aHostName) <= Dnssd::kHostNameMaxLength, error = CHIP_ERROR_INVALID_STRING_LENGTH);
     VerifyOrExit(mSrpClient.mInitializedCallback, error = CHIP_ERROR_INCORRECT_STATE);
 
     // Add host and remove it with notifying SRP server to clean old information related to the host.
@@ -1917,7 +1919,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     }
     mdnsService.mPort        = serviceInfo.mPort;
     mdnsService.mInterface   = INET_NULL_INTERFACEID;
-    mdnsService.mAddressType = Inet::kIPAddressType_IPv6;
+    mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
     mdnsService.mAddress     = chip::Optional<chip::Inet::IPAddress>(ToIPAddress(serviceInfo.mHostAddress));
 
     otDnsTxtEntryIterator iterator;
@@ -1953,9 +1955,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
     CHIP_ERROR error;
     DnsResult browseResult;
     // type buffer size is kDnssdTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
-    char type[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
-    // hostname buffer size is kDnssdHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
-    char hostname[chip::Dnssd::kDnssdHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    char type[Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    // hostname buffer size is kHostNameMaxLength + . + kMaxDomainNameSize + . + termination character
+    char hostname[Dnssd::kHostNameMaxLength + SrpClient::kMaxDomainNameSize + 3];
     // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
     // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
     uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
@@ -2043,9 +2045,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
     CHIP_ERROR error;
     DnsResult resolveResult;
     // type buffer size is kDnssdTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
-    char type[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
-    // hostname buffer size is kDnssdHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
-    char hostname[chip::Dnssd::kDnssdHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    char type[Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    // hostname buffer size is kHostNameMaxLength + . + kMaxDomainNameSize + . + termination character
+    char hostname[Dnssd::kHostNameMaxLength + SrpClient::kMaxDomainNameSize + 3];
     // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
     // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
     uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
@@ -2098,7 +2100,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsResolve(cons
 
     // Append default SRP domain name to the service name.
     // fullServiceName buffer size is kDnssdTypeAndProtocolMaxSize + . separator + kDefaultDomainNameSize + termination character.
-    char fullServiceName[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
+    char fullServiceName[Dnssd::kDnssdTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
     snprintf(fullServiceName, sizeof(fullServiceName), "%s.%s", aServiceName, SrpClient::kDefaultDomainName);
 
     error = MapOpenThreadError(

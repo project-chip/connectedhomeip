@@ -320,33 +320,6 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return success;
 }
 
-- (BOOL)pairDeviceWithoutSecurity:(uint64_t)deviceID
-                          address:(NSString *)address
-                             port:(uint16_t)port
-                            error:(NSError * __autoreleasing *)error
-{
-    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-    __block BOOL success = NO;
-    if (![self isRunning]) {
-        success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
-        return success;
-    }
-    dispatch_sync(_chipWorkQueue, ^{
-        chip::Controller::SerializedDevice serializedTestDevice;
-        chip::Inet::IPAddress addr;
-        chip::Inet::IPAddress::FromString([address UTF8String], addr);
-
-        if ([self isRunning]) {
-            _operationalCredentialsDelegate->SetDeviceID(deviceID);
-            errorCode = _cppCommissioner->PairTestDeviceWithoutSecurity(
-                deviceID, chip::Transport::PeerAddress::UDP(addr, port), serializedTestDevice);
-        }
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
-
-    return success;
-}
-
 - (BOOL)pairDevice:(uint64_t)deviceID
         onboardingPayload:(NSString *)onboardingPayload
     onboardingPayloadType:(CHIPOnboardingPayloadType)onboardingPayloadType

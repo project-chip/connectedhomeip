@@ -38,6 +38,7 @@
 #include <malloc.h>
 #include <net/if.h>
 #include <netinet/in.h>
+#include <signal.h>
 #include <unistd.h>
 
 namespace chip {
@@ -108,6 +109,7 @@ void GDBus_Thread()
 #endif
 } // namespace
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 void PlatformManagerImpl::WiFIIPChangeListener()
 {
     int sock;
@@ -149,7 +151,7 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                         char name[IFNAMSIZ];
                         ChipDeviceEvent event;
                         if_indextoname(addressMessage->ifa_index, name);
-                        if (strcmp(name, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME) != 0)
+                        if (strcmp(name, ConnectivityManagerImpl::GetWiFiIfName()) != 0)
                         {
                             continue;
                         }
@@ -174,6 +176,7 @@ void PlatformManagerImpl::WiFIIPChangeListener()
         }
     }
 }
+#endif // #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
@@ -198,8 +201,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     gdbusThread.detach();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     std::thread wifiIPThread(WiFIIPChangeListener);
     wifiIPThread.detach();
+#endif
 
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();

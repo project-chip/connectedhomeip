@@ -43,6 +43,8 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 
+using namespace ::chip::app::Clusters::GeneralDiagnostics;
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -240,14 +242,15 @@ double ConnectivityUtils::ConvertFrequenceToFloat(const iw_freq * in)
     return result;
 }
 
-ConnectionType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
+InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 {
-    int sock = -1;
+    InterfaceType ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+    int sock          = -1;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to open socket");
-        return ConnectionType::kConnectionUnknown;
+        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
     }
 
     // Test wireless extensions for CONNECTION_WIFI
@@ -255,10 +258,10 @@ ConnectionType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname
     strncpy(pwrq.ifr_name, ifname, IFNAMSIZ - 1);
 
     if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1)
-        return ConnectionType::kConnectionWiFi;
-
-    // Test ethtool for CONNECTION_ETHERNET
-    if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
+    {
+        ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+    }
+    else if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
     {
         struct ethtool_cmd ecmd = {};
         ecmd.cmd                = ETHTOOL_GSET;
@@ -267,15 +270,49 @@ ConnectionType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname
         strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
 
         if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
-            return ConnectionType::kConnectionEthernet;
+            ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
     }
 
-    return ConnectionType::kConnectionUnknown;
+    close(sock);
+
+    return ret;
+}
+
+CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize)
+{
+    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+    int skfd;
+
+    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        return CHIP_ERROR_OPEN_FAILED;
+    }
+
+    if (ifname[0] != '\0')
+    {
+        struct ifreq req;
+
+        strcpy(req.ifr_name, ifname);
+        if (ioctl(skfd, SIOCGIFHWADDR, &req) != -1)
+        {
+            // Copy 48-bit IEEE MAC Address
+            VerifyOrReturnError(bufSize >= 6, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+            memset(buf, 0, bufSize);
+            memcpy(buf, req.ifr_ifru.ifru_hwaddr.sa_data, 6);
+            err = CHIP_NO_ERROR;
+        }
+    }
+
+    close(skfd);
+
+    return err;
 }
 
 CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize)
 {
-    CHIP_ERROR ret          = CHIP_ERROR_READ_FAILED;
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
     if (getifaddrs(&ifaddr) == -1)
@@ -290,11 +327,11 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionWiFi)
+            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
             {
                 strncpy(ifname, ifa->ifa_name, bufSize);
                 ifname[bufSize - 1] = '\0';
-                ret                 = CHIP_NO_ERROR;
+                err                 = CHIP_NO_ERROR;
                 break;
             }
         }
@@ -302,7 +339,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
         freeifaddrs(ifaddr);
     }
 
-    return ret;
+    return err;
 }
 
 CHIP_ERROR ConnectivityUtils::GetWiFiParameter(int skfd,            /* Socket to the kernel */
@@ -334,9 +371,18 @@ CHIP_ERROR ConnectivityUtils::GetWiFiStats(int skfd, const char * ifname, struct
     return GetWiFiParameter(skfd, ifname, SIOCGIWSTATS, &wrq);
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(int skfd, const char * ifname, uint16_t & channelNumber)
+CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
 {
+    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+
     struct iwreq wrq;
+    int skfd;
+
+    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        return CHIP_ERROR_OPEN_FAILED;
+    }
 
     if (GetWiFiParameter(skfd, ifname, SIOCGIWFREQ, &wrq) == CHIP_NO_ERROR)
     {
@@ -344,16 +390,25 @@ CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(int skfd, const char * ifname
         VerifyOrReturnError((freq / 1000000) <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
         channelNumber = MapFrequencyToChannel(static_cast<uint16_t>(freq / 1000000));
 
-        return CHIP_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
 
-    return CHIP_ERROR_READ_FAILED;
+    close(skfd);
+
+    return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiRssi(int skfd, const char * ifname, int8_t & rssi)
+CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
 {
-    CHIP_ERROR ret = CHIP_ERROR_READ_FAILED;
+    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
     struct iw_statistics stats;
+    int skfd;
+
+    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        return CHIP_ERROR_OPEN_FAILED;
+    }
 
     if (GetWiFiStats(skfd, ifname, &stats) == CHIP_NO_ERROR)
     {
@@ -368,7 +423,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(int skfd, const char * ifname, int8_t 
                 double rcpilevel = (qual->level / 2.0) - 110.0;
                 VerifyOrReturnError(rcpilevel <= INT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
                 rssi = static_cast<int8_t>(rcpilevel);
-                ret  = CHIP_NO_ERROR;
+                err  = CHIP_NO_ERROR;
             }
         }
         else
@@ -384,7 +439,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(int skfd, const char * ifname, int8_t 
 
                     VerifyOrReturnError(dblevel <= INT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
                     rssi = static_cast<int8_t>(dblevel);
-                    ret  = CHIP_NO_ERROR;
+                    err  = CHIP_NO_ERROR;
                 }
             }
             else
@@ -393,44 +448,66 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(int skfd, const char * ifname, int8_t 
                 {
                     VerifyOrReturnError(qual->level <= INT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
                     rssi = static_cast<int8_t>(qual->level);
-                    ret  = CHIP_NO_ERROR;
+                    err  = CHIP_NO_ERROR;
                 }
             }
         }
     }
 
-    return ret;
+    close(skfd);
+
+    return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiBeaconLostCount(int skfd, const char * ifname, uint32_t & beaconLostCount)
+CHIP_ERROR ConnectivityUtils::GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount)
 {
+    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
     struct iw_statistics stats;
+    int skfd;
+
+    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        return CHIP_ERROR_OPEN_FAILED;
+    }
 
     if (GetWiFiStats(skfd, ifname, &stats) == CHIP_NO_ERROR)
     {
         beaconLostCount = stats.miss.beacon;
-        return CHIP_NO_ERROR;
+        err             = CHIP_NO_ERROR;
     }
 
-    return CHIP_ERROR_READ_FAILED;
+    close(skfd);
+
+    return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiCurrentMaxRate(int skfd, const char * ifname, uint64_t & currentMaxRate)
+CHIP_ERROR ConnectivityUtils::GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate)
 {
+    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
     struct iwreq wrq;
+    int skfd;
+
+    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        return CHIP_ERROR_OPEN_FAILED;
+    }
 
     if (GetWiFiParameter(skfd, ifname, SIOCGIWRATE, &wrq) == CHIP_NO_ERROR)
     {
         currentMaxRate = wrq.u.bitrate.value;
-        return CHIP_NO_ERROR;
+        err            = CHIP_NO_ERROR;
     }
 
-    return CHIP_ERROR_READ_FAILED;
+    close(skfd);
+
+    return err;
 }
 
 CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
 {
-    CHIP_ERROR ret          = CHIP_ERROR_READ_FAILED;
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
     if (getifaddrs(&ifaddr) == -1)
@@ -445,11 +522,11 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
             {
                 strncpy(ifname, ifa->ifa_name, bufSize);
                 ifname[bufSize - 1] = '\0';
-                ret                 = CHIP_NO_ERROR;
+                err                 = CHIP_NO_ERROR;
                 break;
             }
         }
@@ -457,13 +534,14 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
         freeifaddrs(ifaddr);
     }
 
-    return ret;
+    return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetEthPHYRate(int skfd, const char * ifname, uint8_t & pHYRate)
+CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, uint8_t & pHYRate)
 {
-    CHIP_ERROR ret = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
+    int skfd;
     uint32_t speed          = 0;
     struct ethtool_cmd ecmd = {};
     ecmd.cmd                = ETHTOOL_GSET;
@@ -472,9 +550,16 @@ CHIP_ERROR ConnectivityUtils::GetEthPHYRate(int skfd, const char * ifname, uint8
     ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
     strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
 
+    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        return CHIP_ERROR_OPEN_FAILED;
+    }
+
     if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
     {
         ChipLogError(DeviceLayer, "Cannot get device settings");
+        close(skfd);
         return CHIP_ERROR_READ_FAILED;
     }
 
@@ -513,15 +598,20 @@ CHIP_ERROR ConnectivityUtils::GetEthPHYRate(int skfd, const char * ifname, uint8
         break;
     default:
         ChipLogError(DeviceLayer, "Undefined speed! (%d)\n", speed);
-        ret = CHIP_ERROR_READ_FAILED;
+        err = CHIP_ERROR_READ_FAILED;
         break;
     };
 
-    return ret;
+    close(skfd);
+
+    return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(int skfd, const char * ifname, bool & fullDuplex)
+CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(const char * ifname, bool & fullDuplex)
 {
+    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+
+    int skfd;
     struct ethtool_cmd ecmd = {};
     ecmd.cmd                = ETHTOOL_GSET;
     struct ifreq ifr        = {};
@@ -529,15 +619,26 @@ CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(int skfd, const char * ifname, bo
     ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
     strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
 
+    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        return CHIP_ERROR_OPEN_FAILED;
+    }
+
     if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
     {
         ChipLogError(DeviceLayer, "Cannot get device settings");
-        return CHIP_ERROR_READ_FAILED;
+        err = CHIP_ERROR_READ_FAILED;
+    }
+    else
+    {
+        fullDuplex = (ecmd.duplex == DUPLEX_FULL) ? true : false;
+        err        = CHIP_NO_ERROR;
     }
 
-    fullDuplex = (ecmd.duplex == DUPLEX_FULL) ? true : false;
+    close(skfd);
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 } // namespace Internal

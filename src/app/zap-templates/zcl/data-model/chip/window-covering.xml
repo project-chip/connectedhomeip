@@ -138,6 +138,7 @@ limitations under the License.
  
   <!-- Window Covering BitFlag Meaning Set -->
   <bitmap name="WcMode" type="BITMAP8">
+    <cluster code="0x0102"/>
     <field mask="0x01" name="MotorDirectionReversed"/>
     <field mask="0x02" name="CalibrationMode"/>
     <field mask="0x04" name="MaintenanceMode"/>
@@ -145,12 +146,14 @@ limitations under the License.
   </bitmap>
 
   <bitmap name="WcOperationalStatus" type="BITMAP8">
+    <cluster code="0x0102"/>
     <field mask="0x03" name="Global"/>
     <field mask="0x0C" name="Lift"/>
     <field mask="0x30" name="Tilt"/>
   </bitmap>
 
   <bitmap name="WcConfigStatus" type="BITMAP8">
+    <cluster code="0x0102"/>
     <field mask="0x01" name="Operational"/>
     <field mask="0x02" name="Online"/>
     <field mask="0x04" name="OpenAndUpCommandsReversed"/>
@@ -161,6 +164,7 @@ limitations under the License.
   </bitmap>
 
   <bitmap name="WcSafetyStatus" type="BITMAP16">
+    <cluster code="0x0102"/>
     <field mask="0x0001" name="RemoteLockout"/>
     <field mask="0x0002" name="TamperDetection"/>
     <field mask="0x0004" name="FailedCommunication"/>

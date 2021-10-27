@@ -23,8 +23,10 @@
 
 #include <app/ClusterInfo.h>
 #include <app/Command.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -161,11 +163,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
     chip::app::ConcreteCommandPath commandPath(imCompatibilityEmberApsFrame.destinationEndpoint,
                                                imCompatibilityEmberApsFrame.clusterId, imCompatibilityEmberAfCluster.commandId);
 
-    CHIP_ERROR err = currentCommandObject->AddStatusCode(
-        commandPath,
-        status == EMBER_ZCL_STATUS_SUCCESS ? chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess
-                                           : chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,
-        chip::Protocols::InteractionModel::Id, static_cast<Protocols::InteractionModel::Status>(ToInteractionModelStatus(status)));
+    CHIP_ERROR err = currentCommandObject->AddStatus(commandPath, ToInteractionModelStatus(status));
     return CHIP_NO_ERROR == err;
 }
 
@@ -189,21 +187,19 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 }
 
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     ChipLogDetail(DataManagement,
-                  "Received Cluster Command: Cluster=" ChipLogFormatMEI " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx16
-                  " AttributeId=%" PRIx32 " ListIndex=%" PRIx16,
-                  ChipLogValueMEI(aClusterInfo.mClusterId), ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId,
-                  aClusterInfo.mFieldId, aClusterInfo.mListIndex);
+                  "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
+                  ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
 
-    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
+    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
     if (attrOverride != nullptr)
     {
         // TODO: We should probably clone the writer and convert failures here
         // into status responses, unless our caller already does that.
         AttributeValueEncoder valueEncoder(apWriter);
-        ReturnErrorOnFailure(attrOverride->Read(aClusterInfo, valueEncoder));
+        ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
 
         if (valueEncoder.TriedEncode())
         {
@@ -223,8 +219,8 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
 
     EmberAfAttributeType attributeType;
     EmberAfStatus status;
-    status = emberAfReadAttribute(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId, CLUSTER_MASK_SERVER,
-                                  attributeData, sizeof(attributeData), &attributeType);
+    status = emberAfReadAttribute(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, attributeData,
+                                  sizeof(attributeData), &attributeType);
 
     if (apDataExists != nullptr)
     {
@@ -345,13 +341,23 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         break;
     }
     case ZCL_ARRAY_ATTRIBUTE_TYPE: {
+        // We only get here for attributes of list type that have no override
+        // registered.  There should not be any nonempty lists like that.
+        uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
+        if (size != 2)
+        {
+            // The value returned by emberAfAttributeValueSize for a list
+            // includes the space needed to store the list length (2 bytes) plus
+            // the space needed to store the actual list items.  We expect it to
+            // return 2 here, indicating a zero-length list.  If it doesn't,
+            // something has gone wrong.
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        // Just encode an empty array.
         TLV::TLVType containerType;
         ReturnErrorOnFailure(
-            apWriter->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_List, containerType));
-        // TODO: Encode data in TLV, now raw buffers
-        ReturnErrorOnFailure(apWriter->PutBytes(
-            TLV::AnonymousTag, attributeData,
-            emberAfAttributeValueSize(aClusterInfo.mClusterId, aClusterInfo.mFieldId, attributeType, attributeData)));
+            apWriter->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_Array, containerType));
         ReturnErrorOnFailure(apWriter->EndContainer(containerType));
         break;
     }
@@ -473,11 +479,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
-    return apWriteHandler->AddAttributeStatusCode(attributePathParams,
-                                                  imCode == Protocols::InteractionModel::Status::Success
-                                                      ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
-                                                      : Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                                  Protocols::SecureChannel::Id, imCode);
+    return apWriteHandler->AddStatus(attributePathParams, imCode);
 }
 } // namespace app
 } // namespace chip
@@ -490,6 +492,11 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     IgnoreUnusedVariable(data);
     IgnoreUnusedVariable(mask);
 
+    MatterReportingAttributeChangeCallback(endpoint, clusterId, attributeId);
+}
+
+void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
+{
     ClusterInfo info;
     info.mClusterId  = clusterId;
     info.mFieldId    = attributeId;

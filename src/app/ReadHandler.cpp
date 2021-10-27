@@ -54,8 +54,8 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mDirty              = false;
     mActiveSubscription = false;
     mInteractionType    = aInteractionType;
-    mInitiatorNodeId    = apExchangeContext->GetSecureSession().GetPeerNodeId();
-    mFabricIndex        = apExchangeContext->GetSecureSession().GetFabricIndex();
+    mInitiatorNodeId    = apExchangeContext->GetSessionHandle().GetPeerNodeId();
+    mFabricIndex        = apExchangeContext->GetSessionHandle().GetFabricIndex();
 
     if (apExchangeContext != nullptr)
     {
@@ -196,13 +196,13 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
     if (IsInitialReport())
     {
-        mSessionHandle.SetValue(mpExchangeCtx->GetSecureSession());
+        mSessionHandle.SetValue(mpExchangeCtx->GetSessionHandle());
     }
     else
     {
         VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
         mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Value(), this);
-        mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
+        mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     MoveToState(HandlerState::AwaitingReportResponse);
@@ -584,7 +584,7 @@ CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
         OnRefreshSubscribeTimerSyncCallback, this);
     mHoldReport = true;
     return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        mMinIntervalFloorSeconds * kMillisecondsPerSecond, OnRefreshSubscribeTimerSyncCallback, this);
+        System::Clock::Seconds16(mMinIntervalFloorSeconds), OnRefreshSubscribeTimerSyncCallback, this);
 }
 } // namespace app
 } // namespace chip

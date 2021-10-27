@@ -11,9 +11,9 @@ import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-import com.google.chip.chiptool.util.DeviceIdUtil
-import kotlinx.android.synthetic.main.op_cred_client_fragment.*
-import kotlinx.android.synthetic.main.op_cred_client_fragment.view.*
+import kotlinx.android.synthetic.main.op_cred_client_fragment.opCredClusterCommandStatus
+import kotlinx.android.synthetic.main.op_cred_client_fragment.view.readCommissionedFabricBtn
+import kotlinx.android.synthetic.main.op_cred_client_fragment.view.readSupportedFabricBtn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,6 +26,8 @@ class OpCredClientFragment : Fragment() {
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
 
+  private lateinit var addressUpdateFragment: AddressUpdateFragment
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -34,17 +36,12 @@ class OpCredClientFragment : Fragment() {
     return inflater.inflate(R.layout.op_cred_client_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
 
-      opCredClusterUpdateAddressBtn.setOnClickListener { scope.launch { updateAddressClick() } }
+      addressUpdateFragment =
+        childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+
       readSupportedFabricBtn.setOnClickListener { scope.launch { sendReadOpCredSupportedFabricAttrClick() } }
       readCommissionedFabricBtn.setOnClickListener { scope.launch { sendReadOpCredCommissionedFabricAttrClick() } }
     }
-  }
-
-  override fun onStart() {
-    super.onStart()
-    val compressedFabricId = deviceController.compressedFabricId
-    opCredClusterFabricIdEd.setText(compressedFabricId.toULong().toString(16).padStart(16,'0'))
-    opCredClusterDeviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
@@ -70,18 +67,6 @@ class OpCredClientFragment : Fragment() {
   override fun onStop() {
     super.onStop()
     scope.cancel()
-  }
-
-  private fun updateAddressClick() {
-    try {
-      deviceController.updateDevice(
-        opCredClusterFabricIdEd.text.toString().toULong(16).toLong(),
-        opCredClusterDeviceIdEd.text.toString().toULong().toLong()
-      )
-      showMessage("Address update started")
-    } catch (ex: Exception) {
-      showMessage("Address update failed: $ex")
-    }
   }
 
   private suspend fun sendReadOpCredSupportedFabricAttrClick() {
@@ -118,7 +103,7 @@ class OpCredClientFragment : Fragment() {
 
   private suspend fun getOpCredClusterForDevice(): ChipClusters.OperationalCredentialsCluster {
     return ChipClusters.OperationalCredentialsCluster(
-            ChipClient.getConnectedDevicePointer(requireContext(), opCredClusterDeviceIdEd.text.toString().toLong()), 0
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId), 0
     )
   }
 

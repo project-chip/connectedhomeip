@@ -73,6 +73,11 @@ const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const ESP32Config::Key ESP32Config::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
+// Keys stored in the Chip-counters namespace
+const ESP32Config::Key ESP32Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
+const ESP32Config::Key ESP32Config::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
+const ESP32Config::Key ESP32Config::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters, "total-hours" };
+
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char ESP32Config::kGroupKeyNamePrefix[] = "gk-";
 

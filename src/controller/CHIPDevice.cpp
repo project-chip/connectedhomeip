@@ -255,6 +255,12 @@ CHIP_ERROR Device::Persist()
 
 void Device::OnNewConnection(SessionHandle session)
 {
+    // Only allow update if the session has been initialized and matches
+    if (mSecureSession.HasValue() && !MatchesSession(session))
+    {
+        return;
+    }
+
     mState = ConnectionState::SecureConnected;
     mSecureSession.SetValue(session);
 
@@ -309,6 +315,15 @@ void Device::OnOpenPairingWindowFailureResponse(void * context, uint8_t status)
     ChipLogError(Controller, "Failed to open pairing window on the device. Status %d", status);
 }
 
+CHIP_ERROR Device::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
+                                       PASEVerifier & outVerifier, uint32_t & outPasscodeId)
+{
+    ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(outVerifier, iterations, salt, /* useRandomPIN= */ false, setupPincode));
+
+    outPasscodeId = mPAKEVerifierID++;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, CommissioningWindowOption option,
                                            const ByteSpan & salt, SetupPayload & setupPayload)
 {
@@ -344,7 +359,7 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
     }
 
     setupPayload.version               = 0;
-    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
+    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
 
     return CHIP_NO_ERROR;
 }
@@ -354,6 +369,20 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, CommissioningWindowOption
     ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
 
     return OpenCommissioningWindow(timeout, kPBKDFMinimumIterations, option, salt, setupPayload);
+}
+
+void Device::UpdateSession(bool connected)
+{
+    SessionHandle session =
+        SessionHandle(mDeviceId, mCASESession.GetLocalSessionId(), mCASESession.GetPeerSessionId(), mFabricIndex);
+    if (connected)
+    {
+        OnNewConnection(session);
+    }
+    else
+    {
+        OnConnectionExpired(session);
+    }
 }
 
 CHIP_ERROR Device::CloseSession()
@@ -674,7 +703,7 @@ void Device::CancelResponseHandler(uint8_t seqNum)
     mCallbacksMgr.CancelResponseCallback(mDeviceId, seqNum);
 }
 
-void Device::AddIMResponseHandler(app::CommandSender * commandObj, Callback::Cancelable * onSuccessCallback,
+void Device::AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
                                   Callback::Cancelable * onFailureCallback)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
@@ -686,7 +715,7 @@ void Device::AddIMResponseHandler(app::CommandSender * commandObj, Callback::Can
                                       onFailureCallback);
 }
 
-void Device::CancelIMResponseHandler(app::CommandSender * commandObj)
+void Device::CancelIMResponseHandler(void * commandObj)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
     // there are only one active command transaction on one command sender object. This is a bit tricky, we try to assume that
@@ -774,19 +803,19 @@ CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Cal
                                              Callback::Cancelable * onFailureCallback)
 {
     bool loadedSecureSession = false;
-    uint8_t seqNum           = GetNextSequenceNumber();
     CHIP_ERROR err           = CHIP_NO_ERROR;
 
-    aHandle->SetAppIdentifier(seqNum);
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    app::WriteClient * writeClient = aHandle.Get();
 
     if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
     {
-        AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+        AddIMResponseHandler(writeClient, onSuccessCallback, onFailureCallback);
     }
     if ((err = aHandle.SendWriteRequest(GetDeviceId(), 0, mSecureSession)) != CHIP_NO_ERROR)
     {
-        CancelResponseHandler(seqNum);
+        CancelIMResponseHandler(writeClient);
     }
     return err;
 }

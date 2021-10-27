@@ -23,9 +23,7 @@
  ******************************************************************************/
 
 #include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -33,6 +31,7 @@
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;
 
 ApplicationLauncherResponse applicationLauncherClusterLaunchApp(::ApplicationLauncherApp application, std::string data);
@@ -49,11 +48,11 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
 void sendResponse(app::CommandHandler * command, ApplicationLauncherResponse response)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_APPLICATION_LAUNCHER_CLUSTER_ID,
-                                         ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ApplicationLauncher::Id,
+                                         Commands::LaunchAppResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
     TLV::TLVWriter * writer          = nullptr;
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
-    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), response.status));
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(1), reinterpret_cast<const char *>(response.data)));
     SuccessOrExit(err = command->FinishCommand());

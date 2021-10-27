@@ -419,39 +419,6 @@ limitations under the License.
     <attribute side="server" code="0x0035" define="LAMP_BURN_HOURS_TRIP_POINT" type="INT24U" min="0x000000" max="0xFFFFFE" writable="true" default="0xFFFFFF" optional="true">lamp burn hours trip point</attribute>
   </cluster>
   <cluster>
-    <name>Illuminance Measurement</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements.</description>
-    <code>0x0400</code>
-    <define>ILLUM_MEASUREMENT_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" tickFrequency="half" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="ILLUM_MEASURED_VALUE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" reportable="true" default="0x0000" optional="false">measured value</attribute>
-    <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="ILLUM_MIN_MEASURED_VALUE" type="INT16U" min="0x0001" max="0xFFFD" writable="false" optional="false">min measured value</attribute>
-    <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="ILLUM_MAX_MEASURED_VALUE" type="INT16U" min="0x0001" max="0xFFFE" writable="false" optional="false">max measured value</attribute>
-    <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="ILLUM_TOLERANCE" type="INT16U" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
-    <!-- TOLERANCE -->
-    <attribute side="server" code="0x0004" define="MEASUREMENT_LIGHT_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFF" writable="false" default="0xFF" optional="true">light sensor type</attribute>
-    <!-- LIGHT_SENSOR_TYPE -->
-  </cluster>
-  <cluster>
-    <name>Illuminance Level Sensing</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for configuring the sensing of illuminance levels, and reporting whether illuminance is above, below, or on target.</description>
-    <code>0x0401</code>
-    <define>ILLUM_LEVEL_SENSING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="LEVEL_STATUS" type="ENUM8" min="0x00" max="0xFE" writable="false" reportable="true" optional="false">level status</attribute>
-    <attribute side="server" code="0x0001" define="SENSING_LIGHT_SENSOR_TYPE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="true">light sensor type</attribute>
-    <!-- LIGHT_SENSOR_TYPE -->
-    <attribute side="server" code="0x0010" define="ILLUMINANCE_TARGET_LEVEL" type="INT16U" min="0x0000" max="0xFFFE" writable="true" optional="false">illuminance level target</attribute>
-  </cluster>
-  <cluster>
     <name>Occupancy Sensing</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for configuring occupancy sensing, and reporting occupancy status.</description>
@@ -2068,20 +2035,14 @@ limitations under the License.
         This message is used to return household appliance current alerts.
       </description>
       <arg name="alertsCount" type="AlertCount"/>
-      <!--
       <arg name="alertStructures" type="AlertStructure" array="true"/>
-      TODO: Add back when zap#248 is resolved
-      -->
     </command>
     <command source="server" code="0x01" name="AlertsNotification" optional="false">
       <description>
         This message is used to notify the current modification of warning and/or fault conditions.
       </description>
       <arg name="alertsCount" type="AlertCount"/>
-      <!--
       <arg name="alertStructures" type="AlertStructure" array="true"/>
-      TODO: Add back when zap#248 is resolved
-      -->
     </command>
     <command source="server" code="0x02" name="EventsNotification" optional="false">
       <description>

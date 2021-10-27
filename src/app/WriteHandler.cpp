@@ -70,7 +70,7 @@ CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributeStatusList::Builder attributeStatusList;
-    VerifyOrExit(mState == State::AddAttributeStatusCode, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
     attributeStatusList = mWriteResponseBuilder.GetAttributeStatusListBuilder().EndOfAttributeStatusList();
     err                 = attributeStatusList.GetError();
     SuccessOrExit(err);
@@ -91,7 +91,7 @@ CHIP_ERROR WriteHandler::SendWriteResponse()
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle packet;
 
-    VerifyOrExit(mState == State::AddAttributeStatusCode, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = FinalizeMessage(packet);
     SuccessOrExit(err);
@@ -224,12 +224,12 @@ CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAtt
     return attributePath.GetError();
 }
 
-CHIP_ERROR WriteHandler::AddAttributeStatusCode(const AttributePathParams & aAttributePathParams,
-                                                const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                                const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
+CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathParams,
+                                   const Protocols::InteractionModel::Status aStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusIB::Builder statusIBBuilder;
+    StatusIB statusIB;
     AttributeStatusIB::Builder attributeStatusIB =
         mWriteResponseBuilder.GetAttributeStatusListBuilder().CreateAttributeStatusBuilder();
     err = attributeStatusIB.GetError();
@@ -238,16 +238,16 @@ CHIP_ERROR WriteHandler::AddAttributeStatusCode(const AttributePathParams & aAtt
     err = ConstructAttributePath(aAttributePathParams, attributeStatusIB);
     SuccessOrExit(err);
 
-    statusIBBuilder = attributeStatusIB.CreateStatusIBBuilder();
-    statusIBBuilder.EncodeStatusIB(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), chip::to_underlying(aStatus))
-        .EndOfStatusIB();
+    statusIB.mStatus = aStatus;
+    statusIBBuilder  = attributeStatusIB.CreateStatusIBBuilder();
+    statusIBBuilder.EncodeStatusIB(statusIB);
     err = statusIBBuilder.GetError();
     SuccessOrExit(err);
 
     attributeStatusIB.EndOfAttributeStatusIB();
     err = attributeStatusIB.GetError();
     SuccessOrExit(err);
-    MoveToState(State::AddAttributeStatusCode);
+    MoveToState(State::AddStatus);
 
 exit:
     return err;
@@ -264,8 +264,8 @@ const char * WriteHandler::GetStateStr() const
     case State::Initialized:
         return "Initialized";
 
-    case State::AddAttributeStatusCode:
-        return "AddAttributeStatusCode";
+    case State::AddStatus:
+        return "AddStatus";
     case State::Sending:
         return "Sending";
     }

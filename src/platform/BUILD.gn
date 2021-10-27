@@ -205,6 +205,11 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET_ANDROID=1",
         "CHIP_DEVICE_LAYER_TARGET=android",
       ]
+    } else if (chip_device_platform == "ameba") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_AMEBA=1",
+        "CHIP_DEVICE_LAYER_TARGET=Ameba",
+      ]
     }
   }
 } else {
@@ -256,7 +261,6 @@ if (chip_device_platform != "none") {
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
       "../include/platform/PlatformManager.h",
-      "../include/platform/SoftwareUpdateManagerImpl.h",
       "../include/platform/ThreadStackManager.h",
       "../include/platform/internal/BLEManager.h",
       "../include/platform/internal/CHIPDeviceLayerInternal.h",
@@ -275,8 +279,6 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericPlatformManagerImpl.h",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
-      "../include/platform/internal/GenericSoftwareUpdateManagerImpl.h",
-      "../include/platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "DeviceControlServer.cpp",
       "Entropy.cpp",
@@ -292,6 +294,8 @@ if (chip_device_platform != "none") {
 
     public_deps = [
       ":platform_base",
+      "${chip_root}/src/app:app_buildconfig",
+      "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
     ]
@@ -324,6 +328,8 @@ if (chip_device_platform != "none") {
       _platform_target = chip_platform_target
     } else if (chip_device_platform == "p6") {
       _platform_target = "P6"
+    } else if (chip_device_platform == "ameba") {
+      _platform_target = "Ameba"
     } else if (chip_device_platform == "fake") {
       _platform_target = "fake"
     } else {

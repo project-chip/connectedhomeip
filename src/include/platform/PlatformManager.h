@@ -217,7 +217,7 @@ private:
     [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
     void PostEventOrDie(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
-    CHIP_ERROR StartChipTimer(uint32_t durationMS);
+    CHIP_ERROR StartChipTimer(System::Clock::Timeout duration);
 
 protected:
     // Construction/destruction limited to subclasses.
@@ -408,9 +408,9 @@ inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
     static_cast<ImplClass *>(this)->_DispatchEvent(event);
 }
 
-inline CHIP_ERROR PlatformManager::StartChipTimer(uint32_t durationMS)
+inline CHIP_ERROR PlatformManager::StartChipTimer(System::Clock::Timeout duration)
 {
-    return static_cast<ImplClass *>(this)->_StartChipTimer(durationMS);
+    return static_cast<ImplClass *>(this)->_StartChipTimer(duration);
 }
 
 inline CHIP_ERROR PlatformManager::GetCurrentHeapFree(uint64_t & currentHeapFree)

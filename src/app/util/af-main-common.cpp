@@ -550,13 +550,13 @@ void emAfPrintStatus(const char * task, EmberStatus status)
 
 static void printMessage(EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * messageContents)
 {
-    emberAfAppPrint("Cluster: 0x%2X, %d bytes,", apsFrame->clusterId, messageLength);
+    emberAfAppPrint("Cluster: " ChipLogFormatMEI ", %d bytes,", ChipLogValueMEI(apsFrame->clusterId), messageLength);
     if (messageLength >= 3)
     {
         emberAfAppPrint(" ZCL %p Cmd ID: %d", (messageContents[0] & ZCL_CLUSTER_SPECIFIC_COMMAND ? "Cluster" : "Global"),
                         messageContents[2]);
     }
-    emberAfAppPrintln("");
+    emberAfAppPrintln("%s", "");
 }
 
 void emAfMessageSentHandler(const MessageSendDestination & destination, EmberApsFrame * apsFrame, EmberStatus status,

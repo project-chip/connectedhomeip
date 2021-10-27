@@ -21,7 +21,7 @@
 
 using namespace ::chip;
 
-CHIP_ERROR DiscoverCommissionersCommand::Run()
+CHIP_ERROR DiscoverCommissionersCommand::RunCommand()
 {
     return mCommissionableNodeController.DiscoverCommissioners();
 }
@@ -41,5 +41,5 @@ void DiscoverCommissionersCommand::Shutdown()
     }
 
     ChipLogProgress(chipTool, "Total of %d commissioner(s) discovered in %" PRIu16 " sec", commissionerCount,
-                    GetWaitDurationInSeconds());
+                    std::chrono::duration_cast<System::Clock::Seconds16>(GetWaitDuration()).count());
 }

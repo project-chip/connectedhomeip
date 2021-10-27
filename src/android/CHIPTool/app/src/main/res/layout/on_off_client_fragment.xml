@@ -3,48 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/fabricIdEd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:inputType="text"
-        android:textSize="20sp"
-        android:hint="@string/enter_fabric_id_hint_text"/>
-
-    <EditText
-        android:id="@+id/deviceIdEd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@id/fabricIdEd"
-        android:inputType="text"
-        android:textSize="20sp"
-        android:hint="@string/enter_device_id_hint_text"/>
-
-    <TextView
-        android:id="@+id/updateAddressBtn"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/addressUpdateFragment"
+        android:name="com.google.chip.chiptool.clusterclient.AddressUpdateFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:layout_margin="16dp"
-        android:layout_gravity="center"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/deviceIdEd"
-        android:background="@android:color/darker_gray"
-        android:text="@string/update_device_address_btn_text"
-        android:textSize="16sp"/>
-
+        android:layout_alignParentTop="true" />
 
     <GridLayout
         android:id="@+id/buttonGrid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/updateAddressBtn"
+        android:layout_below="@id/addressUpdateFragment"
         android:columnCount="3"
         android:rowCount="2">
         <TextView

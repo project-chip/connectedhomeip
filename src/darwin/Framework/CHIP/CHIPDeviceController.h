@@ -49,11 +49,6 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
 
-- (BOOL)pairDeviceWithoutSecurity:(uint64_t)deviceID
-                          address:(NSString *)address
-                             port:(uint16_t)port
-                            error:(NSError * __autoreleasing *)error;
-
 - (BOOL)pairDevice:(uint64_t)deviceID
         onboardingPayload:(NSString *)onboardingPayload
     onboardingPayloadType:(CHIPOnboardingPayloadType)onboardingPayloadType

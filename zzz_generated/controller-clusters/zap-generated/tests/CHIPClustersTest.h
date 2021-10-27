@@ -51,15 +51,15 @@ public:
     ~ApplicationBasicClusterTest() {}
 
     CHIP_ERROR WriteAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        chip::ByteSpan value);
+                                        chip::CharSpan value);
     CHIP_ERROR WriteAttributeVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                       uint16_t value);
     CHIP_ERROR WriteAttributeApplicationName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             chip::ByteSpan value);
+                                             chip::CharSpan value);
     CHIP_ERROR WriteAttributeProductId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                        uint16_t value);
     CHIP_ERROR WriteAttributeApplicationId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           chip::ByteSpan value);
+                                           chip::CharSpan value);
     CHIP_ERROR WriteAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
     CHIP_ERROR WriteAttributeApplicationStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -121,31 +121,31 @@ public:
     CHIP_ERROR WriteAttributeInteractionModelVersion(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint16_t value);
     CHIP_ERROR WriteAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        chip::ByteSpan value);
+                                        chip::CharSpan value);
     CHIP_ERROR WriteAttributeVendorID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                       uint16_t value);
     CHIP_ERROR WriteAttributeProductName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         chip::ByteSpan value);
+                                         chip::CharSpan value);
     CHIP_ERROR WriteAttributeProductID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                        uint16_t value);
     CHIP_ERROR WriteAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
     CHIP_ERROR WriteAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, chip::ByteSpan value);
+                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan value);
     CHIP_ERROR WriteAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint32_t value);
     CHIP_ERROR WriteAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, chip::ByteSpan value);
+                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan value);
     CHIP_ERROR WriteAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               chip::ByteSpan value);
+                                               chip::CharSpan value);
     CHIP_ERROR WriteAttributePartNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        chip::ByteSpan value);
+                                        chip::CharSpan value);
     CHIP_ERROR WriteAttributeProductURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        chip::ByteSpan value);
+                                        chip::CharSpan value);
     CHIP_ERROR WriteAttributeProductLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          chip::ByteSpan value);
+                                          chip::CharSpan value);
     CHIP_ERROR WriteAttributeSerialNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          chip::ByteSpan value);
+                                          chip::CharSpan value);
     CHIP_ERROR WriteAttributeReachable(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                        bool value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -174,6 +174,18 @@ public:
                                              uint16_t value);
 };
 
+class DLL_EXPORT BooleanStateClusterTest : public BooleanStateCluster
+{
+public:
+    BooleanStateClusterTest() : BooleanStateCluster() {}
+    ~BooleanStateClusterTest() {}
+
+    CHIP_ERROR WriteAttributeStateValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        bool value);
+    CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t value);
+};
+
 class DLL_EXPORT BridgedDeviceBasicClusterTest : public BridgedDeviceBasicCluster
 {
 public:
@@ -181,29 +193,29 @@ public:
     ~BridgedDeviceBasicClusterTest() {}
 
     CHIP_ERROR WriteAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        chip::ByteSpan value);
+                                        chip::CharSpan value);
     CHIP_ERROR WriteAttributeVendorID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                       uint16_t value);
     CHIP_ERROR WriteAttributeProductName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         chip::ByteSpan value);
+                                         chip::CharSpan value);
     CHIP_ERROR WriteAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
     CHIP_ERROR WriteAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, chip::ByteSpan value);
+                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan value);
     CHIP_ERROR WriteAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint32_t value);
     CHIP_ERROR WriteAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, chip::ByteSpan value);
+                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan value);
     CHIP_ERROR WriteAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               chip::ByteSpan value);
+                                               chip::CharSpan value);
     CHIP_ERROR WriteAttributePartNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        chip::ByteSpan value);
+                                        chip::CharSpan value);
     CHIP_ERROR WriteAttributeProductURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        chip::ByteSpan value);
+                                        chip::CharSpan value);
     CHIP_ERROR WriteAttributeProductLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          chip::ByteSpan value);
+                                          chip::CharSpan value);
     CHIP_ERROR WriteAttributeSerialNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          chip::ByteSpan value);
+                                          chip::CharSpan value);
     CHIP_ERROR WriteAttributeReachable(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                        bool value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -229,7 +241,7 @@ public:
     CHIP_ERROR WriteAttributeDriftCompensation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                uint8_t value);
     CHIP_ERROR WriteAttributeCompensationText(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              chip::ByteSpan value);
+                                              chip::CharSpan value);
     CHIP_ERROR WriteAttributeColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                               uint16_t value);
     CHIP_ERROR WriteAttributeColorMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -489,6 +501,26 @@ public:
                                              uint16_t value);
 };
 
+class DLL_EXPORT IlluminanceMeasurementClusterTest : public IlluminanceMeasurementCluster
+{
+public:
+    IlluminanceMeasurementClusterTest() : IlluminanceMeasurementCluster() {}
+    ~IlluminanceMeasurementClusterTest() {}
+
+    CHIP_ERROR WriteAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t value);
+    CHIP_ERROR WriteAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t value);
+    CHIP_ERROR WriteAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t value);
+    CHIP_ERROR WriteAttributeTolerance(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t value);
+    CHIP_ERROR WriteAttributeLightSensorType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint8_t value);
+    CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t value);
+};
+
 class DLL_EXPORT KeypadInputClusterTest : public KeypadInputCluster
 {
 public:
@@ -507,6 +539,18 @@ public:
 
     CHIP_ERROR WriteAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint8_t value);
+    CHIP_ERROR WriteAttributeRemainingTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t value);
+    CHIP_ERROR WriteAttributeMinLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint8_t value);
+    CHIP_ERROR WriteAttributeMaxLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint8_t value);
+    CHIP_ERROR WriteAttributeCurrentFrequency(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t value);
+    CHIP_ERROR WriteAttributeMinFrequency(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t value);
+    CHIP_ERROR WriteAttributeMaxFrequency(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -661,7 +705,7 @@ public:
     CHIP_ERROR WriteAttributeOrder(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                    uint8_t value);
     CHIP_ERROR WriteAttributeDescription(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         chip::ByteSpan value);
+                                         chip::CharSpan value);
     CHIP_ERROR WriteAttributeBatteryVoltage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                             uint32_t value);
     CHIP_ERROR WriteAttributeBatteryPercentRemaining(Callback::Cancelable * onSuccessCallback,
@@ -706,12 +750,42 @@ public:
                                       uint16_t value);
     CHIP_ERROR WriteAttributeMaxFlow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                      uint16_t value);
+    CHIP_ERROR WriteAttributeMinConstPressure(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              int16_t value);
+    CHIP_ERROR WriteAttributeMaxConstPressure(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              int16_t value);
+    CHIP_ERROR WriteAttributeMinCompPressure(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             int16_t value);
+    CHIP_ERROR WriteAttributeMaxCompPressure(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             int16_t value);
+    CHIP_ERROR WriteAttributeMinConstSpeed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t value);
+    CHIP_ERROR WriteAttributeMaxConstSpeed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t value);
+    CHIP_ERROR WriteAttributeMinConstFlow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t value);
+    CHIP_ERROR WriteAttributeMaxConstFlow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t value);
+    CHIP_ERROR WriteAttributeMinConstTemp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          int16_t value);
+    CHIP_ERROR WriteAttributeMaxConstTemp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          int16_t value);
+    CHIP_ERROR WriteAttributePumpStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint16_t value);
     CHIP_ERROR WriteAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint8_t value);
     CHIP_ERROR WriteAttributeEffectiveControlMode(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback, uint8_t value);
     CHIP_ERROR WriteAttributeCapacity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                       int16_t value);
+    CHIP_ERROR WriteAttributeSpeed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint16_t value);
+    CHIP_ERROR WriteAttributeLifetimeEnergyConsumed(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint32_t value);
+    CHIP_ERROR WriteAttributeAlarmMask(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t value);
+    CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint32_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -1003,7 +1077,7 @@ public:
     ~WakeOnLanClusterTest() {}
 
     CHIP_ERROR WriteAttributeWakeOnLanMacAddress(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 chip::ByteSpan value);
+                                                 chip::CharSpan value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

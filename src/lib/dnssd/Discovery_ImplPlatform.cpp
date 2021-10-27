@@ -19,6 +19,7 @@
 
 #include <inttypes.h>
 
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/dnssd/DnssdCache.h>
@@ -28,7 +29,6 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -47,7 +47,9 @@ CHIP_ERROR DiscoveryImplPlatform::InitImpl()
 {
     ReturnErrorCodeIf(mDnssdInitialized, CHIP_NO_ERROR);
     ReturnErrorOnFailure(ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this));
-    mCommissionInstanceName = GetRandU64();
+
+    uint64_t random_instance_name = chip::Crypto::GetRandU64();
+    memcpy(&mCommissionableInstanceName[0], &random_instance_name, sizeof(mCommissionableInstanceName));
 
     return CHIP_NO_ERROR;
 }
@@ -112,17 +114,13 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
 
 CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
 {
-    if (maxLength < (chip::Dnssd::kMaxInstanceNameSize + 1))
+    if (maxLength < (chip::Dnssd::Commissionable::kInstanceNameMaxLength + 1))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    size_t len = snprintf(instanceName, maxLength, "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
-                          static_cast<uint32_t>(mCommissionInstanceName));
-    if (len >= maxLength)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    return CHIP_NO_ERROR;
+
+    return chip::Encoding::BytesToUppercaseHexString(&mCommissionableInstanceName[0], sizeof(mCommissionableInstanceName),
+                                                     instanceName, maxLength);
 }
 
 template <class Derived, size_t N_idle, size_t N_active, size_t N_tcp>
@@ -219,7 +217,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 1];
     char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 1];
     // size of subTypes array should be count of SubTypes above
-    const char * subTypes[kSubTypeMaxNumber];
+    const char * subTypes[Commissionable::kSubTypeMaxNumber];
     size_t subTypeSize = 0;
 
     if (!mDnssdInitialized)
@@ -350,7 +348,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     service.mInterface     = INET_NULL_INTERFACEID;
     service.mSubTypes      = subTypes;
     service.mSubTypeSize   = subTypeSize;
-    service.mAddressType   = Inet::kIPAddressType_Any;
+    service.mAddressType   = Inet::IPAddressType::kAny;
     error                  = ChipDnssdPublishService(&service);
 
     if (error == CHIP_NO_ERROR)
@@ -396,7 +394,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     char compressedFabricIdSub[kSubTypeCompressedFabricIdMaxLength + 1];
-    const char * subTypes[1];
+    const char * subTypes[Operational::kSubTypeMaxNumber];
     size_t subTypeSize = 0;
 
     mOperationalAdvertisingParams = params;
@@ -430,7 +428,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     service.mTextEntries   = txtEntries;
     service.mTextEntrySize = textEntrySize;
     service.mInterface     = INET_NULL_INTERFACEID;
-    service.mAddressType   = Inet::kIPAddressType_Any;
+    service.mAddressType   = Inet::IPAddressType::kAny;
     service.mSubTypes      = subTypes;
     service.mSubTypeSize   = subTypeSize;
     error                  = ChipDnssdPublishService(&service);
@@ -544,7 +542,7 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter
     char serviceName[kMaxCommisisonableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
-    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
+    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny, INET_NULL_INTERFACEID,
                            HandleNodeBrowse, this);
 }
 
@@ -554,7 +552,7 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
     char serviceName[kMaxCommisisonerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
 
-    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
+    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny, INET_NULL_INTERFACEID,
                            HandleNodeBrowse, this);
 }
 

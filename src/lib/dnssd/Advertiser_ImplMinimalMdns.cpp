@@ -23,6 +23,7 @@
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
 
+#include <crypto/RandUtils.h>
 #include <lib/dnssd/Advertiser_ImplMinimalMdnsAllocator.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
@@ -32,8 +33,8 @@
 #include <lib/dnssd/minimal_mdns/responders/QueryResponder.h>
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/StringBuilder.h>
 
 // Enable detailed mDNS logging for received queries
@@ -231,8 +232,7 @@ private:
     QueryResponderAllocator<kMaxOperationalRecords> * FindEmptyOperationalAllocator();
 
     ResponseSender mResponseSender;
-    uint32_t mCommissionInstanceName1;
-    uint32_t mCommissionInstanceName2;
+    uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
 
     // current request handling
     const chip::Inet::IPPacketInfo * mCurrentSource = nullptr;
@@ -246,7 +246,7 @@ private:
 void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
 #ifdef DETAIL_LOGGING
-    char srcAddressString[chip::Inet::kMaxIPAddressStringLength];
+    char srcAddressString[chip::Inet::IPAddress::kMaxStringLength];
     VerifyOrDie(info->SrcAddress.ToString(srcAddressString) != nullptr);
     ChipLogDetail(Discovery, "Received an mDNS query from %s", srcAddressString);
 #endif
@@ -280,8 +280,9 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::InetLayer * inetLayer)
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
 
-    mCommissionInstanceName1 = GetRandU32();
-    mCommissionInstanceName2 = GetRandU32();
+    uint64_t random_instance_name = chip::Crypto::GetRandU64();
+    memcpy(&mCommissionableInstanceName[0], &random_instance_name, sizeof(mCommissionableInstanceName));
+
     // Re-set the server in the response sender in case this has been swapped in the
     // GlobalMinimalMdnsServer (used for testing).
     mResponseSender.SetServer(&GlobalMinimalMdnsServer::Server());
@@ -338,7 +339,7 @@ QueryResponderAllocator<AdvertiserMinMdns::kMaxOperationalRecords> * AdvertiserM
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
-    char nameBuffer[kOperationalServiceNamePrefix + 1] = "";
+    char nameBuffer[Operational::kInstanceNameMaxLength + 1] = "";
 
     /// need to set server name
     ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
@@ -438,16 +439,13 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
 CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
 {
-    if (maxLength < (kMaxInstanceNameSize + 1))
+    if (maxLength < (Commissionable::kInstanceNameMaxLength + 1))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    size_t len = snprintf(instanceName, maxLength, ChipLogFormatX64, mCommissionInstanceName1, mCommissionInstanceName2);
-    if (len >= maxLength)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    return CHIP_NO_ERROR;
+
+    return chip::Encoding::BytesToUppercaseHexString(&mCommissionableInstanceName[0], sizeof(mCommissionableInstanceName),
+                                                     instanceName, maxLength);
 }
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)

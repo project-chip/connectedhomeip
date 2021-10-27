@@ -23,9 +23,9 @@
 #include <app/CommandPathParams.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <app/util/af.h>
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/RandUtils.h>
 #include <protocols/secure_channel/PASESession.h> // For chip::kTestDeviceNodeId
 
 #include <string.h>
@@ -56,7 +56,7 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
 {
     for (size_t i = 0; i < bufSize; ++i)
     {
-        buf[i] = chip::GetRandU8();
+        buf[i] = chip::Crypto::GetRandU8();
     }
 }
 
@@ -156,7 +156,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     TLVWriter * writer          = nullptr;
     uint8_t tagNum              = 0;
     VerifyOrReturnError((commandObj->PrepareCommand(cmdParams) == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrReturnError((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(tagNum++), queryStatus) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(tagNum++), mDelayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->PutString(ContextTag(tagNum++), uriBuf) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
@@ -190,7 +190,7 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
     TLVWriter * writer          = nullptr;
 
     VerifyOrReturnError((commandObj->PrepareCommand(cmdParams) == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrReturnError((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(0), updateAction) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(1), mDelayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError((commandObj->FinishCommand() == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);

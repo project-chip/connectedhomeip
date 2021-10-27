@@ -12,10 +12,11 @@ import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-import com.google.chip.chiptool.util.DeviceIdUtil
-import kotlinx.android.synthetic.main.basic_client_fragment.*
-import kotlinx.android.synthetic.main.basic_client_fragment.view.*
-import kotlinx.android.synthetic.main.on_off_client_fragment.*
+import kotlinx.android.synthetic.main.basic_client_fragment.basicClusterCommandStatus
+import kotlinx.android.synthetic.main.basic_client_fragment.userLabelEd
+import kotlinx.android.synthetic.main.basic_client_fragment.view.readProductNameBtn
+import kotlinx.android.synthetic.main.basic_client_fragment.view.readUserLabelBtn
+import kotlinx.android.synthetic.main.basic_client_fragment.view.writeUserLabelBtn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -28,6 +29,8 @@ class BasicClientFragment : Fragment() {
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
 
+  private lateinit var addressUpdateFragment: AddressUpdateFragment
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -36,18 +39,13 @@ class BasicClientFragment : Fragment() {
     return inflater.inflate(R.layout.basic_client_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
 
-      basicClusterUpdateAddressBtn.setOnClickListener { scope.launch { updateAddressClick() }}
+      addressUpdateFragment =
+        childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+
       readUserLabelBtn.setOnClickListener { scope.launch { sendReadUserLabelCommandClick() }}
       writeUserLabelBtn.setOnClickListener { scope.launch { sendWriteUserLabelCommandClick() }}
       readProductNameBtn.setOnClickListener { scope.launch { sendReadProductNameCommandClick() }}
     }
-  }
-
-  override fun onStart() {
-    super.onStart()
-    val compressedFabricId = deviceController.compressedFabricId
-    basicClusterFabricIdEd.setText(compressedFabricId.toULong().toString(16).padStart(16,'0'))
-    basicClusterDeviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
@@ -73,18 +71,6 @@ class BasicClientFragment : Fragment() {
   override fun onStop() {
     super.onStop()
     scope.cancel()
-  }
-
-  private fun updateAddressClick() {
-    try {
-      deviceController.updateDevice(
-        basicClusterFabricIdEd.text.toString().toULong(16).toLong(),
-        basicClusterDeviceIdEd.text.toString().toULong().toLong()
-      )
-      showMessage("Address update started")
-    } catch (ex: Exception) {
-      showMessage("Address update failed: $ex")
-    }
   }
 
   private suspend fun sendReadProductNameCommandClick() {
@@ -135,7 +121,7 @@ class BasicClientFragment : Fragment() {
 
   private suspend fun getBasicClusterForDevice(): BasicCluster {
     return BasicCluster(
-      ChipClient.getConnectedDevicePointer(requireContext(), basicClusterDeviceIdEd.text.toString().toLong()), 0
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId), 0
     )
   }
 

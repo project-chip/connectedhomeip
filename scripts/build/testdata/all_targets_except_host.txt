@@ -1,3 +1,5 @@
+ameba-amebad-all-clusters
+android-androidstudio-chip-tool
 android-arm-chip-tool
 android-arm64-chip-test
 android-arm64-chip-tool
@@ -9,11 +11,13 @@ efr32-brd4161a-lock
 efr32-brd4161a-window-covering
 esp32-c3devkit-all-clusters
 esp32-devkitc-all-clusters
+esp32-devkitc-all-clusters-ipv6only
 esp32-devkitc-bridge
 esp32-devkitc-lock
 esp32-devkitc-shell
 esp32-devkitc-temperature-measurement
 esp32-m5stack-all-clusters
+esp32-m5stack-all-clusters-ipv6only
 infineon-p6-lock
 nrf-nrf52840-light
 nrf-nrf52840-lock

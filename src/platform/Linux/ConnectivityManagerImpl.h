@@ -110,6 +110,10 @@ public:
     bool IsWiFiManagementStarted();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    static const char * GetWiFiIfName() { return sWiFiIfName; }
+#endif
+
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 
@@ -119,8 +123,8 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     WiFiStationMode _GetWiFiStationMode();
     CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
-    uint32_t _GetWiFiStationReconnectIntervalMS();
-    CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
+    System::Clock::Timeout _GetWiFiStationReconnectInterval();
+    CHIP_ERROR _SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool _IsWiFiStationEnabled();
     bool _IsWiFiStationConnected();
     bool _IsWiFiStationApplicationControlled();
@@ -135,8 +139,8 @@ private:
     void _DemandStartWiFiAP();
     void _StopOnDemandWiFiAP();
     void _MaintainOnDemandWiFiAP();
-    uint32_t _GetWiFiAPIdleTimeoutMS();
-    void _SetWiFiAPIdleTimeoutMS(uint32_t val);
+    System::Clock::Timeout _GetWiFiAPIdleTimeout();
+    void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
 
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
@@ -150,6 +154,8 @@ private:
     static std::mutex mWpaSupplicantMutex;
 #endif
 
+    void _ReleaseNetworkInterfaces(NetworkInterface * netifp);
+    CHIP_ERROR _GetNetworkInterfaces(NetworkInterface ** netifpp);
     CHIP_ERROR _GetEthPHYRate(uint8_t & pHYRate);
     CHIP_ERROR _GetEthFullDuplex(bool & fullDuplex);
     CHIP_ERROR _GetEthTimeSinceReset(uint64_t & timeSinceReset);
@@ -208,9 +214,9 @@ private:
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
     WiFiAPState mWiFiAPState;
-    uint64_t mLastAPDemandTime;
-    uint32_t mWiFiStationReconnectIntervalMS;
-    uint32_t mWiFiAPIdleTimeoutMS;
+    System::Clock::Timestamp mLastAPDemandTime;
+    System::Clock::Timeout mWiFiStationReconnectInterval;
+    System::Clock::Timeout mWiFiAPIdleTimeout;
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -220,7 +226,7 @@ private:
     uint32_t mPacketUnicastRxCount   = 0;
     uint32_t mPacketUnicastTxCount   = 0;
     uint64_t mOverrunCount           = 0;
-    char mWiFiIfName[IFNAMSIZ];
+    static char sWiFiIfName[IFNAMSIZ];
 #endif
 };
 
@@ -240,9 +246,9 @@ inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled()
     return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
 }
 
-inline uint32_t ConnectivityManagerImpl::_GetWiFiAPIdleTimeoutMS()
+inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
 {
-    return mWiFiAPIdleTimeoutMS;
+    return mWiFiAPIdleTimeout;
 }
 
 #endif

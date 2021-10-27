@@ -50,6 +50,7 @@
 #include <app/util/af-event.h>
 #include <app/util/af-main.h>
 #include <app/util/af.h>
+#include <zap-generated/PluginApplicationCallbacks.h>
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -124,22 +125,6 @@ static EmberAfInterpanHeader interpanResponseHeader;
 uint8_t emAfExtendedPanId[EXTENDED_PAN_ID_SIZE] = {
     0, 0, 0, 0, 0, 0, 0, 0,
 };
-
-#ifdef EMBER_AF_PLUGIN_BARRIER_CONTROL_SERVER
-void emberAfPluginBarrierControlServerInitCallback(void);
-#endif
-#ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
-void emberAfPluginDoorLockServerInitCallback(void);
-#endif
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-void emberAfPluginDescriptorServerInitCallback(void);
-#endif
-#ifdef ZCL_USING_TEST_CLUSTER_SERVER
-void emberAfPluginTestClusterServerInitCallback(void);
-#endif
-#ifdef ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
-void emberAfPluginOperationalCredentialsServerInitCallback(void);
-#endif
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -289,21 +274,7 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
     // initialize event management system
     emAfInitEvents();
 
-#ifdef EMBER_AF_PLUGIN_BARRIER_CONTROL_SERVER
-    emberAfPluginBarrierControlServerInitCallback();
-#endif
-#ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
-    emberAfPluginDoorLockServerInitCallback();
-#endif
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-    emberAfPluginDescriptorServerInitCallback();
-#endif
-#ifdef ZCL_USING_TEST_CLUSTER_SERVER
-    emberAfPluginTestClusterServerInitCallback();
-#endif
-#ifdef ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
-    emberAfPluginOperationalCredentialsServerInitCallback();
-#endif
+    MATTER_PLUGINS_INIT
 
     emAfCallInits();
 }
@@ -367,7 +338,7 @@ void emberAfDecodeAndPrintClusterWithMfgCode(ClusterId cluster, uint16_t mfgCode
     if (index == 0xFFFF)
     {
         static_assert(sizeof(ClusterId) == 4, "Adjust the print formatting");
-        emberAfPrint(emberAfPrintActiveArea, "(Unknown clus. [0x%4x])", cluster);
+        emberAfPrint(emberAfPrintActiveArea, "(Unknown clus. [" ChipLogFormatMEI "])", ChipLogValueMEI(cluster));
     }
     else
     {
@@ -405,15 +376,16 @@ static void printIncomingZclMessage(const EmberAfClusterCommand * cmd)
     if (emberAfPrintReceivedMessages)
     {
         // emberAfAppPrint("\r\nT%4x:", emberAfGetCurrentTime());
-        emberAfAppPrint("RX len %d, ep %x, clus 0x%2x ", cmd->bufLen, cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId);
+        emberAfAppPrint("RX len %d, ep %x, clus " ChipLogFormatMEI " ", cmd->bufLen, cmd->apsFrame->destinationEndpoint,
+                        ChipLogValueMEI(cmd->apsFrame->clusterId));
         emberAfAppDebugExec(emberAfDecodeAndPrintClusterWithMfgCode(cmd->apsFrame->clusterId, cmd->mfgCode));
         if (cmd->mfgSpecific)
         {
             emberAfAppPrint(" mfgId %2x", cmd->mfgCode);
         }
-        emberAfAppPrint(" FC %x seq %x cmd %x payload[",
+        emberAfAppPrint(" FC %x seq %x cmd " ChipLogFormatMEI " payload[",
                         cmd->buffer[0], // frame control
-                        cmd->seqNum, cmd->commandId);
+                        cmd->seqNum, ChipLogValueMEI(cmd->commandId));
         emberAfAppFlush();
         emberAfAppPrintBuffer(cmd->buffer + cmd->payloadStartIndex,                        // message
                               static_cast<uint16_t>(cmd->bufLen - cmd->payloadStartIndex), // length
@@ -430,14 +402,16 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 
     if (index == 0xFFFF)
     {
-        emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
+        emberAfDebugPrint("Drop cluster " ChipLogFormatMEI " command " ChipLogFormatMEI, ChipLogValueMEI(cmd->apsFrame->clusterId),
+                          ChipLogValueMEI(cmd->commandId));
         emberAfDebugPrint(" due to invalid endpoint: ");
         emberAfDebugPrintln("0x%x", cmd->apsFrame->destinationEndpoint);
         return false;
     }
     else if (emberAfNetworkIndexFromEndpointIndex(index) != cmd->networkIndex)
     {
-        emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
+        emberAfDebugPrint("Drop cluster " ChipLogFormatMEI " command " ChipLogFormatMEI, ChipLogValueMEI(cmd->apsFrame->clusterId),
+                          ChipLogValueMEI(cmd->commandId));
         emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "network");
         emberAfDebugPrintln("%d", cmd->networkIndex);
         return false;
@@ -524,12 +498,6 @@ bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType ty
 
     printIncomingZclMessage(&curCmd);
     prepareForResponse(&curCmd);
-
-    if (emberAfPreCommandReceivedCallback(&curCmd))
-    {
-        msgHandled = true;
-        goto kickout;
-    }
 
     if (interPanHeader != NULL && !(interPanHeader->options & EMBER_AF_INTERPAN_OPTION_MAC_HAS_LONG_ADDRESS))
     {

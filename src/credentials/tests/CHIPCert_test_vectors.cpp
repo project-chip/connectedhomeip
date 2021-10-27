@@ -93,6 +93,7 @@ CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFla
     SELECT_CERT(Node02_05);
     SELECT_CERT(Node02_06);
     SELECT_CERT(Node02_07);
+
 #undef SELECT_CERT
 
     err = CHIP_ERROR_CA_CERT_NOT_FOUND;
@@ -128,40 +129,80 @@ const char * GetTestCertName(uint8_t certType)
     NAME_CERT(Node02_06);
     NAME_CERT(Node02_07);
 
+#undef NAME_CERT
+
     return nullptr;
 }
 
-CHIP_ERROR GetTestCertPubkey(uint8_t certType, const uint8_t ** certPubkey, uint32_t & certPubkeyLen)
+CHIP_ERROR GetTestCertPubkey(uint8_t certType, ByteSpan & pubkey)
 {
     CHIP_ERROR err;
 
-#define SELECT_CERT(NAME)                                                                                                          \
+#define SELECT_PUBKEY(NAME)                                                                                                        \
     do                                                                                                                             \
     {                                                                                                                              \
         if (certType == TestCert::k##NAME)                                                                                         \
         {                                                                                                                          \
-            *certPubkey   = sTestCert_##NAME##_PublicKey;                                                                          \
-            certPubkeyLen = sTestCert_##NAME##_PublicKey_Len;                                                                      \
+            pubkey = ByteSpan(sTestCert_##NAME##_PublicKey, sTestCert_##NAME##_PublicKey_Len);                                     \
             ExitNow(err = CHIP_NO_ERROR);                                                                                          \
         }                                                                                                                          \
     } while (0)
 
-    SELECT_CERT(Root01);
-    SELECT_CERT(Root02);
-    SELECT_CERT(ICA01);
-    SELECT_CERT(ICA02);
-    SELECT_CERT(ICA01_1);
-    SELECT_CERT(FWSign01);
-    SELECT_CERT(Node01_01);
-    SELECT_CERT(Node01_02);
-    SELECT_CERT(Node02_01);
-    SELECT_CERT(Node02_02);
-    SELECT_CERT(Node02_03);
-    SELECT_CERT(Node02_04);
-    SELECT_CERT(Node02_05);
-    SELECT_CERT(Node02_06);
-    SELECT_CERT(Node02_07);
-#undef SELECT_CERT
+    SELECT_PUBKEY(Root01);
+    SELECT_PUBKEY(Root02);
+    SELECT_PUBKEY(ICA01);
+    SELECT_PUBKEY(ICA02);
+    SELECT_PUBKEY(ICA01_1);
+    SELECT_PUBKEY(FWSign01);
+    SELECT_PUBKEY(Node01_01);
+    SELECT_PUBKEY(Node01_02);
+    SELECT_PUBKEY(Node02_01);
+    SELECT_PUBKEY(Node02_02);
+    SELECT_PUBKEY(Node02_03);
+    SELECT_PUBKEY(Node02_04);
+    SELECT_PUBKEY(Node02_05);
+    SELECT_PUBKEY(Node02_06);
+    SELECT_PUBKEY(Node02_07);
+
+#undef SELECT_PUBKEY
+
+    err = CHIP_ERROR_CA_CERT_NOT_FOUND;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR GetTestCertSKID(uint8_t certType, ByteSpan & skid)
+{
+    CHIP_ERROR err;
+
+#define SELECT_SKID(NAME)                                                                                                          \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (certType == TestCert::k##NAME)                                                                                         \
+        {                                                                                                                          \
+            skid = ByteSpan(sTestCert_##NAME##_SubjectKeyId, sTestCert_##NAME##_SubjectKeyId_Len);                                 \
+            ExitNow(err = CHIP_NO_ERROR);                                                                                          \
+        }                                                                                                                          \
+    } while (0)
+
+    SELECT_SKID(Root01);
+    SELECT_SKID(Root02);
+    SELECT_SKID(ICA01);
+    SELECT_SKID(ICA02);
+    SELECT_SKID(ICA01_1);
+    SELECT_SKID(FWSign01);
+    SELECT_SKID(Node01_01);
+    SELECT_SKID(Node01_02);
+    SELECT_SKID(Node02_01);
+    SELECT_SKID(Node02_02);
+    SELECT_SKID(Node02_03);
+    SELECT_SKID(Node02_04);
+    SELECT_SKID(Node02_05);
+    SELECT_SKID(Node02_06);
+    SELECT_SKID(Node02_07);
+
+#undef SELECT_SKID
 
     err = CHIP_ERROR_CA_CERT_NOT_FOUND;
 
@@ -173,7 +214,7 @@ CHIP_ERROR GetTestCertAKID(uint8_t certType, ByteSpan & akid)
 {
     CHIP_ERROR err;
 
-#define SELECT_CERT(NAME)                                                                                                          \
+#define SELECT_AKID(NAME)                                                                                                          \
     do                                                                                                                             \
     {                                                                                                                              \
         if (certType == TestCert::k##NAME)                                                                                         \
@@ -183,22 +224,23 @@ CHIP_ERROR GetTestCertAKID(uint8_t certType, ByteSpan & akid)
         }                                                                                                                          \
     } while (0)
 
-    SELECT_CERT(Root01);
-    SELECT_CERT(Root02);
-    SELECT_CERT(ICA01);
-    SELECT_CERT(ICA02);
-    SELECT_CERT(ICA01_1);
-    SELECT_CERT(FWSign01);
-    SELECT_CERT(Node01_01);
-    SELECT_CERT(Node01_02);
-    SELECT_CERT(Node02_01);
-    SELECT_CERT(Node02_02);
-    SELECT_CERT(Node02_03);
-    SELECT_CERT(Node02_04);
-    SELECT_CERT(Node02_05);
-    SELECT_CERT(Node02_06);
-    SELECT_CERT(Node02_07);
-#undef SELECT_CERT
+    SELECT_AKID(Root01);
+    SELECT_AKID(Root02);
+    SELECT_AKID(ICA01);
+    SELECT_AKID(ICA02);
+    SELECT_AKID(ICA01_1);
+    SELECT_AKID(FWSign01);
+    SELECT_AKID(Node01_01);
+    SELECT_AKID(Node01_02);
+    SELECT_AKID(Node02_01);
+    SELECT_AKID(Node02_02);
+    SELECT_AKID(Node02_03);
+    SELECT_AKID(Node02_04);
+    SELECT_AKID(Node02_05);
+    SELECT_AKID(Node02_06);
+    SELECT_AKID(Node02_07);
+
+#undef SELECT_AKID
 
     err = CHIP_ERROR_CA_CERT_NOT_FOUND;
 

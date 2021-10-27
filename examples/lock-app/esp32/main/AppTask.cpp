@@ -171,9 +171,9 @@ void AppTask::AppTaskMain(void * pvParameter)
         sLockLED.Animate();
 
         Clock::MonotonicMicroseconds nowUS            = SystemClock().GetMonotonicMicroseconds();
-        Clock::MonotonicMicroseconds nextChangeTimeUS = Clock::AddOffset(mLastChangeTimeUS, 5 * 1000 * 1000UL);
+        Clock::MonotonicMicroseconds nextChangeTimeUS = mLastChangeTimeUS + (5 * 1000 * 1000UL);
 
-        if (Clock::IsEarlier(nextChangeTimeUS, nowUS))
+        if (nextChangeTimeUS < nowUS)
         {
             mLastChangeTimeUS = nowUS;
         }

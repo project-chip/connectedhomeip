@@ -946,6 +946,13 @@ enum EmberAfLevelStatus : uint8_t
     EMBER_ZCL_LEVEL_STATUS_ABOVE_TARGET = 2,
 };
 
+// Enum for LightSensorType
+enum EmberAfLightSensorType : uint8_t
+{
+    EMBER_ZCL_LIGHT_SENSOR_TYPE_PHOTODIODE = 0,
+    EMBER_ZCL_LIGHT_SENSOR_TYPE_CMOS       = 1,
+};
+
 // Enum for LogsIntent
 enum EmberAfLogsIntent : uint8_t
 {
@@ -969,13 +976,6 @@ enum EmberAfLogsTransferProtocol : uint8_t
 {
     EMBER_ZCL_LOGS_TRANSFER_PROTOCOL_RESPONSE_PAYLOAD = 0,
     EMBER_ZCL_LOGS_TRANSFER_PROTOCOL_BDX              = 1,
-};
-
-// Enum for MeasurementLightSensorType
-enum EmberAfMeasurementLightSensorType : uint8_t
-{
-    EMBER_ZCL_MEASUREMENT_LIGHT_SENSOR_TYPE_PHOTODIODE = 0,
-    EMBER_ZCL_MEASUREMENT_LIGHT_SENSOR_TYPE_CMOS       = 1,
 };
 
 // Enum for MediaInputType
@@ -1386,13 +1386,6 @@ enum EmberAfSecurityType : uint8_t
     EMBER_ZCL_SECURITY_TYPE_WPA         = 3,
     EMBER_ZCL_SECURITY_TYPE_WPA2        = 4,
     EMBER_ZCL_SECURITY_TYPE_WPA3        = 5,
-};
-
-// Enum for SensingLightSensorType
-enum EmberAfSensingLightSensorType : uint8_t
-{
-    EMBER_ZCL_SENSING_LIGHT_SENSOR_TYPE_PHOTODIODE = 0,
-    EMBER_ZCL_SENSING_LIGHT_SENSOR_TYPE_CMOS       = 1,
 };
 
 // Enum for SetpointAdjustMode
@@ -1839,6 +1832,12 @@ enum EmberAfWiredFaultType : uint8_t
 #define EMBER_AF_SHADE_CLOSURE_STATUS_OPENING_OFFSET (2)
 #define EMBER_AF_SHADE_CLOSURE_STATUS_MOTOR_OPENING (8)
 #define EMBER_AF_SHADE_CLOSURE_STATUS_MOTOR_OPENING_OFFSET (3)
+#define EMBER_AF_SIMPLE_BITMAP_VALUE_A (1)
+#define EMBER_AF_SIMPLE_BITMAP_VALUE_A_OFFSET (0)
+#define EMBER_AF_SIMPLE_BITMAP_VALUE_B (2)
+#define EMBER_AF_SIMPLE_BITMAP_VALUE_B_OFFSET (1)
+#define EMBER_AF_SIMPLE_BITMAP_VALUE_C (4)
+#define EMBER_AF_SIMPLE_BITMAP_VALUE_C_OFFSET (2)
 #define EMBER_AF_SQUAWK_INFO_MODE (240)
 #define EMBER_AF_SQUAWK_INFO_MODE_OFFSET (4)
 #define EMBER_AF_SQUAWK_INFO_STROBE (8)

@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.13
+            image: connectedhomeip/chip-build:0.5.22
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -149,6 +149,14 @@ jobs:
                       scripts/build/gn_build.sh
                       scripts/tests/gn_tests.sh
                   done
+            - name: Build using build_examples.py
+              timeout-minutes: 30
+              # NOTE: only vscode image contains the cross compile arm64 sysroot
+              #       so the build command below only compiles x64
+              run: |
+                ./scripts/run_in_build_env.sh \
+                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'linux-x64-*' build"
+                  
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage
@@ -223,6 +231,11 @@ jobs:
                       scripts/build/gn_build.sh
                       scripts/tests/gn_tests.sh
                   done
+            - name: Run Python library specific unit tests
+              timeout-minutes: 5
+              run: |
+                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip-0.0-cp37-abi3-linux_x86_64.whl'
+                  scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage

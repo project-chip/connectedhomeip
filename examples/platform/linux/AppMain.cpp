@@ -33,7 +33,6 @@
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
 
 #include <lib/support/CHIPMem.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>

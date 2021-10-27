@@ -42,7 +42,7 @@ public:
     // Register for the SoftwareDiagnostics cluster on all endpoints.
     SoftwareDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), AttributeValueEncoder & aEncoder);
@@ -50,15 +50,15 @@ private:
 
 SoftwareDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aClusterInfo.mClusterId != SoftwareDiagnostics::Id)
+    if (aPath.mClusterId != SoftwareDiagnostics::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case CurrentHeapFree::Id: {
         return ReadIfSupported(&PlatformManager::GetCurrentHeapFree, aEncoder);

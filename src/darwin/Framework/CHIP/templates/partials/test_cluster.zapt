@@ -27,7 +27,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     NSString * {{asLowerCamelCase name}}Argument= @"{{definedValue}}";
     {{/if}}
     {{else}}
-    {{chipType}} {{asLowerCamelCase name}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
+    {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{definedValue}}{{asTypeLiteralSuffix type}};
     {{/if}}
     {{/chip_tests_item_parameters}}
     {{#if isCommand}}
@@ -62,6 +62,8 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         {{#if hasExpectedValue}}
         {{#if isList}}
         XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
+        {{else if isArray}}
+        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
         {{else}}
         {{#if (isString type)}}
         {{#if (isOctetString type)}}
@@ -73,7 +75,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         XCTAssertTrue([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToString:{{asLowerCamelCase name}}Argument]);
         {{/if}}
         {{else}}
-        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix}});
+        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix type}});
         {{/if}}
         {{/if}}
         {{/if}}

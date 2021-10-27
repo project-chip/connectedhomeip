@@ -37,6 +37,8 @@
 namespace chip {
 namespace secure_channel {
 
+constexpr System::Clock::Timeout MessageCounterManager::kSyncTimeout;
+
 CHIP_ERROR MessageCounterManager::Init(Messaging::ExchangeManager * exchangeMgr)
 {
     VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -102,7 +104,7 @@ CHIP_ERROR MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext *
 
 void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * exchangeContext)
 {
-    Transport::SecureSession * state = mExchangeMgr->GetSessionManager()->GetSecureSession(exchangeContext->GetSecureSession());
+    Transport::SecureSession * state = mExchangeMgr->GetSessionManager()->GetSecureSession(exchangeContext->GetSessionHandle());
 
     if (state != nullptr)
     {
@@ -197,8 +199,8 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SessionHandle session, T
 
     sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck).Set(Messaging::SendMessageFlags::kExpectResponse);
 
-    // Arm a timer to enforce that a MsgCounterSyncRsp is received before kSyncTimeoutMs.
-    exchangeContext->SetResponseTimeout(kSyncTimeoutMs);
+    // Arm a timer to enforce that a MsgCounterSyncRsp is received before kSyncTimeout.
+    exchangeContext->SetResponseTimeout(kSyncTimeout);
 
     // Send the message counter synchronization request in a Secure Channel Protocol::MsgCounterSyncReq message.
     SuccessOrExit(
@@ -226,7 +228,7 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeCont
     System::PacketBufferHandle msgBuf;
     uint8_t * msg = nullptr;
 
-    state = mExchangeMgr->GetSessionManager()->GetSecureSession(exchangeContext->GetSecureSession());
+    state = mExchangeMgr->GetSessionManager()->GetSecureSession(exchangeContext->GetSessionHandle());
     VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
 
     // Allocate new buffer.
@@ -295,7 +297,7 @@ CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeCo
     ChipLogDetail(SecureChannel, "Received MsgCounterSyncResp response");
 
     // Find an active connection to the specified peer node
-    state = mExchangeMgr->GetSessionManager()->GetSecureSession(exchangeContext->GetSecureSession());
+    state = mExchangeMgr->GetSessionManager()->GetSecureSession(exchangeContext->GetSessionHandle());
     VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
 
     VerifyOrExit(msgBuf->DataLength() == kSyncRespMsgSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -312,7 +314,7 @@ CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeCo
     SuccessOrExit(err);
 
     // Process all queued incoming messages after message counter synchronization is completed.
-    ProcessPendingMessages(exchangeContext->GetSecureSession().GetPeerNodeId());
+    ProcessPendingMessages(exchangeContext->GetSessionHandle().GetPeerNodeId());
 
 exit:
     if (err != CHIP_NO_ERROR)

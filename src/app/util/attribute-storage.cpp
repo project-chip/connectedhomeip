@@ -40,12 +40,15 @@
  ******************************************************************************/
 
 #include "app/util/common.h"
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/callbacks/PluginCallbacks.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 
 using namespace chip;
 
@@ -86,12 +89,6 @@ const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
 GENERATED_FUNCTION_ARRAYS
 #endif
 
-#ifdef EMBER_AF_SUPPORT_COMMAND_DISCOVERY
-const EmberAfCommandMetadata generatedCommands[]              = GENERATED_COMMANDS;
-const EmberAfManufacturerCodeEntry commandManufacturerCodes[] = GENERATED_COMMAND_MANUFACTURER_CODES;
-const uint16_t commandManufacturerCodeCount                   = GENERATED_COMMAND_MANUFACTURER_CODE_COUNT;
-#endif
-
 const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
 const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
 const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
@@ -119,10 +116,6 @@ app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
 
 // Returns endpoint index within a given cluster
 static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterId, uint8_t mask, uint16_t manufacturerCode);
-
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-void emberAfPluginDescriptorServerInitCallback(void);
-#endif
 
 //------------------------------------------------------------------------------
 
@@ -589,16 +582,18 @@ bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am,
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write, int32_t index)
 {
-    uint8_t i;
     uint16_t attributeOffsetIndex = 0;
 
-    for (i = 0; i < emberAfEndpointCount(); i++)
+    for (uint8_t ep = 0; ep < emberAfEndpointCount(); ep++)
     {
-        if (emAfEndpoints[i].endpoint == attRecord->endpoint)
+        // Is this a dynamic endpoint?
+        bool isDynamicEndpoint = (ep >= emberAfFixedEndpointCount());
+
+        if (emAfEndpoints[ep].endpoint == attRecord->endpoint)
         {
-            EmberAfEndpointType * endpointType = emAfEndpoints[i].endpointType;
+            EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
             uint8_t clusterIndex;
-            if (!emberAfEndpointIndexIsEnabled(i))
+            if (!emberAfEndpointIndexIsEnabled(ep))
             {
                 continue;
             }
@@ -652,15 +647,29 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     }
                                 }
 
-                                return (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE
-                                            ? (write) ? emberAfExternalAttributeWriteCallback(
-                                                            attRecord->endpoint, attRecord->clusterId, am,
-                                                            emAfGetManufacturerCodeForAttribute(cluster, am), buffer, index)
-                                                      : emberAfExternalAttributeReadCallback(
-                                                            attRecord->endpoint, attRecord->clusterId, am,
-                                                            emAfGetManufacturerCodeForAttribute(cluster, am), buffer,
-                                                            emberAfAttributeSize(am), index)
-                                            : typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength, index));
+                                // Is the attribute externally stored?
+                                if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
+                                {
+                                    return (write ? emberAfExternalAttributeWriteCallback(
+                                                        attRecord->endpoint, attRecord->clusterId, am,
+                                                        emAfGetManufacturerCodeForAttribute(cluster, am), buffer, index)
+                                                  : emberAfExternalAttributeReadCallback(
+                                                        attRecord->endpoint, attRecord->clusterId, am,
+                                                        emAfGetManufacturerCodeForAttribute(cluster, am), buffer,
+                                                        emberAfAttributeSize(am), index));
+                                }
+                                else
+                                {
+                                    // Internal storage is only supported for fixed endpoints
+                                    if (!isDynamicEndpoint)
+                                    {
+                                        return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength, index);
+                                    }
+                                    else
+                                    {
+                                        return EMBER_ZCL_STATUS_FAILURE;
+                                    }
+                                }
                             }
                         }
                         else
@@ -682,9 +691,9 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
         else
         { // Not the endpoint we are looking for
             // Dynamic endpoints are external and don't factor into storage size
-            if (i < emberAfFixedEndpointCount())
+            if (!isDynamicEndpoint)
             {
-                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[i].endpointType->endpointSize);
+                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[ep].endpointType->endpointSize);
             }
         }
     }
@@ -990,10 +999,15 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             }
         }
 
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-        // Rebuild descriptor attributes on all endpoints
-        emberAfPluginDescriptorServerInitCallback();
-#endif
+        // TODO: We should notify about the fact that all the attributes for
+        // this endpoint have appeared/disappeared, but the reporting engine has
+        // no way to do that right now.
+
+        // TODO: Once endpoints are in parts lists other than that of endpoint
+        // 0, something more complicated might need to happen here.
+
+        MatterReportingAttributeChangeCallback(/* EndpointId = */ 0, app::Clusters::Descriptor::Id,
+                                               app::Clusters::Descriptor::Attributes::PartsList::Id);
     }
 
     return true;
@@ -1315,115 +1329,6 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(EmberAfCluster * cluste
     }
     return cluster->functions[functionIndex];
 }
-
-#ifdef EMBER_AF_SUPPORT_COMMAND_DISCOVERY
-
-uint16_t emAfGetManufacturerCodeForCommand(EmberAfCommandMetadata * command)
-{
-    return getManufacturerCode((EmberAfManufacturerCodeEntry *) commandManufacturerCodes, commandManufacturerCodeCount,
-                               static_cast<uint16_t>(command - generatedCommands));
-}
-
-/**
- * This function populates command IDs into a given buffer.
- *
- * It returns true if commands are complete, meaning there are NO MORE
- * commands that would be returned after the last command.
- * It returns false, if there were more commands, but were not populated
- * because of maxIdCount limitation.
- */
-bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, ClusterId clusterId, uint8_t * buffer,
-                              uint16_t bufferLength, uint16_t * bufferIndex, uint8_t startId, uint8_t maxIdCount)
-{
-    uint16_t i, count = 0;
-    bool returnValue   = true;
-    uint8_t cmdDirMask = 0;
-
-    // determine the appropriate mask to match the request
-    // discover commands generated, client is asking server what commands do you generate?
-    if (outgoing && (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER))
-    {
-        cmdDirMask = COMMAND_MASK_OUTGOING_SERVER;
-        // discover commands generated server is asking client what commands do you generate?
-    }
-    else if (outgoing && (cmd->direction == ZCL_DIRECTION_SERVER_TO_CLIENT))
-    {
-        cmdDirMask = COMMAND_MASK_OUTGOING_CLIENT;
-        // discover commands received client is asking server what commands do you receive?
-    }
-    else if (!outgoing && (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER))
-    {
-        cmdDirMask = COMMAND_MASK_INCOMING_SERVER;
-        // discover commands received server is asking client what commands do you receive?
-    }
-    else
-    {
-        cmdDirMask = COMMAND_MASK_INCOMING_CLIENT;
-    }
-
-    for (i = 0; i < EMBER_AF_GENERATED_COMMAND_COUNT; i++)
-    {
-        if (generatedCommands[i].clusterId != clusterId)
-        {
-            continue;
-        }
-
-        if ((generatedCommands[i].mask & cmdDirMask) == 0)
-        {
-            continue;
-        }
-
-        // Only start from the passed command id
-        if (generatedCommands[i].commandId < startId)
-        {
-            continue;
-        }
-
-        // According to spec: if cmd->mfgSpecific is set, then we ONLY return the
-        // mfg specific commands. If it's not, then we ONLY return non-mfg specific.
-        if (generatedCommands[i].mask & COMMAND_MASK_MANUFACTURER_SPECIFIC)
-        {
-            // Command is Mfg specific
-            if (!cmd->mfgSpecific)
-            {
-                continue; // ignore if asking for not mfg specific
-            }
-            if (cmd->mfgCode != emAfGetManufacturerCodeForCommand((EmberAfCommandMetadata *) &(generatedCommands[i])))
-            {
-                continue; // Ignore if mfg code doesn't match the commands
-            }
-        }
-        else
-        {
-            // Command is not mfg specific.
-            if (cmd->mfgSpecific)
-            {
-                continue; // Ignore if asking for mfg specific
-            }
-        }
-
-        // The one we are about to put in, is beyond the maxIdCount,
-        // so instead of populating it in, we set the return flag to
-        // false and get out of here.
-        if (maxIdCount == count || count >= bufferLength)
-        {
-            returnValue = false;
-            break;
-        }
-        buffer[count] = generatedCommands[i].commandId;
-        (*bufferIndex)++;
-        count++;
-    }
-    return returnValue;
-}
-#else
-// We just need an empty stub if we don't support it
-bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, ClusterId clusterId, uint8_t * buffer,
-                              uint16_t bufferLength, uint16_t * bufferIndex, uint8_t startId, uint8_t maxIdCount)
-{
-    return true;
-}
-#endif
 
 bool registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverride)
 {

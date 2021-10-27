@@ -24,6 +24,7 @@ class HostApp(Enum):
     ALL_CLUSTERS = auto()
     CHIP_TOOL = auto()
     THERMOSTAT = auto()
+    RPC_CONSOLE = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -32,6 +33,8 @@ class HostApp(Enum):
             return 'chip-tool'
         elif self == HostApp.THERMOSTAT:
             return 'thermostat/linux'
+        elif self == HostApp.RPC_CONSOLE:
+            return 'common/pigweed/rpc_console'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -42,6 +45,8 @@ class HostApp(Enum):
             return 'chip-tool'
         elif self == HostApp.THERMOSTAT:
             return 'thermostat-app'
+        elif self == HostApp.RPC_CONSOLE:
+            return 'rpc-console'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -81,7 +86,7 @@ class HostBoard(Enum):
 
 class HostBuilder(GnBuilder):
 
-    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE):
+    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -89,17 +94,31 @@ class HostBuilder(GnBuilder):
         self.app_name = app.BinaryName()
         self.map_name = self.app_name + '.map'
         self.board = board
+        self.extra_gn_options = []
+
+        if 'rpc-console' not in self.app_name and not enable_ipv4:
+            self.extra_gn_options.append('chip_inet_config_enable_ipv4=false')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
-            return None
+            return self.extra_gn_options
         elif self.board == HostBoard.ARM64:
-            return [
-                'target_cpu="arm64"',
-                'is_clang=true',
-                'chip_crypto="mbedtls"',
-                'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64'),
-            ]
+            self.extra_gn_options.extend(
+                [
+                    'target_cpu="arm64"',
+                    'is_clang=true'
+                ]
+            )
+
+            if 'rpc-console' not in self.app_name:
+                self.extra_gn_options.extend(
+                    [
+                        'chip_crypto="mbedtls"',
+                        'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
+                    ]
+                )
+
+            return self.extra_gn_options
         else:
             raise Exception('Unknown host board type: %r' % self)
 
@@ -119,7 +138,20 @@ class HostBuilder(GnBuilder):
         return os.environ[name]
 
     def build_outputs(self):
-        return {
-            self.app_name: os.path.join(self.output_dir, self.app_name),
-            self.map_name: os.path.join(self.output_dir, self.map_name)
-        }
+        outputs = {}
+        if 'rpc-console' not in self.app_name:
+            outputs.update(
+                {
+                    self.app_name: os.path.join(self.output_dir, self.app_name),
+                    self.map_name: os.path.join(self.output_dir, self.map_name)
+                }
+            )
+        else:
+            outputs.update(
+                {
+                    self.app_name: os.path.join(
+                        self.output_dir, "chip_rpc_console_wheels")
+                }
+            )
+
+        return outputs

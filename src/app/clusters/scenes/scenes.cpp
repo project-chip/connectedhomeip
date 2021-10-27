@@ -215,7 +215,7 @@ void emAfPluginScenesServerPrintInfo(void)
                              entry.targetPositionTiltPercent100thsValue);
 #endif
         }
-        emberAfCorePrintln("");
+        emberAfCorePrintln("%s", "");
     }
 }
 
@@ -284,7 +284,7 @@ bool emberAfScenesClusterRemoveSceneCallback(app::CommandHandler * commandObj, c
                                                  ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-            VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(2), sceneId));
@@ -337,7 +337,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(app::CommandHandler * commandOb
                                                  (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-            VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
             SuccessOrExit(err = commandObj->FinishCommand());
@@ -371,7 +371,7 @@ bool emberAfScenesClusterStoreSceneCallback(app::CommandHandler * commandObj, co
                                                  ZCL_STORE_SCENE_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-            VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(2), sceneId));
@@ -466,7 +466,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(app::CommandHandler * comman
                                              (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1),
                                         static_cast<uint8_t>(EMBER_AF_PLUGIN_SCENES_TABLE_SIZE -
@@ -759,7 +759,7 @@ bool emberAfPluginScenesServerParseAddScene(
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
 
     emberAfScenesClusterPrintln("RX: %pAddScene 0x%2x, 0x%x, 0x%2x, \"%.*s\"", (enhanced ? "Enhanced" : ""), groupId, sceneId,
-                                transitionTime, sceneName.size(), sceneName.data());
+                                transitionTime, static_cast<int>(sceneName.size()), sceneName.data());
 
     auto fieldSetIter = extensionFieldSets.begin();
 
@@ -1070,7 +1070,7 @@ kickout:
         }
         TLV::TLVWriter * writer = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(2), sceneId));
@@ -1126,7 +1126,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
     }
     TLV::TLVWriter * writer = nullptr;
     SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-    VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
     SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
     SuccessOrExit(err = writer->Put(TLV::ContextTag(2), sceneId));

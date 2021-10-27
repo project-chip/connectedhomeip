@@ -79,9 +79,9 @@ uart:~$ ot masterkey
 Done
 ```
 
-## Using CHIP-specific commands
+## Using Matter-specific commands
 
-The nRF Connect examples let you use several CHIP-specific CLI commands.
+The nRF Connect examples let you use several Matter-specific CLI commands.
 
 These commands are not available by default and to enable using them, set the
 `CONFIG_CHIP_LIB_SHELL=y` Kconfig option in the `prj.conf` file of the given
@@ -89,7 +89,8 @@ example.
 
 Every invoked command must be preceded by the `matter` prefix.
 
-See the following subsections for the description of each CHIP-specific command.
+See the following subsections for the description of each Matter-specific
+command.
 
 ### device
 
@@ -99,7 +100,7 @@ this command together with one of the additional subcommands listed below.
 #### factoryreset
 
 Performs device factory reset that is hardware reset preceded by erasing of the
-whole CHIP settings stored in a non-volatile memory.
+whole Matter settings stored in a non-volatile memory.
 
 ```shell
 uart:~$ matter factoryreset
