@@ -378,7 +378,6 @@ For example, use the following command for `nrf52840dk_nrf52840`:
 
     $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=overlay-low_power.conf
 
-
 ### Building with Device Firmware Upgrade support
 
 To build the example with configuration that enables DFU, run the following
