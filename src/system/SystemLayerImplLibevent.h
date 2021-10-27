@@ -44,13 +44,13 @@ class LayerImplLibevent : public LayerSocketsLoop
 {
 public:
     LayerImplLibevent() : mEventBase(nullptr), mMdnsTimeoutEvent(nullptr) {}
-    ~LayerImplLibevent() { mLayerState.Destroy(); }
+    ~LayerImplLibevent() = default;
 
     // Layer overrides.
     CHIP_ERROR Init() override;
     CHIP_ERROR Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
-    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState) override;
+    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 

@@ -174,13 +174,13 @@ class BaseTestHelper:
             "Sending On/Off commands to device {} endpoint {}".format(nodeid, endpoint))
         err, resp = self.devCtrl.ZCLSend("OnOff", "On", nodeid,
                                          endpoint, group, {}, blocking=True)
-        if err != 0 or resp is None or resp.ProtocolCode != 0:
+        if err != 0 or resp is None or resp.Status != 0:
             self.logger.error(
                 "failed to send OnOff.On: error is {} with im response{}".format(err, resp))
             return False
         err, resp = self.devCtrl.ZCLSend("OnOff", "Off", nodeid,
                                          endpoint, group, {}, blocking=True)
-        if err != 0 or resp is None or resp.ProtocolCode != 0:
+        if err != 0 or resp is None or resp.Status != 0:
             self.logger.error(
                 "failed to send OnOff.Off: error is {} with im response {}".format(err, resp))
             return False
@@ -220,11 +220,10 @@ class BaseTestHelper:
             return False
 
     def TestResolve(self, nodeid):
-        fabricid = self.devCtrl.GetCompressedFabricId()
         self.logger.info(
-            "Resolve: node id = {:08x} (compressed) fabric id = {:08x}".format(nodeid, fabricid))
+            "Resolve: node id = {:08x}".format(nodeid))
         try:
-            self.devCtrl.ResolveNode(fabricid=fabricid, nodeid=nodeid)
+            self.devCtrl.ResolveNode(nodeid=nodeid)
             addr = self.devCtrl.GetAddressAndPort(nodeid)
             if not addr:
                 return False
@@ -270,12 +269,12 @@ class BaseTestHelper:
             cluster: str
             attribute: str
             value: Any
-            expected_status: IM.ProtocolCode = IM.ProtocolCode.Success
+            expected_status: IM.Status = IM.Status.Success
 
         requests = [
             AttributeWriteRequest("Basic", "UserLabel", "Test"),
             AttributeWriteRequest("Basic", "Location",
-                                  "a pretty loooooooooooooog string", IM.ProtocolCode.InvalidValue),
+                                  "a pretty loooooooooooooog string", IM.Status.InvalidValue),
         ]
         failed_zcl = []
         for req in requests:
@@ -288,7 +287,7 @@ class BaseTestHelper:
                                                      value=req.value)
                 TestResult(f"Write attribute {req.cluster}.{req.attribute}", res).assertStatusEqual(
                     req.expected_status)
-                if req.expected_status != IM.ProtocolCode.Success:
+                if req.expected_status != IM.Status.Success:
                     # If the write interaction is expected to success, proceed to verify it.
                     continue
                 res = self.devCtrl.ZCLReadAttribute(
@@ -344,11 +343,14 @@ class BaseTestHelper:
                 "OnOff", "OnOff", nodeid, endpoint, 1, 10)
             changeThread = _conductAttributeChange(
                 self.devCtrl, nodeid, endpoint)
+            # Reset the number of subscriptions received as subscribing causes a callback.
+            handler.subscriptionReceived = 0
             changeThread.start()
             with handler.cv:
                 while handler.subscriptionReceived < 5:
                     # We should observe 10 attribute changes
                     handler.cv.wait()
+            changeThread.join()
             return True
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")

@@ -174,43 +174,43 @@ const IPV6MulticastGroup sIPv6WellKnownMulticastGroups[NUM_MCAST_GROUPS] = {
 const struct IPAddressExpandedContext sIPAddressContext[] =
 {
     {
-         { { 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, kIPAddressType_Any,
+         { { 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, IPAddressType::kAny,
         "::" },
         kTestIsIPv6, kTestIsNotIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsNotMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-        { { 0x26200001, 0x10e70400, 0xe83fb28f, 0x9c3a1941 }, kIPAddressType_IPv6,
+        { { 0x26200001, 0x10e70400, 0xe83fb28f, 0x9c3a1941 }, IPAddressType::kIPv6,
                                                                   "2620:1:10e7:400:e83f:b28f:9c3a:1941" } ,
         kTestIsIPv6, kTestIsNotIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsNotMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0xfe800000, 0x00000000, 0x8edcd4ff, 0xfe3aebfb }, kIPAddressType_IPv6,
+         { { 0xfe800000, 0x00000000, 0x8edcd4ff, 0xfe3aebfb }, IPAddressType::kIPv6,
         "fe80::8edc:d4ff:fe3a:ebfb" },
         kTestIsIPv6, kTestIsNotIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsNotMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0xff010000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6,
+         { { 0xff010000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6,
         "ff01::1" },
         kTestIsIPv6, kTestIsNotIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0xfd000000, 0x00010001, 0x00000000, 0x00000001 }, kIPAddressType_IPv6,
+         { { 0xfd000000, 0x00010001, 0x00000000, 0x00000001 }, IPAddressType::kIPv6,
         "fd00:0:1:1::1" },
         kTestIsIPv6, kTestIsNotIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsNotMulticast, kTestIsNotIPv6Multicast, kTestIsIPv6ULA, kTestIsNotIPv6LLA,
         0x1, 1, 1
     },
     {
-         { { 0xfd123456, 0x0001abcd, 0xabcdef00, 0xfedcba09 }, kIPAddressType_IPv6,
+         { { 0xfd123456, 0x0001abcd, 0xabcdef00, 0xfedcba09 }, IPAddressType::kIPv6,
         "fd12:3456:1:abcd:abcd:ef00:fedc:ba09" },
         kTestIsIPv6, kTestIsNotIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsNotMulticast, kTestIsNotIPv6Multicast, kTestIsIPv6ULA, kTestIsNotIPv6LLA,
         0x1234560001, 0xabcd, 0xabcdef00fedcba09
     },
     {
-         { { 0xfdffffff, 0xffffffff, 0xffffffff, 0xffffffff }, kIPAddressType_IPv6,
+         { { 0xfdffffff, 0xffffffff, 0xffffffff, 0xffffffff }, IPAddressType::kIPv6,
         "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff" },
         kTestIsIPv6, kTestIsNotIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsNotMulticast, kTestIsNotIPv6Multicast, kTestIsIPv6ULA, kTestIsNotIPv6LLA,
         0xffffffffff, 0xffff, 0xffffffffffffffff
@@ -218,13 +218,13 @@ const struct IPAddressExpandedContext sIPAddressContext[] =
 #if INET_CONFIG_ENABLE_IPV4
     // IPv4-only
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xffffff00 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xffffff00 }, IPAddressType::kIPv4,
         "255.255.255.0" },
         kTestIsIPv4, kTestIsNotIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsNotMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0x7f000001 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0x7f000001 }, IPAddressType::kIPv4,
         "127.0.0.1" },
         kTestIsIPv4, kTestIsNotIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsNotMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
@@ -233,286 +233,286 @@ const struct IPAddressExpandedContext sIPAddressContext[] =
 
     // IPv4 Local subnetwork multicast
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000000 }, IPAddressType::kIPv4,
         "224.0.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000001 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000001 }, IPAddressType::kIPv4,
         "224.0.0.1" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000080 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000080 }, IPAddressType::kIPv4,
         "224.0.0.128" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe00000fe }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe00000fe }, IPAddressType::kIPv4,
         "224.0.0.254" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe00000ff }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe00000ff }, IPAddressType::kIPv4,
         "224.0.0.255" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     // IPv4 Internetwork control multicast
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000100 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000100 }, IPAddressType::kIPv4,
         "224.0.1.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000101 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000101 }, IPAddressType::kIPv4,
         "224.0.1.1" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000180 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000180 }, IPAddressType::kIPv4,
         "224.0.1.128" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe00001fe }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe00001fe }, IPAddressType::kIPv4,
         "224.0.1.254" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe00001ff }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe00001ff }, IPAddressType::kIPv4,
         "224.0.1.255" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     // IPv4 AD-HOC block 1 multicast
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000200 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000200 }, IPAddressType::kIPv4,
         "224.0.2.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000201 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0000201 }, IPAddressType::kIPv4,
         "224.0.2.1" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0008100 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0008100 }, IPAddressType::kIPv4,
         "224.0.129.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe000fffe }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe000fffe }, IPAddressType::kIPv4,
         "224.0.255.254" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe000ffff }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe000ffff }, IPAddressType::kIPv4,
         "224.0.255.255" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     // IPv4 AD-HOC block 2 multicast
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0030000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0030000 }, IPAddressType::kIPv4,
         "224.3.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0030001 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0030001 }, IPAddressType::kIPv4,
         "224.3.0.1" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0040000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe0040000 }, IPAddressType::kIPv4,
         "224.4.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe004fffe }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe004fffe }, IPAddressType::kIPv4,
         "224.4.255.254" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe004ffff }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe004ffff }, IPAddressType::kIPv4,
         "224.4.255.255" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     // IPv4 source-specific multicast
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe8000000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe8000000 }, IPAddressType::kIPv4,
         "232.0.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe8000001 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe8000001 }, IPAddressType::kIPv4,
         "232.0.0.1" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe8800000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe8800000 }, IPAddressType::kIPv4,
         "232.128.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe8fffffe }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe8fffffe }, IPAddressType::kIPv4,
         "232.255.255.254" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe8ffffff }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe8ffffff }, IPAddressType::kIPv4,
         "232.255.255.255" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     // IPv4 GLOP addressing multicast
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9000000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9000000 }, IPAddressType::kIPv4,
         "233.0.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9000001 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9000001 }, IPAddressType::kIPv4,
         "233.0.0.1" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe97e0000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe97e0000 }, IPAddressType::kIPv4,
         "233.126.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fbfffe }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fbfffe }, IPAddressType::kIPv4,
         "233.251.255.254" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fbffff }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fbffff }, IPAddressType::kIPv4,
         "233.251.255.255" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     // IPv4 AD-HOC block 3 multicast
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fc0000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fc0000 }, IPAddressType::kIPv4,
         "233.252.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fc0001 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fc0001 }, IPAddressType::kIPv4,
         "233.252.0.1" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fe0000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fe0000 }, IPAddressType::kIPv4,
         "233.254.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fffffe }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9fffffe }, IPAddressType::kIPv4,
         "233.255.255.254" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9ffffff }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xe9ffffff }, IPAddressType::kIPv4,
         "233.255.255.255" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     // IPv4 unicast-prefix-based multicast
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xea000000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xea000000 }, IPAddressType::kIPv4,
         "234.0.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xea000001 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xea000001 }, IPAddressType::kIPv4,
         "234.0.0.1" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xea800000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xea800000 }, IPAddressType::kIPv4,
         "234.128.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xeafffffe }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xeafffffe }, IPAddressType::kIPv4,
         "234.255.255.254" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xeaffffff }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xeaffffff }, IPAddressType::kIPv4,
         "234.255.255.255" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     // IPv4 administratively scoped multicast
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xef000000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xef000000 }, IPAddressType::kIPv4,
         "239.0.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xef000001 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xef000001 }, IPAddressType::kIPv4,
         "239.0.0.1" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xef800000 }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xef800000 }, IPAddressType::kIPv4,
         "239.128.0.0" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xeffffffe }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xeffffffe }, IPAddressType::kIPv4,
         "239.255.255.254" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xefffffff }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xefffffff }, IPAddressType::kIPv4,
         "239.255.255.255" },
         kTestIsIPv4, kTestIsIPv4Multicast, kTestIsNotIPv4Broadcast, kTestIsMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
     },
     // IP4 and IPv4 broadcast
     {
-         { { 0x00000000, 0x00000000, 0x0000ffff, 0xffffffff }, kIPAddressType_IPv4,
+         { { 0x00000000, 0x00000000, 0x0000ffff, 0xffffffff }, IPAddressType::kIPv4,
         "255.255.255.255" },
         kTestIsIPv4, kTestIsNotIPv4Multicast, kTestIsIPv4Broadcast, kTestIsNotMulticast, kTestIsNotIPv6Multicast, kTestIsNotIPv6ULA, kTestIsNotIPv6LLA,
         0x0, 0x0, 0x0
@@ -526,23 +526,23 @@ const IPAddressContext sIPv6WellKnownMulticastContext[] = {
 
     // All-nodes in Various Scopes
 
-    { { 0xff010000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff01::1" },
-    { { 0xff020000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff02::1" },
-    { { 0xff030000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff03::1" },
-    { { 0xff040000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff04::1" },
-    { { 0xff050000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff05::1" },
-    { { 0xff080000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff08::1" },
-    { { 0xff0e0000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff0e::1" },
+    { { 0xff010000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff01::1" },
+    { { 0xff020000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff02::1" },
+    { { 0xff030000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff03::1" },
+    { { 0xff040000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff04::1" },
+    { { 0xff050000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff05::1" },
+    { { 0xff080000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff08::1" },
+    { { 0xff0e0000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff0e::1" },
 
     // All-routers in Various Scopes
 
-    { { 0xff010000, 0x00000000, 0x00000000, 0x00000002 }, kIPAddressType_IPv6, "ff01::2" },
-    { { 0xff020000, 0x00000000, 0x00000000, 0x00000002 }, kIPAddressType_IPv6, "ff02::2" },
-    { { 0xff030000, 0x00000000, 0x00000000, 0x00000002 }, kIPAddressType_IPv6, "ff03::2" },
-    { { 0xff040000, 0x00000000, 0x00000000, 0x00000002 }, kIPAddressType_IPv6, "ff04::2" },
-    { { 0xff050000, 0x00000000, 0x00000000, 0x00000002 }, kIPAddressType_IPv6, "ff05::2" },
-    { { 0xff080000, 0x00000000, 0x00000000, 0x00000002 }, kIPAddressType_IPv6, "ff08::2" },
-    { { 0xff0e0000, 0x00000000, 0x00000000, 0x00000002 }, kIPAddressType_IPv6, "ff0e::2" }
+    { { 0xff010000, 0x00000000, 0x00000000, 0x00000002 }, IPAddressType::kIPv6, "ff01::2" },
+    { { 0xff020000, 0x00000000, 0x00000000, 0x00000002 }, IPAddressType::kIPv6, "ff02::2" },
+    { { 0xff030000, 0x00000000, 0x00000000, 0x00000002 }, IPAddressType::kIPv6, "ff03::2" },
+    { { 0xff040000, 0x00000000, 0x00000000, 0x00000002 }, IPAddressType::kIPv6, "ff04::2" },
+    { { 0xff050000, 0x00000000, 0x00000000, 0x00000002 }, IPAddressType::kIPv6, "ff05::2" },
+    { { 0xff080000, 0x00000000, 0x00000000, 0x00000002 }, IPAddressType::kIPv6, "ff08::2" },
+    { { 0xff0e0000, 0x00000000, 0x00000000, 0x00000002 }, IPAddressType::kIPv6, "ff0e::2" }
 };
 
 const IPAddressContext sIPv6TransientMulticastContext[] = {
@@ -550,23 +550,23 @@ const IPAddressContext sIPv6TransientMulticastContext[] = {
 
     // Short Transient Group in Various Scopes
 
-    { { 0xff110000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff11::1" },
-    { { 0xff120000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff12::1" },
-    { { 0xff130000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff13::1" },
-    { { 0xff140000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff14::1" },
-    { { 0xff150000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff15::1" },
-    { { 0xff180000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff18::1" },
-    { { 0xff1e0000, 0x00000000, 0x00000000, 0x00000001 }, kIPAddressType_IPv6, "ff1e::1" },
+    { { 0xff110000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff11::1" },
+    { { 0xff120000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff12::1" },
+    { { 0xff130000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff13::1" },
+    { { 0xff140000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff14::1" },
+    { { 0xff150000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff15::1" },
+    { { 0xff180000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff18::1" },
+    { { 0xff1e0000, 0x00000000, 0x00000000, 0x00000001 }, IPAddressType::kIPv6, "ff1e::1" },
 
     // Long Transient Group in Various Scopes
 
-    { { 0xff11d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, kIPAddressType_IPv6, "ff11:d5d6:2ba2:7847:6452:587a:c955:b5a" },
-    { { 0xff12d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, kIPAddressType_IPv6, "ff12:d5d6:2ba2:7847:6452:587a:c955:b5a" },
-    { { 0xff13d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, kIPAddressType_IPv6, "ff13:d5d6:2ba2:7847:6452:587a:c955:b5a" },
-    { { 0xff14d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, kIPAddressType_IPv6, "ff14:d5d6:2ba2:7847:6452:587a:c955:b5a" },
-    { { 0xff15d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, kIPAddressType_IPv6, "ff15:d5d6:2ba2:7847:6452:587a:c955:b5a" },
-    { { 0xff18d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, kIPAddressType_IPv6, "ff18:d5d6:2ba2:7847:6452:587a:c955:b5a" },
-    { { 0xff1ed5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, kIPAddressType_IPv6, "ff1e:d5d6:2ba2:7847:6452:587a:c955:b5a" }
+    { { 0xff11d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, IPAddressType::kIPv6, "ff11:d5d6:2ba2:7847:6452:587a:c955:b5a" },
+    { { 0xff12d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, IPAddressType::kIPv6, "ff12:d5d6:2ba2:7847:6452:587a:c955:b5a" },
+    { { 0xff13d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, IPAddressType::kIPv6, "ff13:d5d6:2ba2:7847:6452:587a:c955:b5a" },
+    { { 0xff14d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, IPAddressType::kIPv6, "ff14:d5d6:2ba2:7847:6452:587a:c955:b5a" },
+    { { 0xff15d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, IPAddressType::kIPv6, "ff15:d5d6:2ba2:7847:6452:587a:c955:b5a" },
+    { { 0xff18d5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, IPAddressType::kIPv6, "ff18:d5d6:2ba2:7847:6452:587a:c955:b5a" },
+    { { 0xff1ed5d6, 0x2ba27847, 0x6452587a, 0xc9550b5a }, IPAddressType::kIPv6, "ff1e:d5d6:2ba2:7847:6452:587a:c955:b5a" }
 };
 
 const IPAddressContext sIPv6PrefixMulticastContext[] = {
@@ -574,43 +574,43 @@ const IPAddressContext sIPv6PrefixMulticastContext[] = {
 
     // 56-bit Prefix with Short Group in Various Scopes
 
-    { { 0xff310038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, kIPAddressType_IPv6, "ff31:38:373a:cba4:d2ad:8d00:1:1" },
-    { { 0xff320038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, kIPAddressType_IPv6, "ff32:38:373a:cba4:d2ad:8d00:1:1" },
-    { { 0xff330038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, kIPAddressType_IPv6, "ff33:38:373a:cba4:d2ad:8d00:1:1" },
-    { { 0xff340038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, kIPAddressType_IPv6, "ff34:38:373a:cba4:d2ad:8d00:1:1" },
-    { { 0xff350038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, kIPAddressType_IPv6, "ff35:38:373a:cba4:d2ad:8d00:1:1" },
-    { { 0xff380038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, kIPAddressType_IPv6, "ff38:38:373a:cba4:d2ad:8d00:1:1" },
-    { { 0xff3e0038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, kIPAddressType_IPv6, "ff3e:38:373a:cba4:d2ad:8d00:1:1" },
+    { { 0xff310038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, IPAddressType::kIPv6, "ff31:38:373a:cba4:d2ad:8d00:1:1" },
+    { { 0xff320038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, IPAddressType::kIPv6, "ff32:38:373a:cba4:d2ad:8d00:1:1" },
+    { { 0xff330038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, IPAddressType::kIPv6, "ff33:38:373a:cba4:d2ad:8d00:1:1" },
+    { { 0xff340038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, IPAddressType::kIPv6, "ff34:38:373a:cba4:d2ad:8d00:1:1" },
+    { { 0xff350038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, IPAddressType::kIPv6, "ff35:38:373a:cba4:d2ad:8d00:1:1" },
+    { { 0xff380038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, IPAddressType::kIPv6, "ff38:38:373a:cba4:d2ad:8d00:1:1" },
+    { { 0xff3e0038, 0x373acba4, 0xd2ad8d00, 0x00010001 }, IPAddressType::kIPv6, "ff3e:38:373a:cba4:d2ad:8d00:1:1" },
 
     // 56-bit Prefix with Long Group in Various Scopes
 
-    { { 0xff310038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, kIPAddressType_IPv6, "ff31:38:373a:cba4:d2ad:8d00:afff:5258" },
-    { { 0xff320038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, kIPAddressType_IPv6, "ff32:38:373a:cba4:d2ad:8d00:afff:5258" },
-    { { 0xff330038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, kIPAddressType_IPv6, "ff33:38:373a:cba4:d2ad:8d00:afff:5258" },
-    { { 0xff340038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, kIPAddressType_IPv6, "ff34:38:373a:cba4:d2ad:8d00:afff:5258" },
-    { { 0xff350038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, kIPAddressType_IPv6, "ff35:38:373a:cba4:d2ad:8d00:afff:5258" },
-    { { 0xff380038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, kIPAddressType_IPv6, "ff38:38:373a:cba4:d2ad:8d00:afff:5258" },
-    { { 0xff3e0038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, kIPAddressType_IPv6, "ff3e:38:373a:cba4:d2ad:8d00:afff:5258" },
+    { { 0xff310038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, IPAddressType::kIPv6, "ff31:38:373a:cba4:d2ad:8d00:afff:5258" },
+    { { 0xff320038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, IPAddressType::kIPv6, "ff32:38:373a:cba4:d2ad:8d00:afff:5258" },
+    { { 0xff330038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, IPAddressType::kIPv6, "ff33:38:373a:cba4:d2ad:8d00:afff:5258" },
+    { { 0xff340038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, IPAddressType::kIPv6, "ff34:38:373a:cba4:d2ad:8d00:afff:5258" },
+    { { 0xff350038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, IPAddressType::kIPv6, "ff35:38:373a:cba4:d2ad:8d00:afff:5258" },
+    { { 0xff380038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, IPAddressType::kIPv6, "ff38:38:373a:cba4:d2ad:8d00:afff:5258" },
+    { { 0xff3e0038, 0x373acba4, 0xd2ad8d00, 0xafff5258 }, IPAddressType::kIPv6, "ff3e:38:373a:cba4:d2ad:8d00:afff:5258" },
 
     // 64-bit Prefix with Short Group in Various Scopes
 
-    { { 0xff310040, 0x66643dfb, 0xafa4385b, 0x00010001 }, kIPAddressType_IPv6, "ff31:40:6664:3dfb:afa4:385b:1:1" },
-    { { 0xff320040, 0x66643dfb, 0xafa4385b, 0x00010001 }, kIPAddressType_IPv6, "ff32:40:6664:3dfb:afa4:385b:1:1" },
-    { { 0xff330040, 0x66643dfb, 0xafa4385b, 0x00010001 }, kIPAddressType_IPv6, "ff33:40:6664:3dfb:afa4:385b:1:1" },
-    { { 0xff340040, 0x66643dfb, 0xafa4385b, 0x00010001 }, kIPAddressType_IPv6, "ff34:40:6664:3dfb:afa4:385b:1:1" },
-    { { 0xff350040, 0x66643dfb, 0xafa4385b, 0x00010001 }, kIPAddressType_IPv6, "ff35:40:6664:3dfb:afa4:385b:1:1" },
-    { { 0xff380040, 0x66643dfb, 0xafa4385b, 0x00010001 }, kIPAddressType_IPv6, "ff38:40:6664:3dfb:afa4:385b:1:1" },
-    { { 0xff3e0040, 0x66643dfb, 0xafa4385b, 0x00010001 }, kIPAddressType_IPv6, "ff3e:40:6664:3dfb:afa4:385b:1:1" },
+    { { 0xff310040, 0x66643dfb, 0xafa4385b, 0x00010001 }, IPAddressType::kIPv6, "ff31:40:6664:3dfb:afa4:385b:1:1" },
+    { { 0xff320040, 0x66643dfb, 0xafa4385b, 0x00010001 }, IPAddressType::kIPv6, "ff32:40:6664:3dfb:afa4:385b:1:1" },
+    { { 0xff330040, 0x66643dfb, 0xafa4385b, 0x00010001 }, IPAddressType::kIPv6, "ff33:40:6664:3dfb:afa4:385b:1:1" },
+    { { 0xff340040, 0x66643dfb, 0xafa4385b, 0x00010001 }, IPAddressType::kIPv6, "ff34:40:6664:3dfb:afa4:385b:1:1" },
+    { { 0xff350040, 0x66643dfb, 0xafa4385b, 0x00010001 }, IPAddressType::kIPv6, "ff35:40:6664:3dfb:afa4:385b:1:1" },
+    { { 0xff380040, 0x66643dfb, 0xafa4385b, 0x00010001 }, IPAddressType::kIPv6, "ff38:40:6664:3dfb:afa4:385b:1:1" },
+    { { 0xff3e0040, 0x66643dfb, 0xafa4385b, 0x00010001 }, IPAddressType::kIPv6, "ff3e:40:6664:3dfb:afa4:385b:1:1" },
 
     // 64-bit Prefix with Long Group in Various Scopes
 
-    { { 0xff310040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, kIPAddressType_IPv6, "ff31:40:6664:3dfb:afa4:385b:afff:5258" },
-    { { 0xff320040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, kIPAddressType_IPv6, "ff32:40:6664:3dfb:afa4:385b:afff:5258" },
-    { { 0xff330040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, kIPAddressType_IPv6, "ff33:40:6664:3dfb:afa4:385b:afff:5258" },
-    { { 0xff340040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, kIPAddressType_IPv6, "ff34:40:6664:3dfb:afa4:385b:afff:5258" },
-    { { 0xff350040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, kIPAddressType_IPv6, "ff35:40:6664:3dfb:afa4:385b:afff:5258" },
-    { { 0xff380040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, kIPAddressType_IPv6, "ff38:40:6664:3dfb:afa4:385b:afff:5258" },
-    { { 0xff3e0040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, kIPAddressType_IPv6, "ff3e:40:6664:3dfb:afa4:385b:afff:5258" }
+    { { 0xff310040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, IPAddressType::kIPv6, "ff31:40:6664:3dfb:afa4:385b:afff:5258" },
+    { { 0xff320040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, IPAddressType::kIPv6, "ff32:40:6664:3dfb:afa4:385b:afff:5258" },
+    { { 0xff330040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, IPAddressType::kIPv6, "ff33:40:6664:3dfb:afa4:385b:afff:5258" },
+    { { 0xff340040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, IPAddressType::kIPv6, "ff34:40:6664:3dfb:afa4:385b:afff:5258" },
+    { { 0xff350040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, IPAddressType::kIPv6, "ff35:40:6664:3dfb:afa4:385b:afff:5258" },
+    { { 0xff380040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, IPAddressType::kIPv6, "ff38:40:6664:3dfb:afa4:385b:afff:5258" },
+    { { 0xff3e0040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, IPAddressType::kIPv6, "ff3e:40:6664:3dfb:afa4:385b:afff:5258" }
 };
 
 const size_t kIPv6WellKnownMulticastTestElements = sizeof(sIPv6WellKnownMulticastContext) / sizeof(struct IPAddressContext);
@@ -1053,7 +1053,7 @@ void CheckFromIPv6(nlTestSuite * inSuite, void * inContext)
         struct in6_addr ip_addr;
         ip_addr = *reinterpret_cast<struct in6_addr *>(addr);
 #endif
-        test_addr_2 = IPAddress::FromIPv6(ip_addr);
+        test_addr_2 = IPAddress(ip_addr);
 
         CheckAddressQuartets(inSuite, test_addr_1, test_addr_2);
 
@@ -1186,7 +1186,7 @@ void CheckFromIPv4(nlTestSuite * inSuite, void * inContext)
         ip_addr.s_addr      = htonl(lCurrent->mAddr.mAddrQuartets[3]);
         test_addr_1.Addr[2] = htonl(0xffff);
 #endif
-        test_addr_2 = IPAddress::FromIPv4(ip_addr);
+        test_addr_2 = IPAddress(ip_addr);
 
         CheckAddressQuartets(inSuite, test_addr_1, test_addr_2);
 
@@ -1228,26 +1228,26 @@ void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
         switch (lCurrent->mAddr.mAddrType)
         {
 #if INET_CONFIG_ENABLE_IPV4
-        case kIPAddressType_IPv4:
+        case IPAddressType::kIPv4:
             memset(&sock_v4, 0, sizeof(struct sockaddr_in));
             sock_v4.sin_family = AF_INET;
             memcpy(&sock_v4.sin_addr.s_addr, &addr[3], sizeof(struct in_addr));
-            test_addr_2 = IPAddress::FromSockAddr(reinterpret_cast<struct sockaddr &>(sock_v4));
+            test_addr_2 = IPAddress::FromSockAddr(sock_v4);
             break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        case kIPAddressType_IPv6:
+        case IPAddressType::kIPv6:
             memset(&sock_v6, 0, sizeof(struct sockaddr_in6));
             sock_v6.sin6_family = AF_INET6;
             memcpy(&sock_v6.sin6_addr.s6_addr, addr, sizeof(struct in6_addr));
-            test_addr_2 = IPAddress::FromSockAddr(reinterpret_cast<struct sockaddr &>(sock_v6));
+            test_addr_2 = IPAddress::FromSockAddr(sock_v6);
             break;
 
-        case kIPAddressType_Any:
+        case IPAddressType::kAny:
             memset(&sock_v6, 0, sizeof(struct sockaddr_in6));
             sock_v6.sin6_family = 0;
             memcpy(&sock_v6.sin6_addr.s6_addr, addr, sizeof(struct in6_addr));
-            test_addr_2 = IPAddress::FromSockAddr(reinterpret_cast<struct sockaddr &>(sock_v6));
+            test_addr_2 = IPAddress::FromSockAddr(sock_v6);
             break;
 
         default:
@@ -1290,7 +1290,7 @@ void CheckAnyAddress(nlTestSuite * inSuite, void * inContext)
     const IPAddress test_addr = IPAddress::Any;
     IPAddressType test_type   = test_addr.Type();
 
-    NL_TEST_ASSERT(inSuite, test_type == kIPAddressType_Any);
+    NL_TEST_ASSERT(inSuite, test_type == IPAddressType::kAny);
 }
 
 /**
@@ -1557,7 +1557,7 @@ void CheckMakeIPv6TransientMulticast(nlTestSuite * inSuite, void * inContext)
     const struct TestContext * lContext = static_cast<const struct TestContext *>(inContext);
     IPAddressContextIterator lCurrent   = lContext->mIPv6TransientMulticastContextRange.mBegin;
     IPAddressContextIterator lEnd       = lContext->mIPv6TransientMulticastContextRange.mEnd;
-    const uint8_t lFlags                = 0;
+    constexpr IPv6MulticastFlags lFlags;
     size_t lScopeIndex;
     IPAddress lAddress;
 

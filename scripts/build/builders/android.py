@@ -217,13 +217,11 @@ class AndroidBuilder(Builder):
                 title='Building APP ' + self.identifier)
 
     def build_outputs(self):
-        outputs = {
-            self.app.AppName() + '-debug.apk':
+        if not self.board.IsIde():
+            outputs = {
+                self.app.AppName() + 'app-debug.apk':
                 os.path.join(self.output_dir, 'outputs', 'apk', 'debug',
                              'app-debug.apk'),
-        }
-        if not self.board.IsIde():
-            outputs.update({
                 'CHIPController.jar':
                     os.path.join(self.output_dir, 'lib',
                                  'src/controller/java/CHIPController.jar'),
@@ -243,6 +241,12 @@ class AndroidBuilder(Builder):
                 'jni/%s/libc++_shared.so' % self.board.AbiName():
                     os.path.join(self.output_dir, 'lib', 'jni',
                                  self.board.AbiName(), 'libc++_shared.so'),
-            })
+            }
+        else:
+            outputs = {
+                self.app.AppName() + '-debug.apk':
+                    os.path.join(self.root, "src/android", self.app.AppName(),
+                                 'app/build/outputs/apk/debug/app-debug.apk')
+            }
 
         return outputs

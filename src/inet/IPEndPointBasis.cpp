@@ -50,13 +50,6 @@
 #include <lwip/raw.h>
 #include <lwip/udp.h>
 
-#if INET_CONFIG_ENABLE_IPV4
-#define LWIP_IPV4_ADDR_T ip4_addr_t
-#define IPV4_TO_LWIPADDR(aAddress) (aAddress).ToIPv4()
-#endif // INET_CONFIG_ENABLE_IPV4
-#define LWIP_IPV6_ADDR_T ip6_addr_t
-#define IPV6_TO_LWIPADDR(aAddress) (aAddress).ToIPv6()
-
 #if !defined(RAW_FLAGS_MULTICAST_LOOP) || !defined(UDP_FLAGS_MULTICAST_LOOP) || !defined(raw_clear_flags) ||                       \
     !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
 #define HAVE_LWIP_MULTICAST_LOOP 0
@@ -140,13 +133,13 @@ static CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddr
 #if INET_CONFIG_ENABLE_IPV4
 #if LWIP_IPV4 && LWIP_IGMP
 static CHIP_ERROR LwIPIPv4JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
-                                                  err_t (*aMethod)(struct netif *, const LWIP_IPV4_ADDR_T *))
+                                                  err_t (*aMethod)(struct netif *, const ip4_addr_t *))
 {
     struct netif * const lNetif = IPEndPointBasis::FindNetifFromInterfaceId(aInterfaceId);
     VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
 
-    const LWIP_IPV4_ADDR_T lIPv4Address = IPV4_TO_LWIPADDR(aAddress);
-    const err_t lStatus                 = aMethod(lNetif, &lIPv4Address);
+    const ip4_addr_t lIPv4Address = aAddress.ToIPv4();
+    const err_t lStatus           = aMethod(lNetif, &lIPv4Address);
 
     if (lStatus == ERR_MEM)
     {
@@ -159,13 +152,13 @@ static CHIP_ERROR LwIPIPv4JoinLeaveMulticastGroup(InterfaceId aInterfaceId, cons
 
 #ifdef HAVE_IPV6_MULTICAST
 static CHIP_ERROR LwIPIPv6JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
-                                                  err_t (*aMethod)(struct netif *, const LWIP_IPV6_ADDR_T *))
+                                                  err_t (*aMethod)(struct netif *, const ip6_addr_t *))
 {
     struct netif * const lNetif = IPEndPointBasis::FindNetifFromInterfaceId(aInterfaceId);
     VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
 
-    const LWIP_IPV6_ADDR_T lIPv6Address = IPV6_TO_LWIPADDR(aAddress);
-    const err_t lStatus                 = aMethod(lNetif, &lIPv6Address);
+    const ip6_addr_t lIPv6Address = aAddress.ToIPv6();
+    const err_t lStatus           = aMethod(lNetif, &lIPv6Address);
 
     if (lStatus == ERR_MEM)
     {
@@ -246,7 +239,7 @@ CHIP_ERROR IPEndPointBasis::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfa
 
 void IPEndPointBasis::HandleDataReceived(System::PacketBufferHandle && aBuffer)
 {
-    if ((mState == kState_Listening) && (OnMessageReceived != NULL))
+    if ((mState == State::kListening) && (OnMessageReceived != NULL))
     {
         const IPPacketInfo * pktInfo = GetPacketInfo(aBuffer);
 
@@ -310,21 +303,6 @@ done:
     return (lPacketInfo);
 }
 
-CHIP_ERROR IPEndPointBasis::PostPacketBufferEvent(chip::System::LayerLwIP * aLayer, System::Object & aTarget,
-                                                  System::EventType aEventType, System::PacketBufferHandle && aBuffer)
-{
-    VerifyOrReturnError(aLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    const CHIP_ERROR error =
-        aLayer->PostEvent(aTarget, aEventType, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(aBuffer));
-    if (error == CHIP_NO_ERROR)
-    {
-        // If PostEvent() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
-        static_cast<void>(std::move(aBuffer).UnsafeRelease());
-    }
-    return error;
-}
-
 struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
 {
     struct netif * lRetval = NULL;
@@ -346,13 +324,6 @@ struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceI
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-union PeerSockAddr
-{
-    sockaddr any;
-    sockaddr_in in;
-    sockaddr_in6 in6;
-};
 
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 IPEndPointBasis::MulticastGroupHandler IPEndPointBasis::sJoinMulticastGroupHandler;
@@ -504,7 +475,7 @@ CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & a
 {
     CHIP_ERROR lRetval = CHIP_NO_ERROR;
 
-    if (aAddressType == kIPAddressType_IPv6)
+    if (aAddressType == IPAddressType::kIPv6)
     {
         struct sockaddr_in6 sa;
 
@@ -537,7 +508,7 @@ CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & a
 #endif // defined(IPV6_MULTICAST_HOPS)
     }
 #if INET_CONFIG_ENABLE_IPV4
-    else if (aAddressType == kIPAddressType_IPv4)
+    else if (aAddressType == IPAddressType::kIPv4)
     {
         struct sockaddr_in sa;
         int enable = 1;
@@ -616,7 +587,7 @@ CHIP_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
     return (lRetval);
 }
 
-CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags)
+CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer)
 {
     // Ensure the destination address type is compatible with the endpoint address type.
     VerifyOrReturnError(mAddrType == aPktInfo->DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -639,10 +610,10 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     msgHeader.msg_iovlen = 1;
 
     // Construct a sockaddr_in/sockaddr_in6 structure containing the destination information.
-    PeerSockAddr peerSockAddr;
+    SockAddr peerSockAddr;
     memset(&peerSockAddr, 0, sizeof(peerSockAddr));
     msgHeader.msg_name = &peerSockAddr;
-    if (mAddrType == kIPAddressType_IPv6)
+    if (mAddrType == IPAddressType::kIPv6)
     {
         peerSockAddr.in6.sin6_family = AF_INET6;
         peerSockAddr.in6.sin6_port   = htons(aPktInfo->DestPort);
@@ -675,7 +646,7 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     // address, construct an IP_PKTINFO/IPV6_PKTINFO "control message" to that effect
     // add add it to the message header.  If the local OS doesn't support IP_PKTINFO/IPV6_PKTINFO
     // fail with an error.
-    if (intfId != INET_NULL_INTERFACEID || aPktInfo->SrcAddress.Type() != kIPAddressType_Any)
+    if (intfId != INET_NULL_INTERFACEID || aPktInfo->SrcAddress.Type() != IPAddressType::kAny)
     {
 #if defined(IP_PKTINFO) || defined(IPV6_PKTINFO)
         msgHeader.msg_control    = controlData;
@@ -685,7 +656,7 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
 
 #if INET_CONFIG_ENABLE_IPV4
 
-        if (mAddrType == kIPAddressType_IPv4)
+        if (mAddrType == IPAddressType::kIPv4)
         {
 #if defined(IP_PKTINFO)
             controlHdr->cmsg_level = IPPROTO_IP;
@@ -709,7 +680,7 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
 
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        if (mAddrType == kIPAddressType_IPv6)
+        if (mAddrType == IPAddressType::kIPv6)
         {
 #if defined(IPV6_PKTINFO)
             controlHdr->cmsg_level = IPPROTO_IPV6;
@@ -753,12 +724,12 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
 
         switch (aAddressType)
         {
-        case kIPAddressType_IPv6:
+        case IPAddressType::kIPv6:
             family = PF_INET6;
             break;
 
 #if INET_CONFIG_ENABLE_IPV4
-        case kIPAddressType_IPv4:
+        case IPAddressType::kIPv4:
             family = PF_INET;
             break;
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -799,7 +770,7 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
         // the same port, one for IPv4 and one for IPv6.
 
 #ifdef IPV6_V6ONLY
-        if (aAddressType == kIPAddressType_IPv6)
+        if (aAddressType == IPAddressType::kIPv6)
         {
             res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, &one, sizeof(one));
             if (res != 0)
@@ -811,7 +782,7 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
 
 #if INET_CONFIG_ENABLE_IPV4
 #ifdef IP_PKTINFO
-        if (aAddressType == kIPAddressType_IPv4)
+        if (aAddressType == IPAddressType::kIPv4)
         {
             res = setsockopt(mSocket, IPPROTO_IP, IP_PKTINFO, &one, sizeof(one));
             if (res != 0)
@@ -823,7 +794,7 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #ifdef IPV6_RECVPKTINFO
-        if (aAddressType == kIPAddressType_IPv6)
+        if (aAddressType == IPAddressType::kIPv6)
         {
             res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_RECVPKTINFO, &one, sizeof(one));
             if (res != 0)
@@ -869,7 +840,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     if (!lBuffer.IsNull())
     {
         struct iovec msgIOV;
-        PeerSockAddr lPeerSockAddr;
+        SockAddr lPeerSockAddr;
         uint8_t controlData[256];
         struct msghdr msgHeader;
 
@@ -903,13 +874,13 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 
             if (lPeerSockAddr.any.sa_family == AF_INET6)
             {
-                lPacketInfo.SrcAddress = IPAddress::FromIPv6(lPeerSockAddr.in6.sin6_addr);
+                lPacketInfo.SrcAddress = IPAddress(lPeerSockAddr.in6.sin6_addr);
                 lPacketInfo.SrcPort    = ntohs(lPeerSockAddr.in6.sin6_port);
             }
 #if INET_CONFIG_ENABLE_IPV4
             else if (lPeerSockAddr.any.sa_family == AF_INET)
             {
-                lPacketInfo.SrcAddress = IPAddress::FromIPv4(lPeerSockAddr.in.sin_addr);
+                lPacketInfo.SrcAddress = IPAddress(lPeerSockAddr.in.sin_addr);
                 lPacketInfo.SrcPort    = ntohs(lPeerSockAddr.in.sin_port);
             }
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -935,7 +906,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
                         break;
                     }
                     lPacketInfo.Interface   = static_cast<InterfaceId>(inPktInfo->ipi_ifindex);
-                    lPacketInfo.DestAddress = IPAddress::FromIPv4(inPktInfo->ipi_addr);
+                    lPacketInfo.DestAddress = IPAddress(inPktInfo->ipi_addr);
                     continue;
                 }
 #endif // defined(IP_PKTINFO)
@@ -951,7 +922,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
                         break;
                     }
                     lPacketInfo.Interface   = static_cast<InterfaceId>(in6PktInfo->ipi6_ifindex);
-                    lPacketInfo.DestAddress = IPAddress::FromIPv6(in6PktInfo->ipi6_addr);
+                    lPacketInfo.DestAddress = IPAddress(in6PktInfo->ipi6_addr);
                     continue;
                 }
 #endif // defined(IPV6_PKTINFO)
@@ -1011,12 +982,12 @@ CHIP_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, const 
     switch (aAddressType)
     {
 
-    case kIPAddressType_IPv6:
+    case IPAddressType::kIPv6:
         nw_ip_options_set_version(ipOptions, nw_ip_version_6);
         break;
 
 #if INET_CONFIG_ENABLE_IPV4
-    case kIPAddressType_IPv4:
+    case IPAddressType::kIPv4:
         nw_ip_options_set_version(ipOptions, nw_ip_version_4);
         break;
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -1063,7 +1034,7 @@ CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & a
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags)
+CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer)
 {
     dispatch_data_t content;
 
@@ -1173,9 +1144,9 @@ CHIP_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddre
 
     // Note: aAddress.ToString will return the IPv6 Any address if the address type is Any, but that's not what
     // we want if the locale endpoint is IPv4.
-    if (aAddressType == kIPAddressType_IPv4 && aAddress.Type() == kIPAddressType_Any)
+    if (aAddressType == IPAddressType::kIPv4 && aAddress.Type() == IPAddressType::kAny)
     {
-        const IPAddress anyAddr = IPAddress::FromIPv4(aAddress.ToIPv4());
+        const IPAddress anyAddr = IPAddress(aAddress.ToIPv4());
         anyAddr.ToString(addrStr, sizeof(addrStr));
     }
     else
@@ -1439,13 +1410,13 @@ CHIP_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
     {
 
 #if INET_CONFIG_ENABLE_IPV4
-    case kIPAddressType_IPv4: {
+    case IPAddressType::kIPv4: {
         return IPv4JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, true);
     }
     break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    case kIPAddressType_IPv6: {
+    case IPAddressType::kIPv6: {
         return IPv6JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, true);
     }
     break;
@@ -1471,13 +1442,13 @@ CHIP_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const 
     {
 
 #if INET_CONFIG_ENABLE_IPV4
-    case kIPAddressType_IPv4: {
+    case IPAddressType::kIPv4: {
         return IPv4JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, false);
     }
     break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    case kIPAddressType_IPv6: {
+    case IPAddressType::kIPv6: {
         return IPv6JoinLeaveMulticastGroupImpl(aInterfaceId, aAddress, false);
     }
     break;

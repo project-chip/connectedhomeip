@@ -86,8 +86,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     {
         if (aCommandPath.mCommandId == kTestCommandId)
         {
-            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Success);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success);
         }
         else
         {
@@ -95,7 +94,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
                                                  aCommandPath.mCommandId, (chip::app::CommandPathFlags::kEndpointIdValid) };
 
             apCommandObj->PrepareCommand(responseParams);
-            chip::TLV::TLVWriter * writer = apCommandObj->GetCommandDataElementTLVWriter();
+            chip::TLV::TLVWriter * writer = apCommandObj->GetCommandDataIBTLVWriter();
             writer->PutBoolean(chip::TLV::ContextTag(1), true);
             apCommandObj->FinishCommand();
         }
@@ -125,11 +124,10 @@ public:
                       aPath.mClusterId, aPath.mCommandId, aPath.mEndpointId);
         onResponseCalledTimes++;
     }
-    void OnError(const chip::app::CommandSender * apCommandSender, chip::Protocols::InteractionModel::Status aProtocolCode,
+    void OnError(const chip::app::CommandSender * apCommandSender, chip::Protocols::InteractionModel::Status aStatus,
                  CHIP_ERROR aError) override
     {
-        ChipLogError(Controller, "OnError happens with %" PRIx16 " %" CHIP_ERROR_FORMAT, to_underlying(aProtocolCode),
-                     aError.Format());
+        ChipLogError(Controller, "OnError happens with %" PRIx16 " %" CHIP_ERROR_FORMAT, to_underlying(aStatus), aError.Format());
         onErrorCalledTimes++;
     }
     void OnDone(chip::app::CommandSender * apCommandSender) override { onFinalCalledTimes++; }
@@ -192,8 +190,8 @@ private:
     static void GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
                                         bool aNeedCommandData, EndpointId aEndpointId = kTestEndpointId,
                                         ClusterId aClusterId = kTestClusterId, CommandId aCommandId = kTestCommandId);
-    static void AddCommandDataElement(nlTestSuite * apSuite, void * apContext, Command * apCommand, bool aNeedStatusCode,
-                                      CommandId aCommandId = kTestCommandId);
+    static void AddCommandDataIB(nlTestSuite * apSuite, void * apContext, Command * apCommand, bool aNeedStatusCode,
+                                 CommandId aCommandId = kTestCommandId);
     static void ValidateCommandHandlerWithSendCommand(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode);
 };
 
@@ -229,19 +227,20 @@ void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void
     CommandList::Builder commandList = invokeCommandBuilder.CreateCommandListBuilder();
     NL_TEST_ASSERT(apSuite, invokeCommandBuilder.GetError() == CHIP_NO_ERROR);
 
-    CommandDataElement::Builder commandDataElementBuilder = commandList.CreateCommandDataElementBuilder();
+    CommandDataIB::Builder commandDataIBBuilder = commandList.CreateCommandDataIBBuilder();
     NL_TEST_ASSERT(apSuite, commandList.GetError() == CHIP_NO_ERROR);
-    CommandPath::Builder commandPathBuilder = commandDataElementBuilder.CreateCommandPathBuilder();
-    NL_TEST_ASSERT(apSuite, commandDataElementBuilder.GetError() == CHIP_NO_ERROR);
+
+    CommandPathIB::Builder commandPathBuilder = commandDataIBBuilder.CreateCommandPathBuilder();
+    NL_TEST_ASSERT(apSuite, commandDataIBBuilder.GetError() == CHIP_NO_ERROR);
+
     commandPathBuilder.EndpointId(aEndpointId).ClusterId(aClusterId).CommandId(aCommandId).EndOfCommandPath();
     NL_TEST_ASSERT(apSuite, commandPathBuilder.GetError() == CHIP_NO_ERROR);
 
     if (aNeedCommandData)
     {
-        chip::TLV::TLVWriter * pWriter = commandDataElementBuilder.GetWriter();
+        chip::TLV::TLVWriter * pWriter = commandDataIBBuilder.GetWriter();
         chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
-        err = pWriter->StartContainer(chip::TLV::ContextTag(CommandDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure,
-                                      dummyType);
+        err = pWriter->StartContainer(chip::TLV::ContextTag(CommandDataIB::kCsTag_Data), chip::TLV::kTLVType_Structure, dummyType);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
@@ -251,8 +250,8 @@ void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 
-    commandDataElementBuilder.EndOfCommandDataElement();
-    NL_TEST_ASSERT(apSuite, commandDataElementBuilder.GetError() == CHIP_NO_ERROR);
+    commandDataIBBuilder.EndOfCommandDataIB();
+    NL_TEST_ASSERT(apSuite, commandDataIBBuilder.GetError() == CHIP_NO_ERROR);
 
     commandList.EndOfCommandList();
     NL_TEST_ASSERT(apSuite, commandList.GetError() == CHIP_NO_ERROR);
@@ -264,8 +263,8 @@ void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void * apContext, Command * apCommand,
-                                                   bool aNeedStatusCode, CommandId aCommandId)
+void TestCommandInteraction::AddCommandDataIB(nlTestSuite * apSuite, void * apContext, Command * apCommand, bool aNeedStatusCode,
+                                              CommandId aCommandId)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     auto commandPathParams = MakeTestCommandPath(aCommandId);
@@ -276,15 +275,14 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
                                                    3, // ClusterId
                                                    4  // CommandId
         );
-        apCommand->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
-                                 Protocols::InteractionModel::Status::Success);
+        apCommand->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
     }
     else
     {
         err = apCommand->PrepareCommand(commandPathParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        chip::TLV::TLVWriter * writer = apCommand->GetCommandDataElementTLVWriter();
+        chip::TLV::TLVWriter * writer = apCommand->GetCommandDataIBTLVWriter();
 
         err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -332,7 +330,7 @@ void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSu
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
-    AddCommandDataElement(apSuite, apContext, &commandSender, false);
+    AddCommandDataIB(apSuite, apContext, &commandSender, false);
     err = commandSender.SendCommandRequest(kTestDeviceNodeId, gFabricIndex, Optional<SessionHandle>::Missing());
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 
@@ -387,7 +385,7 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     TestExchangeDelegate delegate;
     commandHandler.mpExchangeCtx->SetDelegate(&delegate);
 
-    AddCommandDataElement(apSuite, apContext, &commandHandler, aNeedStatusCode);
+    AddCommandDataIB(apSuite, apContext, &commandHandler, aNeedStatusCode);
     err = commandHandler.Finalize(commandPacket);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -508,7 +506,7 @@ void TestCommandInteraction::TestCommandSenderCommandSuccessResponseFlow(nlTestS
     mockCommandSenderDelegate.ResetCounter();
     app::CommandSender commandSender(&mockCommandSenderDelegate, gExchangeManager);
 
-    AddCommandDataElement(apSuite, apContext, &commandSender, false);
+    AddCommandDataIB(apSuite, apContext, &commandSender, false);
     err = commandSender.SendCommandRequest(0, 0, Optional<SessionHandle>(ctx.GetSessionBobToAlice()));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite,
@@ -527,7 +525,7 @@ void TestCommandInteraction::TestCommandSenderCommandSpecificResponseFlow(nlTest
     mockCommandSenderDelegate.ResetCounter();
     app::CommandSender commandSender(&mockCommandSenderDelegate, gExchangeManager);
 
-    AddCommandDataElement(apSuite, apContext, &commandSender, false, kTestCommandIdCommandSpecificResponse);
+    AddCommandDataIB(apSuite, apContext, &commandSender, false, kTestCommandIdCommandSpecificResponse);
     err = commandSender.SendCommandRequest(0, 0, Optional<SessionHandle>(ctx.GetSessionBobToAlice()));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite,
@@ -546,7 +544,7 @@ void TestCommandInteraction::TestCommandSenderCommandFailureResponseFlow(nlTestS
     mockCommandSenderDelegate.ResetCounter();
     app::CommandSender commandSender(&mockCommandSenderDelegate, gExchangeManager);
 
-    AddCommandDataElement(apSuite, apContext, &commandSender, false, kTestNonExistCommandId);
+    AddCommandDataIB(apSuite, apContext, &commandSender, false, kTestNonExistCommandId);
     err = commandSender.SendCommandRequest(0, 0, Optional<SessionHandle>(ctx.GetSessionBobToAlice()));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite,
@@ -573,7 +571,7 @@ void TestCommandInteraction::TestCommandSenderAbruptDestruction(nlTestSuite * ap
     {
         app::CommandSender commandSender(&mockCommandSenderDelegate, gExchangeManager);
 
-        AddCommandDataElement(apSuite, apContext, &commandSender, false, kTestCommandIdCommandSpecificResponse);
+        AddCommandDataIB(apSuite, apContext, &commandSender, false, kTestCommandIdCommandSpecificResponse);
         err = commandSender.SendCommandRequest(0, 0, Optional<SessionHandle>(ctx.GetSessionBobToAlice()));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 

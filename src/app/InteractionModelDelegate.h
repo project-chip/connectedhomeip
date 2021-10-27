@@ -25,6 +25,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ClusterInfo.h>
+#include <app/MessageDef/StatusIB.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
@@ -35,7 +36,7 @@
 namespace chip {
 namespace app {
 
-static constexpr uint32_t kImMessageTimeoutMsec = 12000;
+static constexpr System::Clock::Timeout kImMessageTimeout = System::Clock::Seconds16(12);
 
 class ReadClient;
 class WriteClient;
@@ -69,7 +70,7 @@ public:
 
     /**
      * Notification that the interaction model has received a list of attribute data in response to a Read request. apData might be
-     * nullptr if status is not ProtocolCode::Success.
+     * nullptr if status is not Status::Success.
      *
      * @param[in]  apReadClient   The read client object, the application can use GetAppIdentifier() for the read client to
      *                            distinguish different read requests.
@@ -98,16 +99,14 @@ public:
      *                            fail to process report data.
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
-    virtual CHIP_ERROR ReadError(const ReadClient * apReadClient, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR ReadError(ReadClient * apReadClient, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * Notification that a WriteClient has received a Write Response containing a status code.
      * aAttributeIndex is processing attribute index which can identify attribute if there exists multiple attribute changes with
      * same attribute path
      */
-    virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient,
-                                           const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                           const uint32_t aProtocolId, const uint16_t aProtocolCode,
+    virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient, const StatusIB & aStatusIB,
                                            AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -162,7 +161,7 @@ public:
      * @param[in]  aError  notify final error regarding the current read interaction
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
-    virtual CHIP_ERROR ReadDone(const ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR ReadDone(ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     virtual ~InteractionModelDelegate() = default;
 };

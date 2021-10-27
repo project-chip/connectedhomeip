@@ -16,6 +16,20 @@ limitations under the License.
 -->
 <configurator>
   <deviceType>
+    <name>Base Application Example</name>
+    <domain>CHIP</domain>
+    <typeName>Root Node Device Type</typeName>
+    <profileId editable="false">0x0103</profileId>
+    <deviceId editable="false">0xFF00</deviceId>
+    <clusters>
+      <include cluster="Basic" server="true" serverLocked="true"></include>
+      <include cluster="Descriptor" server="true" serverLocked="true"></include>
+      <include cluster="General Commissioning" server="true" serverLocked="true"></include>
+      <include cluster="Operational Credentials" server="true" serverLocked="true"></include>
+    </clusters>
+  </deviceType>
+
+  <deviceType>
     <name>CHIP-All-Clusters-Server</name>
     <domain>CHIP</domain>
     <typeName>CHIP all-clusters-app server example</typeName>

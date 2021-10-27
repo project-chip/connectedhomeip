@@ -85,6 +85,22 @@ function loadClusters()
       .then(clusters => clusters.filter(cluster => cluster.enabled == 1));
 }
 
+function loadCommandResponse(command, packageId)
+{
+  const { db, sessionId } = this.global;
+  return queryCommand.selectCommandById(db, command.id, packageId).then(commandDetails => {
+    if (commandDetails.responseRef == null) {
+      command.response = null;
+      return command;
+    }
+
+    return queryCommand.selectCommandById(db, commandDetails.responseRef, packageId).then(response => {
+      command.response = response;
+      return command;
+    });
+  });
+}
+
 function loadCommandArguments(command, packageId)
 {
   const { db, sessionId } = this.global;
@@ -101,6 +117,7 @@ function loadCommands(packageId)
       .then(endpointTypes => queryEndpointType.selectClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
       .then(endpointTypesAndClusters => queryCommand.selectCommandDetailsFromAllEndpointTypesAndClusters(
                 db, endpointTypesAndClusters, true))
+      .then(commands => Promise.all(commands.map(command => loadCommandResponse.call(this, command, packageId))))
       .then(commands => Promise.all(commands.map(command => loadCommandArguments.call(this, command, packageId))));
 }
 
@@ -189,15 +206,11 @@ function asChipCallback(item)
   }
 
   if (StringHelper.isCharString(item.type)) {
-    return { name : 'CharString', type : 'const chip::ByteSpan' };
+    return { name : 'CharString', type : 'const chip::CharSpan' };
   }
 
   if (ListHelper.isList(item.type)) {
     return { name : 'List', type : null };
-  }
-
-  if (item.type == 'boolean') {
-    return { name : 'Boolean', type : 'bool' };
   }
 
   const basicType = ChipTypesHelper.asBasicType(item.chipType);
@@ -212,6 +225,8 @@ function asChipCallback(item)
   case 'uint32_t':
   case 'uint64_t':
     return { name : 'Int' + basicType.replace(/[^0-9]/g, '') + 'u', type : basicType };
+  case 'bool':
+    return { name : 'Boolean', type : 'bool' };
   default:
     return { name : 'Unsupported', type : null };
   }
@@ -251,9 +266,13 @@ function handleString(item, [ atomics, enums, bitmaps, structs ])
   const kLengthSizeInBytes = 2;
 
   item.atomicTypeId = atomic.atomicId;
-  item.chipType     = 'chip::ByteSpan';
-  item.size         = kLengthSizeInBytes + item.maxLength;
-  item.name         = item.name || item.label;
+  if (StringHelper.isOctetString(item.type)) {
+    item.chipType = 'chip::ByteSpan';
+  } else {
+    item.chipType = 'chip::CharSpan';
+  }
+  item.size = kLengthSizeInBytes + item.maxLength;
+  item.name = item.name || item.label;
   return true;
 }
 
@@ -300,12 +319,14 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
 
   const enumItem = getEnum(enums, itemType);
   if (enumItem) {
-    itemType = enumItem.type;
+    item.isEnum = true;
+    itemType    = enumItem.type;
   }
 
   const bitmap = getBitmap(bitmaps, itemType);
   if (bitmap) {
-    itemType = bitmap.type;
+    item.isBitmap = true;
+    itemType      = bitmap.type;
   }
 
   const atomic = getAtomic(atomics, itemType);
@@ -373,51 +394,18 @@ function enhancedCommands(commands, types)
   commands.forEach(command => {
     command.isResponse                    = command.name.includes('Response');
     command.isManufacturerSpecificCommand = !!this.mfgCode;
-  });
 
-  commands.forEach(command => {
-    // This filter uses the assumption that a response to a command has a well defined name, such as
-    // (response name) == (command name + 'Response') or s/Request/Response. This is very often the case,
-    // but this is not always true since some clusters use the same response to answer different commands, such as the
-    // operational cluster.
-    const automaticFilter = response => {
-      if (!response.isResponse) {
-        return false;
-      }
-
-      if (response.clusterName != command.clusterName) {
-        return false;
-      }
-
-      if (response.name == command.name) {
-        return false;
-      }
-
-      return (response.name == (command.name + 'Response')) || (response.name == (command.name.replace('Request', 'Response')));
-    };
-
-    const manualFilter = response => {
-      switch (command.name) {
-      case 'AddNOC':
-      case 'UpdateNOC':
-      case 'UpdateFabricLabel':
-      case 'RemoveFabric':
-        return response.name == 'NOCResponse';
-      default:
-        return false;
-      }
-    };
-    const filter = response => automaticFilter(response) || manualFilter(response);
-
-    const response = commands.find(filter);
-    if (response) {
-      command.hasSpecificResponse = true;
-      command.responseName        = response.name;
-      command.response            = response;
+    command.hasSpecificResponse = !!command.response;
+    if (command.response) {
+      const responseName   = command.response.name;
+      command.responseName = responseName;
+      // The 'response' property contains the response returned by the `selectCommandById`
+      // helper. But this one does not contains all the metadata informations added by
+      // `enhancedItem`, so instead of using the one from ZAP, retrieve the enhanced version.
+      command.response = commands.find(command => command.name == responseName);
     } else {
-      command.hasSpecificResponse = false;
-      command.responseName        = 'DefaultSuccess';
-      command.response            = { arguments : [] };
+      command.responseName = 'DefaultSuccess';
+      command.response     = { arguments : [] };
     }
   });
 
@@ -431,15 +419,16 @@ function enhancedCommands(commands, types)
     return commands.find(command => command.responseName == responseName);
   });
 
-  // At this stage, 'command.arguments' may contains 'struct'. But controllers does not know (yet) how
+  // At this stage, 'command.arguments' may contains 'struct'. But some controllers does not know (yet) how
   // to handle them. So those needs to be inlined.
   commands.forEach(command => {
     if (command.isResponse) {
       return;
     }
 
-    command.arguments = inlineStructItems(command.arguments);
+    command.expandedArguments = inlineStructItems(command.arguments);
   });
+
   return commands;
 }
 

@@ -161,6 +161,11 @@
 // Server attributes
 #define ZCL_CURRENT_LEVEL_ATTRIBUTE_ID (0x0000)
 #define ZCL_LEVEL_CONTROL_REMAINING_TIME_ATTRIBUTE_ID (0x0001)
+#define ZCL_MINIMUM_LEVEL_ATTRIBUTE_ID (0x0002)
+#define ZCL_MAXIMUM_LEVEL_ATTRIBUTE_ID (0x0003)
+#define ZCL_CURRENT_FREQUENCY_ATTRIBUTE_ID (0x0004)
+#define ZCL_MIN_FREQUENCY_ATTRIBUTE_ID (0x0005)
+#define ZCL_MAX_FREQUENCY_ATTRIBUTE_ID (0x0006)
 #define ZCL_OPTIONS_ATTRIBUTE_ID (0x000F)
 #define ZCL_ON_OFF_TRANSITION_TIME_ATTRIBUTE_ID (0x0010)
 #define ZCL_ON_LEVEL_ATTRIBUTE_ID (0x0011)
@@ -525,6 +530,13 @@
 
 // Server attributes
 #define ZCL_LABEL_LIST_ATTRIBUTE_ID (0x0000)
+
+// Attribute ids for cluster: Boolean State
+
+// Client attributes
+
+// Server attributes
+#define ZCL_STATE_VALUE_ATTRIBUTE_ID (0x0000)
 
 // Attribute ids for cluster: Shade Configuration
 

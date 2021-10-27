@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/AttributeAccessInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventDataElement.h>
 #include <app/util/basic-types.h>
@@ -195,13 +196,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    CHIP_ERROR ReadError(chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
         mReadError = true;
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ReadDone(chip::app::ReadClient * apReadClient) override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR SubscriptionEstablished(const chip::app::ReadHandler * apReadHandler) override
     {
@@ -230,15 +231,14 @@ public:
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     uint64_t version = 0;
-    ChipLogDetail(DataManagement, "TEST Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId,
-                  aClusterInfo.mFieldId);
+    ChipLogDetail(DataManagement, "TEST Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aPath.mClusterId, aPath.mAttributeId);
 
     if (apDataExists != nullptr)
     {
-        *apDataExists = (aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId);
+        *apDataExists = (aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId);
     }
 
     if (apWriter == nullptr)
@@ -246,13 +246,13 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         return CHIP_NO_ERROR;
     }
 
-    if (!(aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId))
+    if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))
     {
         return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
                              chip::Protocols::InteractionModel::Status::UnsupportedAttribute);
     }
 
-    ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), kTestFieldValue1));
+    ReturnErrorOnFailure(AttributeValueEncoder(apWriter).Encode(kTestFieldValue1));
     return apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
 }
 

@@ -464,6 +464,26 @@ namespace RemainingTime {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace RemainingTime
 
+namespace MinLevel {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MinLevel
+
+namespace MaxLevel {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace MaxLevel
+
+namespace CurrentFrequency {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace CurrentFrequency
+
+namespace MinFrequency {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace MinFrequency
+
+namespace MaxFrequency {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace MaxFrequency
+
 namespace Options {
 static constexpr AttributeId Id = 0x0000000F;
 } // namespace Options
@@ -1550,6 +1570,20 @@ namespace ClusterRevision = Globals::Attributes::ClusterRevision;
 
 } // namespace Attributes
 } // namespace FixedLabel
+
+namespace BooleanState {
+namespace Attributes {
+
+namespace StateValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace StateValue
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
+} // namespace Attributes
+} // namespace BooleanState
 
 namespace ShadeConfiguration {
 namespace Attributes {

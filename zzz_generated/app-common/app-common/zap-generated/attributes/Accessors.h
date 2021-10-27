@@ -491,6 +491,31 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * remainingTime); // int16
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t remainingTime);
 } // namespace RemainingTime
 
+namespace MinLevel {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * minLevel); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t minLevel);
+} // namespace MinLevel
+
+namespace MaxLevel {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * maxLevel); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t maxLevel);
+} // namespace MaxLevel
+
+namespace CurrentFrequency {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentFrequency); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentFrequency);
+} // namespace CurrentFrequency
+
+namespace MinFrequency {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * minFrequency); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t minFrequency);
+} // namespace MinFrequency
+
+namespace MaxFrequency {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxFrequency); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxFrequency);
+} // namespace MaxFrequency
+
 namespace Options {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * options); // bitmap8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t options);
@@ -1433,6 +1458,17 @@ namespace Attributes {
 
 } // namespace Attributes
 } // namespace FixedLabel
+
+namespace BooleanState {
+namespace Attributes {
+
+namespace StateValue {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * stateValue); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool stateValue);
+} // namespace StateValue
+
+} // namespace Attributes
+} // namespace BooleanState
 
 namespace ShadeConfiguration {
 namespace Attributes {
@@ -2861,23 +2897,23 @@ namespace CarbonMonoxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -2887,23 +2923,23 @@ namespace CarbonDioxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -2913,23 +2949,23 @@ namespace EthyleneConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -2939,23 +2975,23 @@ namespace EthyleneOxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -2965,23 +3001,23 @@ namespace HydrogenConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -2991,23 +3027,23 @@ namespace HydrogenSulphideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3017,23 +3053,23 @@ namespace NitricOxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3043,23 +3079,23 @@ namespace NitrogenDioxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3069,23 +3105,23 @@ namespace OxygenConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3095,23 +3131,23 @@ namespace OzoneConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3121,23 +3157,23 @@ namespace SulfurDioxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3147,23 +3183,23 @@ namespace DissolvedOxygenConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3173,23 +3209,23 @@ namespace BromateConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3199,23 +3235,23 @@ namespace ChloraminesConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3225,23 +3261,23 @@ namespace ChlorineConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3251,23 +3287,23 @@ namespace FecalColiformAndEColiConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3277,23 +3313,23 @@ namespace FluorideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3303,23 +3339,23 @@ namespace HaloaceticAcidsConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3329,23 +3365,23 @@ namespace TotalTrihalomethanesConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3355,23 +3391,23 @@ namespace TotalColiformBacteriaConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3381,23 +3417,23 @@ namespace TurbidityConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3407,23 +3443,23 @@ namespace CopperConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3433,23 +3469,23 @@ namespace LeadConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3459,23 +3495,23 @@ namespace ManganeseConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3485,23 +3521,23 @@ namespace SulfateConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3511,23 +3547,23 @@ namespace BromodichloromethaneConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3537,23 +3573,23 @@ namespace BromoformConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3563,23 +3599,23 @@ namespace ChlorodibromomethaneConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3589,23 +3625,23 @@ namespace ChloroformConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes
@@ -3615,23 +3651,23 @@ namespace SodiumConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue);
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance);
 } // namespace Tolerance
 
 } // namespace Attributes

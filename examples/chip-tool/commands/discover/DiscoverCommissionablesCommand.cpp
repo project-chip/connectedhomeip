@@ -21,12 +21,11 @@
 
 using namespace ::chip;
 
-CHIP_ERROR DiscoverCommissionablesCommand::Run()
+CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()
 {
-    GetExecContext()->commissioner->RegisterDeviceDiscoveryDelegate(this);
-
+    mController.RegisterDeviceDiscoveryDelegate(this);
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
-    return GetExecContext()->commissioner->DiscoverCommissionableNodes(filter);
+    return mController.DiscoverCommissionableNodes(filter);
 }
 
 void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
@@ -48,7 +47,7 @@ void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Dnssd::Disco
     ChipLogProgress(Discovery, "\tPairing Hint\t\t0x%x", nodeData.pairingHint);
     for (int i = 0; i < nodeData.numIPs; i++)
     {
-        char buf[chip::Inet::kMaxIPAddressStringLength];
+        char buf[chip::Inet::IPAddress::kMaxStringLength];
         nodeData.ipAddress[i].ToString(buf);
 
         ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", i, buf);

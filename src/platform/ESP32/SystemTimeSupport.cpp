@@ -32,20 +32,22 @@
 
 namespace chip {
 namespace System {
+namespace Clock {
 
 namespace Internal {
 ClockImpl gClockImpl;
 } // namespace Internal
 
-Clock::MonotonicMicroseconds ClockImpl::GetMonotonicMicroseconds(void)
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return (Clock::MonotonicMicroseconds)::esp_timer_get_time();
+    return Clock::Microseconds64(::esp_timer_get_time());
 }
 
-Clock::MonotonicMilliseconds GetMonotonicMilliseconds(void)
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
-    return (Clock::MonotonicMilliseconds)::esp_timer_get_time() / kMicrosecondsPerMillisecond;
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
+} // namespace Clock
 } // namespace System
 } // namespace chip

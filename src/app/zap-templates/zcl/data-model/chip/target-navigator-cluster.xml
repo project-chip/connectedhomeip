@@ -51,6 +51,6 @@ limitations under the License.
   <struct name="NavigateTargetTargetInfo">
     <cluster code="0x0505"/>
     <item name="identifier" type="INT8U"/>
-    <item name="name" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
+    <item name="name" type="CHAR_STRING" length="32"/>
   </struct>
 </configurator>

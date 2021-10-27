@@ -31,6 +31,7 @@
 #include <lib/core/CHIPTLVTags.h>
 #include <lib/core/CHIPTLVTypes.h>
 
+#include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
@@ -454,7 +455,7 @@ public:
     CHIP_ERROR Get(float & v);
 
     /**
-     * Get the value of the current element as a chip::ByteSpan
+     * Get the value of the current element as a ByteSpan
      *
      * @param[out]  v                       Receives the value associated with current TLV element.
      *
@@ -463,7 +464,19 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(chip::ByteSpan & v);
+    CHIP_ERROR Get(ByteSpan & v);
+
+    /**
+     * Get the value of the current element as a CharSpan
+     *
+     * @param[out]  v                       Receives the value associated with current TLV element.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV character string, or
+     *                                      the reader is not positioned on an element.
+     *
+     */
+    CHIP_ERROR Get(CharSpan & v);
 
     /**
      * Get the value of the current element as an enum value, if it's an integer
@@ -475,12 +488,23 @@ public:
     CHIP_ERROR Get(T & v)
     {
         std::underlying_type_t<T> val;
-        CHIP_ERROR err = Get(val);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(Get(val));
         v = static_cast<T>(val);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Get the value of the current element as a BitFlags value, if it's an integer
+     * value that fits in the BitFlags type.
+     *
+     * @param[out] v Receives the value associated with current TLV element.
+     */
+    template <typename T>
+    CHIP_ERROR Get(BitFlags<T> & v)
+    {
+        std::underlying_type_t<T> val;
+        ReturnErrorOnFailure(Get(val));
+        v.SetRaw(val);
         return CHIP_NO_ERROR;
     }
 
@@ -1285,6 +1309,16 @@ public:
     CHIP_ERROR Put(Tag tag, T data)
     {
         return Put(tag, to_underlying(data));
+    }
+
+    /**
+     *
+     * Encodes an unsigned integer with bits corresponding to the flags set when data is a BitFlags
+     */
+    template <typename T>
+    CHIP_ERROR Put(Tag tag, BitFlags<T> data)
+    {
+        return Put(tag, data.Raw());
     }
 
     /**
@@ -2393,7 +2427,8 @@ public:
     CHIP_ERROR Get(uint64_t & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(float & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(double & v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(chip::ByteSpan & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(ByteSpan & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(CharSpan & v) { return mUpdaterReader.Get(v); }
 
     CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize) { return mUpdaterReader.GetBytes(buf, bufSize); }
     CHIP_ERROR DupBytes(uint8_t *& buf, uint32_t & dataLen) { return mUpdaterReader.DupBytes(buf, dataLen); }

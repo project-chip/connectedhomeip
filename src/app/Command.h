@@ -27,7 +27,7 @@
 #include <app/CommandPathParams.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelDelegate.h>
-#include <app/MessageDef/CommandDataElement.h>
+#include <app/MessageDef/CommandDataIB.h>
 #include <app/MessageDef/CommandList.h>
 #include <app/MessageDef/InvokeCommand.h>
 #include <lib/core/CHIPCore.h>
@@ -74,15 +74,24 @@ public:
      * A set of methods to construct command request or response payloads
      */
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
-    TLV::TLVWriter * GetCommandDataElementTLVWriter();
+    TLV::TLVWriter * GetCommandDataIBTLVWriter();
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
-    virtual CHIP_ERROR AddStatusCode(const ConcreteCommandPath & aCommandPath,
-                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                     const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
+
+    virtual CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
-    };
+    }
+
+    virtual CHIP_ERROR AddClusterSpecificSuccess(ConcreteCommandPath & aCommandPath, uint8_t aClusterStatus)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    virtual CHIP_ERROR AddClusterSpecificFailure(ConcreteCommandPath & aCommandPath, uint8_t aClusterStatus)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     /**
      * Gets the inner exchange context object, without ownership.
@@ -93,7 +102,7 @@ public:
      */
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
-    virtual CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) = 0;
+    virtual CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement) = 0;
 
 protected:
     Command();
@@ -115,7 +124,7 @@ protected:
 
     void MoveToState(const CommandState aTargetState);
     CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId);
-    CHIP_ERROR ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandDataElement::Builder aCommandDataElement);
+    CHIP_ERROR ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandDataIB::Builder aCommandDataIB);
     const char * GetStateStr() const;
 
     InvokeCommand::Builder mInvokeCommandBuilder;

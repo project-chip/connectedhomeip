@@ -18,16 +18,9 @@
 
 #include "TestCommand.h"
 
-CHIP_ERROR TestCommand::Run()
+CHIP_ERROR TestCommand::RunCommand()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    auto * ctx = GetExecContext();
-
-    err = ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-    ReturnErrorOnFailure(err);
-
-    return CHIP_NO_ERROR;
+    return mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
 void TestCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
@@ -54,9 +47,16 @@ void TestCommand::OnWaitForMsFn(chip::System::Layer * systemLayer, void * contex
     command->NextTest();
 }
 
-CHIP_ERROR TestCommand::WaitForMs(uint32_t ms)
+CHIP_ERROR TestCommand::Wait(chip::System::Clock::Timeout duration)
 {
-    return chip::DeviceLayer::SystemLayer().StartTimer(ms, OnWaitForMsFn, this);
+    return chip::DeviceLayer::SystemLayer().StartTimer(duration, OnWaitForMsFn, this);
+}
+
+CHIP_ERROR TestCommand::Log(const char * message)
+{
+    ChipLogDetail(chipTool, "%s", message);
+    WaitForMs(0);
+    return CHIP_NO_ERROR;
 }
 
 void TestCommand::Exit(std::string message)
@@ -123,6 +123,19 @@ bool TestCommand::CheckValueAsList(const char * itemName, uint64_t current, uint
 bool TestCommand::CheckValueAsString(const char * itemName, const chip::ByteSpan current, const char * expected)
 {
     const chip::ByteSpan expectedArgument = chip::ByteSpan(chip::Uint8::from_const_char(expected), strlen(expected));
+
+    if (!current.data_equal(expectedArgument))
+    {
+        Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));
+        return false;
+    }
+
+    return true;
+}
+
+bool TestCommand::CheckValueAsString(const char * itemName, const chip::CharSpan current, const char * expected)
+{
+    const chip::CharSpan expectedArgument(expected, strlen(expected));
     if (!current.data_equal(expectedArgument))
     {
         Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));

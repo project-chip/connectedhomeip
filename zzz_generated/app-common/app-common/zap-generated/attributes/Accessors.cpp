@@ -1306,6 +1306,77 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t remainingTime)
 
 } // namespace RemainingTime
 
+namespace MinLevel {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * minLevel)
+{
+    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MinLevel::Id, (uint8_t *) minLevel, sizeof(*minLevel));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t minLevel)
+{
+    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MinLevel::Id, (uint8_t *) &minLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace MinLevel
+
+namespace MaxLevel {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * maxLevel)
+{
+    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MaxLevel::Id, (uint8_t *) maxLevel, sizeof(*maxLevel));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t maxLevel)
+{
+    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MaxLevel::Id, (uint8_t *) &maxLevel, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace MaxLevel
+
+namespace CurrentFrequency {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * currentFrequency)
+{
+    return emberAfReadServerAttribute(endpoint, LevelControl::Id, CurrentFrequency::Id, (uint8_t *) currentFrequency,
+                                      sizeof(*currentFrequency));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t currentFrequency)
+{
+    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, CurrentFrequency::Id, (uint8_t *) &currentFrequency,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace CurrentFrequency
+
+namespace MinFrequency {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * minFrequency)
+{
+    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MinFrequency::Id, (uint8_t *) minFrequency,
+                                      sizeof(*minFrequency));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t minFrequency)
+{
+    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MinFrequency::Id, (uint8_t *) &minFrequency,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace MinFrequency
+
+namespace MaxFrequency {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * maxFrequency)
+{
+    return emberAfReadServerAttribute(endpoint, LevelControl::Id, MaxFrequency::Id, (uint8_t *) maxFrequency,
+                                      sizeof(*maxFrequency));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t maxFrequency)
+{
+    return emberAfWriteServerAttribute(endpoint, LevelControl::Id, MaxFrequency::Id, (uint8_t *) &maxFrequency,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace MaxFrequency
+
 namespace Options {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * options)
@@ -3839,6 +3910,26 @@ namespace Attributes {
 
 } // namespace Attributes
 } // namespace FixedLabel
+
+namespace BooleanState {
+namespace Attributes {
+
+namespace StateValue {
+
+EmberAfStatus Get(chip::EndpointId endpoint, bool * stateValue)
+{
+    return emberAfReadServerAttribute(endpoint, BooleanState::Id, StateValue::Id, (uint8_t *) stateValue, sizeof(*stateValue));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, bool stateValue)
+{
+    return emberAfWriteServerAttribute(endpoint, BooleanState::Id, StateValue::Id, (uint8_t *) &stateValue,
+                                       ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+}
+
+} // namespace StateValue
+
+} // namespace Attributes
+} // namespace BooleanState
 
 namespace ShadeConfiguration {
 namespace Attributes {
@@ -7839,12 +7930,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -7854,12 +7945,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -7869,12 +7960,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -7884,12 +7975,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, CarbonMonoxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -7905,12 +7996,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -7920,12 +8011,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -7935,12 +8026,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -7950,12 +8041,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, CarbonDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -7971,12 +8062,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -7986,12 +8077,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8001,12 +8092,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8016,12 +8107,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, EthyleneConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8037,12 +8128,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8052,12 +8143,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8067,12 +8158,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8082,12 +8173,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, EthyleneOxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8103,12 +8194,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8118,12 +8209,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8133,12 +8224,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8148,12 +8239,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, HydrogenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8169,12 +8260,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8184,12 +8275,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8199,12 +8290,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8214,12 +8305,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, HydrogenSulphideConcentrationMeasurement::Id, Tolerance::Id,
                                        (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8235,12 +8326,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8250,12 +8341,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8265,12 +8356,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8280,12 +8371,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, NitricOxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8301,12 +8392,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8316,12 +8407,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8331,12 +8422,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8346,12 +8437,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, NitrogenDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8367,12 +8458,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8382,12 +8473,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8397,12 +8488,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8412,12 +8503,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, OxygenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8433,12 +8524,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8448,12 +8539,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8463,12 +8554,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8478,12 +8569,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, OzoneConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8499,12 +8590,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8514,12 +8605,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8529,12 +8620,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8544,12 +8635,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, SulfurDioxideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8565,12 +8656,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8580,12 +8671,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8595,12 +8686,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8610,12 +8701,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, DissolvedOxygenConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8631,12 +8722,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8646,12 +8737,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8661,12 +8752,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, BromateConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8676,12 +8767,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, BromateConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, BromateConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8697,12 +8788,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8712,12 +8803,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8727,12 +8818,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8742,12 +8833,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, ChloraminesConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8763,12 +8854,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8778,12 +8869,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8793,12 +8884,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8808,12 +8899,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, ChlorineConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8829,12 +8920,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8844,12 +8935,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8859,12 +8950,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8874,12 +8965,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, Tolerance::Id,
                                       (uint8_t *) tolerance, sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, FecalColiformAndEColiConcentrationMeasurement::Id, Tolerance::Id,
                                        (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8895,12 +8986,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8910,12 +9001,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8925,12 +9016,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8940,12 +9031,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, FluorideConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8961,12 +9052,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8976,12 +9067,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -8991,12 +9082,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9006,12 +9097,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, HaloaceticAcidsConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9027,12 +9118,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9042,12 +9133,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9057,12 +9148,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9072,12 +9163,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, Tolerance::Id,
                                       (uint8_t *) tolerance, sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, TotalTrihalomethanesConcentrationMeasurement::Id, Tolerance::Id,
                                        (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9093,12 +9184,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9108,12 +9199,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9123,12 +9214,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9138,12 +9229,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, Tolerance::Id,
                                       (uint8_t *) tolerance, sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, TotalColiformBacteriaConcentrationMeasurement::Id, Tolerance::Id,
                                        (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9159,12 +9250,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9174,12 +9265,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9189,12 +9280,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9204,12 +9295,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, TurbidityConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9225,12 +9316,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9240,12 +9331,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9255,12 +9346,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, CopperConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9270,12 +9361,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, CopperConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, CopperConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9291,12 +9382,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9306,12 +9397,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9321,12 +9412,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, LeadConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9336,12 +9427,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, LeadConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, LeadConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9357,12 +9448,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9372,12 +9463,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9387,12 +9478,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9402,12 +9493,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, ManganeseConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9423,12 +9514,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9438,12 +9529,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9453,12 +9544,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9468,12 +9559,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, SulfateConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9489,12 +9580,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9504,12 +9595,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9519,12 +9610,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9534,12 +9625,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, Tolerance::Id,
                                       (uint8_t *) tolerance, sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, BromodichloromethaneConcentrationMeasurement::Id, Tolerance::Id,
                                        (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9555,12 +9646,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9570,12 +9661,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9585,12 +9676,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9600,12 +9691,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, BromoformConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9621,12 +9712,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9636,12 +9727,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9651,12 +9742,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9666,12 +9757,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, Tolerance::Id,
                                       (uint8_t *) tolerance, sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, ChlorodibromomethaneConcentrationMeasurement::Id, Tolerance::Id,
                                        (uint8_t *) &tolerance, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9687,12 +9778,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MeasuredValue::Id,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MeasuredValue::Id,
                                        (uint8_t *) &measuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9702,12 +9793,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9717,12 +9808,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9732,12 +9823,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, ChloroformConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9753,12 +9844,12 @@ namespace Attributes {
 
 namespace MeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) measuredValue,
                                       sizeof(*measuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MeasuredValue::Id, (uint8_t *) &measuredValue,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9768,12 +9859,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MinMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MinMeasuredValue::Id,
                                        (uint8_t *) &minMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9783,12 +9874,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace MaxMeasuredValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue)
+EmberAfStatus Get(chip::EndpointId endpoint, float * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue)
+EmberAfStatus Set(chip::EndpointId endpoint, float maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, MaxMeasuredValue::Id,
                                        (uint8_t *) &maxMeasuredValue, ZCL_SINGLE_ATTRIBUTE_TYPE);
@@ -9798,12 +9889,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to
 
 namespace Tolerance {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance)
+EmberAfStatus Get(chip::EndpointId endpoint, float * tolerance)
 {
     return emberAfReadServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) tolerance,
                                       sizeof(*tolerance));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance)
+EmberAfStatus Set(chip::EndpointId endpoint, float tolerance)
 {
     return emberAfWriteServerAttribute(endpoint, SodiumConcentrationMeasurement::Id, Tolerance::Id, (uint8_t *) &tolerance,
                                        ZCL_SINGLE_ATTRIBUTE_TYPE);

@@ -50,17 +50,21 @@ class LogPipe(threading.Thread):
 
 class ShellRunner:
 
-    def __init__(self):
+    def __init__(self, root: str):
         self.dry_run = False
+        self.root_dir = root
 
-    def Run(self, cmd, cwd=None, title=None):
+    def StartCommandExecution(self):
+        pass
+
+    def Run(self, cmd, title=None):
         outpipe = LogPipe(logging.INFO)
         errpipe = LogPipe(logging.WARN)
 
         if title:
             logging.info(title)
 
-        with subprocess.Popen(cmd, cwd=cwd, stdout=outpipe, stderr=errpipe) as s:
+        with subprocess.Popen(cmd, cwd=self.root_dir, stdout=outpipe, stderr=errpipe) as s:
             outpipe.close()
             errpipe.close()
             code = s.wait()

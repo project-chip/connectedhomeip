@@ -1,3 +1,21 @@
+# Commands will be run in CHIP project root.
+cd "{root}"
+
+# Generating ameba-amebad-all-clusters
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-all-clusters'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Generating android-androidstudio-chip-tool
+gn gen --check --fail-on-unused-args {out}/android-androidstudio-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
 # Generating JARs for Java build rules test
 python3 build/chip/java/tests/generate_jars_for_test.py
 
@@ -71,44 +89,107 @@ gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--ar
 gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
 
 # Generating esp32-c3devkit-all-clusters
-cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_c3devkit.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-c3devkit-all-clusters reconfigure'
-cd -
+mkdir -p {out}/esp32-c3devkit-all-clusters
+
+cp examples/all-clusters-app/esp32/sdkconfig_c3devkit.defaults {out}/esp32-c3devkit-all-clusters/sdkconfig.defaults
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-c3devkit-all-clusters reconfigure'
 
 # Generating esp32-devkitc-all-clusters
-cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters reconfigure'
-cd -
+mkdir -p {out}/esp32-devkitc-all-clusters
+
+cp examples/all-clusters-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-clusters/sdkconfig.defaults
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters reconfigure'
+
+# Generating esp32-devkitc-all-clusters-ipv6only
+mkdir -p {out}/esp32-devkitc-all-clusters-ipv6only
+
+cp examples/all-clusters-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+bash -c 'echo CONFIG_DISABLE_IPV4=y >>{out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults'
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only reconfigure'
 
 # Generating esp32-devkitc-bridge
-cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge reconfigure'
-cd -
+mkdir -p {out}/esp32-devkitc-bridge
+
+cp examples/bridge-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-bridge/sdkconfig.defaults
+
+rm -f examples/bridge-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
+idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge reconfigure'
 
 # Generating esp32-devkitc-lock
-cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock reconfigure'
-cd -
+mkdir -p {out}/esp32-devkitc-lock
+
+cp examples/lock-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-lock/sdkconfig.defaults
+
+rm -f examples/lock-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-lock/sdkconfig.defaults
+idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock reconfigure'
 
 # Generating esp32-devkitc-shell
-cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/shell/esp32 -B {out}/esp32-devkitc-shell reconfigure'
-cd -
+mkdir -p {out}/esp32-devkitc-shell
+
+cp examples/shell/esp32/sdkconfig.defaults {out}/esp32-devkitc-shell/sdkconfig.defaults
+
+rm -f examples/shell/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-shell/sdkconfig.defaults
+idf.py -C examples/shell/esp32 -B {out}/esp32-devkitc-shell reconfigure'
 
 # Generating esp32-devkitc-temperature-measurement
-cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement reconfigure'
-cd -
+mkdir -p {out}/esp32-devkitc-temperature-measurement
+
+cp examples/temperature-measurement-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
+
+rm -f examples/temperature-measurement-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
+idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement reconfigure'
 
 # Generating esp32-m5stack-all-clusters
-cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_m5stack.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters reconfigure'
-cd -
+mkdir -p {out}/esp32-m5stack-all-clusters
 
-# Generating esp32-m5stack-all-clusters-rpc
-cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_m5stack_rpc.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc reconfigure'
-cd -
+cp examples/all-clusters-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stack-all-clusters/sdkconfig.defaults
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters reconfigure'
+
+# Generating esp32-m5stack-all-clusters-ipv6only
+mkdir -p {out}/esp32-m5stack-all-clusters-ipv6only
+
+cp examples/all-clusters-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+bash -c 'echo CONFIG_DISABLE_IPV4=y >>{out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults'
+
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only reconfigure'
 
 # Generating infineon-p6-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
@@ -175,6 +256,12 @@ west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {
 
 # Generating tizen-arm-light
 gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light
+
+# Building ameba-amebad-all-clusters
+ninja -C {out}/ameba-amebad-all-clusters
+
+# Building APP android-androidstudio-chip-tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-chip-tool -PmatterSdkSourceBuild=true assembleDebug
 
 # Building JNI android-arm-chip-tool
 ninja -C {out}/android-arm-chip-tool
@@ -293,29 +380,68 @@ ninja -C {out}/efr32-brd4161a-lock
 # Building efr32-brd4161a-window-covering
 ninja -C {out}/efr32-brd4161a-window-covering
 
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
 # Building esp32-c3devkit-all-clusters
-bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-c3devkit-all-clusters'"'"''
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-c3devkit-all-clusters build'
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
 
 # Building esp32-devkitc-all-clusters
-bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-all-clusters'"'"''
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters build'
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+# Building esp32-devkitc-all-clusters-ipv6only
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only build'
+
+rm -f examples/bridge-app/esp32/sdkconfig
 
 # Building esp32-devkitc-bridge
-bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-bridge'"'"''
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
+idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge build'
+
+rm -f examples/lock-app/esp32/sdkconfig
 
 # Building esp32-devkitc-lock
-bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-lock'"'"''
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-lock/sdkconfig.defaults
+idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock build'
+
+rm -f examples/shell/esp32/sdkconfig
 
 # Building esp32-devkitc-shell
-bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-shell'"'"''
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-shell/sdkconfig.defaults
+idf.py -C examples/shell/esp32 -B {out}/esp32-devkitc-shell build'
+
+rm -f examples/temperature-measurement-app/esp32/sdkconfig
 
 # Building esp32-devkitc-temperature-measurement
-bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-temperature-measurement'"'"''
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
+idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement build'
+
+rm -f examples/all-clusters-app/esp32/sdkconfig
 
 # Building esp32-m5stack-all-clusters
-bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-m5stack-all-clusters'"'"''
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters build'
 
-# Building esp32-m5stack-all-clusters-rpc
-bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-m5stack-all-clusters-rpc'"'"''
+rm -f examples/all-clusters-app/esp32/sdkconfig
+
+# Building esp32-m5stack-all-clusters-ipv6only
+bash -c 'source $IDF_PATH/export.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
+idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only build'
 
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock

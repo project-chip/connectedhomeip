@@ -161,7 +161,7 @@ CHIP_ERROR ResponseSender::FlushReply()
 
     if (mResponseBuilder.HasResponseRecords())
     {
-        char srcAddressString[chip::Inet::kMaxIPAddressStringLength];
+        char srcAddressString[chip::Inet::IPAddress::kMaxStringLength];
         VerifyOrDie(mSendState.GetSourceAddress().ToString(srcAddressString) != nullptr);
 
         if (mSendState.SendUnicast())
@@ -174,8 +174,8 @@ CHIP_ERROR ResponseSender::FlushReply()
         else
         {
             ChipLogDetail(Discovery, "Broadcasting mDns reply for query from %s", srcAddressString);
-            ReturnErrorOnFailure(
-                mServer->BroadcastSend(mResponseBuilder.ReleasePacket(), kMdnsStandardPort, mSendState.GetSourceInterfaceId()));
+            ReturnErrorOnFailure(mServer->BroadcastSend(mResponseBuilder.ReleasePacket(), kMdnsStandardPort,
+                                                        mSendState.GetSourceInterfaceId(), mSendState.GetSourceAddress().Type()));
         }
     }
 

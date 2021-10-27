@@ -144,6 +144,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Boolean State
+ *
+ */
+@interface CHIPTestBooleanState : CHIPBooleanState
+
+- (void)writeAttributeStateValueWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Bridged Device Basic
  *
  */
@@ -392,6 +403,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestLevelControl : CHIPLevelControl
 
 - (void)writeAttributeCurrentLevelWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeRemainingTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMinLevelWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMaxLevelWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeCurrentFrequencyWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMinFrequencyWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMaxFrequencyWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -557,9 +574,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeMaxPressureWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMaxSpeedWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMaxFlowWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMinConstPressureWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMaxConstPressureWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMinCompPressureWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMaxCompPressureWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMinConstSpeedWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMaxConstSpeedWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMinConstFlowWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMaxConstFlowWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMinConstTempWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMaxConstTempWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePumpStatusWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeEffectiveOperationModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeEffectiveControlModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeCapacityWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeSpeedWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeLifetimeEnergyConsumedWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeAlarmMaskWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeFeatureMapWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end

@@ -255,6 +255,12 @@ CHIP_ERROR Device::Persist()
 
 void Device::OnNewConnection(SessionHandle session)
 {
+    // Only allow update if the session has been initialized and matches
+    if (mSecureSession.HasValue() && !MatchesSession(session))
+    {
+        return;
+    }
+
     mState = ConnectionState::SecureConnected;
     mSecureSession.SetValue(session);
 
@@ -309,6 +315,15 @@ void Device::OnOpenPairingWindowFailureResponse(void * context, uint8_t status)
     ChipLogError(Controller, "Failed to open pairing window on the device. Status %d", status);
 }
 
+CHIP_ERROR Device::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
+                                       PASEVerifier & outVerifier, uint32_t & outPasscodeId)
+{
+    ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(outVerifier, iterations, salt, /* useRandomPIN= */ false, setupPincode));
+
+    outPasscodeId = mPAKEVerifierID++;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, CommissioningWindowOption option,
                                            const ByteSpan & salt, SetupPayload & setupPayload)
 {
@@ -344,7 +359,7 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
     }
 
     setupPayload.version               = 0;
-    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
+    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
 
     return CHIP_NO_ERROR;
 }

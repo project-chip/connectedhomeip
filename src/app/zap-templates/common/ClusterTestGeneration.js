@@ -27,7 +27,9 @@ const path              = require('path');
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
 const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
+const { LogCommands }                   = require('./simulated-clusters/TestLogCommands.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
+const { asUpperCamelCase }              = require(basePath + 'src/app/zap-templates/templates/app/helper.js');
 
 const kClusterName       = 'cluster';
 const kEndpointName      = 'endpoint';
@@ -262,18 +264,31 @@ function getClusters()
 {
   // Create a new array to merge the configured clusters list and test
   // simulated clusters.
-  return Clusters.getClusters().then(clusters => clusters.concat(DelayCommands));
+  return Clusters.getClusters().then(clusters => clusters.concat(DelayCommands, LogCommands));
 }
 
 function getCommands(clusterName)
 {
-  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.commands) : Clusters.getClientCommands(clusterName);
+  switch (clusterName) {
+  case DelayCommands.name:
+    return Promise.resolve(DelayCommands.commands);
+  case LogCommands.name:
+    return Promise.resolve(LogCommands.commands);
+  default:
+    return Clusters.getClientCommands(clusterName);
+  }
 }
 
 function getAttributes(clusterName)
 {
-  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.attributes)
-                                             : Clusters.getServerAttributes(clusterName);
+  switch (clusterName) {
+  case DelayCommands.name:
+    return Promise.resolve(DelayCommands.attributes);
+  case LogCommands.name:
+    return Promise.resolve(LogCommands.attributes);
+  default:
+    return Clusters.getServerAttributes(clusterName);
+  }
 }
 
 function assertCommandOrAttribute(context)
@@ -325,9 +340,10 @@ function assertCommandOrAttribute(context)
 //
 // Templates
 //
-function chip_tests(items, options)
+function chip_tests(list, options)
 {
-  const names = items.split(',').map(name => name.trim());
+  const items = Array.isArray(list) ? list : list.split(',');
+  const names = items.map(name => name.trim());
   const tests = names.map(item => parse(item));
   return templateUtil.collectBlocks(tests, options, this);
 }
@@ -339,7 +355,25 @@ function chip_tests_items(options)
 
 function isTestOnlyCluster(name)
 {
-  return name == DelayCommands.name;
+  const testOnlyClusters = [
+    DelayCommands.name,
+    LogCommands.name,
+  ];
+  return testOnlyClusters.includes(name);
+}
+
+function chip_tests_item_response_type(options)
+{
+  const promise = assertCommandOrAttribute(this).then(item => {
+    if (item.hasSpecificResponse) {
+      return 'Clusters::' + asUpperCamelCase(this.cluster) + '::Commands::' + asUpperCamelCase(item.response.name)
+          + '::DecodableType';
+    }
+
+    return 'DataModel::NullObjectType';
+  });
+
+  return asPromise.call(this, promise, options);
 }
 
 function chip_tests_item_parameters(options)
@@ -366,7 +400,40 @@ function chip_tests_item_parameters(options)
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
       }
-      commandArg.definedValue = expected.value;
+      // test_cluster_command_value is a recursive partial using #each. At some point the |global|
+      // context is lost and it fails. Make sure to attach the global context as a property of the | value |
+      // that is evaluated.
+      function attachGlobal(global, value)
+      {
+        if (Array.isArray(value)) {
+          value = value.map(v => attachGlobal(global, v));
+        } else if (value instanceof Object) {
+          for (key in value) {
+            if (key == "global") {
+              continue;
+            }
+            value[key] = attachGlobal(global, value[key]);
+          }
+        } else {
+          switch (typeof value) {
+          case 'number':
+            value = new Number(value);
+            break;
+          case 'string':
+            value = new String(value);
+            break;
+          case 'boolean':
+            value = new Boolean(value);
+            break;
+          default:
+            throw new Error('Unsupported value: ' + JSON.stringify(value));
+          }
+        }
+
+        value.global = global;
+        return value;
+      }
+      commandArg.definedValue = attachGlobal(this.global, expected.value);
 
       return commandArg;
     });
@@ -423,5 +490,6 @@ function chip_tests_item_response_parameters(options)
 exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
+exports.chip_tests_item_response_type       = chip_tests_item_response_type;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
