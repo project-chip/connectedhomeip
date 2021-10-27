@@ -27,7 +27,6 @@
 #include <transport/raw/PeerAddress.h>
 
 #include <nlbyteorder.h>
-#include <nlunit-test.h>
 
 namespace chip {
 namespace Test {
@@ -38,7 +37,7 @@ public:
     IOContext() {}
 
     /// Initialize the underlying layers and test suite pointer
-    CHIP_ERROR Init(nlTestSuite * suite);
+    CHIP_ERROR Init();
 
     // Shutdown all layers, finalize operations
     CHIP_ERROR Shutdown();
@@ -50,12 +49,10 @@ public:
     /// completionFunction returns true
     void DriveIOUntil(System::Clock::Timeout maxWait, std::function<bool(void)> completionFunction);
 
-    nlTestSuite * GetTestSuite() { return mSuite; }
     System::Layer & GetSystemLayer() { return *mSystemLayer; }
     Inet::InetLayer & GetInetLayer() { return *mInetLayer; }
 
 private:
-    nlTestSuite * mSuite         = nullptr;
     System::Layer * mSystemLayer = nullptr;
     Inet::InetLayer * mInetLayer = nullptr;
 };

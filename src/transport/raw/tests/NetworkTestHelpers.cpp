@@ -26,7 +26,7 @@
 namespace chip {
 namespace Test {
 
-CHIP_ERROR IOContext::Init(nlTestSuite * suite)
+CHIP_ERROR IOContext::Init()
 {
     CHIP_ERROR err = Platform::MemoryInit();
 
@@ -34,7 +34,6 @@ CHIP_ERROR IOContext::Init(nlTestSuite * suite)
 
     InitNetwork();
 
-    mSuite       = suite;
     mSystemLayer = &gSystemLayer;
     mInetLayer   = &gInet;
 
