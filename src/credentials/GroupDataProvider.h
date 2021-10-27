@@ -180,7 +180,7 @@ public:
     virtual bool GroupMappingExists(chip::FabricIndex fabric_index, const GroupMapping & mapping)                       = 0;
     virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping, const char * name) = 0;
     virtual CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping)                 = 0;
-    virtual CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index)                                           = 0;
+    virtual CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint)                      = 0;
     virtual GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint)            = 0;
 
     // States
