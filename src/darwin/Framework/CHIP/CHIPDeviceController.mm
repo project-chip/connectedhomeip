@@ -60,6 +60,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
+@property (readonly) chip::FabricStorage * fabricStorage;
 @property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) CHIPP256KeypairBridge keypairBridge;
 @property (readonly) chip::NodeId localDeviceId;
@@ -153,7 +154,11 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
         _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate);
-
+        // TODO Expose FabricStorage to CHIPFramework consumers.
+        _fabricStorage = new chip::SimpleFabricStorage(_persistentStorageDelegateBridge);
+        if ([self checkForStartError:(_fabricStorage != nullptr) logMsg:kErrorMemoryInit]) {
+            return;
+        }
         // create a CHIPP256KeypairBridge here and pass it to the operationalCredentialsDelegate
         std::unique_ptr<chip::Crypto::CHIPP256KeypairNativeBridge> nativeBridge;
         if (nocSigner != nil) {
@@ -183,7 +188,8 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         // Initialize device attestation verifier
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());
 
-        params.storageDelegate = _persistentStorageDelegateBridge;
+        params.fabricStorage = _fabricStorage;
+        commissionerParams.storageDelegate = _persistentStorageDelegateBridge;
         commissionerParams.deviceAddressUpdateDelegate = _pairingDelegateBridge;
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
 
@@ -490,6 +496,11 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         _cppCommissioner = NULL;
     }
 
+    if (_fabricStorage) {
+        delete _fabricStorage;
+        _fabricStorage = nullptr;
+    }
+
     return YES;
 }
 
@@ -505,6 +516,14 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     }
 
     return YES;
+}
+
+- (void)dealloc
+{
+    if (_fabricStorage) {
+        delete _fabricStorage;
+        _fabricStorage = nullptr;
+    }
 }
 
 @end
