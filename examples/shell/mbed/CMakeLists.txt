@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.19.0)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
+get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
@@ -31,7 +32,8 @@ mbed_configure_app_target(${APP_TARGET})
 
 target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}/main/include
-                           ${APP_ROOT}/shell_common/include)
+                           ${APP_ROOT}/shell_common/include
+                           ${GEN_DIR}/app-common)
 
 target_sources(${APP_TARGET} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
