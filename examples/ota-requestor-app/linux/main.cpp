@@ -244,7 +244,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     return (retval);
 }
 
-void SendQueryImageCommand(chip::NodeId peerNodeId  = providerNodeId,  chip::FabricIndex peerFabricIndex = providerFabricIndex)
+void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::FabricIndex peerFabricIndex = providerFabricIndex)
 {
     // Explicitly calling UpdateAddress() should not be needed once OperationalDeviceProxy can resolve IP address from node ID and
     // fabric index
@@ -261,7 +261,7 @@ void SendQueryImageCommand(chip::NodeId peerNodeId  = providerNodeId,  chip::Fab
         .fabricsTable   = &(server->GetFabricTable()),
     };
 
-    CHIP_ERROR err              = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     gOperationalDeviceProxy.Init(peerNodeId, peerFabricIndex, initParams);
     err = gOperationalDeviceProxy.Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)

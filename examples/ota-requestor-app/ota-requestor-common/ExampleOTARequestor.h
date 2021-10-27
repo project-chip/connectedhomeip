@@ -40,7 +40,7 @@ public:
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
 
     // Setter for mConnectToProviderCallback
-    void SetConnectToProviderCallback(  void (* f) (chip::NodeId, chip::FabricIndex)) {mConnectToProviderCallback = f;}
+    void SetConnectToProviderCallback(void (*f)(chip::NodeId, chip::FabricIndex)) { mConnectToProviderCallback = f; }
 
 private:
     ExampleOTARequestor();
@@ -60,5 +60,5 @@ private:
     // TODO: This will be redone once the full Requestor app design is in place
     // Pointer to the function that establishes a session with the Provider and initiates
     // the BDX download
-    void (* mConnectToProviderCallback ) (chip::NodeId, chip::FabricIndex);
+    void (*mConnectToProviderCallback)(chip::NodeId, chip::FabricIndex);
 };

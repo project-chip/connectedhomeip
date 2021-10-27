@@ -63,17 +63,16 @@ void ExampleOTARequestor::ConnectToProvider()
 {
 
     if (mConnectToProviderCallback != NULL)
-        {
-            ChipLogProgress(SoftwareUpdate,
-                            "Attempting to connect to 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8,
-                            ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
+    {
+        ChipLogProgress(SoftwareUpdate, "Attempting to connect to 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8,
+                        ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
 
-            mConnectToProviderCallback(mProviderNodeId, mProviderFabricIndex);
-        }
+        mConnectToProviderCallback(mProviderNodeId, mProviderFabricIndex);
+    }
     else
-        {
-            ChipLogError(SoftwareUpdate, "ConnectToProviderCallback is not set");
-        }
+    {
+        ChipLogError(SoftwareUpdate, "ConnectToProviderCallback is not set");
+    }
 }
 
 EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
@@ -92,8 +91,7 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
     mProviderNodeId      = providerLocation;
     mProviderFabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
 
-    ChipLogProgress(SoftwareUpdate,
-                    "Notified of Provider at NodeID: 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8 ,
+    ChipLogProgress(SoftwareUpdate, "Notified of Provider at NodeID: 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8,
                     ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
 
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
