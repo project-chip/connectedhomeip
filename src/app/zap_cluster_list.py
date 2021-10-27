@@ -67,7 +67,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'THERMOSTAT_CLUSTER': ['thermostat-server'],
     'THREAD_NETWORK_DIAGNOSTICS_CLUSTER': ['thread_network_diagnostics_server'],
     'WINDOW_COVERING_CLUSTER': ['window-covering-server'],
-    'THERMOSTAT_UI_CONFIG_CLUSTER': [],
+    'THERMOSTAT_UI_CONFIG_CLUSTER': ['thermostat-user-interface-configuration-server'],
     'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': ['wifi_network_diagnostics_server'],
     'WAKE_ON_LAN_CLUSTER': [],
     'ZLL_COMMISSIONING_CLUSTER': []
