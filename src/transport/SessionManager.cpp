@@ -177,7 +177,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const Encr
         }
 
         // This marks any connection where we send data to as 'active'
-        mPeerConnections.MarkConnectionActive(state);
+        mPeerConnections.MarkSessionActive(state);
 
         destination = &state->GetPeerAddress();
 
@@ -220,25 +220,25 @@ void SessionManager::ExpirePairing(SessionHandle session)
     SecureSession * state = GetSecureSession(session);
     if (state != nullptr)
     {
-        mPeerConnections.MarkConnectionExpired(
-            state, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
+        mPeerConnections.MarkSessionExpired(state,
+                                            [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
     }
 }
 
 void SessionManager::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
 {
-    SecureSession * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
+    SecureSession * state = mPeerConnections.FindSecureSession(peerNodeId, nullptr);
     while (state != nullptr)
     {
         if (fabric == state->GetFabricIndex())
         {
-            mPeerConnections.MarkConnectionExpired(
+            mPeerConnections.MarkSessionExpired(
                 state, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
-            state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
+            state = mPeerConnections.FindSecureSession(peerNodeId, nullptr);
         }
         else
         {
-            state = mPeerConnections.FindPeerConnectionState(peerNodeId, state);
+            state = mPeerConnections.FindSecureSession(peerNodeId, state);
         }
     }
 }
@@ -246,12 +246,12 @@ void SessionManager::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
 void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
 {
     ChipLogDetail(Inet, "Expiring all connections for fabric %d!!", fabric);
-    SecureSession * state = mPeerConnections.FindPeerConnectionStateByFabric(fabric);
+    SecureSession * state = mPeerConnections.FindSecureSessionByFabric(fabric);
     while (state != nullptr)
     {
-        mPeerConnections.MarkConnectionExpired(
-            state, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
-        state = mPeerConnections.FindPeerConnectionStateByFabric(fabric);
+        mPeerConnections.MarkSessionExpired(state,
+                                            [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
+        state = mPeerConnections.FindSecureSessionByFabric(fabric);
     }
 }
 
@@ -260,21 +260,19 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
 {
     uint16_t peerSessionId  = pairing->GetPeerSessionId();
     uint16_t localSessionId = pairing->GetLocalSessionId();
-    SecureSession * state =
-        mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(peerNodeId), localSessionId, nullptr);
+    SecureSession * state   = mPeerConnections.FindSecureSessionByLocalKey(localSessionId, nullptr);
 
     // Find any existing connection with the same local key ID
     if (state)
     {
-        mPeerConnections.MarkConnectionExpired(
-            state, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
+        mPeerConnections.MarkSessionExpired(state,
+                                            [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
     }
 
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", key %d!!", ChipLogValueX64(peerNodeId),
                   peerSessionId);
     state = nullptr;
-    ReturnErrorOnFailure(
-        mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerSessionId, localSessionId, &state));
+    ReturnErrorOnFailure(mPeerConnections.CreateNewSecureSession(peerNodeId, peerSessionId, localSessionId, &state));
     ReturnErrorCodeIf(state == nullptr, CHIP_ERROR_NO_MEMORY);
 
     state->SetFabricIndex(fabric);
@@ -392,7 +390,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    SecureSession * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetSessionId(), nullptr);
+    SecureSession * state = mPeerConnections.FindSecureSessionByLocalKey(packetHeader.GetSessionId(), nullptr);
 
     PayloadHeader payloadHeader;
 
@@ -454,7 +452,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         SuccessOrExit(err);
     }
 
-    mPeerConnections.MarkConnectionActive(state);
+    mPeerConnections.MarkSessionActive(state);
 
     if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {
@@ -576,7 +574,7 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
 #if CHIP_CONFIG_SESSION_REKEYING
     // TODO(#2279): session expiration is currently disabled until rekeying is supported
     // the #ifdef should be removed after that.
-    mgr->mPeerConnections.ExpireInactiveConnections(
+    mgr->mPeerConnections.ExpireInactiveSessions(
         CHIP_PEER_CONNECTION_TIMEOUT_MS, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
@@ -584,8 +582,14 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
 
 SecureSession * SessionManager::GetSecureSession(SessionHandle session)
 {
-    return mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(session.mPeerNodeId),
-                                                              session.mLocalSessionId.ValueOr(0), nullptr);
+    if (session.mLocalSessionId.HasValue())
+    {
+        return mPeerConnections.FindSecureSessionByLocalKey(session.mLocalSessionId.Value(), nullptr);
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 } // namespace chip
