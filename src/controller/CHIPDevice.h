@@ -348,17 +348,19 @@ public:
 
     /**
      * @brief
-     *   Update address of the device.
+     *   Update data of the device.
      *
-     *   This function will set new IP address and port of the device. Since the device settings might
-     *   have been moved from RAM to the persistent storage, the function will load the device settings
-     *   first, before making the changes.
+     *   This function will set new IP address, port and MRP retransmission intervals of the device.
+     *   Since the device settings might have been moved from RAM to the persistent storage, the function
+     *   will load the device settings first, before making the changes.
      *
-     * @param[in] addr   Address of the device to be set.
+     * @param[in] addr                Address of the device to be set.
+     * @param[in] mrpIdleInterval     MRP idle retransmission interval of the device to be set.
+     * @param[in] mrpActiveInterval   MRP active retransmision interval of the device to be set.
      *
-     * @return CHIP_NO_ERROR if the address has been updated, an error code otherwise.
+     * @return CHIP_NO_ERROR if the data has been updated, an error code otherwise.
      */
-    CHIP_ERROR UpdateAddress(const Transport::PeerAddress & addr);
+    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, uint32_t mrpIdleInterval, uint32_t mrpActiveInterval);
     /**
      * @brief
      *   Return whether the current device object is actively associated with a paired CHIP
@@ -383,6 +385,12 @@ public:
     Messaging::ExchangeManager * GetExchangeManager() const { return mExchangeMgr; }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
+
+    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval) const
+    {
+        idleInterval   = mMrpIdleInterval;
+        activeInterval = mMrpActiveInterval;
+    }
 
     PASESessionSerializable & GetPairing() { return mPairing; }
 
@@ -485,6 +493,9 @@ private:
     /** Address used to communicate with the device.
      */
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
+
+    uint32_t mMrpIdleInterval   = CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL;
+    uint32_t mMrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
 
     Inet::InetLayer * mInetLayer = nullptr;
 

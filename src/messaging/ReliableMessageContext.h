@@ -76,12 +76,12 @@ public:
     bool HasPiggybackAckPending() const;
 
     /**
-     *  Get the initial retransmission interval. It would be the time to wait before
+     *  Get the idle retransmission interval. It would be the time to wait before
      *  retransmission after first failure.
      *
-     *  @return the initial retransmission interval.
+     *  @return the idle retransmission interval.
      */
-    uint64_t GetInitialRetransmitTimeoutTick();
+    uint64_t GetIdleRetransmitTimeoutTick();
 
     /**
      *  Get the active retransmit interval. It would be the time to wait before

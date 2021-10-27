@@ -559,7 +559,9 @@ void DeviceController::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & no
         interfaceId = nodeData.mInterfaceId;
     }
 
-    err = device->UpdateAddress(Transport::PeerAddress::UDP(nodeData.mAddress, nodeData.mPort, interfaceId));
+    err = device->UpdateDeviceData(Transport::PeerAddress::UDP(nodeData.mAddress, nodeData.mPort, interfaceId),
+                                   nodeData.GetMrpRetryIntervalIdle().ValueOr(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL),
+                                   nodeData.GetMrpRetryIntervalActive().ValueOr(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL));
     SuccessOrExit(err);
 
     PersistDevice(device);
@@ -693,6 +695,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     Device * device                    = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
+    uint32_t mrpIdleInterval, mrpActiveInterval;
 
     Messaging::ExchangeContext * exchangeCtxt = nullptr;
     Optional<SessionHandle> session;
@@ -788,6 +791,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 #endif
     session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress());
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
+
+    // TODO: In some cases like PASE over IP, CRA and CRI values from commissionable node service should be used
+    device->GetMRPIntervals(mrpIdleInterval, mrpActiveInterval);
+    session.Value().GetUnauthenticatedSession()->SetMRPIntervals(mrpIdleInterval, mrpActiveInterval);
 
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &mPairingSession);
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
