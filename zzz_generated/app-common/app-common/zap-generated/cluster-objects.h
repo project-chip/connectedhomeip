@@ -12084,62 +12084,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace DoorLock
 namespace WindowCovering {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for WcEndProductType
-enum class WcEndProductType : uint8_t
-{
-    kRollerShade               = 0x00,
-    kRomanShade                = 0x01,
-    kBalloonShade              = 0x02,
-    kWovenWood                 = 0x03,
-    kPleatedShade              = 0x04,
-    kCellularShade             = 0x05,
-    kLayeredShade              = 0x06,
-    kLayeredShade2D            = 0x07,
-    kSheerShade                = 0x08,
-    kTiltOnlyInteriorBlind     = 0x09,
-    kInteriorBlind             = 0x0A,
-    kVerticalBlindStripCurtain = 0x0B,
-    kInteriorVenetianBlind     = 0x0C,
-    kExteriorVenetianBlind     = 0x0D,
-    kLateralLeftCurtain        = 0x0E,
-    kLateralRightCurtain       = 0x0F,
-    kCentralCurtain            = 0x10,
-    kRollerShutter             = 0x11,
-    kExteriorVerticalScreen    = 0x12,
-    kAwningTerracePatio        = 0x13,
-    kAwningVerticalScreen      = 0x14,
-    kTiltOnlyPergola           = 0x15,
-    kSwingingShutter           = 0x16,
-    kSlidingShutter            = 0x17,
-    kUnknown                   = 0xFF,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WcEndProductType                     = EmberAfWcEndProductType;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for WcType
-enum class WcType : uint8_t
-{
-    kRollershade               = 0x00,
-    kRollershade2Motor         = 0x01,
-    kRollershadeExterior       = 0x02,
-    kRollershadeExterior2Motor = 0x03,
-    kDrapery                   = 0x04,
-    kAwning                    = 0x05,
-    kShutter                   = 0x06,
-    kTiltBlindTiltOnly         = 0x07,
-    kTiltBlindLiftAndTilt      = 0x08,
-    kProjectorScreen           = 0x09,
-    kUnknown                   = 0xFF,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WcType                               = EmberAfWcType;
-#endif
 
 // Bitmap for WcConfigStatus
 enum class WcConfigStatus : uint8_t

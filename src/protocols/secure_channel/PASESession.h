@@ -269,9 +269,6 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
-    // TODO - Move EstimateTLVStructOverhead to CHIPTLV header file
-    constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }
-
     void CloseExchange();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;

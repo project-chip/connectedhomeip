@@ -21,7 +21,16 @@ limitations under the License.
     <define>WINDOW_COVERING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <!-- TODO: Add feature map once it is supported -->
+    <tag name="LF" description="Lift Control"/>
+    <tag name="TL" description="Tilt Control"/>
+    <tag name="PA" description="Position Aware"/>
+    <tag name="ABS" description="Absolute Positioning"/>
+    <globalAttribute side="server" code="0xFFFC" value="0x0001">
+      <featureBit tag="LF" bit="0">true</featureBit>
+      <featureBit tag="TL" bit="1">false</featureBit>
+      <featureBit tag="PA" bit="2">false</featureBit>
+      <featureBit tag="ABS" bit="3">false</featureBit>
+    </globalAttribute>
     <globalAttribute side="either" code="0xFFFD" value="5"/>
     <!-- Window Covering Information Attribute Set -->
     <attribute side="server" writable="false" code="0x0000" define="WC_TYPE"                                      type="ENUM8"    min="0x00"   max="0x09"   default="0x00"   optional="false">Type</attribute>
@@ -86,7 +95,6 @@ limitations under the License.
 
   <!-- Window Covering Descriptive Enum Set -->
   <enum name="WcType" type="ENUM8">
-    <cluster code="0x0102"/>
     <item value="00" name="Rollershade"/>
     <item value="01" name="Rollershade2Motor"/>
     <item value="02" name="RollershadeExterior"/>
@@ -101,7 +109,6 @@ limitations under the License.
   </enum>
 
   <enum name="WcEndProductType" type="ENUM8">
-    <cluster code="0x0102"/>
     <item value="00" name="RollerShade"/>  
     <item value="01" name="RomanShade"/>
     <item value="02" name="BalloonShade"/>

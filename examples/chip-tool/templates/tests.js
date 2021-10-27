@@ -57,6 +57,7 @@ function getTests()
 
   const OccupancySensing = [
     'Test_TC_OCC_1_1',
+    'Test_TC_OCC_2_1',
   ];
 
   const LevelControl = [
@@ -67,6 +68,12 @@ function getTests()
 
   const MediaControl = [
     'Test_TC_MC_1_1',
+    'Test_TC_MC_3_6',
+    'Test_TC_MC_3_7',
+    'Test_TC_MC_3_8',
+    'Test_TC_MC_3_9',
+    'Test_TC_MC_3_10',
+    'Test_TC_MC_3_11',
   ];
 
   const OnOff = [
@@ -78,10 +85,13 @@ function getTests()
   const PumpConfigurationControl = [
     'Test_TC_PCC_1_1',
     'Test_TC_PCC_2_1',
+    'Test_TC_PCC_2_2',
+    'Test_TC_PCC_2_3',
   ];
 
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
+    'Test_TC_RH_2_1',
   ];
 
   const TemperatureMeasurement = [
