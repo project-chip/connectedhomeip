@@ -32,7 +32,9 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Write the default values to mandatory global attribute: ClusterRevision"
+    - label:
+          "Write the default values to mandatory global attribute:
+          ClusterRevision"
       command: "writeAttribute"
       attribute: "ClusterRevision"
       arguments:
@@ -61,7 +63,8 @@ tests:
           constraints:
               type: list
 
-    - label: "Write the default values to mandatory global attribute: AttributeList"
+    - label:
+          "Write the default values to mandatory global attribute: AttributeList"
       disabled: true
       command: "writeAttribute"
       attribute: "AttributeList"
@@ -92,7 +95,8 @@ tests:
           constraints:
               type: list
 
-    - label: "Write the default values to mandatory global attribute: CommandList"
+    - label:
+          "Write the default values to mandatory global attribute: CommandList"
       disabled: true
       command: "writeAttribute"
       attribute: "CommandList"
