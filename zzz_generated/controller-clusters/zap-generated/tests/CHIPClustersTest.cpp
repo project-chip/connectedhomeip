@@ -1336,6 +1336,16 @@ CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Callback::
         chip::app::AttributePathParams(mEndpoint, mClusterId, FlowMeasurement::Attributes::MaxMeasuredValue::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
+CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeTolerance(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, uint16_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, FlowMeasurement::Attributes::Tolerance::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
 CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -2359,6 +2369,16 @@ CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeMaxMeasuredValu
         value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
+CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeTolerance(Callback::Cancelable * onSuccessCallback,
+                                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, RelativeHumidityMeasurement::Attributes::Tolerance::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
 CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                                  Callback::Cancelable * onFailureCallback,
                                                                                  uint16_t value)
@@ -2579,6 +2599,16 @@ CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Cal
         app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
     ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
         chip::app::AttributePathParams(mEndpoint, mClusterId, TemperatureMeasurement::Attributes::MaxMeasuredValue::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeTolerance(Callback::Cancelable * onSuccessCallback,
+                                                                      Callback::Cancelable * onFailureCallback, uint16_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TemperatureMeasurement::Attributes::Tolerance::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,

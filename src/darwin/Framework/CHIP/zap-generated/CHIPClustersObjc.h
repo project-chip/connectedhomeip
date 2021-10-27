@@ -756,6 +756,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1373,6 +1375,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1502,6 +1510,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 

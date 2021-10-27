@@ -326,6 +326,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeMeasuredValueWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMinMeasuredValueWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMaxMeasuredValueWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeToleranceWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -620,6 +621,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeMeasuredValueWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMinMeasuredValueWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMaxMeasuredValueWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeToleranceWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -695,6 +697,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeMeasuredValueWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMinMeasuredValueWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMaxMeasuredValueWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeToleranceWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end

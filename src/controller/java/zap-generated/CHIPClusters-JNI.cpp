@@ -16529,6 +16529,31 @@ JNI_METHOD(void, FlowMeasurementCluster, readMaxMeasuredValueAttribute)
     onFailure.release();
 }
 
+JNI_METHOD(void, FlowMeasurementCluster, readToleranceAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt16uAttributeCallback>(callback), Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    FlowMeasurementCluster * cppCluster = reinterpret_cast<FlowMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeTolerance(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
 JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -23807,6 +23832,80 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMaxMeasuredValueAttribu
     onFailure.release();
 }
 
+JNI_METHOD(void, RelativeHumidityMeasurementCluster, readToleranceAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt16uAttributeCallback>(callback), Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    RelativeHumidityMeasurementCluster * cppCluster = reinterpret_cast<RelativeHumidityMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeTolerance(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeToleranceAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    RelativeHumidityMeasurementCluster * cppCluster = reinterpret_cast<RelativeHumidityMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->SubscribeAttributeTolerance(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(minInterval),
+                                                  static_cast<uint16_t>(maxInterval));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, RelativeHumidityMeasurementCluster, reportToleranceAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onReport(
+        Platform::New<CHIPInt16uAttributeCallback>(callback, true), Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onReport.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native report callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    RelativeHumidityMeasurementCluster * cppCluster = reinterpret_cast<RelativeHumidityMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReportAttributeTolerance(onReport->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ReturnIllegalStateException(env, callback, "Error registering for attribute reporting", err));
+
+    onReport.release();
+}
+
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -25120,6 +25219,80 @@ JNI_METHOD(void, TemperatureMeasurementCluster, readMaxMeasuredValueAttribute)
 
     onSuccess.release();
     onFailure.release();
+}
+
+JNI_METHOD(void, TemperatureMeasurementCluster, readToleranceAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt16uAttributeCallback>(callback), Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    TemperatureMeasurementCluster * cppCluster = reinterpret_cast<TemperatureMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeTolerance(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, TemperatureMeasurementCluster, subscribeToleranceAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    TemperatureMeasurementCluster * cppCluster = reinterpret_cast<TemperatureMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->SubscribeAttributeTolerance(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(minInterval),
+                                                  static_cast<uint16_t>(maxInterval));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, TemperatureMeasurementCluster, reportToleranceAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onReport(
+        Platform::New<CHIPInt16uAttributeCallback>(callback, true), Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onReport.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native report callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    TemperatureMeasurementCluster * cppCluster = reinterpret_cast<TemperatureMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReportAttributeTolerance(onReport->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ReturnIllegalStateException(env, callback, "Error registering for attribute reporting", err));
+
+    onReport.release();
 }
 
 JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)
