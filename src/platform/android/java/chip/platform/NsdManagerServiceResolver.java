@@ -25,7 +25,9 @@ import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NsdManagerServiceResolver implements ServiceResolver {
   private static final String TAG = NsdManagerServiceResolver.class.getSimpleName();
@@ -33,7 +35,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
   private Handler mainThreadHandler;
-  private List<NsdManager.RegistrationListener> mRegistrationListeners = new ArrayList<>();
+  private List<NsdManager.RegistrationListener> registrationListeners = new ArrayList<>();
 
   public NsdManagerServiceResolver(Context context) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
@@ -116,7 +118,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   }
 
   @Override
-  public boolean publish(
+  public void publish(
       String serviceName,
       String hostName,
       String type,
@@ -156,19 +158,15 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered:");
           }
         };
-    mRegistrationListeners.add(registrationListener);
+    registrationListeners.add(registrationListener);
 
     nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
-
-    return true;
   }
 
   @Override
-  public boolean remove() {
-    for (NsdManager.RegistrationListener l : mRegistrationListeners) {
+  public void removeServices() {
+    for (NsdManager.RegistrationListener l : registrationListeners) {
       nsdManager.unregisterService(l);
     }
-
-    return true;
   }
 }

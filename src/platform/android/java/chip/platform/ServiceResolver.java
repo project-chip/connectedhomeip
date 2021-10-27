@@ -35,10 +35,9 @@ public interface ServiceResolver {
    * Publishes a service via DNS-SD.
    *
    * <p>Calling the function again with the same service name, type, protocol, interface and port
-   * but different text will update the text published. This function will NOT take the ownership of
-   * service->mTextEntries memory.
+   * but different text will update the text published.
    */
-  boolean publish(
+  void publish(
       String serviceName,
       String hostName,
       String type,
@@ -48,5 +47,5 @@ public interface ServiceResolver {
       String[] subTypes);
 
   /** Removes or marks all services being advertised for removal. */
-  boolean remove();
+  void removeServices();
 }

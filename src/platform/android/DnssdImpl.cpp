@@ -41,7 +41,7 @@ jobject sResolverObject     = nullptr;
 jobject sMdnsCallbackObject = nullptr;
 jmethodID sResolveMethod    = nullptr;
 jmethodID sPublishMethod    = nullptr;
-jmethodID sRemoveMethod     = nullptr;
+jmethodID sRemoveServicesMethod     = nullptr;
 } // namespace
 
 // Implemention of functions declared in lib/dnssd/platform/Dnssd.h
@@ -62,10 +62,10 @@ CHIP_ERROR ChipDnssdShutdown()
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
-    VerifyOrReturnError(sResolverObject != nullptr && sRemoveMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sResolverObject != nullptr && sRemoveServicesMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    jboolean jret = env->CallBooleanMethod(sResolverObject, sRemoveMethod);
+    env->CallVoidMethod(sResolverObject, sRemoveServicesMethod);
 
     if (env->ExceptionCheck())
     {
@@ -75,14 +75,7 @@ CHIP_ERROR ChipDnssdRemoveServices()
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
 
-    if (jret)
-    {
-        return CHIP_NO_ERROR;
-    }
-    else
-    {
-        return CHIP_JNI_ERROR_JAVA_ERROR;
-    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
@@ -121,12 +114,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
         env->SetObjectArrayElement(subTypes, i, jniSubType.jniValue());
     }
 
-    jboolean jret = env->CallBooleanMethod(sResolverObject, sPublishMethod, jniName.jniValue(), jniHostName.jniValue(),
+    env->CallVoidMethod(sResolverObject, sPublishMethod, jniName.jniValue(), jniHostName.jniValue(),
                                            jniServiceType.jniValue(), service->mPort, keys, datas, subTypes);
-
-    env->DeleteLocalRef(keys);
-    env->DeleteLocalRef(datas);
-    env->DeleteLocalRef(subTypes);
 
     if (env->ExceptionCheck())
     {
@@ -135,15 +124,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
         env->ExceptionClear();
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
-
-    if (jret)
-    {
-        return CHIP_NO_ERROR;
-    }
-    else
-    {
-        return CHIP_JNI_ERROR_JAVA_ERROR;
-    }
+    
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
@@ -207,17 +189,17 @@ void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
 
     sPublishMethod =
         env->GetMethodID(resolverClass, "publish",
-                         "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I[Ljava/lang/String;[[B[Ljava/lang/String;)Z");
+                         "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I[Ljava/lang/String;[[B[Ljava/lang/String;)V");
     if (sPublishMethod == nullptr)
     {
         ChipLogError(Discovery, "Failed to access Resolver 'publish' method");
         env->ExceptionClear();
     }
 
-    sRemoveMethod = env->GetMethodID(resolverClass, "remove", "()Z");
-    if (sRemoveMethod == nullptr)
+    sRemoveServicesMethod = env->GetMethodID(resolverClass, "removeServices", "()V");
+    if (sRemoveServicesMethod == nullptr)
     {
-        ChipLogError(Discovery, "Failed to access Resolver 'remove' method");
+        ChipLogError(Discovery, "Failed to access Resolver 'removeServices' method");
         env->ExceptionClear();
     }
 }
