@@ -84,10 +84,11 @@ inline CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
  * CHIP_ERROR <Object>::Decode(TLVReader &reader);
  *
  */
-template <
-    typename X,
-    typename std::enable_if_t<
-        std::is_class<X>::value && std::is_same<decltype(&X::Decode), CHIP_ERROR (X::*)(TLV::TLVReader &)>::value, X> * = nullptr>
+template <typename X,
+          typename std::enable_if_t<
+              std::is_class<X>::value &&
+                  std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>())), CHIP_ERROR>::value,
+              X> * = nullptr>
 CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 {
     return x.Decode(reader);
