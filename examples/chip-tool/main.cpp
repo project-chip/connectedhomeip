@@ -21,6 +21,7 @@
 #include "commands/discover/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
+#include "commands/multicast/Commands.h"
 
 #include <zap-generated/cluster/Commands.h>
 #include <zap-generated/reporting/Commands.h>
@@ -37,6 +38,7 @@ int main(int argc, char * argv[])
     registerCommandsPairing(commands);
     registerCommandsReporting(commands);
     registerCommandsTests(commands);
+    registerCommandsMulticast(commands);
     registerClusters(commands);
 
     return commands.Run(argc, argv);
