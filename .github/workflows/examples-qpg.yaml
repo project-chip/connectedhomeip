@@ -40,7 +40,6 @@ jobs:
             image: connectedhomeip/chip-build:0.5.22
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/output_binaries:/tmp/output_binaries"
         steps:
             - name: Checkout
               uses: actions/checkout@v2
@@ -86,24 +85,6 @@ jobs:
               timeout-minutes: 5
               run: |
                   config/qpg/chip-gn/build.sh
-            - name: Binary artifact suffix
-              id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
-              if: ${{ !env.ACT }}
-              with:
-                  cond: ${{ github.event.pull_request.number == '' }}
-                  if_true: "${{ github.sha }}"
-                  if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Uploading Binaries
-              uses: actions/upload-artifact@v2
-              if: ${{ !env.ACT }}
-              with:
-                  name:
-                      ${{ env.BUILD_TYPE }}-example-build-${{
-                      steps.outsuffix.outputs.value }}
-                  path: |
-                      out/lighting_app_debug/chip-qpg6100-lighting-example.out
-                      out/lighting_app_debug/chip-qpg6100-lighting-example.out.map
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}

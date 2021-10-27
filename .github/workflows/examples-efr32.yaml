@@ -41,7 +41,6 @@ jobs:
             image: connectedhomeip/chip-build-efr32:latest
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/output_binaries:/tmp/output_binaries"
         steps:
             - name: Checkout
               uses: actions/checkout@v2
@@ -83,26 +82,6 @@ jobs:
                   scripts/examples/gn_efr32_example.sh examples/window-app/efr32/ out/window_app_debug BRD4161A
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A window-app \
                     out/window_app_debug/BRD4161A/chip-efr32-window-example.out /tmp/bloat_reports/
-            - name: Binary artifact suffix
-              id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
-              if: ${{ !env.ACT }}
-              with:
-                  cond: ${{ github.event.pull_request.number == '' }}
-                  if_true: "${{ github.sha }}"
-                  if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Uploading Binaries
-              uses: actions/upload-artifact@v2
-              if: ${{ !env.ACT }}
-              with:
-                  name:
-                      ${{ env.BUILD_TYPE }}-example-build-${{
-                      steps.outsuffix.outputs.value }}
-                  path: |
-                      out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out
-                      out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out.map
-                      out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out
-                      out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out.map
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
