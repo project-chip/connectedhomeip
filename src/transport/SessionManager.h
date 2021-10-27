@@ -313,8 +313,12 @@ private:
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param);
 
-    void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                               System::PacketBufferHandle && msg);
+    void SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                      System::PacketBufferHandle && msg);
+
+    void SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                    System::PacketBufferHandle && msg);
+
     void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                          System::PacketBufferHandle && msg);
 

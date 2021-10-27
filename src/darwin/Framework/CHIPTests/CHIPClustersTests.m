@@ -12196,6 +12196,28 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTestIdentifyCluster_000000_Identify
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Identify command and expect success response"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t identifyTimeArgument = 0U;
+    [cluster identify:identifyTimeArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Identify command and expect success response Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTestOperationalCredentialsCluster_000000_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read number of supported fabrics"];

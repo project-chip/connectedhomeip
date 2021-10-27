@@ -20,6 +20,7 @@
 #include <lib/core/CHIPError.h>
 #include <stdint.h>
 #include <sys/types.h>
+#include <transport/raw/MessageHeader.h>
 
 namespace chip {
 namespace Credentials {
@@ -197,6 +198,9 @@ public:
 
     // Fabrics
     virtual CHIP_ERROR RemoveFabric(chip::FabricIndex fabric_index) = 0;
+
+    // General
+    virtual CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle && msg) = 0;
 
     // Listener
     void SetListener(GroupListener * listener) { mListener = listener; };

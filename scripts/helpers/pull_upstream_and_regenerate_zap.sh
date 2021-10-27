@@ -18,10 +18,7 @@ scripts/tools/zap_regen_all.py
 
 git status
 
-git add zzz_generated/*
-git add src/darwin/Framework/*
-git add src/controller/python/chip/clusters/*
-git add src/controller/java/zap-generated/*
+git add .
 
 git status
 
