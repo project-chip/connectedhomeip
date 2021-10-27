@@ -31,9 +31,9 @@ typedef uint32_t Type;
  * Suffix 0x0000 - 0xFFFE : Item 0 to 65534
  * Suffix 0xFFFF          : Wildcard
  */
-constexpr Type kSuffixMask           = 0x0000'FFFF;
-constexpr Type kPrefixMask           = 0xFFFF'0000;
-constexpr Type kWildcard             = 0xFFFF'FFFF;
+constexpr Type kSuffixMask = 0x0000'FFFF;
+constexpr Type kPrefixMask = 0xFFFF'0000;
+constexpr Type kWildcard   = 0xFFFF'FFFF;
 
 constexpr SuffixType GetSuffix(Type id)
 {
