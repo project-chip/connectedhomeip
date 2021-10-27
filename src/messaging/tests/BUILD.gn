@@ -45,8 +45,12 @@ chip_test_suite("tests") {
   sources = [
     "TestExchangeMgr.cpp",
     "TestMessagingLayer.h",
-    "TestReliableMessageProtocol.cpp",
   ]
+
+  if (chip_device_platform != "efr32") {
+    # TODO(#10447): Test has HF on EFR32.
+    sources += [ "TestReliableMessageProtocol.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 

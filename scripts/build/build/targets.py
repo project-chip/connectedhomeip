@@ -144,6 +144,7 @@ def Efr32Targets():
 
     yield efr_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
     yield efr_target.Extend('lock', app=Efr32App.LOCK)
+    yield efr_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
 
     rpc_aware_targets = [
         efr_target.Extend('light', app=Efr32App.LIGHT),

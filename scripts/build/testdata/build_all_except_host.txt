@@ -121,6 +121,9 @@ gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '
 # Generating efr32-brd4161a-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-lock
 
+# Generating efr32-brd4161a-unit-test
+gn gen --check --fail-on-unused-args --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-unit-test
+
 # Generating efr32-brd4161a-window-covering
 gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
 
@@ -545,6 +548,9 @@ ninja -C {out}/efr32-brd4161a-light-rpc
 
 # Building efr32-brd4161a-lock
 ninja -C {out}/efr32-brd4161a-lock
+
+# Building efr32-brd4161a-unit-test
+ninja -C {out}/efr32-brd4161a-unit-test
 
 # Building efr32-brd4161a-window-covering
 ninja -C {out}/efr32-brd4161a-window-covering
