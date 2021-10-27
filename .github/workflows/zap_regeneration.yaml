@@ -22,8 +22,8 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    zap_templates:
-        name: ZAP templates generation
+    zap_regeneration:
+        name: ZAP Regeneration
         timeout-minutes: 60
 
         runs-on: ubuntu-18.04
