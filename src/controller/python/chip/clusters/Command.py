@@ -35,10 +35,12 @@ class CommandPath:
     ClusterId: int
     CommandId: int
 
+
 @dataclass
 class Status:
     IMStatus: int
     ClusterStatus: int
+
 
 def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
     ''' Locates the right generated cluster object given a set of parameters.
