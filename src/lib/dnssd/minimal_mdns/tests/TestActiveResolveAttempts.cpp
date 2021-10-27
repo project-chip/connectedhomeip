@@ -152,10 +152,10 @@ void TestLRU(nlTestSuite * inSuite, void * inContext)
     }
 
     // +2 because: 1 element skipped, one element is the "current" that has a delay of 1000ms
-    NL_TEST_ASSERT(
-        inSuite,
-        attempts.GetTimeUntilNextExpectedResponse() ==
-            Optional<System::Clock::Timeout>::Value(System::Clock::Milliseconds32(1000 - mdns::Minimal::ActiveResolveAttempts::kRetryQueueSize + 2)));
+    NL_TEST_ASSERT(inSuite,
+                   attempts.GetTimeUntilNextExpectedResponse() ==
+                       Optional<System::Clock::Timeout>::Value(
+                           System::Clock::Milliseconds32(1000 - mdns::Minimal::ActiveResolveAttempts::kRetryQueueSize + 2)));
 
     // add another element - this should overwrite peer 9999
     attempts.MarkPending(MakePeerId(mdns::Minimal::ActiveResolveAttempts::kRetryQueueSize));
