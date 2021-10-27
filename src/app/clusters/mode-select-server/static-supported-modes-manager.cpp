@@ -34,18 +34,17 @@ const map<EndpointId, Span<storage_value_type>> StaticSupportedModesManager::opt
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
-const StaticSupportedModesManager::IteratorFactory *
-StaticSupportedModesManager::getIteratorFactory(EndpointId endpointId) const
+const StaticSupportedModesManager::IteratorFactory * StaticSupportedModesManager::getIteratorFactory(EndpointId endpointId) const
 {
-    const auto& it = _iteratorFactoriesByEndpoints.find(endpointId);
+    const auto & it = _iteratorFactoriesByEndpoints.find(endpointId);
     return (it == _iteratorFactoriesByEndpoints.end()) ? nullptr : &(it->second);
 }
 
 EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointId, unsigned char mode,
-                                                                  const ModeOptionStructType *& dataPtr) const
+                                                               const ModeOptionStructType *& dataPtr) const
 {
-    auto* iteratorFactory = this->getIteratorFactory(endpointId);
-    if(iteratorFactory == nullptr)
+    auto * iteratorFactory = this->getIteratorFactory(endpointId);
+    if (iteratorFactory == nullptr)
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
     }

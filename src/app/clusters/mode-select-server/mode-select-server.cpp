@@ -56,12 +56,12 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
     }
 
     const ModeSelectCluster::StaticSupportedModesManager & gSupportedModeManager =
-    ModeSelectCluster::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
+        ModeSelectCluster::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
 
     if (ModeSelectCluster::Attributes::SupportedModes::Id == aPath.mAttributeId)
     {
-        const ModeSelectCluster::StaticSupportedModesManager::IteratorFactory* iteratorFactory =
-        gSupportedModeManager.getIteratorFactory(aPath.mEndpointId);
+        const ModeSelectCluster::StaticSupportedModesManager::IteratorFactory * iteratorFactory =
+            gSupportedModeManager.getIteratorFactory(aPath.mEndpointId);
         if (iteratorFactory == nullptr)
         {
             aEncoder.Encode(DataModel::List<ModeSelectCluster::Structs::ModeOptionStruct::Type>());
@@ -73,8 +73,8 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
             for (auto it = *(iteratorFactory->begin()); it != end; ++it)
             {
                 emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectCluster: dereferencing it");
-                emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectCluster: it= %p", (void*) it.operator->());
-                auto& modeOption = *it;
+                emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectCluster: it= %p", (void *) it.operator->());
+                auto & modeOption = *it;
                 ReturnErrorOnFailure(encoder.Encode(modeOption));
             }
             return CHIP_NO_ERROR;
@@ -96,7 +96,7 @@ bool emberAfModeSelectClusterClusterChangeToModeCallback(
     // Check that the newMode matches one of the supported options
     const ModeSelectCluster::Structs::ModeOptionStruct::Type * modeOptionPtr;
     const ModeSelectCluster::StaticSupportedModesManager & gSupportedModeManager =
-    ModeSelectCluster::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
+        ModeSelectCluster::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
     EmberAfStatus checkSupportedModeStatus = gSupportedModeManager.getModeOptionByMode(endpointId, newMode, modeOptionPtr);
     if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
     {
