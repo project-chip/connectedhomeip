@@ -1,11 +1,11 @@
 # Visual Studio Code Development
 
 [Visual Studio Code](https://code.visualstudio.com/) is a great and simple IDE
-that can be used to build & develop with for CHIP.
+that can be used to build & develop with for Matter.
 
-CHIP supports the docker / remote container workflow in Visual Studio Code, and
-has a container environment setup automatically. You can read more about this
-workflow [here](https://code.visualstudio.com/docs/remote/containers).
+Matter supports the docker / remote container workflow in Visual Studio Code,
+and has a container environment setup automatically. You can read more about
+this workflow [here](https://code.visualstudio.com/docs/remote/containers).
 
 Tested on:
 
@@ -26,7 +26,7 @@ Tested on:
 1. Install [Git](https://git-scm.com/) if you haven't already
 1. _Windows Only_ Enable git to use LF instead of CLRF by default:
    `git config --global core.autocrlf false`
-1. Git clone the main CHIP repository here:
+1. Git clone the main Matter repository here:
    <https://github.com/project-chip/connectedhomeip>
 1. Launch Visual Studio Code, and open the cloned folder from
 1. Install the
@@ -42,7 +42,7 @@ Tested on:
    to use Bash on Ubuntu (on Windows) eg:
    `"terminal.integrated.shell.windows": "C:\\Windows\\System32\\bash.exe"`
 1. Now your local machine is building a docker image that has all the tools
-   necessary to build and test CHIP. This can take some time, but will
+   necessary to build and test Matter. This can take some time, but will
    eventually complete and open up the source tree
 
 ## Bootstrapping your source tree (one time)

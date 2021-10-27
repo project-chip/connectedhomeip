@@ -222,6 +222,38 @@ function chip_cluster_command_arguments(options)
 }
 
 /**
+ * Creates block iterator over the current command arguments for a given cluster/side.
+ *
+ * This function is meant to be used inside a {{#chip_cluster_commands}}
+ * block. It will throw otherwise.
+ *
+ * The arguments list built by this function differs from {{chip_cluster_command_arguments}}.
+ * For example, if a command contains a single struct argument "SomeStruct", with the following type:
+ *
+ * struct SomeStruct {
+ *   uint8_t a;
+ *   uint16_t b;
+ *   uint32_t c;
+ * }
+ *
+ * then that argument will be expanded into 3 arguments (uint8_t a, uint16_t b, uint32_t c).
+ *
+ * @param {*} options
+ */
+function chip_cluster_command_arguments_with_structs_expanded(options)
+{
+  const commandId = checkIsInsideCommandBlock(this, 'chip_cluster_command_arguments');
+  const commands  = getCommands.call(this.parent, 'chip_cluster_commands_argments_with_structs_expanded');
+
+  const filter = command => command.id == commandId;
+  return asBlocks.call(this, commands.then(items => {
+    const item = items.find(filter);
+    return item.expandedArguments || item.arguments;
+  }),
+      options);
+}
+
+/**
  * Creates block iterator over the current response arguments for a given cluster/side.
  *
  * This function is meant to be used inside a {{#chip_cluster_responses}}
@@ -316,21 +348,36 @@ function chip_available_cluster_commands(options)
   return promise;
 }
 
+/**
+ * Checks whether a type is an enum for purposes of its chipType.  That includes
+ * both spec-defined enum types and types that we map to enum types in our code.
+ */
+function if_chip_enum(type, options)
+{
+  if (type.toLowerCase() == 'vendor_id') {
+    return options.fn(this);
+  }
+
+  return zclHelper.if_is_enum.call(this, type, options);
+}
+
 //
 // Module exports
 //
-exports.chip_clusters                   = chip_clusters;
-exports.chip_has_clusters               = chip_has_clusters;
-exports.chip_client_clusters            = chip_client_clusters;
-exports.chip_has_client_clusters        = chip_has_client_clusters;
-exports.chip_server_clusters            = chip_server_clusters;
-exports.chip_has_server_clusters        = chip_has_server_clusters;
-exports.chip_cluster_commands           = chip_cluster_commands;
-exports.chip_cluster_command_arguments  = chip_cluster_command_arguments;
-exports.chip_server_global_responses    = chip_server_global_responses;
-exports.chip_cluster_responses          = chip_cluster_responses;
-exports.chip_cluster_response_arguments = chip_cluster_response_arguments
-exports.chip_attribute_list_entryTypes  = chip_attribute_list_entryTypes;
-exports.chip_server_cluster_attributes  = chip_server_cluster_attributes;
-exports.chip_server_has_list_attributes = chip_server_has_list_attributes;
-exports.chip_available_cluster_commands = chip_available_cluster_commands;
+exports.chip_clusters                                        = chip_clusters;
+exports.chip_has_clusters                                    = chip_has_clusters;
+exports.chip_client_clusters                                 = chip_client_clusters;
+exports.chip_has_client_clusters                             = chip_has_client_clusters;
+exports.chip_server_clusters                                 = chip_server_clusters;
+exports.chip_has_server_clusters                             = chip_has_server_clusters;
+exports.chip_cluster_commands                                = chip_cluster_commands;
+exports.chip_cluster_command_arguments                       = chip_cluster_command_arguments;
+exports.chip_cluster_command_arguments_with_structs_expanded = chip_cluster_command_arguments_with_structs_expanded;
+exports.chip_server_global_responses                         = chip_server_global_responses;
+exports.chip_cluster_responses                               = chip_cluster_responses;
+exports.chip_cluster_response_arguments                      = chip_cluster_response_arguments
+exports.chip_attribute_list_entryTypes                       = chip_attribute_list_entryTypes;
+exports.chip_server_cluster_attributes                       = chip_server_cluster_attributes;
+exports.chip_server_has_list_attributes                      = chip_server_has_list_attributes;
+exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
+exports.if_chip_enum                                         = if_chip_enum;

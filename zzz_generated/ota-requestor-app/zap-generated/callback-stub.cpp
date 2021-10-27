@@ -38,6 +38,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_OTA_PROVIDER_CLUSTER_ID:
         emberAfOtaSoftwareUpdateProviderClusterInitCallback(endpoint);
         break;
+    case ZCL_OTA_REQUESTOR_CLUSTER_ID:
+        emberAfOtaSoftwareUpdateRequestorClusterInitCallback(endpoint);
+        break;
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
         break;
@@ -58,6 +61,11 @@ void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(Endpoi
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -184,92 +192,6 @@ emberAfAttributeWriteAccessCallback(EndpointId endpoint, ClusterId clusterId, ui
  * detected in the received command.  Ver.: always
  */
 bool __attribute__((weak)) emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, EmberAfStatus status)
-{
-    return false;
-}
-
-/** @brief Discover Attributes Response
- *
- * This function is called by the application framework when a Discover
- * Attributes Response or Discover Attributes Extended Response command is
- * received from an external device.  The Discover Attributes Response command
- * contains a bool indicating if discovery is complete and a list of zero or
- * more attribute identifier/type records. The final argument indicates whether
- * the response is in the extended format or not.  The application should return
- * true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param discoveryComplete Indicates whether there are more attributes to be
- * discovered.  true if there are no more attributes to be discovered.  Ver.:
- * always
- * @param buffer Buffer containing the list of attribute identifier/type
- * records.  Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- * @param extended Indicates whether the response is in the extended format or
- * not.  Ver.: always
- */
-bool __attribute__((weak)) emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discoveryComplete, uint8_t * buffer,
-                                                                     uint16_t bufLen, bool extended)
-{
-    return false;
-}
-
-/** @brief Discover Commands Generated Response
- *
- * This function is called by the framework when Discover Commands Generated
- * Response is received.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param manufacturerCode Manufacturer code  Ver.: always
- * @param discoveryComplete Indicates whether there are more commands to be
- * discovered.  Ver.: always
- * @param commandIds Buffer containing the list of command identifiers.  Ver.:
- * always
- * @param commandIdCount The length of bytes of the list, whish is the same as
- * the number of identifiers.  Ver.: always
- */
-bool __attribute__((weak))
-emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
-                                                 CommandId * commandIds, uint16_t commandIdCount)
-{
-    return false;
-}
-
-/** @brief Discover Commands Received Response
- *
- * This function is called by the framework when Discover Commands Received
- * Response is received.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param manufacturerCode Manufacturer code  Ver.: always
- * @param discoveryComplete Indicates whether there are more commands to be
- * discovered.  Ver.: always
- * @param commandIds Buffer containing the list of command identifiers.  Ver.:
- * always
- * @param commandIdCount The length of bytes of the list, whish is the same as
- * the number of identifiers.  Ver.: always
- */
-bool __attribute__((weak))
-emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
-                                                CommandId * commandIds, uint16_t commandIdCount)
-{
-    return false;
-}
-
-/** @brief Pre Command Received
- *
- * This callback is the second in the Application Framework's message processing
- * chain. At this point in the processing of incoming over-the-air messages, the
- * application has determined that the incoming message is a ZCL command. It
- * parses enough of the message to populate an EmberAfClusterCommand struct. The
- * Application Framework defines this struct value in a local scope to the
- * command processing but also makes it available through a global pointer
- * called emberAfCurrentCommand, in app/framework/util/util.c. When command
- * processing is complete, this pointer is cleared.
- *
- * @param cmd   Ver.: always
- */
-bool __attribute__((weak)) emberAfPreCommandReceivedCallback(EmberAfClusterCommand * cmd)
 {
     return false;
 }

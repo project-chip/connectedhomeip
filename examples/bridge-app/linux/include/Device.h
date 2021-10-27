@@ -18,13 +18,7 @@
 
 #pragma once
 
-//#include <zap-generated/attribute-id.h>
-//#include <zap-generated/cluster-id.h>
-//#include <app/chip-zcl-zpro-codec.h>
-//#include <app/util/af-types.h>
-//#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
-//#include <app/util/util.h>
 
 #include <stdbool.h>
 #include <stdint.h>

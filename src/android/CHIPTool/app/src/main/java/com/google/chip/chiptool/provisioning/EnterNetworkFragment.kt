@@ -36,11 +36,17 @@ import kotlinx.android.synthetic.main.enter_thread_network_fragment.xpanIdEd
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.pwdEd
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.ssidEd
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.view.saveNetworkBtn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 /**
  * Fragment to collect Wi-Fi network information from user and send it to device being provisioned.
  */
 class EnterNetworkFragment : Fragment() {
+
+  private val scope = CoroutineScope(Dispatchers.Main + Job())
 
   private val networkType: ProvisionNetworkType
     get() = requireNotNull(
@@ -58,7 +64,7 @@ class EnterNetworkFragment : Fragment() {
     }
 
     if (USE_HARDCODED_WIFI) {
-      saveHardcodedWifiNetwork()
+      scope.launch { saveHardcodedWifiNetwork() }
     }
 
     return inflater.inflate(layoutRes, container, false).apply {
@@ -68,17 +74,17 @@ class EnterNetworkFragment : Fragment() {
 
   private fun onSaveNetworkClicked() {
     if (networkType == ProvisionNetworkType.WIFI) {
-      saveWifiNetwork()
+      scope.launch { saveWifiNetwork() }
     } else {
-      saveThreadNetwork()
+      scope.launch { saveThreadNetwork() }
     }
   }
 
-  private fun saveHardcodedWifiNetwork() {
+  private suspend fun saveHardcodedWifiNetwork() {
     addAndEnableWifiNetwork(HARDCODED_WIFI_SSID, HARDCODED_WIFI_PASSWORD)
   }
 
-  private fun saveWifiNetwork() {
+  private suspend fun saveWifiNetwork() {
     val ssid = ssidEd?.text
     val pwd = pwdEd?.text
 
@@ -90,13 +96,13 @@ class EnterNetworkFragment : Fragment() {
     addAndEnableWifiNetwork(ssid.toString(), pwd.toString())
   }
 
-  private fun addAndEnableWifiNetwork(ssid: String, password: String) {
+  private suspend fun addAndEnableWifiNetwork(ssid: String, password: String) {
     // Uses UTF-8 as default
     val ssidBytes = ssid.toByteArray()
     val pwdBytes = password.toByteArray()
 
-    val devicePtr = ChipClient.getDeviceController(requireContext())
-      .getDevicePointer(DeviceIdUtil.getLastDeviceId(requireContext()))
+    val devicePtr =
+      ChipClient.getConnectedDevicePointer(requireContext(), DeviceIdUtil.getLastDeviceId(requireContext()))
     val cluster = NetworkCommissioningCluster(devicePtr, /* endpointId = */ 0)
 
     val enableNetworkCallback = object :
@@ -150,7 +156,7 @@ class EnterNetworkFragment : Fragment() {
     }, ssidBytes, pwdBytes, /* breadcrumb = */ 0L, ADD_NETWORK_TIMEOUT)
   }
 
-  private fun saveThreadNetwork() {
+  private suspend fun saveThreadNetwork() {
     val channelStr = channelEd.text
     val panIdStr = panIdEd.text
 
@@ -186,8 +192,8 @@ class EnterNetworkFragment : Fragment() {
       return
     }
 
-    val devicePtr = ChipClient.getDeviceController(requireContext())
-      .getDevicePointer(DeviceIdUtil.getLastDeviceId(requireContext()))
+    val devicePtr =
+      ChipClient.getConnectedDevicePointer(requireContext(), DeviceIdUtil.getLastDeviceId(requireContext()))
     val cluster = NetworkCommissioningCluster(devicePtr, /* endpointId = */ 0)
 
     val operationalDataset = makeThreadOperationalDataset(

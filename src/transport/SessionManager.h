@@ -265,11 +265,8 @@ public:
 
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress)
     {
-        Transport::UnauthenticatedSession * session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
-        if (session == nullptr)
-            return Optional<SessionHandle>::Missing();
-
-        return Optional<SessionHandle>::Value(SessionHandle(Transport::UnauthenticatedSessionHandle(*session)));
+        Optional<Transport::UnauthenticatedSessionHandle> session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
+        return session.HasValue() ? MakeOptional<SessionHandle>(session.Value()) : NullOptional;
     }
 
 private:
@@ -316,8 +313,12 @@ private:
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param);
 
-    void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                               System::PacketBufferHandle && msg);
+    void SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                      System::PacketBufferHandle && msg);
+
+    void SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                    System::PacketBufferHandle && msg);
+
     void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                          System::PacketBufferHandle && msg);
 

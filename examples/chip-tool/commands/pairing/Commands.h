@@ -26,12 +26,6 @@ public:
     Unpair() : PairingCommand("unpair", PairingMode::None, PairingNetworkType::None) {}
 };
 
-class PairBypass : public PairingCommand
-{
-public:
-    PairBypass() : PairingCommand("bypass", PairingMode::Bypass, PairingNetworkType::None) {}
-};
-
 class PairQRCode : public PairingCommand
 {
 public:
@@ -159,7 +153,6 @@ void registerCommandsPairing(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<Unpair>(),
-        make_unique<PairBypass>(),
         make_unique<PairQRCode>(),
         make_unique<PairManualCode>(),
         make_unique<PairBleWiFi>(),

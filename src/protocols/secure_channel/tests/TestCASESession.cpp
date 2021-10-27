@@ -405,6 +405,10 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     PacketHeader header;
     MessageAuthenticationCode mac;
 
+    header.SetSessionId(1);
+    NL_TEST_ASSERT(inSuite, header.IsEncrypted() == true);
+    NL_TEST_ASSERT(inSuite, header.MICTagLength() == 16);
+
     // Let's try encrypting using original session, and decrypting using deserialized
     {
         CryptoContext session1;
@@ -688,9 +692,9 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
 
     gTransportMgr.Init(&gLoopback);
-    ReturnErrorOnFailure(gIOContext.Init(&sSuite));
+    ReturnErrorOnFailure(gIOContext.Init());
 
-    ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr, &gIOContext));
+    ReturnErrorOnFailure(ctx.Init(&gTransportMgr, &gIOContext));
 
     ctx.SetBobNodeId(kPlaceholderNodeId);
     ctx.SetAliceNodeId(kPlaceholderNodeId);

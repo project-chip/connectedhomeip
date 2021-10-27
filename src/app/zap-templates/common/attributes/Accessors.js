@@ -31,10 +31,6 @@ function isUnsupportedType(type)
 
 function canHaveSimpleAccessors(type)
 {
-  if (StringHelper.isString(type)) {
-    return false;
-  }
-
   if (ListHelper.isList(type)) {
     return false;
   }

@@ -32,16 +32,19 @@ public:
     {
         delete onReportBinaryInputBasicPresentValueCallback;
         delete onReportBinaryInputBasicStatusFlagsCallback;
+        delete onReportBooleanStateStateValueCallback;
         delete onReportColorControlCurrentHueCallback;
         delete onReportColorControlCurrentSaturationCallback;
         delete onReportColorControlCurrentXCallback;
         delete onReportColorControlCurrentYCallback;
         delete onReportColorControlColorTemperatureCallback;
         delete onReportDoorLockLockStateCallback;
+        delete onReportIlluminanceMeasurementMeasuredValueCallback;
         delete onReportLevelControlCurrentLevelCallback;
         delete onReportOccupancySensingOccupancyCallback;
         delete onReportOnOffOnOffCallback;
         delete onReportPressureMeasurementMeasuredValueCallback;
+        delete onReportPumpConfigurationAndControlPumpStatusCallback;
         delete onReportPumpConfigurationAndControlCapacityCallback;
         delete onReportRelativeHumidityMeasurementMeasuredValueCallback;
         delete onReportSwitchCurrentPositionCallback;
@@ -64,6 +67,8 @@ public:
                                        BasicAttributeFilter<BooleanAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x000F, 0x006F, onReportBinaryInputBasicStatusFlagsCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0045, 0x0000, onReportBooleanStateStateValueCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0000, onReportColorControlCurrentHueCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0001,
@@ -77,6 +82,9 @@ public:
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0000, onReportDoorLockLockStateCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0400, 0x0000,
+                                       onReportIlluminanceMeasurementMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0000, onReportLevelControlCurrentLevelCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0406, 0x0000, onReportOccupancySensingOccupancyCallback->Cancel(),
@@ -86,6 +94,9 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0403, 0x0000,
                                        onReportPressureMeasurementMeasuredValueCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0010,
+                                       onReportPumpConfigurationAndControlPumpStatusCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0013,
                                        onReportPumpConfigurationAndControlCapacityCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
@@ -161,6 +172,8 @@ private:
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportBinaryInputBasicStatusFlagsCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<BooleanAttributeCallback> * onReportBooleanStateStateValueCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentHueCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentSaturationCallback =
@@ -173,6 +186,8 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportDoorLockLockStateCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportIlluminanceMeasurementMeasuredValueCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportOccupancySensingOccupancyCallback =
@@ -181,6 +196,8 @@ private:
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportPressureMeasurementMeasuredValueCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlPumpStatusCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlCapacityCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementMeasuredValueCallback =

@@ -95,19 +95,16 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SuccessOrExit(err);
 
     // Init transport before operations with secure session mgr.
-    err = mTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(IPAddressType::kIPAddressType_IPv6)
-                               .SetListenPort(mSecuredServicePort)
+    err = mTransports.Init(
+        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(IPAddressType::kIPv6).SetListenPort(mSecuredServicePort)
 
 #if INET_CONFIG_ENABLE_IPV4
-                               ,
-                           UdpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(IPAddressType::kIPAddressType_IPv4)
-                               .SetListenPort(mSecuredServicePort)
+            ,
+        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(IPAddressType::kIPv4).SetListenPort(mSecuredServicePort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                               ,
-                           BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
+            ,
+        BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
 #endif
     );
 
@@ -205,7 +202,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
 
     CHIP_ERROR err;
-    char nameBuffer[chip::Dnssd::kMaxInstanceNameSize + 1];
+    char nameBuffer[chip::Dnssd::Commissionable::kInstanceNameMaxLength + 1];
     err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {

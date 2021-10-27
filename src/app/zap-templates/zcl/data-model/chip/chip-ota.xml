@@ -99,8 +99,8 @@ limitations under the License.
         <attribute side="server" code="0x0002" define="UPDATE_POSSIBLE"      type="BOOLEAN"                  writable="false" optional="false">update possible</attribute>
         <command source="client" code="0" name="AnnounceOtaProvider" optional="true" cli="chip ota announceotaprovider">
             <description>Notify OTA Provider that an update was applied</description>
-            <arg name="providerLocation" type="OCTET_STRING" length="16"/>
-            <arg name="vendorId" type="INT16U"/>
+            <arg name="providerLocation" type="NODE_ID"/>
+            <arg name="vendorId" type="VENDOR_ID"/>
             <arg name="announcementReason" type="OTAAnnouncementReason"/>
             <arg name="metadataForNode" type="OCTET_STRING" length="512" optional="true"/>
         </command>

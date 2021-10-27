@@ -293,7 +293,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: 0x%p", ChipLogValueExchange(ec),
                       ec->GetDelegate());
 
-        if (ec->IsEncryptionRequired() != packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
+        if (ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
         {
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
             ec->Close();
@@ -325,7 +325,7 @@ void ExchangeManager::OnConnectionExpired(SessionHandle session)
     }
 
     mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->mSecureSession.HasValue() && ec->mSecureSession.Value() == session)
+        if (ec->mSession.HasValue() && ec->mSession.Value() == session)
         {
             ec->OnConnectionExpired();
             // Continue to iterate because there can be multiple exchanges

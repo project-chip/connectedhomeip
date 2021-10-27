@@ -209,11 +209,11 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * ar
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartChipTimer(uint32_t aMilliseconds)
+CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartChipTimer(System::Clock::Timeout delay)
 {
     mChipTimerActive = true;
     vTaskSetTimeOutState(&mNextTimerBaseTime);
-    mNextTimerDurationTicks = pdMS_TO_TICKS(aMilliseconds);
+    mNextTimerDurationTicks = pdMS_TO_TICKS(System::Clock::Milliseconds64(delay).count());
 
     // If the platform timer is being updated by a thread other than the event loop thread,
     // trigger the event loop thread to recalculate its wait time by posting a no-op event

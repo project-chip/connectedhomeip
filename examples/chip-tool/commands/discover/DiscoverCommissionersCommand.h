@@ -27,8 +27,8 @@ public:
     DiscoverCommissionersCommand() : CHIPCommand("commissioners") {}
 
     /////////// CHIPCommand Interface /////////
-    CHIP_ERROR Run(NodeId remoteId) override;
-    uint16_t GetWaitDurationInSeconds() const override { return 3; }
+    CHIP_ERROR RunCommand() override;
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(3); }
     void Shutdown() override;
 
 private:

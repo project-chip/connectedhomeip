@@ -42,7 +42,7 @@ public:
     ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 
     /// Initialize the underlying layers and test suite pointer
-    CHIP_ERROR Init(nlTestSuite * suite, TransportMgrBase * transport, IOContext * io);
+    CHIP_ERROR Init(TransportMgrBase * transport, IOContext * io);
 
     // Shutdown all layers, finalize operations
     CHIP_ERROR Shutdown();

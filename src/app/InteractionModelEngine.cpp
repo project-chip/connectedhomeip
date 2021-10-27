@@ -121,16 +121,24 @@ void InteractionModelEngine::Shutdown()
 }
 
 CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
-                                                 uint64_t aAppIdentifier)
+                                                 uint64_t aAppIdentifier, InteractionModelDelegate * apDelegateOverride)
 {
-    CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+
+    if (apDelegateOverride == nullptr)
+    {
+        apDelegateOverride = mpDelegate;
+    }
+
+    *apReadClient = nullptr;
 
     for (auto & readClient : mReadClients)
     {
         if (readClient.IsFree())
         {
+            CHIP_ERROR err;
+
             *apReadClient = &readClient;
-            err           = readClient.Init(mpExchangeMgr, mpDelegate, aInteractionType, aAppIdentifier);
+            err           = readClient.Init(mpExchangeMgr, apDelegateOverride, aInteractionType, aAppIdentifier);
             if (CHIP_NO_ERROR != err)
             {
                 *apReadClient = nullptr;
@@ -139,7 +147,67 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
         }
     }
 
-    return err;
+    return CHIP_ERROR_NO_MEMORY;
+}
+
+uint32_t InteractionModelEngine::GetNumActiveReadClients() const
+{
+    uint32_t numActive = 0;
+
+    for (auto & readClient : mReadClients)
+    {
+        if (!readClient.IsFree())
+        {
+            numActive++;
+        }
+    }
+
+    return numActive;
+}
+
+uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
+{
+    uint32_t numActive = 0;
+
+    for (auto & readHandler : mReadHandlers)
+    {
+        if (!readHandler.IsFree())
+        {
+            numActive++;
+        }
+    }
+
+    return numActive;
+}
+
+uint32_t InteractionModelEngine::GetNumActiveWriteClients() const
+{
+    uint32_t numActive = 0;
+
+    for (auto & writeClient : mWriteClients)
+    {
+        if (!writeClient.IsFree())
+        {
+            numActive++;
+        }
+    }
+
+    return numActive;
+}
+
+uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
+{
+    uint32_t numActive = 0;
+
+    for (auto & writeHandler : mWriteHandlers)
+    {
+        if (!writeHandler.IsFree())
+        {
+            numActive++;
+        }
+    }
+
+    return numActive;
 }
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
@@ -158,7 +226,7 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, uint64_t aApplicationIdentifier)
+CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * apCallback)
 {
     apWriteClient.SetWriteClient(nullptr);
 
@@ -169,7 +237,7 @@ CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteCli
             continue;
         }
 
-        ReturnLogErrorOnFailure(writeClient.Init(mpExchangeMgr, mpDelegate, aApplicationIdentifier));
+        ReturnLogErrorOnFailure(writeClient.Init(mpExchangeMgr, apCallback));
         apWriteClient.SetWriteClient(&writeClient);
         return CHIP_NO_ERROR;
     }
@@ -222,14 +290,14 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogDetail(InteractionModel, "Receive %s request",
+    ChipLogDetail(InteractionModel, "Received %s request",
                   aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
 
     for (auto & readHandler : mReadHandlers)
     {
         if (!readHandler.IsFree() && readHandler.IsSubscriptionType() &&
-            readHandler.GetInitiatorNodeId() == apExchangeContext->GetSecureSession().GetPeerNodeId() &&
-            readHandler.GetFabricIndex() == apExchangeContext->GetSecureSession().GetFabricIndex())
+            readHandler.GetInitiatorNodeId() == apExchangeContext->GetSessionHandle().GetPeerNodeId() &&
+            readHandler.GetFabricIndex() == apExchangeContext->GetSessionHandle().GetFabricIndex())
         {
             bool keepSubscriptions = true;
             System::PacketBufferTLVReader reader;
@@ -271,7 +339,7 @@ CHIP_ERROR InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * a
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogDetail(InteractionModel, "Receive Write request");
+    ChipLogDetail(InteractionModel, "Received Write request");
 
     for (auto & writeHandler : mWriteHandlers)
     {
@@ -356,7 +424,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(InteractionModel, "Time out! failed to receive echo response from Exchange: " ChipLogFormatExchange,
+    ChipLogProgress(InteractionModel, "Time out! Failed to receive IM response from Exchange: " ChipLogFormatExchange,
                     ChipLogValueExchange(ec));
 }
 
@@ -414,7 +482,7 @@ CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfoList, Cl
     ClusterInfo * last = aClusterInfoList;
     if (mpNextAvailableClusterInfo == nullptr)
     {
-        ChipLogProgress(InteractionModel, "There is no available cluster info in mClusterInfoPool");
+        ChipLogError(InteractionModel, "ClusterInfo pool full, cannot handle more entries!");
         return CHIP_ERROR_NO_MEMORY;
     }
     aClusterInfoList           = mpNextAvailableClusterInfo;
@@ -465,7 +533,6 @@ bool InteractionModelEngine::IsOverlappedAttributePath(ClusterInfo & aAttributeP
             }
         }
     }
-    ChipLogDetail(DataManagement, "AttributePath is not interested");
     return false;
 }
 

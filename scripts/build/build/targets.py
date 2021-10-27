@@ -23,6 +23,7 @@ from builders.qpg import QpgBuilder
 from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
+from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 
 
 class Target:
@@ -79,29 +80,26 @@ def HostTargets():
             'all-clusters', app=HostApp.ALL_CLUSTERS))
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
+        app_targets.append(target.Extend(
+            'rpc-console', app=HostApp.RPC_CONSOLE))
 
     for target in app_targets:
         yield target
-        yield target.Extend('ipv6only', enable_ipv4=False)
+        if ('rpc-console' not in target.name):
+            yield target.Extend('ipv6only', enable_ipv4=False)
 
 
 def Esp32Targets():
     esp32_target = Target('esp32', Esp32Builder)
 
+    yield esp32_target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
+    yield esp32_target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
     yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
-
-    rpc_aware_targets = [
-        esp32_target.Extend('m5stack-all-clusters',
-                            board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
-    ]
-
-    for target in rpc_aware_targets:
-        yield target
-        yield target.Extend('rpc', enable_rpcs=True)
 
     devkitc = esp32_target.Extend('devkitc', board=Esp32Board.DevKitC)
 
     yield devkitc.Extend('all-clusters', app=Esp32App.ALL_CLUSTERS)
+    yield devkitc.Extend('all-clusters-ipv6only', app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
     yield devkitc.Extend('shell', app=Esp32App.SHELL)
     yield devkitc.Extend('lock', app=Esp32App.LOCK)
     yield devkitc.Extend('bridge', app=Esp32App.BRIDGE)
@@ -148,12 +146,7 @@ def AndroidTargets():
     yield target.Extend('x64-chip-tool', board=AndroidBoard.X64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('x86-chip-tool', board=AndroidBoard.X86, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('arm64-chip-test', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TEST)
-    # TODO: android studio build is broken:
-    #   - When compile succeeds, build artifact copy fails with "No such file or
-    #     directory: '<out_prefix>/android-androidstudio-chip-tool/outputs/apk/debug/app-debug.apk'
-    #   - Compiling locally in the vscode image fails with
-    #     "2 files found with path 'lib/armeabi-v7a/libCHIPController.so'"
-    # yield target.Extend('androidstudio-chip-tool', board=AndroidBoard.AndroidStudio, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('androidstudio-chip-tool', board=AndroidBoard.AndroidStudio, app=AndroidApp.CHIP_TOOL)
 
 
 ALL = []
@@ -178,6 +171,8 @@ ALL.append(Target('infineon-p6-lock', InfineonBuilder,
                   board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK))
 ALL.append(Target('tizen-arm-light', TizenBuilder,
                   board=TizenBoard.ARM, app=TizenApp.LIGHT))
+ALL.append(Target('ameba-amebad-all-clusters', AmebaBuilder,
+                  board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)

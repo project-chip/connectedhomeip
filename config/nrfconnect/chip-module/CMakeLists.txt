@@ -199,7 +199,6 @@ chip_gn_arg_bool  ("chip_enable_nfc"                        CONFIG_CHIP_NFC_COMM
 chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_monolithic_tests"                  CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
-chip_gn_arg_bool  ("chip_inet_config_enable_dns_resolver"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                  CONFIG_CHIP_PW_RPC)
 
@@ -258,6 +257,7 @@ target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
     ${CHIP_ROOT}/third_party/nlassert/repo/include
+    ${CHIP_ROOT}/zzz_generated/app-common
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)

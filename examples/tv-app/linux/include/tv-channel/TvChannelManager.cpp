@@ -16,6 +16,8 @@
  */
 
 #include "TvChannelManager.h"
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -41,27 +43,27 @@ exit:
     return err;
 }
 
-std::vector<TvChannelInfo> TvChannelManager::proxyGetTvChannelList()
+CHIP_ERROR TvChannelManager::proxyGetTvChannelList(chip::app::AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
-    std::vector<TvChannelInfo> tvChannels;
-    int maximumVectorSize    = 2;
-    char affiliateCallSign[] = "exampleASign";
-    char callSign[]          = "exampleCSign";
-    char name[]              = "exampleName";
+    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+        // TODO: Insert code here
+        int maximumVectorSize    = 2;
+        char affiliateCallSign[] = "exampleASign";
+        char callSign[]          = "exampleCSign";
+        char name[]              = "exampleName";
 
-    for (int i = 0; i < maximumVectorSize; ++i)
-    {
-        TvChannelInfo channelInfo;
-        channelInfo.affiliateCallSign = ByteSpan(Uint8::from_char(affiliateCallSign), sizeof(affiliateCallSign));
-        channelInfo.callSign          = ByteSpan(Uint8::from_char(callSign), sizeof(callSign));
-        channelInfo.name              = ByteSpan(Uint8::from_char(name), sizeof(name));
-        channelInfo.majorNumber       = static_cast<uint8_t>(1 + i);
-        channelInfo.minorNumber       = static_cast<uint16_t>(2 + i);
-        tvChannels.push_back(channelInfo);
-    }
-
-    return tvChannels;
+        for (int i = 0; i < maximumVectorSize; ++i)
+        {
+            chip::app::Clusters::TvChannel::Structs::TvChannelInfo::Type channelInfo;
+            channelInfo.affiliateCallSign = CharSpan(affiliateCallSign, sizeof(affiliateCallSign) - 1);
+            channelInfo.callSign          = CharSpan(callSign, sizeof(callSign) - 1);
+            channelInfo.name              = CharSpan(name, sizeof(name) - 1);
+            channelInfo.majorNumber       = static_cast<uint8_t>(1 + i);
+            channelInfo.minorNumber       = static_cast<uint16_t>(2 + i);
+            ReturnErrorOnFailure(encoder.Encode(channelInfo));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 TvChannelInfo tvChannelClusterChangeChannel(std::string match)

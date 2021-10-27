@@ -128,6 +128,16 @@ private:
      *  construction until a call to Shutdown is made to terminate the
      *  instance.
      *
+     *  The following callbacks are expected to be invoked on the InteractionModelDelegate:
+     *      - EventStreamReceived
+     *      - OnReportData
+     *      - ReportProcessed
+     *      - ReadError
+     *      - ReadDone
+     *
+     *  When processing subscriptions, these callbacks are invoked as well:
+     *      - SubscribeResponseProcessed
+     *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.
      *

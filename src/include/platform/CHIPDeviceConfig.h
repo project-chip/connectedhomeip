@@ -297,7 +297,7 @@
  * Enable support for a WiFi AP interface.
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 1
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 #endif
 
 /**
@@ -696,7 +696,7 @@
  * Amount of services available for advertising using SRP.
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
-#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES 3
+#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_DEVICE_ADMINS + 1)
 #endif
 
 /**

@@ -62,7 +62,7 @@ const char * kSpake2pKeyExchangeSalt = "SPAKE2P Key Salt";
 // Wait at most 30 seconds for the response from the peer.
 // This timeout value assumes the underlying transport is reliable.
 // The session establishment fails if the response is not received with in timeout window.
-static constexpr ExchangeContext::Timeout kSpake2p_Response_Timeout = 30000;
+static constexpr ExchangeContext::Timeout kSpake2p_Response_Timeout = System::Clock::Seconds16(30);
 
 #ifdef ENABLE_HSM_PBKDF2
 using PBKDF2_sha256_crypto = PBKDF2_sha256HSM;

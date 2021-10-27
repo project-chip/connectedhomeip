@@ -26,7 +26,6 @@ chip_mdns = "platform"
 lwip_platform = "qpg"
 
 chip_inet_config_enable_ipv4 = false
-chip_inet_config_enable_dns_resolver = false
 chip_inet_config_enable_tcp_endpoint = false
 
 # Size opt's

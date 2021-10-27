@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/ClusterInfo.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeDataElement.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h> // So we can encode lists
@@ -108,7 +108,7 @@ public:
     /**
      * Callback for reading attributes.
      *
-     * @param [in] aClusterInfo indicates which exact data is being read.
+     * @param [in] aPath indicates which exact data is being read.
      * @param [in] aEncoder the AttributeValueEncoder to use for encoding the
      *             data.  If this function returns scucess and no attempt is
      *             made to encode data using aEncoder, the
@@ -117,7 +117,7 @@ public:
      *             This may involve reading from the attribute store or external
      *             attribute callbacks.
      */
-    virtual CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) = 0;
+    virtual CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) = 0;
 
     /**
      * Mechanism for keeping track of a chain of AttributeAccessInterfaces.

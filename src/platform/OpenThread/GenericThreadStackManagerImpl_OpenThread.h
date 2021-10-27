@@ -136,30 +136,29 @@ private:
     struct SrpClient
     {
         static constexpr uint8_t kMaxServicesNumber      = CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES;
-        static constexpr uint8_t kMaxHostNameSize        = 16;
         static constexpr const char * kDefaultDomainName = "default.service.arpa";
         static constexpr uint8_t kDefaultDomainNameSize  = 20;
         static constexpr uint8_t kMaxDomainNameSize      = 32;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
         // Thread supports both operational and commissionable discovery, so buffers sizes must be worst case.
-        static constexpr size_t kSubTypeMaxNumber   = Dnssd::kSubTypeMaxNumber;
-        static constexpr size_t kSubTypeTotalLength = Dnssd::kSubTypeTotalLength;
+        static constexpr size_t kSubTypeMaxNumber   = Dnssd::Common::kSubTypeMaxNumber;
+        static constexpr size_t kSubTypeTotalLength = Dnssd::Common::kSubTypeTotalLength;
         static constexpr size_t kTxtMaxNumber =
             std::max(Dnssd::CommissionAdvertisingParameters::kTxtMaxNumber, Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber);
         static constexpr size_t kTxtTotalValueLength = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalValueSize,
                                                                 Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
 #else
         // Thread only supports operational discovery.
-        static constexpr size_t kSubTypeMaxNumber    = 1;
-        static constexpr size_t kSubTypeTotalLength  = Dnssd::kSubTypeCompressedFabricIdMaxLength;
+        static constexpr size_t kSubTypeMaxNumber    = Dnssd::Operational::kSubTypeMaxNumber;
+        static constexpr size_t kSubTypeTotalLength  = Dnssd::Operational::kSubTypeTotalLength;
         static constexpr size_t kTxtMaxNumber        = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
         static constexpr size_t kTxtTotalValueLength = Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize;
 #endif
 
-        static constexpr size_t kServiceBufferSize = Dnssd::kDnssdInstanceNameMaxSize + 1 + // add null-terminator
-            Dnssd::kDnssdTypeAndProtocolMaxSize + 1 +                                       // add null-terminator
-            kSubTypeTotalLength + kSubTypeMaxNumber +                                       // add null-terminator for each subtype
+        static constexpr size_t kServiceBufferSize = Dnssd::Common::kInstanceNameMaxLength + 1 + // add null-terminator
+            Dnssd::kDnssdTypeAndProtocolMaxSize + 1 +                                            // add null-terminator
+            kSubTypeTotalLength + kSubTypeMaxNumber + // add null-terminator for each subtype
             kTxtTotalValueLength;
 
         struct Service
@@ -174,7 +173,7 @@ private:
             bool Matches(const char * aInstanceName, const char * aName) const;
         };
 
-        char mHostName[kMaxHostNameSize + 1];
+        char mHostName[Dnssd::kHostNameMaxLength + 1];
         otIp6Address mHostAddress;
         Service mServices[kMaxServicesNumber];
         bool mIsInitialized;
@@ -212,7 +211,7 @@ private:
     struct DnsServiceTxtEntries
     {
         uint8_t mBuffer[kTotalDnsServiceTxtBufferSize];
-        chip::Dnssd::TextEntry mTxtEntries[kMaxDnsServiceTxtEntriesNumber];
+        Dnssd::TextEntry mTxtEntries[kMaxDnsServiceTxtEntriesNumber];
     };
 
     struct DnsResult
