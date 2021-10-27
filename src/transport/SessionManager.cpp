@@ -220,8 +220,8 @@ void SessionManager::ExpirePairing(SessionHandle session)
     SecureSession * state = GetSecureSession(session);
     if (state != nullptr)
     {
-        mPeerConnections.MarkSessionExpired(
-            state, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
+        mPeerConnections.MarkSessionExpired(state,
+                                            [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
     }
 }
 
@@ -249,8 +249,8 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     SecureSession * state = mPeerConnections.FindSecureSessionByFabric(fabric);
     while (state != nullptr)
     {
-        mPeerConnections.MarkSessionExpired(
-            state, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
+        mPeerConnections.MarkSessionExpired(state,
+                                            [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
         state = mPeerConnections.FindSecureSessionByFabric(fabric);
     }
 }
@@ -260,14 +260,13 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
 {
     uint16_t peerSessionId  = pairing->GetPeerSessionId();
     uint16_t localSessionId = pairing->GetLocalSessionId();
-    SecureSession * state =
-        mPeerConnections.FindSecureSessionByLocalKey(localSessionId, nullptr);
+    SecureSession * state   = mPeerConnections.FindSecureSessionByLocalKey(localSessionId, nullptr);
 
     // Find any existing connection with the same local key ID
     if (state)
     {
-        mPeerConnections.MarkSessionExpired(
-            state, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
+        mPeerConnections.MarkSessionExpired(state,
+                                            [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
     }
 
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", key %d!!", ChipLogValueX64(peerNodeId),
