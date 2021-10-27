@@ -91,32 +91,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
-    {
-        VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        std::string formattedKey = formatKey(fabricIndex, key);
-        return mStorage->SyncSetKeyValue(formattedKey.c_str(), buffer, size);
-    };
+    CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override;
 
-    CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override
-    {
-        VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        std::string formattedKey = formatKey(fabricIndex, key);
-        return mStorage->SyncGetKeyValue(formattedKey.c_str(), buffer, size);
-    };
+    CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override;
 
-    CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override
-    {
-        VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        std::string formattedKey = formatKey(fabricIndex, key);
-        return mStorage->SyncDeleteKeyValue(formattedKey.c_str());
-    };
+    CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override;
 
 private:
-    // FabricPrefix is of the format "F%02X/"
-    const static int fabricPrefixSize = 5;
-    // Returns a string that adds a FabricIndex prefix to the Key
-    std::string formatKey(FabricIndex fabricIndex, const char * key);
+    const static int MAX_KEY_SIZE = 32;
 
     PersistentStorageDelegate * mStorage = nullptr;
 };

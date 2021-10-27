@@ -600,13 +600,44 @@ CHIP_ERROR FabricTable::SetFabricDelegate(FabricTableDelegate * delegate)
     return CHIP_NO_ERROR;
 }
 
-std::string SimpleFabricStorage::formatKey(FabricIndex fabricIndex, const char * key)
+CHIP_ERROR formatKey(FabricIndex fabricIndex, MutableCharSpan & formattedKey, const char * key)
 {
-    char fabricPrefix[fabricPrefixSize];
-    snprintf(fabricPrefix, fabricPrefixSize, "F%02X/", fabricIndex);
-    std::string formattedKey = fabricPrefix;
-    formattedKey += key;
-    return formattedKey;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    int res = snprintf(formattedKey.data(), formattedKey.size(), "F%02X/%s", fabricIndex, key);
+    if (res < 0 || (size_t) res >= formattedKey.size())
+    {
+        ChipLogError(Discovery, "Failed to format Key %s. snprintf error: %d", key, res);
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return err;
 }
+
+CHIP_ERROR SimpleFabricStorage::SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size)
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    char formattedKey[MAX_KEY_SIZE] = "";
+    MutableCharSpan keySpan         = MutableCharSpan(formattedKey, MAX_KEY_SIZE);
+    ReturnErrorOnFailure(formatKey(fabricIndex, keySpan, key));
+    return mStorage->SyncSetKeyValue(formattedKey, buffer, size);
+};
+
+CHIP_ERROR SimpleFabricStorage::SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size)
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    char formattedKey[MAX_KEY_SIZE] = "";
+    MutableCharSpan keySpan         = MutableCharSpan(formattedKey, MAX_KEY_SIZE);
+    ReturnErrorOnFailure(formatKey(fabricIndex, keySpan, key));
+    return mStorage->SyncGetKeyValue(formattedKey, buffer, size);
+};
+
+CHIP_ERROR SimpleFabricStorage::SyncDelete(FabricIndex fabricIndex, const char * key)
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    char formattedKey[MAX_KEY_SIZE] = "";
+    MutableCharSpan keySpan         = MutableCharSpan(formattedKey, MAX_KEY_SIZE);
+    ReturnErrorOnFailure(formatKey(fabricIndex, keySpan, key));
+    return mStorage->SyncDeleteKeyValue(formattedKey);
+};
 
 } // namespace chip
