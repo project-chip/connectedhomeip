@@ -35,7 +35,7 @@ enum : uint32_t
     kFirmwareInfoTagId             = 4,
 };
 
-// utility to determine number of Vendor Reserved elemenets in a bytespan
+// utility to determine number of Vendor Reserved elements in a bytespan
 CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements, size_t & numOfElements)
 {
     TLV::ContiguousBufferTLVReader tlvReader;
