@@ -21,7 +21,7 @@ config:
 tests:
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       response:
           constraints:
               type: uint16
@@ -31,7 +31,7 @@ tests:
 
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       response:
           constraints:
               type: uint16
