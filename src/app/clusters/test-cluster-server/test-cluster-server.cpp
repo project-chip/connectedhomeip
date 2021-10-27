@@ -430,6 +430,30 @@ bool emberAfTestClusterClusterTestEnumsRequestCallback(CommandHandler * commandO
     return true;
 }
 
+bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
+    CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+    Commands::TestNullableOptionalRequest::DecodableType const & commandData)
+{
+    Commands::TestNullableOptionalResponse::Type response;
+    response.wasPresent = commandData.arg1.HasValue();
+    if (response.wasPresent)
+    {
+        bool wasNull = commandData.arg1.Value().IsNull();
+        response.wasNull.SetValue(wasNull);
+        if (!wasNull)
+        {
+            response.value.SetValue(commandData.arg1.Value().Value());
+        }
+    }
+
+    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
+    if (err != CHIP_NO_ERROR)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+    return true;
+}
+
 // -----------------------------------------------------------------------------
 // Plugin initialization
 

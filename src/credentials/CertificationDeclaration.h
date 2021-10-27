@@ -34,25 +34,32 @@ namespace chip {
 namespace Credentials {
 
 static constexpr uint32_t kMaxProductIdsCountPerCD = 100;
+static constexpr uint32_t kCertificateIdLength     = 19;
 
+// TODO: share code with EstimateTLVStructOverhead to estimate TLV structure size.
 static constexpr uint32_t kCertificationElements_TLVEncodedMaxLength = (1 + 1) + // Length of header and end of outer TLV structure.
+    (3 + kCertificateIdLength) +                                                 // Encoded length of CertificateId string.
     (1 + sizeof(uint16_t)) * kMaxProductIdsCountPerCD + 3 + // Max encoding length of an array of 100 uint16_t elements.
     (2 + sizeof(uint8_t)) * 2 +                             // Encoding length of two uint8_t element.
-    (2 + sizeof(uint16_t)) * 5;                             // Max total encoding length of five uint16_t elements.
+    (2 + sizeof(uint16_t)) * 7;                             // Max total encoding length of seven uint16_t elements.
 
 static constexpr uint32_t kMaxCMSSignedCDMessage = 183 + kCertificationElements_TLVEncodedMaxLength;
 
 struct CertificationElements
 {
+    uint16_t FormatVersion;
     uint16_t VendorId;
     uint16_t ProductIds[kMaxProductIdsCountPerCD];
     uint8_t ProductIdsCount;
-    uint16_t ServerCategoryId;
-    uint16_t ClientCategoryId;
+    uint16_t DeviceTypeId;
+    char CertificateId[kCertificateIdLength + 1];
     uint8_t SecurityLevel;
     uint16_t SecurityInformation;
     uint16_t VersionNumber;
     uint8_t CertificationType;
+    uint16_t DACOriginVendorId;
+    uint16_t DACOriginProductId;
+    bool DACOriginVIDandPIDPresent;
 };
 
 /**

@@ -396,6 +396,9 @@ function chip_tests_item_parameters(options)
 
       const expected = commandValues.find(value => value.name.toLowerCase() == commandArg.name.toLowerCase());
       if (!expected) {
+        if (commandArg.isOptional) {
+          return undefined;
+        }
         printErrorAndExit(this,
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
@@ -438,7 +441,7 @@ function chip_tests_item_parameters(options)
       return commandArg;
     });
 
-    return commands;
+    return commands.filter(item => item !== undefined);
   });
 
   return asBlocks.call(this, promise, options);

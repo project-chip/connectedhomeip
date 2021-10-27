@@ -10926,8 +10926,8 @@ public:
             err = TestSendsAMoveToLevelCommand_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 10ms\n");
-            err = TestWait10ms_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 100ms\n");
+            err = TestWait100ms_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : reads current Level attribute from DUT\n");
@@ -10938,8 +10938,8 @@ public:
             err = TestSendsAMoveToLevelCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 100ms\n");
-            err = TestWait100ms_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 200ms\n");
+            err = TestWait200ms_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : reads current Level attribute from DUT\n");
@@ -10954,8 +10954,8 @@ public:
             err = TestSendsAMoveToLevelCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 1ms\n");
-            err = TestWait1ms_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 10ms\n");
+            err = TestWait10ms_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : reads current Level attribute from DUT\n");
@@ -10966,8 +10966,8 @@ public:
             err = TestResetLevelTo0_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 10ms\n");
-            err = TestWait10ms_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 100ms\n");
+            err = TestWait100ms_12();
             break;
         }
 
@@ -11092,7 +11092,7 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_2() { return WaitForMs(10); }
+    CHIP_ERROR TestWait100ms_2() { return WaitForMs(100); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_3()
     {
@@ -11138,7 +11138,7 @@ private:
 
     void OnSuccessResponse_4() { NextTest(); }
 
-    CHIP_ERROR TestWait100ms_5() { return WaitForMs(100); }
+    CHIP_ERROR TestWait200ms_5() { return WaitForMs(200); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_6()
     {
@@ -11200,7 +11200,7 @@ private:
 
     void OnSuccessResponse_8() { NextTest(); }
 
-    CHIP_ERROR TestWait1ms_9() { return WaitForMs(1); }
+    CHIP_ERROR TestWait10ms_9() { return WaitForMs(10); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
     {
@@ -11246,7 +11246,7 @@ private:
 
     void OnSuccessResponse_11() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_12() { return WaitForMs(10); }
+    CHIP_ERROR TestWait100ms_12() { return WaitForMs(100); }
 };
 
 class Test_TC_LVL_3_1 : public TestCommand
@@ -11292,8 +11292,8 @@ public:
             err = TestSendsAMoveUpCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 2500ms\n");
-            err = TestWait2500ms_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 3000ms\n");
+            err = TestWait3000ms_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : reads current level attribute from DUT\n");
@@ -11308,8 +11308,8 @@ public:
             err = TestSendsAMoveDownCommand_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 2500ms\n");
-            err = TestWait2500ms_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 3000ms\n");
+            err = TestWait3000ms_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : reads current level attribute from DUT\n");
@@ -11328,8 +11328,8 @@ public:
             err = TestSendsAMoveUpCommandAtDefaultMoveRate_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 10ms\n");
-            err = TestWait10ms_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 100ms\n");
+            err = TestWait100ms_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : reads current level attribute from DUT\n");
@@ -11509,7 +11509,7 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait2500ms_3() { return WaitForMs(2500); }
+    CHIP_ERROR TestWait3000ms_3() { return WaitForMs(3000); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
     {
@@ -11571,7 +11571,7 @@ private:
 
     void OnSuccessResponse_6() { NextTest(); }
 
-    CHIP_ERROR TestWait2500ms_7() { return WaitForMs(2500); }
+    CHIP_ERROR TestWait3000ms_7() { return WaitForMs(3000); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_8()
     {
@@ -11648,7 +11648,7 @@ private:
 
     void OnSuccessResponse_11() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_12() { return WaitForMs(10); }
+    CHIP_ERROR TestWait100ms_12() { return WaitForMs(100); }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_13()
     {
@@ -21676,6 +21676,14 @@ public:
                 " ***** Test Step 6 : Send Test Command With List of Struct Argument and arg1.b of first item is false\n");
             err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_6();
             break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Send Test Command with optional arg set.\n");
+            err = TestSendTestCommandWithOptionalArgSet_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Send Test Command without its optional arg.\n");
+            err = TestSendTestCommandWithoutItsOptionalArg_8();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -21687,7 +21695,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 9;
 
     //
     // Tests methods
@@ -21951,6 +21959,70 @@ private:
     void OnFailureResponse_6(uint8_t status) { NextTest(); }
 
     void OnSuccessResponse_6() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestSendTestCommandWithOptionalArgSet_7()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
+        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
+
+        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
+        request.arg1.Emplace().SetNonNull() = 5;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_7(data.wasPresent, data.wasNull, data.value);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_7(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value)
+    {
+        VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
+
+        VerifyOrReturn(CheckValuePresent("wasNull", wasNull));
+        VerifyOrReturn(CheckValue<bool>("wasNull.Value()", wasNull.Value(), false));
+
+        VerifyOrReturn(CheckValuePresent("value", value));
+        VerifyOrReturn(CheckValue<uint8_t>("value.Value()", value.Value(), 5));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendTestCommandWithoutItsOptionalArg_8()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
+        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
+
+        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_8(data.wasPresent, data.wasNull, data.value);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_8(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value)
+    {
+        VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, false));
+
+        NextTest();
+    }
 };
 
 class TestConstraints : public TestCommand
@@ -22595,6 +22667,83 @@ private:
     void OnSuccessResponse_3(chip::CharSpan location) { NextTest(); }
 };
 
+class TestIdentifyCluster : public TestCommand
+{
+public:
+    TestIdentifyCluster() : TestCommand("TestIdentifyCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestIdentifyCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestIdentifyCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Send Identify command and expect success response\n");
+            err = TestSendIdentifyCommandAndExpectSuccessResponse_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestSendIdentifyCommandAndExpectSuccessResponse_0()
+    {
+        chip::Controller::IdentifyClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        using requestType  = chip::app::Clusters::Identify::Commands::Identify::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::Identify::Commands::Identify::Type request;
+        request.identifyTime = 0U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestIdentifyCluster *>(context))->OnSuccessResponse_0();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestIdentifyCluster *>(context))->OnFailureResponse_0(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0() { NextTest(); }
+};
+
 class TestOperationalCredentialsCluster : public TestCommand
 {
 public:
@@ -23069,6 +23218,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestLogCommands>(),
         make_unique<TestDescriptorCluster>(),
         make_unique<TestBasicInformation>(),
+        make_unique<TestIdentifyCluster>(),
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestSubscribe_OnOff>(),
     };

@@ -83,7 +83,7 @@ public:
      *
      * @return Tick count for the time period.
      */
-    uint64_t GetTickCounterFromTimePeriod(uint64_t period);
+    uint64_t GetTickCounterFromTimePeriod(System::Clock::Milliseconds64 period);
 
     /**
      * Return a tick counter value between the given time and the stored time.
@@ -92,7 +92,7 @@ public:
      *
      * @return Tick count of the difference between the given time and the stored time.
      */
-    uint64_t GetTickCounterFromTimeDelta(uint64_t newTime);
+    uint64_t GetTickCounterFromTimeDelta(System::Clock::Timestamp newTime);
 
     /**
      * Iterate through active exchange contexts and retrans table entries.  If an
@@ -230,9 +230,9 @@ public:
 private:
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
-    uint64_t mTimeStampBase; // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
-    System::Clock::MonotonicMilliseconds mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
-    uint16_t mTimerIntervalShift;                             // ReliableMessageProtocol Timer tick period shift
+    System::Clock::Timestamp mTimeStampBase;      // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
+    System::Clock::Timestamp mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
+    uint16_t mTimerIntervalShift;                 // ReliableMessageProtocol Timer tick period shift
 
     /* Placeholder function to run a function for all exchanges */
     template <typename Function>

@@ -1588,9 +1588,17 @@ namespace TestStructArrayArgumentRequest {
 static constexpr CommandId Id = 0x00000006;
 } // namespace TestStructArrayArgumentRequest
 
+namespace TestNullableOptionalResponse {
+static constexpr CommandId Id = 0x00000006;
+} // namespace TestNullableOptionalResponse
+
 namespace TestStructArgumentRequest {
 static constexpr CommandId Id = 0x00000007;
 } // namespace TestStructArgumentRequest
+
+namespace TestComplexNullableOptionalResponse {
+static constexpr CommandId Id = 0x00000007;
+} // namespace TestComplexNullableOptionalResponse
 
 namespace TestNestedStructArgumentRequest {
 static constexpr CommandId Id = 0x00000008;
@@ -1619,6 +1627,14 @@ static constexpr CommandId Id = 0x0000000D;
 namespace TestEnumsRequest {
 static constexpr CommandId Id = 0x0000000E;
 } // namespace TestEnumsRequest
+
+namespace TestNullableOptionalRequest {
+static constexpr CommandId Id = 0x0000000F;
+} // namespace TestNullableOptionalRequest
+
+namespace TestComplexNullableOptionalRequest {
+static constexpr CommandId Id = 0x00000010;
+} // namespace TestComplexNullableOptionalRequest
 
 } // namespace Commands
 } // namespace TestCluster

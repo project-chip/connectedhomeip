@@ -6,28 +6,53 @@ Software Update with a given OTA Provider node, and download a file.
 
 ## Usage
 
-Due to #9518, this app must pretend to be `chip-tool` in order to establish a
-connection to the OTA Provider. It does this by reading the CASE session and
-other necessary credentials stored in persistent memory on startup.
+In order to use this reference application to connect to a device running OTA
+Provider server and download a software image, these commands should be called
+in the following order:
 
-Therefore, to use this app you should call these commands in the following
-order:
-
-In one terminal:
+In terminal 1:
 
 ```
-./chip-ota-provider-app [-f <filepath>]
+./chip-ota-provider-app -f ${SW_IMAGE_FILE}
 ```
 
-In a second terminal:
+-   `${SW_IMAGE_FILE}` is the file representing a software image to be served.
+
+In terminal 2:
 
 ```
-./chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840
-./chip-ota-requestor-app [-p <provider node id>]
+./chip-tool pairing onnetwork ${NODE_ID_TO_ASSIGN_PROVIDER} 20202021
 ```
 
-where `${NODE_ID_TO_ASSIGN}` is the node id to assign to the provider app, which
-should match the `-p` argument passed to `chip-ota-requestor-app`.
+-   `${NODE_ID_TO_ASSIGN_PROVIDER}` is the node id to assign to the
+    ota-provider-app running in terminal 1.
+
+In terminal 3:
+
+```
+./chip-ota-requestor-app -d ${REQUESTOR_LONG_DISCRIMINATOR} -u ${REQUESTOR_UDP_PORT} -i ${PROVIDER_IP_ADDRESS} -n ${PROVIDER_NODE_ID} -q ${DELAY_QUERY_SECONDS}
+```
+
+-   `{REQUESTOR_LONG_DISCRIMINATOR}` is the long discriminator specified for the
+    ota-requestor-app for commissioning discovery
+-   `{REQUESTOR_UDP_PORT}` is the UDP port that the ota-requestor-app listens on
+    for secure connections
+-   `${PROVIDER_IP_ADDRESS}` is the IP address of the ota-provider-app that has
+    been resolved manually
+-   `${PROVIDER_NODE_ID}` is the node ID of the ota-provider-app assigned above
+-   `${DELAY_QUERY_SECONDS}` is the amount of time in seconds to wait before
+    initiating secure session establishment and query for software image
+
+In terminal 2:
+
+```
+./chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN_REQUESTOR}  20202021 ${REQUESTOR_LONG_DISCRIMINATOR}
+```
+
+-   `${NODE_ID_TO_ASSIGN_REQUESTOR}` is the node id to assign to the
+    ota-requestor-app running in terminal 3
+-   `${REQUESTOR_LONG_DISCRIMINATOR}` is the long discriminator of the
+    ota-requestor-app specified in terminal 3 above
 
 ## Current Features / Limitations
 
@@ -35,21 +60,15 @@ should match the `-p` argument passed to `chip-ota-requestor-app`.
 
 -   Code for running a full BDX download exists in BDX
 -   Sends QueryImage command
--   Takes a peer Node ID as an argument
--   Takes an optional udpPort command argument which when present disables the
-    self-commissioning and automatic image download logic and instead makes the
-    Requestor initialize like a standard Matter application. The udpPort
-    parameter specifies the UDP Port that the Requestor listens on for secure
-    connections
--   Takes an optional discriminator command argument to specify the Setup
-    Discriminator. When the parameter is omitted the value of 3840 is used
+-   Downloads a file over BDX served by an OTA Provider server
+-   Supports various command line configurations
 
 ### Limitations
 
--   needs chip-tool to pair to the Provider device first, so it can steal the
-    CASE session from persisted memory
--   uses Controller class to load the CASE session
--   does not verify QueryImageResponse message contents
--   stores the downloaded file at a hardcoded filepath
--   doesn't close the BDX ExchangeContext when the exchange is over
--   does not support AnnounceOTAProvider command or OTA Requestor attributes
+-   Needs chip-tool to commission the OTA Provider device first because the Node
+    ID and IP Address of the OTA Provider must be supplied to this reference
+    application
+-   Does not verify QueryImageResponse message contents
+-   Stores the downloaded file in the directory this reference app is launched
+    from
+-   Does not support AnnounceOTAProvider command or OTA Requestor attributes

@@ -23,7 +23,7 @@
 namespace chip {
 namespace Test {
 
-CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport, IOContext * ioContext)
+CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioContext)
 {
     VerifyOrReturnError(mInitialized == false, CHIP_ERROR_INTERNAL);
     mInitialized = true;

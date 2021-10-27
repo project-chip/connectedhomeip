@@ -832,6 +832,52 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
 }
 chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>
     gOperationalCredentialsFabricsListListAttributeCallback{ OnOperationalCredentialsFabricsListListAttributeResponse, nullptr };
+static void OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+{
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ChipLogProgress(Zcl, "    %s,", ByteSpanToString(entry).c_str());
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>
+    gOperationalCredentialsTrustedRootCertificatesListAttributeCallback{
+        OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse, nullptr
+    };
 static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context,
                                                                   const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
@@ -5628,6 +5674,18 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_Commi
     return cluster.ReadAttributeCommissionedFabrics(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_TrustedRootCertificates(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeTrustedRootCertificates(gOperationalCredentialsTrustedRootCertificatesListAttributeCallback.Cancel(),
+                                              gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(chip::Controller::Device * device,
                                                                                            chip::EndpointId ZCLendpointId,
                                                                                            chip::GroupId /* ZCLgroupId */)
@@ -6626,6 +6684,15 @@ chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestNotHandled(c
     cluster.Associate(device, ZCLendpointId);
     return cluster.TestNotHandled(nullptr, nullptr).AsInteger();
 }
+chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestNullableOptionalRequest(chip::Controller::Device * device,
+                                                                                            chip::EndpointId ZCLendpointId,
+                                                                                            chip::GroupId, uint8_t arg1)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TestNullableOptionalRequest(nullptr, nullptr, arg1).AsInteger();
+}
 chip::ChipError::StorageType chip_ime_AppendCommand_TestCluster_TestSpecific(chip::Controller::Device * device,
                                                                              chip::EndpointId ZCLendpointId, chip::GroupId)
 {
@@ -7389,6 +7456,26 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointL
     chip::Controller::ThermostatCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.WriteAttributeMaxCoolSetpointLimit(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value)
+        .AsInteger();
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_Thermostat_MinSetpointDeadBand(chip::Controller::Device * device,
+                                                                                   chip::EndpointId ZCLendpointId,
+                                                                                   chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMinSetpointDeadBand(gInt8sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_Thermostat_MinSetpointDeadBand(chip::Controller::Device * device,
+                                                                                    chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                    int8_t value)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.WriteAttributeMinSetpointDeadBand(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value)
         .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation(chip::Controller::Device * device,

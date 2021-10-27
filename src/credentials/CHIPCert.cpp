@@ -575,7 +575,7 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, uint64_t val)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, ByteSpan val)
+CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, CharSpan val)
 {
     uint8_t rdnCount = RDNCount();
 

@@ -12,26 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 33.2.1. [TC-FLW-2.1] Attributes with server as DUT
+name: Identify Cluster Tests
 
 config:
-    cluster: "Flow Measurement"
-    endpoint: 1
+    cluster: "Identify"
+    endpoint: 0
 
 tests:
-    - label: "read the mandatory attribute: MeasuredValue"
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "operate on DUT to change the flow significantly"
-      disabled: true
-
-    - label: "read the mandatory attribute: MeasuredValue"
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          constraints:
-              type: uint16
+    - label: "Send Identify command and expect success response"
+      command: "identify"
+      arguments:
+          values:
+              - name: "IdentifyTime"
+                value: 0

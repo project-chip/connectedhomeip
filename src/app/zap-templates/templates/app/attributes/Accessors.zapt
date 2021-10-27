@@ -25,8 +25,8 @@ namespace Attributes {
 {{#if clusterRef}}
 {{#if (canHaveSimpleAccessors type)}}
 namespace {{asUpperCamelCase label}} {
-EmberAfStatus Get(chip::EndpointId endpoint, {{asUnderlyingZclType type}} * {{asLowerCamelCase label}}); // {{type}} {{isArray}}
-EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} {{asLowerCamelCase label}});
+EmberAfStatus Get(chip::EndpointId endpoint, {{#if (isCharString type)}}chip::MutableCharSpan{{else if (isOctetString type)}}chip::MutableByteSpan{{else}}{{asUnderlyingZclType type}} *{{/if}} value); // {{type}} {{isArray}}
+EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} value);
 } // namespace {{asUpperCamelCase label}}
 
 {{/if}}

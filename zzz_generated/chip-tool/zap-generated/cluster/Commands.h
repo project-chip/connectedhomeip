@@ -619,6 +619,34 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
     command->SetCommandExitStatus(iter.GetStatus());
 }
 
+static void OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+{
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        command->SetCommandExitStatus(err);
+        return;
+    }
+
+    ChipLogProgress(chipTool, "OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse: %zu entries", count);
+
+    auto iter  = list.begin();
+    uint16_t i = 0;
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ++i;
+        ChipLogProgress(Zcl, "  : %zu", entry.size());
+    }
+    command->SetCommandExitStatus(iter.GetStatus());
+}
+
 static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context,
                                                                   const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
@@ -1815,6 +1843,18 @@ static void OnTestClusterTestListInt8UReverseResponseSuccess(
 {
     ChipLogProgress(Zcl, "Received TestListInt8UReverseResponse:");
     ChipLogProgress(Zcl, "  arg1: Array printing is not implemented yet.");
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+};
+
+static void OnTestClusterTestNullableOptionalResponseSuccess(
+    void * context, const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received TestNullableOptionalResponse:");
+    ChipLogProgress(Zcl, "  wasPresent: %d", data.wasPresent);
+    ChipLogProgress(Zcl, "  wasNull: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  value: Optional printing is not implemented yet.");
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -15010,6 +15050,7 @@ private:
 | * FabricsList                                                       | 0x0001 |
 | * SupportedFabrics                                                  | 0x0002 |
 | * CommissionedFabrics                                               | 0x0003 |
+| * TrustedRootCertificates                                           | 0x0004 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -15342,6 +15383,41 @@ public:
 private:
     chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute TrustedRootCertificates
+ */
+class ReadOperationalCredentialsTrustedRootCertificates : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsTrustedRootCertificates() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "trusted-root-certificates");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsTrustedRootCertificates()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeTrustedRootCertificates(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>(
+            OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -18445,6 +18521,7 @@ private:
 | * TestListInt8UReverseRequest                                       |   0x0D |
 | * TestListStructArgumentRequest                                     |   0x09 |
 | * TestNotHandled                                                    |   0x01 |
+| * TestNullableOptionalRequest                                       |   0x0F |
 | * TestSpecific                                                      |   0x02 |
 | * TestStructArgumentRequest                                         |   0x07 |
 | * TestUnknownCommand                                                |   0x03 |
@@ -18646,6 +18723,31 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type mRequest;
+};
+
+/*
+ * Command TestNullableOptionalRequest
+ */
+class TestClusterTestNullableOptionalRequest : public ModelCommand
+{
+public:
+    TestClusterTestNullableOptionalRequest() : ModelCommand("test-nullable-optional-request")
+    {
+        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnTestClusterTestNullableOptionalResponseSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type mRequest;
 };
 
 /*
@@ -20416,6 +20518,7 @@ private:
 | * MaxHeatSetpointLimit                                              | 0x0016 |
 | * MinCoolSetpointLimit                                              | 0x0017 |
 | * MaxCoolSetpointLimit                                              | 0x0018 |
+| * MinSetpointDeadBand                                               | 0x0019 |
 | * ControlSequenceOfOperation                                        | 0x001B |
 | * SystemMode                                                        | 0x001C |
 | * StartOfWeek                                                       | 0x0020 |
@@ -21170,6 +21273,73 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     int16_t mValue;
+};
+
+/*
+ * Attribute MinSetpointDeadBand
+ */
+class ReadThermostatMinSetpointDeadBand : public ModelCommand
+{
+public:
+    ReadThermostatMinSetpointDeadBand() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "min-setpoint-dead-band");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatMinSetpointDeadBand()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMinSetpointDeadBand(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatMinSetpointDeadBand : public ModelCommand
+{
+public:
+    WriteThermostatMinSetpointDeadBand() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "min-setpoint-dead-band");
+        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatMinSetpointDeadBand()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeMinSetpointDeadBand(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int8_t mValue;
 };
 
 /*
@@ -26586,6 +26756,7 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<ReadOperationalCredentialsFabricsList>(),              //
         make_unique<ReadOperationalCredentialsSupportedFabrics>(),         //
         make_unique<ReadOperationalCredentialsCommissionedFabrics>(),      //
+        make_unique<ReadOperationalCredentialsTrustedRootCertificates>(),  //
         make_unique<ReadOperationalCredentialsClusterRevision>(),          //
     };
 
@@ -26779,6 +26950,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<TestClusterTestListInt8UReverseRequest>(),   //
         make_unique<TestClusterTestListStructArgumentRequest>(), //
         make_unique<TestClusterTestNotHandled>(),                //
+        make_unique<TestClusterTestNullableOptionalRequest>(),   //
         make_unique<TestClusterTestSpecific>(),                  //
         make_unique<TestClusterTestStructArgumentRequest>(),     //
         make_unique<TestClusterTestUnknownCommand>(),            //
@@ -26864,6 +27036,8 @@ void registerClusterThermostat(Commands & commands)
         make_unique<WriteThermostatMinCoolSetpointLimit>(),       //
         make_unique<ReadThermostatMaxCoolSetpointLimit>(),        //
         make_unique<WriteThermostatMaxCoolSetpointLimit>(),       //
+        make_unique<ReadThermostatMinSetpointDeadBand>(),         //
+        make_unique<WriteThermostatMinSetpointDeadBand>(),        //
         make_unique<ReadThermostatControlSequenceOfOperation>(),  //
         make_unique<WriteThermostatControlSequenceOfOperation>(), //
         make_unique<ReadThermostatSystemMode>(),                  //
