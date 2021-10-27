@@ -349,7 +349,7 @@ void HandleSendTimerComplete(System::Layer * aSystemLayer, void * aAppState)
 
 // Raw Endpoint Callback Handlers
 
-void HandleRawMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBufferHandle & aBuffer,
+void HandleRawMessageReceived(const UDPEndPoint * aEndPoint, const PacketBufferHandle & aBuffer,
                               const IPPacketInfo * aPacketInfo)
 {
     char lSourceAddressBuffer[INET6_ADDRSTRLEN];
@@ -362,7 +362,7 @@ void HandleRawMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBuf
            static_cast<size_t>(aBuffer->DataLength()));
 }
 
-void HandleRawReceiveError(const IPEndPointBasis * aEndPoint, const CHIP_ERROR & aError, const IPPacketInfo * aPacketInfo)
+void HandleRawReceiveError(const UDPEndPoint * aEndPoint, const CHIP_ERROR & aError, const IPPacketInfo * aPacketInfo)
 {
     char lAddressBuffer[INET6_ADDRSTRLEN];
 
@@ -380,7 +380,7 @@ void HandleRawReceiveError(const IPEndPointBasis * aEndPoint, const CHIP_ERROR &
 
 // UDP Endpoint Callback Handlers
 
-void HandleUDPMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBufferHandle & aBuffer,
+void HandleUDPMessageReceived(const UDPEndPoint * aEndPoint, const PacketBufferHandle & aBuffer,
                               const IPPacketInfo * aPacketInfo)
 {
     char lSourceAddressBuffer[INET6_ADDRSTRLEN];
@@ -393,7 +393,7 @@ void HandleUDPMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBuf
            lDestinationAddressBuffer, aPacketInfo->DestPort, static_cast<size_t>(aBuffer->DataLength()));
 }
 
-void HandleUDPReceiveError(const IPEndPointBasis * aEndPoint, const CHIP_ERROR & aError, const IPPacketInfo * aPacketInfo)
+void HandleUDPReceiveError(const UDPEndPoint * aEndPoint, const CHIP_ERROR & aError, const IPPacketInfo * aPacketInfo)
 {
     char lAddressBuffer[INET6_ADDRSTRLEN];
     uint16_t lSourcePort;

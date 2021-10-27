@@ -845,7 +845,6 @@ namespace chip {
 
 namespace Inet {
 class UDPEndPoint;
-class IPEndPointBasis;
 } // namespace Inet
 
 namespace System {
@@ -865,7 +864,6 @@ private:
      */
     static struct pbuf * UnsafeGetLwIPpbuf(const PacketBufferHandle & handle) { return PacketBufferHandle::GetLwIPpbuf(handle); }
     friend class Inet::UDPEndPoint;
-    friend class Inet::IPEndPointBasis;
 };
 
 } // namespace System
