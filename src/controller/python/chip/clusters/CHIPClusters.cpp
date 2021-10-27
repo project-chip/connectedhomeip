@@ -4029,6 +4029,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredV
     return cluster.ReadAttributeMaxMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_FlowMeasurement_Tolerance(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId,
+                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::FlowMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTolerance(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision(chip::Controller::Device * device,
                                                                                     chip::EndpointId ZCLendpointId,
                                                                                     chip::GroupId /* ZCLgroupId */)
@@ -6204,6 +6214,29 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_RelativeHumidityMeasurement_
     return cluster.ReadAttributeMaxMeasuredValue(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_RelativeHumidityMeasurement_Tolerance(chip::Controller::Device * device,
+                                                                                          chip::EndpointId ZCLendpointId,
+                                                                                          chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::RelativeHumidityMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTolerance(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_RelativeHumidityMeasurement_Tolerance(chip::Controller::Device * device,
+                                                                                               chip::EndpointId ZCLendpointId,
+                                                                                               uint16_t minInterval,
+                                                                                               uint16_t maxInterval)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::RelativeHumidityMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .SubscribeAttributeTolerance(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
+        .AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_RelativeHumidityMeasurement_ClusterRevision(chip::Controller::Device * device,
                                                                                                 chip::EndpointId ZCLendpointId,
                                                                                                 chip::GroupId /* ZCLgroupId */)
@@ -6604,6 +6637,29 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_TemperatureMeasurement_MaxMe
     chip::Controller::TemperatureMeasurementCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ReadAttributeMaxMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_TemperatureMeasurement_Tolerance(chip::Controller::Device * device,
+                                                                                     chip::EndpointId ZCLendpointId,
+                                                                                     chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TemperatureMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTolerance(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_TemperatureMeasurement_Tolerance(chip::Controller::Device * device,
+                                                                                          chip::EndpointId ZCLendpointId,
+                                                                                          uint16_t minInterval,
+                                                                                          uint16_t maxInterval)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TemperatureMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .SubscribeAttributeTolerance(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
+        .AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision(chip::Controller::Device * device,

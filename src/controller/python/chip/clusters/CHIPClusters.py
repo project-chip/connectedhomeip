@@ -1520,6 +1520,11 @@ class ChipClusters:
                 "attributeId": 0x00000002,
                 "type": "int",
             },
+            0x00000003: {
+                "attributeName": "Tolerance",
+                "attributeId": 0x00000003,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -2819,6 +2824,12 @@ class ChipClusters:
                 "attributeId": 0x00000002,
                 "type": "int",
             },
+            0x00000003: {
+                "attributeName": "Tolerance",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -3079,6 +3090,12 @@ class ChipClusters:
                 "attributeName": "MaxMeasuredValue",
                 "attributeId": 0x00000002,
                 "type": "int",
+            },
+            0x00000003: {
+                "attributeName": "Tolerance",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
@@ -5711,6 +5728,9 @@ class ChipClusters:
     def ClusterFlowMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterFlowMeasurement_ReadAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_Tolerance(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterFlowMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -6143,6 +6163,12 @@ class ChipClusters:
     def ClusterRelativeHumidityMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterRelativeHumidityMeasurement_ReadAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_Tolerance(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterRelativeHumidityMeasurement_SubscribeAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_RelativeHumidityMeasurement_Tolerance(device, ZCLendpoint, minInterval, maxInterval)
+
     def ClusterRelativeHumidityMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -6217,6 +6243,12 @@ class ChipClusters:
 
     def ClusterTemperatureMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTemperatureMeasurement_ReadAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_Tolerance(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTemperatureMeasurement_SubscribeAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_TemperatureMeasurement_Tolerance(device, ZCLendpoint, minInterval, maxInterval)
 
     def ClusterTemperatureMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -7811,6 +7843,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster FlowMeasurement ReadAttribute Tolerance
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_Tolerance.restype = ctypes.c_uint32
         # Cluster FlowMeasurement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8669,6 +8705,14 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_MaxMeasuredValue.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster RelativeHumidityMeasurement ReadAttribute Tolerance
+        self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_Tolerance.restype = ctypes.c_uint32
+        # Cluster RelativeHumidityMeasurement SubscribeAttribute Tolerance
+        self._chipLib.chip_ime_SubscribeAttribute_RelativeHumidityMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_RelativeHumidityMeasurement_Tolerance.restype = ctypes.c_uint32
         # Cluster RelativeHumidityMeasurement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8823,6 +8867,14 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster TemperatureMeasurement ReadAttribute Tolerance
+        self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_Tolerance.restype = ctypes.c_uint32
+        # Cluster TemperatureMeasurement SubscribeAttribute Tolerance
+        self._chipLib.chip_ime_SubscribeAttribute_TemperatureMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_TemperatureMeasurement_Tolerance.restype = ctypes.c_uint32
         # Cluster TemperatureMeasurement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
