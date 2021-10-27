@@ -75,6 +75,7 @@ static bool sHaveBLEConnections       = false;
 
 static mbed::Timeout sFunctionTimer;
 
+// TODO: change EventQueue default event size
 static events::EventQueue sAppEventQueue;
 
 using namespace ::chip::Credentials;
