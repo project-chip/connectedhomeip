@@ -30,7 +30,7 @@ source "$CHIP_ROOT/scripts/activate.sh"
 APP_DIR=$1
 
 function runZAP() {
-    ZAP_INPUT_FILE=$INPUT_DIR/apps/$APP_DIR/zap.config
+    ZAP_INPUT_FILE=$INPUT_DIR/apps/$APP_DIR/config.zap
     ZAP_OUTPUT_DIR=$OUTPUT_DIR/$APP_DIR/zap-generated
 
     # Create the folder to host the generated content if needed
