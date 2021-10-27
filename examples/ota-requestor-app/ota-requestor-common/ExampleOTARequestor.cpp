@@ -62,7 +62,7 @@ void ExampleOTARequestor::Init(chip::Controller::ControllerDeviceInitParams conn
 void ExampleOTARequestor::ConnectToProvider()
 {
 
-    if (mConnectToProviderCallback != NULL)
+    if (mConnectToProviderCallback != nullptr)
     {
         ChipLogProgress(SoftwareUpdate, "Attempting to connect to 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8,
                         ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
