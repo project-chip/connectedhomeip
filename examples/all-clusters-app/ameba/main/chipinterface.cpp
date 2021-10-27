@@ -4,6 +4,7 @@
 #include "DeviceCallbacks.h"
 #include "Server.h"
 
+#include <app/clusters/identify-server/identify-server.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 
@@ -14,6 +15,20 @@ void * __dso_handle = 0;
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
+
+Identify gIdentify0 = {
+    chip::EndpointId{ 0 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+};
+
+Identify gIdentify1 = {
+    chip::EndpointId{ 1 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+};
 
 static DeviceCallbacks EchoCallbacks;
 
