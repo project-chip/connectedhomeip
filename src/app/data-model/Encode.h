@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include <app/data-model/Nullable.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
@@ -76,6 +78,37 @@ template <
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
 {
     return x.Encode(writer, tag);
+}
+
+/*
+ * @brief
+ *
+ * Encodes an optional value (struct field, command field, event field).
+ */
+template <typename X>
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<X> & x)
+{
+    if (x.HasValue())
+    {
+        return Encode(writer, tag, x.Value());
+    }
+    // If no value, just do nothing.
+    return CHIP_NO_ERROR;
+}
+
+/*
+ * @brief
+ *
+ * Encodes a nullable value.
+ */
+template <typename X>
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const Nullable<X> & x)
+{
+    if (x.IsNull())
+    {
+        return writer.PutNull(tag);
+    }
+    return Encode(writer, tag, x.Value());
 }
 
 } // namespace DataModel

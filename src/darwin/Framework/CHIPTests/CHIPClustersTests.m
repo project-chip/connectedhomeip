@@ -6743,10 +6743,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000002_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 10ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 100ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 10);
+    WaitForMs(expectation, queue, 100);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000003_ReadAttribute
@@ -6799,10 +6799,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000005_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 100ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 200ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 100);
+    WaitForMs(expectation, queue, 200);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000006_ReadAttribute
@@ -6876,10 +6876,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000009_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 1ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 10ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1);
+    WaitForMs(expectation, queue, 10);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000010_ReadAttribute
@@ -6932,10 +6932,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000012_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 10ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 100ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 10);
+    WaitForMs(expectation, queue, 100);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -7010,10 +7010,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000003_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 2500ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2500);
+    WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000004_ReadAttribute
@@ -7087,10 +7087,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000007_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 2500ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2500);
+    WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000008_ReadAttribute
@@ -7185,10 +7185,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000012_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 10ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 100ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 10);
+    WaitForMs(expectation, queue, 100);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000013_ReadAttribute
@@ -12174,6 +12174,28 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTestIdentifyCluster_000000_Identify
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Identify command and expect success response"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t identifyTimeArgument = 0U;
+    [cluster identify:identifyTimeArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Identify command and expect success response Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTestOperationalCredentialsCluster_000000_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read number of supported fabrics"];
@@ -16932,6 +16954,25 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterOperationalCredentialsReadAttributeTrustedRootCertificatesWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"OperationalCredentialsReadAttributeTrustedRootCertificatesWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTrustedRootCertificatesWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"OperationalCredentials TrustedRootCertificates Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterOperationalCredentialsReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =
@@ -18609,6 +18650,44 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
                                              XCTAssertEqual(err.code, 0);
                                              [expectation fulfill];
                                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterThermostatReadAttributeMinSetpointDeadBandWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ThermostatReadAttributeMinSetpointDeadBandWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMinSetpointDeadBandWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Thermostat MinSetpointDeadBand Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterThermostatWriteAttributeMinSetpointDeadBandWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"ThermostatWriteAttributeMinSetpointDeadBandWithValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int8_t value = 0x0A;
+    [cluster writeAttributeMinSetpointDeadBandWithValue:value
+                                        responseHandler:^(NSError * err, NSDictionary * values) {
+                                            NSLog(@"Thermostat MinSetpointDeadBand Error: %@", err);
+                                            XCTAssertEqual(err.code, 0);
+                                            [expectation fulfill];
+                                        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }

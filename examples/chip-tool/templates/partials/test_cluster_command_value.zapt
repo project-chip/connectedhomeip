@@ -1,7 +1,21 @@
-{{#if isArray}}
+{{#if isOptional}}
+  {{#if ignore}}
+    {{>commandValue ns=ns container=(concat container ".Emplace()") definedValue=definedValue type=type isOptional=false ignore=true}}
+  {{else}}
+    {{>commandValue ns=ns container=(concat container "." label ".Emplace()") definedValue=definedValue type=type isOptional=false ignore=true}}
+  {{/if}}
+{{else if isNullable}}
+  {{#if ignore}}
+    {{>commandValue ns=ns container=(concat container ".SetNonNull()") definedValue=definedValue type=type isNullable=false ignore=true}}
+  {{else}}
+    {{>commandValue ns=ns container=(concat container "." label ".SetNonNull()") definedValue=definedValue type=type isNullable=false ignore=true}}
+  {{/if}}
+{{else if isArray}}
 
-  {{! forceNotList=true because we really want the type of a single item here }}
-  {{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true}} {{asLowerCamelCase label}}List[{{definedValue.length}}];
+  {{! forceNotList=true because we really want the type of a single item here.
+      Similarly, forceNotOptional=true and forceNotNullable=true because we
+      have accounted for those already. }}
+  {{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}} {{asLowerCamelCase label}}List[{{definedValue.length}}];
   {{#each definedValue}}
   {{>commandValue ns=../ns container=(concat (asLowerCamelCase ../label) "List[" @index "]") definedValue=. type=../type ignore=true}}
   {{/each}}

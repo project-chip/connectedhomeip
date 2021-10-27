@@ -62,7 +62,7 @@ public:
     CHIP_ERROR GetProductRevision(uint16_t & productRev) override;
     CHIP_ERROR StoreProductRevision(uint16_t productRev) override;
     CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetFirmwareRevision(uint32_t & firmwareRev) override;
+    CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev) override;
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
@@ -134,7 +134,7 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductId(uint1
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetFirmwareRevision(uint32_t & firmwareRev)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetFirmwareRevision(uint16_t & firmwareRev)
 {
     firmwareRev = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
     return CHIP_NO_ERROR;

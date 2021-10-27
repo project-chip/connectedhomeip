@@ -68,12 +68,14 @@ import os
 import pathlib
 import sys
 
+import numpy as np  # type: ignore
+
 import memdf.collect
 import memdf.report
 import memdf.select
 import memdf.util
 
-from memdf import Config, ConfigDescription, DFs, SectionDF
+from memdf import Config, ConfigDescription, DFs, SectionDF, SegmentDF
 
 PLATFORM_CONFIG_DIR = pathlib.Path('scripts/tools/memory/platform')
 
@@ -169,20 +171,40 @@ def main(argv):
 
         collected: DFs = memdf.collect.collect_files(config, [binary])
 
+        # Aggregate loaded segments, by writable (flash) or not (RAM).
+        segments = collected[SegmentDF.name]
+        segments['segment'] = segments.index
+        segments['wr'] = ((segments['flags'] & 2) != 0).convert_dtypes(
+            convert_boolean=False, convert_integer=True)
+        segment_summary = segments[segments['type'] == 'PT_LOAD'][[
+            'wr', 'size'
+        ]].groupby('wr').aggregate(np.sum).reset_index().astype(
+            {'size': np.int64})
+        segment_summary.attrs['name'] = "wr"
+
         sections = collected[SectionDF.name]
-        section_summary = sections[['section',
-                                    'size']].sort_values(by='section')
+        sections = sections.join(on='segment',
+                                 how='left',
+                                 other=segments,
+                                 rsuffix='-segment')
+        section_summary = sections[['section', 'size',
+                                    'wr']].sort_values(by='section')
         section_summary.attrs['name'] = "section"
 
         summaries = {
             'section': section_summary,
+            'memory': segment_summary,
         }
 
         # Write configured (json) report to the output file.
         memdf.report.write_dfs(config, summaries)
 
         # Write text report to stdout.
-        memdf.report.write_dfs(config, summaries, sys.stdout, 'simple')
+        memdf.report.write_dfs(config,
+                               summaries,
+                               sys.stdout,
+                               'simple',
+                               floatfmt='.0f')
 
     except Exception as exception:
         raise exception

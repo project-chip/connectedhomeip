@@ -378,6 +378,23 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, @ { @"value" : array });
 };
 
+void CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        [array addObject:[NSData dataWithBytes:entry.data() length:entry.size()]];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
 void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
@@ -1269,6 +1286,16 @@ void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccess
             // arg1 : /* TYPE WARNING: array array defaults to */ uint8_t *
             // Conversion from this type to Objc is not properly implemented yet
         });
+};
+
+void CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge::OnSuccessFn(
+    void * context, bool wasPresent, bool wasNull, uint8_t value)
+{
+    DispatchSuccess(context, @ {
+        @"wasPresent" : [NSNumber numberWithBool:wasPresent],
+        @"wasNull" : [NSNumber numberWithBool:wasNull],
+        @"value" : [NSNumber numberWithUnsignedChar:value],
+    });
 };
 
 void CHIPTestClusterClusterTestSpecificResponseCallbackBridge::OnSuccessFn(void * context, uint8_t returnValue)

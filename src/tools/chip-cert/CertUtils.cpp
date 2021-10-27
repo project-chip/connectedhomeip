@@ -97,8 +97,8 @@ bool ToolChipDN::SetCertSubjectDN(X509 * cert) const
         else
         {
             if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(cert), attrNID, MBSTRING_UTF8,
-                                            const_cast<uint8_t *>(rdn[i].mString.data()), static_cast<int>(rdn[i].mString.size()),
-                                            -1, 0))
+                                            reinterpret_cast<uint8_t *>(const_cast<char *>(rdn[i].mString.data())),
+                                            static_cast<int>(rdn[i].mString.size()), -1, 0))
             {
                 ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
             }

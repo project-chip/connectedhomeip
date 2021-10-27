@@ -102,8 +102,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return {{asUpperCamelCase name}}::Id; }
-    static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::{{asUpperCamelCase name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_command_arguments}}
     {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}};
@@ -114,8 +114,8 @@ public:
 
 struct DecodableType {
 public:
-    static constexpr CommandId GetCommandId() { return {{asUpperCamelCase name}}::Id; }
-    static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::{{asUpperCamelCase name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_command_arguments}}
     {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}};
@@ -134,12 +134,14 @@ namespace Attributes {
 {{/first}}
 namespace {{asUpperCamelCase label}} {
     struct TypeInfo {
+    {{! forceNotOptional=true because the optionality is on the attribute
+        itself, but we want just the type of the attribute. }}
     {{#if entryType}}
-        using Type = {{zapTypeToEncodableClusterObjectType entryType}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType entryType}};
+        using Type = {{zapTypeToEncodableClusterObjectType entryType forceNotOptional=true}};
+        using DecodableType = {{zapTypeToDecodableClusterObjectType entryType forceNotOptional=true}};
     {{else}}
-        using Type = {{zapTypeToEncodableClusterObjectType type}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType type}};
+        using Type = {{zapTypeToEncodableClusterObjectType type forceNotOptional=true}};
+        using DecodableType = {{zapTypeToDecodableClusterObjectType type forceNotOptional=true}};
     {{/if}}
 
         static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
@@ -169,7 +171,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::{{asUpperCamelCase priority}};
     static constexpr EventId eventId = {{asMEI manufacturerCode code}};
-    static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_event_fields}}
     {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase name}};
@@ -182,7 +184,7 @@ struct DecodableType {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_event_fields}}
     {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase name}};

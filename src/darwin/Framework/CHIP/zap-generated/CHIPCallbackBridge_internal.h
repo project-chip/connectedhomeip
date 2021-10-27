@@ -332,6 +332,18 @@ public:
                                 chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list);
 };
 
+class CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>
+{
+public:
+    CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+};
+
 class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
     : public CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>
 {
@@ -1284,6 +1296,18 @@ public:
                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context, /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+};
+
+class CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge
+    : public CHIPCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallback>
+{
+public:
+    CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, bool wasPresent, bool wasNull, uint8_t value);
 };
 
 class CHIPTestClusterClusterTestSpecificResponseCallbackBridge

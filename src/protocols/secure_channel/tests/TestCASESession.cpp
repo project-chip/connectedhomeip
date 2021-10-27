@@ -692,9 +692,9 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
 
     gTransportMgr.Init(&gLoopback);
-    ReturnErrorOnFailure(gIOContext.Init(&sSuite));
+    ReturnErrorOnFailure(gIOContext.Init());
 
-    ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr, &gIOContext));
+    ReturnErrorOnFailure(ctx.Init(&gTransportMgr, &gIOContext));
 
     ctx.SetBobNodeId(kPlaceholderNodeId);
     ctx.SetAliceNodeId(kPlaceholderNodeId);
