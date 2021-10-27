@@ -42,10 +42,14 @@ public:
     void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override
     {
         char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
-        nodeData.mAddress.ToString(addrBuffer);
-        ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Address: %s, Port: %" PRIu16, nodeData.mPeerId.GetNodeId(),
-                        addrBuffer, nodeData.mPort);
+
+        ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Port: %" PRIu16, nodeData.mPeerId.GetNodeId(), nodeData.mPort);
         ChipLogProgress(chipTool, "    Hostname: %s", nodeData.mHostName);
+        for (int i = 0; i < nodeData.mNumIPs; ++i)
+        {
+            nodeData.mAddress[i].ToString(addrBuffer);
+            ChipLogProgress(chipTool, "    addr %d: %s", i, addrBuffer);
+        }
 
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 

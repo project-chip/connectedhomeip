@@ -472,10 +472,10 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     {
         ResolvedNodeData nodeData;
 
-        nodeData.mInterfaceId = iface;
-        nodeData.mPort        = port;
-        nodeData.mAddress     = addr;
-        nodeData.mPeerId      = peerId;
+        nodeData.mInterfaceId                 = iface;
+        nodeData.mPort                        = port;
+        nodeData.mAddress[nodeData.mNumIPs++] = addr;
+        nodeData.mPeerId                      = peerId;
 
         mResolverDelegate->OnNodeIdResolved(nodeData);
 
@@ -592,6 +592,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     // TODO --  define appropriate TTL, for now use 2000 msec (rfc default)
     // figure out way to use TTL value from mDNS packet in  future update
+    // TODO: Expand the cache to hold all the addresses.
     error = mgr->sDnssdCache.Insert(nodeData.mPeerId, result->mAddress.Value(), result->mPort, result->mInterface, 2 * 1000);
 
     if (CHIP_NO_ERROR != error)
@@ -600,9 +601,10 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     }
 #endif
 
+    // TODO: Expand the results to include all the addresses.
     Platform::CopyString(nodeData.mHostName, result->mHostName);
     nodeData.mInterfaceId = result->mInterface;
-    nodeData.mAddress     = result->mAddress.ValueOr({});
+    nodeData.mAddress[0]  = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)

@@ -37,15 +37,21 @@ constexpr uint32_t kUndefinedRetryInterval = std::numeric_limits<uint32_t>::max(
 
 struct ResolvedNodeData
 {
+    // TODO: use pool to allow dynamic
+    static constexpr int kMaxIPAddresses = 5;
     void LogNodeIdResolved()
     {
 #if CHIP_PROGRESS_LOGGING
         char addrBuffer[Inet::IPAddress::kMaxStringLength];
-        mAddress.ToString(addrBuffer);
+
         // Would be nice to log the interface id, but sorting out how to do so
         // across our differnet InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64 " to [%s]:%" PRIu16,
-                        ChipLogValueX64(mPeerId.GetNodeId()), addrBuffer, mPort);
+        ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+        for (int i = 0; i < mNumIPs; ++i)
+        {
+            mAddress[i].ToString(addrBuffer);
+            ChipLogProgress(Discovery, "    Addr %d: [%s]:%" PRIu16, i, addrBuffer, mPort);
+        }
 #endif // CHIP_PROGRESS_LOGGING
     }
 
@@ -62,8 +68,9 @@ struct ResolvedNodeData
     }
 
     PeerId mPeerId;
-    Inet::IPAddress mAddress               = Inet::IPAddress::Any;
-    Inet::InterfaceId mInterfaceId         = Inet::InterfaceId::Null();
+    int mNumIPs = 0;
+    Inet::InterfaceId mInterfaceId;
+    Inet::IPAddress mAddress[kMaxIPAddresses];
     uint16_t mPort                         = 0;
     char mHostName[kHostNameMaxLength + 1] = {};
     bool mSupportsTcp                      = false;
