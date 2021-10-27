@@ -45,7 +45,9 @@
 
 namespace chip {
 
-namespace secure_channel { class MessageCounterManager; }
+namespace secure_channel {
+class MessageCounterManager;
+}
 
 class PairingSession;
 
@@ -278,7 +280,7 @@ protected:
      * Process a secure message after decryption, including all message counter replay checks.
      */
     void SecureMessageCounterDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                               System::PacketBufferHandle && msg);
+                                      System::PacketBufferHandle && msg);
 
 private:
     /**
