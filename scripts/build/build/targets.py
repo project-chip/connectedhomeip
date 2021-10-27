@@ -24,6 +24,7 @@ from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
+from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
 
 
 class Target:
@@ -190,6 +191,26 @@ def AndroidTargets():
     yield target.Extend('androidstudio-x86-chip-tool', board=AndroidBoard.AndroidStudio_X86, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('androidstudio-x64-chip-tool', board=AndroidBoard.AndroidStudio_X64, app=AndroidApp.CHIP_TOOL)
 
+def MbedTargets():
+    target = Target('mbed', MbedBuilder)
+
+    targets = [
+        target.Extend('CY8CPROTO_062_4343W', board=MbedBoard.CY8CPROTO_062_4343W),
+    ]
+
+    app_targets = []
+    for target in targets:
+        app_targets.append(target.Extend('lock', app=MbedApp.LOCK))
+        app_targets.append(target.Extend('light', app=MbedApp.LIGHT))
+        app_targets.append(target.Extend('all-clusters', app=MbedApp.ALL_CLUSTERS))
+        app_targets.append(target.Extend('pigweed', app=MbedApp.PIGWEED))
+        app_targets.append(target.Extend('shell', app=MbedApp.SHELL))
+
+    for target in app_targets:
+        yield target.Extend('release', profile=MbedProfile.RELEASE)
+        yield target.Extend('develop', profile=MbedProfile.DEVELOP)
+        yield target.Extend('debug', profile=MbedProfile.DEBUG)
+
 
 ALL = []
 
@@ -199,6 +220,7 @@ target_generators = [
     Efr32Targets(),
     NrfTargets(),
     AndroidTargets(),
+    MbedTargets()
 ]
 
 for generator in target_generators:
