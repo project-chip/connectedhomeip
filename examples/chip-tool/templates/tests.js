@@ -132,6 +132,7 @@ function getTests()
     'TestLogCommands',
     'TestDescriptorCluster',
     'TestBasicInformation',
+    'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
   ];
 
