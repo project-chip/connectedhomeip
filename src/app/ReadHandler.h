@@ -133,7 +133,8 @@ public:
     void SetDirty() { mDirty = true; }
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
-    bool MatchSession(const SessionHandle & session) const {
+    bool MatchSession(const SessionHandle & session) const
+    {
         return mSessionHandle.HasValue() && mSessionHandle.Value() == session;
     }
 

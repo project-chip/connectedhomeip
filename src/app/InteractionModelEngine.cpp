@@ -295,7 +295,8 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
 
     for (auto & readHandler : mReadHandlers)
     {
-        if (!readHandler.IsFree() && readHandler.IsSubscriptionType() && apExchangeContext->HasSessionHandle() && readHandler.MatchSession(apExchangeContext->GetSessionHandle()))
+        if (!readHandler.IsFree() && readHandler.IsSubscriptionType() && apExchangeContext->HasSessionHandle() &&
+            readHandler.MatchSession(apExchangeContext->GetSessionHandle()))
         {
             bool keepSubscriptions = true;
             System::PacketBufferTLVReader reader;
