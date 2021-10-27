@@ -27935,10 +27935,6 @@ JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
     onFailure.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, ThermostatCluster, readMinSetpointDeadBandAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27993,20 +27989,6 @@ JNI_METHOD(void, ThermostatCluster, writeMinSetpointDeadBandAttribute)
 
 JNI_METHOD(void, ThermostatCluster, readControlSequenceOfOperationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, ThermostatCluster, readControlSequenceOfOperationAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 65aa185cd (basic code generation template, but not able to import to tool app)
-=======
-JNI_METHOD(void, ThermostatCluster, readControlSequenceOfOperationAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> b02eb9b8e (create new public class under chip/clusterinfo)
-=======
-JNI_METHOD(void, ThermostatCluster, readControlSequenceOfOperationAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 8f25b7c48 (need to wait for cast-helper)
-=======
-JNI_METHOD(void, ThermostatCluster, readControlSequenceOfOperationAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> a70710878 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(

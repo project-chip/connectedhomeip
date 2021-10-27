@@ -5950,24 +5950,11 @@ public class ChipClusters {
       testNotHandled(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void testNullableOptionalRequest(
         TestNullableOptionalResponseCallback callback, int arg1) {
       testNullableOptionalRequest(chipClusterPtr, callback, arg1);
     }
-=======
->>>>>>> 65aa185cd (basic code generation template, but not able to import to tool app)
 
-=======
->>>>>>> b02eb9b8e (create new public class under chip/clusterinfo)
-=======
-
->>>>>>> 8f25b7c48 (need to wait for cast-helper)
-=======
->>>>>>> a70710878 (callback generation done)
     public void testSpecific(TestSpecificResponseCallback callback) {
       testSpecific(chipClusterPtr, callback);
     }
@@ -6006,24 +5993,10 @@ public class ChipClusters {
         int f);
 
     private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback callback);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     private native void testNullableOptionalRequest(
         long chipClusterPtr, TestNullableOptionalResponseCallback callback, int arg1);
 
-=======
->>>>>>> 65aa185cd (basic code generation template, but not able to import to tool app)
-=======
-
->>>>>>> b02eb9b8e (create new public class under chip/clusterinfo)
-=======
->>>>>>> 8f25b7c48 (need to wait for cast-helper)
-=======
-
->>>>>>> a70710878 (callback generation done)
     private native void testSpecific(long chipClusterPtr, TestSpecificResponseCallback callback);
 
     private native void testStructArgumentRequest(
@@ -6576,10 +6549,6 @@ public class ChipClusters {
       writeMaxCoolSetpointLimitAttribute(chipClusterPtr, callback, value);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void readMinSetpointDeadBandAttribute(IntegerAttributeCallback callback) {
       readMinSetpointDeadBandAttribute(chipClusterPtr, callback);
     }
@@ -6589,22 +6558,6 @@ public class ChipClusters {
     }
 
     public void readControlSequenceOfOperationAttribute(IntegerAttributeCallback callback) {
-=======
-    public void readControlSequenceOfOperationAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> 65aa185cd (basic code generation template, but not able to import to tool app)
-=======
-    public void readControlSequenceOfOperationAttribute(IntegerAttributeCallback callback) {
->>>>>>> b02eb9b8e (create new public class under chip/clusterinfo)
-=======
-    public void readControlSequenceOfOperationAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> 8f25b7c48 (need to wait for cast-helper)
-=======
-    public void readControlSequenceOfOperationAttribute(IntegerAttributeCallback callback) {
->>>>>>> a70710878 (callback generation done)
       readControlSequenceOfOperationAttribute(chipClusterPtr, callback);
     }
 
@@ -6668,14 +6621,6 @@ public class ChipClusters {
     private native void writeOccupiedCoolingSetpointAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b02eb9b8e (create new public class under chip/clusterinfo)
-=======
->>>>>>> a70710878 (callback generation done)
     private native void readOccupiedHeatingSetpointAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -6706,18 +6651,12 @@ public class ChipClusters {
     private native void writeMaxCoolSetpointLimitAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private native void readMinSetpointDeadBandAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeMinSetpointDeadBandAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
 
-=======
->>>>>>> b02eb9b8e (create new public class under chip/clusterinfo)
-=======
->>>>>>> a70710878 (callback generation done)
     private native void readControlSequenceOfOperationAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -6744,40 +6683,6 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 8f25b7c48 (need to wait for cast-helper)
-    private native void writeSystemModeAttribute(long chipClusterPtr, DefaultClusterCallback callback, int value);
-  
-    private native void readStartOfWeekAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readNumberOfWeeklyTransitionsAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readNumberOfDailyTransitionsAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readFeatureMapAttribute(long chipClusterPtr,
-      LongAttributeCallback callback
-    );
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-<<<<<<< HEAD
->>>>>>> 65aa185cd (basic code generation template, but not able to import to tool app)
-=======
->>>>>>> b02eb9b8e (create new public class under chip/clusterinfo)
-=======
->>>>>>> 8f25b7c48 (need to wait for cast-helper)
-=======
->>>>>>> a70710878 (callback generation done)
   }
 
   public static class ThermostatUserInterfaceConfigurationCluster extends BaseChipCluster {

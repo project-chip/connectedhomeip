@@ -1859,6 +1859,31 @@ public class ClusterInfoMapping {
     }
   }
 
+  public class DelegatedTestNullableOptionalResponseCallback
+      implements ChipClusters.TestClusterCluster.TestNullableOptionalResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(boolean wasPresent, boolean wasNull, int value) {
+      List<Object> responseValues = new ArrayList<>();
+      responseValues.add(wasPresent);
+      responseValues.add(wasNull);
+      responseValues.add(value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public class DelegatedTestSpecificResponseCallback
       implements ChipClusters.TestClusterCluster.TestSpecificResponseCallback,
           DelegatedClusterCallback {
@@ -6594,6 +6619,32 @@ public class ClusterInfoMapping {
             () -> new DelegatedDefaultClusterCallback(),
             testClustertestNotHandledCommandParams);
     testClusterClusterCommandInfoMap.put("testNotHandled", testClustertestNotHandledCommandInfo);
+    Map<String, CommandParameterInfo> testClustertestNullableOptionalRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    // TODO: fill out parameter types
+    CommandParameterInfo testClustertestNullableOptionalRequestCommandParameterInfo =
+        new CommandParameterInfo(
+            "TestCluster",
+            ChipClusters.TestClusterCluster.TestNullableOptionalResponseCallback.class);
+    CommandParameterInfo testClustertestNullableOptionalRequestarg1CommandParameterInfo =
+        new CommandParameterInfo("arg1", int.class);
+    testClustertestNullableOptionalRequestCommandParams.put(
+        "arg1", testClustertestNullableOptionalRequestarg1CommandParameterInfo);
+
+    // Populate commands
+    CommandInfo testClustertestNullableOptionalRequestCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .testNullableOptionalRequest(
+                      (ChipClusters.TestClusterCluster.TestNullableOptionalResponseCallback)
+                          callback,
+                      (Integer) commandArguments.get("arg1"));
+            },
+            () -> new DelegatedTestNullableOptionalResponseCallback(),
+            testClustertestNullableOptionalRequestCommandParams);
+    testClusterClusterCommandInfoMap.put(
+        "testNullableOptionalRequest", testClustertestNullableOptionalRequestCommandInfo);
     Map<String, CommandParameterInfo> testClustertestSpecificCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     // TODO: fill out parameter types
