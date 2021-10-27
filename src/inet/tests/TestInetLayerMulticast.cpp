@@ -589,7 +589,7 @@ static bool HandleDataReceived(const PacketBufferHandle & aBuffer, const IPPacke
 
 // UDP Endpoint Callbacks
 
-static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
+static void HandleUDPMessageReceived(UDPEndPoint * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
 {
     const bool lCheckBuffer = true;
     bool lStatus;
@@ -609,7 +609,7 @@ exit:
     }
 }
 
-static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
+static void HandleUDPReceiveError(UDPEndPoint * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleUDPReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -719,7 +719,7 @@ static void StartTest()
     IPAddressType lIPAddressType = IPAddressType::kIPv6;
     IPVersion lIPVersion         = kIPVersion_6;
     IPAddress lAddress           = IPAddress::Any;
-    IPEndPointBasis * lEndPoint  = nullptr;
+    UDPEndPoint * lEndPoint  = nullptr;
     const bool lUseLoopback      = ((gOptFlags & kOptFlagNoLoopback) == 0);
     CHIP_ERROR lStatus;
 
@@ -803,7 +803,7 @@ static void StartTest()
 
 static void CleanupTest()
 {
-    IPEndPointBasis * lEndPoint = nullptr;
+    UDPEndPoint * lEndPoint = nullptr;
     CHIP_ERROR lStatus;
 
     gSendIntervalExpired = false;
