@@ -54,10 +54,14 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build android examples
+            - name: Build Android CHIPTool and CHIPTest
               run: |
                 ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-*' build"
+                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-{arm,arm64,x64,x86}-chip-*' build"
+            - name: Build Android Studio build (arm64 only)
+              run: |
+                ./scripts/run_in_build_env.sh \
+                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-androidstudio-arm64-chip-tool' build"
             - name: Run Android build rule tests
               run: |
                 ./scripts/run_in_build_env.sh \

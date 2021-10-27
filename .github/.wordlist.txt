@@ -550,6 +550,7 @@ matterc
 matterd
 MatterLock
 matterSdkSourceBuild
+matterSourceBuildAbiFilters
 matterUTestLib
 MaxInterval
 MaxIntervalCeilingSeconds
