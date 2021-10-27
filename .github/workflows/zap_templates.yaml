@@ -61,5 +61,9 @@ jobs:
             - name: Check for uncommited changes
               run: |
                 git add .
-                git diff-index HEAD --
-                git diff-index --quiet HEAD --
+                # Show the full diff
+                git diff-index -p HEAD --
+                # Also show just the files that are different, to make it easy
+                # to tell at a glance what might be going on.  And throw in
+                # --exit-code to make this job fail if there is a difference.
+                git diff-index --exit-code HEAD --
