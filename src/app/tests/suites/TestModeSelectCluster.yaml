@@ -47,12 +47,13 @@ tests:
       command: "readAttribute"
       attribute: "SupportedModes"
       response:
-            value: [
-              { label: "Black", mode: 0, semanticTag: 0 },
-              { label: "Cappuccino", mode: 4, semanticTag: 0 },
-              { label: "Espresso", mode: 7, semanticTag: 0 },
-            ]
-            constraints:
+          value:
+              [
+                  { label: "Black", mode: 0, semanticTag: 0 },
+                  { label: "Cappuccino", mode: 4, semanticTag: 0 },
+                  { label: "Espresso", mode: 7, semanticTag: 0 },
+              ]
+          constraints:
               - type: list
               - minLength: 3
               - maxLength: 3
