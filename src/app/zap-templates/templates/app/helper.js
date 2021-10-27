@@ -104,11 +104,6 @@ var endpointClusterWithInit = [
   'Color Control',
   'IAS Zone',
   'Pump Configuration and Control',
-  'Ethernet Network Diagnostics',
-  'Software Diagnostics',
-  'Thread Network Diagnostics',
-  'General Diagnostics',
-  'WiFi Network Diagnostics',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];

@@ -92,12 +92,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath
 }
 } // anonymous namespace
 
-void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpoint)
+void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gAttrAccess);
-        attrAccessRegistered = true;
-    }
+    registerAttributeAccessOverride(&gAttrAccess);
 }
