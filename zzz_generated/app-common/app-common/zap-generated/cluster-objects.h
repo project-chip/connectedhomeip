@@ -5485,7 +5485,7 @@ namespace Attributes {
 namespace ActionList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::ActionStruct::Type>;
+    using Type          = DataModel::List<const Structs::ActionStruct::Type>;
     using DecodableType = DataModel::DecodableList<Structs::ActionStruct::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
@@ -5495,7 +5495,7 @@ struct TypeInfo
 namespace EndpointList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::EndpointListStruct::Type>;
+    using Type          = DataModel::List<const Structs::EndpointListStruct::Type>;
     using DecodableType = DataModel::DecodableList<Structs::EndpointListStruct::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
@@ -23083,9 +23083,9 @@ public:
     DataModel::Nullable<Structs::SimpleStruct::Type> nullableStruct;
     Optional<Structs::SimpleStruct::Type> optionalStruct;
     Optional<DataModel::Nullable<Structs::SimpleStruct::Type>> nullableOptionalStruct;
-    DataModel::Nullable<DataModel::List<SimpleEnum>> nullableList;
-    Optional<DataModel::List<SimpleEnum>> optionalList;
-    Optional<DataModel::Nullable<DataModel::List<SimpleEnum>>> nullableOptionalList;
+    DataModel::Nullable<DataModel::List<const SimpleEnum>> nullableList;
+    Optional<DataModel::List<const SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::List<const SimpleEnum>>> nullableOptionalList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23724,12 +23724,12 @@ public:
     Optional<bool> nullableOptionalStructWasNull;
     Optional<Structs::SimpleStruct::Type> nullableOptionalStructValue;
     bool nullableListWasNull;
-    Optional<DataModel::List<SimpleEnum>> nullableListValue;
+    Optional<DataModel::List<const SimpleEnum>> nullableListValue;
     bool optionalListWasPresent;
-    Optional<DataModel::List<SimpleEnum>> optionalListValue;
+    Optional<DataModel::List<const SimpleEnum>> optionalListValue;
     bool nullableOptionalListWasPresent;
     Optional<bool> nullableOptionalListWasNull;
-    Optional<DataModel::List<SimpleEnum>> nullableOptionalListValue;
+    Optional<DataModel::List<const SimpleEnum>> nullableOptionalListValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -24031,9 +24031,9 @@ public:
     DataModel::Nullable<Structs::SimpleStruct::Type> nullableStruct;
     Optional<Structs::SimpleStruct::Type> optionalStruct;
     Optional<DataModel::Nullable<Structs::SimpleStruct::Type>> nullableOptionalStruct;
-    DataModel::Nullable<DataModel::List<SimpleEnum>> nullableList;
-    Optional<DataModel::List<SimpleEnum>> optionalList;
-    Optional<DataModel::Nullable<DataModel::List<SimpleEnum>>> nullableOptionalList;
+    DataModel::Nullable<DataModel::List<const SimpleEnum>> nullableList;
+    Optional<DataModel::List<const SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::List<const SimpleEnum>>> nullableOptionalList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
