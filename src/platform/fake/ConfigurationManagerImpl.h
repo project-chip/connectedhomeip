@@ -25,7 +25,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the fake platform.
  */
-class ConfigurationManagerImpl final : public ConfigurationManager
+class ConfigurationManagerImpl : public ConfigurationManager
 {
 public:
     virtual ~ConfigurationManagerImpl() = default;

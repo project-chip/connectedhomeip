@@ -41,13 +41,13 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the ESP32 platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
+                                 public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
-                                       public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
+                                 public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
 #endif
-                                       private Internal::ESP32Config
+                                 private Internal::ESP32Config
 {
 public:
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;

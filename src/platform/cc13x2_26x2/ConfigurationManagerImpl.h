@@ -33,8 +33,8 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the CC13X2_26X2 platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                       private Internal::CC13X2_26X2Config
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+                                 private Internal::CC13X2_26X2Config
 {
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
