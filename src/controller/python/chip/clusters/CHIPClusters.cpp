@@ -779,6 +779,56 @@ static void OnMediaInputMediaInputListListAttributeResponse(
 chip::Callback::Callback<MediaInputMediaInputListListAttributeCallback> gMediaInputMediaInputListListAttributeCallback{
     OnMediaInputMediaInputListListAttributeResponse, nullptr
 };
+static void OnModeSelectClusterSupportedModesListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelectCluster::Structs::ModeOptionStruct::DecodableType> &
+        list)
+{
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+#endif // CHIP_PROGRESS_LOGGING
+        ChipLogProgress(Zcl, "    {");
+        ChipLogProgress(Zcl, "      Label: %.*s,", static_cast<int>(entry.label.size()), entry.label.data());
+        ChipLogProgress(Zcl, "      Mode: %" PRIu8 ",", entry.mode);
+        ChipLogProgress(Zcl, "      SemanticTag: %" PRIu32 ",", entry.semanticTag);
+        ChipLogProgress(Zcl, "    },");
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<ModeSelectClusterSupportedModesListAttributeCallback>
+    gModeSelectClusterSupportedModesListAttributeCallback{ OnModeSelectClusterSupportedModesListAttributeResponse, nullptr };
 static void OnOperationalCredentialsFabricsListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<
@@ -5059,6 +5109,103 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_MediaPlayback_ClusterRevisio
 }
 
 // End of Cluster MediaPlayback
+// Cluster ModeSelectCluster
+
+chip::ChipError::StorageType chip_ime_AppendCommand_ModeSelectCluster_ChangeToMode(chip::Controller::Device * device,
+                                                                                   chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                   uint8_t newMode)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ModeSelectClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ChangeToMode(nullptr, nullptr, newMode).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_ModeSelectCluster_CurrentMode(chip::Controller::Device * device,
+                                                                                  chip::EndpointId ZCLendpointId,
+                                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ModeSelectClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentMode(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_ModeSelectCluster_CurrentMode(chip::Controller::Device * device,
+                                                                                       chip::EndpointId ZCLendpointId,
+                                                                                       uint16_t minInterval, uint16_t maxInterval)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ModeSelectClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .SubscribeAttributeCurrentMode(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_ModeSelectCluster_SupportedModes(chip::Controller::Device * device,
+                                                                                     chip::EndpointId ZCLendpointId,
+                                                                                     chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ModeSelectClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeSupportedModes(gModeSelectClusterSupportedModesListAttributeCallback.Cancel(),
+                                     gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_ModeSelectCluster_OnMode(chip::Controller::Device * device,
+                                                                             chip::EndpointId ZCLendpointId,
+                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ModeSelectClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOnMode(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_ModeSelectCluster_OnMode(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                              uint8_t value)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ModeSelectClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.WriteAttributeOnMode(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_ModeSelectCluster_StartUpMode(chip::Controller::Device * device,
+                                                                                  chip::EndpointId ZCLendpointId,
+                                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ModeSelectClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeStartUpMode(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_ModeSelectCluster_Description(chip::Controller::Device * device,
+                                                                                  chip::EndpointId ZCLendpointId,
+                                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ModeSelectClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeDescription(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_ModeSelectCluster_ClusterRevision(chip::Controller::Device * device,
+                                                                                      chip::EndpointId ZCLendpointId,
+                                                                                      chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ModeSelectClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+// End of Cluster ModeSelectCluster
 // Cluster NetworkCommissioning
 
 chip::ChipError::StorageType chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork(

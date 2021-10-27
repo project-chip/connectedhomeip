@@ -1742,6 +1742,47 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeClusterRevision(Callback::Can
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR ModeSelectClusterClusterTest::WriteAttributeCurrentMode(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ModeSelectCluster::Attributes::CurrentMode::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR ModeSelectClusterClusterTest::WriteAttributeStartUpMode(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ModeSelectCluster::Attributes::StartUpMode::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR ModeSelectClusterClusterTest::WriteAttributeDescription(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ModeSelectCluster::Attributes::Description::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR ModeSelectClusterClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ModeSelectCluster::Attributes::ClusterRevision::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
 CHIP_ERROR NetworkCommissioningClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, uint32_t value)
 {

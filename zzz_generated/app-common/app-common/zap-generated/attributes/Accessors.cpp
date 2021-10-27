@@ -3907,6 +3907,54 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool stateValue)
 } // namespace Attributes
 } // namespace BooleanState
 
+namespace ModeSelectCluster {
+namespace Attributes {
+
+namespace CurrentMode {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * currentMode)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::ModeSelectCluster::Id, Id, (uint8_t *) currentMode, sizeof(*currentMode));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t currentMode)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::ModeSelectCluster::Id, Id, (uint8_t *) &currentMode,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace CurrentMode
+
+namespace OnMode {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * onMode)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::ModeSelectCluster::Id, Id, (uint8_t *) onMode, sizeof(*onMode));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t onMode)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::ModeSelectCluster::Id, Id, (uint8_t *) &onMode,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace OnMode
+
+namespace StartUpMode {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * startUpMode)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::ModeSelectCluster::Id, Id, (uint8_t *) startUpMode, sizeof(*startUpMode));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t startUpMode)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::ModeSelectCluster::Id, Id, (uint8_t *) &startUpMode,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace StartUpMode
+
+} // namespace Attributes
+} // namespace ModeSelectCluster
+
 namespace ShadeConfiguration {
 namespace Attributes {
 
