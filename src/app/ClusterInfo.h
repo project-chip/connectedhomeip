@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
 #include <assert.h>
 #include <lib/core/Optional.h>
@@ -53,6 +54,15 @@ public:
         VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
         VerifyOrReturnError(HasWildcardAttributeId() || mAttributeId == other.mAttributeId, false);
         VerifyOrReturnError(HasWildcardListIndex() || mListIndex == other.mListIndex, false);
+
+        return true;
+    }
+
+    bool IsPathIncluded(const ConcreteAttributePath & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+        VerifyOrReturnError(HasWildcardAttributeId() || mAttributeId == other.mAttributeId, false);
 
         return true;
     }

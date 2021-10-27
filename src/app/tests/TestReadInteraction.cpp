@@ -27,6 +27,8 @@
 #include <app/MessageDef/EventDataIB.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/basic-types.h>
+#include <app/util/mock/Constants.h>
+#include <app/util/mock/Functions.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -234,6 +236,11 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     AttributePathIB::Builder attributePath;
     ChipLogDetail(DataManagement, "TEST Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aPath.mClusterId, aPath.mAttributeId);
 
+    if (aPath.mClusterId >= Test::kMockEndpointMin)
+    {
+        return Test::ReadSingleMockClusterData(aAccessingFabricIndex, aPath, aAttributeReport);
+    }
+
     if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))
     {
         AttributeStatusIB::Builder attributeStatus;
@@ -272,6 +279,9 @@ public:
     static void TestProcessSubscribeResponse(nlTestSuite * apSuite, void * apContext);
     static void TestProcessSubscribeRequest(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtrip(nlTestSuite * apSuite, void * apContext);
+    static void TestReadWildcard(nlTestSuite * apSuite, void * apContext);
+    static void TestReadChunking(nlTestSuite * apSuite, void * apContext);
+    static void TestReadChunkingRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext);
@@ -399,7 +409,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
 
     GenerateReportData(apSuite, apContext, reportDatabuf);
-    err = readHandler.SendReportData(std::move(reportDatabuf));
+    err = readHandler.SendReportData(std::move(reportDatabuf), false);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     writer.Init(std::move(readRequestbuf));
@@ -528,7 +538,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
 
     GenerateReportData(apSuite, apContext, reportDatabuf);
-    err = readHandler.SendReportData(std::move(reportDatabuf));
+    err = readHandler.SendReportData(std::move(reportDatabuf), false);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     writer.Init(std::move(readRequestbuf));
@@ -710,6 +720,91 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+    NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+    NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+    // By now we should have closed all exchanges and sent all pending acks, so
+    // there should be no queued-up things in the retransmit table.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    engine->Shutdown();
+}
+
+void TestReadInteraction::TestReadWildcard(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    GenerateEvents(apSuite, apContext);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+
+    chip::app::AttributePathParams attributePathParams[1];
+    attributePathParams[0].mEndpointId = Test::kMockEndpoint2;
+    attributePathParams[0].mClusterId  = Test::MockClusterId(3);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpEventPathParamsList        = nullptr;
+    readPrepareParams.mEventPathParamsListSize     = 0;
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 1;
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 5);
+    NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+    NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+    // By now we should have closed all exchanges and sent all pending acks, so
+    // there should be no queued-up things in the retransmit table.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    engine->Shutdown();
+}
+
+void TestReadInteraction::TestReadChunking(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    GenerateEvents(apSuite, apContext);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+
+    chip::app::AttributePathParams attributePathParams[6];
+    for (int i = 0; i < 6; i++)
+    {
+        attributePathParams[i].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams[i].mClusterId   = Test::MockClusterId(2);
+        attributePathParams[i].mAttributeId = Test::MockAttributeId(4);
+    }
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpEventPathParamsList        = nullptr;
+    readPrepareParams.mEventPathParamsListSize     = 0;
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 6;
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     NL_TEST_ASSERT(apSuite, !delegate.mReadError);
     // By now we should have closed all exchanges and sent all pending acks, so
@@ -1229,6 +1324,8 @@ namespace {
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestReadRoundtrip", chip::app::TestReadInteraction::TestReadRoundtrip),
+    NL_TEST_DEF("TestReadWildcard", chip::app::TestReadInteraction::TestReadWildcard),
+    NL_TEST_DEF("TestReadChunking", chip::app::TestReadInteraction::TestReadChunking),
     NL_TEST_DEF("CheckReadClient", chip::app::TestReadInteraction::TestReadClient),
     NL_TEST_DEF("CheckReadHandler", chip::app::TestReadInteraction::TestReadHandler),
     NL_TEST_DEF("TestReadClientGenerateAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateAttributePathList),

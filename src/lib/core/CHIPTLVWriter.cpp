@@ -58,6 +58,7 @@ NO_INLINE void TLVWriter::Init(uint8_t * buf, size_t maxLen)
     mLenWritten             = 0;
     mMaxLen                 = actualMaxLen;
     mContainerType          = kTLVType_NotSpecified;
+    mReservedSize           = 0;
     SetContainerOpen(false);
     SetCloseContainerReserved(true);
 
@@ -77,6 +78,7 @@ CHIP_ERROR TLVWriter::Init(TLVBackingStore & backingStore, uint32_t maxLen)
     mLenWritten    = 0;
     mMaxLen        = maxLen;
     mContainerType = kTLVType_NotSpecified;
+    mReservedSize  = 0;
     SetContainerOpen(false);
     SetCloseContainerReserved(true);
 

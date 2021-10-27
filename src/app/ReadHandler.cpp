@@ -139,6 +139,15 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
     SuccessOrExit(err);
     switch (mState)
     {
+    case HandlerState::AwaitingChunkingResponse:
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+        MoveToState(HandlerState::GeneratingReports);
+        if (mpExchangeCtx)
+        {
+            mpExchangeCtx->WillSendMessage();
+        }
+        SuccessOrExit(err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
+        break;
     case HandlerState::AwaitingReportResponse:
         if (IsSubscriptionType())
         {
@@ -176,7 +185,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks)
 {
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
     if (IsInitialReport())
@@ -190,7 +199,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
         mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    MoveToState(HandlerState::AwaitingReportResponse);
+    MoveToState(aMoreChunks ? HandlerState::AwaitingChunkingResponse : HandlerState::AwaitingReportResponse);
     CHIP_ERROR err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                                 Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     if (err == CHIP_NO_ERROR)
@@ -200,7 +209,10 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
             err = RefreshSubscribeSyncTimer();
         }
     }
-    ClearDirty();
+    if (!aMoreChunks)
+    {
+        ClearDirty();
+    }
     return err;
 }
 
@@ -364,7 +376,8 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        err = CHIP_NO_ERROR;
+        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
+        err                          = CHIP_NO_ERROR;
     }
 
 exit:
@@ -424,6 +437,9 @@ const char * ReadHandler::GetStateStr() const
 
     case HandlerState::GeneratingReports:
         return "GeneratingReports";
+
+    case HandlerState::AwaitingChunkingResponse:
+        return "AwaitingChunkingResponse";
 
     case HandlerState::AwaitingReportResponse:
         return "AwaitingReportResponse";

@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <app/AttributePathExpandIterator.h>
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelDelegate.h>
@@ -97,12 +98,13 @@ public:
      *  Send ReportData to initiator
      *
      *  @param[in]    aPayload             A payload that has read request data
+     *  @param[in]    aMoreChunks          A flags indicating there will be more chunks for this read request
      *
      *  @retval #Others If fails to send report data
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool mMoreChunks);
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
     bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport; }
@@ -130,7 +132,12 @@ public:
     bool IsActiveSubscription() const { return mActiveSubscription; }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     void GetSubscriptionId(uint64_t & aSubscriptionId) { aSubscriptionId = mSubscriptionId; }
-    void SetDirty() { mDirty = true; }
+    AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
+    void SetDirty()
+    {
+        mDirty                       = true;
+        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
+    }
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
@@ -140,11 +147,12 @@ private:
     friend class TestReadInteraction;
     enum class HandlerState
     {
-        Uninitialized = 0,      ///< The handler has not been initialized
-        Initialized,            ///< The handler has been initialized and is ready
-        GeneratingReports,      ///< The handler has received either a Read or Subscribe request and is the process of generating a
-                                ///< report.
-        AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
+        Uninitialized = 0, ///< The handler has not been initialized
+        Initialized,       ///< The handler has been initialized and is ready
+        GeneratingReports, ///< The handler has received either a Read or Subscribe request and is the process of generating a
+                           ///< report.
+        AwaitingChunkingResponse, ///< The handler just sent a report chunk and is waiting a status response.
+        AwaitingReportResponse,   ///< The handler has sent the last report chunk to the client and is awaiting a status response.
     };
 
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
@@ -189,11 +197,12 @@ private:
     uint16_t mMinIntervalFloorSeconds          = 0;
     uint16_t mMaxIntervalCeilingSeconds        = 0;
     Optional<SessionHandle> mSessionHandle;
-    bool mHoldReport         = false;
-    bool mDirty              = false;
-    bool mActiveSubscription = false;
-    NodeId mInitiatorNodeId  = kUndefinedNodeId;
-    FabricIndex mFabricIndex = 0;
+    bool mHoldReport                                         = false;
+    bool mDirty                                              = false;
+    bool mActiveSubscription                                 = false;
+    NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
+    FabricIndex mFabricIndex                                 = 0;
+    AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
 };
 } // namespace app
 } // namespace chip

@@ -265,6 +265,7 @@ private:
     Callback * mpCallback                      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
     bool mInitialReport                        = true;
+    bool mPendingMoreChunks                    = false;
     uint16_t mMinIntervalFloorSeconds          = 0;
     uint16_t mMaxIntervalCeilingSeconds        = 0;
     uint64_t mSubscriptionId                   = 0;

@@ -261,7 +261,7 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
 
 exit:
-    if (!IsSubscriptionType() || err != CHIP_NO_ERROR)
+    if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
     {
         ShutdownInternal(err);
     }
@@ -300,7 +300,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     bool isEventReportsPresent       = false;
     bool isAttributeReportIBsPresent = false;
     bool suppressResponse            = false;
-    bool moreChunkedMessages         = false;
     uint64_t subscriptionId          = 0;
     EventReports::Parser EventReports;
     AttributeReportIBs::Parser attributeReportIBs;
@@ -349,10 +348,11 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
-    err = report.GetMoreChunkedMessages(&moreChunkedMessages);
+    err = report.GetMoreChunkedMessages(&mPendingMoreChunks);
     if (CHIP_END_OF_TLV == err)
     {
-        err = CHIP_NO_ERROR;
+        mPendingMoreChunks = false;
+        err                = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
@@ -378,7 +378,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
-    if (isAttributeReportIBsPresent && nullptr != mpCallback && !moreChunkedMessages)
+    if (isAttributeReportIBsPresent && nullptr != mpCallback)
     {
         TLV::TLVReader attributeReportIBsReader;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
@@ -407,9 +407,9 @@ exit:
 
     StatusResponse::SendStatusResponse(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
                                                             : Protocols::InteractionModel::Status::InvalidSubscription,
-                                       mpExchangeCtx, IsAwaitingSubscribeResponse());
+                                       mpExchangeCtx, IsAwaitingSubscribeResponse() || mPendingMoreChunks);
 
-    if (!mInitialReport)
+    if (!mInitialReport && !mPendingMoreChunks)
     {
         mpExchangeCtx = nullptr;
     }

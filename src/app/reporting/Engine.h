@@ -95,7 +95,7 @@ private:
     CHIP_ERROR BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
     CHIP_ERROR RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
-                                   ClusterInfo & aClusterInfo);
+                                   const ConcreteAttributePath & aClusterInfo);
     EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
 
     /**
@@ -149,6 +149,9 @@ private:
      *
      */
     ClusterInfo * mpGlobalDirtySet = nullptr;
+
+    constexpr static uint32_t kReservedSizeForMoreChunksFlag =
+        2; // According to TLV encoding, the TAG length is 1 byte and its type is 1 byte.
 };
 
 }; // namespace reporting
