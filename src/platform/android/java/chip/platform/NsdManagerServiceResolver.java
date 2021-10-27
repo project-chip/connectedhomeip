@@ -25,7 +25,6 @@ import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
