@@ -62,6 +62,43 @@ constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milli
 OTAProviderExample::queryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
 uint32_t gDelayedActionTimeSec                                 = 0;
 const char * gOtaFilepath                                      = nullptr;
+uint32_t otaTransferInProgress                                 = false;
+
+void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
+void OnTransferComplete(void * context);
+void OnTransferFailed(void * context);
+
+chip::Callback::Callback<OnBdxBlockQuery> mOnBlockQuery(OnBlockQuery, nullptr);
+chip::Callback::Callback<OnBdxTransferComplete> mOnTransferComplete(OnTransferComplete, nullptr);
+chip::Callback::Callback<OnBdxTransferFailed> mOnTransferFailed(OnTransferFailed, nullptr);
+
+void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset)
+{
+    std::ifstream otaFile(gOtaFilepath, std::ifstream::in);
+    VerifyOrReturn(otaFile.good(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
+    otaFile.seekg(offset);
+    otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), kMaxBdxBlockSize);
+    if ((otaFile.good() || otaFile.eof()) == false)
+    {
+        ChipLogError(BDX, "%s: file read failed", __FUNCTION__);
+        return;
+    }
+
+    size  = static_cast<size_t>(otaFile.gcount());
+    isEof = (size < kMaxBdxBlockSize || otaFile.peek() == EOF);
+}
+
+void OnTransferComplete(void * context)
+{
+    ChipLogDetail(SoftwareUpdate, "OTA file transfer Complete!");
+    otaTransferInProgress = false;
+}
+
+void OnTransferFailed(void * context)
+{
+    ChipLogDetail(SoftwareUpdate, "OTA file transfer failed");
+    otaTransferInProgress = false;
+}
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -177,8 +214,13 @@ int main(int argc, char * argv[])
     if (gOtaFilepath != nullptr)
     {
         otaProvider.SetOTAFilePath(gOtaFilepath);
-        bdxServer.SetFilepath(gOtaFilepath);
     }
+
+    BdxOtaSenderCallbacks callbacks;
+    callbacks.onBlockQuery       = &mOnBlockQuery;
+    callbacks.onTransferComplete = &mOnTransferComplete;
+    callbacks.onTransferFailed   = &mOnTransferFailed;
+    bdxServer.SetCallbacks(callbacks);
 
     otaProvider.SetQueryImageBehavior(gQueryImageBehavior);
     otaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
