@@ -194,6 +194,18 @@ protected:
 
     bool CheckValueAsString(const char * itemName, chip::CharSpan current, const char * expected);
 
+    template <typename T>
+    bool CheckValuePresent(const char * itemName, const chip::Optional<T> & value)
+    {
+        if (value.HasValue())
+        {
+            return true;
+        }
+
+        Exit(std::string(itemName) + " expected to have value but doesn't");
+        return false;
+    }
+
     chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 

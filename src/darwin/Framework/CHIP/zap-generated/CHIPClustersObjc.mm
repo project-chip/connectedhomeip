@@ -4523,6 +4523,14 @@ using chip::Callback::Cancelable;
     });
 }
 
+- (void)testNullableOptionalRequest:(uint8_t)arg1 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.TestNullableOptionalRequest(success, failure, arg1);
+        });
+}
+
 - (void)testSpecific:(ResponseHandler)responseHandler
 {
     new CHIPTestClusterClusterTestSpecificResponseCallbackBridge(

@@ -1288,6 +1288,16 @@ void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccess
         });
 };
 
+void CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge::OnSuccessFn(
+    void * context, bool wasPresent, bool wasNull, uint8_t value)
+{
+    DispatchSuccess(context, @ {
+        @"wasPresent" : [NSNumber numberWithBool:wasPresent],
+        @"wasNull" : [NSNumber numberWithBool:wasNull],
+        @"value" : [NSNumber numberWithUnsignedChar:value],
+    });
+};
+
 void CHIPTestClusterClusterTestSpecificResponseCallbackBridge::OnSuccessFn(void * context, uint8_t returnValue)
 {
     DispatchSuccess(context, @ {

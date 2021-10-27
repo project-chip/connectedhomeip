@@ -15121,6 +15121,90 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace SimpleStruct
+namespace NullablesAndOptionalsStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableInt)), nullableInt));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalInt)), optionalInt));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalInt)), nullableOptionalInt));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableString)), nullableString));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalString)), optionalString));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalString)), nullableOptionalString));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableStruct)), nullableStruct));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalStruct)), optionalStruct));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalStruct)), nullableOptionalStruct));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableList)), nullableList));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalList)), optionalList));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalList)), nullableOptionalList));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kNullableInt):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt));
+            break;
+        case to_underlying(Fields::kOptionalInt):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalInt));
+            break;
+        case to_underlying(Fields::kNullableOptionalInt):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalInt));
+            break;
+        case to_underlying(Fields::kNullableString):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableString));
+            break;
+        case to_underlying(Fields::kOptionalString):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalString));
+            break;
+        case to_underlying(Fields::kNullableOptionalString):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalString));
+            break;
+        case to_underlying(Fields::kNullableStruct):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStruct));
+            break;
+        case to_underlying(Fields::kOptionalStruct):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStruct));
+            break;
+        case to_underlying(Fields::kNullableOptionalStruct):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStruct));
+            break;
+        case to_underlying(Fields::kNullableList):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableList));
+            break;
+        case to_underlying(Fields::kOptionalList):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalList));
+            break;
+        case to_underlying(Fields::kNullableOptionalList):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalList));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace NullablesAndOptionalsStruct
 namespace NestedStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -15778,6 +15862,48 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace TestStructArrayArgumentRequest.
+namespace TestNullableOptionalResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kWasPresent)), wasPresent));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kWasNull)), wasNull));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kValue)), value));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kWasPresent):
+            ReturnErrorOnFailure(DataModel::Decode(reader, wasPresent));
+            break;
+        case to_underlying(Fields::kWasNull):
+            ReturnErrorOnFailure(DataModel::Decode(reader, wasNull));
+            break;
+        case to_underlying(Fields::kValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace TestNullableOptionalResponse.
 namespace TestStructArgumentRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -15812,6 +15938,172 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace TestStructArgumentRequest.
+namespace TestComplexNullableOptionalResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableIntWasNull)), nullableIntWasNull));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableIntValue)), nullableIntValue));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalIntWasPresent)), optionalIntWasPresent));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalIntValue)), optionalIntValue));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalIntWasPresent)),
+                                           nullableOptionalIntWasPresent));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalIntWasNull)), nullableOptionalIntWasNull));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalIntValue)), nullableOptionalIntValue));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableStringWasNull)), nullableStringWasNull));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableStringValue)), nullableStringValue));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalStringWasPresent)), optionalStringWasPresent));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalStringValue)), optionalStringValue));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalStringWasPresent)),
+                                           nullableOptionalStringWasPresent));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalStringWasNull)),
+                                           nullableOptionalStringWasNull));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalStringValue)),
+                                           nullableOptionalStringValue));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableStructWasNull)), nullableStructWasNull));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableStructValue)), nullableStructValue));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalStructWasPresent)), optionalStructWasPresent));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalStructValue)), optionalStructValue));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalStructWasPresent)),
+                                           nullableOptionalStructWasPresent));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalStructWasNull)),
+                                           nullableOptionalStructWasNull));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalStructValue)),
+                                           nullableOptionalStructValue));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableListWasNull)), nullableListWasNull));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableListValue)), nullableListValue));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalListWasPresent)), optionalListWasPresent));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalListValue)), optionalListValue));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalListWasPresent)),
+                                           nullableOptionalListWasPresent));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalListWasNull)),
+                                           nullableOptionalListWasNull));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalListValue)), nullableOptionalListValue));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kNullableIntWasNull):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableIntWasNull));
+            break;
+        case to_underlying(Fields::kNullableIntValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableIntValue));
+            break;
+        case to_underlying(Fields::kOptionalIntWasPresent):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalIntWasPresent));
+            break;
+        case to_underlying(Fields::kOptionalIntValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalIntValue));
+            break;
+        case to_underlying(Fields::kNullableOptionalIntWasPresent):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalIntWasPresent));
+            break;
+        case to_underlying(Fields::kNullableOptionalIntWasNull):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalIntWasNull));
+            break;
+        case to_underlying(Fields::kNullableOptionalIntValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalIntValue));
+            break;
+        case to_underlying(Fields::kNullableStringWasNull):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStringWasNull));
+            break;
+        case to_underlying(Fields::kNullableStringValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStringValue));
+            break;
+        case to_underlying(Fields::kOptionalStringWasPresent):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStringWasPresent));
+            break;
+        case to_underlying(Fields::kOptionalStringValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStringValue));
+            break;
+        case to_underlying(Fields::kNullableOptionalStringWasPresent):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStringWasPresent));
+            break;
+        case to_underlying(Fields::kNullableOptionalStringWasNull):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStringWasNull));
+            break;
+        case to_underlying(Fields::kNullableOptionalStringValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStringValue));
+            break;
+        case to_underlying(Fields::kNullableStructWasNull):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStructWasNull));
+            break;
+        case to_underlying(Fields::kNullableStructValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStructValue));
+            break;
+        case to_underlying(Fields::kOptionalStructWasPresent):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStructWasPresent));
+            break;
+        case to_underlying(Fields::kOptionalStructValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStructValue));
+            break;
+        case to_underlying(Fields::kNullableOptionalStructWasPresent):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStructWasPresent));
+            break;
+        case to_underlying(Fields::kNullableOptionalStructWasNull):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStructWasNull));
+            break;
+        case to_underlying(Fields::kNullableOptionalStructValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStructValue));
+            break;
+        case to_underlying(Fields::kNullableListWasNull):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableListWasNull));
+            break;
+        case to_underlying(Fields::kNullableListValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableListValue));
+            break;
+        case to_underlying(Fields::kOptionalListWasPresent):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalListWasPresent));
+            break;
+        case to_underlying(Fields::kOptionalListValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalListValue));
+            break;
+        case to_underlying(Fields::kNullableOptionalListWasPresent):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalListWasPresent));
+            break;
+        case to_underlying(Fields::kNullableOptionalListWasNull):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalListWasNull));
+            break;
+        case to_underlying(Fields::kNullableOptionalListValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalListValue));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace TestComplexNullableOptionalResponse.
 namespace TestNestedStructArgumentRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -16054,6 +16346,122 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace TestEnumsRequest.
+namespace TestNullableOptionalRequest {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kArg1)), arg1));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kArg1):
+            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace TestNullableOptionalRequest.
+namespace TestComplexNullableOptionalRequest {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableInt)), nullableInt));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalInt)), optionalInt));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalInt)), nullableOptionalInt));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableString)), nullableString));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalString)), optionalString));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalString)), nullableOptionalString));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableStruct)), nullableStruct));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalStruct)), optionalStruct));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalStruct)), nullableOptionalStruct));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableList)), nullableList));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalList)), optionalList));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableOptionalList)), nullableOptionalList));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kNullableInt):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt));
+            break;
+        case to_underlying(Fields::kOptionalInt):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalInt));
+            break;
+        case to_underlying(Fields::kNullableOptionalInt):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalInt));
+            break;
+        case to_underlying(Fields::kNullableString):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableString));
+            break;
+        case to_underlying(Fields::kOptionalString):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalString));
+            break;
+        case to_underlying(Fields::kNullableOptionalString):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalString));
+            break;
+        case to_underlying(Fields::kNullableStruct):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStruct));
+            break;
+        case to_underlying(Fields::kOptionalStruct):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStruct));
+            break;
+        case to_underlying(Fields::kNullableOptionalStruct):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStruct));
+            break;
+        case to_underlying(Fields::kNullableList):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableList));
+            break;
+        case to_underlying(Fields::kOptionalList):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalList));
+            break;
+        case to_underlying(Fields::kNullableOptionalList):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalList));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace TestComplexNullableOptionalRequest.
 } // namespace Commands
 
 namespace Events {

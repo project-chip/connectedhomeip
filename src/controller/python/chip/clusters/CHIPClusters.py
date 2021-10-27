@@ -3145,6 +3145,13 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x0000000F: {
+                "commandId": 0x0000000F,
+                "commandName": "TestNullableOptionalRequest",
+                "args": {
+                    "arg1": "int",
+                },
+            },
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "TestSpecific",
@@ -5052,6 +5059,11 @@ class ChipClusters:
     def ClusterTestCluster_CommandTestNotHandled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled(
             device, ZCLendpoint, ZCLgroupid
+        )
+
+    def ClusterTestCluster_CommandTestNullableOptionalRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, arg1: int):
+        return self._chipLib.chip_ime_AppendCommand_TestCluster_TestNullableOptionalRequest(
+            device, ZCLendpoint, ZCLgroupid, arg1
         )
 
     def ClusterTestCluster_CommandTestSpecific(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -8836,6 +8848,10 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.restype = ctypes.c_uint32
+        # Cluster TestCluster Command TestNullableOptionalRequest
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestNullableOptionalRequest.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestNullableOptionalRequest.restype = ctypes.c_uint32
         # Cluster TestCluster Command TestSpecific
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestSpecific.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

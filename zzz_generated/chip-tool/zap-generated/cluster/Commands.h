@@ -1848,6 +1848,18 @@ static void OnTestClusterTestListInt8UReverseResponseSuccess(
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 };
 
+static void OnTestClusterTestNullableOptionalResponseSuccess(
+    void * context, const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received TestNullableOptionalResponse:");
+    ChipLogProgress(Zcl, "  wasPresent: %d", data.wasPresent);
+    ChipLogProgress(Zcl, "  wasNull: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  value: Optional printing is not implemented yet.");
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+};
+
 static void OnTestClusterTestSpecificResponseSuccess(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data)
 {
@@ -18509,6 +18521,7 @@ private:
 | * TestListInt8UReverseRequest                                       |   0x0D |
 | * TestListStructArgumentRequest                                     |   0x09 |
 | * TestNotHandled                                                    |   0x01 |
+| * TestNullableOptionalRequest                                       |   0x0F |
 | * TestSpecific                                                      |   0x02 |
 | * TestStructArgumentRequest                                         |   0x07 |
 | * TestUnknownCommand                                                |   0x03 |
@@ -18710,6 +18723,31 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type mRequest;
+};
+
+/*
+ * Command TestNullableOptionalRequest
+ */
+class TestClusterTestNullableOptionalRequest : public ModelCommand
+{
+public:
+    TestClusterTestNullableOptionalRequest() : ModelCommand("test-nullable-optional-request")
+    {
+        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnTestClusterTestNullableOptionalResponseSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type mRequest;
 };
 
 /*
@@ -26912,6 +26950,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<TestClusterTestListInt8UReverseRequest>(),   //
         make_unique<TestClusterTestListStructArgumentRequest>(), //
         make_unique<TestClusterTestNotHandled>(),                //
+        make_unique<TestClusterTestNullableOptionalRequest>(),   //
         make_unique<TestClusterTestSpecific>(),                  //
         make_unique<TestClusterTestStructArgumentRequest>(),     //
         make_unique<TestClusterTestUnknownCommand>(),            //

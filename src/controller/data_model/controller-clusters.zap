@@ -11007,6 +11007,14 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
+            },
+            {
+              "name": "TestNullableOptionalRequest",
+              "code": 15,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -11062,6 +11070,14 @@
             {
               "name": "TestEnumsResponse",
               "code": 5,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "TestNullableOptionalResponse",
+              "code": 6,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,

@@ -29,6 +29,7 @@
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/Optional.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
@@ -110,6 +111,7 @@ public:
     // TODO - Optimize persistent storage of NOC and Root Cert in FabricInfo.
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert) { return SetCert(mRootCert, cert); }
     CHIP_ERROR SetICACert(const chip::ByteSpan & cert) { return SetCert(mICACert, cert); }
+    CHIP_ERROR SetICACert(const Optional<ByteSpan> & cert) { return SetICACert(cert.ValueOr(ByteSpan())); }
     CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert) { return SetCert(mNOCCert, cert); }
 
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }

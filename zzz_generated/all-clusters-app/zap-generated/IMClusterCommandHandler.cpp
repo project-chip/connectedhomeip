@@ -1683,6 +1683,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::TestNullableOptionalRequest::Id: {
+            Commands::TestNullableOptionalRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfTestClusterClusterTestNullableOptionalRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::TestSpecific::Id: {
             Commands::TestSpecific::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
