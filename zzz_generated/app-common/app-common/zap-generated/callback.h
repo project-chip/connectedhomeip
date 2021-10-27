@@ -13904,11 +13904,33 @@ bool emberAfTestClusterClusterTestStructArrayArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentRequest::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster TestNullableOptionalResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestNullableOptionalResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                                   bool wasPresent, bool wasNull, uint8_t value);
+/**
  * @brief Test Cluster Cluster TestStructArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestStructArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestComplexNullableOptionalResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestComplexNullableOptionalResponseCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, bool NullableIntWasNull, uint16_t NullableIntValue,
+    bool OptionalIntWasPresent, uint16_t OptionalIntValue, bool NullableOptionalIntWasPresent, bool NullableOptionalIntWasNull,
+    uint16_t NullableOptionalIntValue, bool NullableStringWasNull, chip::CharSpan NullableStringValue,
+    bool OptionalStringWasPresent, chip::CharSpan OptionalStringValue, bool NullableOptionalStringWasPresent,
+    bool NullableOptionalStringWasNull, chip::CharSpan NullableOptionalStringValue, bool NullableStructWasNull,
+    chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> NullableStructValue,
+    bool OptionalStructWasPresent,
+    chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> OptionalStructValue,
+    bool NullableOptionalStructWasPresent, bool NullableOptionalStructWasNull,
+    chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> NullableOptionalStructValue,
+    bool NullableListWasNull, /* TYPE WARNING: array array defaults to */ uint8_t * NullableListValue, bool OptionalListWasPresent,
+    /* TYPE WARNING: array array defaults to */ uint8_t * OptionalListValue, bool NullableOptionalListWasPresent,
+    bool NullableOptionalListWasNull, /* TYPE WARNING: array array defaults to */ uint8_t * NullableOptionalListValue);
 /**
  * @brief Test Cluster Cluster TestNestedStructArgumentRequest Command callback (from client)
  */
@@ -13951,6 +13973,18 @@ bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
 bool emberAfTestClusterClusterTestEnumsRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestNullableOptionalRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestComplexNullableOptionalRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestComplexNullableOptionalRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalRequest::DecodableType & commandData);
 /**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */

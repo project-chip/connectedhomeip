@@ -390,3 +390,41 @@ tests:
                     ]
       response:
           error: 1
+
+    # Tests for Nullables and Optionals
+
+    - label: "Send Test Command with optional arg set."
+      command: "testNullableOptionalRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 5
+      response:
+          values:
+              - name: "wasPresent"
+                value: true
+              - name: "wasNull"
+                value: false
+              - name: "value"
+                value: 5
+
+    - label: "Send Test Command without its optional arg."
+      command: "testNullableOptionalRequest"
+      response:
+          values:
+              - name: "wasPresent"
+                value: false
+
+    - label: "Send Test Command with optional arg set to null."
+      disabled: true
+      command: "testNullableOptionalRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: null
+      response:
+          values:
+              - name: "wasPresent"
+                value: true
+              - name: "wasNull"
+                value: false

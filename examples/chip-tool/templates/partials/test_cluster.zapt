@@ -171,8 +171,12 @@ class {{filename}}: public TestCommand
           VerifyOrReturn(mReceivedReport_{{waitForReport.index}}, Exit("Initial report not received!"));
           {{/if}}
           {{#chip_tests_item_response_parameters}}
-            {{~#*inline "item"}}{{asLowerCamelCase name}}{{/inline}}
+            {{~#*inline "item"}}{{asLowerCamelCase name}}{{#if isOptional}}.Value(){{/if}}{{/inline}}
             {{#if hasExpectedValue}}
+              {{#if isOptional}}
+                {{~#*inline "item"}}{{asLowerCamelCase name}}{{/inline}}
+                VerifyOrReturn(CheckValuePresent("{{> item}}", {{> item}}));
+              {{/if}}
               VerifyOrReturn(CheckValue
                 {{~#if isList}}AsListLength("{{>item}}", {{>item}}, {{expectedValue.length}})
                 {{else if isArray}}AsList("{{>item}}", {{>item}}, {{expectedValue}})
@@ -182,6 +186,10 @@ class {{filename}}: public TestCommand
               );
             {{/if}}
             {{#if hasExpectedConstraints}}
+              {{#if isOptional}}
+                {{~#*inline "item"}}{{asLowerCamelCase name}}{{/inline}}
+                VerifyOrReturn(CheckValuePresent("{{> item}}", {{> item}}));
+              {{/if}}
               {{#if expectedConstraints.type}}VerifyOrReturn(CheckConstraintType("{{>item}}", "", "{{expectedConstraints.type}}"));{{/if}}
               {{~#if expectedConstraints.format}}VerifyOrReturn(CheckConstraintFormat("{{>item}}", "", "{{expectedConstraints.format}}"));{{/if}}
               {{~#if expectedConstraints.minLength}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.minLength}}));{{/if}}

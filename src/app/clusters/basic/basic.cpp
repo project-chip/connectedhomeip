@@ -18,81 +18,76 @@
 
 #include "basic.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <platform/CHIPDeviceLayer.h>
-
-#include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app/util/af.h>
-#include <app/util/attribute-storage.h>
-#include <lib/support/ZclString.h>
-#include <protocols/interaction_model/Constants.h>
 
 #include <cstring>
 
 using namespace chip;
+using namespace chip::app::Clusters::Basic;
 using namespace chip::DeviceLayer;
 
 void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
 {
-    uint16_t vendorId;
-    uint16_t productId;
-    uint16_t productRevision;
-    uint32_t firmwareRevision;
-    char cString[65];
-    uint8_t bufferMemory[65];
-    MutableByteSpan zclString(bufferMemory);
+    EmberAfStatus status;
 
-    if (ConfigurationMgr().GetVendorName(cString, sizeof(cString)) == CHIP_NO_ERROR)
+    char vendorName[33];
+    if (ConfigurationMgr().GetVendorName(vendorName, sizeof(vendorName)) == CHIP_NO_ERROR)
     {
-        MakeZclCharString(zclString, cString);
-        emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_VENDOR_NAME_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, zclString.data(),
-                              ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+        status = Attributes::VendorName::Set(endpoint, chip::CharSpan(vendorName, strlen(vendorName)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Vendor Name: 0x%02x", status));
     }
 
+    uint16_t vendorId;
     if (ConfigurationMgr().GetVendorId(vendorId) == CHIP_NO_ERROR)
     {
-        emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_VENDOR_ID_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                              reinterpret_cast<uint8_t *>(&vendorId), ZCL_INT16U_ATTRIBUTE_TYPE);
+        status = Attributes::VendorID::Set(endpoint, vendorId);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Vendor Id: 0x%02x", status));
     }
 
-    if (ConfigurationMgr().GetProductName(cString, sizeof(cString)) == CHIP_NO_ERROR)
+    char productName[33];
+    if (ConfigurationMgr().GetProductName(productName, sizeof(productName)) == CHIP_NO_ERROR)
     {
-        MakeZclCharString(zclString, cString);
-        emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_PRODUCT_NAME_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, zclString.data(),
-                              ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+        status = Attributes::ProductName::Set(endpoint, chip::CharSpan(productName, strlen(productName)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product Name: 0x%02x", status));
     }
 
+    uint16_t productId;
     if (ConfigurationMgr().GetProductId(productId) == CHIP_NO_ERROR)
     {
-        emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_PRODUCT_ID_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                              reinterpret_cast<uint8_t *>(&productId), ZCL_INT16U_ATTRIBUTE_TYPE);
+        status = Attributes::ProductID::Set(endpoint, productId);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product Id: 0x%02x", status));
     }
 
-    if (ConfigurationMgr().GetProductRevisionString(cString, sizeof(cString)) == CHIP_NO_ERROR)
+    char productRevisionString[65];
+    if (ConfigurationMgr().GetProductRevisionString(productRevisionString, sizeof(productRevisionString)) == CHIP_NO_ERROR)
     {
-        MakeZclCharString(zclString, cString);
-        emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_HARDWARE_VERSION_STRING_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                              zclString.data(), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+        status =
+            Attributes::HardwareVersionString::Set(endpoint, chip::CharSpan(productRevisionString, strlen(productRevisionString)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                       ChipLogError(Zcl, "Error setting Hardware Version String: 0x%02x", status));
     }
 
+    uint16_t productRevision;
     if (ConfigurationMgr().GetProductRevision(productRevision) == CHIP_NO_ERROR)
     {
-        emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_HARDWARE_VERSION_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                              reinterpret_cast<uint8_t *>(&productRevision), ZCL_INT16U_ATTRIBUTE_TYPE);
+        status = Attributes::HardwareVersion::Set(endpoint, productRevision);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Hardware Version: 0x%02x", status));
     }
 
-    if (ConfigurationMgr().GetFirmwareRevisionString(cString, sizeof(cString)) == CHIP_NO_ERROR)
+    char firmwareRevisionString[65];
+    if (ConfigurationMgr().GetFirmwareRevisionString(firmwareRevisionString, sizeof(firmwareRevisionString)) == CHIP_NO_ERROR)
     {
-        MakeZclCharString(zclString, cString);
-        emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_SOFTWARE_VERSION_STRING_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                              zclString.data(), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+        status = Attributes::SoftwareVersionString::Set(endpoint,
+                                                        chip::CharSpan(firmwareRevisionString, strlen(firmwareRevisionString)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                       ChipLogError(Zcl, "Error setting Software Version String: 0x%02x", status));
     }
 
+    uint16_t firmwareRevision;
     if (ConfigurationMgr().GetFirmwareRevision(firmwareRevision) == CHIP_NO_ERROR)
     {
-        emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_SOFTWARE_VERSION_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                              reinterpret_cast<uint8_t *>(&firmwareRevision), ZCL_INT32U_ATTRIBUTE_TYPE);
+        status = Attributes::HardwareVersion::Set(endpoint, firmwareRevision);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Software Version: 0x%02x", status));
     }
 }

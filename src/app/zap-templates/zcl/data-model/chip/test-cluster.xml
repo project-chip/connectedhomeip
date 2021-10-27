@@ -70,6 +70,27 @@ limitations under the License.
     <item name="a" type="NestedStructList" array="true" optional="false"/>
   </struct>
 
+
+  <struct name="NullablesAndOptionalsStruct">
+    <cluster code="0x050F"/>
+    <item name="NullableInt" type="INT16U" isNullable="true"/>
+    <item name="OptionalInt" type="INT16U" optional="true"/>
+    <item name="NullableOptionalInt" type="INT16U" isNullable="true"
+          optional="true"/>
+    <item name="NullableString" type="CHAR_STRING" isNullable="true"/>
+    <item name="OptionalString" type="CHAR_STRING" optional="true"/>
+    <item name="NullableOptionalString" type="CHAR_STRING" isNullable="true"
+          optional="true"/>
+    <item name="NullableStruct" type="SimpleStruct" isNullable="true"/>
+    <item name="OptionalStruct" type="SimpleStruct" optional="true"/>
+    <item name="NullableOptionalStruct" type="SimpleStruct" isNullable="true"
+          optional="true"/>
+    <item name="NullableList" type="SimpleEnum" isNullable="true" array="true"/>
+    <item name="OptionalList" type="SimpleEnum" optional="true" array="true"/>
+    <item name="NullableOptionalList" type="SimpleEnum" isNullable="true"
+          array="true" optional="true"/>
+  </struct>
+
   <cluster>
     <domain>CHIP</domain>
     <name>Test Cluster</name>
@@ -260,6 +281,42 @@ limitations under the License.
       <arg name="arg2" type="SimpleEnum"/>
     </command>
 
+    <command source="client" code="0x0F" name="TestNullableOptionalRequest"
+             optional="false" response="TestNullableOptionalResponse">
+      <description>
+        Command that takes an argument which is nullable and optional.  The
+        response returns a boolean indicating whether the argument was present,
+        if that's true a boolean indicating whether the argument was null, and
+        if that' false the argument it received.
+      </description>
+      <arg name="arg1" type="INT8U" optional="true" isNullable="true"/>
+    </command>
+
+    <command source="client" code="0x10" name="TestComplexNullableOptionalRequest"
+             optional="false" response="TestComplexNullableOptionalResponse">
+      <description>
+        Command that takes various arguments which can be nullable and/or optional.  The
+        response returns information about which things were received and what
+        their state was.
+      </description>
+      <arg name="NullableInt" type="INT16U" isNullable="true"/>
+      <arg name="OptionalInt" type="INT16U" optional="true"/>
+      <arg name="NullableOptionalInt" type="INT16U" isNullable="true"
+           optional="true"/>
+      <arg name="NullableString" type="CHAR_STRING" isNullable="true"/>
+      <arg name="OptionalString" type="CHAR_STRING" optional="true"/>
+      <arg name="NullableOptionalString" type="CHAR_STRING" isNullable="true"
+           optional="true"/>
+      <arg name="NullableStruct" type="SimpleStruct" isNullable="true"/>
+      <arg name="OptionalStruct" type="SimpleStruct" optional="true"/>
+      <arg name="NullableOptionalStruct" type="SimpleStruct" isNullable="true"
+           optional="true"/>
+      <arg name="NullableList" type="SimpleEnum" isNullable="true" array="true"/>
+      <arg name="OptionalList" type="SimpleEnum" optional="true" array="true"/>
+      <arg name="NullableOptionalList" type="SimpleEnum" isNullable="true"
+           array="true" optional="true"/>
+    </command>
+
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
       <description>
         Simple response for TestWithResponse with a simple return value
@@ -306,6 +363,52 @@ limitations under the License.
       </description>
       <arg name="arg1" type="vendor_id"/>
       <arg name="arg2" type="SimpleEnum"/>
+    </command>
+
+    <command source="server" code="0x06" name="TestNullableOptionalResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Delivers information about the argument TestNullableOptionalRequest had.
+      </description>
+      <arg name="wasPresent" type="BOOLEAN"/>
+      <arg name="wasNull" type="BOOLEAN" optional="true"/>
+      <arg name="value" type="INT8U" optional="true"/>
+    </command>
+
+    <command source="server" code="0x07" name="TestComplexNullableOptionalResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Delivers information about the arguments TestComplexNullableOptionalRequest had.
+      </description>
+      <arg name="NullableIntWasNull" type="BOOLEAN"/>
+      <arg name="NullableIntValue" type="INT16U" optional="true"/>
+      <arg name="OptionalIntWasPresent" type="BOOLEAN"/>
+      <arg name="OptionalIntValue" type="INT16U" optional="true"/>
+      <arg name="NullableOptionalIntWasPresent" type="BOOLEAN"/>
+      <arg name="NullableOptionalIntWasNull" type="BOOLEAN" optional="true"/>
+      <arg name="NullableOptionalIntValue" type="INT16U" optional="true"/>
+      <arg name="NullableStringWasNull" type="BOOLEAN"/>
+      <arg name="NullableStringValue" type="CHAR_STRING" optional="true"/>
+      <arg name="OptionalStringWasPresent" type="BOOLEAN"/>
+      <arg name="OptionalStringValue" type="CHAR_STRING" optional="true"/>
+      <arg name="NullableOptionalStringWasPresent" type="BOOLEAN"/>
+      <arg name="NullableOptionalStringWasNull" type="BOOLEAN" optional="true"/>
+      <arg name="NullableOptionalStringValue" type="CHAR_STRING" optional="true"/>
+      <arg name="NullableStructWasNull" type="BOOLEAN"/>
+      <arg name="NullableStructValue" type="SimpleStruct" optional="true"/>
+      <arg name="OptionalStructWasPresent" type="BOOLEAN"/>
+      <arg name="OptionalStructValue" type="SimpleStruct" optional="true"/>
+      <arg name="NullableOptionalStructWasPresent" type="BOOLEAN"/>
+      <arg name="NullableOptionalStructWasNull" type="BOOLEAN" optional="true"/>
+      <arg name="NullableOptionalStructValue" type="SimpleStruct" optional="true"/>
+      <arg name="NullableListWasNull" type="BOOLEAN"/>
+      <arg name="NullableListValue" type="SimpleEnum" array="true"
+           optional="true"/>
+      <arg name="OptionalListWasPresent" type="BOOLEAN"/>
+      <arg name="OptionalListValue" type="SimpleEnum" array="true"
+           optional="true"/>
+      <arg name="NullableOptionalListWasPresent" type="BOOLEAN"/>
+      <arg name="NullableOptionalListWasNull" type="BOOLEAN" optional="true"/>
+      <arg name="NullableOptionalListValue" type="SimpleEnum" array="true"
+           optional="true"/>
     </command>
 
     <event code="0x0001" name="TestEvent" priority="info" side="server">

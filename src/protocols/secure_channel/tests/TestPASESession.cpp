@@ -374,11 +374,11 @@ int TestSecurePairing_Setup(void * inContext)
 {
     // Initialize System memory and resources
     VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init() == CHIP_NO_ERROR, FAILURE);
     VerifyOrReturnError(gTransportMgr.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
 
     auto & ctx = *static_cast<TestContext *>(inContext);
-    VerifyOrReturnError(ctx.Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(ctx.Init(&gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     ctx.SetBobNodeId(kPlaceholderNodeId);
     ctx.SetAliceNodeId(kPlaceholderNodeId);

@@ -1526,6 +1526,7 @@ NS_ASSUME_NONNULL_BEGIN
                                     f:(uint8_t)f
                       responseHandler:(ResponseHandler)responseHandler;
 - (void)testNotHandled:(ResponseHandler)responseHandler;
+- (void)testNullableOptionalRequest:(uint8_t)arg1 responseHandler:(ResponseHandler)responseHandler;
 - (void)testSpecific:(ResponseHandler)responseHandler;
 - (void)testStructArgumentRequest:(uint8_t)a
                                 b:(bool)b

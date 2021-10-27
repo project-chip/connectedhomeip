@@ -134,12 +134,14 @@ namespace Attributes {
 {{/first}}
 namespace {{asUpperCamelCase label}} {
     struct TypeInfo {
+    {{! forceNotOptional=true because the optionality is on the attribute
+        itself, but we want just the type of the attribute. }}
     {{#if entryType}}
-        using Type = {{zapTypeToEncodableClusterObjectType entryType}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType entryType}};
+        using Type = {{zapTypeToEncodableClusterObjectType entryType forceNotOptional=true}};
+        using DecodableType = {{zapTypeToDecodableClusterObjectType entryType forceNotOptional=true}};
     {{else}}
-        using Type = {{zapTypeToEncodableClusterObjectType type}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType type}};
+        using Type = {{zapTypeToEncodableClusterObjectType type forceNotOptional=true}};
+        using DecodableType = {{zapTypeToDecodableClusterObjectType type forceNotOptional=true}};
     {{/if}}
 
         static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
