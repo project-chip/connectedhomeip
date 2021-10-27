@@ -21,39 +21,39 @@ config:
 tests:
     - label: "Write 1 to the OperationMode attribute to DUT: OperationMode"
       command: "writeAttribute"
-      attribute: "operation mode"
+      attribute: "OperationMode"
       arguments:
           value: 1
 
     - label: "Reads the attribute: EffectiveOperationMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective operation mode"
+      attribute: "EffectiveOperationMode"
       response:
           value: 1
 
     - label: "Write 2 to the OperationMode attribute to DUT: OperationMode"
       command: "writeAttribute"
-      attribute: "operation mode"
+      attribute: "OperationMode"
       arguments:
           value: 2
 
     - label: "Reads the attribute: EffectiveOperationMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective operation mode"
+      attribute: "EffectiveOperationMode"
       response:
           value: 2
 
     - label: "Write 3 to the OperationMode attribute to DUT: OperationMode"
       command: "writeAttribute"
-      attribute: "operation mode"
+      attribute: "OperationMode"
       arguments:
           value: 3
 
     - label: "Reads the attribute: EffectiveOperationMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective operation mode"
+      attribute: "EffectiveOperationMode"
       response:
           value: 3

@@ -21,96 +21,96 @@ config:
 tests:
     - label: "Write 0 to the OperationMode attribute to DUT"
       command: "writeAttribute"
-      attribute: "operation mode"
+      attribute: "OperationMode"
       arguments:
           value: 0
 
     - label: "Reads the attribute: EffectiveOperationMode"
       command: "readAttribute"
-      attribute: "effective operation mode"
+      attribute: "EffectiveOperationMode"
       response:
           value: 0
 
     - label: "Write 0 to the ControlMode attribute to DUT"
       disabled: true
       command: "writeAttribute"
-      attribute: "control mode"
+      attribute: "ControlMode"
       arguments:
           value: 0
 
     - label: "Reads the attribute: EffectiveControlMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective control mode"
+      attribute: "EffectiveControlMode"
       response:
           value: 0
 
     - label: "Write 1 to the ControlMode attribute to DUT"
       disabled: true
       command: "writeAttribute"
-      attribute: "control mode"
+      attribute: "ControlMode"
       arguments:
           value: 1
 
     - label: "Reads the attribute: EffectiveControlMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective control mode"
+      attribute: "EffectiveControlMode"
       response:
           value: 1
 
     - label: "Write 2 to the ControlMode attribute to DUT"
       disabled: true
       command: "writeAttribute"
-      attribute: "control mode"
+      attribute: "ControlMode"
       arguments:
           value: 2
 
     - label: "Reads the attribute: EffectiveControlMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective control mode"
+      attribute: "EffectiveControlMode"
       response:
           value: 2
 
     - label: "Write 3 to the ControlMode attribute to DUT"
       disabled: true
       command: "writeAttribute"
-      attribute: "control mode"
+      attribute: "ControlMode"
       arguments:
           value: 3
 
     - label: "Reads the attribute: EffectiveControlMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective control mode"
+      attribute: "EffectiveControlMode"
       response:
           value: 3
 
     - label: "Write 5 to the ControlMode attribute to DUT"
       disabled: true
       command: "writeAttribute"
-      attribute: "control mode"
+      attribute: "ControlMode"
       arguments:
           value: 5
 
     - label: "Reads the attribute: EffectiveControlMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective control mode"
+      attribute: "EffectiveControlMode"
       response:
           value: 5
 
     - label: "Write 7 to the ControlMode attribute to DUT"
       disabled: true
       command: "writeAttribute"
-      attribute: "control mode"
+      attribute: "ControlMode"
       arguments:
           value: 7
 
     - label: "Reads the attribute: EffectiveControlMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective control mode"
+      attribute: "EffectiveControlMode"
       response:
           value: 7
