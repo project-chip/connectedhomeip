@@ -4267,25 +4267,25 @@ class BridgedActions:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=1, Type=str),
+                            Label="name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="Type", Tag=2, Type=BridgedActions.Enums.ActionTypeEnum),
+                            Label="type", Tag=2, Type=BridgedActions.Enums.ActionTypeEnum),
                         ClusterObjectFieldDescriptor(
-                            Label="EndpointListID", Tag=3, Type=uint),
+                            Label="endpointListID", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="SupportedCommands", Tag=4, Type=uint),
+                            Label="supportedCommands", Tag=4, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Status", Tag=5, Type=BridgedActions.Enums.ActionStatusEnum),
+                            Label="status", Tag=5, Type=BridgedActions.Enums.ActionStatusEnum),
                     ])
 
-            ActionID: 'uint' = None
-            Name: 'str' = None
-            Type: 'BridgedActions.Enums.ActionTypeEnum' = None
-            EndpointListID: 'uint' = None
-            SupportedCommands: 'uint' = None
-            Status: 'BridgedActions.Enums.ActionStatusEnum' = None
+            actionID: 'uint' = None
+            name: 'str' = None
+            type: 'BridgedActions.Enums.ActionTypeEnum' = None
+            endpointListID: 'uint' = None
+            supportedCommands: 'uint' = None
+            status: 'BridgedActions.Enums.ActionStatusEnum' = None
 
         @dataclass
         class EndpointListStruct(ClusterObject):
@@ -4294,251 +4294,263 @@ class BridgedActions:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="EndpointListID", Tag=0, Type=uint),
+                            Label="endpointListID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Name", Tag=1, Type=str),
+                            Label="name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(
-                            Label="Type", Tag=2, Type=BridgedActions.Enums.EndpointListTypeEnum),
+                            Label="type", Tag=2, Type=BridgedActions.Enums.EndpointListTypeEnum),
                         ClusterObjectFieldDescriptor(
-                            Label="Endpoints", Tag=3, Type=bytes),
+                            Label="endpoints", Tag=3, Type=bytes),
                     ])
 
-            EndpointListID: 'uint' = None
-            Name: 'str' = None
-            Type: 'BridgedActions.Enums.EndpointListTypeEnum' = None
-            Endpoints: 'bytes' = None
+            endpointListID: 'uint' = None
+            name: 'str' = None
+            type: 'BridgedActions.Enums.EndpointListTypeEnum' = None
+            endpoints: 'bytes' = None
 
     class Commands:
         @dataclass
         class InstantAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0000
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
 
         @dataclass
         class InstantActionWithTransition(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0001
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="TransitionTime", Tag=2, Type=uint),
+                            Label="transitionTime", Tag=2, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
-            TransitionTime: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
+            transitionTime: 'uint' = None
 
         @dataclass
         class StartAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0002
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
 
         @dataclass
         class StartActionWithDuration(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0003
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Duration", Tag=2, Type=uint),
+                            Label="duration", Tag=2, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
-            Duration: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
+            duration: 'uint' = None
 
         @dataclass
         class StopAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0004
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
 
         @dataclass
         class PauseAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0005
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
 
         @dataclass
         class PauseActionWithDuration(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0006
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Duration", Tag=2, Type=uint),
+                            Label="duration", Tag=2, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
-            Duration: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
+            duration: 'uint' = None
 
         @dataclass
         class ResumeAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0007
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
 
         @dataclass
         class EnableAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0008
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
 
         @dataclass
         class EnableActionWithDuration(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0009
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Duration", Tag=2, Type=uint),
+                            Label="duration", Tag=2, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
-            Duration: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
+            duration: 'uint' = None
 
         @dataclass
         class DisableAction(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x000A
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
 
         @dataclass
         class DisableActionWithDuration(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x000B
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="ActionID", Tag=0, Type=uint),
+                            Label="actionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="InvokeID", Tag=1, Type=uint),
+                            Label="invokeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="Duration", Tag=2, Type=uint),
+                            Label="duration", Tag=2, Type=uint),
                     ])
 
-            ActionID: 'uint' = None
-            InvokeID: 'uint' = None
-            Duration: 'uint' = None
+            actionID: 'uint' = None
+            invokeID: 'uint' = None
+            duration: 'uint' = None
 
     class Attributes:
         class ActionList(ClusterAttributeDescriptor):
