@@ -301,7 +301,7 @@ void ChipLinuxAppMainLoop()
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();
 #if defined(ENABLE_CHIP_SHELL)
-    chip::Shell::RegisterDiscoverCommands(&gCommissioner);
+    chip::Shell::RegisterControllerCommands(&gCommissioner);
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 

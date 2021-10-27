@@ -270,33 +270,37 @@ static CHIP_ERROR pairUDC(bool printHeader, uint32_t pincode, size_t index)
 static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
-    streamer_printf(sout, "  help                       Usage: discover <subcommand>\r\n");
+    streamer_printf(sout, "  help                       Usage: controller <subcommand>\r\n");
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     streamer_printf(
-        sout, "  udc-reset                   Clear all pending UDC sessions from this UDC server. Usage: discover udc-reset\r\n");
+        sout, "  udc-reset                   Clear all pending UDC sessions from this UDC server. Usage: controller udc-reset\r\n");
     streamer_printf(
-        sout, "  udc-print                   Print all pending UDC sessions from this UDC server. Usage: discover udc-print\r\n");
+        sout, "  udc-print                   Print all pending UDC sessions from this UDC server. Usage: controller udc-print\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout,
-                    "  udc-commission <pincode> <udc-entry>     Commission given udc-entry using given pincode. Usage: discover "
+                    "  udc-commission <pincode> <udc-entry>     Commission given udc-entry using given pincode. Usage: controller "
                     "udc-commission 34567890 0\r\n");
-    streamer_printf(sout,
-                    "  commissionable                   Discover all commissionable nodes. Usage: discover commissionable\r\n");
-    streamer_printf(sout,
-                    "  commissionable-instance <name>   Discover all commissionable node with given instance name. Usage: discover "
-                    "commissionable-instance DC514873944A5CFF\r\n");
-    streamer_printf(sout, "  display                    Display all discovered commissionable nodes. Usage: discover display\r\n");
-    streamer_printf(sout,
-                    "  onnetwork <pincode> <disc> <IP> <port>   Pair given device. Usage: discover onnetwork "
-                    "20202021 3840 127.0.0.1 5540\r\n");
+    streamer_printf(
+        sout,
+        "  discover-commissionable          Discover all commissionable nodes. Usage: controller discover-commissionable\r\n");
+    streamer_printf(
+        sout,
+        "  discover-commissionable-instance <name>   Discover all commissionable node with given instance name. Usage: controller "
+        "discover-commissionable-instance DC514873944A5CFF\r\n");
+    streamer_printf(
+        sout, "  discover-display           Display all discovered commissionable nodes. Usage: controller discover-display\r\n");
+    streamer_printf(
+        sout,
+        "  commission-onnetwork <pincode> <disc> <IP> <port>   Pair given device. Usage: controller commission-onnetwork "
+        "20202021 3840 127.0.0.1 5540\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR DiscoverHandler(int argc, char ** argv)
+static CHIP_ERROR ControllerHandler(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -315,19 +319,19 @@ static CHIP_ERROR DiscoverHandler(int argc, char ** argv)
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    else if (strcmp(argv[0], "commissionable") == 0)
+    else if (strcmp(argv[0], "discover-commissionable") == 0)
     {
         return error = discover(true);
     }
-    else if (strcmp(argv[0], "commissionable-instance") == 0)
+    else if (strcmp(argv[0], "discover-commissionable-instance") == 0)
     {
         return error = discover(true, argv[1]);
     }
-    else if (strcmp(argv[0], "display") == 0)
+    else if (strcmp(argv[0], "discover-display") == 0)
     {
         return error = display(true);
     }
-    else if (strcmp(argv[0], "onnetwork") == 0)
+    else if (strcmp(argv[0], "commission-onnetwork") == 0)
     {
         // onnetwork pincode disc IP port
         if (argc < 5)
@@ -365,11 +369,11 @@ static CHIP_ERROR DiscoverHandler(int argc, char ** argv)
     return error;
 }
 
-void RegisterDiscoverCommands(chip::Controller::DeviceCommissioner * commissioner)
+void RegisterControllerCommands(chip::Controller::DeviceCommissioner * commissioner)
 {
     gCommissioner                              = commissioner;
-    static const shell_command_t sDeviceComand = { &DiscoverHandler, "discover",
-                                                   "Discover commands. Usage: discover [command_name]" };
+    static const shell_command_t sDeviceComand = { &ControllerHandler, "controller",
+                                                   "Controller commands. Usage: controller [command_name]" };
 
     // Register the root `device` command with the top-level shell.
     Engine::Root().RegisterCommands(&sDeviceComand, 1);
