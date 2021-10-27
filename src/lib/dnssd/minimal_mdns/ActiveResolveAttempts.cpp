@@ -100,8 +100,7 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
         {
             entryToUse = entry;
         }
-        else if ((entry->nextRetryDelay == entryToUse->nextRetryDelay) &&
-                 (entry->queryDueTime < entryToUse->queryDueTime))
+        else if ((entry->nextRetryDelay == entryToUse->nextRetryDelay) && (entry->queryDueTime < entryToUse->queryDueTime))
         {
             entryToUse = entry;
         }
@@ -119,8 +118,8 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
         ChipLogError(Discovery, "Re-using pending resolve entry before reply was received.");
     }
 
-    entryToUse->peerId            = peerId;
-    entryToUse->queryDueTime    = mClock->GetMonotonicTimestamp();
+    entryToUse->peerId         = peerId;
+    entryToUse->queryDueTime   = mClock->GetMonotonicTimestamp();
     entryToUse->nextRetryDelay = System::Clock::Seconds16(1);
 }
 

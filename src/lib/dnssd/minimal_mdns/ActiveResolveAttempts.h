@@ -38,7 +38,7 @@ namespace Minimal {
 class ActiveResolveAttempts
 {
 public:
-    static constexpr size_t kRetryQueueSize     = 4;
+    static constexpr size_t kRetryQueueSize                      = 4;
     static constexpr chip::System::Clock::Timeout kMaxRetryDelay = chip::System::Clock::Seconds16(16);
 
     ActiveResolveAttempts(chip::System::Clock::ClockBase * clock) : mClock(clock) { Reset(); }
