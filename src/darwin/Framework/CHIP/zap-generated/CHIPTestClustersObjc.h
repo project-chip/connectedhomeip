@@ -863,6 +863,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInstalledOpenLimitTiltWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeInstalledClosedLimitTiltWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeSafetyStatusWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeFeatureMapWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end

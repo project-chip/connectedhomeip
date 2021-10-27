@@ -8856,6 +8856,16 @@ chip::ChipError::StorageType chip_ime_SubscribeAttribute_WindowCovering_SafetySt
         .AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_WindowCovering_FeatureMap(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId,
+                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeFeatureMap(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_WindowCovering_ClusterRevision(chip::Controller::Device * device,
                                                                                    chip::EndpointId ZCLendpointId,
                                                                                    chip::GroupId /* ZCLgroupId */)
