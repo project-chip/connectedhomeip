@@ -158,19 +158,19 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
 
 void UserDirectedCommissioningServer::PrintUDCClients()
 {
-    for (size_t i = 0; i < kMaxUDCClients; i++)
+    for (uint8_t i = 0; i < kMaxUDCClients; i++)
     {
         UDCClientState * state = GetUDCClients().GetUDCClientState(i);
         if (state == nullptr)
         {
-            ChipLogProgress(AppServer, "UDC Client[%ld] null", i);
+            ChipLogProgress(AppServer, "UDC Client[%d] null", i);
         }
         else
         {
             char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
             state->GetPeerAddress().ToString(addrBuffer);
 
-            ChipLogProgress(AppServer, "UDC Client[%ld] instance=%s deviceName=%s address=%s, disc=%d", i, state->GetInstanceName(),
+            ChipLogProgress(AppServer, "UDC Client[%d] instance=%s deviceName=%s address=%s, disc=%d", i, state->GetInstanceName(),
                             state->GetDeviceName(), addrBuffer, state->GetLongDiscriminator());
         }
     }

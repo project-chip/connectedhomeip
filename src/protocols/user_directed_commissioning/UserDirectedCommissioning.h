@@ -42,7 +42,7 @@ namespace Protocols {
 namespace UserDirectedCommissioning {
 
 // Cache contains 16 clients. This may need to be tweaked.
-constexpr size_t kMaxUDCClients = 16;
+constexpr uint8_t kMaxUDCClients = 16;
 
 /**
  * User Directed Commissioning Protocol Message Types
