@@ -48,7 +48,7 @@ public:
 
     /// DriveIO until the specified number of milliseconds has passed or until
     /// completionFunction returns true
-    void DriveIOUntil(unsigned maxWaitMs, std::function<bool(void)> completionFunction);
+    void DriveIOUntil(System::Clock::Timeout maxWait, std::function<bool(void)> completionFunction);
 
     nlTestSuite * GetTestSuite() { return mSuite; }
     System::Layer & GetSystemLayer() { return *mSystemLayer; }

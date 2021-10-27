@@ -142,7 +142,7 @@ public:
 
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
-        mContext.DriveIOUntil(5000 /* ms */, [this]() { return mReceiveHandlerCallCount != 0; });
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });
         NL_TEST_ASSERT(mSuite, mReceiveHandlerCallCount == 1);
 
         SetCallback(nullptr);
@@ -152,7 +152,7 @@ public:
     {
         // Disconnect and wait for seeing peer close
         tcp.Disconnect(Transport::PeerAddress::TCP(addr));
-        mContext.DriveIOUntil(5000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
     }
 
     int mReceiveHandlerCallCount = 0;
