@@ -124,7 +124,7 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
         env->ExceptionClear();
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
