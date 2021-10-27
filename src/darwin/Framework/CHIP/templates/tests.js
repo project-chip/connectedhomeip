@@ -95,14 +95,17 @@ function getTests()
     'Test_TC_PCC_2_3',
   ];
 
-  const RelativeHumidityMeasurement = [
-    'Test_TC_RH_1_1',
-    'Test_TC_RH_2_1',
+  const PressureMeasurement = [
+    'Test_TC_PRS_1_1',
+    'Test_TC_PRS_2_1',
   ];
+
+  const RelativeHumidityMeasurement = [ 'Test_TC_RH_1_1', 'Test_TC_RH_2_1', 'Test_TC_RH_2_2' ];
 
   const TemperatureMeasurement = [
     'Test_TC_TM_1_1',
     'Test_TC_TM_2_1',
+    'Test_TC_TM_2_2',
   ];
 
   const Thermostat = [
@@ -112,6 +115,7 @@ function getTests()
   const ThermostatUserConfiguration = [
     'Test_TC_TSUIC_1_1',
     'Test_TC_TSUIC_2_1',
+    'Test_TC_TSUIC_2_2',
   ];
 
   const ThreadNetworkDiagnostics = [
@@ -159,6 +163,7 @@ function getTests()
     WindowCovering, //
     Others, //
     Subscriptions, //
+    PressureMeasurement, //
   ];
   return tests.flat(1);
 }
