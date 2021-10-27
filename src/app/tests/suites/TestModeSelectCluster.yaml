@@ -16,7 +16,7 @@ name: Mode Select Cluster Tests
 
 config:
     cluster: "Mode Select"
-    endpoint: 1 
+    endpoint: 1
 
 tests:
     - label: "Read CurrentMode"
@@ -56,7 +56,7 @@ tests:
               - type: list
               - minLength: 3
               - maxLength: 3
-             
+
     - label: "Change to Supported Mode"
       command: "changeToMode"
       arguments:
@@ -70,7 +70,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
-          value: 4 
+          value: 4
 
     - label: "Change to Unsupported Mode"
       command: "changeToMode"
