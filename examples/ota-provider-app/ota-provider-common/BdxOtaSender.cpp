@@ -24,27 +24,15 @@
 #include <messaging/Flags.h>
 #include <protocols/bdx/BdxTransferSession.h>
 
-#include <fstream>
-
 using chip::bdx::StatusCode;
 using chip::bdx::TransferControlFlags;
 using chip::bdx::TransferSession;
 
-BdxOtaSender::BdxOtaSender()
+void BdxOtaSender::SetCallbacks(BdxOtaSenderCallbacks callbacks)
 {
-    memset(mFilepath, 0, kFilepathMaxLength);
-}
-
-void BdxOtaSender::SetFilepath(const char * path)
-{
-    if (path != nullptr)
-    {
-        chip::Platform::CopyString(mFilepath, path);
-    }
-    else
-    {
-        memset(mFilepath, 0, kFilepathMaxLength);
-    }
+    mOnBlockQueryCallback       = callbacks.onBlockQuery;
+    mOnTransferCompleteCallback = callbacks.onTransferComplete;
+    mOnTransferFailedCallback   = callbacks.onTransferFailed;
 }
 
 void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
@@ -95,13 +83,6 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         uint16_t blockSize   = mTransfer.GetTransferBlockSize();
         uint16_t bytesToRead = blockSize;
 
-        // TODO: This should be a utility function in TransferSession
-        if (mTransfer.GetTransferLength() > 0 && mNumBytesSent + blockSize > mTransfer.GetTransferLength())
-        {
-            // cast should be safe because of condition above
-            bytesToRead = static_cast<uint16_t>(mTransfer.GetTransferLength() - mNumBytesSent);
-        }
-
         chip::System::PacketBufferHandle blockBuf = chip::System::PacketBufferHandle::New(bytesToRead);
         if (blockBuf.IsNull())
         {
@@ -110,17 +91,25 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             return;
         }
 
-        std::ifstream otaFile(mFilepath, std::ifstream::in);
-        VerifyOrReturn(otaFile.good(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
-        otaFile.seekg(mNumBytesSent);
-        otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
-        VerifyOrReturn(otaFile.good() || otaFile.eof(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
+        if (mOnBlockQueryCallback != nullptr && mOnBlockQueryCallback->mCall != nullptr)
+        {
+            mOnBlockQueryCallback->mCall(mOnBlockQueryCallback->mContext, blockBuf, blockData.Length, blockData.IsEof,
+                                         mNumBytesSent);
+        }
+        else
+        {
+            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            return;
+        }
 
-        blockData.Data   = blockBuf->Start();
-        blockData.Length = static_cast<size_t>(otaFile.gcount());
-        blockData.IsEof  = (blockData.Length < blockSize) ||
-            (mNumBytesSent + static_cast<uint64_t>(blockData.Length) == mTransfer.GetTransferLength() || (otaFile.peek() == EOF));
-        mNumBytesSent = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
+        if (blockData.Length == 0 && blockData.IsEof == false)
+        {
+            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            return;
+        }
+
+        blockData.Data = blockBuf->Start();
+        mNumBytesSent  = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
 
         VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlock(blockData),
                        ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err)));
@@ -130,18 +119,34 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         break;
     case TransferSession::OutputEventType::kAckEOFReceived:
         ChipLogDetail(BDX, "Transfer completed, got AckEOF");
+        if (mOnTransferCompleteCallback != nullptr && mOnTransferCompleteCallback->mCall != nullptr)
+        {
+            mOnTransferCompleteCallback->mCall(mOnTransferCompleteCallback->mContext);
+        }
         Reset();
         break;
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
+        if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
+        {
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext);
+        }
         Reset();
         break;
     case TransferSession::OutputEventType::kInternalError:
         ChipLogError(BDX, "InternalError");
+        if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
+        {
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext);
+        }
         Reset();
         break;
     case TransferSession::OutputEventType::kTransferTimeout:
         ChipLogError(BDX, "Transfer timed out");
+        if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
+        {
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext);
+        }
         Reset();
         break;
     case TransferSession::OutputEventType::kAcceptReceived:
@@ -159,7 +164,5 @@ void BdxOtaSender::Reset()
     {
         mExchangeCtx->Close();
     }
-
     mNumBytesSent = 0;
-    memset(mFilepath, 0, kFilepathMaxLength);
 }
