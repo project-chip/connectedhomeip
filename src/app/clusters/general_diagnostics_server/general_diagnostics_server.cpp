@@ -74,8 +74,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEnco
     CHIP_ERROR err = aEncoder.EncodeList([&netifs](const TagBoundEncoder & encoder) -> CHIP_ERROR {
         for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
         {
-            GeneralDiagnostics::Structs::NetworkInterfaceType::Type * networkInterface = ifp;
-            ReturnErrorOnFailure(encoder.Encode(*networkInterface));
+            ReturnErrorOnFailure(encoder.Encode(*ifp));
         }
 
         return CHIP_NO_ERROR;
