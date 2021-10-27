@@ -12,8 +12,7 @@ using namespace chip::app::Clusters::ModeSelect;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
 using storage_value_type   = const ModeOptionStructType *;
-namespace
-{
+namespace {
 Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode, uint32_t semanticTag)
 {
     Structs::ModeOptionStruct::Type option;
@@ -22,7 +21,7 @@ Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_
     option.semanticTag = semanticTag;
     return option;
 }
-}
+} // namespace
 
 const Structs::ModeOptionStruct::Type StaticSupportedModesManager::blackOption      = buildModeOptionStruct("Black", 0, 0);
 const Structs::ModeOptionStruct::Type StaticSupportedModesManager::cappuccinoOption = buildModeOptionStruct("Cappuccino", 4, 0);
@@ -36,18 +35,17 @@ const map<EndpointId, Span<storage_value_type>> StaticSupportedModesManager::opt
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
-const StaticSupportedModesManager::IteratorFactory *
-StaticSupportedModesManager::getIteratorFactory(EndpointId endpointId) const
+const StaticSupportedModesManager::IteratorFactory * StaticSupportedModesManager::getIteratorFactory(EndpointId endpointId) const
 {
-    const auto& it = _iteratorFactoriesByEndpoints.find(endpointId);
+    const auto & it = _iteratorFactoriesByEndpoints.find(endpointId);
     return (it == _iteratorFactoriesByEndpoints.end()) ? nullptr : &(it->second);
 }
 
 EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointId, unsigned char mode,
-                                                                  const ModeOptionStructType ** dataPtr) const
+                                                               const ModeOptionStructType ** dataPtr) const
 {
-    auto* iteratorFactory = this->getIteratorFactory(endpointId);
-    if(iteratorFactory == nullptr)
+    auto * iteratorFactory = this->getIteratorFactory(endpointId);
+    if (iteratorFactory == nullptr)
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
     }
