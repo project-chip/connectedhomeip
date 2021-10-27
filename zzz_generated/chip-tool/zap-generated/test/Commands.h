@@ -22379,6 +22379,83 @@ private:
     void OnSuccessResponse_3(chip::CharSpan location) { NextTest(); }
 };
 
+class TestIdentifyCluster : public TestCommand
+{
+public:
+    TestIdentifyCluster() : TestCommand("TestIdentifyCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestIdentifyCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestIdentifyCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Send Identify command and expect success response\n");
+            err = TestSendIdentifyCommandAndExpectSuccessResponse_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestSendIdentifyCommandAndExpectSuccessResponse_0()
+    {
+        chip::Controller::IdentifyClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        using requestType  = chip::app::Clusters::Identify::Commands::Identify::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::Identify::Commands::Identify::Type request;
+        request.identifyTime = 0U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestIdentifyCluster *>(context))->OnSuccessResponse_0();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestIdentifyCluster *>(context))->OnFailureResponse_0(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0() { NextTest(); }
+};
+
 class TestOperationalCredentialsCluster : public TestCommand
 {
 public:
@@ -22847,6 +22924,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestLogCommands>(),
         make_unique<TestDescriptorCluster>(),
         make_unique<TestBasicInformation>(),
+        make_unique<TestIdentifyCluster>(),
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestSubscribe_OnOff>(),
     };
