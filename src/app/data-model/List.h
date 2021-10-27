@@ -48,7 +48,13 @@ struct List : public Span<T>
     // List<T> instances as though they were just Spans.
     //
     using Span<T>::Span;
-    using Span<T>::operator=;
+
+    template <size_t N>
+    constexpr List & operator=(T (&databuf)[N])
+    {
+        Span<T>::operator=(databuf);
+        return (*this);
+    }
 };
 
 template <typename X>
