@@ -25,7 +25,7 @@ tests:
       response:
           value: 2
 
-    - label: "Read the global attribute constrains: ClusterRevision"
+    - label: "Read the global attribute constraints: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
