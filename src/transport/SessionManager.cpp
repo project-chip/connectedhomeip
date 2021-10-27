@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include <app/util/basic-types.h>
+#include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPKeyIds.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -328,7 +329,14 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
 
     if (packetHeader.IsEncrypted())
     {
-        SecureMessageDispatch(packetHeader, peerAddress, std::move(msg));
+        if (packetHeader.IsGroupSession())
+        {
+            SecureGroupMessageDispatch(packetHeader, peerAddress, std::move(msg));
+        }
+        else
+        {
+            SecureUnicastMessageDispatch(packetHeader, peerAddress, std::move(msg));
+        }
     }
     else
     {
@@ -379,8 +387,8 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
     }
 }
 
-void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                           System::PacketBufferHandle && msg)
+void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                                  System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -484,6 +492,61 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
         SessionHandle session(state->GetPeerNodeId(), state->GetLocalSessionId(), state->GetPeerSessionId(),
                               state->GetFabricIndex());
         mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, isDuplicate, std::move(msg));
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR && mCB != nullptr)
+    {
+        mCB->OnReceiveError(err, peerAddress);
+    }
+}
+
+void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                                System::PacketBufferHandle && msg)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PayloadHeader payloadHeader;
+    SessionManagerDelegate::DuplicateMessage isDuplicate = SessionManagerDelegate::DuplicateMessage::No;
+    // Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
+
+    VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
+
+    // TODO: Handle Group message counter here spec 4.7.3
+    // spec 4.5.1.2 for msg counter
+
+    // Trial decryption with GroupDataProvider. TODO: Implement the GroupDataProvider Class
+    // VerifyOrExit(CHIP_NO_ERROR == groups->DecryptMessage(packetHeader, payloadHeader, msg),
+    //     ChipLogError(Inet, "Secure transport received group message, but failed to decode it, discarding"));
+
+    if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
+    {
+        ChipLogDetail(Inet,
+                      "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
+                      " on exchange " ChipLogFormatExchangeId,
+                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromSentHeader(payloadHeader));
+        if (!payloadHeader.NeedsAck())
+        {
+            // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
+            // cycles on further message processing.
+            ExitNow(err = CHIP_NO_ERROR);
+        }
+    }
+
+    if (packetHeader.IsSecureSessionControlMsg())
+    {
+        // TODO: control message counter is not implemented yet
+    }
+    else
+    {
+        // TODO: Commit Group Message Counter
+    }
+
+    if (mCB != nullptr)
+    {
+        // TODO: Update Session Handle for Group messages.
+        // SessionHandle session(state->GetPeerNodeId(), state->GetLocalSessionId(), state->GetPeerSessionId(),
+        //                       state->GetFabricIndex());
+        // mCB->OnMessageReceived(packetHeader, payloadHeader, nullptr, peerAddress, isDuplicate, std::move(msg));
     }
 
 exit:

@@ -657,6 +657,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle && msg) override
+    {
+        // TODO
+
+        return CHIP_NO_ERROR;
+    }
+
 private:
     bool mInitialized = false;
     Fabric mFabrics[kNumFabrics];
