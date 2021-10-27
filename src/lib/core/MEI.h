@@ -18,29 +18,33 @@
 #pragma once
 
 #include <cstdint>
-#include <lib/core/MEI.h>
 
 namespace chip {
 
-typedef uint8_t ActionId;
+namespace MEI {
+typedef uint16_t PrefixType;
+typedef uint16_t SuffixType;
+typedef uint32_t Type;
 
-typedef MEI::Type DeviceTypeId; // 7.17.2.13
-typedef MEI::Type ClusterId;    // 7.17.2.14
-typedef MEI::Type AttributeId;  // 7.17.2.15
-typedef MEI::Type FieldId;      // 7.17.2.16
-typedef MEI::Type EventId;      // 7.17.2.17
-typedef MEI::Type CommandId;    // 7.17.2.18
+/**
+ * 7.18.2.1 MEI Encoding
+ * Suffix 0x0000 - 0xFFFE : Item 0 to 65534
+ * Suffix 0xFFFF          : Wildcard
+ */
+constexpr Type kSuffixMask           = 0x0000'FFFF;
+constexpr Type kPrefixMask           = 0xFFFF'0000;
+constexpr Type kWildcard             = 0xFFFF'FFFF;
 
-typedef uint8_t ClusterStatus;
-typedef uint32_t DataVersion;
-typedef uint16_t EndpointId;
-typedef uint64_t EventNumber;
-typedef uint64_t FabricId;
-typedef uint8_t FabricIndex;
-typedef uint16_t ListIndex;
-typedef uint32_t TransactionId;
+constexpr SuffixType GetSuffix(Type id)
+{
+    return static_cast<SuffixType>(id & kSuffixMask);
+}
 
-static constexpr FabricIndex kUndefinedFabricIndex = 0;
+constexpr PrefixType GetPrefix(Type id)
+{
+    return static_cast<PrefixType>((id & kPrefixMask) >> 16);
+}
 
-constexpr EndpointId kWildcardEndpointId = 0xFFFF;
+} // namespace MEI
+
 } // namespace chip
