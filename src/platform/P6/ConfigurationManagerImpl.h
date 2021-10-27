@@ -35,8 +35,8 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the PSoC6 platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                       private Internal::P6Config
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+                                 private Internal::P6Config
 {
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.

@@ -34,8 +34,8 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Tizen platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                       private Internal::PosixConfig
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+                                 private Internal::PosixConfig
 {
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.

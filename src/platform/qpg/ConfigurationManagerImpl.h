@@ -32,8 +32,8 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                       private Internal::QPGConfig
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+                                 private Internal::QPGConfig
 {
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
