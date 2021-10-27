@@ -5022,6 +5022,5 @@
       "endpointVersion": 0,
       "deviceIdentifier": null
     }
-  ],
-  "log": []
+  ]
 }

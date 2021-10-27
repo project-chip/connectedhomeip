@@ -802,8 +802,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Identify::Id; }
-    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Identify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
     uint16_t identifyTime;
 
@@ -813,8 +813,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Identify::Id; }
-    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Identify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
     uint16_t identifyTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -830,8 +830,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return IdentifyQueryResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::IdentifyQueryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
     uint16_t timeout;
 
@@ -841,8 +841,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return IdentifyQueryResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::IdentifyQueryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
     uint16_t timeout;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -857,8 +857,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return IdentifyQuery::Id; }
-    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::IdentifyQuery::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -866,8 +866,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return IdentifyQuery::Id; }
-    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::IdentifyQuery::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -883,8 +883,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TriggerEffect::Id; }
-    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TriggerEffect::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
     IdentifyEffectIdentifier effectIdentifier;
     IdentifyEffectVariant effectVariant;
@@ -895,8 +895,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TriggerEffect::Id; }
-    static constexpr ClusterId GetClusterId() { return Identify::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TriggerEffect::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
     IdentifyEffectIdentifier effectIdentifier;
     IdentifyEffectVariant effectVariant;
@@ -962,8 +962,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AddGroup::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint16_t groupId;
     chip::CharSpan groupName;
@@ -974,8 +974,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AddGroup::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint16_t groupId;
     chip::CharSpan groupName;
@@ -993,8 +993,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AddGroupResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1005,8 +1005,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AddGroupResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1023,8 +1023,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ViewGroup::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ViewGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint16_t groupId;
 
@@ -1034,8 +1034,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ViewGroup::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ViewGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint16_t groupId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -1053,8 +1053,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ViewGroupResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ViewGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1066,8 +1066,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ViewGroupResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ViewGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1086,8 +1086,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetGroupMembership::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetGroupMembership::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t groupCount;
     DataModel::List<uint16_t> groupList;
@@ -1098,8 +1098,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetGroupMembership::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetGroupMembership::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t groupCount;
     DataModel::DecodableList<uint16_t> groupList;
@@ -1118,8 +1118,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetGroupMembershipResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t capacity;
     uint8_t groupCount;
@@ -1131,8 +1131,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetGroupMembershipResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t capacity;
     uint8_t groupCount;
@@ -1150,8 +1150,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RemoveGroup::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint16_t groupId;
 
@@ -1161,8 +1161,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RemoveGroup::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint16_t groupId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -1179,8 +1179,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RemoveGroupResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1191,8 +1191,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RemoveGroupResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveGroupResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1208,8 +1208,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RemoveAllGroups::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveAllGroups::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -1217,8 +1217,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RemoveAllGroups::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveAllGroups::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1234,8 +1234,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AddGroupIfIdentifying::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddGroupIfIdentifying::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint16_t groupId;
     chip::CharSpan groupName;
@@ -1246,8 +1246,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AddGroupIfIdentifying::Id; }
-    static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddGroupIfIdentifying::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint16_t groupId;
     chip::CharSpan groupName;
@@ -1337,8 +1337,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AddScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1352,8 +1352,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AddScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1375,8 +1375,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AddSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1388,8 +1388,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AddSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1408,8 +1408,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ViewScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ViewScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1420,8 +1420,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ViewScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ViewScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1443,8 +1443,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ViewSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ViewSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1459,8 +1459,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ViewSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ViewSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1482,8 +1482,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RemoveScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1494,8 +1494,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RemoveScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1514,8 +1514,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RemoveSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1527,8 +1527,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RemoveSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1546,8 +1546,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RemoveAllScenes::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveAllScenes::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
 
@@ -1557,8 +1557,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RemoveAllScenes::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveAllScenes::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -1575,8 +1575,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RemoveAllScenesResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveAllScenesResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1587,8 +1587,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RemoveAllScenesResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveAllScenesResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1606,8 +1606,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StoreScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StoreScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1618,8 +1618,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StoreScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StoreScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1638,8 +1638,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StoreSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StoreSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1651,8 +1651,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StoreSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StoreSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1672,8 +1672,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RecallScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RecallScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1685,8 +1685,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RecallScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RecallScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1704,8 +1704,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetSceneMembership::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetSceneMembership::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
 
@@ -1715,8 +1715,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetSceneMembership::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetSceneMembership::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -1736,8 +1736,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetSceneMembershipResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetSceneMembershipResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint8_t capacity;
@@ -1751,8 +1751,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetSceneMembershipResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetSceneMembershipResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint8_t capacity;
@@ -1776,8 +1776,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnhancedAddScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedAddScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1791,8 +1791,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnhancedAddScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedAddScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1814,8 +1814,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnhancedAddSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedAddSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1827,8 +1827,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnhancedAddSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedAddSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1847,8 +1847,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnhancedViewScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedViewScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1859,8 +1859,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnhancedViewScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedViewScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint16_t groupId;
     uint8_t sceneId;
@@ -1882,8 +1882,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnhancedViewSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedViewSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1898,8 +1898,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnhancedViewSceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedViewSceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupId;
@@ -1924,8 +1924,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CopyScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CopyScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     chip::BitFlags<ScenesCopyMode> mode;
     uint16_t groupIdFrom;
@@ -1939,8 +1939,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CopyScene::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CopyScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     chip::BitFlags<ScenesCopyMode> mode;
     uint16_t groupIdFrom;
@@ -1962,8 +1962,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CopySceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CopySceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupIdFrom;
@@ -1975,8 +1975,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CopySceneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Scenes::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CopySceneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
     uint8_t status;
     uint16_t groupIdFrom;
@@ -2123,8 +2123,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Off::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Off::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -2132,8 +2132,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Off::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Off::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -2147,8 +2147,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOffWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOffWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -2156,8 +2156,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOffWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOffWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -2171,8 +2171,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return On::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::On::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -2180,8 +2180,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return On::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::On::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -2195,8 +2195,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOnWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOnWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -2204,8 +2204,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOnWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOnWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -2219,8 +2219,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOnWithTransition2::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOnWithTransition2::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -2228,8 +2228,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SampleMfgSpecificOnWithTransition2::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOnWithTransition2::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -2243,8 +2243,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Toggle::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Toggle::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -2252,8 +2252,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Toggle::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Toggle::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -2267,8 +2267,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SampleMfgSpecificToggleWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificToggleWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -2276,8 +2276,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SampleMfgSpecificToggleWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificToggleWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -2291,8 +2291,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SampleMfgSpecificToggleWithTransition2::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificToggleWithTransition2::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -2300,8 +2300,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SampleMfgSpecificToggleWithTransition2::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificToggleWithTransition2::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -2317,8 +2317,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return OffWithEffect::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OffWithEffect::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     OnOffEffectIdentifier effectId;
     OnOffDelayedAllOffEffectVariant effectVariant;
@@ -2329,8 +2329,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return OffWithEffect::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OffWithEffect::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     OnOffEffectIdentifier effectId;
     OnOffDelayedAllOffEffectVariant effectVariant;
@@ -2346,8 +2346,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return OnWithRecallGlobalScene::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OnWithRecallGlobalScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -2355,8 +2355,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return OnWithRecallGlobalScene::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OnWithRecallGlobalScene::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -2373,8 +2373,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return OnWithTimedOff::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OnWithTimedOff::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     chip::BitFlags<OnOffControl> onOffControl;
     uint16_t onTime;
@@ -2386,8 +2386,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return OnWithTimedOff::Id; }
-    static constexpr ClusterId GetClusterId() { return OnOff::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OnWithTimedOff::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     chip::BitFlags<OnOffControl> onOffControl;
     uint16_t onTime;
@@ -2595,8 +2595,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveToLevel::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToLevel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     uint8_t level;
     uint16_t transitionTime;
@@ -2609,8 +2609,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveToLevel::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToLevel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     uint8_t level;
     uint16_t transitionTime;
@@ -2632,8 +2632,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Move::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Move::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     MoveMode moveMode;
     uint8_t rate;
@@ -2646,8 +2646,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Move::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Move::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     MoveMode moveMode;
     uint8_t rate;
@@ -2670,8 +2670,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Step::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     StepMode stepMode;
     uint8_t stepSize;
@@ -2685,8 +2685,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Step::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     StepMode stepMode;
     uint8_t stepSize;
@@ -2707,8 +2707,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Stop::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     uint8_t optionMask;
     uint8_t optionOverride;
@@ -2719,8 +2719,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Stop::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     uint8_t optionMask;
     uint8_t optionOverride;
@@ -2738,8 +2738,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveToLevelWithOnOff::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToLevelWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     uint8_t level;
     uint16_t transitionTime;
@@ -2750,8 +2750,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveToLevelWithOnOff::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToLevelWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     uint8_t level;
     uint16_t transitionTime;
@@ -2769,8 +2769,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveWithOnOff::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     MoveMode moveMode;
     uint8_t rate;
@@ -2781,8 +2781,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveWithOnOff::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     MoveMode moveMode;
     uint8_t rate;
@@ -2801,8 +2801,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StepWithOnOff::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StepWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     StepMode stepMode;
     uint8_t stepSize;
@@ -2814,8 +2814,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StepWithOnOff::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StepWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     StepMode stepMode;
     uint8_t stepSize;
@@ -2832,8 +2832,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StopWithOnOff::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StopWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -2841,8 +2841,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StopWithOnOff::Id; }
-    static constexpr ClusterId GetClusterId() { return LevelControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StopWithOnOff::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -3026,8 +3026,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ResetAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     uint8_t alarmCode;
     chip::ClusterId clusterId;
@@ -3038,8 +3038,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ResetAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     uint8_t alarmCode;
     chip::ClusterId clusterId;
@@ -3057,8 +3057,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Alarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Alarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     uint8_t alarmCode;
     chip::ClusterId clusterId;
@@ -3069,8 +3069,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Alarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Alarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     uint8_t alarmCode;
     chip::ClusterId clusterId;
@@ -3086,8 +3086,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ResetAllAlarms::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetAllAlarms::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3095,8 +3095,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ResetAllAlarms::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetAllAlarms::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -3114,8 +3114,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetAlarmResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetAlarmResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     uint8_t status;
     uint8_t alarmCode;
@@ -3128,8 +3128,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetAlarmResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetAlarmResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     uint8_t status;
     uint8_t alarmCode;
@@ -3147,8 +3147,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3156,8 +3156,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -3171,8 +3171,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ResetAlarmLog::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetAlarmLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3180,8 +3180,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ResetAlarmLog::Id; }
-    static constexpr ClusterId GetClusterId() { return Alarms::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetAlarmLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -3549,8 +3549,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return PowerProfileRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
 
@@ -3560,8 +3560,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return PowerProfileRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -3580,8 +3580,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return PowerProfileNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t totalProfileNum;
     uint8_t powerProfileId;
@@ -3594,8 +3594,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return PowerProfileNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t totalProfileNum;
     uint8_t powerProfileId;
@@ -3613,8 +3613,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return PowerProfileStateRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileStateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3622,8 +3622,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return PowerProfileStateRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileStateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -3641,8 +3641,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return PowerProfileResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t totalProfileNum;
     uint8_t powerProfileId;
@@ -3655,8 +3655,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return PowerProfileResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t totalProfileNum;
     uint8_t powerProfileId;
@@ -3678,8 +3678,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPowerProfilePriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint16_t currency;
@@ -3692,8 +3692,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPowerProfilePriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint16_t currency;
@@ -3713,8 +3713,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return PowerProfileStateResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileCount;
     DataModel::List<Structs::PowerProfileRecord::Type> powerProfileRecords;
@@ -3725,8 +3725,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return PowerProfileStateResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileCount;
     DataModel::DecodableList<Structs::PowerProfileRecord::DecodableType> powerProfileRecords;
@@ -3745,8 +3745,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetOverallSchedulePriceResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetOverallSchedulePriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint16_t currency;
     uint32_t price;
@@ -3758,8 +3758,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetOverallSchedulePriceResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetOverallSchedulePriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint16_t currency;
     uint32_t price;
@@ -3777,8 +3777,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetPowerProfilePrice::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPowerProfilePrice::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
 
@@ -3788,8 +3788,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetPowerProfilePrice::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPowerProfilePrice::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -3807,8 +3807,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
@@ -3820,8 +3820,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
@@ -3840,8 +3840,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return PowerProfilesStateNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfilesStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileCount;
     DataModel::List<Structs::PowerProfileRecord::Type> powerProfileRecords;
@@ -3852,8 +3852,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return PowerProfilesStateNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfilesStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileCount;
     DataModel::DecodableList<Structs::PowerProfileRecord::DecodableType> powerProfileRecords;
@@ -3872,8 +3872,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
@@ -3885,8 +3885,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
@@ -3903,8 +3903,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetOverallSchedulePrice::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetOverallSchedulePrice::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3912,8 +3912,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetOverallSchedulePrice::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetOverallSchedulePrice::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -3928,8 +3928,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileScheduleConstraintsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
 
@@ -3939,8 +3939,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileScheduleConstraintsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -3956,8 +3956,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
 
@@ -3967,8 +3967,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -3984,8 +3984,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleStateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
 
@@ -3995,8 +3995,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleStateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4014,8 +4014,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
@@ -4027,8 +4027,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
@@ -4049,8 +4049,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceExtendedResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPowerProfilePriceExtendedResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint16_t currency;
@@ -4063,8 +4063,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceExtendedResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPowerProfilePriceExtendedResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint16_t currency;
@@ -4085,8 +4085,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
@@ -4098,8 +4098,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnergyPhasesScheduleStateNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnergyPhasesScheduleStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
@@ -4119,8 +4119,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileScheduleConstraintsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint16_t startAfter;
@@ -4132,8 +4132,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileScheduleConstraintsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint16_t startAfter;
@@ -4153,8 +4153,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileScheduleConstraintsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint16_t startAfter;
@@ -4166,8 +4166,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return PowerProfileScheduleConstraintsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PowerProfileScheduleConstraintsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileId;
     uint16_t startAfter;
@@ -4187,8 +4187,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceExtended::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPowerProfilePriceExtended::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t options;
     uint8_t powerProfileId;
@@ -4200,8 +4200,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetPowerProfilePriceExtended::Id; }
-    static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPowerProfilePriceExtended::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t options;
     uint8_t powerProfileId;
@@ -4365,8 +4365,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ExecutionOfACommand::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ExecutionOfACommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CommandIdentification commandId;
 
@@ -4376,8 +4376,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ExecutionOfACommand::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ExecutionOfACommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CommandIdentification commandId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4395,8 +4395,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SignalStateResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignalStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
     chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
@@ -4408,8 +4408,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SignalStateResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignalStateResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
     chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
@@ -4426,8 +4426,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SignalState::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4435,8 +4435,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SignalState::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -4453,8 +4453,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SignalStateNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignalStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
     chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
@@ -4466,8 +4466,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SignalStateNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignalStateNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     ApplianceStatus applianceStatus;
     chip::BitFlags<RemoteEnableFlagsAndDeviceStatus2> remoteEnableFlagsAndDeviceStatus2;
@@ -4487,8 +4487,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return WriteFunctions::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::WriteFunctions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     uint16_t functionId;
     uint8_t functionDataType;
@@ -4500,8 +4500,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return WriteFunctions::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::WriteFunctions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     uint16_t functionId;
     uint8_t functionDataType;
@@ -4518,8 +4518,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return OverloadPauseResume::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OverloadPauseResume::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4527,8 +4527,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return OverloadPauseResume::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OverloadPauseResume::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -4542,8 +4542,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return OverloadPause::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OverloadPause::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4551,8 +4551,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return OverloadPause::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OverloadPause::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -4567,8 +4567,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return OverloadWarning::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OverloadWarning::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     WarningEvent warningEvent;
 
@@ -4578,8 +4578,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return OverloadWarning::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OverloadWarning::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     WarningEvent warningEvent;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4740,8 +4740,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CheckIn::Id; }
-    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CheckIn::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4749,8 +4749,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CheckIn::Id; }
-    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CheckIn::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -4766,8 +4766,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CheckInResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CheckInResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     bool startFastPolling;
     uint16_t fastPollTimeout;
@@ -4778,8 +4778,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CheckInResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CheckInResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     bool startFastPolling;
     uint16_t fastPollTimeout;
@@ -4795,8 +4795,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return FastPollStop::Id; }
-    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::FastPollStop::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4804,8 +4804,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return FastPollStop::Id; }
-    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::FastPollStop::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -4820,8 +4820,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetLongPollInterval::Id; }
-    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetLongPollInterval::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     uint32_t newLongPollInterval;
 
@@ -4831,8 +4831,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetLongPollInterval::Id; }
-    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetLongPollInterval::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     uint32_t newLongPollInterval;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4848,8 +4848,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetShortPollInterval::Id; }
-    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetShortPollInterval::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     uint16_t newShortPollInterval;
 
@@ -4859,8 +4859,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetShortPollInterval::Id; }
-    static constexpr ClusterId GetClusterId() { return PollControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetShortPollInterval::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     uint16_t newShortPollInterval;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4973,8 +4973,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StartUp::Id; }
-    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4982,8 +4982,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StartUp::Id; }
-    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -4997,8 +4997,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MfgSpecificPing::Id; }
-    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MfgSpecificPing::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -5006,8 +5006,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MfgSpecificPing::Id; }
-    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MfgSpecificPing::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -5021,8 +5021,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ShutDown::Id; }
-    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -5030,8 +5030,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ShutDown::Id; }
-    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -5045,8 +5045,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Leave::Id; }
-    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -5054,8 +5054,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Leave::Id; }
-    static constexpr ClusterId GetClusterId() { return Basic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -5325,8 +5325,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return QueryImage::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::QueryImage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     uint16_t vendorId;
     uint16_t productId;
@@ -5343,8 +5343,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return QueryImage::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::QueryImage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     uint16_t vendorId;
     uint16_t productId;
@@ -5368,8 +5368,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ApplyUpdateRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     chip::ByteSpan updateToken;
     uint32_t newVersion;
@@ -5380,8 +5380,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ApplyUpdateRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     chip::ByteSpan updateToken;
     uint32_t newVersion;
@@ -5399,8 +5399,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return NotifyUpdateApplied::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NotifyUpdateApplied::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     chip::ByteSpan updateToken;
     uint32_t softwareVersion;
@@ -5411,8 +5411,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return NotifyUpdateApplied::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NotifyUpdateApplied::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     chip::ByteSpan updateToken;
     uint32_t softwareVersion;
@@ -5436,8 +5436,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return QueryImageResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::QueryImageResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     OTAQueryStatus status;
     uint32_t delayedActionTime;
@@ -5454,8 +5454,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return QueryImageResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::QueryImageResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     OTAQueryStatus status;
     uint32_t delayedActionTime;
@@ -5479,8 +5479,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ApplyUpdateRequestResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateRequestResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     OTAApplyUpdateAction action;
     uint32_t delayedActionTime;
@@ -5491,8 +5491,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ApplyUpdateRequestResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateProvider::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateRequestResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     OTAApplyUpdateAction action;
     uint32_t delayedActionTime;
@@ -5553,13 +5553,13 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AnnounceOtaProvider::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateRequestor::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AnnounceOtaProvider::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
     chip::NodeId providerLocation;
     chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
-    chip::ByteSpan metadataForNode;
+    Optional<chip::ByteSpan> metadataForNode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -5567,13 +5567,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AnnounceOtaProvider::Id; }
-    static constexpr ClusterId GetClusterId() { return OtaSoftwareUpdateRequestor::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AnnounceOtaProvider::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
     chip::NodeId providerLocation;
     chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
-    chip::ByteSpan metadataForNode;
+    Optional<chip::ByteSpan> metadataForNode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AnnounceOtaProvider
@@ -6019,8 +6019,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ArmFailSafe::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ArmFailSafe::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     uint16_t expiryLengthSeconds;
     uint64_t breadcrumb;
@@ -6032,8 +6032,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ArmFailSafe::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ArmFailSafe::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     uint16_t expiryLengthSeconds;
     uint64_t breadcrumb;
@@ -6052,8 +6052,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ArmFailSafeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ArmFailSafeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
     chip::CharSpan debugText;
@@ -6064,8 +6064,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ArmFailSafeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ArmFailSafeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
     chip::CharSpan debugText;
@@ -6085,8 +6085,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetRegulatoryConfig::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfig::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     RegulatoryLocationType location;
     chip::CharSpan countryCode;
@@ -6099,8 +6099,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetRegulatoryConfig::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfig::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     RegulatoryLocationType location;
     chip::CharSpan countryCode;
@@ -6120,8 +6120,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetRegulatoryConfigResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfigResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
     chip::CharSpan debugText;
@@ -6132,8 +6132,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetRegulatoryConfigResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfigResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
     chip::CharSpan debugText;
@@ -6149,8 +6149,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CommissioningComplete::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CommissioningComplete::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6158,8 +6158,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CommissioningComplete::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CommissioningComplete::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6175,8 +6175,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CommissioningCompleteResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CommissioningCompleteResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
     chip::CharSpan debugText;
@@ -6187,8 +6187,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CommissioningCompleteResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return GeneralCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CommissioningCompleteResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     GeneralCommissioningError errorCode;
     chip::CharSpan debugText;
@@ -6352,8 +6352,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ScanNetworks::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ScanNetworks::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan ssid;
     uint64_t breadcrumb;
@@ -6365,8 +6365,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ScanNetworks::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ScanNetworks::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan ssid;
     uint64_t breadcrumb;
@@ -6387,8 +6387,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ScanNetworksResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6401,8 +6401,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ScanNetworksResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6424,8 +6424,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AddWiFiNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddWiFiNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan ssid;
     chip::ByteSpan credentials;
@@ -6438,8 +6438,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AddWiFiNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddWiFiNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan ssid;
     chip::ByteSpan credentials;
@@ -6459,8 +6459,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AddWiFiNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddWiFiNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6471,8 +6471,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AddWiFiNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddWiFiNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6492,8 +6492,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return UpdateWiFiNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateWiFiNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan ssid;
     chip::ByteSpan credentials;
@@ -6506,8 +6506,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return UpdateWiFiNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateWiFiNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan ssid;
     chip::ByteSpan credentials;
@@ -6527,8 +6527,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return UpdateWiFiNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateWiFiNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6539,8 +6539,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return UpdateWiFiNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateWiFiNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6559,8 +6559,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AddThreadNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddThreadNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan operationalDataset;
     uint64_t breadcrumb;
@@ -6572,8 +6572,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AddThreadNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddThreadNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan operationalDataset;
     uint64_t breadcrumb;
@@ -6592,8 +6592,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AddThreadNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddThreadNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6604,8 +6604,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AddThreadNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddThreadNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6624,8 +6624,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return UpdateThreadNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateThreadNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan operationalDataset;
     uint64_t breadcrumb;
@@ -6637,8 +6637,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return UpdateThreadNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateThreadNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan operationalDataset;
     uint64_t breadcrumb;
@@ -6657,8 +6657,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return UpdateThreadNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateThreadNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6669,8 +6669,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return UpdateThreadNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateThreadNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6689,8 +6689,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RemoveNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
     uint64_t breadcrumb;
@@ -6702,8 +6702,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RemoveNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
     uint64_t breadcrumb;
@@ -6722,8 +6722,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RemoveNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6734,8 +6734,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RemoveNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6754,8 +6754,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnableNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnableNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
     uint64_t breadcrumb;
@@ -6767,8 +6767,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnableNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnableNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
     uint64_t breadcrumb;
@@ -6787,8 +6787,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnableNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnableNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6799,8 +6799,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnableNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnableNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6819,8 +6819,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return DisableNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DisableNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
     uint64_t breadcrumb;
@@ -6832,8 +6832,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return DisableNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DisableNetwork::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
     uint64_t breadcrumb;
@@ -6852,8 +6852,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return DisableNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DisableNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6864,8 +6864,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return DisableNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DisableNetworkResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint8_t errorCode;
     chip::CharSpan debugText;
@@ -6882,8 +6882,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetLastNetworkCommissioningResult::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetLastNetworkCommissioningResult::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint32_t timeoutMs;
 
@@ -6893,8 +6893,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetLastNetworkCommissioningResult::Id; }
-    static constexpr ClusterId GetClusterId() { return NetworkCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetLastNetworkCommissioningResult::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     uint32_t timeoutMs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6980,8 +6980,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RetrieveLogsRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return DiagnosticLogs::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
 
     LogsIntent intent;
     LogsTransferProtocol requestedProtocol;
@@ -6993,8 +6993,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RetrieveLogsRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return DiagnosticLogs::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
 
     LogsIntent intent;
     LogsTransferProtocol requestedProtocol;
@@ -7015,8 +7015,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RetrieveLogsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DiagnosticLogs::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
 
     LogsStatus status;
     chip::ByteSpan content;
@@ -7029,8 +7029,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RetrieveLogsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DiagnosticLogs::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RetrieveLogsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
 
     LogsStatus status;
     chip::ByteSpan content;
@@ -7325,8 +7325,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ResetWatermarks::Id; }
-    static constexpr ClusterId GetClusterId() { return SoftwareDiagnostics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetWatermarks::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -7334,8 +7334,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ResetWatermarks::Id; }
-    static constexpr ClusterId GetClusterId() { return SoftwareDiagnostics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetWatermarks::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -7591,8 +7591,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
-    static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -7600,8 +7600,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
-    static constexpr ClusterId GetClusterId() { return ThreadNetworkDiagnostics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8305,8 +8305,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
-    static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8314,8 +8314,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
-    static constexpr ClusterId GetClusterId() { return WiFiNetworkDiagnostics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8507,8 +8507,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
-    static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8516,8 +8516,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ResetCounts::Id; }
-    static constexpr ClusterId GetClusterId() { return EthernetNetworkDiagnostics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ResetCounts::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8649,8 +8649,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StartUp::Id; }
-    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8658,8 +8658,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StartUp::Id; }
-    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8673,8 +8673,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ShutDown::Id; }
-    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8682,8 +8682,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ShutDown::Id; }
-    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8697,8 +8697,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Leave::Id; }
-    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8706,8 +8706,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Leave::Id; }
-    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8721,8 +8721,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ReachableChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ReachableChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8730,8 +8730,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ReachableChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return BridgedDeviceBasic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ReachableChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8987,8 +8987,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return OpenCommissioningWindow::Id; }
-    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OpenCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 
     uint16_t commissioningTimeout;
     chip::ByteSpan PAKEVerifier;
@@ -9003,8 +9003,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return OpenCommissioningWindow::Id; }
-    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OpenCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 
     uint16_t commissioningTimeout;
     chip::ByteSpan PAKEVerifier;
@@ -9025,8 +9025,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return OpenBasicCommissioningWindow::Id; }
-    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OpenBasicCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 
     uint16_t commissioningTimeout;
 
@@ -9036,8 +9036,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return OpenBasicCommissioningWindow::Id; }
-    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OpenBasicCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 
     uint16_t commissioningTimeout;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9052,8 +9052,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RevokeCommissioning::Id; }
-    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RevokeCommissioning::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -9061,8 +9061,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RevokeCommissioning::Id; }
-    static constexpr ClusterId GetClusterId() { return AdministratorCommissioning::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RevokeCommissioning::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -9176,8 +9176,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AttestationRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AttestationRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan attestationNonce;
 
@@ -9187,8 +9187,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AttestationRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AttestationRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan attestationNonce;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9205,8 +9205,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AttestationResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AttestationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan attestationElements;
     chip::ByteSpan signature;
@@ -9217,8 +9217,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AttestationResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AttestationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan attestationElements;
     chip::ByteSpan signature;
@@ -9235,8 +9235,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CertificateChainRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CertificateChainRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     uint8_t certificateType;
 
@@ -9246,8 +9246,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CertificateChainRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CertificateChainRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     uint8_t certificateType;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9263,8 +9263,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CertificateChainResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CertificateChainResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan certificate;
 
@@ -9274,8 +9274,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CertificateChainResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CertificateChainResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan certificate;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9291,8 +9291,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return OpCSRRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OpCSRRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan CSRNonce;
 
@@ -9302,8 +9302,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return OpCSRRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OpCSRRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan CSRNonce;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9320,8 +9320,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return OpCSRResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OpCSRResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCSRElements;
     chip::ByteSpan attestationSignature;
@@ -9332,8 +9332,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return OpCSRResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OpCSRResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCSRElements;
     chip::ByteSpan attestationSignature;
@@ -9354,11 +9354,11 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AddNOC::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddNOC::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCValue;
-    chip::ByteSpan ICACValue;
+    Optional<chip::ByteSpan> ICACValue;
     chip::ByteSpan IPKValue;
     chip::NodeId caseAdminNode;
     uint16_t adminVendorId;
@@ -9369,11 +9369,11 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AddNOC::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddNOC::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCValue;
-    chip::ByteSpan ICACValue;
+    Optional<chip::ByteSpan> ICACValue;
     chip::ByteSpan IPKValue;
     chip::NodeId caseAdminNode;
     uint16_t adminVendorId;
@@ -9391,11 +9391,11 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return UpdateNOC::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateNOC::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCValue;
-    chip::ByteSpan ICACValue;
+    Optional<chip::ByteSpan> ICACValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -9403,11 +9403,11 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return UpdateNOC::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateNOC::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCValue;
-    chip::ByteSpan ICACValue;
+    Optional<chip::ByteSpan> ICACValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UpdateNOC
@@ -9423,8 +9423,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return NOCResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NOCResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     uint8_t statusCode;
     uint8_t fabricIndex;
@@ -9436,8 +9436,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return NOCResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NOCResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     uint8_t statusCode;
     uint8_t fabricIndex;
@@ -9455,8 +9455,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return UpdateFabricLabel::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateFabricLabel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::CharSpan label;
 
@@ -9466,8 +9466,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return UpdateFabricLabel::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpdateFabricLabel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::CharSpan label;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9483,8 +9483,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RemoveFabric::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveFabric::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     uint8_t fabricIndex;
 
@@ -9494,8 +9494,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RemoveFabric::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveFabric::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     uint8_t fabricIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9511,8 +9511,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AddTrustedRootCertificate::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddTrustedRootCertificate::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan rootCertificate;
 
@@ -9522,8 +9522,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AddTrustedRootCertificate::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddTrustedRootCertificate::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan rootCertificate;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9539,8 +9539,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RemoveTrustedRootCertificate::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveTrustedRootCertificate::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan trustedRootIdentifier;
 
@@ -9550,8 +9550,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RemoveTrustedRootCertificate::Id; }
-    static constexpr ClusterId GetClusterId() { return OperationalCredentials::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RemoveTrustedRootCertificate::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan trustedRootIdentifier;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9729,7 +9729,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x00000000;
-    static constexpr ClusterId GetClusterId() { return BooleanState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
 
     bool stateValue;
 
@@ -9741,7 +9741,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return BooleanState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
 
     bool stateValue;
 
@@ -9936,8 +9936,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LockDoor::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LockDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     chip::ByteSpan pin;
 
@@ -9947,8 +9947,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LockDoor::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LockDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     chip::ByteSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9964,8 +9964,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LockDoorResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LockDoorResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -9975,8 +9975,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LockDoorResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LockDoorResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9992,8 +9992,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return UnlockDoor::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UnlockDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     chip::ByteSpan pin;
 
@@ -10003,8 +10003,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return UnlockDoor::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UnlockDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     chip::ByteSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10020,8 +10020,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return UnlockDoorResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UnlockDoorResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -10031,8 +10031,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return UnlockDoorResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UnlockDoorResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10048,8 +10048,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Toggle::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Toggle::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     chip::CharSpan pin;
 
@@ -10059,8 +10059,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Toggle::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Toggle::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     chip::CharSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10076,8 +10076,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ToggleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ToggleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -10087,8 +10087,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ToggleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ToggleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10105,8 +10105,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return UnlockWithTimeout::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeout::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t timeoutInSeconds;
     chip::ByteSpan pin;
@@ -10117,8 +10117,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return UnlockWithTimeout::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeout::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t timeoutInSeconds;
     chip::ByteSpan pin;
@@ -10135,8 +10135,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return UnlockWithTimeoutResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeoutResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -10146,8 +10146,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return UnlockWithTimeoutResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeoutResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10163,8 +10163,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetLogRecord::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetLogRecord::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t logIndex;
 
@@ -10174,8 +10174,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetLogRecord::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetLogRecord::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t logIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10197,8 +10197,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetLogRecordResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetLogRecordResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t logEntryId;
     uint32_t timestamp;
@@ -10214,8 +10214,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetLogRecordResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetLogRecordResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t logEntryId;
     uint32_t timestamp;
@@ -10240,8 +10240,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetPin::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetPin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserStatus userStatus;
@@ -10254,8 +10254,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetPin::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetPin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserStatus userStatus;
@@ -10274,8 +10274,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetPinResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DoorLockSetPinOrIdStatus status;
 
@@ -10285,8 +10285,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetPinResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DoorLockSetPinOrIdStatus status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10302,8 +10302,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetPin::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
 
@@ -10313,8 +10313,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetPin::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10333,8 +10333,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetPinResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserStatus userStatus;
@@ -10347,8 +10347,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetPinResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserStatus userStatus;
@@ -10367,8 +10367,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearPin::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearPin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
 
@@ -10378,8 +10378,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearPin::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearPin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10395,8 +10395,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearPinResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -10406,8 +10406,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearPinResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearPinResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10422,8 +10422,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearAllPins::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllPins::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -10431,8 +10431,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearAllPins::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllPins::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -10447,8 +10447,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearAllPinsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllPinsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -10458,8 +10458,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearAllPinsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllPinsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10476,8 +10476,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetUserStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     uint8_t userStatus;
@@ -10488,8 +10488,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetUserStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     uint8_t userStatus;
@@ -10506,8 +10506,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetUserStatusResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUserStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -10517,8 +10517,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetUserStatusResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUserStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10534,8 +10534,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetUserStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
 
@@ -10545,8 +10545,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetUserStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetUserStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10563,8 +10563,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetUserStatusResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetUserStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     uint8_t status;
@@ -10575,8 +10575,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetUserStatusResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetUserStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     uint8_t status;
@@ -10599,8 +10599,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetWeekdaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10616,8 +10616,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetWeekdaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10639,8 +10639,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetWeekdayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -10650,8 +10650,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetWeekdayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10668,8 +10668,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetWeekdaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10680,8 +10680,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetWeekdaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10705,8 +10705,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetWeekdayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10723,8 +10723,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetWeekdayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10748,8 +10748,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearWeekdaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10760,8 +10760,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearWeekdaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearWeekdaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10778,8 +10778,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearWeekdayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -10789,8 +10789,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearWeekdayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearWeekdayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10809,8 +10809,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetYeardaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10823,8 +10823,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetYeardaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10843,8 +10843,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetYeardayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -10854,8 +10854,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetYeardayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10872,8 +10872,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetYeardaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10884,8 +10884,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetYeardaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10906,8 +10906,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetYeardayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10921,8 +10921,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetYeardayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10943,8 +10943,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearYeardaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10955,8 +10955,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearYeardaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearYeardaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint16_t userId;
@@ -10973,8 +10973,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearYeardayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -10984,8 +10984,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearYeardayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearYeardayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11004,8 +11004,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetHolidaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint32_t localStartTime;
@@ -11018,8 +11018,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetHolidaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint32_t localStartTime;
@@ -11038,8 +11038,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetHolidayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -11049,8 +11049,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetHolidayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11066,8 +11066,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetHolidaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
 
@@ -11077,8 +11077,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetHolidaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11098,8 +11098,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetHolidayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint8_t status;
@@ -11113,8 +11113,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetHolidayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     uint8_t status;
@@ -11134,8 +11134,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearHolidaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
 
@@ -11145,8 +11145,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearHolidaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearHolidaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t scheduleId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11162,8 +11162,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearHolidayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -11173,8 +11173,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearHolidayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearHolidayScheduleResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11191,8 +11191,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetUserType::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserType userType;
@@ -11203,8 +11203,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetUserType::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserType userType;
@@ -11221,8 +11221,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetUserTypeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUserTypeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -11232,8 +11232,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetUserTypeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUserTypeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11249,8 +11249,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetUserType::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
 
@@ -11260,8 +11260,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetUserType::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetUserType::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11278,8 +11278,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetUserTypeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetUserTypeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserType userType;
@@ -11290,8 +11290,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetUserTypeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetUserTypeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserType userType;
@@ -11311,8 +11311,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetRfid::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserStatus userStatus;
@@ -11325,8 +11325,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetRfid::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserStatus userStatus;
@@ -11345,8 +11345,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetRfidResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DoorLockSetPinOrIdStatus status;
 
@@ -11356,8 +11356,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetRfidResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     DoorLockSetPinOrIdStatus status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11373,8 +11373,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetRfid::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
 
@@ -11384,8 +11384,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetRfid::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11404,8 +11404,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetRfidResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserStatus userStatus;
@@ -11418,8 +11418,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetRfidResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     DoorLockUserStatus userStatus;
@@ -11438,8 +11438,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearRfid::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
 
@@ -11449,8 +11449,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearRfid::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearRfid::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11466,8 +11466,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearRfidResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -11477,8 +11477,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearRfidResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearRfidResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11493,8 +11493,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearAllRfids::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllRfids::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -11502,8 +11502,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearAllRfids::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllRfids::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -11518,8 +11518,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearAllRfidsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllRfidsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
 
@@ -11529,8 +11529,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearAllRfidsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllRfidsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11551,8 +11551,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return OperationEventNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OperationEventNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t source;
     DoorLockOperationEventCode eventCode;
@@ -11567,8 +11567,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return OperationEventNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OperationEventNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t source;
     DoorLockOperationEventCode eventCode;
@@ -11596,8 +11596,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ProgrammingEventNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ProgrammingEventNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t source;
     DoorLockProgrammingEventCode eventCode;
@@ -11614,8 +11614,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ProgrammingEventNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return DoorLock::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ProgrammingEventNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint8_t source;
     DoorLockProgrammingEventCode eventCode;
@@ -12084,62 +12084,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace DoorLock
 namespace WindowCovering {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for WcEndProductType
-enum class WcEndProductType : uint8_t
-{
-    kRollerShade               = 0x00,
-    kRomanShade                = 0x01,
-    kBalloonShade              = 0x02,
-    kWovenWood                 = 0x03,
-    kPleatedShade              = 0x04,
-    kCellularShade             = 0x05,
-    kLayeredShade              = 0x06,
-    kLayeredShade2D            = 0x07,
-    kSheerShade                = 0x08,
-    kTiltOnlyInteriorBlind     = 0x09,
-    kInteriorBlind             = 0x0A,
-    kVerticalBlindStripCurtain = 0x0B,
-    kInteriorVenetianBlind     = 0x0C,
-    kExteriorVenetianBlind     = 0x0D,
-    kLateralLeftCurtain        = 0x0E,
-    kLateralRightCurtain       = 0x0F,
-    kCentralCurtain            = 0x10,
-    kRollerShutter             = 0x11,
-    kExteriorVerticalScreen    = 0x12,
-    kAwningTerracePatio        = 0x13,
-    kAwningVerticalScreen      = 0x14,
-    kTiltOnlyPergola           = 0x15,
-    kSwingingShutter           = 0x16,
-    kSlidingShutter            = 0x17,
-    kUnknown                   = 0xFF,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WcEndProductType                     = EmberAfWcEndProductType;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for WcType
-enum class WcType : uint8_t
-{
-    kRollershade               = 0x00,
-    kRollershade2Motor         = 0x01,
-    kRollershadeExterior       = 0x02,
-    kRollershadeExterior2Motor = 0x03,
-    kDrapery                   = 0x04,
-    kAwning                    = 0x05,
-    kShutter                   = 0x06,
-    kTiltBlindTiltOnly         = 0x07,
-    kTiltBlindLiftAndTilt      = 0x08,
-    kProjectorScreen           = 0x09,
-    kUnknown                   = 0xFF,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WcType                               = EmberAfWcType;
-#endif
 
 // Bitmap for WcConfigStatus
 enum class WcConfigStatus : uint8_t
@@ -12197,8 +12141,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return UpOrOpen::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpOrOpen::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12206,8 +12150,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return UpOrOpen::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UpOrOpen::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -12221,8 +12165,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return DownOrClose::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DownOrClose::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12230,8 +12174,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return DownOrClose::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DownOrClose::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -12245,8 +12189,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StopMotion::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StopMotion::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12254,8 +12198,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StopMotion::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StopMotion::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -12270,8 +12214,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GoToLiftValue::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GoToLiftValue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     uint16_t liftValue;
 
@@ -12281,8 +12225,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GoToLiftValue::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GoToLiftValue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     uint16_t liftValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -12299,8 +12243,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GoToLiftPercentage::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GoToLiftPercentage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     uint8_t liftPercentageValue;
     uint16_t liftPercent100thsValue;
@@ -12311,8 +12255,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GoToLiftPercentage::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GoToLiftPercentage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     uint8_t liftPercentageValue;
     uint16_t liftPercent100thsValue;
@@ -12329,8 +12273,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GoToTiltValue::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GoToTiltValue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     uint16_t tiltValue;
 
@@ -12340,8 +12284,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GoToTiltValue::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GoToTiltValue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     uint16_t tiltValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -12358,8 +12302,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GoToTiltPercentage::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GoToTiltPercentage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     uint8_t tiltPercentageValue;
     uint16_t tiltPercent100thsValue;
@@ -12370,8 +12314,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GoToTiltPercentage::Id; }
-    static constexpr ClusterId GetClusterId() { return WindowCovering::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GoToTiltPercentage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     uint8_t tiltPercentageValue;
     uint16_t tiltPercent100thsValue;
@@ -12686,8 +12630,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return BarrierControlGoToPercent::Id; }
-    static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::BarrierControlGoToPercent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
 
     uint8_t percentOpen;
 
@@ -12697,8 +12641,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return BarrierControlGoToPercent::Id; }
-    static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::BarrierControlGoToPercent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
 
     uint8_t percentOpen;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -12713,8 +12657,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return BarrierControlStop::Id; }
-    static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::BarrierControlStop::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -12722,8 +12666,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return BarrierControlStop::Id; }
-    static constexpr ClusterId GetClusterId() { return BarrierControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::BarrierControlStop::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13175,7 +13119,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x00000000;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13185,7 +13129,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13203,7 +13147,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x00000001;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13213,7 +13157,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13231,7 +13175,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x00000002;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13241,7 +13185,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13259,7 +13203,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x00000003;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13269,7 +13213,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13287,7 +13231,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x00000004;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13297,7 +13241,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13315,7 +13259,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
     static constexpr EventId eventId             = 0x00000005;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13325,7 +13269,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13343,7 +13287,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x00000006;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13353,7 +13297,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13371,7 +13315,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
     static constexpr EventId eventId             = 0x00000007;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13381,7 +13325,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13399,7 +13343,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x00000008;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13409,7 +13353,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13427,7 +13371,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
     static constexpr EventId eventId             = 0x00000009;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13437,7 +13381,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13455,7 +13399,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x0000000A;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13465,7 +13409,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13483,7 +13427,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x0000000B;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13493,7 +13437,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13511,7 +13455,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
     static constexpr EventId eventId             = 0x0000000C;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13521,7 +13465,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13539,7 +13483,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x0000000D;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13549,7 +13493,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13567,7 +13511,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x0000000E;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13577,7 +13521,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13595,7 +13539,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x0000000F;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13605,7 +13549,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13623,7 +13567,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x00000010;
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13633,7 +13577,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return PumpConfigurationAndControl::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13687,8 +13631,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetpointRaiseLower::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetpointRaiseLower::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     SetpointAdjustMode mode;
     int8_t amount;
@@ -13699,8 +13643,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetpointRaiseLower::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetpointRaiseLower::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     SetpointAdjustMode mode;
     int8_t amount;
@@ -13720,8 +13664,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CurrentWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CurrentWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
     chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
@@ -13734,8 +13678,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CurrentWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CurrentWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
     chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
@@ -13757,8 +13701,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
     chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
@@ -13771,8 +13715,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
     chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
@@ -13796,8 +13740,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RelayStatusLog::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RelayStatusLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint16_t timeOfDay;
     uint16_t relayStatus;
@@ -13812,8 +13756,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RelayStatusLog::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RelayStatusLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint16_t timeOfDay;
     uint16_t relayStatus;
@@ -13835,8 +13779,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     chip::BitFlags<DayOfWeek> daysToReturn;
     chip::BitFlags<ModeForSequence> modeToReturn;
@@ -13847,8 +13791,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     chip::BitFlags<DayOfWeek> daysToReturn;
     chip::BitFlags<ModeForSequence> modeToReturn;
@@ -13864,8 +13808,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ClearWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13873,8 +13817,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ClearWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearWeeklySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -13888,8 +13832,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetRelayStatusLog::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13897,8 +13841,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetRelayStatusLog::Id; }
-    static constexpr ClusterId GetClusterId() { return Thermostat::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLog::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -14701,8 +14645,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveToHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint8_t hue;
     HueDirection direction;
@@ -14716,8 +14660,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveToHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint8_t hue;
     HueDirection direction;
@@ -14740,8 +14684,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueMoveMode moveMode;
     uint8_t rate;
@@ -14754,8 +14698,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueMoveMode moveMode;
     uint8_t rate;
@@ -14778,8 +14722,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StepHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StepHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueStepMode stepMode;
     uint8_t stepSize;
@@ -14793,8 +14737,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StepHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StepHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueStepMode stepMode;
     uint8_t stepSize;
@@ -14817,8 +14761,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveToSaturation::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint8_t saturation;
     uint16_t transitionTime;
@@ -14831,8 +14775,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveToSaturation::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint8_t saturation;
     uint16_t transitionTime;
@@ -14854,8 +14798,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveSaturation::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     SaturationMoveMode moveMode;
     uint8_t rate;
@@ -14868,8 +14812,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveSaturation::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     SaturationMoveMode moveMode;
     uint8_t rate;
@@ -14892,8 +14836,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StepSaturation::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StepSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     SaturationStepMode stepMode;
     uint8_t stepSize;
@@ -14907,8 +14851,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StepSaturation::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StepSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     SaturationStepMode stepMode;
     uint8_t stepSize;
@@ -14932,8 +14876,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveToHueAndSaturation::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToHueAndSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint8_t hue;
     uint8_t saturation;
@@ -14947,8 +14891,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveToHueAndSaturation::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToHueAndSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint8_t hue;
     uint8_t saturation;
@@ -14972,8 +14916,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveToColor::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToColor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint16_t colorX;
     uint16_t colorY;
@@ -14987,8 +14931,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveToColor::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToColor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint16_t colorX;
     uint16_t colorY;
@@ -15011,8 +14955,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveColor::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveColor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     int16_t rateX;
     int16_t rateY;
@@ -15025,8 +14969,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveColor::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveColor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     int16_t rateX;
     int16_t rateY;
@@ -15049,8 +14993,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StepColor::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StepColor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     int16_t stepX;
     int16_t stepY;
@@ -15064,8 +15008,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StepColor::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StepColor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     int16_t stepX;
     int16_t stepY;
@@ -15088,8 +15032,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveToColorTemperature::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint16_t colorTemperature;
     uint16_t transitionTime;
@@ -15102,8 +15046,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveToColorTemperature::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveToColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint16_t colorTemperature;
     uint16_t transitionTime;
@@ -15126,8 +15070,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnhancedMoveToHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveToHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint16_t enhancedHue;
     HueDirection direction;
@@ -15141,8 +15085,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnhancedMoveToHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveToHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint16_t enhancedHue;
     HueDirection direction;
@@ -15165,8 +15109,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnhancedMoveHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueMoveMode moveMode;
     uint16_t rate;
@@ -15179,8 +15123,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnhancedMoveHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueMoveMode moveMode;
     uint16_t rate;
@@ -15203,8 +15147,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnhancedStepHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedStepHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueStepMode stepMode;
     uint16_t stepSize;
@@ -15218,8 +15162,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnhancedStepHue::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedStepHue::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueStepMode stepMode;
     uint16_t stepSize;
@@ -15243,8 +15187,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EnhancedMoveToHueAndSaturation::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveToHueAndSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint16_t enhancedHue;
     uint8_t saturation;
@@ -15258,8 +15202,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EnhancedMoveToHueAndSaturation::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveToHueAndSaturation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint16_t enhancedHue;
     uint8_t saturation;
@@ -15285,8 +15229,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ColorLoopSet::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ColorLoopSet::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     chip::BitFlags<ColorLoopUpdateFlags> updateFlags;
     ColorLoopAction action;
@@ -15302,8 +15246,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ColorLoopSet::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ColorLoopSet::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     chip::BitFlags<ColorLoopUpdateFlags> updateFlags;
     ColorLoopAction action;
@@ -15326,8 +15270,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StopMoveStep::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StopMoveStep::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint8_t optionsMask;
     uint8_t optionsOverride;
@@ -15338,8 +15282,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StopMoveStep::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StopMoveStep::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     uint8_t optionsMask;
     uint8_t optionsOverride;
@@ -15361,8 +15305,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MoveColorTemperature::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueMoveMode moveMode;
     uint16_t rate;
@@ -15377,8 +15321,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MoveColorTemperature::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MoveColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueMoveMode moveMode;
     uint16_t rate;
@@ -15405,8 +15349,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StepColorTemperature::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StepColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueStepMode stepMode;
     uint16_t stepSize;
@@ -15422,8 +15366,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StepColorTemperature::Id; }
-    static constexpr ClusterId GetClusterId() { return ColorControl::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StepColorTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
 
     HueStepMode stepMode;
     uint16_t stepSize;
@@ -16183,8 +16127,8 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type          = DataModel::Nullable<uint16_t>;
+    using DecodableType = DataModel::Nullable<uint16_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16193,8 +16137,8 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type          = DataModel::Nullable<uint16_t>;
+    using DecodableType = DataModel::Nullable<uint16_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16203,8 +16147,8 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type          = DataModel::Nullable<uint16_t>;
+    using DecodableType = DataModel::Nullable<uint16_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16223,8 +16167,8 @@ struct TypeInfo
 namespace LightSensorType {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type          = DataModel::Nullable<uint8_t>;
+    using DecodableType = DataModel::Nullable<uint8_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LightSensorType::Id; }
@@ -18726,8 +18670,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ZoneEnrollResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ZoneEnrollResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     IasEnrollResponseCode enrollResponseCode;
     uint8_t zoneId;
@@ -18738,8 +18682,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ZoneEnrollResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ZoneEnrollResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     IasEnrollResponseCode enrollResponseCode;
     uint8_t zoneId;
@@ -18759,8 +18703,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ZoneStatusChangeNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ZoneStatusChangeNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     chip::BitFlags<IasZoneStatus> zoneStatus;
     uint8_t extendedStatus;
@@ -18773,8 +18717,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ZoneStatusChangeNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ZoneStatusChangeNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     chip::BitFlags<IasZoneStatus> zoneStatus;
     uint8_t extendedStatus;
@@ -18792,8 +18736,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return InitiateNormalOperationMode::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::InitiateNormalOperationMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -18801,8 +18745,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return InitiateNormalOperationMode::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::InitiateNormalOperationMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -18818,8 +18762,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ZoneEnrollRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ZoneEnrollRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     IasZoneType zoneType;
     uint16_t manufacturerCode;
@@ -18830,8 +18774,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ZoneEnrollRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ZoneEnrollRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     IasZoneType zoneType;
     uint16_t manufacturerCode;
@@ -18849,8 +18793,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return InitiateTestMode::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::InitiateTestMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     uint8_t testModeDuration;
     uint8_t currentZoneSensitivityLevel;
@@ -18861,8 +18805,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return InitiateTestMode::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::InitiateTestMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     uint8_t testModeDuration;
     uint8_t currentZoneSensitivityLevel;
@@ -18878,8 +18822,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return InitiateNormalOperationModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::InitiateNormalOperationModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -18887,8 +18831,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return InitiateNormalOperationModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::InitiateNormalOperationModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -18902,8 +18846,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return InitiateTestModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::InitiateTestModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -18911,8 +18855,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return InitiateTestModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasZone::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::InitiateTestModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -19188,8 +19132,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Arm::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Arm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     IasAceArmMode armMode;
     chip::CharSpan armDisarmCode;
@@ -19201,8 +19145,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Arm::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Arm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     IasAceArmMode armMode;
     chip::CharSpan armDisarmCode;
@@ -19220,8 +19164,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ArmResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ArmResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     IasAceArmNotification armNotification;
 
@@ -19231,8 +19175,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ArmResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ArmResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     IasAceArmNotification armNotification;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -19250,8 +19194,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Bypass::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Bypass::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t numberOfZones;
     DataModel::List<uint8_t> zoneIds;
@@ -19263,8 +19207,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Bypass::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Bypass::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t numberOfZones;
     DataModel::DecodableList<uint8_t> zoneIds;
@@ -19297,8 +19241,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetZoneIdMapResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneIdMapResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint16_t section0;
     uint16_t section1;
@@ -19323,8 +19267,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetZoneIdMapResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneIdMapResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint16_t section0;
     uint16_t section1;
@@ -19354,8 +19298,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Emergency::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Emergency::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19363,8 +19307,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Emergency::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Emergency::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -19382,8 +19326,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetZoneInformationResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneInformationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t zoneId;
     IasZoneType zoneType;
@@ -19396,8 +19340,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetZoneInformationResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneInformationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t zoneId;
     IasZoneType zoneType;
@@ -19415,8 +19359,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Fire::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Fire::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19424,8 +19368,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Fire::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Fire::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -19443,8 +19387,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ZoneStatusChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ZoneStatusChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t zoneId;
     uint16_t zoneStatus;
@@ -19457,8 +19401,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ZoneStatusChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ZoneStatusChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t zoneId;
     uint16_t zoneStatus;
@@ -19476,8 +19420,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Panic::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Panic::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19485,8 +19429,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Panic::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Panic::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -19504,8 +19448,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return PanelStatusChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PanelStatusChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     IasAcePanelStatus panelStatus;
     uint8_t secondsRemaining;
@@ -19518,8 +19462,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return PanelStatusChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PanelStatusChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     IasAcePanelStatus panelStatus;
     uint8_t secondsRemaining;
@@ -19537,8 +19481,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetZoneIdMap::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneIdMap::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19546,8 +19490,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetZoneIdMap::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneIdMap::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -19565,8 +19509,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetPanelStatusResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPanelStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     IasAcePanelStatus panelStatus;
     uint8_t secondsRemaining;
@@ -19579,8 +19523,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetPanelStatusResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPanelStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     IasAcePanelStatus panelStatus;
     uint8_t secondsRemaining;
@@ -19599,8 +19543,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetZoneInformation::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneInformation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t zoneId;
 
@@ -19610,8 +19554,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetZoneInformation::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneInformation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t zoneId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -19628,8 +19572,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SetBypassedZoneList::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetBypassedZoneList::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t numberOfZones;
     DataModel::List<uint8_t> zoneIds;
@@ -19640,8 +19584,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SetBypassedZoneList::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetBypassedZoneList::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t numberOfZones;
     DataModel::DecodableList<uint8_t> zoneIds;
@@ -19657,8 +19601,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetPanelStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPanelStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19666,8 +19610,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetPanelStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPanelStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -19683,8 +19627,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return BypassResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::BypassResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t numberOfZones;
     DataModel::List<IasAceBypassResult> bypassResult;
@@ -19695,8 +19639,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return BypassResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::BypassResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t numberOfZones;
     DataModel::DecodableList<IasAceBypassResult> bypassResult;
@@ -19712,8 +19656,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetBypassedZoneList::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetBypassedZoneList::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19721,8 +19665,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetBypassedZoneList::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetBypassedZoneList::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -19739,8 +19683,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetZoneStatusResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     bool zoneStatusComplete;
     uint8_t numberOfZones;
@@ -19752,8 +19696,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetZoneStatusResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     bool zoneStatusComplete;
     uint8_t numberOfZones;
@@ -19774,8 +19718,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetZoneStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t startingZoneId;
     uint8_t maxNumberOfZoneIds;
@@ -19788,8 +19732,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetZoneStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return IasAce::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetZoneStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t startingZoneId;
     uint8_t maxNumberOfZoneIds;
@@ -19855,8 +19799,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StartWarning::Id; }
-    static constexpr ClusterId GetClusterId() { return IasWd::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StartWarning::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
 
     chip::BitFlags<WarningInfo> warningInfo;
     uint16_t warningDuration;
@@ -19869,8 +19813,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StartWarning::Id; }
-    static constexpr ClusterId GetClusterId() { return IasWd::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StartWarning::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
 
     chip::BitFlags<WarningInfo> warningInfo;
     uint16_t warningDuration;
@@ -19889,8 +19833,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Squawk::Id; }
-    static constexpr ClusterId GetClusterId() { return IasWd::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Squawk::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
 
     chip::BitFlags<SquawkInfo> squawkInfo;
 
@@ -19900,8 +19844,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Squawk::Id; }
-    static constexpr ClusterId GetClusterId() { return IasWd::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Squawk::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
 
     chip::BitFlags<SquawkInfo> squawkInfo;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20066,8 +20010,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ChangeChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
 
     chip::CharSpan match;
 
@@ -20077,8 +20021,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ChangeChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
 
     chip::CharSpan match;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20095,8 +20039,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ChangeChannelResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
 
     DataModel::List<Structs::TvChannelInfo::Type> channelMatch;
     TvChannelErrorType errorType;
@@ -20107,8 +20051,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ChangeChannelResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
 
     DataModel::DecodableList<Structs::TvChannelInfo::DecodableType> channelMatch;
     TvChannelErrorType errorType;
@@ -20126,8 +20070,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ChangeChannelByNumber::Id; }
-    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeChannelByNumber::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
 
     uint16_t majorNumber;
     uint16_t minorNumber;
@@ -20138,8 +20082,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ChangeChannelByNumber::Id; }
-    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeChannelByNumber::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
 
     uint16_t majorNumber;
     uint16_t minorNumber;
@@ -20156,8 +20100,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SkipChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
 
     uint16_t count;
 
@@ -20167,8 +20111,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SkipChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
 
     uint16_t count;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20279,8 +20223,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return NavigateTarget::Id; }
-    static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NavigateTarget::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     uint8_t target;
     chip::CharSpan data;
@@ -20291,8 +20235,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return NavigateTarget::Id; }
-    static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NavigateTarget::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     uint8_t target;
     chip::CharSpan data;
@@ -20310,8 +20254,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return NavigateTargetResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     NavigateTargetStatus status;
     chip::CharSpan data;
@@ -20322,8 +20266,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return NavigateTargetResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TargetNavigator::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     NavigateTargetStatus status;
     chip::CharSpan data;
@@ -20440,8 +20384,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaPlay::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPlay::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20449,8 +20393,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaPlay::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPlay::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -20465,8 +20409,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaPlayResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPlayResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
@@ -20476,8 +20420,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaPlayResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPlayResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20492,8 +20436,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaPause::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPause::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20501,8 +20445,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaPause::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPause::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -20517,8 +20461,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaPauseResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPauseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
@@ -20528,8 +20472,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaPauseResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPauseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20544,8 +20488,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaStop::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaStop::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20553,8 +20497,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaStop::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaStop::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -20569,8 +20513,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaStopResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaStopResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
@@ -20580,8 +20524,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaStopResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaStopResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20596,8 +20540,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaStartOver::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaStartOver::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20605,8 +20549,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaStartOver::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaStartOver::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -20621,8 +20565,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaStartOverResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaStartOverResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
@@ -20632,8 +20576,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaStartOverResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaStartOverResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20648,8 +20592,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaPrevious::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPrevious::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20657,8 +20601,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaPrevious::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPrevious::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -20673,8 +20617,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaPreviousResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPreviousResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
@@ -20684,8 +20628,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaPreviousResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaPreviousResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20700,8 +20644,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaNext::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaNext::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20709,8 +20653,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaNext::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaNext::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -20725,8 +20669,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaNextResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaNextResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
@@ -20736,8 +20680,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaNextResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaNextResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20752,8 +20696,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaRewind::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaRewind::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20761,8 +20705,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaRewind::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaRewind::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -20777,8 +20721,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaRewindResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaRewindResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
@@ -20788,8 +20732,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaRewindResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaRewindResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20804,8 +20748,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaFastForward::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaFastForward::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20813,8 +20757,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaFastForward::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaFastForward::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -20829,8 +20773,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaFastForwardResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaFastForwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
@@ -20840,8 +20784,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaFastForwardResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaFastForwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20857,8 +20801,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaSkipForward::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSkipForward::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t deltaPositionMilliseconds;
 
@@ -20868,8 +20812,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaSkipForward::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSkipForward::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t deltaPositionMilliseconds;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20885,8 +20829,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaSkipForwardResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSkipForwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
@@ -20896,8 +20840,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaSkipForwardResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSkipForwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20913,8 +20857,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaSkipBackward::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSkipBackward::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t deltaPositionMilliseconds;
 
@@ -20924,8 +20868,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaSkipBackward::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSkipBackward::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t deltaPositionMilliseconds;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20941,8 +20885,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaSkipBackwardResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSkipBackwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
@@ -20952,8 +20896,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaSkipBackwardResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSkipBackwardResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20969,8 +20913,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaSeek::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSeek::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t position;
 
@@ -20980,8 +20924,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaSeek::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSeek::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t position;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20997,8 +20941,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MediaSeekResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSeekResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
 
@@ -21008,8 +20952,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MediaSeekResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaPlayback::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MediaSeekResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     MediaPlaybackStatus mediaPlaybackStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -21182,8 +21126,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SelectInput::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectInput::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     uint8_t index;
 
@@ -21193,8 +21137,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SelectInput::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectInput::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     uint8_t index;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -21209,8 +21153,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ShowInputStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ShowInputStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21218,8 +21162,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ShowInputStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ShowInputStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -21233,8 +21177,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return HideInputStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::HideInputStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21242,8 +21186,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return HideInputStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::HideInputStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -21259,8 +21203,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RenameInput::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RenameInput::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     uint8_t index;
     chip::CharSpan name;
@@ -21271,8 +21215,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RenameInput::Id; }
-    static constexpr ClusterId GetClusterId() { return MediaInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RenameInput::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     uint8_t index;
     chip::CharSpan name;
@@ -21336,8 +21280,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Sleep::Id; }
-    static constexpr ClusterId GetClusterId() { return LowPower::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Sleep::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21345,8 +21289,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Sleep::Id; }
-    static constexpr ClusterId GetClusterId() { return LowPower::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Sleep::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -21498,8 +21442,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SendKey::Id; }
-    static constexpr ClusterId GetClusterId() { return KeypadInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
     KeypadInputCecKeyCode keyCode;
 
@@ -21509,8 +21453,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SendKey::Id; }
-    static constexpr ClusterId GetClusterId() { return KeypadInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
     KeypadInputCecKeyCode keyCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -21526,8 +21470,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SendKeyResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return KeypadInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
     KeypadInputStatus status;
 
@@ -21537,8 +21481,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SendKeyResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return KeypadInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
     KeypadInputStatus status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -21764,8 +21708,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LaunchContent::Id; }
-    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchContent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     bool autoPlay;
     chip::CharSpan data;
@@ -21776,8 +21720,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LaunchContent::Id; }
-    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchContent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     bool autoPlay;
     chip::CharSpan data;
@@ -21795,8 +21739,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LaunchContentResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchContentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
@@ -21807,8 +21751,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LaunchContentResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchContentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
@@ -21826,8 +21770,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LaunchURL::Id; }
-    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchURL::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan contentURL;
     chip::CharSpan displayString;
@@ -21838,8 +21782,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LaunchURL::Id; }
-    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchURL::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan contentURL;
     chip::CharSpan displayString;
@@ -21857,8 +21801,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LaunchURLResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchURLResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
@@ -21869,8 +21813,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LaunchURLResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ContentLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchURLResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
@@ -21976,8 +21920,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return SelectOutput::Id; }
-    static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectOutput::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
 
     uint8_t index;
 
@@ -21987,8 +21931,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return SelectOutput::Id; }
-    static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectOutput::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
 
     uint8_t index;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22005,8 +21949,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return RenameOutput::Id; }
-    static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RenameOutput::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
 
     uint8_t index;
     chip::CharSpan name;
@@ -22017,8 +21961,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return RenameOutput::Id; }
-    static constexpr ClusterId GetClusterId() { return AudioOutput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RenameOutput::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
 
     uint8_t index;
     chip::CharSpan name;
@@ -22121,8 +22065,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LaunchApp::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchApp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
     uint16_t catalogVendorId;
@@ -22134,8 +22078,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LaunchApp::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchApp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
     uint16_t catalogVendorId;
@@ -22154,8 +22098,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LaunchAppResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchAppResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     ApplicationLauncherStatus status;
     chip::CharSpan data;
@@ -22166,8 +22110,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LaunchAppResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplicationLauncher::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchAppResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     ApplicationLauncherStatus status;
     chip::CharSpan data;
@@ -22256,8 +22200,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return ChangeStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
 
     ApplicationBasicStatus status;
 
@@ -22267,8 +22211,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return ChangeStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplicationBasic::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
 
     ApplicationBasicStatus status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22382,8 +22326,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetSetupPIN::Id; }
-    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetSetupPIN::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     chip::CharSpan tempAccountIdentifier;
 
@@ -22393,8 +22337,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetSetupPIN::Id; }
-    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetSetupPIN::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     chip::CharSpan tempAccountIdentifier;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22410,8 +22354,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetSetupPINResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetSetupPINResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     chip::CharSpan setupPIN;
 
@@ -22421,8 +22365,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetSetupPINResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetSetupPINResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     chip::CharSpan setupPIN;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22439,8 +22383,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Login::Id; }
-    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Login::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     chip::CharSpan tempAccountIdentifier;
     chip::CharSpan setupPIN;
@@ -22451,8 +22395,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Login::Id; }
-    static constexpr ClusterId GetClusterId() { return AccountLogin::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Login::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     chip::CharSpan tempAccountIdentifier;
     chip::CharSpan setupPIN;
@@ -22537,6 +22481,61 @@ public:
 using DecodableType = Type;
 
 } // namespace SimpleStruct
+namespace NullablesAndOptionalsStruct {
+enum class Fields
+{
+    kNullableInt            = 0,
+    kOptionalInt            = 1,
+    kNullableOptionalInt    = 2,
+    kNullableString         = 3,
+    kOptionalString         = 4,
+    kNullableOptionalString = 5,
+    kNullableStruct         = 6,
+    kOptionalStruct         = 7,
+    kNullableOptionalStruct = 8,
+    kNullableList           = 9,
+    kOptionalList           = 10,
+    kNullableOptionalList   = 11,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<uint16_t> nullableInt;
+    Optional<uint16_t> optionalInt;
+    Optional<DataModel::Nullable<uint16_t>> nullableOptionalInt;
+    DataModel::Nullable<chip::CharSpan> nullableString;
+    Optional<chip::CharSpan> optionalString;
+    Optional<DataModel::Nullable<chip::CharSpan>> nullableOptionalString;
+    DataModel::Nullable<Structs::SimpleStruct::Type> nullableStruct;
+    Optional<Structs::SimpleStruct::Type> optionalStruct;
+    Optional<DataModel::Nullable<Structs::SimpleStruct::Type>> nullableOptionalStruct;
+    DataModel::Nullable<DataModel::List<SimpleEnum>> nullableList;
+    Optional<DataModel::List<SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::List<SimpleEnum>>> nullableOptionalList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::Nullable<uint16_t> nullableInt;
+    Optional<uint16_t> optionalInt;
+    Optional<DataModel::Nullable<uint16_t>> nullableOptionalInt;
+    DataModel::Nullable<chip::CharSpan> nullableString;
+    Optional<chip::CharSpan> optionalString;
+    Optional<DataModel::Nullable<chip::CharSpan>> nullableOptionalString;
+    DataModel::Nullable<Structs::SimpleStruct::DecodableType> nullableStruct;
+    Optional<Structs::SimpleStruct::DecodableType> optionalStruct;
+    Optional<DataModel::Nullable<Structs::SimpleStruct::DecodableType>> nullableOptionalStruct;
+    DataModel::Nullable<DataModel::DecodableList<SimpleEnum>> nullableList;
+    Optional<DataModel::DecodableList<SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::DecodableList<SimpleEnum>>> nullableOptionalList;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace NullablesAndOptionalsStruct
 namespace NestedStruct {
 enum class Fields
 {
@@ -22653,8 +22652,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Test::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Test::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22662,8 +22661,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Test::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Test::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -22678,8 +22677,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestSpecificResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestSpecificResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t returnValue;
 
@@ -22689,8 +22688,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestSpecificResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestSpecificResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t returnValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22705,8 +22704,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestNotHandled::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestNotHandled::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22714,8 +22713,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestNotHandled::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestNotHandled::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -22730,8 +22729,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestAddArgumentsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestAddArgumentsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t returnValue;
 
@@ -22741,8 +22740,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestAddArgumentsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestAddArgumentsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t returnValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22757,8 +22756,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestSpecific::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22766,8 +22765,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestSpecific::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestSpecific::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -22782,8 +22781,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestSimpleArgumentResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestSimpleArgumentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     bool returnValue;
 
@@ -22793,8 +22792,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestSimpleArgumentResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestSimpleArgumentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     bool returnValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22809,8 +22808,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestUnknownCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestUnknownCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22818,8 +22817,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestUnknownCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestUnknownCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -22839,8 +22838,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestStructArrayArgumentResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestStructArrayArgumentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::List<Structs::NestedStructList::Type> arg1;
     DataModel::List<Structs::SimpleStruct::Type> arg2;
@@ -22855,8 +22854,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestStructArrayArgumentResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestStructArrayArgumentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::DecodableList<Structs::NestedStructList::DecodableType> arg1;
     DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg2;
@@ -22878,8 +22877,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestAddArguments::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestAddArguments::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1;
     uint8_t arg2;
@@ -22890,8 +22889,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestAddArguments::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestAddArguments::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1;
     uint8_t arg2;
@@ -22908,8 +22907,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestListInt8UReverseResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestListInt8UReverseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::List<uint8_t> arg1;
 
@@ -22919,8 +22918,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestListInt8UReverseResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestListInt8UReverseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::DecodableList<uint8_t> arg1;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22936,8 +22935,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestSimpleArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestSimpleArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     bool arg1;
 
@@ -22947,8 +22946,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestSimpleArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestSimpleArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     bool arg1;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22965,8 +22964,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestEnumsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestEnumsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     chip::VendorId arg1;
     SimpleEnum arg2;
@@ -22977,8 +22976,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestEnumsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestEnumsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     chip::VendorId arg1;
     SimpleEnum arg2;
@@ -23000,8 +22999,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestStructArrayArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestStructArrayArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::List<Structs::NestedStructList::Type> arg1;
     DataModel::List<Structs::SimpleStruct::Type> arg2;
@@ -23016,8 +23015,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestStructArrayArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestStructArrayArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::DecodableList<Structs::NestedStructList::DecodableType> arg1;
     DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg2;
@@ -23028,6 +23027,40 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestStructArrayArgumentRequest
+namespace TestNullableOptionalResponse {
+enum class Fields
+{
+    kWasPresent = 0,
+    kWasNull    = 1,
+    kValue      = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestNullableOptionalResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    bool wasPresent;
+    Optional<bool> wasNull;
+    Optional<uint8_t> value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestNullableOptionalResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    bool wasPresent;
+    Optional<bool> wasNull;
+    Optional<uint8_t> value;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNullableOptionalResponse
 namespace TestStructArgumentRequest {
 enum class Fields
 {
@@ -23038,8 +23071,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestStructArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     Structs::SimpleStruct::Type arg1;
 
@@ -23049,13 +23082,122 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestStructArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     Structs::SimpleStruct::DecodableType arg1;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestStructArgumentRequest
+namespace TestComplexNullableOptionalResponse {
+enum class Fields
+{
+    kNullableIntWasNull               = 0,
+    kNullableIntValue                 = 1,
+    kOptionalIntWasPresent            = 2,
+    kOptionalIntValue                 = 3,
+    kNullableOptionalIntWasPresent    = 4,
+    kNullableOptionalIntWasNull       = 5,
+    kNullableOptionalIntValue         = 6,
+    kNullableStringWasNull            = 7,
+    kNullableStringValue              = 8,
+    kOptionalStringWasPresent         = 9,
+    kOptionalStringValue              = 10,
+    kNullableOptionalStringWasPresent = 11,
+    kNullableOptionalStringWasNull    = 12,
+    kNullableOptionalStringValue      = 13,
+    kNullableStructWasNull            = 14,
+    kNullableStructValue              = 15,
+    kOptionalStructWasPresent         = 16,
+    kOptionalStructValue              = 17,
+    kNullableOptionalStructWasPresent = 18,
+    kNullableOptionalStructWasNull    = 19,
+    kNullableOptionalStructValue      = 20,
+    kNullableListWasNull              = 21,
+    kNullableListValue                = 22,
+    kOptionalListWasPresent           = 23,
+    kOptionalListValue                = 24,
+    kNullableOptionalListWasPresent   = 25,
+    kNullableOptionalListWasNull      = 26,
+    kNullableOptionalListValue        = 27,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestComplexNullableOptionalResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    bool nullableIntWasNull;
+    Optional<uint16_t> nullableIntValue;
+    bool optionalIntWasPresent;
+    Optional<uint16_t> optionalIntValue;
+    bool nullableOptionalIntWasPresent;
+    Optional<bool> nullableOptionalIntWasNull;
+    Optional<uint16_t> nullableOptionalIntValue;
+    bool nullableStringWasNull;
+    Optional<chip::CharSpan> nullableStringValue;
+    bool optionalStringWasPresent;
+    Optional<chip::CharSpan> optionalStringValue;
+    bool nullableOptionalStringWasPresent;
+    Optional<bool> nullableOptionalStringWasNull;
+    Optional<chip::CharSpan> nullableOptionalStringValue;
+    bool nullableStructWasNull;
+    Optional<Structs::SimpleStruct::Type> nullableStructValue;
+    bool optionalStructWasPresent;
+    Optional<Structs::SimpleStruct::Type> optionalStructValue;
+    bool nullableOptionalStructWasPresent;
+    Optional<bool> nullableOptionalStructWasNull;
+    Optional<Structs::SimpleStruct::Type> nullableOptionalStructValue;
+    bool nullableListWasNull;
+    Optional<DataModel::List<SimpleEnum>> nullableListValue;
+    bool optionalListWasPresent;
+    Optional<DataModel::List<SimpleEnum>> optionalListValue;
+    bool nullableOptionalListWasPresent;
+    Optional<bool> nullableOptionalListWasNull;
+    Optional<DataModel::List<SimpleEnum>> nullableOptionalListValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestComplexNullableOptionalResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    bool nullableIntWasNull;
+    Optional<uint16_t> nullableIntValue;
+    bool optionalIntWasPresent;
+    Optional<uint16_t> optionalIntValue;
+    bool nullableOptionalIntWasPresent;
+    Optional<bool> nullableOptionalIntWasNull;
+    Optional<uint16_t> nullableOptionalIntValue;
+    bool nullableStringWasNull;
+    Optional<chip::CharSpan> nullableStringValue;
+    bool optionalStringWasPresent;
+    Optional<chip::CharSpan> optionalStringValue;
+    bool nullableOptionalStringWasPresent;
+    Optional<bool> nullableOptionalStringWasNull;
+    Optional<chip::CharSpan> nullableOptionalStringValue;
+    bool nullableStructWasNull;
+    Optional<Structs::SimpleStruct::DecodableType> nullableStructValue;
+    bool optionalStructWasPresent;
+    Optional<Structs::SimpleStruct::DecodableType> optionalStructValue;
+    bool nullableOptionalStructWasPresent;
+    Optional<bool> nullableOptionalStructWasNull;
+    Optional<Structs::SimpleStruct::DecodableType> nullableOptionalStructValue;
+    bool nullableListWasNull;
+    Optional<DataModel::DecodableList<SimpleEnum>> nullableListValue;
+    bool optionalListWasPresent;
+    Optional<DataModel::DecodableList<SimpleEnum>> optionalListValue;
+    bool nullableOptionalListWasPresent;
+    Optional<bool> nullableOptionalListWasNull;
+    Optional<DataModel::DecodableList<SimpleEnum>> nullableOptionalListValue;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestComplexNullableOptionalResponse
 namespace TestNestedStructArgumentRequest {
 enum class Fields
 {
@@ -23066,8 +23208,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestNestedStructArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestNestedStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     Structs::NestedStruct::Type arg1;
 
@@ -23077,8 +23219,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestNestedStructArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestNestedStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     Structs::NestedStruct::DecodableType arg1;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -23094,8 +23236,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestListStructArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestListStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::List<Structs::SimpleStruct::Type> arg1;
 
@@ -23105,8 +23247,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestListStructArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestListStructArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg1;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -23122,8 +23264,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestListInt8UArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestListInt8UArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::List<uint8_t> arg1;
 
@@ -23133,8 +23275,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestListInt8UArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestListInt8UArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::DecodableList<uint8_t> arg1;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -23150,8 +23292,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestNestedStructListArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     Structs::NestedStructList::Type arg1;
 
@@ -23161,8 +23303,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestNestedStructListArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     Structs::NestedStructList::DecodableType arg1;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -23178,8 +23320,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestListNestedStructListArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestListNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::List<Structs::NestedStructList::Type> arg1;
 
@@ -23189,8 +23331,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestListNestedStructListArgumentRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestListNestedStructListArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::DecodableList<Structs::NestedStructList::DecodableType> arg1;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -23206,8 +23348,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestListInt8UReverseRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestListInt8UReverseRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::List<uint8_t> arg1;
 
@@ -23217,8 +23359,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestListInt8UReverseRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestListInt8UReverseRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     DataModel::DecodableList<uint8_t> arg1;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -23235,8 +23377,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return TestEnumsRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestEnumsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     chip::VendorId arg1;
     SimpleEnum arg2;
@@ -23247,14 +23389,103 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return TestEnumsRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::TestEnumsRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     chip::VendorId arg1;
     SimpleEnum arg2;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestEnumsRequest
+namespace TestNullableOptionalRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestNullableOptionalRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    Optional<DataModel::Nullable<uint8_t>> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestNullableOptionalRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    Optional<DataModel::Nullable<uint8_t>> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestNullableOptionalRequest
+namespace TestComplexNullableOptionalRequest {
+enum class Fields
+{
+    kNullableInt            = 0,
+    kOptionalInt            = 1,
+    kNullableOptionalInt    = 2,
+    kNullableString         = 3,
+    kOptionalString         = 4,
+    kNullableOptionalString = 5,
+    kNullableStruct         = 6,
+    kOptionalStruct         = 7,
+    kNullableOptionalStruct = 8,
+    kNullableList           = 9,
+    kOptionalList           = 10,
+    kNullableOptionalList   = 11,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestComplexNullableOptionalRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    DataModel::Nullable<uint16_t> nullableInt;
+    Optional<uint16_t> optionalInt;
+    Optional<DataModel::Nullable<uint16_t>> nullableOptionalInt;
+    DataModel::Nullable<chip::CharSpan> nullableString;
+    Optional<chip::CharSpan> optionalString;
+    Optional<DataModel::Nullable<chip::CharSpan>> nullableOptionalString;
+    DataModel::Nullable<Structs::SimpleStruct::Type> nullableStruct;
+    Optional<Structs::SimpleStruct::Type> optionalStruct;
+    Optional<DataModel::Nullable<Structs::SimpleStruct::Type>> nullableOptionalStruct;
+    DataModel::Nullable<DataModel::List<SimpleEnum>> nullableList;
+    Optional<DataModel::List<SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::List<SimpleEnum>>> nullableOptionalList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestComplexNullableOptionalRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    DataModel::Nullable<uint16_t> nullableInt;
+    Optional<uint16_t> optionalInt;
+    Optional<DataModel::Nullable<uint16_t>> nullableOptionalInt;
+    DataModel::Nullable<chip::CharSpan> nullableString;
+    Optional<chip::CharSpan> optionalString;
+    Optional<DataModel::Nullable<chip::CharSpan>> nullableOptionalString;
+    DataModel::Nullable<Structs::SimpleStruct::DecodableType> nullableStruct;
+    Optional<Structs::SimpleStruct::DecodableType> optionalStruct;
+    Optional<DataModel::Nullable<Structs::SimpleStruct::DecodableType>> nullableOptionalStruct;
+    DataModel::Nullable<DataModel::DecodableList<SimpleEnum>> nullableList;
+    Optional<DataModel::DecodableList<SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::DecodableList<SimpleEnum>>> nullableOptionalList;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestComplexNullableOptionalRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -23559,7 +23790,7 @@ struct Type
 public:
     static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
     static constexpr EventId eventId             = 0x00000001;
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1;
     SimpleEnum arg2;
@@ -23576,7 +23807,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return kEventId; }
-    static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1;
     SimpleEnum arg2;
@@ -23773,8 +24004,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return DisplayMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DisplayMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t messageId;
     chip::BitFlags<MessagingControlMask> messageControl;
@@ -23789,8 +24020,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return DisplayMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DisplayMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t messageId;
     chip::BitFlags<MessagingControlMask> messageControl;
@@ -23810,8 +24041,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetLastMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetLastMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23819,8 +24050,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetLastMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetLastMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -23836,8 +24067,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CancelMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CancelMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t messageId;
     chip::BitFlags<MessagingControlMask> messageControl;
@@ -23848,8 +24079,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CancelMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CancelMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t messageId;
     chip::BitFlags<MessagingControlMask> messageControl;
@@ -23869,8 +24100,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return MessageConfirmation::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MessageConfirmation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t messageId;
     uint32_t confirmationTime;
@@ -23883,8 +24114,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return MessageConfirmation::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::MessageConfirmation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t messageId;
     uint32_t confirmationTime;
@@ -23908,8 +24139,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return DisplayProtectedMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DisplayProtectedMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t messageId;
     chip::BitFlags<MessagingControlMask> messageControl;
@@ -23924,8 +24155,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return DisplayProtectedMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::DisplayProtectedMessage::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t messageId;
     chip::BitFlags<MessagingControlMask> messageControl;
@@ -23946,8 +24177,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetMessageCancellation::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetMessageCancellation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t earliestImplementationTime;
 
@@ -23957,8 +24188,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetMessageCancellation::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetMessageCancellation::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t earliestImplementationTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -23974,8 +24205,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CancelAllMessages::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CancelAllMessages::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t implementationDateTime;
 
@@ -23985,8 +24216,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CancelAllMessages::Id; }
-    static constexpr ClusterId GetClusterId() { return Messaging::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CancelAllMessages::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     uint32_t implementationDateTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -24349,8 +24580,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetAlerts::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetAlerts::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -24358,8 +24589,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetAlerts::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetAlerts::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -24375,8 +24606,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetAlertsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetAlertsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     chip::BitFlags<AlertCount> alertsCount;
     DataModel::List<chip::BitFlags<AlertStructure>> alertStructures;
@@ -24387,8 +24618,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetAlertsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetAlertsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     chip::BitFlags<AlertCount> alertsCount;
     DataModel::DecodableList<chip::BitFlags<AlertStructure>> alertStructures;
@@ -24406,8 +24637,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return AlertsNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AlertsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     chip::BitFlags<AlertCount> alertsCount;
     DataModel::List<chip::BitFlags<AlertStructure>> alertStructures;
@@ -24418,8 +24649,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return AlertsNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AlertsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     chip::BitFlags<AlertCount> alertsCount;
     DataModel::DecodableList<chip::BitFlags<AlertStructure>> alertStructures;
@@ -24437,8 +24668,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return EventsNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EventsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     uint8_t eventHeader;
     EventIdentification eventId;
@@ -24449,8 +24680,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return EventsNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceEventsAndAlert::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::EventsNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     uint8_t eventHeader;
     EventIdentification eventId;
@@ -24498,8 +24729,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LogNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint32_t timeStamp;
     uint32_t logId;
@@ -24512,8 +24743,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LogNotification::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint32_t timeStamp;
     uint32_t logId;
@@ -24532,8 +24763,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LogRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint32_t logId;
 
@@ -24543,8 +24774,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LogRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint32_t logId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -24563,8 +24794,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LogResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint32_t timeStamp;
     uint32_t logId;
@@ -24577,8 +24808,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LogResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint32_t timeStamp;
     uint32_t logId;
@@ -24596,8 +24827,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LogQueueRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogQueueRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -24605,8 +24836,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LogQueueRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogQueueRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -24622,8 +24853,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return LogQueueResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogQueueResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint8_t logQueueSize;
     DataModel::List<uint32_t> logIds;
@@ -24634,8 +24865,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return LogQueueResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogQueueResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint8_t logQueueSize;
     DataModel::DecodableList<uint32_t> logIds;
@@ -24653,8 +24884,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return StatisticsAvailable::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StatisticsAvailable::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint8_t logQueueSize;
     DataModel::List<uint32_t> logIds;
@@ -24665,8 +24896,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return StatisticsAvailable::Id; }
-    static constexpr ClusterId GetClusterId() { return ApplianceStatistics::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StatisticsAvailable::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint8_t logQueueSize;
     DataModel::DecodableList<uint32_t> logIds;
@@ -24734,8 +24965,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetProfileInfoResponseCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetProfileInfoResponseCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 
     uint8_t profileCount;
     uint8_t profileIntervalPeriod;
@@ -24748,8 +24979,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetProfileInfoResponseCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetProfileInfoResponseCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 
     uint8_t profileCount;
     uint8_t profileIntervalPeriod;
@@ -24767,8 +24998,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetProfileInfoCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetProfileInfoCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -24776,8 +25007,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetProfileInfoCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetProfileInfoCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -24797,8 +25028,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetMeasurementProfileResponseCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetMeasurementProfileResponseCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 
     uint32_t startTime;
     uint8_t status;
@@ -24813,8 +25044,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetMeasurementProfileResponseCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetMeasurementProfileResponseCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 
     uint32_t startTime;
     uint8_t status;
@@ -24837,8 +25068,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return GetMeasurementProfileCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetMeasurementProfileCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 
     uint16_t attributeId;
     uint32_t startTime;
@@ -24850,8 +25081,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return GetMeasurementProfileCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return ElectricalMeasurement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetMeasurementProfileCommand::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 
     uint16_t attributeId;
     uint32_t startTime;
@@ -26180,8 +26411,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Bind::Id; }
-    static constexpr ClusterId GetClusterId() { return Binding::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Bind::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
 
     chip::NodeId nodeId;
     chip::GroupId groupId;
@@ -26194,8 +26425,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Bind::Id; }
-    static constexpr ClusterId GetClusterId() { return Binding::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Bind::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
 
     chip::NodeId nodeId;
     chip::GroupId groupId;
@@ -26217,8 +26448,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Unbind::Id; }
-    static constexpr ClusterId GetClusterId() { return Binding::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Unbind::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
 
     chip::NodeId nodeId;
     chip::GroupId groupId;
@@ -26231,8 +26462,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Unbind::Id; }
-    static constexpr ClusterId GetClusterId() { return Binding::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Unbind::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
 
     chip::NodeId nodeId;
     chip::GroupId groupId;
@@ -26387,8 +26618,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CommandOne::Id; }
-    static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CommandOne::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
 
     uint8_t argOne;
 
@@ -26398,8 +26629,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CommandOne::Id; }
-    static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CommandOne::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
 
     uint8_t argOne;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -26463,8 +26694,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return CommandTwo::Id; }
-    static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster2::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CommandTwo::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
 
     uint8_t argOne;
 
@@ -26474,8 +26705,8 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return CommandTwo::Id; }
-    static constexpr ClusterId GetClusterId() { return SampleMfgSpecificCluster2::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CommandTwo::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
 
     uint8_t argOne;
     CHIP_ERROR Decode(TLV::TLVReader & reader);

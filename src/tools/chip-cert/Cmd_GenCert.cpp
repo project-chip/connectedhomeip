@@ -192,6 +192,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint64_t chip64bitAttr;
+    uint32_t chip32bitAttr;
     OID attrOID;
 
     switch (id)
@@ -226,7 +227,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'i':
-        if (!ParseChip64bitAttr(arg, chip64bitAttr))
+        if (!ParseInt(arg, chip64bitAttr, 16))
         {
             PrintArgError("%s: Invalid value specified for subject chip id attribute: %s\n", progName, arg);
             return false;
@@ -260,7 +261,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'a':
-        if (!ParseChip64bitAttr(arg, chip64bitAttr))
+        if (!ParseInt(arg, chip32bitAttr, 16))
         {
             PrintArgError("%s: Invalid value specified for the subject authentication tag attribute: %s\n", progName, arg);
             return false;
@@ -280,7 +281,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             return false;
         }
 
-        err = gSubjectDN.AddAttribute(attrOID, chip64bitAttr);
+        err = gSubjectDN.AddAttribute(attrOID, chip32bitAttr);
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add subject DN attribute: %s\n", chip::ErrorStr(err));
@@ -296,7 +297,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         }
         break;
     case 'f':
-        if (!ParseChip64bitAttr(arg, chip64bitAttr))
+        if (!ParseInt(arg, chip64bitAttr, 16))
         {
             PrintArgError("%s: Invalid value specified for subject fabric id attribute: %s\n", progName, arg);
             return false;
@@ -311,8 +312,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'c':
-        err = gSubjectDN.AddAttribute(kOID_AttributeType_CommonName,
-                                      chip::ByteSpan(reinterpret_cast<const uint8_t *>(arg), strlen(arg)));
+        err = gSubjectDN.AddAttribute(kOID_AttributeType_CommonName, chip::CharSpan(arg, strlen(arg)));
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add Common Name attribute to the subject DN: %s\n", chip::ErrorStr(err));

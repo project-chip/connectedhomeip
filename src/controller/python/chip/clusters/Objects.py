@@ -10498,47 +10498,6 @@ class DoorLock:
 class WindowCovering:
     id: typing.ClassVar[int] = 0x0102
 
-    class Enums:
-        class WcEndProductType(IntEnum):
-            kRollerShade = 0x00
-            kRomanShade = 0x01
-            kBalloonShade = 0x02
-            kWovenWood = 0x03
-            kPleatedShade = 0x04
-            kCellularShade = 0x05
-            kLayeredShade = 0x06
-            kLayeredShade2D = 0x07
-            kSheerShade = 0x08
-            kTiltOnlyInteriorBlind = 0x09
-            kInteriorBlind = 0x0A
-            kVerticalBlindStripCurtain = 0x0B
-            kInteriorVenetianBlind = 0x0C
-            kExteriorVenetianBlind = 0x0D
-            kLateralLeftCurtain = 0x0E
-            kLateralRightCurtain = 0x0F
-            kCentralCurtain = 0x10
-            kRollerShutter = 0x11
-            kExteriorVerticalScreen = 0x12
-            kAwningTerracePatio = 0x13
-            kAwningVerticalScreen = 0x14
-            kTiltOnlyPergola = 0x15
-            kSwingingShutter = 0x16
-            kSlidingShutter = 0x17
-            kUnknown = 0xFF
-
-        class WcType(IntEnum):
-            kRollershade = 0x00
-            kRollershade2Motor = 0x01
-            kRollershadeExterior = 0x02
-            kRollershadeExterior2Motor = 0x03
-            kDrapery = 0x04
-            kAwning = 0x05
-            kShutter = 0x06
-            kTiltBlindTiltOnly = 0x07
-            kTiltBlindLiftAndTilt = 0x08
-            kProjectorScreen = 0x09
-            kUnknown = 0xFF
-
     class Commands:
         @dataclass
         class UpOrOpen(ClusterCommand):
@@ -20159,6 +20118,51 @@ class TestCluster:
             f: 'int' = None
 
         @dataclass
+        class NullablesAndOptionalsStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableInt", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalInt", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalInt", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableString", Tag=3, Type=str),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalString", Tag=4, Type=str),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalString", Tag=5, Type=str),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableStruct", Tag=6, Type=TestCluster.Structs.SimpleStruct),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalStruct", Tag=7, Type=TestCluster.Structs.SimpleStruct),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalStruct", Tag=8, Type=TestCluster.Structs.SimpleStruct),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableList", Tag=9, Type=TestCluster.Enums.SimpleEnum, IsArray=True),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalList", Tag=10, Type=TestCluster.Enums.SimpleEnum, IsArray=True),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalList", Tag=11, Type=TestCluster.Enums.SimpleEnum, IsArray=True),
+                    ])
+
+            nullableInt: 'uint' = None
+            optionalInt: 'uint' = None
+            nullableOptionalInt: 'uint' = None
+            nullableString: 'str' = None
+            optionalString: 'str' = None
+            nullableOptionalString: 'str' = None
+            nullableStruct: 'TestCluster.Structs.SimpleStruct' = None
+            optionalStruct: 'TestCluster.Structs.SimpleStruct' = None
+            nullableOptionalStruct: 'TestCluster.Structs.SimpleStruct' = None
+            nullableList: typing.List['TestCluster.Enums.SimpleEnum'] = None
+            optionalList: typing.List['TestCluster.Enums.SimpleEnum'] = None
+            nullableOptionalList: typing.List['TestCluster.Enums.SimpleEnum'] = None
+
+        @dataclass
         class NestedStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -20463,6 +20467,28 @@ class TestCluster:
             arg6: 'bool' = None
 
         @dataclass
+        class TestNullableOptionalResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0006
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="wasPresent", Tag=0, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="wasNull", Tag=1, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="value", Tag=2, Type=uint),
+                    ])
+
+            wasPresent: 'bool' = None
+            wasNull: 'bool' = None
+            value: 'uint' = None
+
+        @dataclass
         class TestStructArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050F
             command_id: typing.ClassVar[int] = 0x0007
@@ -20477,6 +20503,103 @@ class TestCluster:
                     ])
 
             arg1: 'TestCluster.Structs.SimpleStruct' = None
+
+        @dataclass
+        class TestComplexNullableOptionalResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0007
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableIntWasNull", Tag=0, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableIntValue", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalIntWasPresent", Tag=2, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalIntValue", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalIntWasPresent", Tag=4, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalIntWasNull", Tag=5, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalIntValue", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableStringWasNull", Tag=7, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableStringValue", Tag=8, Type=str),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalStringWasPresent", Tag=9, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalStringValue", Tag=10, Type=str),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalStringWasPresent", Tag=11, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalStringWasNull", Tag=12, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalStringValue", Tag=13, Type=str),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableStructWasNull", Tag=14, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableStructValue", Tag=15, Type=TestCluster.Structs.SimpleStruct),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalStructWasPresent", Tag=16, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalStructValue", Tag=17, Type=TestCluster.Structs.SimpleStruct),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalStructWasPresent", Tag=18, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalStructWasNull", Tag=19, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalStructValue", Tag=20, Type=TestCluster.Structs.SimpleStruct),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableListWasNull", Tag=21, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableListValue", Tag=22, Type=TestCluster.Enums.SimpleEnum, IsArray=True),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalListWasPresent", Tag=23, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalListValue", Tag=24, Type=TestCluster.Enums.SimpleEnum, IsArray=True),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalListWasPresent", Tag=25, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalListWasNull", Tag=26, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalListValue", Tag=27, Type=TestCluster.Enums.SimpleEnum, IsArray=True),
+                    ])
+
+            nullableIntWasNull: 'bool' = None
+            nullableIntValue: 'uint' = None
+            optionalIntWasPresent: 'bool' = None
+            optionalIntValue: 'uint' = None
+            nullableOptionalIntWasPresent: 'bool' = None
+            nullableOptionalIntWasNull: 'bool' = None
+            nullableOptionalIntValue: 'uint' = None
+            nullableStringWasNull: 'bool' = None
+            nullableStringValue: 'str' = None
+            optionalStringWasPresent: 'bool' = None
+            optionalStringValue: 'str' = None
+            nullableOptionalStringWasPresent: 'bool' = None
+            nullableOptionalStringWasNull: 'bool' = None
+            nullableOptionalStringValue: 'str' = None
+            nullableStructWasNull: 'bool' = None
+            nullableStructValue: 'TestCluster.Structs.SimpleStruct' = None
+            optionalStructWasPresent: 'bool' = None
+            optionalStructValue: 'TestCluster.Structs.SimpleStruct' = None
+            nullableOptionalStructWasPresent: 'bool' = None
+            nullableOptionalStructWasNull: 'bool' = None
+            nullableOptionalStructValue: 'TestCluster.Structs.SimpleStruct' = None
+            nullableListWasNull: 'bool' = None
+            nullableListValue: typing.List['TestCluster.Enums.SimpleEnum'] = None
+            optionalListWasPresent: 'bool' = None
+            optionalListValue: typing.List['TestCluster.Enums.SimpleEnum'] = None
+            nullableOptionalListWasPresent: 'bool' = None
+            nullableOptionalListWasNull: 'bool' = None
+            nullableOptionalListValue: typing.List['TestCluster.Enums.SimpleEnum'] = None
 
         @dataclass
         class TestNestedStructArgumentRequest(ClusterCommand):
@@ -20592,6 +20715,71 @@ class TestCluster:
 
             arg1: 'uint' = None
             arg2: 'TestCluster.Enums.SimpleEnum' = None
+
+        @dataclass
+        class TestNullableOptionalRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x000F
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="arg1", Tag=0, Type=uint),
+                    ])
+
+            arg1: 'uint' = None
+
+        @dataclass
+        class TestComplexNullableOptionalRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0010
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableInt", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalInt", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalInt", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableString", Tag=3, Type=str),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalString", Tag=4, Type=str),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalString", Tag=5, Type=str),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableStruct", Tag=6, Type=TestCluster.Structs.SimpleStruct),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalStruct", Tag=7, Type=TestCluster.Structs.SimpleStruct),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalStruct", Tag=8, Type=TestCluster.Structs.SimpleStruct),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableList", Tag=9, Type=TestCluster.Enums.SimpleEnum, IsArray=True),
+                        ClusterObjectFieldDescriptor(
+                            Label="optionalList", Tag=10, Type=TestCluster.Enums.SimpleEnum, IsArray=True),
+                        ClusterObjectFieldDescriptor(
+                            Label="nullableOptionalList", Tag=11, Type=TestCluster.Enums.SimpleEnum, IsArray=True),
+                    ])
+
+            nullableInt: 'uint' = None
+            optionalInt: 'uint' = None
+            nullableOptionalInt: 'uint' = None
+            nullableString: 'str' = None
+            optionalString: 'str' = None
+            nullableOptionalString: 'str' = None
+            nullableStruct: 'TestCluster.Structs.SimpleStruct' = None
+            optionalStruct: 'TestCluster.Structs.SimpleStruct' = None
+            nullableOptionalStruct: 'TestCluster.Structs.SimpleStruct' = None
+            nullableList: typing.List['TestCluster.Enums.SimpleEnum'] = None
+            optionalList: typing.List['TestCluster.Enums.SimpleEnum'] = None
+            nullableOptionalList: typing.List['TestCluster.Enums.SimpleEnum'] = None
 
     class Attributes:
         class Boolean(ClusterAttributeDescriptor):

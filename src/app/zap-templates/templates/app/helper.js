@@ -381,6 +381,20 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     let listNamespace = options.hash.ns ? "chip::app::" : ""
     promise           = promise.then(typeStr => `${listNamespace}DataModel::${listType}<${typeStr}>`);
   }
+  if (this.isNullable && !options.hash.forceNotNullable) {
+    passByReference = true;
+    // If we did not have a namespace provided, we can assume we're inside
+    // chip::app::.
+    let ns  = options.hash.ns ? "chip::app::" : ""
+    promise = promise.then(typeStr => `${ns}DataModel::Nullable<${typeStr}>`);
+  }
+  if (this.isOptional && !options.hash.forceNotOptional) {
+    passByReference = true;
+    // If we did not have a namespace provided, we can assume we're inside
+    // chip::.
+    let ns  = options.hash.ns ? "chip::" : ""
+    promise = promise.then(typeStr => `${ns}Optional<${typeStr}>`);
+  }
   if (options.hash.isArgument && passByReference) {
     promise = promise.then(typeStr => `const ${typeStr} &`);
   }

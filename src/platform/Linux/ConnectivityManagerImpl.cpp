@@ -967,7 +967,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             // This should be removed or find a better place once we depercate the rendezvous session.
             for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
             {
-                char ifName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+                char ifName[chip::Inet::InterfaceId::kMaxIfNameLength];
                 if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
                     strncmp(ifName, sWiFiIfName, sizeof(ifName)) == 0)
                 {
@@ -1068,8 +1068,8 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** ne
             {
                 NetworkInterface * ifp = new NetworkInterface();
 
-                strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceIterator::kMaxIfNameLength);
-                ifp->Name[Inet::InterfaceIterator::kMaxIfNameLength - 1] = '\0';
+                strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceId::kMaxIfNameLength);
+                ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
 
                 ifp->name                            = CharSpan(ifp->Name, strlen(ifp->Name));
                 ifp->fabricConnected                 = ifa->ifa_flags & IFF_RUNNING;

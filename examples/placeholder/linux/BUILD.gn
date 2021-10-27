@@ -22,7 +22,7 @@ declare_args() {
 }
 
 chip_data_model("configuration") {
-  zap_file = "apps/${chip_tests_zap_config}/zap.config"
+  zap_file = "apps/${chip_tests_zap_config}/config.zap"
 
   zap_pregenerated_dir = "${chip_root}/out/debug/placeholder/${chip_tests_zap_config}/zap-generated"
   is_server = true

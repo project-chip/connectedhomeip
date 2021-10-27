@@ -1520,6 +1520,11 @@ class ChipClusters:
                 "attributeId": 0x00000002,
                 "type": "int",
             },
+            0x00000003: {
+                "attributeName": "Tolerance",
+                "attributeId": 0x00000003,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -2819,6 +2824,12 @@ class ChipClusters:
                 "attributeId": 0x00000002,
                 "type": "int",
             },
+            0x00000003: {
+                "attributeName": "Tolerance",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -3080,6 +3091,12 @@ class ChipClusters:
                 "attributeId": 0x00000002,
                 "type": "int",
             },
+            0x00000003: {
+                "attributeName": "Tolerance",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -3143,6 +3160,13 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "TestNotHandled",
                 "args": {
+                },
+            },
+            0x0000000F: {
+                "commandId": 0x0000000F,
+                "commandName": "TestNullableOptionalRequest",
+                "args": {
+                    "arg1": "int",
                 },
             },
             0x00000002: {
@@ -3434,6 +3458,12 @@ class ChipClusters:
             0x00000018: {
                 "attributeName": "MaxCoolSetpointLimit",
                 "attributeId": 0x00000018,
+                "type": "int",
+                "writable": True,
+            },
+            0x00000019: {
+                "attributeName": "MinSetpointDeadBand",
+                "attributeId": 0x00000019,
                 "type": "int",
                 "writable": True,
             },
@@ -4095,6 +4125,11 @@ class ChipClusters:
                 "attributeId": 0x0000001A,
                 "type": "int",
                 "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
@@ -5048,6 +5083,11 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid
         )
 
+    def ClusterTestCluster_CommandTestNullableOptionalRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, arg1: int):
+        return self._chipLib.chip_ime_AppendCommand_TestCluster_TestNullableOptionalRequest(
+            device, ZCLendpoint, ZCLgroupid, arg1
+        )
+
     def ClusterTestCluster_CommandTestSpecific(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestSpecific(
             device, ZCLendpoint, ZCLgroupid
@@ -5688,6 +5728,9 @@ class ChipClusters:
     def ClusterFlowMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterFlowMeasurement_ReadAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_Tolerance(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterFlowMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -6120,6 +6163,12 @@ class ChipClusters:
     def ClusterRelativeHumidityMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterRelativeHumidityMeasurement_ReadAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_Tolerance(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterRelativeHumidityMeasurement_SubscribeAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_RelativeHumidityMeasurement_Tolerance(device, ZCLendpoint, minInterval, maxInterval)
+
     def ClusterRelativeHumidityMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -6194,6 +6243,12 @@ class ChipClusters:
 
     def ClusterTemperatureMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTemperatureMeasurement_ReadAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_Tolerance(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTemperatureMeasurement_SubscribeAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_TemperatureMeasurement_Tolerance(device, ZCLendpoint, minInterval, maxInterval)
 
     def ClusterTemperatureMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -6403,6 +6458,12 @@ class ChipClusters:
 
     def ClusterThermostat_WriteAttributeMaxCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterThermostat_ReadAttributeMinSetpointDeadBand(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_MinSetpointDeadBand(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterThermostat_WriteAttributeMinSetpointDeadBand(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_MinSetpointDeadBand(device, ZCLendpoint, ZCLgroupid, value)
 
     def ClusterThermostat_ReadAttributeControlSequenceOfOperation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation(device, ZCLendpoint, ZCLgroupid)
@@ -6772,6 +6833,9 @@ class ChipClusters:
 
     def ClusterWindowCovering_SubscribeAttributeSafetyStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_WindowCovering_SafetyStatus(device, ZCLendpoint, minInterval, maxInterval)
+
+    def ClusterWindowCovering_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_FeatureMap(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterWindowCovering_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -7779,6 +7843,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster FlowMeasurement ReadAttribute Tolerance
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_Tolerance.restype = ctypes.c_uint32
         # Cluster FlowMeasurement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8637,6 +8705,14 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_MaxMeasuredValue.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster RelativeHumidityMeasurement ReadAttribute Tolerance
+        self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_Tolerance.restype = ctypes.c_uint32
+        # Cluster RelativeHumidityMeasurement SubscribeAttribute Tolerance
+        self._chipLib.chip_ime_SubscribeAttribute_RelativeHumidityMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_RelativeHumidityMeasurement_Tolerance.restype = ctypes.c_uint32
         # Cluster RelativeHumidityMeasurement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8791,6 +8867,14 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster TemperatureMeasurement ReadAttribute Tolerance
+        self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_Tolerance.restype = ctypes.c_uint32
+        # Cluster TemperatureMeasurement SubscribeAttribute Tolerance
+        self._chipLib.chip_ime_SubscribeAttribute_TemperatureMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_TemperatureMeasurement_Tolerance.restype = ctypes.c_uint32
         # Cluster TemperatureMeasurement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8824,6 +8908,10 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.restype = ctypes.c_uint32
+        # Cluster TestCluster Command TestNullableOptionalRequest
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestNullableOptionalRequest.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestNullableOptionalRequest.restype = ctypes.c_uint32
         # Cluster TestCluster Command TestSpecific
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestSpecific.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -9129,6 +9217,14 @@ class ChipClusters:
         self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
         self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute MinSetpointDeadBand
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinSetpointDeadBand.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinSetpointDeadBand.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute MinSetpointDeadBand
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinSetpointDeadBand.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int8]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinSetpointDeadBand.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute ControlSequenceOfOperation
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -9662,6 +9758,10 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_WindowCovering_SafetyStatus.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_WindowCovering_SafetyStatus.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_FeatureMap.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_FeatureMap.restype = ctypes.c_uint32
         # Cluster WindowCovering ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

@@ -2804,6 +2804,10 @@ public class ChipClusters {
       readMaxMeasuredValueAttribute(chipClusterPtr, callback);
     }
 
+    public void readToleranceAttribute(IntegerAttributeCallback callback) {
+      readToleranceAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -2815,6 +2819,9 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readToleranceAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
@@ -5160,6 +5167,19 @@ public class ChipClusters {
       readMaxMeasuredValueAttribute(chipClusterPtr, callback);
     }
 
+    public void readToleranceAttribute(IntegerAttributeCallback callback) {
+      readToleranceAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeToleranceAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeToleranceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportToleranceAttribute(IntegerAttributeCallback callback) {
+      reportToleranceAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -5177,6 +5197,15 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readToleranceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeToleranceAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportToleranceAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
@@ -5643,6 +5672,19 @@ public class ChipClusters {
       readMaxMeasuredValueAttribute(chipClusterPtr, callback);
     }
 
+    public void readToleranceAttribute(IntegerAttributeCallback callback) {
+      readToleranceAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeToleranceAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeToleranceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportToleranceAttribute(IntegerAttributeCallback callback) {
+      reportToleranceAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -5660,6 +5702,15 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readToleranceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeToleranceAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportToleranceAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
@@ -5708,6 +5759,11 @@ public class ChipClusters {
       testNotHandled(chipClusterPtr, callback);
     }
 
+    public void testNullableOptionalRequest(
+        TestNullableOptionalResponseCallback callback, int arg1) {
+      testNullableOptionalRequest(chipClusterPtr, callback, arg1);
+    }
+
     public void testSpecific(TestSpecificResponseCallback callback) {
       testSpecific(chipClusterPtr, callback);
     }
@@ -5747,6 +5803,9 @@ public class ChipClusters {
 
     private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback callback);
 
+    private native void testNullableOptionalRequest(
+        long chipClusterPtr, TestNullableOptionalResponseCallback callback, int arg1);
+
     private native void testSpecific(long chipClusterPtr, TestSpecificResponseCallback callback);
 
     private native void testStructArgumentRequest(
@@ -5778,6 +5837,12 @@ public class ChipClusters {
           // arg1: /* TYPE WARNING: array array defaults to */ uint8_t *
           // Conversion from this type to Java is not properly implemented yet
           );
+
+      void onError(Exception error);
+    }
+
+    public interface TestNullableOptionalResponseCallback {
+      void onSuccess(boolean wasPresent, boolean wasNull, int value);
 
       void onError(Exception error);
     }
@@ -6293,6 +6358,14 @@ public class ChipClusters {
       writeMaxCoolSetpointLimitAttribute(chipClusterPtr, callback, value);
     }
 
+    public void readMinSetpointDeadBandAttribute(IntegerAttributeCallback callback) {
+      readMinSetpointDeadBandAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeMinSetpointDeadBandAttribute(DefaultClusterCallback callback, int value) {
+      writeMinSetpointDeadBandAttribute(chipClusterPtr, callback, value);
+    }
+
     public void readControlSequenceOfOperationAttribute(IntegerAttributeCallback callback) {
       readControlSequenceOfOperationAttribute(chipClusterPtr, callback);
     }
@@ -6385,6 +6458,12 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeMaxCoolSetpointLimitAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readMinSetpointDeadBandAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeMinSetpointDeadBandAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
 
     private native void readControlSequenceOfOperationAttribute(
@@ -7474,6 +7553,10 @@ public class ChipClusters {
       reportSafetyStatusAttribute(chipClusterPtr, callback);
     }
 
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -7580,6 +7663,9 @@ public class ChipClusters {
 
     private native void reportSafetyStatusAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

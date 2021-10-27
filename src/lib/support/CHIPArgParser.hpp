@@ -123,6 +123,8 @@ bool ParseInt(const char * str, uint16_t & output);
 bool ParseInt(const char * str, int32_t & output);
 bool ParseInt(const char * str, uint32_t & output);
 bool ParseInt(const char * str, uint64_t & output);
+bool ParseInt(const char * str, uint8_t & output, int base);
+bool ParseInt(const char * str, uint16_t & output, int base);
 bool ParseInt(const char * str, int32_t & output, int base);
 bool ParseInt(const char * str, uint32_t & output, int base);
 bool ParseInt(const char * str, uint64_t & output, int base);

@@ -103,6 +103,7 @@ class Device;
 
 typedef void (*OnDeviceConnected)(void * context, Device * device);
 typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
+typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
 
 class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEstablishmentDelegate
 {
@@ -289,12 +290,14 @@ public:
      *                            the PIN code provied in the setupPayload).
      * @param[in] salt            The PAKE Salt associated with the PAKE Passcode ID and ephemeral PAKE passcode
      *                            verifier to be used for this commissioning.
+     * @param[in] callback        The function to be called on success or failure of opening of commissioning window.
      * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, CommissioningWindowOption option,
-                                       const ByteSpan & salt, SetupPayload & setupPayload);
+                                       const ByteSpan & salt, Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                       SetupPayload & setupPayload);
 
     /**
      * @brief
@@ -578,6 +581,9 @@ private:
 
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
+
+    Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
+    SetupPayload mSetupPayload;
 
     Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
     Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;

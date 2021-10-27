@@ -564,7 +564,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     // Making this static to reduce stack usage, as some platforms have limits on stack size.
     static TestContext ctx;
 
-    CHIP_ERROR err = ctx.Init(inSuite, &gTransportMgr, &gIOContext);
+    CHIP_ERROR err = ctx.Init(&gTransportMgr, &gIOContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
@@ -1443,11 +1443,11 @@ int Initialize(void * aContext)
 {
     // Initialize System memory and resources
     VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init() == CHIP_NO_ERROR, FAILURE);
     VerifyOrReturnError(gTransportMgr.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
 
     auto * ctx = static_cast<TestContext *>(aContext);
-    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(ctx->Init(&gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     gTransportMgr.SetSessionManager(&ctx->GetSecureSessionManager());
     return SUCCESS;

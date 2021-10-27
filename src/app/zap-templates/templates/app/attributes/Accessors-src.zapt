@@ -28,14 +28,34 @@ namespace Attributes {
 {{#if (canHaveSimpleAccessors type)}}
 namespace {{asUpperCamelCase label}} {
 
-EmberAfStatus Get(chip::EndpointId endpoint, {{asUnderlyingZclType type}} * {{asLowerCamelCase label}})
-{
-    return emberAfReadServerAttribute(endpoint, Clusters::{{asUpperCamelCase parent.label}}::Id, Id, (uint8_t *) {{asLowerCamelCase label}}, sizeof(*{{asLowerCamelCase label}}));
+{{#*inline "clusterId"}}Clusters::{{asUpperCamelCase parent.label}}::Id{{/inline}}
+{{#*inline "sizingBytes"}}{{#if (isShortString type)}}1{{else}}2{{/if}}{{/inline}}
 
-}
-EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} {{asLowerCamelCase label}})
+EmberAfStatus Get(chip::EndpointId endpoint, {{#if (isCharString type)}}chip::MutableCharSpan{{else if (isOctetString type)}}chip::MutableByteSpan{{else}}{{asUnderlyingZclType type}} *{{/if}} value)
 {
-    return emberAfWriteServerAttribute(endpoint, Clusters::{{asUpperCamelCase parent.label}}::Id, Id, (uint8_t *) &{{asLowerCamelCase label}}, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    {{#if (isString type)}}
+    VerifyOrReturnError(value.size() == {{maxLength}}, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    uint8_t zclString[{{maxLength}} + {{>sizingBytes}}];
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, {{>clusterId}}, Id, zclString, sizeof(zclString));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    memcpy(value.data(), &zclString[{{>sizingBytes}}], {{maxLength}});
+    value.reduce_size(emberAf{{#if (isLongString type)}}Long{{/if}}StringLength(zclString));
+    return status;
+    {{else}}
+    return emberAfReadServerAttribute(endpoint, {{>clusterId}}, Id, (uint8_t *) value, sizeof(*value));
+    {{/if}}
+}
+EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} value)
+{
+    {{#if (isString type)}}
+    VerifyOrReturnError(value.size() <= {{maxLength}}, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    uint8_t zclString[{{maxLength}} + {{>sizingBytes}}];
+    emberAfCopyInt{{#if (isShortString type)}}8{{else}}16{{/if}}u(zclString, 0, static_cast<uint{{#if (isShortString type)}}8{{else}}16{{/if}}_t>(value.size()));
+    memcpy(&zclString[{{>sizingBytes}}], value.data(), value.size());
+    return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    {{else}}
+    return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, (uint8_t *) &value, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    {{/if}}
 }
 
 } // namespace {{asUpperCamelCase label}}
