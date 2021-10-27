@@ -1,0 +1,67 @@
+{{> header}}
+
+{{#if (chip_has_client_clusters)}}
+#include "CHIPClusters.h"
+
+#include <cstdint>
+
+
+#include <app/InteractionModelEngine.h>
+#include <app/chip-zcl-zpro-codec.h>
+#include <app/util/basic-types.h>
+#include <app/CommandSender.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <controller/CommandSenderAllocator.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
+#include <zap-generated/CHIPClientCallbacks.h>
+
+namespace chip {
+
+using namespace app::Clusters;
+using namespace System;
+using namespace Encoding::LittleEndian;
+
+namespace Controller {
+
+// TODO(#4502): onCompletion is not used by IM for now.
+// TODO(#4503): length should be passed to commands when byte string is in argument list.
+// TODO(#4503): Commands should take group id as an argument.
+
+{{#chip_client_clusters}}
+
+{{#chip_cluster_commands}}
+{{#*inline "requestType"}}chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type{{/inline}}
+{{#*inline "responseType"}}chip::app::{{#if hasSpecificResponse}}Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase response.name}}::DecodableType{{else}}DataModel::NullObjectType{{/if}}{{/inline}}
+template CHIP_ERROR ClusterBase::InvokeCommand<{{>requestType}}, {{>responseType}}>(const {{>requestType}} &, void *, CommandResponseSuccessCallback<{{>responseType}}>, CommandResponseFailureCallback);
+{{/chip_cluster_commands}}
+{{/chip_client_clusters}}
+
+template <typename RequestDataT, typename ResponseDataT>
+CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
+                         CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
+
+    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus, const ResponseDataT & responseData) {
+        successCb(context, responseData);
+    };
+
+    auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+        failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
+    };
+
+    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
+                                               requestData, onSuccessCb, onFailureCb);
+};
+
+} // namespace Controller
+} // namespace chip
+{{/if}}

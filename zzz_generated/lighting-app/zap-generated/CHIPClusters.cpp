@@ -102,10 +102,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeOnTime(Callback::Cancelable * onSuccessCal
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-    const chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OnOffCluster::WriteAttributeOnTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                               uint16_t value)
 {
@@ -129,10 +125,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeOffWaitTime(Callback::Cancelable * onSucce
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-    const chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OnOffCluster::WriteAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -155,10 +147,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeStartUpOnOff(Callback::Cancelable * onSucc
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
-    const chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR OnOffCluster::WriteAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -192,51 +180,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template <typename RequestDataT, typename ResponseDataT>
-CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
-                                      CommandResponseSuccessCallback<ResponseDataT> successCb,
-                                      CommandResponseFailureCallback failureCb)
-{
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
-
-    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
-                                            const ResponseDataT & responseData) { successCb(context, responseData); };
-
-    auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
-        failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
-    };
-
-    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                               requestData, onSuccessCb, onFailureCb);
-};
-
-template <typename AttributeInfo>
-CHIP_ERROR ClusterBase::WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
-                                       WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
-{
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
-
-    auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
-        if (successCb != nullptr)
-        {
-            successCb(context);
-        }
-    };
-
-    auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
-                                            CHIP_ERROR aError) {
-        if (failureCb != nullptr)
-        {
-            failureCb(context, app::ToEmberAfStatus(status.mStatus));
-        }
-    };
-
-    return chip::Controller::WriteAttribute<AttributeInfo>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
-                                                           mEndpoint, requestData, onSuccessCb, onFailureCb);
 }
 
 } // namespace Controller
