@@ -16529,10 +16529,6 @@ JNI_METHOD(void, FlowMeasurementCluster, readMaxMeasuredValueAttribute)
     onFailure.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, FlowMeasurementCluster, readToleranceAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
@@ -16560,20 +16556,6 @@ JNI_METHOD(void, FlowMeasurementCluster, readToleranceAttribute)(JNIEnv * env, j
 
 JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> e10d44a16 (basic code generation template, but not able to import to tool app)
-=======
-JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
-JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 9109a53ae (need to wait for cast-helper)
-=======
-JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 9d40fec82 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
@@ -23850,10 +23832,6 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMaxMeasuredValueAttribu
     onFailure.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readToleranceAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -23930,20 +23908,6 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, reportToleranceAttribute)
 
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> e10d44a16 (basic code generation template, but not able to import to tool app)
-=======
-JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
-JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 9109a53ae (need to wait for cast-helper)
-=======
-JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 9d40fec82 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
@@ -25257,10 +25221,6 @@ JNI_METHOD(void, TemperatureMeasurementCluster, readMaxMeasuredValueAttribute)
     onFailure.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, TemperatureMeasurementCluster, readToleranceAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -25337,20 +25297,6 @@ JNI_METHOD(void, TemperatureMeasurementCluster, reportToleranceAttribute)
 
 JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> e10d44a16 (basic code generation template, but not able to import to tool app)
-=======
-JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
-JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 9109a53ae (need to wait for cast-helper)
-=======
-JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 9d40fec82 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
@@ -31828,10 +31774,6 @@ JNI_METHOD(void, WindowCoveringCluster, reportSafetyStatusAttribute)(JNIEnv * en
     onReport.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, WindowCoveringCluster, readFeatureMapAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
@@ -31859,20 +31801,6 @@ JNI_METHOD(void, WindowCoveringCluster, readFeatureMapAttribute)(JNIEnv * env, j
 
 JNI_METHOD(void, WindowCoveringCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, WindowCoveringCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> e10d44a16 (basic code generation template, but not able to import to tool app)
-=======
-JNI_METHOD(void, WindowCoveringCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
-JNI_METHOD(void, WindowCoveringCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 9109a53ae (need to wait for cast-helper)
-=======
-JNI_METHOD(void, WindowCoveringCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 9d40fec82 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(

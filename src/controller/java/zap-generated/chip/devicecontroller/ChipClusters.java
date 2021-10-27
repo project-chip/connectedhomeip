@@ -2804,10 +2804,6 @@ public class ChipClusters {
       readMaxMeasuredValueAttribute(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void readToleranceAttribute(IntegerAttributeCallback callback) {
       readToleranceAttribute(chipClusterPtr, callback);
     }
@@ -2830,77 +2826,6 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
-      readClusterRevisionAttribute(chipClusterPtr, callback);
-    }
-  
-    private native void readMeasuredValueAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMinMeasuredValueAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxMeasuredValueAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
->>>>>>> e10d44a16 (basic code generation template, but not able to import to tool app)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
-      readClusterRevisionAttribute(chipClusterPtr, callback);
-    }
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
-      readClusterRevisionAttribute(chipClusterPtr, callback);
-    }
->>>>>>> 9d40fec82 (callback generation done)
-
-    private native void readMeasuredValueAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void readMinMeasuredValueAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void readMaxMeasuredValueAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-<<<<<<< HEAD
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
-      readClusterRevisionAttribute(chipClusterPtr, callback);
-    }
-  
-    private native void readMeasuredValueAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMinMeasuredValueAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxMeasuredValueAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
->>>>>>> 9109a53ae (need to wait for cast-helper)
-=======
->>>>>>> 9d40fec82 (callback generation done)
   }
 
   public static class GeneralCommissioningCluster extends BaseChipCluster {
@@ -5242,10 +5167,6 @@ public class ChipClusters {
       readMaxMeasuredValueAttribute(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void readToleranceAttribute(IntegerAttributeCallback callback) {
       readToleranceAttribute(chipClusterPtr, callback);
     }
@@ -5260,36 +5181,12 @@ public class ChipClusters {
     }
 
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> e10d44a16 (basic code generation template, but not able to import to tool app)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> 9109a53ae (need to wait for cast-helper)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
->>>>>>> 9d40fec82 (callback generation done)
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
     private native void readMeasuredValueAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
->>>>>>> 9d40fec82 (callback generation done)
     private native void subscribeMeasuredValueAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
 
@@ -5302,8 +5199,6 @@ public class ChipClusters {
     private native void readMaxMeasuredValueAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private native void readToleranceAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -5315,34 +5210,6 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
-=======
-=======
->>>>>>> 9109a53ae (need to wait for cast-helper)
-    private native void reportMeasuredValueAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
-  
-    private native void readMinMeasuredValueAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxMeasuredValueAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-<<<<<<< HEAD
->>>>>>> e10d44a16 (basic code generation template, but not able to import to tool app)
-=======
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
->>>>>>> 9109a53ae (need to wait for cast-helper)
-=======
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
->>>>>>> 9d40fec82 (callback generation done)
   }
 
   public static class ScenesCluster extends BaseChipCluster {
@@ -5805,10 +5672,6 @@ public class ChipClusters {
       readMaxMeasuredValueAttribute(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void readToleranceAttribute(IntegerAttributeCallback callback) {
       readToleranceAttribute(chipClusterPtr, callback);
     }
@@ -5823,36 +5686,12 @@ public class ChipClusters {
     }
 
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> e10d44a16 (basic code generation template, but not able to import to tool app)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> 9109a53ae (need to wait for cast-helper)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
->>>>>>> 9d40fec82 (callback generation done)
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
     private native void readMeasuredValueAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
->>>>>>> 9d40fec82 (callback generation done)
     private native void subscribeMeasuredValueAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
 
@@ -5865,8 +5704,6 @@ public class ChipClusters {
     private native void readMaxMeasuredValueAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private native void readToleranceAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -5878,34 +5715,6 @@ public class ChipClusters {
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
-=======
-=======
->>>>>>> 9109a53ae (need to wait for cast-helper)
-    private native void reportMeasuredValueAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
-  
-    private native void readMinMeasuredValueAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readMaxMeasuredValueAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-<<<<<<< HEAD
->>>>>>> e10d44a16 (basic code generation template, but not able to import to tool app)
-=======
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
->>>>>>> 9109a53ae (need to wait for cast-helper)
-=======
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
->>>>>>> 9d40fec82 (callback generation done)
   }
 
   public static class TestClusterCluster extends BaseChipCluster {
@@ -7744,31 +7553,11 @@ public class ChipClusters {
       reportSafetyStatusAttribute(chipClusterPtr, callback);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public void readFeatureMapAttribute(LongAttributeCallback callback) {
       readFeatureMapAttribute(chipClusterPtr, callback);
     }
 
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> e10d44a16 (basic code generation template, but not able to import to tool app)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
-    public void readClusterRevisionAttribute(
-      IntegerAttributeCallback callback
-    ) {
->>>>>>> 9109a53ae (need to wait for cast-helper)
-=======
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
->>>>>>> 9d40fec82 (callback generation done)
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
@@ -7819,14 +7608,6 @@ public class ChipClusters {
     private native void reportTargetPositionLiftPercent100thsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
->>>>>>> 9d40fec82 (callback generation done)
     private native void readTargetPositionTiltPercent100thsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -7883,32 +7664,10 @@ public class ChipClusters {
     private native void reportSafetyStatusAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private native void readFeatureMapAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
-=======
-=======
->>>>>>> 9109a53ae (need to wait for cast-helper)
-    private native void reportSafetyStatusAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
-  
-    private native void readClusterRevisionAttribute(long chipClusterPtr,
-      IntegerAttributeCallback callback
-    );
-<<<<<<< HEAD
->>>>>>> e10d44a16 (basic code generation template, but not able to import to tool app)
-=======
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
->>>>>>> f018b1196 (create new public class under chip/clusterinfo)
-=======
->>>>>>> 9109a53ae (need to wait for cast-helper)
-=======
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
->>>>>>> 9d40fec82 (callback generation done)
   }
 }
