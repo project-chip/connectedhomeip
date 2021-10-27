@@ -37,11 +37,11 @@ namespace Dnssd {
 using namespace chip::Platform;
 
 namespace {
-jobject sResolverObject     = nullptr;
-jobject sMdnsCallbackObject = nullptr;
-jmethodID sResolveMethod    = nullptr;
-jmethodID sPublishMethod    = nullptr;
-jmethodID sRemoveServicesMethod     = nullptr;
+jobject sResolverObject         = nullptr;
+jobject sMdnsCallbackObject     = nullptr;
+jmethodID sResolveMethod        = nullptr;
+jmethodID sPublishMethod        = nullptr;
+jmethodID sRemoveServicesMethod = nullptr;
 } // namespace
 
 // Implemention of functions declared in lib/dnssd/platform/Dnssd.h
@@ -114,8 +114,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
         env->SetObjectArrayElement(subTypes, i, jniSubType.jniValue());
     }
 
-    env->CallVoidMethod(sResolverObject, sPublishMethod, jniName.jniValue(), jniHostName.jniValue(),
-                                           jniServiceType.jniValue(), service->mPort, keys, datas, subTypes);
+    env->CallVoidMethod(sResolverObject, sPublishMethod, jniName.jniValue(), jniHostName.jniValue(), jniServiceType.jniValue(),
+                        service->mPort, keys, datas, subTypes);
 
     if (env->ExceptionCheck())
     {
