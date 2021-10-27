@@ -18,6 +18,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <credentials/CHIPCert.h>
+#include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -227,6 +228,11 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
 
 static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inSuite, void * inContext)
 {
+    static constexpr uint8_t sTestCMS_CDContent[] = { 0x15, 0x25, 0x01, 0xF1, 0xFF, 0x36, 0x02, 0x05, 0x00, 0x80,
+                                                      0x05, 0x01, 0x80, 0x05, 0x02, 0x80, 0x18, 0x25, 0x03, 0xD2,
+                                                      0x04, 0x25, 0x04, 0x2E, 0x16, 0x24, 0x05, 0xAA, 0x25, 0x06,
+                                                      0xDE, 0xC0, 0x25, 0x07, 0x94, 0x26, 0x24, 0x08, 0x00, 0x18 };
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Replace default verifier with example verifier
@@ -245,9 +251,8 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     NL_TEST_ASSERT(inSuite, default_provider == example_dac_provider);
 
     // Check for CD presence
-    uint8_t cd_data_buf[256];
+    uint8_t cd_data_buf[kMaxCMSSignedCDMessage] = { 0 };
     MutableByteSpan cd_data_span(cd_data_buf);
-    memset(cd_data_span.data(), 0, cd_data_span.size());
 
     err = example_dac_provider->GetCertificationDeclaration(cd_data_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -257,6 +262,8 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     ByteSpan cd_payload;
     AttestationVerificationResult attestation_result = default_verifier->ValidateCertificationDeclaration(cd_data_span, cd_payload);
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
+
+    NL_TEST_ASSERT(inSuite, cd_payload.data_equal(ByteSpan(sTestCMS_CDContent)));
 }
 
 /**
