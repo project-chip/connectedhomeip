@@ -11017,14 +11017,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 
 namespace VendorId {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * vendorId)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * value)
 {
-    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) vendorId, sizeof(*vendorId));
+    return emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) value, sizeof(*value));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId vendorId)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value)
 {
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &vendorId,
-                                       ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorId

@@ -4192,8 +4192,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace EpochS
 
 namespace VendorId {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * vendorId); // vendor_id
-EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId vendorId);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * value); // vendor_id
+EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value);
 } // namespace VendorId
 
 namespace Unsupported {
