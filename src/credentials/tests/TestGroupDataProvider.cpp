@@ -22,9 +22,6 @@
 #include <nlunit-test.h>
 #include <string.h>
 
-static_assert(CHIP_CONFIG_MAX_GROUPS_PER_FABRIC >= 5, "Test expects CHIP_CONFIG_MAX_GROUPS_PER_FABRIC >= 5");
-static_assert(CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC >= 8, "Test expects CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC >= 8");
-
 using namespace chip::Credentials;
 
 namespace chip {
@@ -97,7 +94,7 @@ void TestEndpoints(nlTestSuite * apSuite, void * apContext)
     exists = groups->GroupMappingExists(kFabricIndex1, group1c);
     NL_TEST_ASSERT(apSuite, exists);
 
-    err = groups->RemoveAllGroupMappings(kFabricIndex1);
+    err = groups->RemoveAllGroupMappings(kFabricIndex1, 1);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     exists = groups->GroupMappingExists(kFabricIndex1, group1a);
@@ -167,7 +164,7 @@ void TestEndpoints(nlTestSuite * apSuite, void * apContext)
     exists = groups->GroupMappingExists(kFabricIndex2, group1c);
     NL_TEST_ASSERT(apSuite, exists);
 
-    err = groups->RemoveAllGroupMappings(kFabricIndex2);
+    err = groups->RemoveAllGroupMappings(kFabricIndex2, 1);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     exists = groups->GroupMappingExists(kFabricIndex2, group1a);

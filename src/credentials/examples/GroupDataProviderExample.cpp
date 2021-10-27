@@ -411,7 +411,7 @@ public:
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
-    CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index) override
+    CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint) override
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
@@ -421,7 +421,10 @@ public:
         // Remove all mappings from fabric
         for (uint16_t i = 0; fabric && i < kEndpointEntriesMax; ++i)
         {
-            fabric->endpoints[i].in_use = false;
+            if (fabric->endpoints[i].endpoint == endpoint)
+            {
+                fabric->endpoints[i].in_use = false;
+            }
         }
         return CHIP_NO_ERROR;
     }
