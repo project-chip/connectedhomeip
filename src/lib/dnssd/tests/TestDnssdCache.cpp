@@ -49,29 +49,28 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     const int sizeOfCache = 5;
     DnssdCache<sizeOfCache> tDnssdCache;
     PeerId peerId;
-    int64_t id                        = 0x100;
-    uint16_t port                     = 2000;
-    constexpr Inet::InterfaceId iface = Inet::InterfaceId::Null();
-
-    Inet::IPAddress addr;
-    Inet::IPAddress addrV6;
-    const int ttl = 2; /* seconds */
-    Inet::InterfaceId iface_out;
-    Inet::IPAddress addr_out;
-    uint16_t port_out;
+    int64_t id                  = 0x100;
+    uint16_t port               = 2000;
+    const int ttl               = 2; /* seconds */
     const uint64_t KNOWN_FABRIC = 0x100;
+    ResolvedNodeData nodeData;
+    ResolvedNodeData nodeDataOut;
 
-    Inet::IPAddress::FromString("1.0.0.1", addr);
+    Inet::IPAddress::FromString("1.0.0.1", nodeData.mAddress[nodeData.mNumIPs++]);
+
+    nodeData.mInterfaceId = Inet::InterfaceId::Null();
+    nodeData.mExpiryTime  = tDnssdCache.GetTimeSource().GetCurrentMonotonicTimeMs() + ttl * 1000;
 
     peerId.SetCompressedFabricId(KNOWN_FABRIC);
+    nodeData.mPeerId.SetCompressedFabricId(KNOWN_FABRIC);
 
     for (uint16_t i = 0; i < 10; i++)
     {
         CHIP_ERROR result;
-
-        // ml -- why doesn't adding 2 uint16_t give a uint16_t?
-        peerId.SetNodeId((NodeId) id + i);
-        result = tDnssdCache.Insert(peerId, addr, (uint16_t)(port + i), iface, 1000 * ttl);
+        nodeData.mPeerId.SetNodeId(static_cast<NodeId>(id + i));
+        // Need to re-cast to uint16_t because of integer type promotion
+        nodeData.mPort = static_cast<uint16_t>(port + i);
+        result         = tDnssdCache.Insert(nodeData);
         if (i < sizeOfCache)
         {
             NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
@@ -83,15 +82,19 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     }
 
     tDnssdCache.DumpCache();
-    usleep(static_cast<useconds_t>((ttl + 1) * 1000 * 1000));
+    tDnssdCache.GetTimeSource().SetCurrentMonotonicTimeMs(nodeData.mExpiryTime + (ttl + 1) * 1000);
+
+    nodeData.mExpiryTime = tDnssdCache.GetTimeSource().GetCurrentMonotonicTimeMs() + ttl * 1000;
+
     id   = 0x200;
     port = 3000;
     for (uint16_t i = 0; i < sizeOfCache; i++)
     {
         CHIP_ERROR result;
 
-        peerId.SetNodeId((NodeId) id + i);
-        result = tDnssdCache.Insert(peerId, addr, (uint16_t)(port + i), iface, 1000 * ttl);
+        nodeData.mPeerId.SetNodeId(static_cast<NodeId>(id + i));
+        nodeData.mPort = static_cast<uint16_t>(port + i);
+        result         = tDnssdCache.Insert(nodeData);
         NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
     }
     tDnssdCache.DumpCache();
@@ -99,8 +102,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     for (uint16_t i = 0; i < sizeOfCache; i++)
     {
         CHIP_ERROR result;
-
-        peerId.SetNodeId((NodeId) id + i);
+        peerId.SetNodeId(static_cast<NodeId>(id + i));
         result = tDnssdCache.Delete(peerId);
         NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
     }
@@ -108,22 +110,24 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     tDnssdCache.DumpCache();
 
     // ipv6 inserts
-    Inet::IPAddress::FromString("::1", addrV6);
+    Inet::IPAddress::FromString("::1", nodeData.mAddress[nodeData.mNumIPs++]);
     port = 4000;
     for (uint16_t i = 0; i < sizeOfCache; i++)
     {
         CHIP_ERROR result;
 
-        peerId.SetNodeId((NodeId) id + i);
-        result = tDnssdCache.Insert(peerId, addrV6, (uint16_t)(port + i), iface, 1000 * ttl);
+        nodeData.mPeerId.SetNodeId(static_cast<NodeId>(id + i));
+        nodeData.mPort = static_cast<uint16_t>(port + i);
+
+        result = tDnssdCache.Insert(nodeData);
         NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
     }
 
     tDnssdCache.DumpCache();
 
-    NL_TEST_ASSERT(inSuite, tDnssdCache.Lookup(peerId, addr_out, port_out, iface_out) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, tDnssdCache.Lookup(peerId, nodeDataOut) == CHIP_NO_ERROR);
     peerId.SetCompressedFabricId(KNOWN_FABRIC + 1);
-    NL_TEST_ASSERT(inSuite, tDnssdCache.Lookup(peerId, addr_out, port_out, iface_out) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, tDnssdCache.Lookup(peerId, nodeDataOut) != CHIP_NO_ERROR);
 }
 
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCreate), NL_TEST_DEF_FN(TestInsert), NL_TEST_SENTINEL() };

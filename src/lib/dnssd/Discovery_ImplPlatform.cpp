@@ -462,23 +462,11 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     ReturnErrorOnFailure(InitImpl());
 
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    Inet::IPAddress addr;
-    uint16_t port;
-    Inet::InterfaceId iface;
-
     /* see if the entry is cached and use it.... */
-
-    if (sDnssdCache.Lookup(peerId, addr, port, iface) == CHIP_NO_ERROR)
+    ResolvedNodeData nodeData;
+    if (sDnssdCache.Lookup(peerId, nodeData) == CHIP_NO_ERROR)
     {
-        ResolvedNodeData nodeData;
-
-        nodeData.mInterfaceId                 = iface;
-        nodeData.mPort                        = port;
-        nodeData.mAddress[nodeData.mNumIPs++] = addr;
-        nodeData.mPeerId                      = peerId;
-
         mResolverDelegate->OnNodeIdResolved(nodeData);
-
         return CHIP_NO_ERROR;
     }
 #endif
@@ -589,23 +577,13 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
         return;
     }
 
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    // TODO --  define appropriate TTL, for now use 2000 msec (rfc default)
-    // figure out way to use TTL value from mDNS packet in  future update
-    // TODO: Expand the cache to hold all the addresses.
-    error = mgr->sDnssdCache.Insert(nodeData.mPeerId, result->mAddress.Value(), result->mPort, result->mInterface, 2 * 1000);
-
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(Discovery, "DnssdCache insert failed with %s", chip::ErrorStr(error));
-    }
-#endif
-
     // TODO: Expand the results to include all the addresses.
     Platform::CopyString(nodeData.mHostName, result->mHostName);
     nodeData.mInterfaceId = result->mInterface;
     nodeData.mAddress[0]  = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
+    Time::TimeSource<Time::Source::kSystem> timeSource;
+    nodeData.mExpiryTime = timeSource.GetCurrentMonotonicTimeMs() + result->mTtl * 1000;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
@@ -615,6 +593,14 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     }
 
     nodeData.LogNodeIdResolved();
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+    error = mgr->sDnssdCache.Insert(nodeData);
+
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Discovery, "DnssdCache insert failed with %s", chip::ErrorStr(error));
+    }
+#endif
     mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
 }
 
