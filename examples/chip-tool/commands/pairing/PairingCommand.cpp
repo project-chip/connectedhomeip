@@ -160,17 +160,17 @@ void PairingCommand::OnOpenCommissioningWindowResponse(void * context, NodeId re
     PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(chipTool, "Failed in opening commissioning window on the device: %" PRIu64 ", error %" CHIP_ERROR_FORMAT,
-                     remoteId, err.Format());
+        ChipLogError(chipTool,
+                     "Failed in opening commissioning window on the device: 0x" ChipLogFormatX64 ", error %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(remoteId), err.Format());
     }
     command->SetCommandExitStatus(err);
 }
 
 CHIP_ERROR PairingCommand::OpenCommissioningWindow()
 {
-    CHIP_ERROR err = mController.OpenCommissioningWindowWithCallback(
-        mNodeId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption, &mOnOpenCommissioningWindowCallback);
-    return err;
+    return mController.OpenCommissioningWindowWithCallback(mNodeId, mTimeout, mIteration, mDiscriminator,
+                                                           mCommissioningWindowOption, &mOnOpenCommissioningWindowCallback);
 }
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
