@@ -6343,6 +6343,194 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPBridgedActionsActionListAttributeCallback : public Callback::Callback<BridgedActionsActionListListAttributeCallback>
+{
+public:
+    CHIPBridgedActionsActionListAttributeCallback(jobject javaCallback) :
+        Callback::Callback<BridgedActionsActionListListAttributeCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & list)
+    {
+        chip::DeviceLayer::StackUnlock unlock;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+
+        VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+        std::unique_ptr<CHIPBridgedActionsActionListAttributeCallback> cppCallback(
+            reinterpret_cast<CHIPBridgedActionsActionListAttributeCallback *>(context));
+
+        // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+        javaCallbackRef = cppCallback.get()->javaCallbackRef;
+        VerifyOrReturn(javaCallbackRef != nullptr,
+                       ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+        jclass arrayListClass;
+        err = JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
+        JniClass arrayListJniClass(arrayListClass);
+        jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
+        jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+        VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
+                       ChipLogError(Zcl, "Error finding Java ArrayList methods"));
+        jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
+        VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+
+        jmethodID javaMethod;
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+        jclass attributeClass;
+        err = JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipClusters$BridgedActionsCluster$ActionListAttribute", attributeClass);
+        VerifyOrReturn(
+            err == CHIP_NO_ERROR,
+            ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$BridgedActionsCluster$ActionListAttribute"));
+        JniClass attributeJniClass(attributeClass);
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(ILjava/lang/String;IIII)V");
+        VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find ActionListAttribute constructor"));
+
+        auto iter = list.begin();
+        while (iter.Next())
+        {
+            auto & entry  = iter.GetValue();
+            jint actionID = entry.actionID;
+            UtfString nameStr(env, entry.name);
+            jstring name(nameStr.jniValue());
+            jint type              = entry.type;
+            jint endpointListID    = entry.endpointListID;
+            jint supportedCommands = entry.supportedCommands;
+            jint status            = entry.status;
+
+            jobject attributeObj =
+                env->NewObject(attributeClass, attributeCtor, actionID, name, type, endpointListID, supportedCommands, status);
+            VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create ActionListAttribute object"));
+
+            env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        }
+        VerifyOrReturn(
+            iter.GetStatus() == CHIP_NO_ERROR,
+            ChipLogError(Zcl, "Error decoding ActionListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
+
+        env->ExceptionClear();
+        env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPBridgedActionsEndpointListAttributeCallback : public Callback::Callback<BridgedActionsEndpointListListAttributeCallback>
+{
+public:
+    CHIPBridgedActionsEndpointListAttributeCallback(jobject javaCallback) :
+        Callback::Callback<BridgedActionsEndpointListListAttributeCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+            list)
+    {
+        chip::DeviceLayer::StackUnlock unlock;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+
+        VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+        std::unique_ptr<CHIPBridgedActionsEndpointListAttributeCallback> cppCallback(
+            reinterpret_cast<CHIPBridgedActionsEndpointListAttributeCallback *>(context));
+
+        // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+        javaCallbackRef = cppCallback.get()->javaCallbackRef;
+        VerifyOrReturn(javaCallbackRef != nullptr,
+                       ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+        jclass arrayListClass;
+        err = JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
+        JniClass arrayListJniClass(arrayListClass);
+        jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
+        jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+        VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
+                       ChipLogError(Zcl, "Error finding Java ArrayList methods"));
+        jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
+        VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+
+        jmethodID javaMethod;
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+        jclass attributeClass;
+        err = JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipClusters$BridgedActionsCluster$EndpointListAttribute", attributeClass);
+        VerifyOrReturn(
+            err == CHIP_NO_ERROR,
+            ChipLogError(Zcl,
+                         "Could not find class chip/devicecontroller/ChipClusters$BridgedActionsCluster$EndpointListAttribute"));
+        JniClass attributeJniClass(attributeClass);
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(ILjava/lang/String;I[B)V");
+        VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find EndpointListAttribute constructor"));
+
+        auto iter = list.begin();
+        while (iter.Next())
+        {
+            auto & entry        = iter.GetValue();
+            jint endpointListID = entry.endpointListID;
+            UtfString nameStr(env, entry.name);
+            jstring name(nameStr.jniValue());
+            jint type            = entry.type;
+            jbyteArray endpoints = env->NewByteArray(entry.endpoints.size());
+            env->SetByteArrayRegion(endpoints, 0, entry.endpoints.size(), reinterpret_cast<const jbyte *>(entry.endpoints.data()));
+
+            jobject attributeObj = env->NewObject(attributeClass, attributeCtor, endpointListID, name, type, endpoints);
+            VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create EndpointListAttribute object"));
+
+            env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        }
+        VerifyOrReturn(
+            iter.GetStatus() == CHIP_NO_ERROR,
+            ChipLogError(Zcl, "Error decoding EndpointListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
+
+        env->ExceptionClear();
+        env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPContentLauncherAcceptsHeaderListAttributeCallback
     : public Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>
 {
@@ -10784,6 +10972,682 @@ JNI_METHOD(void, BooleanStateCluster, readClusterRevisionAttribute)(JNIEnv * env
 
     CHIP_ERROR err                   = CHIP_NO_ERROR;
     BooleanStateCluster * cppCluster = reinterpret_cast<BooleanStateCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(jlong, BridgedActionsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    chip::DeviceLayer::StackLock lock;
+    BridgedActionsCluster * cppCluster = new BridgedActionsCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
+JNI_METHOD(void, BridgedActionsCluster, disableAction)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->DisableAction(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, BridgedActionsCluster, disableActionWithDuration)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID, jlong duration)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->DisableActionWithDuration(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID, duration);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, BridgedActionsCluster, enableAction)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->EnableAction(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, BridgedActionsCluster, enableActionWithDuration)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID, jlong duration)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->EnableActionWithDuration(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID, duration);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, BridgedActionsCluster, instantAction)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->InstantAction(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, BridgedActionsCluster, instantActionWithTransition)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID, jint transitionTime)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->InstantActionWithTransition(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID, transitionTime);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, BridgedActionsCluster, pauseAction)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->PauseAction(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, BridgedActionsCluster, pauseActionWithDuration)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID, jlong duration)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->PauseActionWithDuration(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID, duration);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, BridgedActionsCluster, resumeAction)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->ResumeAction(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, BridgedActionsCluster, startAction)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->StartAction(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, BridgedActionsCluster, startActionWithDuration)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID, jlong duration)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->StartActionWithDuration(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID, duration);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+JNI_METHOD(void, BridgedActionsCluster, stopAction)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint actionID, jlong invokeID)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->StopAction(onSuccess->Cancel(), onFailure->Cancel(), actionID, invokeID);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+    else
+    {
+        onSuccess.release();
+        onFailure.release();
+    }
+}
+
+JNI_METHOD(void, BridgedActionsCluster, readActionListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBridgedActionsActionListAttributeCallback, void (*)(CHIPBridgedActionsActionListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPBridgedActionsActionListAttributeCallback>(callback),
+                  Platform::Delete<CHIPBridgedActionsActionListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeActionList(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, BridgedActionsCluster, readEndpointListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBridgedActionsEndpointListAttributeCallback, void (*)(CHIPBridgedActionsEndpointListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPBridgedActionsEndpointListAttributeCallback>(callback),
+                  Platform::Delete<CHIPBridgedActionsEndpointListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeEndpointList(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, BridgedActionsCluster, readSetupUrlAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPCharStringAttributeCallback, void (*)(CHIPCharStringAttributeCallback *)> onSuccess(
+        Platform::New<CHIPCharStringAttributeCallback>(callback, false), Platform::Delete<CHIPCharStringAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeSetupUrl(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, BridgedActionsCluster, readClusterRevisionAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt16uAttributeCallback>(callback), Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 

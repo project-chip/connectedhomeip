@@ -1985,6 +1985,35 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace PollControl
 
+namespace BridgedActions {
+namespace Attributes {
+
+namespace SetupUrl {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+{
+    VerifyOrReturnError(value.size() == 512, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    uint8_t zclString[512 + 1];
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedActions::Id, Id, zclString, sizeof(zclString));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    memcpy(value.data(), &zclString[1], 512);
+    value.reduce_size(emberAfStringLength(zclString));
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
+{
+    VerifyOrReturnError(value.size() <= 512, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    uint8_t zclString[512 + 1];
+    emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedActions::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+}
+
+} // namespace SetupUrl
+
+} // namespace Attributes
+} // namespace BridgedActions
+
 namespace Basic {
 namespace Attributes {
 
