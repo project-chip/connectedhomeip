@@ -32,7 +32,7 @@
   "endpointTypes": [
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "Root Node Device Type",
+      "deviceTypeName": "Base Application Example",
       "deviceTypeCode": 65280,
       "deviceTypeProfileId": 259,
       "clusters": [
@@ -1710,6 +1710,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 257
     }
-  ],
-  "log": []
+  ]
 }
