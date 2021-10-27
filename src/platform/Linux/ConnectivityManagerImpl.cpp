@@ -1068,8 +1068,8 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** ne
             {
                 NetworkInterface * ifp = new NetworkInterface();
 
-                strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceIterator::kMaxIfNameLength);
-                ifp->Name[Inet::InterfaceIterator::kMaxIfNameLength - 1] = '\0';
+                strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceId::kMaxIfNameLength);
+                ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
 
                 ifp->name                            = CharSpan(ifp->Name, strlen(ifp->Name));
                 ifp->fabricConnected                 = ifa->ifa_flags & IFF_RUNNING;
