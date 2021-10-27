@@ -154,7 +154,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
     Shutdown(); // ensure everything starts fresh
 
     size_t endpointIndex                = 0;
-    chip::Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
+    chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
     chip::Inet::IPAddressType addressType;
 
     ShutdownOnError autoShutdown(this);
@@ -176,8 +176,8 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
         CHIP_ERROR err = JoinMulticastGroup(interfaceId, info->udp, addressType);
         if (err != CHIP_NO_ERROR)
         {
-            char interfaceName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
-            chip::Inet::GetInterfaceName(interfaceId, interfaceName, sizeof(interfaceName));
+            char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
+            interfaceId.GetInterfaceName(interfaceName, sizeof(interfaceName));
 
             // Log only as non-fatal error. Failure to join will mean we reply to unicast queries only.
             ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %s", interfaceName,
@@ -211,7 +211,7 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
 
         chip::Inet::InterfaceId boundIf = info->udp->GetBoundInterface();
 
-        if ((boundIf != INET_NULL_INTERFACEID) && (boundIf != interface))
+        if ((boundIf.IsPresent()) && (boundIf != interface))
         {
             continue;
         }
@@ -234,7 +234,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
             continue;
         }
 
-        if ((info->interfaceId != interface) && (info->interfaceId != INET_NULL_INTERFACEID))
+        if ((info->interfaceId != interface) && (info->interfaceId != chip::Inet::InterfaceId::Null()))
         {
             continue;
         }

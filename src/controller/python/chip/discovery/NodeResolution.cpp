@@ -45,7 +45,7 @@ public:
             mSuccessCallback(                                                         //
                 nodeData.mPeerId.GetCompressedFabricId(),                             //
                 nodeData.mPeerId.GetNodeId(),                                         //
-                nodeData.mInterfaceId,                                                //
+                nodeData.mInterfaceId.GetPlatformInterface(),                         //
                 nodeData.mAddress.ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
                 nodeData.mPort                                                        //
             );
