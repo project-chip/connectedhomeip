@@ -91,7 +91,8 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
 #endif
     SuccessOrExit(err);
 
-    err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
+    err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(),
+                              params.GetInterfaceId().IsPresent());
     SuccessOrExit(err);
 
     err = mListenSocket->Listen(kListenBacklogSize);
@@ -357,7 +358,7 @@ CHIP_ERROR TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuf
 {
     Inet::IPAddress ipAddress;
     uint16_t port;
-    Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
+    Inet::InterfaceId interfaceId;
 
     endPoint->GetPeerInfo(&ipAddress, &port);
     endPoint->GetInterfaceId(&interfaceId);
@@ -382,7 +383,7 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, CHIP_ERROR inet
     TCPBase * tcp           = reinterpret_cast<TCPBase *>(endPoint->AppState);
     Inet::IPAddress ipAddress;
     uint16_t port;
-    Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
+    Inet::InterfaceId interfaceId;
 
     endPoint->GetPeerInfo(&ipAddress, &port);
     endPoint->GetInterfaceId(&interfaceId);
@@ -512,7 +513,7 @@ void TCPBase::Disconnect(const PeerAddress & address)
         {
             Inet::IPAddress ipAddress;
             uint16_t port;
-            Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
+            Inet::InterfaceId interfaceId;
 
             mActiveConnections[i].mEndPoint->GetPeerInfo(&ipAddress, &port);
             mActiveConnections[i].mEndPoint->GetInterfaceId(&interfaceId);

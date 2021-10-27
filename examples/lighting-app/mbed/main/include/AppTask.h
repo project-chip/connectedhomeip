@@ -31,8 +31,6 @@ public:
     void PostEvent(AppEvent * aEvent);
     void UpdateClusterState(void);
 
-    void ButtonEventHandler(uint32_t id, bool pushed);
-
 private:
     friend AppTask & GetAppTask(void);
 
@@ -52,6 +50,7 @@ private:
     void LightingButtonPressEventHandler(void);
     void FunctionButtonPressEventHandler(void);
     void FunctionButtonReleaseEventHandler(void);
+    void ButtonEventHandler(uint32_t id, bool pushed);
     void SliderEventHandler(int slider_pos);
     void TimerEventHandler(void);
 

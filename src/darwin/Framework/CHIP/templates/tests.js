@@ -57,6 +57,7 @@ function getTests()
 
   const OccupancySensing = [
     'Test_TC_OCC_1_1',
+    'Test_TC_OCC_2_1',
   ];
 
   const LevelControl = [
@@ -84,10 +85,13 @@ function getTests()
   const PumpConfigurationControl = [
     'Test_TC_PCC_1_1',
     'Test_TC_PCC_2_1',
+    'Test_TC_PCC_2_2',
+    'Test_TC_PCC_2_3',
   ];
 
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
+    'Test_TC_RH_2_1',
   ];
 
   const TemperatureMeasurement = [

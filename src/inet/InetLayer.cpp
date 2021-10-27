@@ -345,20 +345,20 @@ bool InetLayer::IsIdleTimerRunning()
 /**
  *  Get the link local IPv6 address for a specified link or interface.
  *
- *  @param[in]    link    The interface for which the link local IPv6
- *                        address is being sought.
+ *  @param[in]    interface The interface for which the link local IPv6
+ *                          address is being sought.
  *
  *  @param[out]   llAddr  The link local IPv6 address for the link.
  *
  *  @retval    #CHIP_ERROR_NOT_IMPLEMENTED      If IPv6 is not supported.
  *  @retval    #CHIP_ERROR_INVALID_ARGUMENT     If the link local address
- *                                              is NULL.
+ *                                              is nullptr.
  *  @retval    #INET_ERROR_ADDRESS_NOT_FOUND    If the link does not have
  *                                              any address configured.
  *  @retval    #CHIP_NO_ERROR                   On success.
  *
  */
-CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
+CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId interface, IPAddress * llAddr)
 {
     VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -367,6 +367,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif //! LWIP_IPV6
 
+    struct netif * link = interface.GetPlatformInterface();
     for (struct netif * intf = netif_list; intf != NULL; intf = intf->next)
     {
         if ((link != NULL) && (link != intf))
@@ -399,7 +400,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
         if (ifaddr_iter->ifa_addr != nullptr)
         {
             if ((ifaddr_iter->ifa_addr->sa_family == AF_INET6) &&
-                ((link == INET_NULL_INTERFACEID) || (if_nametoindex(ifaddr_iter->ifa_name) == link)))
+                (!interface.IsPresent() || (if_nametoindex(ifaddr_iter->ifa_name) == interface.GetPlatformInterface())))
             {
                 struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
                 if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
@@ -414,7 +415,7 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-    net_if * const iface = (link == INET_NULL_INTERFACEID) ? net_if_get_default() : net_if_get_by_index(link);
+    net_if * const iface = interface.IsPresent() ? net_if_get_by_index(interface.GetPlatformInterface()) : net_if_get_default();
     VerifyOrReturnError(iface != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
 
     in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
@@ -508,8 +509,8 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
 /**
  *  Get the interface identifier for the specified IP address. If the
- *  interface identifier cannot be derived it is set to the
- *  #INET_NULL_INTERFACEID.
+ *  interface identifier cannot be derived it is set to the default
+ *  InterfaceId.
  *
  *  @note
  *    This function fetches the first interface (from the configured list
@@ -531,12 +532,12 @@ CHIP_ERROR InetLayer::GetInterfaceFromAddr(const IPAddress & addr, InterfaceId &
         IPAddress curAddr = addrIter.GetAddress();
         if (addr == curAddr)
         {
-            intfId = addrIter.GetInterface();
+            intfId = addrIter.GetInterfaceId();
             return CHIP_NO_ERROR;
         }
     }
 
-    intfId = INET_NULL_INTERFACEID;
+    intfId = InterfaceId::Null();
 
     return CHIP_NO_ERROR;
 }
@@ -566,7 +567,7 @@ bool InetLayer::MatchLocalIPv6Subnet(const IPAddress & addr)
 #endif // INET_CONFIG_ENABLE_IPV4
         if (addrPrefix.IPAddr.IsIPv6LinkLocal())
             continue;
-        addrPrefix.Length = ifAddrIter.GetIPv6PrefixLength();
+        addrPrefix.Length = ifAddrIter.GetPrefixLength();
         if (addrPrefix.MatchAddress(addr))
             return true;
     }
@@ -674,7 +675,7 @@ void IPPacketInfo::Clear()
 {
     SrcAddress  = IPAddress::Any;
     DestAddress = IPAddress::Any;
-    Interface   = INET_NULL_INTERFACEID;
+    Interface   = InterfaceId::Null();
     SrcPort     = 0;
     DestPort    = 0;
 }

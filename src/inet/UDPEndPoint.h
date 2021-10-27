@@ -78,7 +78,7 @@ public:
      * @retval  INET_ERROR_WRONG_ADDRESS_TYPE   \c addrType is \c IPAddressType::kAny, or not equal to the type of \c addr.
      * @retval  other                           Another system or platform error
      */
-    CHIP_ERROR Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
+    CHIP_ERROR Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId = InterfaceId::Null());
 
     /**
      * Bind the endpoint to a network interface.
@@ -146,7 +146,7 @@ public:
      * @retval  other                               Another system or platform error.
      */
     CHIP_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg,
-                      InterfaceId intfId = INET_NULL_INTERFACEID);
+                      InterfaceId intfId = InterfaceId::Null());
 
     /**
      * Send a UDP message to a specified destination.

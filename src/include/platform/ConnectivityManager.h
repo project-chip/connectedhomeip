@@ -55,7 +55,7 @@ constexpr size_t kMaxHardwareAddrSize = 8;
 
 struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type
 {
-    char Name[Inet::InterfaceIterator::kMaxIfNameLength];
+    char Name[Inet::InterfaceId::kMaxIfNameLength];
     uint8_t MacAddress[kMaxHardwareAddrSize];
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };

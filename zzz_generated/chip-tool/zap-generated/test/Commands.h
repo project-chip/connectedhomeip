@@ -12149,6 +12149,353 @@ private:
     void OnSuccessResponse_1(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
+class Test_TC_OCC_2_1 : public TestCommand
+{
+public:
+    Test_TC_OCC_2_1() : TestCommand("Test_TC_OCC_2_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_OCC_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_OCC_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Reads mandatory attribute constrains: Occupancy\n");
+            err = TestReadsMandatoryAttributeConstrainsOccupancy_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 1 : Writes the respective default value to mandatory attribute: Occupancy\n");
+            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancy_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads back mandatory attribute: Occupancy\n");
+            err = TestReadsBackMandatoryAttributeOccupancy_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads mandatory attribute constrains: OccupancySensorType\n");
+            err = TestReadsMandatoryAttributeConstrainsOccupancySensorType_3();
+            break;
+        case 4:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 4 : Writes the respective default value to mandatory attribute: OccupancySensorType\n");
+            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancySensorType_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Reads back mandatory attribute: OccupancySensorType\n");
+            err = TestReadsBackMandatoryAttributeOccupancySensorType_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads mandatory attribute constrains: OccupancySensorTypeBitmap\n");
+            err = TestReadsMandatoryAttributeConstrainsOccupancySensorTypeBitmap_6();
+            break;
+        case 7:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 7 : Writes the respective default value to mandatory attribute: OccupancySensorTypeBitmap\n");
+            err = TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancySensorTypeBitmap_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Reads back mandatory attribute: OccupancySensorTypeBitmap\n");
+            err = TestReadsBackMandatoryAttributeOccupancySensorTypeBitmap_8();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 9;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t occupancy)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t occupancy)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t occupancy)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t occupancySensorType)> mOnSuccessCallback_3{ OnSuccessCallback_3,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t occupancySensorType)> mOnSuccessCallback_4{ OnSuccessCallback_4,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t occupancySensorType)> mOnSuccessCallback_5{ OnSuccessCallback_5,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t occupancySensorTypeBitmap)> mOnSuccessCallback_6{ OnSuccessCallback_6,
+                                                                                                                this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t occupancySensorTypeBitmap)> mOnSuccessCallback_7{ OnSuccessCallback_7,
+                                                                                                                this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t occupancySensorTypeBitmap)> mOnSuccessCallback_8{ OnSuccessCallback_8,
+                                                                                                                this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint8_t occupancy)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_0(occupancy);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t occupancy)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_1(occupancy);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint8_t occupancy)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_2(occupancy);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint8_t occupancySensorType)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_3(occupancySensorType);
+    }
+
+    static void OnFailureCallback_4(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint8_t occupancySensorType)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_4(occupancySensorType);
+    }
+
+    static void OnFailureCallback_5(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context, uint8_t occupancySensorType)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_5(occupancySensorType);
+    }
+
+    static void OnFailureCallback_6(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, uint8_t occupancySensorTypeBitmap)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_6(occupancySensorTypeBitmap);
+    }
+
+    static void OnFailureCallback_7(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_7(status);
+    }
+
+    static void OnSuccessCallback_7(void * context, uint8_t occupancySensorTypeBitmap)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_7(occupancySensorTypeBitmap);
+    }
+
+    static void OnFailureCallback_8(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context, uint8_t occupancySensorTypeBitmap)
+    {
+        (static_cast<Test_TC_OCC_2_1 *>(context))->OnSuccessResponse_8(occupancySensorTypeBitmap);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancy_0()
+    {
+        chip::Controller::OccupancySensingClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeOccupancy(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t occupancy)
+    {
+        VerifyOrReturn(CheckConstraintType("occupancy", "", "map8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("occupancy", occupancy, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancy_1()
+    {
+        chip::Controller::OccupancySensingClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t occupancyArgument = 0;
+
+        return cluster.WriteAttributeOccupancy(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(), occupancyArgument);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_1(uint8_t occupancy) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeOccupancy_2()
+    {
+        chip::Controller::OccupancySensingClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeOccupancy(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint8_t occupancy)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("occupancy", occupancy, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancySensorType_3()
+    {
+        chip::Controller::OccupancySensingClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeOccupancySensorType(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint8_t occupancySensorType)
+    {
+        VerifyOrReturn(CheckConstraintType("occupancySensorType", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("occupancySensorType", occupancySensorType, 3));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancySensorType_4()
+    {
+        chip::Controller::OccupancySensingClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t occupancySensorTypeArgument = static_cast<uint8_t>(0);
+
+        return cluster.WriteAttributeOccupancySensorType(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel(),
+                                                         occupancySensorTypeArgument);
+    }
+
+    void OnFailureResponse_4(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_4(uint8_t occupancySensorType) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeOccupancySensorType_5()
+    {
+        chip::Controller::OccupancySensingClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeOccupancySensorType(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(uint8_t occupancySensorType)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("occupancySensorType", occupancySensorType, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancySensorTypeBitmap_6()
+    {
+        chip::Controller::OccupancySensingClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeOccupancySensorTypeBitmap(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(uint8_t occupancySensorTypeBitmap)
+    {
+        VerifyOrReturn(CheckConstraintType("occupancySensorTypeBitmap", "", "map8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("occupancySensorTypeBitmap", occupancySensorTypeBitmap, 1));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("occupancySensorTypeBitmap", occupancySensorTypeBitmap, 7));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancySensorTypeBitmap_7()
+    {
+        chip::Controller::OccupancySensingClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t occupancySensorTypeBitmapArgument = 1;
+
+        return cluster.WriteAttributeOccupancySensorTypeBitmap(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel(),
+                                                               occupancySensorTypeBitmapArgument);
+    }
+
+    void OnFailureResponse_7(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_7(uint8_t occupancySensorTypeBitmap) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeOccupancySensorTypeBitmap_8()
+    {
+        chip::Controller::OccupancySensingClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeOccupancySensorTypeBitmap(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(uint8_t occupancySensorTypeBitmap)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("occupancySensorTypeBitmap", occupancySensorTypeBitmap, 1));
+        NextTest();
+    }
+};
+
 class Test_TC_OO_1_1 : public TestCommand
 {
 public:
@@ -13675,6 +14022,261 @@ private:
     }
 };
 
+class Test_TC_PCC_2_2 : public TestCommand
+{
+public:
+    Test_TC_PCC_2_2() : TestCommand("Test_TC_PCC_2_2"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_PCC_2_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_PCC_2_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Write 1 to the OperationMode attribute to DUT: OperationMode\n");
+            err = TestWrite1ToTheOperationModeAttributeToDutOperationMode_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Write 2 to the OperationMode attribute to DUT: OperationMode\n");
+            err = TestWrite2ToTheOperationModeAttributeToDutOperationMode_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Write 3 to the OperationMode attribute to DUT: OperationMode\n");
+            err = TestWrite3ToTheOperationModeAttributeToDutOperationMode_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t operationMode)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t operationMode)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t operationMode)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PCC_2_2 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint8_t operationMode)
+    {
+        (static_cast<Test_TC_PCC_2_2 *>(context))->OnSuccessResponse_0(operationMode);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PCC_2_2 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t operationMode)
+    {
+        (static_cast<Test_TC_PCC_2_2 *>(context))->OnSuccessResponse_1(operationMode);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PCC_2_2 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint8_t operationMode)
+    {
+        (static_cast<Test_TC_PCC_2_2 *>(context))->OnSuccessResponse_2(operationMode);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWrite1ToTheOperationModeAttributeToDutOperationMode_0()
+    {
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t operationModeArgument = static_cast<uint8_t>(1);
+
+        return cluster.WriteAttributeOperationMode(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
+                                                   operationModeArgument);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t operationMode) { NextTest(); }
+
+    CHIP_ERROR TestWrite2ToTheOperationModeAttributeToDutOperationMode_1()
+    {
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t operationModeArgument = static_cast<uint8_t>(2);
+
+        return cluster.WriteAttributeOperationMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
+                                                   operationModeArgument);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t operationMode) { NextTest(); }
+
+    CHIP_ERROR TestWrite3ToTheOperationModeAttributeToDutOperationMode_2()
+    {
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t operationModeArgument = static_cast<uint8_t>(3);
+
+        return cluster.WriteAttributeOperationMode(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(),
+                                                   operationModeArgument);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint8_t operationMode) { NextTest(); }
+};
+
+class Test_TC_PCC_2_3 : public TestCommand
+{
+public:
+    Test_TC_PCC_2_3() : TestCommand("Test_TC_PCC_2_3"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_PCC_2_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_PCC_2_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Write 0 to the OperationMode attribute to DUT\n");
+            err = TestWrite0ToTheOperationModeAttributeToDut_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads the attribute: EffectiveOperationMode\n");
+            err = TestReadsTheAttributeEffectiveOperationMode_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t operationMode)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t effectiveOperationMode)> mOnSuccessCallback_1{ OnSuccessCallback_1,
+                                                                                                             this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint8_t operationMode)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_0(operationMode);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t effectiveOperationMode)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_1(effectiveOperationMode);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWrite0ToTheOperationModeAttributeToDut_0()
+    {
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint8_t operationModeArgument = static_cast<uint8_t>(0);
+
+        return cluster.WriteAttributeOperationMode(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
+                                                   operationModeArgument);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t operationMode) { NextTest(); }
+
+    CHIP_ERROR TestReadsTheAttributeEffectiveOperationMode_1()
+    {
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeEffectiveOperationMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t effectiveOperationMode)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("effectiveOperationMode", effectiveOperationMode, 0));
+        NextTest();
+    }
+};
+
 class Test_TC_RH_1_1 : public TestCommand
 {
 public:
@@ -13754,6 +14356,120 @@ private:
     void OnFailureResponse_0(uint8_t status) { NextTest(); }
 
     void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
+};
+
+class Test_TC_RH_2_1 : public TestCommand
+{
+public:
+    Test_TC_RH_2_1() : TestCommand("Test_TC_RH_2_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_RH_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_RH_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Reads constraints of attribute: MeasuredValue\n");
+            err = TestReadsConstraintsOfAttributeMeasuredValue_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads constraints of attribute: MinMeasuredValue\n");
+            err = TestReadsConstraintsOfAttributeMinMeasuredValue_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t measuredValue)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t minMeasuredValue)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_RH_2_1 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint16_t measuredValue)
+    {
+        (static_cast<Test_TC_RH_2_1 *>(context))->OnSuccessResponse_0(measuredValue);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_RH_2_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint16_t minMeasuredValue)
+    {
+        (static_cast<Test_TC_RH_2_1 *>(context))->OnSuccessResponse_1(minMeasuredValue);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadsConstraintsOfAttributeMeasuredValue_0()
+    {
+        chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint16_t measuredValue)
+    {
+        VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsConstraintsOfAttributeMinMeasuredValue_1()
+    {
+        chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeMinMeasuredValue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t minMeasuredValue)
+    {
+        VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("minMeasuredValue", minMeasuredValue, 9999));
+        NextTest();
+    }
 };
 
 class Test_TC_TM_1_1 : public TestCommand
@@ -14873,6 +15589,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 2 : reads back global attribute: ClusterRevision\n");
             err = TestReadsBackGlobalAttributeClusterRevision_2();
             break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : read the global attribute: FeatureMap\n");
+            err = TestReadTheGlobalAttributeFeatureMap_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: FeatureMap\n");
+            err = TestReadsBackGlobalAttributeFeatureMap_4();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -14884,7 +15608,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 5;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
@@ -14892,6 +15616,10 @@ private:
     chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
     chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t featureMap)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint32_t featureMap)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
@@ -14921,6 +15649,26 @@ private:
     static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
     {
         (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_WNCV_1_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint32_t featureMap)
+    {
+        (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_3(featureMap);
+    }
+
+    static void OnFailureCallback_4(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_WNCV_1_1 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint32_t featureMap)
+    {
+        (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_4(featureMap);
     }
 
     //
@@ -14971,6 +15719,38 @@ private:
     void OnSuccessResponse_2(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 5U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeFeatureMap_3()
+    {
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeFeatureMap(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint32_t featureMap)
+    {
+        VerifyOrReturn(CheckValue<uint32_t>("featureMap", featureMap, 0UL));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsBackGlobalAttributeFeatureMap_4()
+    {
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeFeatureMap(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint32_t featureMap)
+    {
+        VerifyOrReturn(CheckValue<uint32_t>("featureMap", featureMap, 0UL));
         NextTest();
     }
 };
@@ -23183,12 +23963,16 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_MC_3_10>(),
         make_unique<Test_TC_MC_3_11>(),
         make_unique<Test_TC_OCC_1_1>(),
+        make_unique<Test_TC_OCC_2_1>(),
         make_unique<Test_TC_OO_1_1>(),
         make_unique<Test_TC_OO_2_1>(),
         make_unique<Test_TC_OO_2_2>(),
         make_unique<Test_TC_PCC_1_1>(),
         make_unique<Test_TC_PCC_2_1>(),
+        make_unique<Test_TC_PCC_2_2>(),
+        make_unique<Test_TC_PCC_2_3>(),
         make_unique<Test_TC_RH_1_1>(),
+        make_unique<Test_TC_RH_2_1>(),
         make_unique<Test_TC_TM_1_1>(),
         make_unique<Test_TC_TM_2_1>(),
         make_unique<Test_TC_TSTAT_1_1>(),

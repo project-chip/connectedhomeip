@@ -142,8 +142,8 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     serializable.mDeviceTransport = to_underlying(mDeviceAddress.GetTransportType());
 
-    ReturnErrorOnFailure(Inet::GetInterfaceName(mDeviceAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
-                                                sizeof(serializable.mInterfaceName)));
+    ReturnErrorOnFailure(mDeviceAddress.GetInterface().GetInterfaceName(Uint8::to_char(serializable.mInterfaceName),
+                                                                        sizeof(serializable.mInterfaceName)));
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
     mDeviceAddress.GetIPAddress().ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
@@ -202,13 +202,13 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 
     // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
     // LwIP stack.
-    Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
+    Inet::InterfaceId interfaceId;
     if (serializable.mInterfaceName[0] != '\0')
     {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         LOCK_TCPIP_CORE();
 #endif
-        CHIP_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), interfaceId);
+        CHIP_ERROR inetErr = Inet::InterfaceId::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), interfaceId);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         UNLOCK_TCPIP_CORE();
 #endif

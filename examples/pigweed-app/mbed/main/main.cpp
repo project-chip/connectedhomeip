@@ -16,16 +16,46 @@
  */
 
 #include "LEDWidget.h"
-#include "Rpc.h"
+#include "PigweedLoggerMutex.h"
+#include "pigweed/RpcService.h"
+
+#include "pw_rpc/echo_service_nanopb.h"
+#include "pw_rpc/server.h"
+#include "pw_sys_io/sys_io.h"
+#include "pw_sys_io_mbed/init.h"
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/mbed/Logging.h>
+
+#include "rtos/Mutex.h"
+#include "rtos/Thread.h"
 
 using namespace ::chip::rpc;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging::Platform;
 
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
+
+namespace {
+
+#define RPC_THREAD_NAME "RPC"
+#define RPC_STACK_SIZE (4 * 1024)
+
+rtos::Thread rpcThread{ osPriorityNormal, RPC_STACK_SIZE, /* memory provided */ nullptr, RPC_THREAD_NAME };
+
+pw::rpc::EchoService echo_service;
+
+void RegisterServices(pw::rpc::Server & server)
+{
+    server.RegisterService(echo_service);
+}
+
+void RunRpcService()
+{
+    Start(RegisterServices, &logger_mutex);
+}
+
+} // namespace
 
 int main()
 {
@@ -35,19 +65,21 @@ int main()
 
     ChipLogProgress(NotSpecified, "Mbed pigweed-app example application start");
 
+    pw_sys_io_Init();
+
     sStatusLED.Set(true);
 
-    auto rpcThread = chip::rpc::Init();
-    if (rpcThread == NULL)
+    auto error = rpcThread.start(RunRpcService);
+    if (error != osOK)
     {
-        ChipLogError(NotSpecified, "RPC service initialization and run failed");
+        ChipLogError(NotSpecified, "Run RPC thread failed [%d]", (int) error);
         ret = EXIT_FAILURE;
         goto exit;
     }
 
     ChipLogProgress(NotSpecified, "Mbed pigweed-app example application run");
 
-    rpcThread->join();
+    rpcThread.join();
 
 exit:
     ChipLogProgress(NotSpecified, "Exited with code %d", ret);

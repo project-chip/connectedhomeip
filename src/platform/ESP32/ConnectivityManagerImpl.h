@@ -46,11 +46,12 @@
 
 #include "esp_event.h"
 
+namespace chip {
+
 namespace Inet {
 class IPAddress;
 } // namespace Inet
 
-namespace chip {
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
