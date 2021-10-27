@@ -47,6 +47,9 @@ public:
 
     /**
      * Whether the privilege matches the entry, including subsumed privileges.
+     * E.g. both Privilege::kOperate and Privilege::kView will match an entry
+     * with Privilege::kOperate, but Privilege::kManage will not match such an
+     * entry.
      */
     virtual bool MatchesPrivilege(Privilege privilege) const = 0;
 
