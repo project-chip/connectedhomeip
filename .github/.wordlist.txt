@@ -58,6 +58,7 @@ attrMask
 attSizeBytes
 attType
 ATW
+ATWC
 AudioOutput
 auth
 autoconnect
@@ -138,6 +139,7 @@ CHIPCryptoPALHsm
 CHIPDeviceController
 ChipDeviceCtrl
 CHIPDeviceEvent
+CHIPDevicePlatformConfig
 CHIPDevicePlatformEvent
 ChipEchoRequester
 ChipEchoResponder
@@ -145,6 +147,7 @@ ChipImInitiator
 ChipImResponder
 ChipLight
 ChipMessageLayer
+CHIPOBLE
 CHIPTest
 CHIPTool
 chmod
@@ -797,9 +800,9 @@ ScriptBinding
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
 SDKs
+SDK's
 SDKTARGETSYSROOT
 sdl
 segger

@@ -26,7 +26,8 @@ list(
     -DCONFIG_FUNCION_O0_OPTIMIZE
     -DDM_ODM_SUPPORT_TYPE=32
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
-    -DMBEDTLS_CONFIG_FILE=\\\"mbedtls_config.h\\\"
+    -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
+    -D_POSIX_REALTIME_SIGNALS
 )
 
 list(
@@ -96,7 +97,6 @@ string(APPEND CHIP_GN_ARGS "ameba_ar = \"arm-none-eabi-ar\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cc = \"arm-none-eabi-gcc\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cxx = \"arm-none-eabi-c++\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cpu = \"ameba\"\n")
-string(APPEND CHIP_GN_ARGS "chip_build_tests = false\n")
 
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 
