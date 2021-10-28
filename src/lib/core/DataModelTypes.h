@@ -22,6 +22,7 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp> // For VendorId
 #include <lib/core/GroupId.h>
 #include <lib/core/NodeId.h>
+#include <lib/core/PasscodeId.h>
 
 namespace chip {
 
