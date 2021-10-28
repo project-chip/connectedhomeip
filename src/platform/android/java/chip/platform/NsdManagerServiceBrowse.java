@@ -25,7 +25,6 @@ import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -40,13 +39,17 @@ public class NsdManagerServiceBrowse implements ServiceBrowse {
   public NsdManagerServiceBrowse(Context context) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
 
-    this.multicastLock = ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
-        .createMulticastLock("chipDiscoverMulticastLock");
+    this.multicastLock =
+        ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
+            .createMulticastLock("chipDiscoverMulticastLock");
     this.multicastLock.setReferenceCounted(true);
   }
 
   @Override
-  public void browse(final String serviceType, final long callbackHandle, final long contextHandle,
+  public void browse(
+      final String serviceType,
+      final long callbackHandle,
+      final long contextHandle,
       final ChipMdnsCallback chipMdnsCallback) {
     startDiscover(serviceType, callbackHandle, contextHandle, chipMdnsCallback);
 
@@ -56,15 +59,18 @@ public class NsdManagerServiceBrowse implements ServiceBrowse {
     handler.sendMessageDelayed(msg, DISCOVER_SERVICE_TIMEOUT);
   }
 
-  public void startDiscover(final String serviceType, final long callbackHandle, final long contextHandle,
+  public void startDiscover(
+      final String serviceType,
+      final long callbackHandle,
+      final long contextHandle,
       final ChipMdnsCallback chipMdnsCallback) {
     if (callbackMap.containsKey(callbackHandle)) {
       Log.d(TAG, "Invalid callbackHandle");
       return;
     }
 
-    NsdManagerDiscovery discovery = new NsdManagerDiscovery(serviceType, callbackHandle, contextHandle,
-        chipMdnsCallback);
+    NsdManagerDiscovery discovery =
+        new NsdManagerDiscovery(serviceType, callbackHandle, contextHandle, chipMdnsCallback);
     multicastLock.acquire();
 
     Log.d(TAG, "Starting service discovering for '" + serviceType + "'");
@@ -88,14 +94,15 @@ public class NsdManagerServiceBrowse implements ServiceBrowse {
     discovery.sendCallback();
   }
 
-  private Handler handler = new Handler() {
-    @Override
-    public void handleMessage(Message msg) {
-      long handle = ((Long) msg.obj).longValue();
-      stopDiscover(handle);
-      super.handleMessage(msg);
-    }
-  };
+  private Handler handler =
+      new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+          long handle = ((Long) msg.obj).longValue();
+          stopDiscover(handle);
+          super.handleMessage(msg);
+        }
+      };
 
   public class NsdManagerDiscovery implements NsdManager.DiscoveryListener {
     private String serviceType;
@@ -104,7 +111,10 @@ public class NsdManagerServiceBrowse implements ServiceBrowse {
     private ChipMdnsCallback chipMdnsCallback;
     private ArrayList<String> serviceNameList = new ArrayList<>();
 
-    public NsdManagerDiscovery(String serviceType, long callbackHandle, long contextHandle,
+    public NsdManagerDiscovery(
+        String serviceType,
+        long callbackHandle,
+        long contextHandle,
         ChipMdnsCallback chipMdnsCallback) {
       this.serviceType = serviceType;
       this.callbackHandle = callbackHandle;
@@ -144,8 +154,11 @@ public class NsdManagerServiceBrowse implements ServiceBrowse {
     }
 
     public void sendCallback() {
-      chipMdnsCallback.handleServiceBrowse(serviceNameList.toArray(new String[serviceNameList.size()]), serviceType,
-          callbackHandle, contextHandle);
+      chipMdnsCallback.handleServiceBrowse(
+          serviceNameList.toArray(new String[serviceNameList.size()]),
+          serviceType,
+          callbackHandle,
+          contextHandle);
     }
   }
 }

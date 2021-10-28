@@ -19,9 +19,10 @@ package chip.platform;
 
 /** Interface for resolving network services. */
 public interface ServiceBrowse {
-  /**
-   * TO-DO
-   */
-  public void browse(final String serviceType, final long callbackHandle, final long contextHandle,
+  /** TO-DO */
+  public void browse(
+      final String serviceType,
+      final long callbackHandle,
+      final long contextHandle,
       final ChipMdnsCallback chipMdnsCallback);
 }
