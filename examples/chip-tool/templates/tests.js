@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-function getTests()
-{
+function getTests() {
   const BinaryInput = [
     'Test_TC_BI_1_1',
+    'Test_TC_BI_2_1',
   ];
 
   const ColorControl = [
@@ -58,12 +58,15 @@ function getTests()
   const OccupancySensing = [
     'Test_TC_OCC_1_1',
     'Test_TC_OCC_2_1',
+    'Test_TC_OCC_2_2',
   ];
 
   const LevelControl = [
     'Test_TC_LVL_1_1',
     'Test_TC_LVL_2_1',
     'Test_TC_LVL_3_1',
+    'Test_TC_LVL_4_1',
+    'Test_TC_LVL_5_1',
   ];
 
   const MediaControl = [
