@@ -29,8 +29,8 @@
 #pragma once
 
 #include <inet/EndPointBasis.h>
-#include <inet/InetInterface.h>
 #include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 
 #include <system/SystemPacketBuffer.h>
 
@@ -280,8 +280,6 @@ private:
     CHIP_ERROR IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join);
 
     // XXX Temporary: end of import from IPEndPointBasis
-
-
 
     UDPEndPoint(const UDPEndPoint &) = delete;
 

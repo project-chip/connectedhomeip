@@ -28,8 +28,8 @@
 #include <utility>
 
 #include <inet/IPAddress.h>
-#include <inet/UDPEndPoint.h>
 #include <inet/InetInterface.h>
+#include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPCore.h>
 #include <transport/raw/Base.h>
 
