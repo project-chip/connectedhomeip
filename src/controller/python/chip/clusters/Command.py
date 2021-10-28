@@ -16,7 +16,7 @@
 #
 
 from asyncio.futures import Future
-import ctypes
+import ctypes  # lgtm [py/import-and-import-from]
 from dataclasses import dataclass
 from typing import Type
 from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32, c_uint16, c_uint8, py_object
@@ -74,7 +74,7 @@ class AsyncCommandTransaction:
             self._future.set_result(None)
         else:
             # If a type hasn't been assigned, let's auto-deduce it.
-            if (self._expect_type == None):
+            if (self._expect_type is None):
                 self._expect_type = FindCommandClusterObject(False, path)
 
             if self._expect_type:

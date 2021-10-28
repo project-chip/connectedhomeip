@@ -24,7 +24,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import binascii
-from ctypes import *
+from ctypes import c_void_p, c_byte
 
 
 class ChipUtility(object):
