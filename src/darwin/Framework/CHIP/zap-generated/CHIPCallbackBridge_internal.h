@@ -1335,7 +1335,7 @@ public:
         CHIPCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, bool wasPresent, bool wasNull, uint8_t value);
+    static void OnSuccessFn(void * context, bool wasPresent, bool wasNull, uint8_t value, uint8_t originalValue);
 };
 
 class CHIPTestClusterClusterTestSpecificResponseCallbackBridge

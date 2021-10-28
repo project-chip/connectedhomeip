@@ -367,11 +367,13 @@ limitations under the License.
 
     <command source="server" code="0x06" name="TestNullableOptionalResponse" optional="false" disableDefaultResponse="true">
       <description>
-        Delivers information about the argument TestNullableOptionalRequest had.
+        Delivers information about the argument TestNullableOptionalRequest had,
+        and the original value if there was one.
       </description>
       <arg name="wasPresent" type="BOOLEAN"/>
       <arg name="wasNull" type="BOOLEAN" optional="true"/>
       <arg name="value" type="INT8U" optional="true"/>
+      <arg name="originalValue" type="INT8U" optional="true" isNullable="true"/>
     </command>
 
     <command source="server" code="0x07" name="TestComplexNullableOptionalResponse" optional="false" disableDefaultResponse="true">
