@@ -75,6 +75,10 @@ CHIP_ERROR CHIPCommand::Run()
     commissionerParams.controllerICAC                 = icacSpan;
     commissionerParams.controllerNOC                  = nocSpan;
 
+    // Set controller vendor ID to Test Vendor #1
+    // As per specifications (section 2.5.2 Vendor Identifier)
+    commissionerParams.controllerVendorId = 0xFFF1;
+
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, mController));
 
