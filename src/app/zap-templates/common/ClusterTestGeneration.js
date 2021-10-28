@@ -43,7 +43,10 @@ const kDisabledName      = 'disabled';
 const kResponseErrorName = 'error';
 
 class NullObject {
-  toString() { return "YOU SHOULD HAVE CHECKED (isLiteralNull definedValue)" }
+  toString()
+  {
+    return "YOU SHOULD HAVE CHECKED (isLiteralNull definedValue)"
+  }
 };
 
 function throwError(test, errorStr)
