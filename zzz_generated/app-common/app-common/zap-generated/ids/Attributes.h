@@ -4474,6 +4474,10 @@ namespace VendorId {
 static constexpr AttributeId Id = 0x00000022;
 } // namespace VendorId
 
+namespace ListNullablesAndOptionalsStruct {
+static constexpr AttributeId Id = 0x00000023;
+} // namespace ListNullablesAndOptionalsStruct
+
 namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported

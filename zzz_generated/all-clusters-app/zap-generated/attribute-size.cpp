@@ -781,6 +781,73 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             entryOffset = static_cast<uint16_t>(entryOffset + 34);
             break;
         }
+        case 0x0023: // list_nullables_and_optionals_struct
+        {
+            entryLength = 39;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _NullablesAndOptionalsStruct
+            _NullablesAndOptionalsStruct * entry = reinterpret_cast<_NullablesAndOptionalsStruct *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->NullableInt, write ? (uint8_t *) &entry->NullableInt : src, write,
+                           &entryOffset, sizeof(entry->NullableInt)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->OptionalInt, write ? (uint8_t *) &entry->OptionalInt : src, write,
+                           &entryOffset, sizeof(entry->OptionalInt)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->NullableOptionalInt,
+                           write ? (uint8_t *) &entry->NullableOptionalInt : src, write, &entryOffset,
+                           sizeof(entry->NullableOptionalInt)); // INT16U
+            ByteSpan NullableStringSpanStorage(Uint8::from_const_char(entry->NullableString.data()),
+                                               entry->NullableString.size()); // CHAR_STRING
+            ByteSpan * NullableStringSpan = &NullableStringSpanStorage;
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 2, NullableStringSpan)
+                       : ReadByteSpan(src + entryOffset, 2, NullableStringSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 2);
+            ByteSpan OptionalStringSpanStorage(Uint8::from_const_char(entry->OptionalString.data()),
+                                               entry->OptionalString.size()); // CHAR_STRING
+            ByteSpan * OptionalStringSpan = &OptionalStringSpanStorage;
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 2, OptionalStringSpan)
+                       : ReadByteSpan(src + entryOffset, 2, OptionalStringSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 2);
+            ByteSpan NullableOptionalStringSpanStorage(Uint8::from_const_char(entry->NullableOptionalString.data()),
+                                                       entry->NullableOptionalString.size()); // CHAR_STRING
+            ByteSpan * NullableOptionalStringSpan = &NullableOptionalStringSpanStorage;
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 2, NullableOptionalStringSpan)
+                       : ReadByteSpan(src + entryOffset, 2, NullableOptionalStringSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 2);
+            copyListMember(write ? dest : (uint8_t *) &entry->NullableStruct, write ? (uint8_t *) &entry->NullableStruct : src,
+                           write, &entryOffset, sizeof(entry->NullableStruct)); // SimpleStruct
+            copyListMember(write ? dest : (uint8_t *) &entry->OptionalStruct, write ? (uint8_t *) &entry->OptionalStruct : src,
+                           write, &entryOffset, sizeof(entry->OptionalStruct)); // SimpleStruct
+            copyListMember(write ? dest : (uint8_t *) &entry->NullableOptionalStruct,
+                           write ? (uint8_t *) &entry->NullableOptionalStruct : src, write, &entryOffset,
+                           sizeof(entry->NullableOptionalStruct)); // SimpleStruct
+            copyListMember(write ? dest : (uint8_t *) &entry->NullableList, write ? (uint8_t *) &entry->NullableList : src, write,
+                           &entryOffset, sizeof(entry->NullableList)); // SimpleEnum
+            copyListMember(write ? dest : (uint8_t *) &entry->OptionalList, write ? (uint8_t *) &entry->OptionalList : src, write,
+                           &entryOffset, sizeof(entry->OptionalList)); // SimpleEnum
+            copyListMember(write ? dest : (uint8_t *) &entry->NullableOptionalList,
+                           write ? (uint8_t *) &entry->NullableOptionalList : src, write, &entryOffset,
+                           sizeof(entry->NullableOptionalList)); // SimpleEnum
+            break;
+        }
         }
         break;
     }
@@ -1126,6 +1193,10 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x001C: // list_struct_octet_string
             // Struct _TestListStructOctet
             entryLength = 42;
+            break;
+        case 0x0023: // list_nullables_and_optionals_struct
+            // Struct _NullablesAndOptionalsStruct
+            entryLength = 39;
             break;
         }
         break;

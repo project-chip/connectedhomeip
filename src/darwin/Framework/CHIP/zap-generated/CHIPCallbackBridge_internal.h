@@ -444,6 +444,20 @@ public:
             list);
 };
 
+class CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TestClusterListNullablesAndOptionalsStructListAttributeCallback>
+{
+public:
+    CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterListNullablesAndOptionalsStructListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list);
+};
+
 class CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>
 {

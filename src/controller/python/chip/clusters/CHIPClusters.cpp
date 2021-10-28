@@ -126,8 +126,8 @@ OnApplicationLauncherApplicationLauncherListListAttributeResponse(void * context
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu16 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -173,12 +173,12 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      index: %" PRIu8 ",", entry.index);
         ChipLogProgress(Zcl, "      outputType: %" PRIu8 ",", entry.outputType);
         ChipLogProgress(Zcl, "      name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -223,7 +223,6 @@ static void OnBridgedActionsActionListListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      ActionID: %" PRIu16 ",", entry.actionID);
         ChipLogProgress(Zcl, "      Name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
@@ -232,6 +231,7 @@ static void OnBridgedActionsActionListListAttributeResponse(
         ChipLogProgress(Zcl, "      SupportedCommands: %" PRIu16 ",", entry.supportedCommands);
         ChipLogProgress(Zcl, "      Status: %" PRIu8 ",", entry.status);
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -277,13 +277,13 @@ static void OnBridgedActionsEndpointListListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      EndpointListID: %" PRIu16 ",", entry.endpointListID);
         ChipLogProgress(Zcl, "      Name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "      Type: %" PRIu8 ",", entry.type);
         ChipLogProgress(Zcl, "      Endpoints: %s,", ByteSpanToString(entry.endpoints).c_str());
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -328,8 +328,8 @@ OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context,
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %s,", ByteSpanToString(entry).c_str());
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -373,8 +373,8 @@ static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -419,11 +419,11 @@ static void OnDescriptorDeviceListListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      type: %" PRIu32 ",", entry.type);
         ChipLogProgress(Zcl, "      revision: %" PRIu16 ",", entry.revision);
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -467,8 +467,8 @@ static void OnDescriptorServerListListAttributeResponse(void * context,
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu32 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -512,8 +512,8 @@ static void OnDescriptorClientListListAttributeResponse(void * context,
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu32 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -557,8 +557,8 @@ static void OnDescriptorPartsListListAttributeResponse(void * context,
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu16 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -603,11 +603,11 @@ static void OnFixedLabelLabelListListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      label: %.*s,", static_cast<int>(entry.label.size()), entry.label.data());
         ChipLogProgress(Zcl, "      value: %.*s,", static_cast<int>(entry.value.size()), entry.value.data());
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -653,10 +653,10 @@ static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeRespons
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      FailSafeExpiryLengthMs: %" PRIu32 ",", entry.failSafeExpiryLengthMs);
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -703,7 +703,6 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      Name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "      FabricConnected: %d,", entry.fabricConnected);
@@ -712,6 +711,7 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
         ChipLogProgress(Zcl, "      HardwareAddress: %s,", ByteSpanToString(entry.hardwareAddress).c_str());
         ChipLogProgress(Zcl, "      Type: %" PRIu8 ",", entry.type);
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -756,12 +756,12 @@ static void OnGroupKeyManagementGroupsListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      VendorId: %" PRIu16 ",", entry.vendorId);
         ChipLogProgress(Zcl, "      VendorGroupId: %" PRIu16 ",", entry.vendorGroupId);
         ChipLogProgress(Zcl, "      GroupKeySetIndex: %" PRIu16 ",", entry.groupKeySetIndex);
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -806,7 +806,6 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      VendorId: %" PRIu16 ",", entry.vendorId);
         ChipLogProgress(Zcl, "      GroupKeyIndex: %" PRIu16 ",", entry.groupKeyIndex);
@@ -814,6 +813,7 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(
         ChipLogProgress(Zcl, "      GroupKeyEpochStartTime: %" PRIu64 ",", entry.groupKeyEpochStartTime);
         ChipLogProgress(Zcl, "      GroupKeySecurityPolicy: %" PRIu8 ",", entry.groupKeySecurityPolicy);
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -858,13 +858,13 @@ static void OnMediaInputMediaInputListListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      index: %" PRIu8 ",", entry.index);
         ChipLogProgress(Zcl, "      inputType: %" PRIu8 ",", entry.inputType);
         ChipLogProgress(Zcl, "      name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "      description: %.*s,", static_cast<int>(entry.description.size()), entry.description.data());
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -910,7 +910,6 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      FabricIndex: %" PRIu8 ",", entry.fabricIndex);
         ChipLogProgress(Zcl, "      RootPublicKey: %s,", ByteSpanToString(entry.rootPublicKey).c_str());
@@ -919,6 +918,7 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
         ChipLogProgress(Zcl, "      NodeId: %" PRIu64 ",", entry.nodeId);
         ChipLogProgress(Zcl, "      Label: %.*s,", static_cast<int>(entry.label.size()), entry.label.data());
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -961,8 +961,8 @@ static void OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %s,", ByteSpanToString(entry).c_str());
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -1007,8 +1007,8 @@ static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -1053,7 +1053,6 @@ static void OnTvChannelTvChannelListListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      majorNumber: %" PRIu16 ",", entry.majorNumber);
         ChipLogProgress(Zcl, "      minorNumber: %" PRIu16 ",", entry.minorNumber);
@@ -1062,6 +1061,7 @@ static void OnTvChannelTvChannelListListAttributeResponse(
         ChipLogProgress(Zcl, "      affiliateCallSign: %.*s,", static_cast<int>(entry.affiliateCallSign.size()),
                         entry.affiliateCallSign.data());
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -1107,11 +1107,11 @@ static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      identifier: %" PRIu8 ",", entry.identifier);
         ChipLogProgress(Zcl, "      name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -1153,8 +1153,8 @@ static void OnTestClusterListInt8uListAttributeResponse(void * context, const ch
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -1198,8 +1198,8 @@ static void OnTestClusterListOctetStringListAttributeResponse(void * context,
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %s,", ByteSpanToString(entry).c_str());
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -1244,11 +1244,11 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      fabricIndex: %" PRIu64 ",", entry.fabricIndex);
         ChipLogProgress(Zcl, "      operationalCert: %s,", ByteSpanToString(entry.operationalCert).c_str());
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -1267,6 +1267,156 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(
 }
 chip::Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>
     gTestClusterListStructOctetStringListAttributeCallback{ OnTestClusterListStructOctetStringListAttributeResponse, nullptr };
+static void OnTestClusterListNullablesAndOptionalsStructListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list)
+{
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+        ChipLogProgress(Zcl, "    {");
+        if (entry.nullableInt.IsNull())
+        {
+            ChipLogProgress(chipTool, "  NullableInt: null");
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "      NullableInt: %" PRIu16 ",", entry.nullableInt.Value());
+        }
+        if (entry.optionalInt.HasValue())
+        {
+            ChipLogProgress(Zcl, "      OptionalInt: %" PRIu16 ",", entry.optionalInt.Value());
+        }
+        if (entry.nullableOptionalInt.HasValue())
+        {
+            if (entry.nullableOptionalInt.Value().IsNull())
+            {
+                ChipLogProgress(chipTool, "  NullableOptionalInt: null");
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "      NullableOptionalInt: %" PRIu16 ",", entry.nullableOptionalInt.Value().Value());
+            }
+        }
+        if (entry.nullableString.IsNull())
+        {
+            ChipLogProgress(chipTool, "  NullableString: null");
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "      NullableString: %.*s,", static_cast<int>(entry.nullableString.Value().size()),
+                            entry.nullableString.Value().data());
+        }
+        if (entry.optionalString.HasValue())
+        {
+            ChipLogProgress(Zcl, "      OptionalString: %.*s,", static_cast<int>(entry.optionalString.Value().size()),
+                            entry.optionalString.Value().data());
+        }
+        if (entry.nullableOptionalString.HasValue())
+        {
+            if (entry.nullableOptionalString.Value().IsNull())
+            {
+                ChipLogProgress(chipTool, "  NullableOptionalString: null");
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "      NullableOptionalString: %.*s,",
+                                static_cast<int>(entry.nullableOptionalString.Value().Value().size()),
+                                entry.nullableOptionalString.Value().Value().data());
+            }
+        }
+        if (entry.nullableStruct.IsNull())
+        {
+            ChipLogProgress(chipTool, "  NullableStruct: null");
+        }
+        else
+        {
+            ChipLogProgress(chipTool,
+                            "  NullableStruct: struct member of struct element of list attribute printing not supported yet");
+        }
+        if (entry.optionalStruct.HasValue())
+        {
+            ChipLogProgress(chipTool,
+                            "  OptionalStruct: struct member of struct element of list attribute printing not supported yet");
+        }
+        if (entry.nullableOptionalStruct.HasValue())
+        {
+            if (entry.nullableOptionalStruct.Value().IsNull())
+            {
+                ChipLogProgress(chipTool, "  NullableOptionalStruct: null");
+            }
+            else
+            {
+                ChipLogProgress(
+                    chipTool,
+                    "  NullableOptionalStruct: struct member of struct element of list attribute printing not supported yet");
+            }
+        }
+        if (entry.nullableList.IsNull())
+        {
+            ChipLogProgress(chipTool, "  NullableList: null");
+        }
+        else
+        {
+            ChipLogProgress(chipTool, "  NullableList: list member of struct element of list attribute printing not supported yet");
+        }
+        if (entry.optionalList.HasValue())
+        {
+            ChipLogProgress(chipTool, "  OptionalList: list member of struct element of list attribute printing not supported yet");
+        }
+        if (entry.nullableOptionalList.HasValue())
+        {
+            if (entry.nullableOptionalList.Value().IsNull())
+            {
+                ChipLogProgress(chipTool, "  NullableOptionalList: null");
+            }
+            else
+            {
+                ChipLogProgress(
+                    chipTool, "  NullableOptionalList: list member of struct element of list attribute printing not supported yet");
+            }
+        }
+        ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback>
+    gTestClusterListNullablesAndOptionalsStructListAttributeCallback{
+        OnTestClusterListNullablesAndOptionalsStructListAttributeResponse, nullptr
+    };
 static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<
@@ -1293,7 +1443,6 @@ static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      ExtAddress: %" PRIu64 ",", entry.extAddress);
         ChipLogProgress(Zcl, "      Age: %" PRIu32 ",", entry.age);
@@ -1310,6 +1459,7 @@ static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
         ChipLogProgress(Zcl, "      FullNetworkData: %d,", entry.fullNetworkData);
         ChipLogProgress(Zcl, "      IsChild: %d,", entry.isChild);
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -1356,7 +1506,6 @@ static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      ExtAddress: %" PRIu64 ",", entry.extAddress);
         ChipLogProgress(Zcl, "      Rloc16: %" PRIu16 ",", entry.rloc16);
@@ -1369,6 +1518,7 @@ static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(
         ChipLogProgress(Zcl, "      Allocated: %d,", entry.allocated);
         ChipLogProgress(Zcl, "      LinkEstablished: %d,", entry.linkEstablished);
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -1414,11 +1564,11 @@ static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      RotationTime: %" PRIu16 ",", entry.rotationTime);
         ChipLogProgress(Zcl, "      Flags: %" PRIu16 ",", entry.flags);
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -1464,7 +1614,6 @@ static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeR
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    {");
         ChipLogProgress(Zcl, "      ActiveTimestampPresent: %d,", entry.activeTimestampPresent);
         ChipLogProgress(Zcl, "      PendingTimestampPresent: %d,", entry.pendingTimestampPresent);
@@ -1479,6 +1628,7 @@ static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeR
         ChipLogProgress(Zcl, "      SecurityPolicyPresent: %d,", entry.securityPolicyPresent);
         ChipLogProgress(Zcl, "      ChannelMaskPresent: %d,", entry.channelMaskPresent);
         ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -1523,8 +1673,8 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
@@ -7518,6 +7668,19 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_VendorId(chip::
     cluster.Associate(device, ZCLendpointId);
     return cluster.WriteAttributeVendorId(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value).AsInteger();
 }
+chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct(chip::Controller::Device * device,
+                                                                                                chip::EndpointId ZCLendpointId,
+                                                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeListNullablesAndOptionalsStruct(gTestClusterListNullablesAndOptionalsStructListAttributeCallback.Cancel(),
+                                                      gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_Unsupported(chip::Controller::Device * device,
                                                                             chip::EndpointId ZCLendpointId,
                                                                             chip::GroupId /* ZCLgroupId */)

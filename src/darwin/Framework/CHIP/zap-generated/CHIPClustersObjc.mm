@@ -5096,6 +5096,14 @@ using chip::Callback::Cancelable;
     });
 }
 
+- (void)readAttributeListNullablesAndOptionalsStructWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReadAttributeListNullablesAndOptionalsStruct(success, failure);
+        });
+}
+
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {

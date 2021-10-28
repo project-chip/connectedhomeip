@@ -6088,6 +6088,17 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
+    public static class ListNullablesAndOptionalsStructAttribute {
+
+      public ListNullablesAndOptionalsStructAttribute() {}
+    }
+
+    public interface ListNullablesAndOptionalsStructAttributeCallback {
+      void onSuccess(List<ListNullablesAndOptionalsStructAttribute> valueList);
+
+      void onError(Exception ex);
+    }
+
     public void readBooleanAttribute(BooleanAttributeCallback callback) {
       readBooleanAttribute(chipClusterPtr, callback);
     }
@@ -6277,6 +6288,11 @@ public class ChipClusters {
       writeVendorIdAttribute(chipClusterPtr, callback, value);
     }
 
+    public void readListNullablesAndOptionalsStructAttribute(
+        ListNullablesAndOptionalsStructAttributeCallback callback) {
+      readListNullablesAndOptionalsStructAttribute(chipClusterPtr, callback);
+    }
+
     public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
       readUnsupportedAttribute(chipClusterPtr, callback);
     }
@@ -6415,6 +6431,9 @@ public class ChipClusters {
 
     private native void writeVendorIdAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readListNullablesAndOptionalsStructAttribute(
+        long chipClusterPtr, ListNullablesAndOptionalsStructAttributeCallback callback);
 
     private native void readUnsupportedAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);

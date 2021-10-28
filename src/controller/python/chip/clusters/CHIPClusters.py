@@ -3476,6 +3476,11 @@ class ChipClusters:
                 "type": "int",
                 "writable": True,
             },
+            0x00000023: {
+                "attributeName": "ListNullablesAndOptionalsStruct",
+                "attributeId": 0x00000023,
+                "type": "",
+            },
             0x000000FF: {
                 "attributeName": "Unsupported",
                 "attributeId": 0x000000FF,
@@ -6607,6 +6612,9 @@ class ChipClusters:
     def ClusterTestCluster_WriteAttributeVendorId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId(device, ZCLendpoint, ZCLgroupid, value)
 
+    def ClusterTestCluster_ReadAttributeListNullablesAndOptionalsStruct(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterTestCluster_ReadAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid)
 
@@ -9392,6 +9400,10 @@ class ChipClusters:
         self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute ListNullablesAndOptionalsStruct
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Unsupported
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
