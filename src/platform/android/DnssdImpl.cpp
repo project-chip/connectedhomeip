@@ -47,8 +47,8 @@ jmethodID sDiscoveryMethod        = nullptr;
 jmethodID sGetAttributeKeysMethod = nullptr;
 jmethodID sGetAttributeDataMethod = nullptr;
 jclass sMdnsCallbackClass         = nullptr;
-jmethodID sPublishMethod        = nullptr;
-jmethodID sRemoveServicesMethod = nullptr;
+jmethodID sPublishMethod          = nullptr;
+jmethodID sRemoveServicesMethod   = nullptr;
 
 } // namespace
 
