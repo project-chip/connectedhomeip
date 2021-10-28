@@ -14,6 +14,7 @@
 
 import logging
 import os
+import glob
 import shlex
 import pathlib
 
@@ -107,7 +108,6 @@ class MbedBuilder(Builder):
         cmake_build_subdir = pathlib.Path(self.board.BoardName.upper(), self.profile.ProfileName.lower(), self.toolchain.upper())
         self.program = MbedProgram.from_existing(pathlib.Path(self.ExamplePath), cmake_build_subdir, pathlib.Path(self.mbed_os_path))
         
-
     @property
     def ExamplePath(self):
         return os.path.join('examples', self.app.ExampleName, 'mbed')
@@ -124,15 +124,20 @@ class MbedBuilder(Builder):
                         '-DMBED_OS_POSIX_SOCKET_PATH={}'.format(shlex.quote(self.mbed_os_posix_socket_path)),
                         ], title='Generating ' + self.identifier)
             
-
     def _build(self):
-        logging.info('Compiling Mbed at %s', self.output_dir)
+        logging.info('Building ' + self.identifier)
+        # Remove old artifacts to force linking
+        if pathlib.Path(self.output_dir, self.app.AppNamePrefix + '.elf').is_file():
+            for filename in glob.glob(os.path.join(self.output_dir, self.app.AppNamePrefix + '*')):
+                os.remove(filename)
         build_project(pathlib.Path(self.output_dir))
 
     def build_outputs(self):
         return {
             self.app.AppNamePrefix + '.elf':
                 os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),
+            self.app.AppNamePrefix + '.hex':
+                os.path.join(self.output_dir, self.app.AppNamePrefix + '.hex'),
             self.app.AppNamePrefix + '.map':
-                os.path.join(self.output_dir, self.app.AppNamePrefix + '.map'),
+                os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf.map'),
         }
