@@ -5899,8 +5899,6 @@ private:
     jobject javaCallbackRef;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 class CHIPTestClusterClusterTestEnumsResponseCallback : public Callback::Callback<TestClusterClusterTestEnumsResponseCallback>
 {
 public:
@@ -5971,13 +5969,6 @@ private:
 
 class CHIPTestClusterClusterTestListInt8UReverseResponseCallback
     : public Callback::Callback<TestClusterClusterTestListInt8UReverseResponseCallback>
-=======
-class CHIPTestClusterClusterTestListInt8UReverseResponseCallback : public Callback::Callback<TestClusterClusterTestListInt8UReverseResponseCallback>
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-class CHIPTestClusterClusterTestListInt8UReverseResponseCallback
-    : public Callback::Callback<TestClusterClusterTestListInt8UReverseResponseCallback>
->>>>>>> 698449e64 (add recycler view to display endpoint)
 {
 public:
     CHIPTestClusterClusterTestListInt8UReverseResponseCallback(jobject javaCallback) :
@@ -7658,8 +7649,6 @@ private:
     jobject javaCallbackRef;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 class CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback
     : public Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>
 {
@@ -7735,13 +7724,6 @@ private:
 
 class CHIPPowerSourceActiveBatteryFaultsAttributeCallback
     : public Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>
-=======
-class CHIPPowerSourceActiveBatteryFaultsAttributeCallback : public Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-class CHIPPowerSourceActiveBatteryFaultsAttributeCallback
-    : public Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>
->>>>>>> 677ef48a5 (callback generation done)
 {
 public:
     CHIPPowerSourceActiveBatteryFaultsAttributeCallback(jobject javaCallback) :
@@ -12122,17 +12104,8 @@ JNI_METHOD(void, ColorControlCluster, colorLoopSet)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->ColorLoopSet(onSuccess->Cancel(), onFailure->Cancel(), updateFlags, static_cast<uint8_t>(action),
                                    static_cast<uint8_t>(direction), time, startHue, optionsMask, optionsOverride);
-=======
-    err = cppCluster->ColorLoopSet(onSuccess->Cancel(), onFailure->Cancel(), updateFlags, action, direction, time, startHue, optionsMask, optionsOverride);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->ColorLoopSet(onSuccess->Cancel(), onFailure->Cancel(), updateFlags, action, direction, time, startHue,
-                                   optionsMask, optionsOverride);
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -12228,17 +12201,8 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHue)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, static_cast<uint8_t>(direction),
                                         transitionTime, optionsMask, optionsOverride);
-=======
-    err = cppCluster->EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, direction, transitionTime, optionsMask, optionsOverride);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, direction, transitionTime,
-                                        optionsMask, optionsOverride);
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -12335,17 +12299,8 @@ JNI_METHOD(void, ColorControlCluster, enhancedStepHue)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(stepMode), stepSize,
                                       transitionTime, optionsMask, optionsOverride);
-=======
-    err = cppCluster->EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask,
-                                      optionsOverride);
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -12440,17 +12395,8 @@ JNI_METHOD(void, ColorControlCluster, moveColorTemperature)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(moveMode), rate,
                                            colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
-=======
-    err = cppCluster->MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, colorTemperatureMinimum,
-                                           colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -12692,17 +12638,8 @@ JNI_METHOD(void, ColorControlCluster, moveToHue)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, static_cast<uint8_t>(direction), transitionTime,
                                 optionsMask, optionsOverride);
-=======
-    err = cppCluster->MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask,
-                                optionsOverride);
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -12897,18 +12834,9 @@ JNI_METHOD(void, ColorControlCluster, stepColorTemperature)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(stepMode), stepSize,
                                            transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask,
                                            optionsOverride);
-=======
-    err = cppCluster->StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime,
-                                           colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -12956,17 +12884,8 @@ JNI_METHOD(void, ColorControlCluster, stepHue)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->StepHue(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(stepMode), stepSize, transitionTime,
                               optionsMask, optionsOverride);
-=======
-    err = cppCluster->StepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->StepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask,
-                              optionsOverride);
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -13014,17 +12933,8 @@ JNI_METHOD(void, ColorControlCluster, stepSaturation)
     cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(stepMode), stepSize,
                                      transitionTime, optionsMask, optionsOverride);
-=======
-    err = cppCluster->StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask,
-                                     optionsOverride);
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -15390,19 +15300,9 @@ JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)
     cppCluster = reinterpret_cast<DiagnosticLogsCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->RetrieveLogsRequest(
         onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(intent), static_cast<uint8_t>(requestedProtocol),
         chip::ByteSpan((const uint8_t *) transferFileDesignatorArr.data(), transferFileDesignatorArr.size()));
-=======
-    err = cppCluster->RetrieveLogsRequest(onSuccess->Cancel(), onFailure->Cancel(), intent, requestedProtocol, chip::ByteSpan((const uint8_t*) transferFileDesignatorArr.data(), transferFileDesignatorArr.size()));
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->RetrieveLogsRequest(
-        onSuccess->Cancel(), onFailure->Cancel(), intent, requestedProtocol,
-        chip::ByteSpan((const uint8_t *) transferFileDesignatorArr.data(), transferFileDesignatorArr.size()));
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -16232,17 +16132,8 @@ JNI_METHOD(void, DoorLockCluster, setPin)
     cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, static_cast<uint8_t>(userStatus),
                              static_cast<uint8_t>(userType), chip::ByteSpan((const uint8_t *) pinArr.data(), pinArr.size()));
-=======
-    err = cppCluster->SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, chip::ByteSpan((const uint8_t*) pinArr.data(), pinArr.size()));
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-                             chip::ByteSpan((const uint8_t *) pinArr.data(), pinArr.size()));
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -16292,17 +16183,8 @@ JNI_METHOD(void, DoorLockCluster, setRfid)
     cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, static_cast<uint8_t>(userStatus),
                               static_cast<uint8_t>(userType), chip::ByteSpan((const uint8_t *) idArr.data(), idArr.size()));
-=======
-    err = cppCluster->SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, chip::ByteSpan((const uint8_t*) idArr.data(), idArr.size()));
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-                              chip::ByteSpan((const uint8_t *) idArr.data(), idArr.size()));
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -17511,8 +17393,6 @@ JNI_METHOD(void, FlowMeasurementCluster, readMaxMeasuredValueAttribute)
     onFailure.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, FlowMeasurementCluster, readToleranceAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
@@ -17540,13 +17420,6 @@ JNI_METHOD(void, FlowMeasurementCluster, readToleranceAttribute)(JNIEnv * env, j
 
 JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 677ef48a5 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
@@ -17698,28 +17571,9 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)
     cppCluster = reinterpret_cast<GeneralCommissioningCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->SetRegulatoryConfig(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(location),
                                           chip::CharSpan(countryCodeStr.c_str(), strlen(countryCodeStr.c_str())), breadcrumb,
                                           timeoutMs);
-=======
-    err = cppCluster->SetRegulatoryConfig(onSuccess->Cancel(), onFailure->Cancel(), location, chip::CharSpan(countryCodeStr.c_str(), strlen(countryCodeStr.c_str())), breadcrumb, timeoutMs);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->SetRegulatoryConfig(onSuccess->Cancel(), onFailure->Cancel(), location, chip::CharSpan(countryCodeStr.c_str(), strlen(countryCodeStr.c_str())), breadcrumb, timeoutMs);
-=======
-=======
->>>>>>> 698449e64 (add recycler view to display endpoint)
-    err = cppCluster->SetRegulatoryConfig(onSuccess->Cancel(), onFailure->Cancel(), location,
-                                          chip::CharSpan(countryCodeStr.c_str(), strlen(countryCodeStr.c_str())), breadcrumb,
-                                          timeoutMs);
-<<<<<<< HEAD
->>>>>>> b8d7ee0e3 (callback generation done)
->>>>>>> 677ef48a5 (callback generation done)
-=======
->>>>>>> 698449e64 (add recycler view to display endpoint)
     SuccessOrExit(err);
 
 exit:
@@ -19216,17 +19070,8 @@ JNI_METHOD(void, LevelControlCluster, step)
     cppCluster = reinterpret_cast<LevelControlCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->Step(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(stepMode), stepSize, transitionTime,
                            optionMask, optionOverride);
-=======
-    err = cppCluster->Step(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err =
-        cppCluster->Step(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -21793,30 +21638,10 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
     cppCluster = reinterpret_cast<OtaSoftwareUpdateProviderCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, hardwareVersion, softwareVersion,
                                  static_cast<uint8_t>(protocolsSupported),
                                  chip::CharSpan(locationStr.c_str(), strlen(locationStr.c_str())), requestorCanConsent,
                                  chip::ByteSpan((const uint8_t *) metadataForProviderArr.data(), metadataForProviderArr.size()));
-=======
-    err = cppCluster->QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported, chip::CharSpan(locationStr.c_str(), strlen(locationStr.c_str())), requestorCanConsent, chip::ByteSpan((const uint8_t*) metadataForProviderArr.data(), metadataForProviderArr.size()));
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported, chip::CharSpan(locationStr.c_str(), strlen(locationStr.c_str())), requestorCanConsent, chip::ByteSpan((const uint8_t*) metadataForProviderArr.data(), metadataForProviderArr.size()));
-=======
-=======
->>>>>>> 698449e64 (add recycler view to display endpoint)
-    err = cppCluster->QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, hardwareVersion, softwareVersion,
-                                 protocolsSupported, chip::CharSpan(locationStr.c_str(), strlen(locationStr.c_str())),
-                                 requestorCanConsent,
-                                 chip::ByteSpan((const uint8_t *) metadataForProviderArr.data(), metadataForProviderArr.size()));
-<<<<<<< HEAD
->>>>>>> b8d7ee0e3 (callback generation done)
->>>>>>> 677ef48a5 (callback generation done)
-=======
->>>>>>> 698449e64 (add recycler view to display endpoint)
     SuccessOrExit(err);
 
 exit:
@@ -21881,33 +21706,14 @@ JNI_METHOD(jlong, OtaSoftwareUpdateRequestorCluster, initWithDevice)(JNIEnv * en
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong providerLocation, jint vendorId, jint announcementReason,
  jbyteArray metadataForNode)
-=======
-JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray providerLocation, jint vendorId, jint announcementReason, jbyteArray metadataForNode)
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray providerLocation, jint vendorId,
- jint announcementReason, jbyteArray metadataForNode)
->>>>>>> 677ef48a5 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateRequestorCluster * cppCluster;
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
-    
-=======
-
->>>>>>> 677ef48a5 (callback generation done)
-    JniByteArray providerLocationArr(env, providerLocation);
->>>>>>> e83b94d19 (need to wait for cast-helper)
     JniByteArray metadataForNodeArr(env, metadataForNode);
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
@@ -21920,20 +21726,9 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
     cppCluster = reinterpret_cast<OtaSoftwareUpdateRequestorCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->AnnounceOtaProvider(onSuccess->Cancel(), onFailure->Cancel(), providerLocation,
                                           static_cast<chip::VendorId>(vendorId), static_cast<uint8_t>(announcementReason),
                                           chip::ByteSpan((const uint8_t *) metadataForNodeArr.data(), metadataForNodeArr.size()));
-=======
-    err = cppCluster->AnnounceOtaProvider(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) providerLocationArr.data(), providerLocationArr.size()), vendorId, announcementReason, chip::ByteSpan((const uint8_t*) metadataForNodeArr.data(), metadataForNodeArr.size()));
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->AnnounceOtaProvider(onSuccess->Cancel(), onFailure->Cancel(),
-                                          chip::ByteSpan((const uint8_t *) providerLocationArr.data(), providerLocationArr.size()),
-                                          vendorId, announcementReason,
-                                          chip::ByteSpan((const uint8_t *) metadataForNodeArr.data(), metadataForNodeArr.size()));
->>>>>>> 677ef48a5 (callback generation done)
     SuccessOrExit(err);
 
 exit:
@@ -23483,8 +23278,6 @@ JNI_METHOD(void, OperationalCredentialsCluster, readCommissionedFabricsAttribute
     onFailure.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, OperationalCredentialsCluster, readTrustedRootCertificatesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -23515,13 +23308,6 @@ JNI_METHOD(void, OperationalCredentialsCluster, readTrustedRootCertificatesAttri
 
 JNI_METHOD(void, OperationalCredentialsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, OperationalCredentialsCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-JNI_METHOD(void, OperationalCredentialsCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 677ef48a5 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
@@ -24910,8 +24696,6 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMaxMeasuredValueAttribu
     onFailure.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readToleranceAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -24988,13 +24772,6 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, reportToleranceAttribute)
 
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 677ef48a5 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
@@ -26308,8 +26085,6 @@ JNI_METHOD(void, TemperatureMeasurementCluster, readMaxMeasuredValueAttribute)
     onFailure.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, TemperatureMeasurementCluster, readToleranceAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -26386,13 +26161,6 @@ JNI_METHOD(void, TemperatureMeasurementCluster, reportToleranceAttribute)
 
 JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 677ef48a5 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
@@ -26520,8 +26288,6 @@ exit:
         onFailure.release();
     }
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, TestClusterCluster, testEnumsRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint arg1, jint arg2)
 {
@@ -26573,13 +26339,6 @@ exit:
 }
 JNI_METHOD(void, TestClusterCluster, testListInt8UArgumentRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint arg1)
-=======
-JNI_METHOD(void, TestClusterCluster, testListInt8UArgumentRequest)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint arg1)
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-JNI_METHOD(void, TestClusterCluster, testListInt8UArgumentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint arg1)
->>>>>>> 698449e64 (add recycler view to display endpoint)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -26694,19 +26453,9 @@ JNI_METHOD(void, TestClusterCluster, testListStructArgumentRequest)
     cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->TestListStructArgumentRequest(onSuccess->Cancel(), onFailure->Cancel(), a, b, static_cast<uint8_t>(c),
                                                     chip::ByteSpan((const uint8_t *) dArr.data(), dArr.size()),
                                                     chip::CharSpan(eStr.c_str(), strlen(eStr.c_str())), f);
-=======
-    err = cppCluster->TestListStructArgumentRequest(onSuccess->Cancel(), onFailure->Cancel(), a, b, c, chip::ByteSpan((const uint8_t*) dArr.data(), dArr.size()), chip::CharSpan(eStr.c_str(), strlen(eStr.c_str())), f);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->TestListStructArgumentRequest(onSuccess->Cancel(), onFailure->Cancel(), a, b, c,
-                                                    chip::ByteSpan((const uint8_t *) dArr.data(), dArr.size()),
-                                                    chip::CharSpan(eStr.c_str(), strlen(eStr.c_str())), f);
->>>>>>> 698449e64 (add recycler view to display endpoint)
     SuccessOrExit(err);
 
 exit:
@@ -26899,19 +26648,9 @@ JNI_METHOD(void, TestClusterCluster, testStructArgumentRequest)
     cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     err = cppCluster->TestStructArgumentRequest(onSuccess->Cancel(), onFailure->Cancel(), a, b, static_cast<uint8_t>(c),
                                                 chip::ByteSpan((const uint8_t *) dArr.data(), dArr.size()),
                                                 chip::CharSpan(eStr.c_str(), strlen(eStr.c_str())), f);
-=======
-    err = cppCluster->TestStructArgumentRequest(onSuccess->Cancel(), onFailure->Cancel(), a, b, c, chip::ByteSpan((const uint8_t*) dArr.data(), dArr.size()), chip::CharSpan(eStr.c_str(), strlen(eStr.c_str())), f);
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-    err = cppCluster->TestStructArgumentRequest(onSuccess->Cancel(), onFailure->Cancel(), a, b, c,
-                                                chip::ByteSpan((const uint8_t *) dArr.data(), dArr.size()),
-                                                chip::CharSpan(eStr.c_str(), strlen(eStr.c_str())), f);
->>>>>>> 698449e64 (add recycler view to display endpoint)
     SuccessOrExit(err);
 
 exit:
@@ -29006,8 +28745,6 @@ JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
     onFailure.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, ThermostatCluster, readMinSetpointDeadBandAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29062,13 +28799,6 @@ JNI_METHOD(void, ThermostatCluster, writeMinSetpointDeadBandAttribute)
 
 JNI_METHOD(void, ThermostatCluster, readControlSequenceOfOperationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, ThermostatCluster, readControlSequenceOfOperationAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-JNI_METHOD(void, ThermostatCluster, readControlSequenceOfOperationAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 677ef48a5 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
@@ -32908,8 +32638,6 @@ JNI_METHOD(void, WindowCoveringCluster, reportSafetyStatusAttribute)(JNIEnv * en
     onReport.release();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 JNI_METHOD(void, WindowCoveringCluster, readFeatureMapAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
@@ -32937,13 +32665,6 @@ JNI_METHOD(void, WindowCoveringCluster, readFeatureMapAttribute)(JNIEnv * env, j
 
 JNI_METHOD(void, WindowCoveringCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-=======
-JNI_METHOD(void, WindowCoveringCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> e83b94d19 (need to wait for cast-helper)
-=======
-JNI_METHOD(void, WindowCoveringCluster, readClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
->>>>>>> 677ef48a5 (callback generation done)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
