@@ -208,8 +208,8 @@ JNI_METHOD(void, nativeSetServiceResolver)(JNIEnv * env, jclass self, jobject re
 }
 
 JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)
-(JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring hostName, jstring address, jint port, jobject attributes, jlong callbackHandle,
- jlong contextHandle)
+(JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring hostName, jstring address, jint port,
+ jobject attributes, jlong callbackHandle, jlong contextHandle)
 {
     using ::chip::Dnssd::HandleResolve;
     HandleResolve(instanceName, serviceType, hostName, address, port, attributes, callbackHandle, contextHandle);

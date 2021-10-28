@@ -28,8 +28,8 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <string>
 #include <memory>
+#include <string>
 
 namespace chip {
 namespace Dnssd {
@@ -37,14 +37,14 @@ namespace Dnssd {
 using namespace chip::Platform;
 
 namespace {
-jobject sResolverObject     = nullptr;
-jobject sDiscoverObject     = nullptr;
-jobject sMdnsCallbackObject = nullptr;
-jmethodID sResolveMethod    = nullptr;
-jmethodID sDiscoveryMethod    = nullptr;
-jmethodID sGetAttributeKeysMethod   = nullptr;
+jobject sResolverObject           = nullptr;
+jobject sDiscoverObject           = nullptr;
+jobject sMdnsCallbackObject       = nullptr;
+jmethodID sResolveMethod          = nullptr;
+jmethodID sDiscoveryMethod        = nullptr;
+jmethodID sGetAttributeKeysMethod = nullptr;
 jmethodID sGetAttributeDataMethod = nullptr;
-jclass sMdnsCallbackClass = nullptr;
+jclass sMdnsCallbackClass         = nullptr;
 } // namespace
 
 // Implemention of functions declared in lib/dnssd/platform/Dnssd.h
@@ -92,8 +92,8 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     UtfString jniServiceType(env, serviceType.c_str());
 
-    env->CallVoidMethod(sDiscoverObject, sDiscoveryMethod, jniServiceType.jniValue(),
-                        reinterpret_cast<jlong>(callback), reinterpret_cast<jlong>(context), sMdnsCallbackObject);
+    env->CallVoidMethod(sDiscoverObject, sDiscoveryMethod, jniServiceType.jniValue(), reinterpret_cast<jlong>(callback),
+                        reinterpret_cast<jlong>(context), sMdnsCallbackObject);
 
     if (env->ExceptionCheck())
     {
@@ -143,8 +143,8 @@ void InitializeWithObjects(jobject resolverObject, jobject browseObject, jobject
     sDiscoverObject      = env->NewGlobalRef(browseObject);
     sMdnsCallbackObject  = env->NewGlobalRef(mdnsCallbackObject);
     jclass resolverClass = env->GetObjectClass(sResolverObject);
-    jclass browseClass = env->GetObjectClass(browseObject);
-    sMdnsCallbackClass = env->GetObjectClass(sMdnsCallbackObject);
+    jclass browseClass   = env->GetObjectClass(browseObject);
+    sMdnsCallbackClass   = env->GetObjectClass(sMdnsCallbackObject);
 
     VerifyOrReturn(browseClass != nullptr, ChipLogError(Discovery, "Failed to get Browse Java class"));
     VerifyOrReturn(resolverClass != nullptr, ChipLogError(Discovery, "Failed to get Resolver Java class"));
@@ -152,14 +152,11 @@ void InitializeWithObjects(jobject resolverObject, jobject browseObject, jobject
     sResolveMethod =
         env->GetMethodID(resolverClass, "resolve", "(Ljava/lang/String;Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
 
-    sDiscoveryMethod =
-        env->GetMethodID(browseClass, "browse", "(Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
+    sDiscoveryMethod = env->GetMethodID(browseClass, "browse", "(Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
 
-    sGetAttributeKeysMethod =
-        env->GetMethodID(sMdnsCallbackClass, "getAttributeKeys", "(Ljava/util/Map;)[Ljava/lang/String;");
+    sGetAttributeKeysMethod = env->GetMethodID(sMdnsCallbackClass, "getAttributeKeys", "(Ljava/util/Map;)[Ljava/lang/String;");
 
-    sGetAttributeDataMethod =
-        env->GetMethodID(sMdnsCallbackClass, "getAttributeData", "(Ljava/util/Map;Ljava/lang/String;)[B");
+    sGetAttributeDataMethod = env->GetMethodID(sMdnsCallbackClass, "getAttributeData", "(Ljava/util/Map;Ljava/lang/String;)[B");
 
     if (sResolveMethod == nullptr)
     {
@@ -186,7 +183,8 @@ void InitializeWithObjects(jobject resolverObject, jobject browseObject, jobject
     }
 }
 
-void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, jstring address, jint port, jobject attributes, jlong callbackHandle, jlong contextHandle)
+void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, jstring address, jint port, jobject attributes,
+                   jlong callbackHandle, jlong contextHandle)
 {
     VerifyOrReturn(callbackHandle != 0, ChipLogError(Discovery, "HandleResolve called with callback equal to nullptr"));
 
@@ -216,45 +214,57 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, 
     service.mAddress.SetValue(ipAddress);
     service.mPort = static_cast<uint16_t>(port);
 
-    if (attributes != nullptr) {
-        jobjectArray keys = (jobjectArray)env->CallObjectMethod(sMdnsCallbackObject, sGetAttributeKeysMethod, attributes);
-        size_t size = env->GetArrayLength(keys);
-        TextEntry* entries = new TextEntry[size];
-        for (size_t i = 0 ; i < size ; i++) {
-            jstring jniKeyObject = (jstring)env->GetObjectArrayElement(keys, i);
-            entries[i].mKey = getTxtInfoKey(env, jniKeyObject);
+    if (attributes != nullptr)
+    {
+        jobjectArray keys   = (jobjectArray) env->CallObjectMethod(sMdnsCallbackObject, sGetAttributeKeysMethod, attributes);
+        size_t size         = env->GetArrayLength(keys);
+        TextEntry * entries = new TextEntry[size];
+        for (size_t i = 0; i < size; i++)
+        {
+            jstring jniKeyObject = (jstring) env->GetObjectArrayElement(keys, i);
+            entries[i].mKey      = getTxtInfoKey(env, jniKeyObject);
 
-            jbyteArray datas = (jbyteArray)env->CallObjectMethod(sMdnsCallbackObject, sGetAttributeDataMethod, attributes, jniKeyObject);
-            if (datas != nullptr) {
+            jbyteArray datas =
+                (jbyteArray) env->CallObjectMethod(sMdnsCallbackObject, sGetAttributeDataMethod, attributes, jniKeyObject);
+            if (datas != nullptr)
+            {
                 size_t dataSize = env->GetArrayLength(datas);
-                uint8_t *data = new uint8_t[dataSize + 1];
-                jbyte* jnidata = env->GetByteArrayElements(datas, nullptr);
-                for (size_t j = 0 ; j < dataSize ; j++) {
-                    data[j] = (uint8_t)jnidata[j];
+                uint8_t * data  = new uint8_t[dataSize + 1];
+                jbyte * jnidata = env->GetByteArrayElements(datas, nullptr);
+                for (size_t j = 0; j < dataSize; j++)
+                {
+                    data[j] = (uint8_t) jnidata[j];
                 }
                 entries[i].mDataSize = dataSize;
-                entries[i].mData = data;
-            } else {
+                entries[i].mData     = data;
+            }
+            else
+            {
                 entries[i].mDataSize = 0;
-                entries[i].mData = nullptr;
+                entries[i].mData     = nullptr;
             }
         }
         service.mTextEntrySize = size;
-        service.mTextEntries = entries;
-    } else {
+        service.mTextEntries   = entries;
+    }
+    else
+    {
         ChipLogError(Discovery, "attributes is null");
         service.mTextEntrySize = 0;
-        service.mTextEntries = nullptr;
+        service.mTextEntries   = nullptr;
     }
     dispatch(CHIP_NO_ERROR, &service);
 
-    if (service.mTextEntries != nullptr) {
+    if (service.mTextEntries != nullptr)
+    {
         size_t size = service.mTextEntrySize;
-        for (size_t i = 0 ; i < size ; i++) {
-            //if (service.mTextEntries[i].mKey != nullptr) {
+        for (size_t i = 0; i < size; i++)
+        {
+            // if (service.mTextEntries[i].mKey != nullptr) {
             //    delete[] service.mTextEntries[i].mKey;
             //}
-            if (service.mTextEntries[i].mData != nullptr) {
+            if (service.mTextEntries[i].mData != nullptr)
+            {
                 delete[] service.mTextEntries[i].mData;
             }
         }
@@ -262,7 +272,8 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, 
     }
 }
 
-void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callbackHandle, jlong contextHandle) {
+void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callbackHandle, jlong contextHandle)
+{
     VerifyOrReturn(callbackHandle != 0, ChipLogError(Discovery, "HandleDiscover called with callback equal to nullptr"));
 
     const auto dispatch = [callbackHandle, contextHandle](CHIP_ERROR error, DnssdService * service = nullptr, size_t size = 0) {
@@ -275,11 +286,13 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
 
     VerifyOrReturn(strlen(jniServiceType.c_str()) <= kDnssdTypeAndProtocolMaxSize, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
-    size_t size = env->GetArrayLength(instanceName);
+    size_t size            = env->GetArrayLength(instanceName);
     DnssdService * service = new DnssdService[size];
-    for (size_t i = 0 ; i < size ; i++) {
-        JniUtfString jniInstanceName(env, (jstring)env->GetObjectArrayElement(instanceName, i));
-        VerifyOrReturn(strlen(jniInstanceName.c_str()) <= Operational::kInstanceNameMaxLength, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+    for (size_t i = 0; i < size; i++)
+    {
+        JniUtfString jniInstanceName(env, (jstring) env->GetObjectArrayElement(instanceName, i));
+        VerifyOrReturn(strlen(jniInstanceName.c_str()) <= Operational::kInstanceNameMaxLength,
+                       dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
         CopyString(service[i].mName, jniInstanceName.c_str());
         CopyString(service[i].mType, jniServiceType.c_str());
@@ -289,11 +302,14 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
     delete[] service;
 }
 
-const char* getTxtInfoKey(JNIEnv* env, jstring key) {
-    const char * keyList[] = {"D", "VP", "AP", "CM", "DT", "DN", "RI", "PI", "PH", "CRI", "CRA","T"};
+const char * getTxtInfoKey(JNIEnv * env, jstring key)
+{
+    const char * keyList[] = { "D", "VP", "AP", "CM", "DT", "DN", "RI", "PI", "PH", "CRI", "CRA", "T" };
     JniUtfString jniKey(env, key);
-    for (auto & info : keyList) {
-        if (strcmp(info, jniKey.c_str()) == 0) {
+    for (auto & info : keyList)
+    {
+        if (strcmp(info, jniKey.c_str()) == 0)
+        {
             return info;
         }
     }

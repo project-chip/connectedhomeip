@@ -32,11 +32,11 @@ void InitializeWithObjects(jobject resolverObject, jobject discoverObject, jobje
 /**
  * Pass results of the service resolution to the CHIP stack.
  */
-void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, jstring address, jint port, jobject attributes, jlong callbackHandle,
-                   jlong contextHandle);
+void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, jstring address, jint port, jobject attributes,
+                   jlong callbackHandle, jlong contextHandle);
 
 void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callbackHandle, jlong contextHandle);
-const char* getTxtInfoKey(JNIEnv* env, jstring key);
+const char * getTxtInfoKey(JNIEnv * env, jstring key);
 
 } // namespace Dnssd
 } // namespace chip

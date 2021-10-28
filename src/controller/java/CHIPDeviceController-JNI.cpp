@@ -356,7 +356,7 @@ JNI_METHOD(void, discoverCommissionableNodes)(JNIEnv * env, jobject self, jlong 
     chip::DeviceLayer::StackLock lock;
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    chip::Dnssd::DiscoveryFilter filter = chip::Dnssd::DiscoveryFilter();
+    chip::Dnssd::DiscoveryFilter filter      = chip::Dnssd::DiscoveryFilter();
 
     CHIP_ERROR err = wrapper->Controller()->DiscoverCommissionableNodes(filter);
     if (err != CHIP_NO_ERROR)
@@ -371,17 +371,18 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     chip::DeviceLayer::StackLock lock;
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    const Dnssd::DiscoveredNodeData *data = wrapper->Controller()->GetDiscoveredDevice(idx);
+    const Dnssd::DiscoveredNodeData * data   = wrapper->Controller()->GetDiscoveredDevice(idx);
 
-    if (data == nullptr) {
+    if (data == nullptr)
+    {
         return nullptr;
     }
 
     jclass discoveredDevicecls = env->FindClass("chip/devicecontroller/ChipDeviceController$DiscoveredDevice");
-    jmethodID constructor = env->GetMethodID(discoveredDevicecls, "<init>", "()V");
+    jmethodID constructor      = env->GetMethodID(discoveredDevicecls, "<init>", "()V");
 
     jfieldID discrminatorID = env->GetFieldID(discoveredDevicecls, "discriminator", "J");
-    jfieldID ipAddressID = env->GetFieldID(discoveredDevicecls, "ipAddress", "Ljava/lang/String;");
+    jfieldID ipAddressID    = env->GetFieldID(discoveredDevicecls, "ipAddress", "Ljava/lang/String;");
 
     jobject discoveredObj = env->NewObject(discoveredDevicecls, constructor);
 
@@ -392,7 +393,8 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     jstring jniipAdress = env->NewStringUTF(ipAddress);
     env->SetObjectField(discoveredObj, ipAddressID, jniipAdress);
 
-    if (data == nullptr) {
+    if (data == nullptr)
+    {
         ChipLogError(Controller, "GetDiscoveredDevice - not found");
     }
     return discoveredObj;
