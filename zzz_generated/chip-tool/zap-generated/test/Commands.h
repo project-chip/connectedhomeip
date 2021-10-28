@@ -12496,8 +12496,8 @@ public:
         switch (mTestIndex++)
         {
         case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Reads mandatory attribute constrains: Occupancy\n");
-            err = TestReadsMandatoryAttributeConstrainsOccupancy_0();
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Reads mandatory attribute constraints: Occupancy\n");
+            err = TestReadsMandatoryAttributeConstraintsOccupancy_0();
             break;
         case 1:
             ChipLogProgress(chipTool,
@@ -12509,8 +12509,8 @@ public:
             err = TestReadsBackMandatoryAttributeOccupancy_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads mandatory attribute constrains: OccupancySensorType\n");
-            err = TestReadsMandatoryAttributeConstrainsOccupancySensorType_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads mandatory attribute constraints: OccupancySensorType\n");
+            err = TestReadsMandatoryAttributeConstraintsOccupancySensorType_3();
             break;
         case 4:
             ChipLogProgress(
@@ -12522,8 +12522,8 @@ public:
             err = TestReadsBackMandatoryAttributeOccupancySensorType_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads mandatory attribute constrains: OccupancySensorTypeBitmap\n");
-            err = TestReadsMandatoryAttributeConstrainsOccupancySensorTypeBitmap_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads mandatory attribute constraints: OccupancySensorTypeBitmap\n");
+            err = TestReadsMandatoryAttributeConstraintsOccupancySensorTypeBitmap_6();
             break;
         case 7:
             ChipLogProgress(
@@ -12667,7 +12667,7 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancy_0()
+    CHIP_ERROR TestReadsMandatoryAttributeConstraintsOccupancy_0()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -12714,7 +12714,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancySensorType_3()
+    CHIP_ERROR TestReadsMandatoryAttributeConstraintsOccupancySensorType_3()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -12762,7 +12762,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancySensorTypeBitmap_6()
+    CHIP_ERROR TestReadsMandatoryAttributeConstraintsOccupancySensorTypeBitmap_6()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -13944,6 +13944,517 @@ private:
     void OnSuccessResponse_13(bool onOff)
     {
         VerifyOrReturn(CheckValue<bool>("onOff", onOff, 0));
+        NextTest();
+    }
+};
+
+class Test_TC_PRS_1_1 : public TestCommand
+{
+public:
+    Test_TC_PRS_1_1() : TestCommand("Test_TC_PRS_1_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_PRS_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_PRS_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 2 : Write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_3(clusterRevision);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 2U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t clusterRevisionArgument = 2U;
+
+        return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(),
+                                                     clusterRevisionArgument);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_3()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 2U));
+        NextTest();
+    }
+};
+
+class Test_TC_PRS_2_1 : public TestCommand
+{
+public:
+    Test_TC_PRS_2_1() : TestCommand("Test_TC_PRS_2_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_PRS_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_PRS_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Read the mandatory attribute constraints: MeasuredValue\n");
+            err = TestReadTheMandatoryAttributeConstraintsMeasuredValue_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Write the default values to mandatory attribute: MeasuredValue\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeMeasuredValue_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads back mandatory attribute: MeasuredValue\n");
+            err = TestReadsBackMandatoryAttributeMeasuredValue_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the mandatory attribute constraints: MinMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeConstraintsMinMeasuredValue_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Write the default values to mandatory attribute: MinMeasuredValue\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeMinMeasuredValue_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Reads back mandatory attribute: MinMeasuredValue\n");
+            err = TestReadsBackMandatoryAttributeMinMeasuredValue_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the mandatory attribute constraints: MaxMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeConstraintsMaxMeasuredValue_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Write the default values to mandatory attribute: MaxMeasuredValue\n");
+            err = TestWriteTheDefaultValuesToMandatoryAttributeMaxMeasuredValue_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Reads back mandatory attribute: MaxMeasuredValue\n");
+            err = TestReadsBackMandatoryAttributeMaxMeasuredValue_8();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 9;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t measuredValue)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t measuredValue)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t measuredValue)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t minMeasuredValue)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t minMeasuredValue)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t minMeasuredValue)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t maxMeasuredValue)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t maxMeasuredValue)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, int16_t maxMeasuredValue)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, int16_t measuredValue)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_0(measuredValue);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, int16_t measuredValue)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_1(measuredValue);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, int16_t measuredValue)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_2(measuredValue);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, int16_t minMeasuredValue)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_3(minMeasuredValue);
+    }
+
+    static void OnFailureCallback_4(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, int16_t minMeasuredValue)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_4(minMeasuredValue);
+    }
+
+    static void OnFailureCallback_5(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context, int16_t minMeasuredValue)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_5(minMeasuredValue);
+    }
+
+    static void OnFailureCallback_6(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, int16_t maxMeasuredValue)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_6(maxMeasuredValue);
+    }
+
+    static void OnFailureCallback_7(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_7(status);
+    }
+
+    static void OnSuccessCallback_7(void * context, int16_t maxMeasuredValue)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_7(maxMeasuredValue);
+    }
+
+    static void OnFailureCallback_8(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context, int16_t maxMeasuredValue)
+    {
+        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_8(maxMeasuredValue);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadTheMandatoryAttributeConstraintsMeasuredValue_0()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(int16_t measuredValue)
+    {
+        VerifyOrReturn(CheckConstraintType("measuredValue", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMeasuredValue_1()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        int16_t measuredValueArgument = 0;
+
+        return cluster.WriteAttributeMeasuredValue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
+                                                   measuredValueArgument);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_1(int16_t measuredValue) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeMeasuredValue_2()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(int16_t measuredValue)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("measuredValue", measuredValue, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeConstraintsMinMeasuredValue_3()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeMinMeasuredValue(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(int16_t minMeasuredValue)
+    {
+        VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMinMeasuredValue_4()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        int16_t minMeasuredValueArgument = 0;
+
+        return cluster.WriteAttributeMinMeasuredValue(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel(),
+                                                      minMeasuredValueArgument);
+    }
+
+    void OnFailureResponse_4(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_4(int16_t minMeasuredValue) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeMinMeasuredValue_5()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeMinMeasuredValue(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(int16_t minMeasuredValue)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("minMeasuredValue", minMeasuredValue, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeConstraintsMaxMeasuredValue_6()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeMaxMeasuredValue(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(int16_t maxMeasuredValue)
+    {
+        VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMaxMeasuredValue_7()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        int16_t maxMeasuredValueArgument = 0;
+
+        return cluster.WriteAttributeMaxMeasuredValue(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel(),
+                                                      maxMeasuredValueArgument);
+    }
+
+    void OnFailureResponse_7(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_7(int16_t maxMeasuredValue) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeMaxMeasuredValue_8()
+    {
+        chip::Controller::PressureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeMaxMeasuredValue(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(int16_t maxMeasuredValue)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("maxMeasuredValue", maxMeasuredValue, 0));
         NextTest();
     }
 };
@@ -25223,517 +25734,6 @@ private:
     }
 };
 
-class Test_TC_PRS_1_1 : public TestCommand
-{
-public:
-    Test_TC_PRS_1_1() : TestCommand("Test_TC_PRS_1_1"), mTestIndex(0) {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_PRS_1_1\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_PRS_1_1\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Read the global attribute: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeClusterRevision_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constrains: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeConstrainsClusterRevision_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 2 : Write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_3();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
-
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
-
-    static void OnFailureCallback_0(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_0(status);
-    }
-
-    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
-    }
-
-    static void OnFailureCallback_1(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_1(status);
-    }
-
-    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
-    }
-
-    static void OnFailureCallback_2(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_2(status);
-    }
-
-    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
-    }
-
-    static void OnFailureCallback_3(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_3(status);
-    }
-
-    static void OnSuccessCallback_3(void * context, uint16_t clusterRevision)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_3(clusterRevision);
-    }
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
-    }
-
-    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_0(uint16_t clusterRevision)
-    {
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 2U));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeConstrainsClusterRevision_1()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
-    }
-
-    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_1(uint16_t clusterRevision)
-    {
-        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        uint16_t clusterRevisionArgument = 2U;
-
-        return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(),
-                                                     clusterRevisionArgument);
-    }
-
-    void OnFailureResponse_2(uint8_t status) { NextTest(); }
-
-    void OnSuccessResponse_2(uint16_t clusterRevision) { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_3()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
-    }
-
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_3(uint16_t clusterRevision)
-    {
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 2U));
-        NextTest();
-    }
-};
-
-class Test_TC_PRS_2_1 : public TestCommand
-{
-public:
-    Test_TC_PRS_2_1() : TestCommand("Test_TC_PRS_2_1"), mTestIndex(0) {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_PRS_2_1\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_PRS_2_1\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Read the mandatory attribute constrains: MeasuredValue\n");
-            err = TestReadTheMandatoryAttributeConstrainsMeasuredValue_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Write the default values to mandatory attribute: MeasuredValue\n");
-            err = TestWriteTheDefaultValuesToMandatoryAttributeMeasuredValue_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads back mandatory attribute: MeasuredValue\n");
-            err = TestReadsBackMandatoryAttributeMeasuredValue_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the mandatory attribute constrains: MinMeasuredValue\n");
-            err = TestReadTheMandatoryAttributeConstrainsMinMeasuredValue_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Write the default values to mandatory attribute: MinMeasuredValue\n");
-            err = TestWriteTheDefaultValuesToMandatoryAttributeMinMeasuredValue_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Reads back mandatory attribute: MinMeasuredValue\n");
-            err = TestReadsBackMandatoryAttributeMinMeasuredValue_5();
-            break;
-        case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the mandatory attribute constrains: MaxMeasuredValue\n");
-            err = TestReadTheMandatoryAttributeConstrainsMaxMeasuredValue_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Write the default values to mandatory attribute: MaxMeasuredValue\n");
-            err = TestWriteTheDefaultValuesToMandatoryAttributeMaxMeasuredValue_7();
-            break;
-        case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Reads back mandatory attribute: MaxMeasuredValue\n");
-            err = TestReadsBackMandatoryAttributeMaxMeasuredValue_8();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
-
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t measuredValue)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t measuredValue)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t measuredValue)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t minMeasuredValue)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t minMeasuredValue)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t minMeasuredValue)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t maxMeasuredValue)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t maxMeasuredValue)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t maxMeasuredValue)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
-
-    static void OnFailureCallback_0(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_0(status);
-    }
-
-    static void OnSuccessCallback_0(void * context, int16_t measuredValue)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_0(measuredValue);
-    }
-
-    static void OnFailureCallback_1(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_1(status);
-    }
-
-    static void OnSuccessCallback_1(void * context, int16_t measuredValue)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_1(measuredValue);
-    }
-
-    static void OnFailureCallback_2(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_2(status);
-    }
-
-    static void OnSuccessCallback_2(void * context, int16_t measuredValue)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_2(measuredValue);
-    }
-
-    static void OnFailureCallback_3(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_3(status);
-    }
-
-    static void OnSuccessCallback_3(void * context, int16_t minMeasuredValue)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_3(minMeasuredValue);
-    }
-
-    static void OnFailureCallback_4(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_4(status);
-    }
-
-    static void OnSuccessCallback_4(void * context, int16_t minMeasuredValue)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_4(minMeasuredValue);
-    }
-
-    static void OnFailureCallback_5(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_5(status);
-    }
-
-    static void OnSuccessCallback_5(void * context, int16_t minMeasuredValue)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_5(minMeasuredValue);
-    }
-
-    static void OnFailureCallback_6(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_6(status);
-    }
-
-    static void OnSuccessCallback_6(void * context, int16_t maxMeasuredValue)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_6(maxMeasuredValue);
-    }
-
-    static void OnFailureCallback_7(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_7(status);
-    }
-
-    static void OnSuccessCallback_7(void * context, int16_t maxMeasuredValue)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_7(maxMeasuredValue);
-    }
-
-    static void OnFailureCallback_8(void * context, uint8_t status)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_8(status);
-    }
-
-    static void OnSuccessCallback_8(void * context, int16_t maxMeasuredValue)
-    {
-        (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_8(maxMeasuredValue);
-    }
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestReadTheMandatoryAttributeConstrainsMeasuredValue_0()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
-    }
-
-    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_0(int16_t measuredValue)
-    {
-        VerifyOrReturn(CheckConstraintType("measuredValue", "", "int16"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMeasuredValue_1()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        int16_t measuredValueArgument = 0;
-
-        return cluster.WriteAttributeMeasuredValue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
-                                                   measuredValueArgument);
-    }
-
-    void OnFailureResponse_1(uint8_t status) { NextTest(); }
-
-    void OnSuccessResponse_1(int16_t measuredValue) { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackMandatoryAttributeMeasuredValue_2()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
-    }
-
-    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_2(int16_t measuredValue)
-    {
-        VerifyOrReturn(CheckValue<int16_t>("measuredValue", measuredValue, 0));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheMandatoryAttributeConstrainsMinMeasuredValue_3()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        return cluster.ReadAttributeMinMeasuredValue(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
-    }
-
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_3(int16_t minMeasuredValue)
-    {
-        VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "int16"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMinMeasuredValue_4()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        int16_t minMeasuredValueArgument = 0;
-
-        return cluster.WriteAttributeMinMeasuredValue(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel(),
-                                                      minMeasuredValueArgument);
-    }
-
-    void OnFailureResponse_4(uint8_t status) { NextTest(); }
-
-    void OnSuccessResponse_4(int16_t minMeasuredValue) { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackMandatoryAttributeMinMeasuredValue_5()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        return cluster.ReadAttributeMinMeasuredValue(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
-    }
-
-    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_5(int16_t minMeasuredValue)
-    {
-        VerifyOrReturn(CheckValue<int16_t>("minMeasuredValue", minMeasuredValue, 0));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheMandatoryAttributeConstrainsMaxMeasuredValue_6()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        return cluster.ReadAttributeMaxMeasuredValue(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
-    }
-
-    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_6(int16_t maxMeasuredValue)
-    {
-        VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "int16"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMaxMeasuredValue_7()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        int16_t maxMeasuredValueArgument = 0;
-
-        return cluster.WriteAttributeMaxMeasuredValue(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel(),
-                                                      maxMeasuredValueArgument);
-    }
-
-    void OnFailureResponse_7(uint8_t status) { NextTest(); }
-
-    void OnSuccessResponse_7(int16_t maxMeasuredValue) { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackMandatoryAttributeMaxMeasuredValue_8()
-    {
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        return cluster.ReadAttributeMaxMeasuredValue(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
-    }
-
-    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_8(int16_t maxMeasuredValue)
-    {
-        VerifyOrReturn(CheckValue<int16_t>("maxMeasuredValue", maxMeasuredValue, 0));
-        NextTest();
-    }
-};
-
 void registerCommandsTests(Commands & commands)
 {
     const char * clusterName = "Tests";
@@ -25786,6 +25786,8 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_OO_1_1>(),
         make_unique<Test_TC_OO_2_1>(),
         make_unique<Test_TC_OO_2_2>(),
+        make_unique<Test_TC_PRS_1_1>(),
+        make_unique<Test_TC_PRS_2_1>(),
         make_unique<Test_TC_PCC_1_1>(),
         make_unique<Test_TC_PCC_2_1>(),
         make_unique<Test_TC_PCC_2_2>(),
@@ -25828,8 +25830,6 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestModeSelectCluster>(),
         make_unique<TestSubscribe_OnOff>(),
-        make_unique<Test_TC_PRS_1_1>(),
-        make_unique<Test_TC_PRS_2_1>(),
     };
 
     commands.Register(clusterName, clusterCommands);
