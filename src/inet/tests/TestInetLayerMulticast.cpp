@@ -719,7 +719,7 @@ static void StartTest()
     IPAddressType lIPAddressType = IPAddressType::kIPv6;
     IPVersion lIPVersion         = kIPVersion_6;
     IPAddress lAddress           = IPAddress::Any;
-    UDPEndPoint * lEndPoint  = nullptr;
+    UDPEndPoint * lEndPoint      = nullptr;
     const bool lUseLoopback      = ((gOptFlags & kOptFlagNoLoopback) == 0);
     CHIP_ERROR lStatus;
 

@@ -349,8 +349,7 @@ void HandleSendTimerComplete(System::Layer * aSystemLayer, void * aAppState)
 
 // Raw Endpoint Callback Handlers
 
-void HandleRawMessageReceived(const UDPEndPoint * aEndPoint, const PacketBufferHandle & aBuffer,
-                              const IPPacketInfo * aPacketInfo)
+void HandleRawMessageReceived(const UDPEndPoint * aEndPoint, const PacketBufferHandle & aBuffer, const IPPacketInfo * aPacketInfo)
 {
     char lSourceAddressBuffer[INET6_ADDRSTRLEN];
     char lDestinationAddressBuffer[INET6_ADDRSTRLEN];
@@ -380,8 +379,7 @@ void HandleRawReceiveError(const UDPEndPoint * aEndPoint, const CHIP_ERROR & aEr
 
 // UDP Endpoint Callback Handlers
 
-void HandleUDPMessageReceived(const UDPEndPoint * aEndPoint, const PacketBufferHandle & aBuffer,
-                              const IPPacketInfo * aPacketInfo)
+void HandleUDPMessageReceived(const UDPEndPoint * aEndPoint, const PacketBufferHandle & aBuffer, const IPPacketInfo * aPacketInfo)
 {
     char lSourceAddressBuffer[INET6_ADDRSTRLEN];
     char lDestinationAddressBuffer[INET6_ADDRSTRLEN];

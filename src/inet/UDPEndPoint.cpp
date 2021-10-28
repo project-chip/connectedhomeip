@@ -34,8 +34,8 @@
 #include <inet/InetLayer.h>
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -72,7 +72,7 @@
 // as well as group communication.
 #undef HAVE_IPV6_MULTICAST
 #endif
-#endif                             // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if HAVE_SYS_SOCKET_H
@@ -580,13 +580,13 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
 #else // LWIP_VERSION_MAJOR <= 1
         if (PCB_ISIPV6(pcb))
         {
-            pktInfo->SrcAddress = IPAddress(*(ip6_addr_t *) addr);
+            pktInfo->SrcAddress  = IPAddress(*(ip6_addr_t *) addr);
             pktInfo->DestAddress = IPAddress(*ip6_current_dest_addr());
         }
 #if INET_CONFIG_ENABLE_IPV4
         else
         {
-            pktInfo->SrcAddress = IPAddress(*addr);
+            pktInfo->SrcAddress  = IPAddress(*addr);
             pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
         }
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -1533,7 +1533,7 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
 }
 
 CHIP_ERROR UDPEndPoint::IpBind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
-                                 const nw_parameters_t & aParameters)
+                               const nw_parameters_t & aParameters)
 {
     nw_endpoint_t endpoint = nullptr;
 
@@ -1751,7 +1751,7 @@ void UDPEndPoint::GetPacketInfo(const nw_connection_t & aConnection, IPPacketInf
 }
 
 CHIP_ERROR UDPEndPoint::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddressType aAddressType, const IPAddress & aAddress,
-                                        uint16_t aPort)
+                                    uint16_t aPort)
 {
     char addrStr[INET6_ADDRSTRLEN];
     char portStr[INET_PORTSTRLEN];
