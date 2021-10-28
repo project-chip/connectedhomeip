@@ -111,7 +111,7 @@ CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & address, System::Pack
     return mUDPEndPoint->SendMsg(&addrInfo, std::move(msgBuf));
 }
 
-void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle && buffer, const Inet::IPPacketInfo * pktInfo)
+void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle && buffer, const Inet::IPPacketInfo * pktInfo)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);

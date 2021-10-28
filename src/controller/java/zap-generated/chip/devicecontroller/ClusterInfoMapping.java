@@ -1870,11 +1870,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(boolean wasPresent, boolean wasNull, int value) {
+    public void onSuccess(boolean wasPresent, boolean wasNull, int value, int originalValue) {
       List<Object> responseValues = new ArrayList<>();
       responseValues.add(wasPresent);
       responseValues.add(wasNull);
       responseValues.add(value);
+      responseValues.add(originalValue);
       callback.onSuccess(responseValues);
     }
 

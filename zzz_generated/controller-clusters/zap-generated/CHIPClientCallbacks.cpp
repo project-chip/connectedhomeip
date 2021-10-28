@@ -131,9 +131,7 @@ namespace {
         return true;                                                                                                               \
     }
 
-// TODO: These IM related callbacks contains small or no generated code, should be put into seperate file to reduce the size of
-// template. Singleton instance of the callbacks manager
-
+// Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
 void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::TLVReader * tlvData,
@@ -1959,18 +1957,20 @@ bool emberAfTestClusterClusterTestListInt8UReverseResponseCallback(EndpointId en
 }
 
 bool emberAfTestClusterClusterTestNullableOptionalResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                   bool wasPresent, bool wasNull, uint8_t value)
+                                                                   bool wasPresent, bool wasNull, uint8_t value,
+                                                                   uint8_t originalValue)
 {
     ChipLogProgress(Zcl, "TestNullableOptionalResponse:");
     ChipLogProgress(Zcl, "  wasPresent: %d", wasPresent);
     ChipLogProgress(Zcl, "  wasNull: %d", wasNull);
     ChipLogProgress(Zcl, "  value: %" PRIu8 "", value);
+    ChipLogProgress(Zcl, "  originalValue: %" PRIu8 "", originalValue);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestNullableOptionalResponseCallback");
 
     Callback::Callback<TestClusterClusterTestNullableOptionalResponseCallback> * cb =
         Callback::Callback<TestClusterClusterTestNullableOptionalResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, wasPresent, wasNull, value);
+    cb->mCall(cb->mContext, wasPresent, wasNull, value, originalValue);
     return true;
 }
 
