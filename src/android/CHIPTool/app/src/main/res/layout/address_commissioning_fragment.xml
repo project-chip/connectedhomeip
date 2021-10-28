@@ -84,12 +84,11 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/address_commissioning_fragment_flow">
 
-    <ToggleButton
+    <Button
         android:id="@+id/discoverBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textOn="@string/dns_discover_btn_on_text"
-        android:textOff="@string/dns_discover_btn_off_text"/>
+        android:text="@string/dns_discover_btn_text"/>
 
     <Spinner
         android:id="@+id/discoverListSpinner"

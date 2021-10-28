@@ -17,19 +17,25 @@
  */
 package chip.platform;
 
+import android.content.Context;
+
 public final class AndroidChipPlatform {
   private BleManager mBleManager = null;
 
-  public AndroidChipPlatform(
-      BleManager ble,
-      KeyValueStoreManager kvm,
-      ConfigurationManager cfg,
-      ServiceResolver resolver,
-      ChipMdnsCallback chipMdnsCallback) {
+  public AndroidChipPlatform(Context context) {
+    setBLEManager(new AndroidBleManager());
+    setKeyValueStoreManager(new PreferencesKeyValueStoreManager(context));
+    setConfigurationManager(new PreferencesConfigurationManager(context));
+    setServiceResolver(new NsdManagerServiceResolver(context), new NsdManagerServiceBrowse(context),
+        new ChipMdnsCallbackImpl());
+  }
+
+  public AndroidChipPlatform(BleManager ble, KeyValueStoreManager kvm, ConfigurationManager cfg,
+      ServiceResolver resolver, ServiceBrowse browse, ChipMdnsCallback chipMdnsCallback) {
     setBLEManager(ble);
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
-    setServiceResolver(resolver, chipMdnsCallback);
+    setServiceResolver(resolver, browse, chipMdnsCallback);
   }
 
   // for BLEManager
@@ -73,12 +79,12 @@ public final class AndroidChipPlatform {
   private native void setConfigurationManager(ConfigurationManager manager);
 
   // for ServiceResolver
-  private void setServiceResolver(ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback) {
+  private void setServiceResolver(ServiceResolver resolver, ServiceBrowse browse, ChipMdnsCallback chipMdnsCallback) {
     if (resolver != null) {
-      nativeSetServiceResolver(resolver, chipMdnsCallback);
+      nativeSetServiceResolver(resolver, browse, chipMdnsCallback);
     }
   }
 
   private native void nativeSetServiceResolver(
-      ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
+      ServiceResolver resolver, ServiceBrowse browse, ChipMdnsCallback chipMdnsCallback);
 }

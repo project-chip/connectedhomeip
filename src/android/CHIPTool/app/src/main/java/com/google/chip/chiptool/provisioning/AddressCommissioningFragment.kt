@@ -22,11 +22,6 @@ import kotlinx.android.synthetic.main.address_commissioning_fragment.discoverLis
 import kotlinx.android.synthetic.main.address_commissioning_fragment.discriminatorEditText
 import kotlinx.android.synthetic.main.address_commissioning_fragment.pincodeEditText
 
-import chip.platform.NsdManagerServiceDiscover;
-import chip.platform.NsdManagerServiceResolver;
-import chip.platform.ServiceResolver;
-import chip.platform.ChipMdnsCallback;
-
 class AddressCommissioningFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -39,11 +34,9 @@ class AddressCommissioningFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    serviceDiscover = NsdManagerServiceDiscover(requireContext())
-    serviceResolver = NsdManagerServiceResolver(requireContext())
-
     updateSpinnerHandler = Handler(Looper.getMainLooper()) {
       updateSpinner()
+      discoverBtn.isEnabled = true;
       true
     }
 
@@ -66,20 +59,20 @@ class AddressCommissioningFragment : Fragment() {
       )
     }
 
-    discoverBtn.setOnCheckedChangeListener { _, isChecked ->
-      if (!isChecked) {
-        serviceDiscover.stopDiscover(0, 0)
-        commissionBtn.isEnabled = true
-        return@setOnCheckedChangeListener
-      }
-      commissionBtn.isEnabled = false
-      ipAddressList.clear()
-      updateSpinnerHandler.sendEmptyMessage(0)
-      serviceDiscover.startDiscover(SERVICE_TYPE, 0, 0, discoverCallback)
+    discoverBtn.setOnClickListener { _ ->
+      val deviceController = ChipClient.getDeviceController(requireContext())
+      deviceController.discoverCommissionableNodes()
+      updateSpinnerHandler.sendEmptyMessageDelayed(0, 5000)
+      discoverBtn.isEnabled = false;
     }
   }
 
   private fun updateSpinner() {
+    val deviceController = ChipClient.getDeviceController(requireContext())
+    for(i: Int in 0..10) {
+      val device = deviceController.getDiscoveredDevice(i) ?: break
+      ipAddressList.add("${device.ipAddress},${device.discriminator}")
+    }
     requireActivity().runOnUiThread {
       discoverListSpinner.adapter =
         ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, ipAddressList)
@@ -99,51 +92,9 @@ class AddressCommissioningFragment : Fragment() {
   companion object {
     private const val TAG = "AddressCommissioningFragment"
     private const val SERVICE_TYPE = "_matterc._udp"
-    private lateinit var serviceDiscover : NsdManagerServiceDiscover
-    private lateinit var serviceResolver : ServiceResolver
     private val ipAddressList = ArrayList<String>()
     private lateinit var updateSpinnerHandler: Handler
 
-    private val mdnsCallback = object: ChipMdnsCallback {
-      override fun handleServiceResolve(
-              instanceName: String?,
-              serviceType: String?,
-              address: String?,
-              port: Int,
-              attributes: MutableMap<String, ByteArray>?,
-              callbackHandle: Long,
-              contextHandle: Long,
-              errorCode: Int
-      ) {
-        if (errorCode != 0) {
-          return
-        }
-
-        if (attributes != null) {
-          val value = String(attributes["CM"] ?: return)
-          val discriminator = String(attributes["D"] ?: return)
-          if (value == "1") {
-            ipAddressList.add("${address}, $discriminator")
-            updateSpinnerHandler.sendEmptyMessage(0)
-          }
-        }
-      }
-    }
-
-    private val discoverCallback = object: NsdManagerServiceDiscover.Callback {
-      override fun handleServiceDiscover(
-        instanceName: String?,
-        serviceType: String?,
-        callbackHandle: Long,
-        contextHandle: Long,
-        errorCode: Int
-      ) {
-       if (errorCode != 0) {
-         return
-       }
-        serviceResolver.resolve(instanceName, serviceType, 0, 0, mdnsCallback)
-      }
-    }
     fun newInstance(): AddressCommissioningFragment = AddressCommissioningFragment()
   }
 }
