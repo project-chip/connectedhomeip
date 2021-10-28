@@ -29,9 +29,8 @@ class ClusterInteractionFragment : Fragment() {
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
   private lateinit var addressUpdateFragment: AddressUpdateFragment
-  private lateinit var clusterMap: HashMap<String, ClusterInfo>
+  private lateinit var clusterMap: Map<String, ClusterInfo>
   private var devicePtr = 0L
-  private val endpointId = 1
 
 
   override fun onCreateView(
@@ -41,9 +40,6 @@ class ClusterInteractionFragment : Fragment() {
   ): View {
     return inflater.inflate(R.layout.cluster_interaction_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
-      if (devicePtr == 0L) {
-        endpointList.visibility = View.GONE
-      }
       getEndpoingListBtn.setOnClickListener {
         scope.launch {
           setDevicePtr()
@@ -54,11 +50,11 @@ class ClusterInteractionFragment : Fragment() {
 
       addressUpdateFragment =
         childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
-      clusterMap = ClusterInfoMapping().clusterMap as HashMap<String, ClusterInfo>;
+      clusterMap = ClusterInfoMapping().clusterMap
       var dataList: List<EndpointItem> = ArrayList()
       // TODO: Dynamically retrieve endpoint information using descriptor cluster
       // hardcode the endpoint for now
-      for (i in 0 until 19) {
+      for (i in 0 until 2) {
         dataList += EndpointItem(i)
       }
       endpointList.adapter = EndpointAdapter(dataList, EndpointListener())

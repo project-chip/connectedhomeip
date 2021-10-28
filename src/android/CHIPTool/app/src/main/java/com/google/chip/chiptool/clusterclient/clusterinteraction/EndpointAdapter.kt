@@ -14,7 +14,7 @@ class EndpointAdapter(private val endpointList: List<EndpointItem>,
 ) : RecyclerView.Adapter<EndpointAdapter.EndpointViewHolder>() {
 
   inner class EndpointViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-    val endpointId: TextView = itemView.findViewById(R.id.endpoint_id)
+    val endpointId: TextView = itemView.findViewById(R.id.endpointTv)
     init {
       itemView.setOnClickListener(this)
     }

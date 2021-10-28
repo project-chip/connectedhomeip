@@ -7,9 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import chip.clusterinfo.ClusterCommandCallback
-import chip.clusterinfo.ClusterInfo
-import chip.clusterinfo.CommandInfo
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
@@ -18,6 +15,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+
+/**
+ * ClusterDetailFragment is the next displayed fragment after clicking on the list of available
+ * endpoints. ClusterDetailFragment allows user to pick cluster, command, specify parameters and see
+ * the callback result.
+ */
 
 class ClusterDetailFragment : Fragment(){
   private val deviceController: ChipDeviceController
@@ -31,32 +34,13 @@ class ClusterDetailFragment : Fragment(){
     savedInstanceState: Bundle?
   ): View {
     return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
-      deviceController.setCompletionListener(ChipControllerCallback())
+      deviceController.setCompletionListener(GenericChipDeviceListener())
     }
   }
 
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread {
       Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-    }
-  }
-
-  inner class ChipControllerCallback : GenericChipDeviceListener() {
-    override fun onConnectDeviceComplete() {}
-
-    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-    }
-
-    override fun onNotifyChipConnectionClosed() {
-      Log.d(TAG, "onNotifyChipConnectionClosed")
-    }
-
-    override fun onCloseBleComplete() {
-      Log.d(TAG, "onCloseBleComplete")
-    }
-
-    override fun onError(error: Throwable?) {
-      Log.d(TAG, "onError: $error")
     }
   }
 
