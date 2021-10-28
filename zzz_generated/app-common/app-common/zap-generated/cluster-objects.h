@@ -23603,9 +23603,10 @@ public:
 namespace TestNullableOptionalResponse {
 enum class Fields
 {
-    kWasPresent = 0,
-    kWasNull    = 1,
-    kValue      = 2,
+    kWasPresent    = 0,
+    kWasNull       = 1,
+    kValue         = 2,
+    kOriginalValue = 3,
 };
 
 struct Type
@@ -23618,6 +23619,7 @@ public:
     bool wasPresent;
     Optional<bool> wasNull;
     Optional<uint8_t> value;
+    Optional<DataModel::Nullable<uint8_t>> originalValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23631,6 +23633,7 @@ public:
     bool wasPresent;
     Optional<bool> wasNull;
     Optional<uint8_t> value;
+    Optional<DataModel::Nullable<uint8_t>> originalValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestNullableOptionalResponse

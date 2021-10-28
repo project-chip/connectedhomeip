@@ -6070,7 +6070,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, bool wasPresent, bool wasNull, uint8_t value)
+    static void CallbackFn(void * context, bool wasPresent, bool wasNull, uint8_t value, uint8_t originalValue)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6087,11 +6087,11 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ZZI)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ZZII)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jboolean>(wasPresent), static_cast<jboolean>(wasNull),
-                            static_cast<jint>(value));
+                            static_cast<jint>(value), static_cast<jint>(originalValue));
 
     exit:
         if (err != CHIP_NO_ERROR)
