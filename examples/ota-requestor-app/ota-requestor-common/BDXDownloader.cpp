@@ -40,7 +40,7 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
 
     if (event.EventType != TransferSession::OutputEventType::kNone)
     {
-        ChipLogDetail(BDX, "OutputEvent type: %d", static_cast<uint16_t>(event.EventType));
+        ChipLogDetail(BDX, "OutputEvent type: %s", event.ToString(event.EventType));
     }
 
     switch (event.EventType)
