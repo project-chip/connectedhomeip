@@ -30,6 +30,8 @@
     MatterGroupsPluginClientInitCallback();                                                                                        \
     MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterOnOffPluginClientInitCallback();                                                                                         \
+    MatterOnOffPluginServerInitCallback();                                                                                         \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \

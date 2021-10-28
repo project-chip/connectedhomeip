@@ -14480,7 +14480,6 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        printf("---- OnOffToggle::SendCommand");
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::OnOffCluster cluster;

@@ -98,7 +98,7 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
 
 CHIP_ERROR Device::SendCommands(app::CommandSender * commandObj)
 {
-    printf("\nDevice::SendCommands\n");
+    printf("\n---- Device::SendCommands\n");
 
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));

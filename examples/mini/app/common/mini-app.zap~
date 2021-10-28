@@ -1,5 +1,5 @@
 {
-  "featureLevel": 55,
+  "featureLevel": 63,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -18,13 +18,13 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../../../develop/src/app/zap-templates/zcl/zcl.json",
+      "path": "../../../../../../../../../../git/matter/ricardo/groups/src/app/zap-templates/zcl/zcl.json",
       "version": "ZCL Test Data",
       "type": "zcl-properties"
     },
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../../../develop/src/app/zap-templates/app-templates.json",
+      "path": "../../../../../../../../../../git/matter/ricardo/groups/src/app/zap-templates/app-templates.json",
       "version": "chip-v1",
       "type": "gen-templates-json"
     }
@@ -3272,7 +3272,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddGroup",
@@ -3347,7 +3347,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddGroupResponse",
