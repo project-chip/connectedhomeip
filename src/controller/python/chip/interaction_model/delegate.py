@@ -17,7 +17,7 @@
 from abc import abstractmethod
 from construct import Struct, Int64ul, Int32ul, Int16ul, Int8ul
 from ctypes import CFUNCTYPE, c_void_p, c_uint32, c_uint64, c_uint8, c_uint16, c_ssize_t
-import ctypes
+import ctypes  # lgtm [py/import-and-import-from]
 import chip.native
 import threading
 import chip.tlv
