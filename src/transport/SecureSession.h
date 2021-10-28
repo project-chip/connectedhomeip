@@ -49,7 +49,9 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
 class SecureSession
 {
 public:
-    SecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric, uint64_t time) : mPeerNodeId(peerNodeId), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mFabric(fabric) {
+    SecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric, uint64_t time) :
+        mPeerNodeId(peerNodeId), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mFabric(fabric)
+    {
         SetLastActivityTimeMs(time);
     }
 

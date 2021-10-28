@@ -61,10 +61,7 @@ public:
         return mEntries.CreateObject(localSessionId, peerNodeId, peerSessionId, fabric, mTimeSource.GetCurrentMonotonicTimeMs());
     }
 
-    void ReleaseSession(SecureSession * session)
-    {
-        mEntries.ReleaseObject(session);
-    }
+    void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
 
     template <typename Function>
     bool ForEachSession(Function && function)
@@ -84,7 +81,7 @@ public:
     SecureSession * FindSecureSessionByLocalKey(uint16_t localSessionId)
     {
         SecureSession * result = nullptr;
-        mEntries.ForEachActiveObject([&] (auto session) {
+        mEntries.ForEachActiveObject([&](auto session) {
             if (session->GetLocalSessionId() == localSessionId)
             {
                 result = session;
@@ -108,7 +105,7 @@ public:
     void ExpireInactiveSessions(uint64_t maxIdleTimeMs, Callback callback)
     {
         const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
-        mEntries.ForEachActiveObject([&] (auto session) {
+        mEntries.ForEachActiveObject([&](auto session) {
             if (session->GetLastActivityTimeMs() + maxIdleTimeMs < currentTime)
             {
                 callback(*session);

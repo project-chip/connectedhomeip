@@ -184,8 +184,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, cons
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
                         " at monotonic time: %" PRId64 " msec",
-                        "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(session->GetPeerNodeId()),
-                        System::SystemClock().GetMonotonicMilliseconds64().count());
+                        "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(),
+                        ChipLogValueX64(session->GetPeerNodeId()), System::SystemClock().GetMonotonicMilliseconds64().count());
     }
     else
     {
@@ -227,7 +227,7 @@ void SessionManager::ExpirePairing(SessionHandle sessionHandle)
 
 void SessionManager::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
 {
-    mSecureSessions.ForEachSession([&] (auto session) {
+    mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetPeerNodeId() == peerNodeId && session->GetFabricIndex() == fabric)
         {
             HandleConnectionExpired(*session);
@@ -240,8 +240,9 @@ void SessionManager::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
 void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
 {
     ChipLogDetail(Inet, "Expiring all connections for fabric %d!!", fabric);
-    mSecureSessions.ForEachSession([&] (auto session) {
-        if (session->GetFabricIndex() == fabric) {
+    mSecureSessions.ForEachSession([&](auto session) {
+        if (session->GetFabricIndex() == fabric)
+        {
             HandleConnectionExpired(*session);
             mSecureSessions.ReleaseSession(session);
         }
@@ -254,7 +255,7 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
 {
     uint16_t peerSessionId  = pairing->GetPeerSessionId();
     uint16_t localSessionId = pairing->GetLocalSessionId();
-    SecureSession * session   = mSecureSessions.FindSecureSessionByLocalKey(localSessionId);
+    SecureSession * session = mSecureSessions.FindSecureSessionByLocalKey(localSessionId);
 
     // Find any existing connection with the same local key ID
     if (session)
@@ -288,7 +289,8 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
     if (mCB != nullptr)
     {
         session->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(pairing->GetPeerCounter());
-        mCB->OnNewConnection(SessionHandle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(), fabric));
+        mCB->OnNewConnection(
+            SessionHandle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(), fabric));
     }
 
     return CHIP_NO_ERROR;
@@ -479,7 +481,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     if (mCB != nullptr)
     {
         SessionHandle sessionHandle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(),
-                              session->GetFabricIndex());
+                                    session->GetFabricIndex());
         mCB->OnMessageReceived(packetHeader, payloadHeader, sessionHandle, peerAddress, isDuplicate, std::move(msg));
     }
 
@@ -552,8 +554,8 @@ void SessionManager::HandleConnectionExpired(const Transport::SecureSession & se
 
     if (mCB != nullptr)
     {
-        mCB->OnConnectionExpired(
-            SessionHandle(session.GetPeerNodeId(), session.GetLocalSessionId(), session.GetPeerSessionId(), session.GetFabricIndex()));
+        mCB->OnConnectionExpired(SessionHandle(session.GetPeerNodeId(), session.GetLocalSessionId(), session.GetPeerSessionId(),
+                                               session.GetFabricIndex()));
     }
 
     mTransportMgr->Disconnect(session.GetPeerAddress());
