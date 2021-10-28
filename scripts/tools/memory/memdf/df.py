@@ -32,7 +32,8 @@ class DF(pd.DataFrame):  # pylint: disable=too-many-ancestors
                 self[c] = pd.Series()
         types = {c: self.dtype[c] for c in self.columns if c in self.dtype}
         typed_columns = list(types.keys())
-        self[typed_columns] = self.astype(types, copy=False)[typed_columns]  # lgtm [py/hash-unhashable-value]
+        self[typed_columns] = self.astype(types, copy=False)[
+            typed_columns]  # lgtm [py/hash-unhashable-value]
         self.attrs['name'] = self.name
 
 
