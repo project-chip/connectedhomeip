@@ -175,7 +175,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(int conn_id, int indicationsEnabled, 
         // If indications are not already enabled for the connection...
         if (!IsSubscribed(conn_id))
         {
-            // Record that indications have been enabled for this connection.  If this fails because
+            // Record that indications have been enabled for this connection.
             err = SetSubscribed(conn_id);
             VerifyOrExit(err != CHIP_ERROR_NO_MEMORY, err = CHIP_NO_ERROR);
             SuccessOrExit(err);
@@ -411,10 +411,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 
     if (deviceName != NULL && deviceName[0] != 0)
     {
-        if (strlen(deviceName) >= kMaxDeviceNameLength)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
+        VerifyOrExit(strlen(deviceName) >= kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
         strcpy(mDeviceName, deviceName);
         mFlags.Set(Flags::kDeviceNameSet);
         ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", deviceName);
@@ -556,7 +553,6 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                                     PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    // struct os_mbuf * om;
 
     VerifyOrExit(IsSubscribed(conId), err = CHIP_ERROR_INVALID_ARGUMENT);
     server_send_data(conId, bt_matter_adapter_service_id, BT_MATTER_ADAPTER_SERVICE_CHAR_NOTIFY_CCCD_INDEX - 1, data->Start(),
@@ -658,7 +654,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     mFlags.Clear(Flags::kRestartAdvertising);
 
     if (err == CHIP_NO_ERROR)
-    /* schedule NFC emulation stop */
     {
         ChipDeviceEvent advChange;
         advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;

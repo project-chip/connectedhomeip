@@ -36,16 +36,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t ret    = -1;
-    char * _key    = (char *) malloc(strlen(key) + 1);
 
     if (!value)
     {
         return (err = CHIP_ERROR_INVALID_ARGUMENT);
     }
-    if (_key == NULL)
-    {
-        return (err = CHIP_ERROR_NO_MEMORY);
-    }
+
     if (offset_bytes > 0)
     {
         // Offset and partial reads are not supported in nvs, for now just return NOT_IMPLEMENTED. Support can be added in the
@@ -53,8 +49,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         return (err = CHIP_ERROR_NOT_IMPLEMENTED);
     }
 
-    strcpy(_key, key);
-    ret = getPref_bin_new(_key, _key, (uint8_t *) value, value_size, read_bytes_size);
+    ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, read_bytes_size);
+
     if (TRUE == ret)
     {
         err = CHIP_NO_ERROR;
@@ -68,7 +64,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         err = CHIP_ERROR_INTERNAL;
     }
 
-    free(_key);
     return err;
 }
 
@@ -76,25 +71,18 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t ret    = -1;
-    char * _key    = (char *) malloc(strlen(key) + 1);
 
     if (!value)
     {
         return (err = CHIP_ERROR_INVALID_ARGUMENT);
     }
-    if (_key == NULL)
-    {
-        return (err = CHIP_ERROR_NO_MEMORY);
-    }
 
-    strcpy(_key, key);
-    ret = setPref_new(_key, _key, (uint8_t *) value, value_size);
+    ret = setPref_new(key, key, (uint8_t *) value, value_size);
+
     if (TRUE == ret)
         err = CHIP_NO_ERROR;
     else
         err = CHIP_ERROR_INTERNAL;
-
-    free(_key);
 
     return err;
 }
@@ -102,20 +90,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    char * _key    = (char *) malloc(strlen(key) + 1);
-    if (_key == NULL)
-    {
-        return (err = CHIP_ERROR_NO_MEMORY);
-    }
 
-    strcpy(_key, key);
-    // registerPref(_key);
-    if (TRUE == deleteKey(_key, _key))
+    if (TRUE == deleteKey(key, key))
         err = CHIP_NO_ERROR;
     else
         err = CHIP_ERROR_INTERNAL;
 
-    free(_key);
     return err;
 }
 
