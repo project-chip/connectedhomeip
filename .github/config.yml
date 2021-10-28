@@ -5,4 +5,4 @@ todo:
   autoAssign: true                        # string|string[]|boolean
   label: ["todo"]                         # boolean|string|string[]
   reopenClosed: true                      # boolean
-  exclude: ".*lint\.yaml|.*/(zzz-generated|zap-generated)/.*" # string
+  exclude: ".*lint\\.yaml|.*/(zzz-generated|zap-generated)/.*" # string
