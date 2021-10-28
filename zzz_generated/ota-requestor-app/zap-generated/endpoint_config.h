@@ -157,7 +157,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 12
+#define GENERATED_ATTRIBUTE_COUNT 14
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -182,7 +182,11 @@
             { 0x0001, ZAP_TYPE(ARRAY), 320, 0, ZAP_LONG_DEFAULTS_INDEX(279) }, /* fabrics list */                                  \
             { 0x0002, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },            /* SupportedFabrics */                              \
             { 0x0003, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },            /* CommissionedFabrics */                           \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },         /* ClusterRevision */                               \
+            { 0x0004, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                    \
+              ZAP_EMPTY_DEFAULT() }, /* TrustedRootCertificates */                                                                 \
+            { 0x0005, ZAP_TYPE(FABRIC_IDX), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
+              ZAP_EMPTY_DEFAULT() },                                   /* CurrentFabricIndex */                                    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                       \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -208,7 +212,7 @@
                 0x0031, ZAP_ATTRIBUTE_INDEX(7), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
             }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
             {                                                                                                                      \
-                0x003E, ZAP_ATTRIBUTE_INDEX(8), 4, 324, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x003E, ZAP_ATTRIBUTE_INDEX(8), 6, 324, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
     }
 
@@ -221,7 +225,7 @@
     }
 
 // Largest attribute size is needed for various buffers
-#define ATTRIBUTE_LARGEST (321)
+#define ATTRIBUTE_LARGEST (401)
 
 // Total size of singleton attributes
 #define ATTRIBUTE_SINGLETONS_SIZE (0)

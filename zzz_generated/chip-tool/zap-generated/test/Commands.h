@@ -23611,6 +23611,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Read number of commissioned fabrics\n");
             err = TestReadNumberOfCommissionedFabrics_1();
             break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read current fabric index\n");
+            err = TestReadCurrentFabricIndex_2();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -23622,13 +23626,17 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 3;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t supportedFabrics)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t commissionedFabrics)> mOnSuccessCallback_1{ OnSuccessCallback_1,
                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, chip::FabricIndex currentFabricIndex)> mOnSuccessCallback_2{
+        OnSuccessCallback_2, this
+    };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
@@ -23648,6 +23656,16 @@ private:
     static void OnSuccessCallback_1(void * context, uint8_t commissionedFabrics)
     {
         (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_1(commissionedFabrics);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, chip::FabricIndex currentFabricIndex)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_2(currentFabricIndex);
     }
 
     //
@@ -23685,6 +23703,23 @@ private:
     {
         VerifyOrReturn(CheckConstraintType("commissionedFabrics", "", "uint8"));
         VerifyOrReturn(CheckConstraintMinValue<uint8_t>("commissionedFabrics", commissionedFabrics, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadCurrentFabricIndex_2()
+    {
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeCurrentFabricIndex(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(chip::FabricIndex currentFabricIndex)
+    {
+        VerifyOrReturn(CheckConstraintType("currentFabricIndex", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::FabricIndex>("currentFabricIndex", currentFabricIndex, 1));
         NextTest();
     }
 };

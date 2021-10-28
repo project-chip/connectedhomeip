@@ -2700,6 +2700,11 @@ class ChipClusters:
                 "attributeId": 0x00000004,
                 "type": "bytes",
             },
+            0x00000005: {
+                "attributeName": "CurrentFabricIndex",
+                "attributeId": 0x00000005,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -6219,6 +6224,9 @@ class ChipClusters:
     def ClusterOperationalCredentials_ReadAttributeTrustedRootCertificates(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_TrustedRootCertificates(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterOperationalCredentials_ReadAttributeCurrentFabricIndex(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CurrentFabricIndex(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterOperationalCredentials_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -8773,6 +8781,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_TrustedRootCertificates.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_TrustedRootCertificates.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials ReadAttribute CurrentFabricIndex
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CurrentFabricIndex.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CurrentFabricIndex.restype = ctypes.c_uint32
         # Cluster OperationalCredentials ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

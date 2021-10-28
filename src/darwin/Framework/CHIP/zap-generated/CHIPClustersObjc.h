@@ -1283,6 +1283,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTrustedRootCertificatesWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeCurrentFabricIndexWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
