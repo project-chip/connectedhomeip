@@ -168,14 +168,13 @@ void InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
 void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
 {
     chip::app::ClusterInfo dirtyPath;
-    dirtyPath.mClusterId  = kTestClusterId;
-    dirtyPath.mEndpointId = kTestEndpointId;
-    dirtyPath.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
+    dirtyPath.mClusterId.SetValue(kTestClusterId);
+    dirtyPath.mEndpointId.SetValue(kTestEndpointId);
     printf("MutateClusterHandler is triggered...");
     // send dirty change
     if (!testSyncReport)
     {
-        dirtyPath.mFieldId = 1;
+        dirtyPath.mFieldId.SetValue(1);
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), MutateClusterHandler, NULL);
@@ -183,7 +182,7 @@ void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
     }
     else
     {
-        dirtyPath.mFieldId = 10; // unknown field
+        dirtyPath.mFieldId.SetValue(10); // unknown field
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
         // send sync message(empty report)
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();

@@ -443,7 +443,7 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(Cluste
     // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here, and ember will not do data read &
     // copy in this case.
     const EmberAfAttributeMetadata * attributeMetadata = emberAfLocateAttributeMetadata(
-        aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId, CLUSTER_MASK_SERVER, 0);
+        aClusterInfo.mEndpointId.Value(), aClusterInfo.mClusterId.Value(), aClusterInfo.mFieldId.Value(), CLUSTER_MASK_SERVER, 0);
 
     if (attributeMetadata == nullptr)
     {
@@ -464,18 +464,18 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(Cluste
         return Protocols::InteractionModel::Status::InvalidValue;
     }
 
-    return ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
-                                                                  aClusterInfo.mFieldId, CLUSTER_MASK_SERVER, 0, attributeData,
-                                                                  attributeMetadata->attributeType));
+    return ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId.Value(), aClusterInfo.mClusterId.Value(),
+                                                                  aClusterInfo.mFieldId.Value(), CLUSTER_MASK_SERVER, 0,
+                                                                  attributeData, attributeMetadata->attributeType));
 }
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId     = aClusterInfo.mNodeId;
-    attributePathParams.mEndpointId = aClusterInfo.mEndpointId;
-    attributePathParams.mClusterId  = aClusterInfo.mClusterId;
-    attributePathParams.mFieldId    = aClusterInfo.mFieldId;
+    attributePathParams.mNodeId     = aClusterInfo.mNodeId.Value();
+    attributePathParams.mEndpointId = aClusterInfo.mEndpointId.Value();
+    attributePathParams.mClusterId  = aClusterInfo.mClusterId.Value();
+    attributePathParams.mFieldId    = aClusterInfo.mFieldId.Value();
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
@@ -498,10 +498,9 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
 void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     ClusterInfo info;
-    info.mClusterId  = clusterId;
-    info.mFieldId    = attributeId;
-    info.mEndpointId = endpoint;
-    info.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
+    info.mClusterId.SetValue(clusterId);
+    info.mFieldId.SetValue(attributeId);
+    info.mEndpointId.SetValue(endpoint);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
 }

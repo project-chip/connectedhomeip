@@ -219,15 +219,15 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     NL_TEST_ASSERT(apSuite, (eid5 + 1) == eid6);
 
     chip::app::ClusterInfo testClusterInfo1;
-    testClusterInfo1.mNodeId     = kTestDeviceNodeId1;
-    testClusterInfo1.mEndpointId = kTestEndpointId;
-    testClusterInfo1.mClusterId  = kLivenessClusterId;
-    testClusterInfo1.mEventId    = kLivenessChangeEvent;
+    testClusterInfo1.mNodeId.SetValue(kTestDeviceNodeId1);
+    testClusterInfo1.mEndpointId.SetValue(kTestEndpointId);
+    testClusterInfo1.mClusterId.SetValue(kLivenessClusterId);
+    testClusterInfo1.mEventId.SetValue(kLivenessChangeEvent);
     chip::app::ClusterInfo testClusterInfo2;
-    testClusterInfo2.mNodeId     = kTestDeviceNodeId2;
-    testClusterInfo2.mEndpointId = kTestEndpointId;
-    testClusterInfo2.mClusterId  = kLivenessClusterId;
-    testClusterInfo2.mEventId    = kLivenessChangeEvent;
+    testClusterInfo2.mNodeId.SetValue(kTestDeviceNodeId2);
+    testClusterInfo2.mEndpointId.SetValue(kTestEndpointId);
+    testClusterInfo2.mClusterId.SetValue(kLivenessClusterId);
+    testClusterInfo2.mEventId.SetValue(kLivenessChangeEvent);
 
     CheckLogReadOut(apSuite, logMgmt, chip::app::PriorityLevel::Info, eid1, 3, &testClusterInfo1);
     CheckLogReadOut(apSuite, logMgmt, chip::app::PriorityLevel::Info, eid2, 2, &testClusterInfo1);

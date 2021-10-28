@@ -85,6 +85,16 @@ public:
     CHIP_ERROR GetNodeId(chip::NodeId * const apNodeId) const;
 
     /**
+     *  @brief Get NodeId field, will set the aNodeId to Optional::Missing when value does not exist.
+     *
+     *  @param [in] aListIndex    The value for getting list index field.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     */
+    CHIP_ERROR GetNodeId(chip::Optional<NodeId> & aNodeId) const;
+
+    /**
      *  @brief Get a TLVReader for the EndpointId. Next() must be called before accessing them.
      *
      *  @param [in] apEndpointId    A pointer to apEndpointId
@@ -94,6 +104,16 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetEndpointId(chip::EndpointId * const apEndpointId) const;
+
+    /*
+     *  @brief Gets EndpointId, will set the aEndpointId to Optional::Missing when the field is missing.
+     *
+     *  @param [in] aListIndex    The value for getting list index field.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     */
+    CHIP_ERROR GetEndpointId(chip::Optional<EndpointId> & aEndpointId) const;
 
     /**
      *  @brief Get a TLVReader for the ClusterId. Next() must be called before accessing them.
@@ -107,6 +127,16 @@ public:
     CHIP_ERROR GetClusterId(chip::ClusterId * const apClusterId) const;
 
     /**
+     *  @brief Gets ClusterId, will set the aClusterId to Optional::Missing when the field is missing.
+     *
+     *  @param [in] aListIndex    The value for getting list index field.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     */
+    CHIP_ERROR GetClusterId(chip::Optional<ClusterId> & aClusterId) const;
+
+    /**
      *  @brief Get a TLVReader for the EventId. Next() must be called before accessing them.
      *
      *  @param [in] apEventId    A pointer to apEventId
@@ -116,6 +146,16 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetEventId(chip::EventId * const apEventId) const;
+
+    /**
+     *  @brief Gets FieldId, will set the aFieldId to Optional::Missing when the field is missing.
+     *
+     *  @param [in] aListIndex    The value for getting list index field.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     */
+    CHIP_ERROR GetEventId(chip::Optional<EventId> & aFieldId) const;
 };
 
 class Builder : public chip::app::Builder

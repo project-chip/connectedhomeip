@@ -71,9 +71,9 @@ void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuit
     ClusterInfo clusterInfo2;
     ClusterInfo clusterInfo3;
 
-    clusterInfo1.mEndpointId = 1;
-    clusterInfo2.mEndpointId = 2;
-    clusterInfo3.mEndpointId = 3;
+    clusterInfo1.mEndpointId.SetValue(1);
+    clusterInfo2.mEndpointId.SetValue(2);
+    clusterInfo3.mEndpointId.SetValue(3);
 
     InteractionModelEngine::GetInstance()->PushFront(clusterInfoList, clusterInfo1);
     NL_TEST_ASSERT(apSuite, clusterInfoList != nullptr && clusterInfo1.mEndpointId == clusterInfoList->mEndpointId);
@@ -99,21 +99,17 @@ void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ClusterInfo clusterInfoList[2];
 
-    clusterInfoList[0].mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    clusterInfoList[0].mFieldId = 1;
-    clusterInfoList[1].mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    clusterInfoList[1].mFieldId = 2;
+    clusterInfoList[0].mFieldId.SetValue(1);
+    clusterInfoList[1].mFieldId.SetValue(2);
 
     chip::app::ClusterInfo testClusterInfo;
-    testClusterInfo.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    testClusterInfo.mFieldId = 3;
+    testClusterInfo.mFieldId.SetValue(3);
 
     NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
-    testClusterInfo.mFieldId = 0xFFFFFFFF;
+    testClusterInfo.mFieldId.ClearValue();
     NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
-    testClusterInfo.mFlags.Set(chip::app::ClusterInfo::Flags::kListIndexValid);
-    testClusterInfo.mFieldId   = 1;
-    testClusterInfo.mListIndex = 2;
+    testClusterInfo.mFieldId.SetValue(1);
+    testClusterInfo.mListIndex.SetValue(2);
     NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
 }
 } // namespace app

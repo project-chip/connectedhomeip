@@ -647,7 +647,8 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler *)
 {
-    if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
+    if (!(aClusterInfo.mClusterId == Optional<ClusterId>(kTestClusterId)) ||
+        !(aClusterInfo.mEndpointId == Optional<EndpointId>(kTestEndpointId)))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

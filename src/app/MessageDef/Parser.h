@@ -26,6 +26,7 @@
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -71,6 +72,23 @@ protected:
     CHIP_ERROR GetUnsignedInteger(const uint8_t aContextTag, T * const apLValue) const
     {
         return GetSimpleValue(aContextTag, chip::TLV::kTLVType_UnsignedInteger, apLValue);
+    };
+
+    template <typename T>
+    CHIP_ERROR GetUnsignedInteger(const uint8_t aContextTag, Optional<T> & aValue) const
+    {
+        T value;
+        CHIP_ERROR err = GetSimpleValue(aContextTag, chip::TLV::kTLVType_UnsignedInteger, &value);
+        aValue.ClearValue();
+        if (err == CHIP_NO_ERROR)
+        {
+            aValue.SetValue(value);
+        }
+        if (err != CHIP_ERROR_END_OF_TLV)
+        {
+            return err;
+        }
+        return CHIP_NO_ERROR;
     };
 
     template <typename T>

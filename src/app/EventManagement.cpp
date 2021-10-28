@@ -277,7 +277,7 @@ CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
     EventLoadOutContext ctxt       = EventLoadOutContext(writer, apOptions->mpEventSchema->mPriority,
-                                                   GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->GetLastEventNumber());
+                                                         GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->GetLastEventNumber());
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(kMaxEventSizeReserve);
     if (buf.IsNull())
     {
@@ -495,7 +495,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
     CircularEventBuffer checkpoint = *mpEventBuffer;
     CircularEventBuffer * buffer   = nullptr;
     EventLoadOutContext ctxt       = EventLoadOutContext(writer, aEventOptions.mpEventSchema->mPriority,
-                                                   GetPriorityBuffer(aEventOptions.mpEventSchema->mPriority)->GetLastEventNumber());
+                                                         GetPriorityBuffer(aEventOptions.mpEventSchema->mPriority)->GetLastEventNumber());
     Timestamp timestamp(Timestamp::Type::kSystem, System::SystemClock().GetMonotonicMilliseconds());
     EventOptions opts = EventOptions(timestamp);
     // Start the event container (anonymous structure) in the circular buffer
@@ -618,8 +618,10 @@ static bool IsInterestedEventPaths(EventLoadOutContext * eventLoadOutContext, co
     }
     while (interestedEventPaths != nullptr)
     {
-        if (interestedEventPaths->mNodeId == event.mNodeId && interestedEventPaths->mEndpointId == event.mEndpointId &&
-            interestedEventPaths->mClusterId == event.mClusterId && interestedEventPaths->mEventId == event.mEventId)
+        if (interestedEventPaths->mNodeId == Optional<NodeId>(event.mNodeId) &&
+            interestedEventPaths->mEndpointId == Optional<EndpointId>(event.mEndpointId) &&
+            interestedEventPaths->mClusterId == Optional<ClusterId>(event.mClusterId) &&
+            interestedEventPaths->mEventId == Optional<EventId>(event.mEventId))
         {
             return true;
         }

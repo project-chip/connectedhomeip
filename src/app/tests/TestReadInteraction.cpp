@@ -921,36 +921,30 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 1);
 
     chip::app::ClusterInfo dirtyPath1;
-    dirtyPath1.mClusterId  = kTestClusterId;
-    dirtyPath1.mEndpointId = kTestEndpointId;
-    dirtyPath1.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath1.mFieldId = 1;
+    dirtyPath1.mClusterId.SetValue(kTestClusterId);
+    dirtyPath1.mEndpointId.SetValue(kTestEndpointId);
+    dirtyPath1.mFieldId.SetValue(1);
 
     chip::app::ClusterInfo dirtyPath2;
-    dirtyPath2.mClusterId  = kTestClusterId;
-    dirtyPath2.mEndpointId = kTestEndpointId;
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath2.mFieldId = 2;
+    dirtyPath2.mClusterId.SetValue(kTestClusterId);
+    dirtyPath2.mEndpointId.SetValue(kTestEndpointId);
+    dirtyPath2.mFieldId.SetValue(2);
 
     chip::app::ClusterInfo dirtyPath3;
-    dirtyPath2.mClusterId  = kTestClusterId;
-    dirtyPath2.mEndpointId = kTestEndpointId;
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kListIndexValid);
-    dirtyPath2.mFieldId   = 2;
-    dirtyPath2.mListIndex = 1;
+    dirtyPath3.mClusterId.SetValue(kTestClusterId);
+    dirtyPath3.mEndpointId.SetValue(kTestEndpointId);
+    dirtyPath3.mFieldId.SetValue(2);
+    dirtyPath3.mListIndex.SetValue(1);
 
     chip::app::ClusterInfo dirtyPath4;
-    dirtyPath4.mClusterId  = kTestClusterId;
-    dirtyPath4.mEndpointId = kTestEndpointId;
-    dirtyPath4.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath4.mFieldId = 3;
+    dirtyPath4.mClusterId.SetValue(kTestClusterId);
+    dirtyPath4.mEndpointId.SetValue(kTestEndpointId);
+    dirtyPath4.mFieldId.SetValue(3);
 
     chip::app::ClusterInfo dirtyPath5;
-    dirtyPath5.mClusterId  = kTestClusterId;
-    dirtyPath5.mEndpointId = kTestEndpointId;
-    dirtyPath5.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath5.mFieldId = 4;
+    dirtyPath5.mClusterId.SetValue(kTestClusterId);
+    dirtyPath5.mEndpointId.SetValue(kTestEndpointId);
+    dirtyPath5.mFieldId.SetValue(4);
 
     // Test report with 2 different path
     delegate.mpReadHandler->mHoldReport = false;

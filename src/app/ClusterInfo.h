@@ -25,96 +25,37 @@
 
 namespace chip {
 namespace app {
-static constexpr AttributeId kRootAttributeId = 0xFFFFFFFF;
 
+/**
+ * ClusterInfo is the representation of an attribute path or an event path used by ReacHandler, ReadClient, WriteHandler,
+ * Report::Engine etc, it contains a mpNext field so it can be used as a linked list. It uses some invalid values for representing
+ * the wildcard value for its field.
+ */
+// TODO: The cluster info should be breaked into AttributeInfo and EventInfo.
+// Note: The change will happen after #11171 with a better linked list.
 struct ClusterInfo
 {
-    enum class Flags : uint8_t
-    {
-        kFieldIdValid   = 0x01,
-        kListIndexValid = 0x02,
-        kEventIdValid   = 0x03,
-    };
-
     bool IsAttributePathSupersetOf(const ClusterInfo & other) const
     {
-        if ((other.mEndpointId != mEndpointId) || (other.mClusterId != mClusterId))
-        {
-            return false;
-        }
+        VerifyOrReturnError(!mEndpointId.HasValue() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(!mClusterId.HasValue() || mClusterId == other.mClusterId, false);
+        VerifyOrReturnError(!mFieldId.HasValue() || mFieldId == other.mFieldId, false);
+        VerifyOrReturnError(!mListIndex.HasValue() || mListIndex == other.mListIndex, false);
 
-        Optional<AttributeId> myFieldId =
-            mFlags.Has(Flags::kFieldIdValid) ? Optional<AttributeId>::Value(mFieldId) : Optional<AttributeId>::Missing();
-
-        Optional<AttributeId> otherFieldId = other.mFlags.Has(Flags::kFieldIdValid) ? Optional<AttributeId>::Value(other.mFieldId)
-                                                                                    : Optional<AttributeId>::Missing();
-
-        Optional<ListIndex> myListIndex =
-            mFlags.Has(Flags::kListIndexValid) ? Optional<ListIndex>::Value(mListIndex) : Optional<ListIndex>::Missing();
-
-        Optional<ListIndex> otherListIndex = other.mFlags.Has(Flags::kListIndexValid) ? Optional<ListIndex>::Value(other.mListIndex)
-                                                                                      : Optional<ListIndex>::Missing();
-
-        // If list index exists, field index must exist
-        // Field 0xFFFFFFF (any) &  listindex set is invalid
-        assert(!(myListIndex.HasValue() && !myFieldId.HasValue()));
-        assert(!(otherListIndex.HasValue() && !otherFieldId.HasValue()));
-        assert(!(myFieldId == Optional<AttributeId>::Value(kRootAttributeId) && myListIndex.HasValue()));
-        assert(!(otherFieldId == Optional<AttributeId>::Value(kRootAttributeId) && otherListIndex.HasValue()));
-
-        if (myFieldId == Optional<AttributeId>::Value(kRootAttributeId))
-        {
-            return true;
-        }
-
-        if (myFieldId != otherFieldId)
-        {
-            return false;
-        }
-
-        // We only support top layer for attribute representation, either FieldId or FieldId + ListIndex
-        // Combination: if myFieldId == otherFieldId, ListIndex cannot exist without FieldId
-        // 1. myListIndex and otherListIndex both missing or both exactly the same, then current is superset of other
-        // 2. myListIndex is missing, no matter if otherListIndex is missing or not, then current is superset of other
-        if (myListIndex == otherListIndex)
-        {
-            // either both missing or both exactly the same
-            return true;
-        }
-
-        if (!myListIndex.HasValue())
-        {
-            // difference is ok only if myListIndex is missing
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
+    bool HasWildcard() const { return !mEndpointId.HasValue() || !mClusterId.HasValue() || !mFieldId.HasValue(); }
+
     ClusterInfo() {}
-    NodeId mNodeId         = 0;
-    ClusterId mClusterId   = 0;
-    ListIndex mListIndex   = 0;
-    AttributeId mFieldId   = 0;
-    EndpointId mEndpointId = 0;
-    BitFlags<Flags> mFlags;
-    ClusterInfo * mpNext = nullptr;
-    EventId mEventId     = 0;
-    /* For better structure alignment
-     * Above ordering is by bit-size to ensure least amount of memory alignment padding.
-     * Changing order to something more natural (e.g. clusterid before nodeid) will result
-     * in extra memory alignment padding.
-     * uint64 mNodeId
-     * uint16_t mClusterId
-     * uint16_t mListIndex
-     * uint8_t FieldId
-     * uint8_t EndpointId
-     * uint8_t mDirty
-     * uint8_t mType
-     * uint32_t mpNext
-     * uint16_t EventId
-     * padding 2 bytes
-     */
+
+    Optional<NodeId> mNodeId;
+    Optional<EndpointId> mEndpointId;
+    Optional<ClusterId> mClusterId;
+    Optional<AttributeId> mFieldId;
+    Optional<EventId> mEventId;
+    Optional<ListIndex> mListIndex;
+    ClusterInfo * mpNext = nullptr; // pointer width (uint32 or uint64)
 };
 } // namespace app
 } // namespace chip

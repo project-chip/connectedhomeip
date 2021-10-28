@@ -29,6 +29,7 @@
 #include <stdio.h>
 
 #include <app/AppBuildConfig.h>
+#include <lib/core/Optional.h>
 
 using namespace chip;
 using namespace chip::TLV;
@@ -191,6 +192,31 @@ CHIP_ERROR AttributePath::Parser::GetFieldId(chip::AttributeId * const apFieldId
 CHIP_ERROR AttributePath::Parser::GetListIndex(chip::ListIndex * const apListIndex) const
 {
     return GetUnsignedInteger(kCsTag_ListIndex, apListIndex);
+}
+
+CHIP_ERROR AttributePath::Parser::GetNodeId(chip::Optional<NodeId> & aNodeId) const
+{
+    return GetUnsignedInteger(kCsTag_NodeId, aNodeId);
+}
+
+CHIP_ERROR AttributePath::Parser::GetEndpointId(chip::Optional<EndpointId> & aEndpointId) const
+{
+    return GetUnsignedInteger(kCsTag_EndpointId, aEndpointId);
+}
+
+CHIP_ERROR AttributePath::Parser::GetClusterId(chip::Optional<ClusterId> & aClusterId) const
+{
+    return GetUnsignedInteger(kCsTag_ClusterId, aClusterId);
+}
+
+CHIP_ERROR AttributePath::Parser::GetFieldId(chip::Optional<FieldId> & aFieldId) const
+{
+    return GetUnsignedInteger(kCsTag_FieldId, aFieldId);
+}
+
+CHIP_ERROR AttributePath::Parser::GetListIndex(chip::Optional<ListIndex> & aListIndex) const
+{
+    return GetUnsignedInteger(kCsTag_ListIndex, aListIndex);
 }
 
 CHIP_ERROR AttributePath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)

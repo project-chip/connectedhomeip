@@ -65,19 +65,21 @@ CHIP_ERROR
 Engine::RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId);
+
+    // TODO: We assume the path is a concrete path here, will be changed when implementing the wildcard event read.
+    ConcreteAttributePath path(aClusterInfo.mEndpointId.Value(), aClusterInfo.mClusterId.Value(), aClusterInfo.mFieldId.Value());
     AttributeDataElement::Builder attributeDataElementBuilder = aAttributeDataList.CreateAttributeDataElementBuilder();
     AttributePath::Builder attributePathBuilder               = attributeDataElementBuilder.CreateAttributePathBuilder();
-    attributePathBuilder.NodeId(aClusterInfo.mNodeId)
-        .EndpointId(aClusterInfo.mEndpointId)
-        .ClusterId(aClusterInfo.mClusterId)
-        .FieldId(aClusterInfo.mFieldId)
+    attributePathBuilder.NodeId(aClusterInfo.mNodeId.ValueOr(kUndefinedNodeId))
+        .EndpointId(aClusterInfo.mEndpointId.Value())
+        .ClusterId(aClusterInfo.mClusterId.Value())
+        .FieldId(aClusterInfo.mFieldId.Value())
         .EndOfAttributePath();
     err = attributePathBuilder.GetError();
     SuccessOrExit(err);
 
-    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId,
-                  aClusterInfo.mFieldId);
+    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId.Value(),
+                  aClusterInfo.mFieldId.Value());
 
     err = ReadSingleClusterData(path, attributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
     SuccessOrExit(err);
@@ -89,7 +91,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DataManagement, "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
-                     ChipLogValueMEI(aClusterInfo.mClusterId), err.Format());
+                     ChipLogValueMEI(aClusterInfo.mClusterId.Value()), err.Format());
     }
 
     return err;

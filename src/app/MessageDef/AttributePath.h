@@ -30,6 +30,7 @@
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -85,6 +86,16 @@ public:
     CHIP_ERROR GetNodeId(chip::NodeId * const apNodeId) const;
 
     /**
+     *  @brief Get NodeId field, will set the aNodeId to Optional::Missing when value does not exist.
+     *
+     *  @param [in] aListIndex    The value for getting list index field.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     */
+    CHIP_ERROR GetNodeId(chip::Optional<NodeId> & aNodeId) const;
+
+    /**
      *  @brief Get a TLVReader for the EndpointId. Next() must be called before accessing them.
      *
      *  @param [in] apEndpointId    A pointer to apEndpointId
@@ -94,6 +105,16 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetEndpointId(chip::EndpointId * const apEndpointId) const;
+
+    /**
+     *  @brief Gets EndpointId, will set the aEndpointId to Optional::Missing when the field is missing.
+     *
+     *  @param [in] aListIndex    The value for getting list index field.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     */
+    CHIP_ERROR GetEndpointId(chip::Optional<EndpointId> & aEndpointId) const;
 
     /**
      *  @brief Get a TLVReader for the ClusterId. Next() must be called before accessing them.
@@ -107,6 +128,16 @@ public:
     CHIP_ERROR GetClusterId(chip::ClusterId * const apClusterId) const;
 
     /**
+     *  @brief Gets ClusterId, will set the aClusterId to Optional::Missing when the field is missing.
+     *
+     *  @param [in] aListIndex    The value for getting list index field.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     */
+    CHIP_ERROR GetClusterId(chip::Optional<ClusterId> & aClusterId) const;
+
+    /**
      *  @brief Get a TLVReader for the FieldId. Next() must be called before accessing them.
      *
      *  @param [in] apFieldId    A pointer to apFieldId
@@ -118,6 +149,16 @@ public:
     CHIP_ERROR GetFieldId(chip::AttributeId * const apFieldId) const;
 
     /**
+     *  @brief Gets FieldId, will set the aFieldId to Optional::Missing when the field is missing.
+     *
+     *  @param [in] aListIndex    The value for getting list index field.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     */
+    CHIP_ERROR GetFieldId(chip::Optional<AttributeId> & aFieldId) const;
+
+    /**
      *  @brief Get a TLVReader for the ListIndex. Next() must be called before accessing them.
      *
      *  @param [in] apListIndex    A pointer to apListIndex
@@ -127,6 +168,16 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetListIndex(chip::ListIndex * const apListIndex) const;
+
+    /**
+     *  @brief Gets ListIndex, will set the aListIndex to Optional::Missing when the field is missing.
+     *
+     *  @param [in] aListIndex    The value for getting list index field.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     */
+    CHIP_ERROR GetListIndex(chip::Optional<ListIndex> & aListIndex) const;
 };
 
 class Builder : public chip::app::Builder

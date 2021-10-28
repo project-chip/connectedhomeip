@@ -176,6 +176,26 @@ CHIP_ERROR EventPath::Parser::GetEventId(chip::EventId * const apEventId) const
     return GetUnsignedInteger(kCsTag_EventId, apEventId);
 }
 
+CHIP_ERROR EventPath::Parser::GetNodeId(chip::Optional<NodeId> & aNodeId) const
+{
+    return GetUnsignedInteger(kCsTag_NodeId, aNodeId);
+}
+
+CHIP_ERROR EventPath::Parser::GetEndpointId(chip::Optional<EndpointId> & aEndpointId) const
+{
+    return GetUnsignedInteger(kCsTag_EndpointId, aEndpointId);
+}
+
+CHIP_ERROR EventPath::Parser::GetClusterId(chip::Optional<ClusterId> & aClusterId) const
+{
+    return GetUnsignedInteger(kCsTag_ClusterId, aClusterId);
+}
+
+CHIP_ERROR EventPath::Parser::GetEventId(chip::Optional<EventId> & aFieldId) const
+{
+    return GetUnsignedInteger(kCsTag_EventId, aFieldId);
+}
+
 CHIP_ERROR EventPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
 {
     mpWriter = apWriter;

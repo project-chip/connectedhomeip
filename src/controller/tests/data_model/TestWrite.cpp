@@ -66,8 +66,8 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
-    if (aClusterInfo.mClusterId == TestCluster::Id &&
-        aClusterInfo.mFieldId == TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
+    if (aClusterInfo.mClusterId == Optional<ClusterId>(TestCluster::Id) &&
+        aClusterInfo.mFieldId == Optional<AttributeId>(TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId()))
     {
         if (responseDirective == kSendAttributeSuccess)
         {
@@ -87,12 +87,14 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 
             VerifyOrReturnError(i == 4, CHIP_ERROR_INVALID_ARGUMENT);
 
-            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mFieldId);
+            AttributePathParams attributePathParams(aClusterInfo.mClusterId.Value(), aClusterInfo.mEndpointId.Value(),
+                                                    aClusterInfo.mFieldId.Value());
             aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
         }
         else
         {
-            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mFieldId);
+            AttributePathParams attributePathParams(aClusterInfo.mClusterId.Value(), aClusterInfo.mEndpointId.Value(),
+                                                    aClusterInfo.mFieldId.Value());
             aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Failure);
         }
 

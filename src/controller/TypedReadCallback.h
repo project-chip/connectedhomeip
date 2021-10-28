@@ -54,11 +54,12 @@ private:
                       Protocols::InteractionModel::Status status) override
     {
         CHIP_ERROR err                           = CHIP_NO_ERROR;
-        app::ConcreteAttributePath attributePath = { aPath.mEndpointId, aPath.mClusterId, aPath.mFieldId };
+        app::ConcreteAttributePath attributePath = { aPath.mEndpointId.Value(), aPath.mClusterId.Value(), aPath.mFieldId.Value() };
         typename AttributeTypeInfo::DecodableType value;
 
         VerifyOrExit(status == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
-        VerifyOrExit(aPath.mClusterId == AttributeTypeInfo::GetClusterId() && aPath.mFieldId == AttributeTypeInfo::GetAttributeId(),
+        VerifyOrExit(aPath.mClusterId == Optional<ClusterId>(AttributeTypeInfo::GetClusterId()) &&
+                         aPath.mFieldId == Optional<AttributeId>(AttributeTypeInfo::GetAttributeId()),
                      CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
