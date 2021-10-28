@@ -114,7 +114,7 @@ Mbed-OS gives possibility to tweak its parameters by using the
 The same configuration system can be used to change default hardware target
 setup used in application. Additionally, it is the first place for adding
 support of the new hardware target support into the application. Mbed-OS
-configuration system can be accessed by modyfing the `mbed_app.json` file which
+configuration system can be accessed by modifying the `mbed_app.json` file which
 exists in each sample project directory.
 
 ## Build system
@@ -138,7 +138,7 @@ Arm Mbed OS defines three collections of toolchain flags used during the build:
 -   release
 -   debug
 
-Build profiles can be easly selected when building example application using
+Build profiles can be easy selected when building example application using
 either vscode task or its associated build script directly
 ([mbed_examples.sh](../../scripts/examples/mbed_example.sh)).
 

@@ -9,15 +9,15 @@
 -   [CHIPTool for Android](#chiptool-for-android)
     -   [Building and installing](#building-and-installing)
     -   [Accessory Matter device setup](#accessory-matter-device-setup)
-    -   [Device commisioning for Android](#device-commisioning-for-android)
+    -   [Device commissioning for Android](#device-commissioning-for-android)
     -   [Sending ZCL commands](#sending-zcl-commands)
 -   [POSIX CLI CHIPTool](#posix-cli-chiptool)
     -   [Building](#building)
-    -   [Device commisioning for CLI](#device-commisioning-for-cli)
+    -   [Device commissioning for CLI](#device-commissioning-for-cli)
     -   [Sending ZCL commands](#sending-zcl-commands-1)
 -   [Python Device Controller](#python-device-controller)
     -   [Building and installing](#building-and-installing-1)
-    -   [Device commisioning for Python Device Controller](#device-commisioning-for-python-device-controller)
+    -   [Device commissioning for Python Device Controller](#device-commissioning-for-python-device-controller)
     -   [Sending ZCL commands](#sending-zcl-commands-2)
         -   [ZCL commands details](#zcl-commands-details)
 
@@ -109,7 +109,7 @@ to the UART console.
 
 -   Open URL from the console to display the QR in a web browser.
 
-## Device commisioning for Android
+## Device commissioning for Android
 
 To commission Matter device onto the network created complete the following
 steps:
@@ -127,7 +127,7 @@ steps:
     will see a few pop-up messages appear as the commissioning progresses.
     Finally, the network settings screen appears.
 
--   In the network setitngs screen enter the Wi-Fi credentials and tap the Save
+-   In the network settings screen enter the Wi-Fi credentials and tap the Save
     Network button to send a WiFi provisioning message to the accessory device.
 
 -   After successful completion of the process, the application returns to the
@@ -162,12 +162,12 @@ device, you can build and run the Matter Client example application on it.
 To build the POSIX CLI CHIPTool application check the guide
 [POSIX CLI guide](../../examples/chip-tool/README.md).
 
-## Device commisioning for CLI
+## Device commissioning for CLI
 
 In order to send commands to a device, it must be paired with the client and
 connected to the network.
 
-To run the commisioning process via BLE, run the built executable and pass it
+To run the commissioning process via BLE, run the built executable and pass it
 the network ssid and password, fabric id, discriminator and pairing code of the
 remote device.
 
@@ -204,12 +204,12 @@ application, you can build and run the Python CHIP controller.
 To build and install the Python Device Controller application check the guide
 [Python Device Controller guide](python_chip_controller_building.md).
 
-## Device commisioning for Python Device Controller
+## Device commissioning for Python Device Controller
 
 In order to send commands to a device, it must be paired with the client and
 connected to the network.
 
-To run the commisioning process via BLE:
+To run the commissioning process via BLE:
 
 -   Run Device Controller:
 
@@ -232,7 +232,7 @@ To run the commisioning process via BLE:
 
         chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
 
--   Close BLE connectino:
+-   Close BLE connection:
 
         chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
 
@@ -267,7 +267,7 @@ To get the list of available commands in cluster run:
 For any integer and char string (null terminated) types, just use `key=value`,
 for example: `rate=2`, `string=123`, `string_2="123 456"`
 
-For byte string type, use `key=encoding:value`, currectly, we support `str` and
+For byte string type, use `key=encoding:value`, currently, we support `str` and
 `hex` encoding, the `str` encoding will encode a NULL terminated string. For
 example, `networkId=hex:0123456789abcdef` (for
 `[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]`), `ssid=str:Test` (for
