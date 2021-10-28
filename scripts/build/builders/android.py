@@ -25,36 +25,38 @@ class AndroidBoard(Enum):
     ARM64 = auto()
     X64 = auto()
     X86 = auto()
-    AndroidStudio = auto()
+    AndroidStudio_ARM = auto()
+    AndroidStudio_ARM64 = auto()
+    AndroidStudio_X64 = auto()
+    AndroidStudio_X86 = auto()
 
     def TargetCpuName(self):
-        if self == AndroidBoard.ARM:
+        if self == AndroidBoard.ARM or self == AndroidBoard.AndroidStudio_ARM:
             return 'arm'
-        elif self == AndroidBoard.ARM64:
+        elif self == AndroidBoard.ARM64 or self == AndroidBoard.AndroidStudio_ARM64:
             return 'arm64'
-        elif self == AndroidBoard.X64:
+        elif self == AndroidBoard.X64 or self == AndroidBoard.AndroidStudio_X64:
             return 'x64'
-        elif self == AndroidBoard.X86:
+        elif self == AndroidBoard.X86 or self == AndroidBoard.AndroidStudio_X86:
             return 'x86'
-        elif self == AndroidBoard.AndroidStudio:
-            return "arm64"
         else:
             raise Exception('Unknown board type: %r' % self)
 
     def AbiName(self):
-        if self == AndroidBoard.ARM:
+        if self.TargetCpuName() == 'arm':
             return 'armeabi-v7a'
-        elif self == AndroidBoard.ARM64:
+        elif self.TargetCpuName() == 'arm64':
             return 'arm64-v8a'
-        elif self == AndroidBoard.X64:
+        elif self.TargetCpuName() == 'x64':
             return 'x86_64'
-        elif self == AndroidBoard.X86:
+        elif self.TargetCpuName() == 'x86':
             return 'x86'
         else:
             raise Exception('Unknown board type: %r' % self)
 
     def IsIde(self):
-        if self == AndroidBoard.AndroidStudio:
+        if (self == AndroidBoard.AndroidStudio_ARM or self == AndroidBoard.AndroidStudio_ARM64
+                or self == AndroidBoard.AndroidStudio_X64 or self == AndroidBoard.AndroidStudio_X86):
             return True
         else:
             return False
@@ -161,6 +163,7 @@ class AndroidBuilder(Builder):
                 '%s/src/android/%s' % (self.root, self.app.AppName()),
                 '-PmatterBuildSrcDir=%s' % self.output_dir,
                 '-PmatterSdkSourceBuild=true',
+                '-PmatterSourceBuildAbiFilters=%s' % self.board.AbiName(),
                 'assembleDebug'
             ],
                 title='Building APP ' + self.identifier)
