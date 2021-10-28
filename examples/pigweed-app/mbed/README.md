@@ -28,6 +28,7 @@ serial port to the device. The following RPC protocols services are available:
     -   [Flashing](#flashing)
     -   [Debugging](#debugging)
     -   [Testing](#testing)
+        -   [Serial port terminal](#serial-port-terminal)
         -   [RPC console](#rpc-console)
     -   [Supported devices](#supported-devices)
         -   [Notes](#notes)
@@ -51,7 +52,7 @@ other cases.
 Before building the example, check out the Matter repository and sync submodules
 using the following command:
 
-        $ git submodule update --init
+    $ git submodule update --init
 
 Building the example application requires the use of **ARM Mbed-OS** sources and
 the **arm-none-gnu-eabi** toolchain. The OpenOCD package is used for flashing
@@ -158,6 +159,24 @@ It is possible to connect to an external gdb-server session by using specific
 
 ## Testing
 
+### Serial port terminal
+
+The application traces are streaming to serial output. To start communication
+open a terminal session and connect to the serial port of the device. You can
+use **mbed-tools** for this purpose
+([mbed-tools](https://github.com/ARMmbed/mbed-tools)):
+
+    mbed-tools sterm -p /dev/ttyACM0 -b 115200 -e off
+
+After device reset these lines should be visible:
+
+    [INFO][CHIP]: [-]Mbed pigweed-app example application start
+    ...
+    [INFO][CHIP]: [-]Mbed pigweed-app example application run
+
+The pigweed-app application launched correctly and you can follow traces in the
+terminal.
+
 ### RPC console
 
 The RPC console is an interactive Python shell console, where the different RPC
@@ -184,7 +203,7 @@ parameters as arguments:
 
 Example:
 
-      python -m chip_rpc.console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
+    python -m chip_rpc.console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
 
 To send the echo message type the following command, where you define the
 message content:

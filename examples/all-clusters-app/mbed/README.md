@@ -28,6 +28,7 @@ paired into an existing Matter network and can be controlled by this network.
     -   [Flashing](#flashing)
     -   [Debugging](#debugging)
     -   [Testing](#testing)
+        -   [Serial port terminal](#serial-port-terminal)
         -   [CHIP Tools](#chip-tools)
     -   [Supported devices](#supported-devices)
         -   [Notes](#notes)
@@ -73,7 +74,7 @@ the network.
 Before building the example, check out the Matter repository and sync submodules
 using the following command:
 
-        $ git submodule update --init
+    $ git submodule update --init
 
 Building the example application requires the use of **ARM Mbed-OS** sources and
 the **arm-none-gnu-eabi** toolchain. The OpenOCD package is used for flashing
@@ -179,6 +180,24 @@ It is possible to connect to an external gdb-server session by using specific
 **'Debug Mbed examples [remote]'** task.
 
 ## Testing
+
+### Serial port terminal
+
+The application traces are streaming to serial output. To start communication
+open a terminal session and connect to the serial port of the device. You can
+use **mbed-tools** for this purpose
+([mbed-tools](https://github.com/ARMmbed/mbed-tools)):
+
+    mbed-tools sterm -p /dev/ttyACM0 -b 115200 -e off
+
+After device reset these lines should be visible:
+
+    [INFO][CHIP]: [-]Mbed all-clusters-app example application start
+    ...
+    [INFO][CHIP]: [-]Mbed all-clusters-app example application run
+
+The all-clusters-app application launched correctly and you can follow traces in
+the terminal.
 
 ### CHIP Tools
 

@@ -213,20 +213,20 @@ To run the commisioning process via BLE:
 
 -   Run Device Controller:
 
-         chip-device-ctrl
+        chip-device-ctrl
 
 -   Scan BLE devices:
 
-         chip-device-ctrl > ble-scan
+        chip-device-ctrl > ble-scan
 
 -   Connect the device via BLE (provide the accessory device discriminator,
     setup pin code and node ID):
 
-         chip-device-ctrl > connect -ble 3840 20202021 1234
+        chip-device-ctrl > connect -ble 3840 20202021 1234
 
 -   Pass the Wi-Fi credentials to the device:
 
-         chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 1234 0 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0 timeoutMs=1000
+        chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 1234 0 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0 timeoutMs=1000
 
 -   Enable the Wi-Fi interface:
 
