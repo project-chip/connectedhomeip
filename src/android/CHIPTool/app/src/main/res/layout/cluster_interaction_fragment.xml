@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
   <Button
-      android:id="@+id/getEndpoingListBtn"
+      android:id="@+id/getEndpointListBtn"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginTop="132dp"
@@ -29,6 +29,6 @@
       android:layout_height="wrap_content"
       android:clipToPadding="false"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/getEndpoingListBtn" />
+      app:layout_constraintTop_toBottomOf="@+id/getEndpointListBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,7 +20,7 @@ import kotlinx.coroutines.cancel
 import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.endpointList
-import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getEndpoingListBtn
+import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getEndpointListBtn
 import kotlinx.coroutines.launch
 
 class ClusterInteractionFragment : Fragment() {
@@ -40,10 +40,11 @@ class ClusterInteractionFragment : Fragment() {
   ): View {
     return inflater.inflate(R.layout.cluster_interaction_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
-      getEndpoingListBtn.setOnClickListener {
+      getEndpointListBtn.setOnClickListener {
         scope.launch {
-          setDevicePtr()
-          showMessage("Button Clicked")
+          devicePtr =
+            ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+          showMessage("Retrieving endpoints")
           endpointList.visibility = View.VISIBLE
         }
       }
@@ -60,11 +61,6 @@ class ClusterInteractionFragment : Fragment() {
       endpointList.adapter = EndpointAdapter(dataList, EndpointListener())
       endpointList.layoutManager = LinearLayoutManager(requireContext())
     }
-  }
-
-  private suspend fun setDevicePtr() {
-    devicePtr =
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
   }
 
   private fun showMessage(msg: String) {
@@ -117,7 +113,7 @@ class ClusterInteractionFragment : Fragment() {
   inner class EndpointListener : EndpointAdapter.OnItemClickListener {
     override fun onItemClick(position: Int) {
       Toast.makeText(requireContext(), "Item $position clicked", Toast.LENGTH_SHORT).show()
-      showFragment(ClusterDetailFragment.newInstance(), true)
+      showFragment(ClusterDetailFragment.newInstance())
     }
   }
 }
