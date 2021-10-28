@@ -18,21 +18,15 @@
 
 #pragma once
 
+#include "../common/Commands.h"
 #include "MulticastCommand.h"
-
-class Push : public MulticastCommand
-{
-public:
-    Push() : MulticastCommand("push") {}
-};
-
 
 void registerCommandsMulticast(Commands & commands)
 {
     const char * clusterName = "Multicast";
 
     commands_list clusterCommands = {
-        make_unique<Push>(),
+        make_unique<multicast::Push>(),
     };
 
     commands.Register(clusterName, clusterCommands);

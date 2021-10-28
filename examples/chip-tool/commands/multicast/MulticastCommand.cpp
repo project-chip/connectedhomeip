@@ -29,17 +29,21 @@
 
 using namespace ::chip;
 
+namespace multicast
+{
 
-CHIP_ERROR MulticastCommand::RunCommand()
+CHIP_ERROR Push::RunCommand()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    printf("\n---- MulticastCommand::RunCommand\n");
+    printf("\n---- Push::RunCommand\n");
     SetCommandExitStatus(CHIP_NO_ERROR);
     return err;
 }
 
-void MulticastCommand::Shutdown()
+void Push::Shutdown()
 {
-    printf("\n---- MulticastCommand::Shutdown\n");
+    printf("\n---- Push::Shutdown\n");
 }
+
+} // multicast

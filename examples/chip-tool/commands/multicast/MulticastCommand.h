@@ -28,20 +28,34 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #include <setup_payload/SetupPayload.h>
 
+namespace multicast
+{
 
-class MulticastCommand : public CHIPCommand
+class Command : public CHIPCommand
 {
 public:
-    MulticastCommand(const char * commandName) : CHIPCommand(commandName)
+    Command(const char * commandName) : CHIPCommand(commandName)
     {
         AddArgument("group-id", 0, UINT16_MAX, &mGroupId);
     }
 
     /////////// CHIPCommand Interface /////////
-    CHIP_ERROR RunCommand() override;
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(5); }
-    void Shutdown() override;
+    // virtual CHIP_ERROR RunCommand() = 0;
+    // virtual void Shutdown() = 0;
 
 private:
     NodeId mGroupId;
 };
+
+
+class Push : public Command
+{
+public:
+    Push() : Command("push") {}
+
+    CHIP_ERROR RunCommand() override;
+    void Shutdown() override;
+};
+
+}
