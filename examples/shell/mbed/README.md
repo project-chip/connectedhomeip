@@ -16,17 +16,17 @@ supports remote access and control of device over serial port.
 
 <hr>
 
-- [Overview](#overview)
-- [Run application](#run-application)
-  - [Environment setup](#environment-setup)
-  - [Building](#building)
-  - [Flashing](#flashing)
-  - [Debugging](#debugging)
-  - [Testing](#testing)
-    - [Serial port terminal](#serial-port-terminal)
-  - [Supported devices](#supported-devices)
-      - [Notes](#notes)
-- [Shell commands](#shell-commands)
+-   [Overview](#overview)
+-   [Run application](#run-application)
+    -   [Environment setup](#environment-setup)
+    -   [Building](#building)
+    -   [Flashing](#flashing)
+    -   [Debugging](#debugging)
+    -   [Testing](#testing)
+        -   [Serial port terminal](#serial-port-terminal)
+    -   [Supported devices](#supported-devices)
+        -   [Notes](#notes)
+-   [Shell commands](#shell-commands)
 
 <hr>
 
