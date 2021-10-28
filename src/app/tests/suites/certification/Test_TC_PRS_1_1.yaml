@@ -55,7 +55,7 @@ tests:
       response:
           value: 0
 
-    - label: "Read the global attribute constrains: AttributeList"
+    - label: "Read the global attribute constraints: AttributeList"
       disabled: true
       command: "readAttribute"
       attribute: "AttributeList"
@@ -87,7 +87,7 @@ tests:
       response:
           value: 0
 
-    - label: "Read the global attribute constrains: CommandList"
+    - label: "Read the global attribute constraints: CommandList"
       disabled: true
       command: "readAttribute"
       attribute: "CommandList"
@@ -119,7 +119,7 @@ tests:
       response:
           value: 0
 
-    - label: "Read the global attribute constrains: EventList"
+    - label: "Read the global attribute constraints: EventList"
       disabled: true
       command: "readAttribute"
       attribute: "EventList"
@@ -150,7 +150,7 @@ tests:
       response:
           value: 0
 
-    - label: "Read the optional global attribute constrains: FeatureMap"
+    - label: "Read the optional global attribute constraints: FeatureMap"
       disabled: true
       command: "readAttribute"
       attribute: "FeatureMap"

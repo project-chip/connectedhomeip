@@ -154,6 +154,7 @@ function getTests()
     MediaControl, //
     OccupancySensing, //
     OnOff, //
+    PressureMeasurement, //
     PumpConfigurationControl, //
     RelativeHumidityMeasurement, //
     TemperatureMeasurement, //
@@ -163,7 +164,6 @@ function getTests()
     WindowCovering, //
     Others, //
     Subscriptions, //
-    PressureMeasurement, //
   ];
   return tests.flat(1);
 }

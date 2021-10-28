@@ -19,7 +19,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Read the mandatory attribute constrains: MeasuredValue"
+    - label: "Read the mandatory attribute constraints: MeasuredValue"
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
@@ -40,7 +40,7 @@ tests:
       response:
           value: 0
 
-    - label: "Read the mandatory attribute constrains: MinMeasuredValue"
+    - label: "Read the mandatory attribute constraints: MinMeasuredValue"
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
@@ -61,7 +61,7 @@ tests:
       response:
           value: 0
 
-    - label: "Read the mandatory attribute constrains: MaxMeasuredValue"
+    - label: "Read the mandatory attribute constraints: MaxMeasuredValue"
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
