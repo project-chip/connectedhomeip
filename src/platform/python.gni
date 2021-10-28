@@ -18,6 +18,6 @@ declare_args() {
   # Build Python controller (set to false for a Python device)
   chip_python_controller = true
 
-  # Pass the directory to the BUILD.gn that pulls in the generated data-model files, e.g. ///examples/lighting-app/lighting-common 
+  # Pass the directory to the BUILD.gn that pulls in the generated data-model files, e.g. ///examples/lighting-app/lighting-common
   chip_data_model = ""
 }

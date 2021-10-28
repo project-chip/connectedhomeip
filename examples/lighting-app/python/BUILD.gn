@@ -30,16 +30,16 @@ config("includes") {
   include_dirs = [
     ".",
     "include",
-    "${chip_root}/zzz_generated/lighting-app/"
+    "${chip_root}/zzz_generated/lighting-app/",
   ]
 }
 
 shared_library("chip-lighting-app") {
   sources = [
-#    "${chip_root}/src/controller/python/chip/setup_payload/Generator.cpp",
-#    "${chip_root}/src/controller/python/chip/server/ServerInit.cpp",
-#    "${chip_root}/src/controller/python/chip/server/Options.cpp",
-#    "${chip_root}/src/controller/python/chip/setup_payload/Parser.cpp",
+    #    "${chip_root}/src/controller/python/chip/setup_payload/Generator.cpp",
+    #    "${chip_root}/src/controller/python/chip/server/ServerInit.cpp",
+    #    "${chip_root}/src/controller/python/chip/server/Options.cpp",
+    #    "${chip_root}/src/controller/python/chip/setup_payload/Parser.cpp",
   ]
 
   public_deps = [
@@ -49,9 +49,7 @@ shared_library("chip-lighting-app") {
     #"${chip_root}/src/lib",
   ]
 
-  include_dirs = [
-    "include"
-  ]
+  include_dirs = [ "include" ]
 
   if (chip_enable_pw_rpc) {
     defines = [ "PW_RPC_ENABLED" ]

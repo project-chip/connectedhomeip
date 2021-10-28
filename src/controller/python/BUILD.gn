@@ -32,7 +32,7 @@ config("controller_wno_deprecate") {
 
 shared_library("ChipDeviceCtrl") {
   if (chip_python_controller) {
-  output_name = "_ChipDeviceCtrl"
+    output_name = "_ChipDeviceCtrl"
   } else {
     output_name = "_ChipServer"
   }
@@ -46,30 +46,30 @@ shared_library("ChipDeviceCtrl") {
 
   if (chip_python_controller) {
     sources += [
-    "ChipCommissionableNodeController-ScriptBinding.cpp",
-    "ChipDeviceController-ScriptBinding.cpp",
-    "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.cpp",
-    "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h",
-    "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
-    "ChipDeviceController-ScriptDevicePairingDelegate.h",
-    "ChipDeviceController-StorageDelegate.cpp",
-    "ChipDeviceController-StorageDelegate.h",
-    "chip/clusters/CHIPClusters.cpp",
-    "chip/clusters/command.cpp",
-    "chip/discovery/NodeResolution.cpp",
-    "chip/interaction_model/Delegate.cpp",
-    "chip/interaction_model/Delegate.h",
-    "chip/internal/ChipThreadWork.cpp",
-    "chip/internal/ChipThreadWork.h",
-    "chip/internal/CommissionerImpl.cpp",
-    "chip/logging/LoggingRedirect.cpp",
-    "chip/native/StackInit.cpp",
+      "ChipCommissionableNodeController-ScriptBinding.cpp",
+      "ChipDeviceController-ScriptBinding.cpp",
+      "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.cpp",
+      "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h",
+      "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
+      "ChipDeviceController-ScriptDevicePairingDelegate.h",
+      "ChipDeviceController-StorageDelegate.cpp",
+      "ChipDeviceController-StorageDelegate.h",
+      "chip/clusters/CHIPClusters.cpp",
+      "chip/clusters/command.cpp",
+      "chip/discovery/NodeResolution.cpp",
+      "chip/interaction_model/Delegate.cpp",
+      "chip/interaction_model/Delegate.h",
+      "chip/internal/ChipThreadWork.cpp",
+      "chip/internal/ChipThreadWork.h",
+      "chip/internal/CommissionerImpl.cpp",
+      "chip/logging/LoggingRedirect.cpp",
+      "chip/native/StackInit.cpp",
     ]
   } else {
     sources += [
-    "chip/server/ServerInit.cpp",
-    "chip/server/Options.cpp",
-  ]
+      "chip/server/Options.cpp",
+      "chip/server/ServerInit.cpp",
+    ]
   }
 
   if (chip_enable_ble) {
@@ -99,9 +99,7 @@ shared_library("ChipDeviceCtrl") {
   ]
 
   if (chip_python_controller) {
-    public_deps += [
-      "${chip_root}/src/controller/data_model",
-    ]
+    public_deps += [ "${chip_root}/src/controller/data_model" ]
   } else {
     public_deps += [ "$chip_data_model" ]
   }
@@ -159,9 +157,7 @@ pw_python_action("python") {
       ]
 
       if (chip_python_controller) {
-        sources += [
-          "chip/ChipDeviceCtrl.py",
-        ]
+        sources += [ "chip/ChipDeviceCtrl.py" ]
       } else {
         sources += [
           "chip/server/__init__.py",
@@ -172,7 +168,7 @@ pw_python_action("python") {
     {
       src_dir = target_out_dir
       if (chip_python_controller) {
-      sources = [ "${target_out_dir}/chip/_ChipDeviceCtrl.so" ]
+        sources = [ "${target_out_dir}/chip/_ChipDeviceCtrl.so" ]
       } else {
         sources = [ "${target_out_dir}/chip/_ChipServer.so" ]
       }
@@ -243,7 +239,7 @@ pw_python_action("python") {
   } else {
     args += [
       "--server",
-      "True"
+      "True",
     ]
   }
 

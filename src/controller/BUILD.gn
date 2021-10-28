@@ -36,24 +36,23 @@ static_library("controller") {
   if (chip_python_controller) {
     sources += [
       "AbstractMdnsDiscoveryController.cpp",
-    "CHIPCommissionableNodeController.cpp",
-    "CHIPCommissionableNodeController.h",
-    "CHIPDevice.cpp",
-    "CHIPDevice.h",
-    "CHIPDeviceController.cpp",
-    "CHIPDeviceController.h",
-    "CHIPDeviceControllerFactory.cpp",
-    "CHIPDeviceControllerFactory.h",
-    "DeviceAddressUpdateDelegate.h",
-    "DeviceDiscoveryDelegate.h",
-    "EmptyDataModelHandler.cpp",
-    "ExampleOperationalCredentialsIssuer.cpp",
-    "ExampleOperationalCredentialsIssuer.h",
-    "SetUpCodePairer.cpp",
-    "SetUpCodePairer.h",
-  ]
+      "CHIPCommissionableNodeController.cpp",
+      "CHIPCommissionableNodeController.h",
+      "CHIPDevice.cpp",
+      "CHIPDevice.h",
+      "CHIPDeviceController.cpp",
+      "CHIPDeviceController.h",
+      "CHIPDeviceControllerFactory.cpp",
+      "CHIPDeviceControllerFactory.h",
+      "DeviceAddressUpdateDelegate.h",
+      "DeviceDiscoveryDelegate.h",
+      "EmptyDataModelHandler.cpp",
+      "ExampleOperationalCredentialsIssuer.cpp",
+      "ExampleOperationalCredentialsIssuer.h",
+      "SetUpCodePairer.cpp",
+      "SetUpCodePairer.h",
+    ]
   }
-
 
   cflags = [ "-Wconversion" ]
 
