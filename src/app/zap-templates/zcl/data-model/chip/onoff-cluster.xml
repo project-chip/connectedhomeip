@@ -48,32 +48,52 @@ limitations under the License.
     <description>Attributes and commands for switching devices between 'On' and 'Off' states.</description>
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
-    <attribute side="server" code="0x0000" define="ON_OFF"               type="boolean" default="0" reportable="true"              >OnOff</attribute>
-    <attribute side="server" code="0x4000" define="GLOBAL_SCENE_CONTROL" type="boolean" default="1"                 optional="true">GlobalSceneControl</attribute>
-    <attribute side="server" code="0x4001" define="ON_TIME"              type="int16u"  default="0" writable="true" optional="true">OnTime</attribute>
-    <attribute side="server" code="0x4002" define="OFF_WAIT_TIME"        type="int16u"  default="0" writable="true" optional="true">OffWaitTime</attribute>
-    <attribute side="server" code="0x4003" define="START_UP_ON_OFF"      type="enum8"               writable="true" optional="true">StartUpOnOff</attribute>
+    <attribute side="server" code="0x0000" define="ON_OFF"               type="boolean" default="0" reportable="true" optional="false">    
+      <description>OnOff</description>
+      <access op="read" role="view"/>
+    </attribute>
+    <attribute side="server" code="0x4000" define="GLOBAL_SCENE_CONTROL" type="boolean" default="1"                 optional="true">
+      <description>GlobalSceneControl</description>
+      <access op="read" role="view"/>
+    </attribute>
+    <attribute side="server" code="0x4001" define="ON_TIME"              type="int16u"  c writable="true" optional="true">
+      <description>OnTime</description>
+      <access op="write" role="operate"/><!-- Example considers the W O combination. XSL parser to verify if (R) then V else if (W) then O -->
+    </attribute>
+    <attribute side="server" code="0x4002" define="OFF_WAIT_TIME"        type="int16u"  default="0" writable="true" optional="true">
+      <description>OffWaitTime</description><!-- Example considers the R V combination. XSL parser to verify if (R) then V else if (W) then O -->
+      <access op="read" role="view"/>
+    </attribute>
+    <attribute side="server" code="0x4003" define="START_UP_ON_OFF"      type="enum8"               writable="true" optional="true">
+      <description>StartUpOnOff</description>
+      <access op="write" role="manage"/><!-- Example considers the W M combination. XSL parser to verify if (R) then V else if (W) then M -->
+    </attribute>
 
     <command source="client" code="0x00" name="Off" optional="false">
       <description>On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0.</description>
+      <access role="operate"/><!-- Example considers Operate privilege -->
     </command>
 
     <command source="client" code="0x01" name="On" optional="false">
       <description>On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0.</description>
+      <access role="operate"/><!-- Example considers Operate privilege -->
     </command>
 
     <command source="client" code="0x02" name="Toggle" optional="false">
       <description>On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0.</description>
+      <access role="operate"/><!-- Example considers Operate privilege -->
     </command>
 
     <command source="client" code="0x40" name="OffWithEffect" optional="true">
       <description>The OffWithEffect command allows devices to be turned off using enhanced ways of fading.</description>
       <arg name="EffectId" type="OnOffEffectIdentifier"/>
       <arg name="EffectVariant" type="OnOffDelayedAllOffEffectVariant"/>
+      <access role="operate"/><!-- Example considers Operate privilege -->
     </command>
 
     <command source="client" code="0x41" name="OnWithRecallGlobalScene" optional="true">
       <description>The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off.</description>
+      <access role="operate"/><!-- Example considers Operate privilege -->
     </command>
 
     <command source="client" code="0x42" name="OnWithTimedOff" optional="true">
@@ -81,6 +101,7 @@ limitations under the License.
       <arg name="OnOffControl" type="OnOffControl"/>
       <arg name="OnTime" type="int16u"/><!-- min:0 max:0xfe -->
       <arg name="OffWaitTime" type="int16u"/><!-- min:0 max:0xfe -->
+      <access role="operate"/><!-- Example considers Operate privilege -->
     </command>
 
   </cluster>
