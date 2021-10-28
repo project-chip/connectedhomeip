@@ -45,4 +45,4 @@ jobs:
       # Comments like '{{! ... }}' should be used in zap files
       - name: Do not allow TODO in generated files
         run: |
-          git grep -n 'TODO:' -- ./zzz_generated './*/zap-generated/*' && exit 0 || exit 1
+          git grep -n 'TODO:' -- ./zzz_generated './*/zap-generated/*' && exit 1 || exit 0
