@@ -124,6 +124,66 @@ ClusterBase::InvokeCommand<chip::app::Clusters::Binding::Commands::Unbind::Type,
     const chip::app::Clusters::Binding::Commands::Unbind::Type &, void *,
     CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::DisableAction::Type,
+                                               chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::DisableAction::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type,
+                                               chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::EnableAction::Type, chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::EnableAction::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type,
+                                               chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::InstantAction::Type,
+                                               chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::InstantAction::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type,
+                                               chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::PauseAction::Type, chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::PauseAction::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type,
+                                               chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type, chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StartAction::Type, chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::StartAction::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type,
+                                               chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StopAction::Type, chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::BridgedActions::Commands::StopAction::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
 template CHIP_ERROR
 ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type, chip::app::DataModel::NullObjectType>(
     const chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type &, void *,

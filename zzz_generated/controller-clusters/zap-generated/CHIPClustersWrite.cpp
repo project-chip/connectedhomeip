@@ -89,6 +89,8 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BinaryInput
 
 // BooleanState Cluster Attributes
 
+// BridgedActions Cluster Attributes
+
 // BridgedDeviceBasic Cluster Attributes
 
 template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::UserLabel::TypeInfo>(
