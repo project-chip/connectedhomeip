@@ -24,7 +24,7 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-from ctypes import *
+from ctypes import *  # lgtm [py/polluting-import]
 from .ChipUtility import ChipUtility
 
 

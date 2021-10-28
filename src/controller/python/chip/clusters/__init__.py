@@ -22,4 +22,4 @@
 
 """Provides Python APIs for CHIP."""
 from . import Command
-from .Objects import *
+from .Objects import *  # lgtm [py/polluting-import]
