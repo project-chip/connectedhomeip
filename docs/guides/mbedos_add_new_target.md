@@ -107,7 +107,7 @@ The Matter project continue integration process is based on Github Actions tool.
 It uses workflow configuration files to execute actions on CI server.
 
 To add the new target to the validation process of building Mbed OS applications
-you need to modify the `.gtihub/workflows.examples-mbed.yaml` file. Extend the
+you need to modify the `.github/workflows/examples-mbed.yaml` file. Extend the
 job's environment variable **APP_TARGET** with the target name.
 
 Example:
