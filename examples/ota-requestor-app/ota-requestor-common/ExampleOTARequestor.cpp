@@ -91,9 +91,16 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
     mProviderNodeId      = providerLocation;
     mProviderFabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
 
-    ChipLogProgress(SoftwareUpdate, "Notified of Provider at NodeID: 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8,
-                    ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
-
+    ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
+    ChipLogDetail(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
+    ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: %" PRIu64, mProviderNodeId);
+    ChipLogDetail(SoftwareUpdate, "  VendorID: %" PRIu16, commandData.vendorId);
+    ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %" PRIu8, announcementReason);
+    if (commandData.metadataForNode.HasValue())
+    {
+        ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %.*s", static_cast<int>(commandData.metadataForNode.Value().size()), commandData.metadataForNode.Value().data());
+    }
+    
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
     uint32_t msToStart = 0;
