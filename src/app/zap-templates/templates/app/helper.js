@@ -104,11 +104,6 @@ var endpointClusterWithInit = [
   'Color Control',
   'IAS Zone',
   'Pump Configuration and Control',
-  'Ethernet Network Diagnostics',
-  'Software Diagnostics',
-  'Thread Network Diagnostics',
-  'General Diagnostics',
-  'WiFi Network Diagnostics',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
@@ -375,11 +370,19 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
   let promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
   if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
     passByReference = true;
-    let listType    = isDecodable ? "DecodableList" : "List";
     // If we did not have a namespace provided, we can assume we're inside
     // chip::app.
     let listNamespace = options.hash.ns ? "chip::app::" : ""
-    promise           = promise.then(typeStr => `${listNamespace}DataModel::${listType}<${typeStr}>`);
+    if (isDecodable)
+    {
+      promise = promise.then(typeStr => `${listNamespace}DataModel::DecodableList<${typeStr}>`);
+    }
+    else
+    {
+      // Use const ${typeStr} so that consumers don't have to create non-const
+      // data to encode.
+      promise = promise.then(typeStr => `${listNamespace}DataModel::List<const ${typeStr}>`);
+    }
   }
   if (this.isNullable && !options.hash.forceNotNullable) {
     passByReference = true;

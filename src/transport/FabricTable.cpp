@@ -39,7 +39,7 @@ CHIP_ERROR FabricInfo::SetFabricLabel(const CharSpan & fabricLabel)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
+CHIP_ERROR FabricInfo::CommitToStorage(FabricStorage * storage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -103,7 +103,7 @@ CHIP_ERROR FabricInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
         memcpy(info->mNOCCert, mNOCCert.data(), mNOCCert.size());
     }
 
-    err = kvs->SyncSetKeyValue(key, info, sizeof(StorableFabricInfo));
+    err = storage->SyncStore(mFabric, key, info, sizeof(StorableFabricInfo));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue: %s", chip::ErrorStr(err));
@@ -117,7 +117,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR FabricInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
+CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     char key[kKeySize];
@@ -134,7 +134,7 @@ CHIP_ERROR FabricInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
 
     NodeId nodeId;
 
-    SuccessOrExit(err = kvs->SyncGetKeyValue(key, info, infoSize));
+    SuccessOrExit(err = storage->SyncLoad(mFabric, key, info, infoSize));
 
     mFabricId   = Encoding::LittleEndian::HostSwap64(info->mFabricId);
     nodeId      = Encoding::LittleEndian::HostSwap64(info->mNodeId);
@@ -162,7 +162,7 @@ CHIP_ERROR FabricInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     VerifyOrExit(mOperationalKey != nullptr, err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = mOperationalKey->Deserialize(info->mOperationalKey));
 
-    ChipLogProgress(Inet, "Loading certs from KVS");
+    ChipLogProgress(Inet, "Loading certs from storage");
     SuccessOrExit(err = SetRootCert(ByteSpan(info->mRootCert, rootCertLen)));
 
     // The compressed fabric ID doesn't change for a fabric over time.
@@ -197,17 +197,17 @@ CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id)
+CHIP_ERROR FabricInfo::DeleteFromStorage(FabricStorage * storage, FabricIndex fabricIndex)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     char key[kKeySize];
-    ReturnErrorOnFailure(GenerateKey(id, key, sizeof(key)));
+    ReturnErrorOnFailure(GenerateKey(fabricIndex, key, sizeof(key)));
 
-    err = kvs->SyncDeleteKeyValue(key);
+    err = storage->SyncDelete(fabricIndex, key);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Discovery, "Fabric %d is not yet configured", id);
+        ChipLogDetail(Discovery, "Fabric %d is not yet configured", fabricIndex);
     }
     return err;
 }
@@ -382,6 +382,22 @@ FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
     return nullptr;
 }
 
+FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId fabricId)
+{
+    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
+    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
+    {
+        FabricInfo * fabric = FindFabricWithIndex(i);
+
+        if (fabric != nullptr && fabricId == fabric->GetPeerId().GetCompressedFabricId())
+        {
+            LoadFromStorage(fabric);
+            return fabric;
+        }
+    }
+    return nullptr;
+}
+
 void FabricTable::Reset()
 {
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
@@ -408,7 +424,7 @@ CHIP_ERROR FabricTable::Store(FabricIndex id)
     fabric = FindFabricWithIndex(id);
     VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = fabric->StoreIntoKVS(mStorage);
+    err = fabric->CommitToStorage(mStorage);
 exit:
     if (err == CHIP_NO_ERROR && mDelegate != nullptr)
     {
@@ -424,7 +440,7 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric)
 
     if (!fabric->IsInitialized())
     {
-        ReturnErrorOnFailure(fabric->FetchFromKVS(mStorage));
+        ReturnErrorOnFailure(fabric->LoadFromStorage(mStorage));
     }
 
     if (mDelegate != nullptr)
@@ -522,7 +538,7 @@ CHIP_ERROR FabricTable::Delete(FabricIndex id)
 
     fabric              = FindFabricWithIndex(id);
     fabricIsInitialized = fabric != nullptr && fabric->IsInitialized();
-    err                 = FabricInfo::DeleteFromKVS(mStorage, id); // Delete from storage regardless
+    err                 = FabricInfo::DeleteFromStorage(mStorage, id); // Delete from storage regardless
 
 exit:
     if (err == CHIP_NO_ERROR)
@@ -554,7 +570,7 @@ void FabricTable::DeleteAllFabrics()
     }
 }
 
-CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
+CHIP_ERROR FabricTable::Init(FabricStorage * storage)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mStorage = storage;
@@ -583,5 +599,42 @@ CHIP_ERROR FabricTable::SetFabricDelegate(FabricTableDelegate * delegate)
     ChipLogDetail(Discovery, "Set the fabric pairing table delegate");
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR formatKey(FabricIndex fabricIndex, MutableCharSpan formattedKey, const char * key)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    int res = snprintf(formattedKey.data(), formattedKey.size(), "F%02X/%s", fabricIndex, key);
+    if (res < 0 || (size_t) res >= formattedKey.size())
+    {
+        ChipLogError(Discovery, "Failed to format Key %s. snprintf error: %d", key, res);
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return err;
+}
+
+CHIP_ERROR SimpleFabricStorage::SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size)
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    char formattedKey[MAX_KEY_SIZE] = "";
+    ReturnErrorOnFailure(formatKey(fabricIndex, MutableCharSpan(formattedKey, MAX_KEY_SIZE), key));
+    return mStorage->SyncSetKeyValue(formattedKey, buffer, size);
+};
+
+CHIP_ERROR SimpleFabricStorage::SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size)
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    char formattedKey[MAX_KEY_SIZE] = "";
+    ReturnErrorOnFailure(formatKey(fabricIndex, MutableCharSpan(formattedKey, MAX_KEY_SIZE), key));
+    return mStorage->SyncGetKeyValue(formattedKey, buffer, size);
+};
+
+CHIP_ERROR SimpleFabricStorage::SyncDelete(FabricIndex fabricIndex, const char * key)
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    char formattedKey[MAX_KEY_SIZE] = "";
+    ReturnErrorOnFailure(formatKey(fabricIndex, MutableCharSpan(formattedKey, MAX_KEY_SIZE), key));
+    return mStorage->SyncDeleteKeyValue(formattedKey);
+};
 
 } // namespace chip

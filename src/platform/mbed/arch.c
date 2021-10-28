@@ -89,3 +89,13 @@ void usleep(unsigned int usec)
         wait_us((int) us);
     }
 }
+
+void sleep(unsigned int sec)
+{
+    unsigned int ms = (sec * 1000);
+
+    if (ms)
+    {
+        thread_sleep_for(ms);
+    }
+}

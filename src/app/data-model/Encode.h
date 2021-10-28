@@ -70,11 +70,12 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, Span<const char>
  *
  *
  */
-template <
-    typename X,
-    typename std::enable_if_t<std::is_class<X>::value &&
-                                  std::is_same<decltype(&X::Encode), CHIP_ERROR (X::*)(TLV::TLVWriter &, TLV::Tag) const>::value,
-                              X> * = nullptr>
+template <typename X,
+          typename std::enable_if_t<
+              std::is_class<X>::value &&
+                  std::is_same<decltype(std::declval<X>().Encode(std::declval<TLV::TLVWriter &>(), std::declval<TLV::Tag>())),
+                               CHIP_ERROR>::value,
+              X> * = nullptr>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
 {
     return x.Encode(writer, tag);

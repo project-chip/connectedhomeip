@@ -86,6 +86,7 @@ chip::Controller::PythonPersistentStorageDelegate sStorageDelegate;
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::ScriptDeviceAddressUpdateDelegate sDeviceAddressUpdateDelegate;
 chip::Controller::ExampleOperationalCredentialsIssuer sOperationalCredentialsIssuer;
+chip::SimpleFabricStorage sFabricStorage;
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -186,6 +187,9 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     CHIP_ERROR err = sOperationalCredentialsIssuer.Initialize(sStorageDelegate);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
+    err = sFabricStorage.Initialize(&sStorageDelegate);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
     chip::Crypto::P256Keypair ephemeralKey;
     err = ephemeralKey.Initialize();
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
@@ -207,10 +211,11 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     FactoryInitParams factoryParams;
-    factoryParams.storageDelegate = &sStorageDelegate;
-    factoryParams.imDelegate      = &PythonInteractionModelDelegate::Instance();
+    factoryParams.fabricStorage = &sFabricStorage;
+    factoryParams.imDelegate    = &PythonInteractionModelDelegate::Instance();
 
     SetupParams initParams;
+    initParams.storageDelegate                = &sStorageDelegate;
     initParams.deviceAddressUpdateDelegate    = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;

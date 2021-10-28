@@ -209,6 +209,7 @@ class MyServerStorageDelegate : public PersistentStorageDelegate
 
 DeviceCommissioner gCommissioner;
 MyServerStorageDelegate gServerStorage;
+chip::SimpleFabricStorage gFabricStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 
 CHIP_ERROR InitCommissioner()
@@ -218,9 +219,12 @@ CHIP_ERROR InitCommissioner()
     chip::Controller::FactoryInitParams factoryParams;
     chip::Controller::SetupParams params;
 
-    factoryParams.storageDelegate = &gServerStorage;
+    ReturnErrorOnFailure(gFabricStorage.Initialize(&gServerStorage));
+
+    factoryParams.fabricStorage = &gFabricStorage;
     // use a different listen port for the commissioner.
     factoryParams.listenPort              = LinuxDeviceOptions::GetInstance().securedCommissionerPort;
+    params.storageDelegate                = &gServerStorage;
     params.deviceAddressUpdateDelegate    = nullptr;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
 
@@ -301,7 +305,7 @@ void ChipLinuxAppMainLoop()
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();
 #if defined(ENABLE_CHIP_SHELL)
-    chip::Shell::RegisterDiscoverCommands(&gCommissioner);
+    chip::Shell::RegisterControllerCommands(&gCommissioner);
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 

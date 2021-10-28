@@ -38,10 +38,8 @@
  ******************************************************************************/
 
 #include "door-lock-server.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/util/af.h>
 
 #include <app/CommandHandler.h>
@@ -108,15 +106,15 @@ void emAfPluginDoorLockServerInitSchedule(void)
     defined(ZCL_USING_DOOR_LOCK_CLUSTER_NUM_HOLIDAY_SCHEDULES_SUPPORTED_PER_USER_ATTRIBUTE)
     const EmAfPluginDoorLockServerAttributeData data[] = {
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER_ATTRIBUTE
-        { ZCL_NUM_WEEKDAY_SCHEDULES_SUPPORTED_PER_USER_ATTRIBUTE_ID, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE },
+        { Attributes::NumWeekdaySchedulesSupportedPerUser::Id, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE },
 #endif
 
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER_ATTRIBUTE
-        { ZCL_NUM_YEARDAY_SCHEDULES_SUPPORTED_PER_USER_ATTRIBUTE_ID, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_YEARDAY_SCHEDULE_TABLE_SIZE },
+        { Attributes::NumYeardaySchedulesSupportedPerUser::Id, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_YEARDAY_SCHEDULE_TABLE_SIZE },
 #endif
 
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_NUM_HOLIDAY_SCHEDULES_SUPPORTED_PER_USER_ATTRIBUTE
-        { ZCL_NUM_HOLIDAY_SCHEDULES_SUPPORTED_PER_USER_ATTRIBUTE_ID, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_HOLIDAY_SCHEDULE_TABLE_SIZE },
+        { Attributes::NumHolidaySchedulesSupportedPerUser::Id, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_HOLIDAY_SCHEDULE_TABLE_SIZE },
 #endif
     };
     emAfPluginDoorLockServerWriteAttributes(data, ArraySize(data), "schedule table");
@@ -160,9 +158,8 @@ bool emberAfDoorLockClusterSetWeekdayScheduleCallback(app::CommandHandler * comm
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_SET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
+                                             Commands::SetWeekdayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -171,14 +168,13 @@ bool emberAfDoorLockClusterSetWeekdayScheduleCallback(app::CommandHandler * comm
     }
 
     // get bitmask so we can check if we should send event notification
-    emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_RF_PROGRAMMING_EVENT_MASK_ATTRIBUTE_ID,
-                               (uint8_t *) &rfProgrammingEventMask, sizeof(rfProgrammingEventMask));
+    Attributes::RfProgrammingEventMask::Get(DOOR_LOCK_SERVER_ENDPOINT, &rfProgrammingEventMask);
 
     if (rfProgrammingEventMask & EMBER_BIT(0))
     {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_PROGRAMMING_EVENT_NOTIFICATION_COMMAND_ID, "uuvsuuws", 0x01, 0x00, userId, &userPin, 0x00,
-                                  0x00, 0x00, &userPin);
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ::Id,
+                                  Commands::ProgrammingEventNotification::Id, "uuvsuuws", 0x01, 0x00, userId, &userPin, 0x00, 0x00,
+                                  0x00, &userPin);
         SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
 exit:
@@ -209,9 +205,8 @@ bool emberAfDoorLockClusterGetWeekdayScheduleCallback(app::CommandHandler * comm
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_GET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
+                                             Commands::GetWeekdayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -251,8 +246,8 @@ bool emberAfDoorLockClusterClearWeekdayScheduleCallback(app::CommandHandler * co
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_CLEAR_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID,
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
+                                             Commands::ClearWeekdayScheduleResponse::Id,
                                              (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
@@ -293,9 +288,8 @@ bool emberAfDoorLockClusterSetYeardayScheduleCallback(app::CommandHandler * comm
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_SET_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
+                                             Commands::SetYeardayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -339,9 +333,8 @@ bool emberAfDoorLockClusterGetYeardayScheduleCallback(app::CommandHandler * comm
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_GET_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
+                                             Commands::GetYeardayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -381,8 +374,8 @@ bool emberAfDoorLockClusterClearYeardayScheduleCallback(app::CommandHandler * co
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_CLEAR_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID,
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
+                                             Commands::ClearYeardayScheduleResponse::Id,
                                              (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
@@ -425,9 +418,8 @@ bool emberAfDoorLockClusterSetHolidayScheduleCallback(app::CommandHandler * comm
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_SET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
+                                             Commands::SetHolidayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -469,9 +461,8 @@ bool emberAfDoorLockClusterGetHolidayScheduleCallback(app::CommandHandler * comm
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_GET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
+                                             Commands::GetHolidayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -509,8 +500,8 @@ bool emberAfDoorLockClusterClearHolidayScheduleCallback(app::CommandHandler * co
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_CLEAR_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID,
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
+                                             Commands::ClearHolidayScheduleResponse::Id,
                                              (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));

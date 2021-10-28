@@ -49,6 +49,61 @@ static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 constexpr char kFabricTableKeyPrefix[] = "Fabric";
 constexpr char kFabricTableCountKey[]  = "NumFabrics";
 
+class DLL_EXPORT FabricStorage
+{
+public:
+    virtual ~FabricStorage() {}
+
+    /**
+     * Gets called when fabric data needs to be stored.
+     **/
+    virtual CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) = 0;
+
+    /**
+     * Gets called when fabric data needs to be loaded.
+     **/
+    virtual CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) = 0;
+
+    /**
+     * Gets called when fabric data needs to be removed.
+     **/
+    virtual CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) = 0;
+};
+
+/**
+ * @brief A default implementation of Fabric storage that preserves legacy behavior of using
+ *        the Persistent storage delegate directly.
+ *
+ *        This class automatically prefixes the Fabric Storage Keys with the FabricIndex.
+ *        The keys are formatted like so: "F%02X/" + key.
+ *
+ */
+class DLL_EXPORT SimpleFabricStorage : public FabricStorage
+{
+public:
+    SimpleFabricStorage(){};
+    SimpleFabricStorage(PersistentStorageDelegate * storage) : mStorage(storage){};
+    ~SimpleFabricStorage() override { mStorage = nullptr; };
+
+    CHIP_ERROR Initialize(PersistentStorageDelegate * storage)
+    {
+        VerifyOrReturnError(mStorage == nullptr || storage == mStorage, CHIP_ERROR_INCORRECT_STATE);
+        mStorage = storage;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override;
+
+    CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override;
+
+    CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override;
+
+private:
+    const static int MAX_KEY_SIZE = 32;
+
+    PersistentStorageDelegate * mStorage = nullptr;
+};
+
 /**
  * Defines state of a pairing established by a fabric.
  * Node ID is only settable using the device operational credentials.
@@ -211,9 +266,9 @@ private:
 
     static CHIP_ERROR GenerateKey(FabricIndex id, char * key, size_t len);
 
-    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate * kvs);
-    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
-    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id);
+    CHIP_ERROR CommitToStorage(FabricStorage * storage);
+    CHIP_ERROR LoadFromStorage(FabricStorage * storage);
+    static CHIP_ERROR DeleteFromStorage(FabricStorage * storage, FabricIndex fabricIndex);
 
     void ReleaseCert(MutableByteSpan & cert);
     void ReleaseOperationalCerts()
@@ -358,13 +413,14 @@ public:
     void ReleaseFabricIndex(FabricIndex fabricIndex);
 
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
+    FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
 
     FabricIndex FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
                                            const ByteSpan * ipkList, size_t ipkListEntries);
 
     void Reset();
 
-    CHIP_ERROR Init(PersistentStorageDelegate * storage);
+    CHIP_ERROR Init(FabricStorage * storage);
     CHIP_ERROR SetFabricDelegate(FabricTableDelegate * delegate);
 
     uint8_t FabricCount() const { return mFabricCount; }
@@ -379,7 +435,7 @@ public:
 
 private:
     FabricInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
-    PersistentStorageDelegate * mStorage = nullptr;
+    FabricStorage * mStorage = nullptr;
 
     // TODO: Fabric table should be backed by a single backing store (attribute store), remove delegate callbacks #6419
     FabricTableDelegate * mDelegate = nullptr;

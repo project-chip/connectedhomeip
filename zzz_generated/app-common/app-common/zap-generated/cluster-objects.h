@@ -1090,7 +1090,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t groupCount;
-    DataModel::List<uint16_t> groupList;
+    DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -1123,7 +1123,7 @@ public:
 
     uint8_t capacity;
     uint8_t groupCount;
-    DataModel::List<uint16_t> groupList;
+    DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -1344,7 +1344,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     chip::CharSpan sceneName;
-    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
+    DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -1451,7 +1451,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     chip::CharSpan sceneName;
-    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
+    DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -1743,7 +1743,7 @@ public:
     uint8_t capacity;
     uint16_t groupId;
     uint8_t sceneCount;
-    DataModel::List<uint8_t> sceneList;
+    DataModel::List<const uint8_t> sceneList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -1783,7 +1783,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     chip::CharSpan sceneName;
-    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
+    DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -1890,7 +1890,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     chip::CharSpan sceneName;
-    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
+    DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3586,7 +3586,7 @@ public:
     uint8_t totalProfileNum;
     uint8_t powerProfileId;
     uint8_t numOfTransferredPhases;
-    DataModel::List<Structs::TransferredPhase::Type> transferredPhases;
+    DataModel::List<const Structs::TransferredPhase::Type> transferredPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3647,7 +3647,7 @@ public:
     uint8_t totalProfileNum;
     uint8_t powerProfileId;
     uint8_t numOfTransferredPhases;
-    DataModel::List<Structs::TransferredPhase::Type> transferredPhases;
+    DataModel::List<const Structs::TransferredPhase::Type> transferredPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3717,7 +3717,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileCount;
-    DataModel::List<Structs::PowerProfileRecord::Type> powerProfileRecords;
+    DataModel::List<const Structs::PowerProfileRecord::Type> powerProfileRecords;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3812,7 +3812,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
+    DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3844,7 +3844,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     uint8_t powerProfileCount;
-    DataModel::List<Structs::PowerProfileRecord::Type> powerProfileRecords;
+    DataModel::List<const Structs::PowerProfileRecord::Type> powerProfileRecords;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -3877,7 +3877,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
+    DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4019,7 +4019,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
+    DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4090,7 +4090,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
+    DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4492,7 +4492,7 @@ public:
 
     uint16_t functionId;
     uint8_t functionDataType;
-    DataModel::List<uint8_t> functionData;
+    DataModel::List<const uint8_t> functionData;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -4669,7 +4669,7 @@ namespace Attributes {
 namespace DeviceList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::DeviceType::Type>;
+    using Type          = DataModel::List<const Structs::DeviceType::Type>;
     using DecodableType = DataModel::DecodableList<Structs::DeviceType::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
@@ -4679,7 +4679,7 @@ struct TypeInfo
 namespace ServerList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<chip::ClusterId>;
+    using Type          = DataModel::List<const chip::ClusterId>;
     using DecodableType = DataModel::DecodableList<chip::ClusterId>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
@@ -4689,7 +4689,7 @@ struct TypeInfo
 namespace ClientList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<chip::ClusterId>;
+    using Type          = DataModel::List<const chip::ClusterId>;
     using DecodableType = DataModel::DecodableList<chip::ClusterId>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
@@ -4699,7 +4699,7 @@ struct TypeInfo
 namespace PartsList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<chip::EndpointId>;
+    using Type          = DataModel::List<const chip::EndpointId>;
     using DecodableType = DataModel::DecodableList<chip::EndpointId>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
@@ -4961,6 +4961,579 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace PollControl
+namespace BridgedActions {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ActionErrorEnum
+enum class ActionErrorEnum : uint8_t
+{
+    kUnknown     = 0x00,
+    kInterrupted = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ActionErrorEnum                      = EmberAfActionErrorEnum;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ActionStatusEnum
+enum class ActionStatusEnum : uint8_t
+{
+    kInactive = 0x00,
+    kActive   = 0x01,
+    kPaused   = 0x02,
+    kDisabled = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ActionStatusEnum                     = EmberAfActionStatusEnum;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ActionTypeEnum
+enum class ActionTypeEnum : uint8_t
+{
+    kOther        = 0x00,
+    kScene        = 0x01,
+    kSequence     = 0x02,
+    kAutomation   = 0x03,
+    kException    = 0x04,
+    kNotification = 0x05,
+    kAlarm        = 0x06,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ActionTypeEnum                       = EmberAfActionTypeEnum;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for EndpointListTypeEnum
+enum class EndpointListTypeEnum : uint8_t
+{
+    kOther = 0x00,
+    kRoom  = 0x01,
+    kZone  = 0x02,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using EndpointListTypeEnum                 = EmberAfEndpointListTypeEnum;
+#endif
+
+// Bitmap for CommandBits
+enum class CommandBits : uint16_t
+{
+    kInstantAction               = 0,
+    kInstantActionWithTransition = 1,
+    kStartAction                 = 2,
+    kStartActionWithDuration     = 3,
+    kStopAction                  = 4,
+    kPauseAction                 = 5,
+    kPauseActionWithDuration     = 6,
+    kResumeAction                = 7,
+    kEnableAction                = 8,
+    kEnableActionWithDuration    = 9,
+    kDisableAction               = 10,
+    kDisableActionWithDuration   = 11,
+};
+
+namespace Structs {
+namespace ActionStruct {
+enum class Fields
+{
+    kActionID          = 0,
+    kName              = 1,
+    kType              = 2,
+    kEndpointListID    = 3,
+    kSupportedCommands = 4,
+    kStatus            = 5,
+};
+
+struct Type
+{
+public:
+    uint16_t actionID;
+    chip::CharSpan name;
+    ActionTypeEnum type;
+    uint16_t endpointListID;
+    uint16_t supportedCommands;
+    ActionStatusEnum status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ActionStruct
+namespace EndpointListStruct {
+enum class Fields
+{
+    kEndpointListID = 0,
+    kName           = 1,
+    kType           = 2,
+    kEndpoints      = 3,
+};
+
+struct Type
+{
+public:
+    uint16_t endpointListID;
+    chip::CharSpan name;
+    EndpointListTypeEnum type;
+    chip::ByteSpan endpoints;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace EndpointListStruct
+} // namespace Structs
+
+namespace Commands {
+namespace InstantAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::InstantAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::InstantAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace InstantAction
+namespace InstantActionWithTransition {
+enum class Fields
+{
+    kActionID       = 0,
+    kInvokeID       = 1,
+    kTransitionTime = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::InstantActionWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    uint16_t transitionTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::InstantActionWithTransition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    uint16_t transitionTime;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace InstantActionWithTransition
+namespace StartAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StartAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StartAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StartAction
+namespace StartActionWithDuration {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kDuration = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StartActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    uint32_t duration;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StartActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    uint32_t duration;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StartActionWithDuration
+namespace StopAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StopAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StopAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StopAction
+namespace PauseAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::PauseAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::PauseAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PauseAction
+namespace PauseActionWithDuration {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kDuration = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::PauseActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    uint32_t duration;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::PauseActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    uint32_t duration;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PauseActionWithDuration
+namespace ResumeAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResumeAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResumeAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResumeAction
+namespace EnableAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::EnableAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::EnableAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnableAction
+namespace EnableActionWithDuration {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kDuration = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::EnableActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    uint32_t duration;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::EnableActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    uint32_t duration;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnableActionWithDuration
+namespace DisableAction {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::DisableAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::DisableAction::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace DisableAction
+namespace DisableActionWithDuration {
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kDuration = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::DisableActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    uint32_t duration;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::DisableActionWithDuration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    Optional<uint32_t> invokeID;
+    uint32_t duration;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace DisableActionWithDuration
+} // namespace Commands
+
+namespace Attributes {
+namespace ActionList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<const Structs::ActionStruct::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::ActionStruct::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActionList::Id; }
+};
+} // namespace ActionList
+namespace EndpointList {
+struct TypeInfo
+{
+    using Type          = DataModel::List<const Structs::EndpointListStruct::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::EndpointListStruct::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EndpointList::Id; }
+};
+} // namespace EndpointList
+namespace SetupUrl {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SetupUrl::Id; }
+};
+} // namespace SetupUrl
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace BridgedActions
 namespace Basic {
 
 namespace Commands {
@@ -5728,7 +6301,7 @@ struct TypeInfo
 namespace ActiveWiredFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<uint8_t>;
+    using Type          = DataModel::List<const uint8_t>;
     using DecodableType = DataModel::DecodableList<uint8_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
@@ -5808,7 +6381,7 @@ struct TypeInfo
 namespace ActiveBatteryFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<uint8_t>;
+    using Type          = DataModel::List<const uint8_t>;
     using DecodableType = DataModel::DecodableList<uint8_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
@@ -5928,7 +6501,7 @@ struct TypeInfo
 namespace ActiveBatteryChargeFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<uint8_t>;
+    using Type          = DataModel::List<const uint8_t>;
     using DecodableType = DataModel::DecodableList<uint8_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
@@ -6211,7 +6784,7 @@ struct TypeInfo
 namespace BasicCommissioningInfoList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::BasicCommissioningInfoType::Type>;
+    using Type          = DataModel::List<const Structs::BasicCommissioningInfoType::Type>;
     using DecodableType = DataModel::DecodableList<Structs::BasicCommissioningInfoType::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
@@ -6221,7 +6794,7 @@ struct TypeInfo
 namespace RegulatoryConfigList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<RegulatoryLocationType>;
+    using Type          = DataModel::List<const RegulatoryLocationType>;
     using DecodableType = DataModel::DecodableList<RegulatoryLocationType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
@@ -6231,7 +6804,7 @@ struct TypeInfo
 namespace LocationCapabilityList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<RegulatoryLocationType>;
+    using Type          = DataModel::List<const RegulatoryLocationType>;
     using DecodableType = DataModel::DecodableList<RegulatoryLocationType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
@@ -6392,8 +6965,8 @@ public:
 
     uint8_t errorCode;
     chip::CharSpan debugText;
-    DataModel::List<Structs::WiFiInterfaceScanResult::Type> wifiScanResults;
-    DataModel::List<Structs::ThreadInterfaceScanResult::Type> threadScanResults;
+    DataModel::List<const Structs::WiFiInterfaceScanResult::Type> wifiScanResults;
+    DataModel::List<const Structs::ThreadInterfaceScanResult::Type> threadScanResults;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -7185,7 +7758,7 @@ namespace Attributes {
 namespace NetworkInterfaces {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::NetworkInterfaceType::Type>;
+    using Type          = DataModel::List<const Structs::NetworkInterfaceType::Type>;
     using DecodableType = DataModel::DecodableList<Structs::NetworkInterfaceType::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
@@ -7235,7 +7808,7 @@ struct TypeInfo
 namespace ActiveHardwareFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<uint8_t>;
+    using Type          = DataModel::List<const uint8_t>;
     using DecodableType = DataModel::DecodableList<uint8_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
@@ -7245,7 +7818,7 @@ struct TypeInfo
 namespace ActiveRadioFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<uint8_t>;
+    using Type          = DataModel::List<const uint8_t>;
     using DecodableType = DataModel::DecodableList<uint8_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
@@ -7255,7 +7828,7 @@ struct TypeInfo
 namespace ActiveNetworkFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<uint8_t>;
+    using Type          = DataModel::List<const uint8_t>;
     using DecodableType = DataModel::DecodableList<uint8_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
@@ -7346,7 +7919,7 @@ namespace Attributes {
 namespace ThreadMetrics {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::ThreadMetrics::Type>;
+    using Type          = DataModel::List<const Structs::ThreadMetrics::Type>;
     using DecodableType = DataModel::DecodableList<Structs::ThreadMetrics::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
@@ -7682,7 +8255,7 @@ struct TypeInfo
 namespace NeighborTableList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::NeighborTable::Type>;
+    using Type          = DataModel::List<const Structs::NeighborTable::Type>;
     using DecodableType = DataModel::DecodableList<Structs::NeighborTable::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
@@ -7692,7 +8265,7 @@ struct TypeInfo
 namespace RouteTableList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::RouteTable::Type>;
+    using Type          = DataModel::List<const Structs::RouteTable::Type>;
     using DecodableType = DataModel::DecodableList<Structs::RouteTable::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
@@ -8202,7 +8775,7 @@ struct TypeInfo
 namespace SecurityPolicy {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::SecurityPolicy::Type>;
+    using Type          = DataModel::List<const Structs::SecurityPolicy::Type>;
     using DecodableType = DataModel::DecodableList<Structs::SecurityPolicy::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
@@ -8222,7 +8795,7 @@ struct TypeInfo
 namespace OperationalDatasetComponents {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::OperationalDatasetComponents::Type>;
+    using Type          = DataModel::List<const Structs::OperationalDatasetComponents::Type>;
     using DecodableType = DataModel::DecodableList<Structs::OperationalDatasetComponents::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
@@ -8232,7 +8805,7 @@ struct TypeInfo
 namespace ActiveNetworkFaultsList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<NetworkFault>;
+    using Type          = DataModel::List<const NetworkFault>;
     using DecodableType = DataModel::DecodableList<NetworkFault>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
@@ -9563,7 +10136,7 @@ namespace Attributes {
 namespace FabricsList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::FabricDescriptor::Type>;
+    using Type          = DataModel::List<const Structs::FabricDescriptor::Type>;
     using DecodableType = DataModel::DecodableList<Structs::FabricDescriptor::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
@@ -9593,7 +10166,7 @@ struct TypeInfo
 namespace TrustedRootCertificates {
 struct TypeInfo
 {
-    using Type          = DataModel::List<chip::ByteSpan>;
+    using Type          = DataModel::List<const chip::ByteSpan>;
     using DecodableType = DataModel::DecodableList<chip::ByteSpan>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
@@ -9651,7 +10224,7 @@ namespace Attributes {
 namespace LabelList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::LabelStruct::Type>;
+    using Type          = DataModel::List<const Structs::LabelStruct::Type>;
     using DecodableType = DataModel::DecodableList<Structs::LabelStruct::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
@@ -13670,7 +14243,7 @@ public:
     uint8_t numberOfTransitionsForSequence;
     chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
     chip::BitFlags<ModeForSequence> modeForSequence;
-    DataModel::List<uint8_t> payload;
+    DataModel::List<const uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -13707,7 +14280,7 @@ public:
     uint8_t numberOfTransitionsForSequence;
     chip::BitFlags<DayOfWeek> dayOfWeekForSequence;
     chip::BitFlags<ModeForSequence> modeForSequence;
-    DataModel::List<uint8_t> payload;
+    DataModel::List<const uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19198,7 +19771,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t numberOfZones;
-    DataModel::List<uint8_t> zoneIds;
+    DataModel::List<const uint8_t> zoneIds;
     chip::CharSpan armDisarmCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -19576,7 +20149,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t numberOfZones;
-    DataModel::List<uint8_t> zoneIds;
+    DataModel::List<const uint8_t> zoneIds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19631,7 +20204,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     uint8_t numberOfZones;
-    DataModel::List<IasAceBypassResult> bypassResult;
+    DataModel::List<const IasAceBypassResult> bypassResult;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19688,7 +20261,7 @@ public:
 
     bool zoneStatusComplete;
     uint8_t numberOfZones;
-    DataModel::List<Structs::IasAceZoneStatusResult::Type> zoneStatusResult;
+    DataModel::List<const Structs::IasAceZoneStatusResult::Type> zoneStatusResult;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -20042,7 +20615,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
 
-    DataModel::List<Structs::TvChannelInfo::Type> channelMatch;
+    DataModel::List<const Structs::TvChannelInfo::Type> channelMatch;
     TvChannelErrorType errorType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20124,7 +20697,7 @@ namespace Attributes {
 namespace TvChannelList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::TvChannelInfo::Type>;
+    using Type          = DataModel::List<const Structs::TvChannelInfo::Type>;
     using DecodableType = DataModel::DecodableList<Structs::TvChannelInfo::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
@@ -20280,7 +20853,7 @@ namespace Attributes {
 namespace TargetNavigatorList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::NavigateTargetTargetInfo::Type>;
+    using Type          = DataModel::List<const Structs::NavigateTargetTargetInfo::Type>;
     using DecodableType = DataModel::DecodableList<Structs::NavigateTargetTargetInfo::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
@@ -21229,7 +21802,7 @@ namespace Attributes {
 namespace MediaInputList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::MediaInputInfo::Type>;
+    using Type          = DataModel::List<const Structs::MediaInputInfo::Type>;
     using DecodableType = DataModel::DecodableList<Structs::MediaInputInfo::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
@@ -21607,7 +22180,7 @@ struct Type
 public:
     ContentLaunchParameterEnum type;
     chip::CharSpan value;
-    DataModel::List<Structs::ContentLaunchAdditionalInfo::Type> externalIDList;
+    DataModel::List<const Structs::ContentLaunchAdditionalInfo::Type> externalIDList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21827,7 +22400,7 @@ namespace Attributes {
 namespace AcceptsHeaderList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<chip::ByteSpan>;
+    using Type          = DataModel::List<const chip::ByteSpan>;
     using DecodableType = DataModel::DecodableList<chip::ByteSpan>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
@@ -21837,7 +22410,7 @@ struct TypeInfo
 namespace SupportedStreamingTypes {
 struct TypeInfo
 {
-    using Type          = DataModel::List<ContentLaunchStreamingType>;
+    using Type          = DataModel::List<const ContentLaunchStreamingType>;
     using DecodableType = DataModel::DecodableList<ContentLaunchStreamingType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
@@ -21975,7 +22548,7 @@ namespace Attributes {
 namespace AudioOutputList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::AudioOutputInfo::Type>;
+    using Type          = DataModel::List<const Structs::AudioOutputInfo::Type>;
     using DecodableType = DataModel::DecodableList<Structs::AudioOutputInfo::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
@@ -22124,7 +22697,7 @@ namespace Attributes {
 namespace ApplicationLauncherList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<uint16_t>;
+    using Type          = DataModel::List<const uint16_t>;
     using DecodableType = DataModel::DecodableList<uint16_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
@@ -22510,9 +23083,9 @@ public:
     DataModel::Nullable<Structs::SimpleStruct::Type> nullableStruct;
     Optional<Structs::SimpleStruct::Type> optionalStruct;
     Optional<DataModel::Nullable<Structs::SimpleStruct::Type>> nullableOptionalStruct;
-    DataModel::Nullable<DataModel::List<SimpleEnum>> nullableList;
-    Optional<DataModel::List<SimpleEnum>> optionalList;
-    Optional<DataModel::Nullable<DataModel::List<SimpleEnum>>> nullableOptionalList;
+    DataModel::Nullable<DataModel::List<const SimpleEnum>> nullableList;
+    Optional<DataModel::List<const SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::List<const SimpleEnum>>> nullableOptionalList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22576,10 +23149,10 @@ public:
     uint8_t a;
     bool b;
     Structs::SimpleStruct::Type c;
-    DataModel::List<Structs::SimpleStruct::Type> d;
-    DataModel::List<uint32_t> e;
-    DataModel::List<chip::ByteSpan> f;
-    DataModel::List<uint8_t> g;
+    DataModel::List<const Structs::SimpleStruct::Type> d;
+    DataModel::List<const uint32_t> e;
+    DataModel::List<const chip::ByteSpan> f;
+    DataModel::List<const uint8_t> g;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22607,7 +23180,7 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<Structs::NestedStructList::Type> a;
+    DataModel::List<const Structs::NestedStructList::Type> a;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22841,10 +23414,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestStructArrayArgumentResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
-    DataModel::List<Structs::NestedStructList::Type> arg1;
-    DataModel::List<Structs::SimpleStruct::Type> arg2;
-    DataModel::List<SimpleEnum> arg3;
-    DataModel::List<bool> arg4;
+    DataModel::List<const Structs::NestedStructList::Type> arg1;
+    DataModel::List<const Structs::SimpleStruct::Type> arg2;
+    DataModel::List<const SimpleEnum> arg3;
+    DataModel::List<const bool> arg4;
     SimpleEnum arg5;
     bool arg6;
 
@@ -22910,7 +23483,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestListInt8UReverseResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
-    DataModel::List<uint8_t> arg1;
+    DataModel::List<const uint8_t> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23002,10 +23575,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestStructArrayArgumentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
-    DataModel::List<Structs::NestedStructList::Type> arg1;
-    DataModel::List<Structs::SimpleStruct::Type> arg2;
-    DataModel::List<SimpleEnum> arg3;
-    DataModel::List<bool> arg4;
+    DataModel::List<const Structs::NestedStructList::Type> arg1;
+    DataModel::List<const Structs::SimpleStruct::Type> arg2;
+    DataModel::List<const SimpleEnum> arg3;
+    DataModel::List<const bool> arg4;
     SimpleEnum arg5;
     bool arg6;
 
@@ -23151,12 +23724,12 @@ public:
     Optional<bool> nullableOptionalStructWasNull;
     Optional<Structs::SimpleStruct::Type> nullableOptionalStructValue;
     bool nullableListWasNull;
-    Optional<DataModel::List<SimpleEnum>> nullableListValue;
+    Optional<DataModel::List<const SimpleEnum>> nullableListValue;
     bool optionalListWasPresent;
-    Optional<DataModel::List<SimpleEnum>> optionalListValue;
+    Optional<DataModel::List<const SimpleEnum>> optionalListValue;
     bool nullableOptionalListWasPresent;
     Optional<bool> nullableOptionalListWasNull;
-    Optional<DataModel::List<SimpleEnum>> nullableOptionalListValue;
+    Optional<DataModel::List<const SimpleEnum>> nullableOptionalListValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23239,7 +23812,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestListStructArgumentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
-    DataModel::List<Structs::SimpleStruct::Type> arg1;
+    DataModel::List<const Structs::SimpleStruct::Type> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23267,7 +23840,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestListInt8UArgumentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
-    DataModel::List<uint8_t> arg1;
+    DataModel::List<const uint8_t> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23323,7 +23896,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestListNestedStructListArgumentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
-    DataModel::List<Structs::NestedStructList::Type> arg1;
+    DataModel::List<const Structs::NestedStructList::Type> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23351,7 +23924,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestListInt8UReverseRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
-    DataModel::List<uint8_t> arg1;
+    DataModel::List<const uint8_t> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23458,9 +24031,9 @@ public:
     DataModel::Nullable<Structs::SimpleStruct::Type> nullableStruct;
     Optional<Structs::SimpleStruct::Type> optionalStruct;
     Optional<DataModel::Nullable<Structs::SimpleStruct::Type>> nullableOptionalStruct;
-    DataModel::Nullable<DataModel::List<SimpleEnum>> nullableList;
-    Optional<DataModel::List<SimpleEnum>> optionalList;
-    Optional<DataModel::Nullable<DataModel::List<SimpleEnum>>> nullableOptionalList;
+    DataModel::Nullable<DataModel::List<const SimpleEnum>> nullableList;
+    Optional<DataModel::List<const SimpleEnum>> optionalList;
+    Optional<DataModel::Nullable<DataModel::List<const SimpleEnum>>> nullableOptionalList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23652,7 +24225,7 @@ struct TypeInfo
 namespace ListInt8u {
 struct TypeInfo
 {
-    using Type          = DataModel::List<uint8_t>;
+    using Type          = DataModel::List<const uint8_t>;
     using DecodableType = DataModel::DecodableList<uint8_t>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
@@ -23662,7 +24235,7 @@ struct TypeInfo
 namespace ListOctetString {
 struct TypeInfo
 {
-    using Type          = DataModel::List<chip::ByteSpan>;
+    using Type          = DataModel::List<const chip::ByteSpan>;
     using DecodableType = DataModel::DecodableList<chip::ByteSpan>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
@@ -23672,7 +24245,7 @@ struct TypeInfo
 namespace ListStructOctetString {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::TestListStructOctet::Type>;
+    using Type          = DataModel::List<const Structs::TestListStructOctet::Type>;
     using DecodableType = DataModel::DecodableList<Structs::TestListStructOctet::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
@@ -23796,8 +24369,8 @@ public:
     SimpleEnum arg2;
     bool arg3;
     Structs::SimpleStruct::Type arg4;
-    DataModel::List<Structs::SimpleStruct::Type> arg5;
-    DataModel::List<SimpleEnum> arg6;
+    DataModel::List<const Structs::SimpleStruct::Type> arg5;
+    DataModel::List<const SimpleEnum> arg6;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -24610,7 +25183,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     chip::BitFlags<AlertCount> alertsCount;
-    DataModel::List<chip::BitFlags<AlertStructure>> alertStructures;
+    DataModel::List<const chip::BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -24641,7 +25214,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     chip::BitFlags<AlertCount> alertsCount;
-    DataModel::List<chip::BitFlags<AlertStructure>> alertStructures;
+    DataModel::List<const chip::BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -24735,7 +25308,7 @@ public:
     uint32_t timeStamp;
     uint32_t logId;
     uint32_t logLength;
-    DataModel::List<uint8_t> logPayload;
+    DataModel::List<const uint8_t> logPayload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -24800,7 +25373,7 @@ public:
     uint32_t timeStamp;
     uint32_t logId;
     uint32_t logLength;
-    DataModel::List<uint8_t> logPayload;
+    DataModel::List<const uint8_t> logPayload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -24857,7 +25430,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint8_t logQueueSize;
-    DataModel::List<uint32_t> logIds;
+    DataModel::List<const uint32_t> logIds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -24888,7 +25461,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     uint8_t logQueueSize;
-    DataModel::List<uint32_t> logIds;
+    DataModel::List<const uint32_t> logIds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -24971,7 +25544,7 @@ public:
     uint8_t profileCount;
     uint8_t profileIntervalPeriod;
     uint8_t maxNumberOfIntervals;
-    DataModel::List<uint16_t> listOfAttributes;
+    DataModel::List<const uint16_t> listOfAttributes;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -25036,7 +25609,7 @@ public:
     uint8_t profileIntervalPeriod;
     uint8_t numberOfIntervalsDelivered;
     uint16_t attributeId;
-    DataModel::List<uint8_t> intervals;
+    DataModel::List<const uint8_t> intervals;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -26566,7 +27139,7 @@ namespace Attributes {
 namespace Groups {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::GroupState::Type>;
+    using Type          = DataModel::List<const Structs::GroupState::Type>;
     using DecodableType = DataModel::DecodableList<Structs::GroupState::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
@@ -26576,7 +27149,7 @@ struct TypeInfo
 namespace GroupKeys {
 struct TypeInfo
 {
-    using Type          = DataModel::List<Structs::GroupKey::Type>;
+    using Type          = DataModel::List<const Structs::GroupKey::Type>;
     using DecodableType = DataModel::DecodableList<Structs::GroupKey::DecodableType>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }

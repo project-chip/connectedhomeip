@@ -21,10 +21,12 @@ limitations under the License.
     <define>WINDOW_COVERING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+    <!-- TODO: <tag> support seems to be broken in ZAP, leading to database
+         constraint errors
     <tag name="LF" description="Lift Control"/>
     <tag name="TL" description="Tilt Control"/>
     <tag name="PA" description="Position Aware"/>
-    <tag name="ABS" description="Absolute Positioning"/>
+    <tag name="ABS" description="Absolute Positioning"/> -->
     <globalAttribute side="server" code="0xFFFC" value="0x0001">
       <featureBit tag="LF" bit="0">true</featureBit>
       <featureBit tag="TL" bit="1">false</featureBit>
