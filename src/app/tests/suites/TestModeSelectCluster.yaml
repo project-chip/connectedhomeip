@@ -53,10 +53,6 @@ tests:
                   { label: "Cappuccino", mode: 4, semanticTag: 0 },
                   { label: "Espresso", mode: 7, semanticTag: 0 },
               ]
-          constraints:
-              - type: list
-              - minLength: 3
-              - maxLength: 3
 
     - label: "Change to Supported Mode"
       command: "changeToMode"
