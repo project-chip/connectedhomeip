@@ -123,7 +123,10 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
         SuccessOrExit(err);
 
         err = attributePath.GetNodeId(&(clusterInfo.mNodeId));
-        SuccessOrExit(err);
+        if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
+        }
 
         err = attributePath.GetEndpointId(&(clusterInfo.mEndpointId));
         SuccessOrExit(err);
@@ -132,22 +135,16 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
         SuccessOrExit(err);
 
         err = attributePath.GetFieldId(&(clusterInfo.mFieldId));
-        if (CHIP_NO_ERROR == err)
-        {
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
-        }
-        else if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
         SuccessOrExit(err);
 
         err = attributePath.GetListIndex(&(clusterInfo.mListIndex));
-        if (CHIP_NO_ERROR == err)
+        if (CHIP_END_OF_TLV == err)
         {
-            VerifyOrExit(clusterInfo.mFlags.Has(ClusterInfo::Flags::kFieldIdValid), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kListIndexValid);
+            err = CHIP_NO_ERROR;
         }
+
+        VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasWildcard(),
+                     err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);

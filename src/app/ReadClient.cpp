@@ -490,11 +490,7 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         SuccessOrExit(err);
 
         err = attributePathParser.GetFieldId(&(clusterInfo.mFieldId));
-        if (CHIP_NO_ERROR == err)
-        {
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
-        }
-        else if (CHIP_END_OF_TLV == err)
+        if (CHIP_END_OF_TLV == err)
         {
             err = CHIP_NO_ERROR;
         }
@@ -503,8 +499,7 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         err = attributePathParser.GetListIndex(&(clusterInfo.mListIndex));
         if (CHIP_NO_ERROR == err)
         {
-            VerifyOrExit(clusterInfo.mFlags.Has(ClusterInfo::Flags::kFieldIdValid), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kListIndexValid);
+            VerifyOrExit(clusterInfo.mFieldId != ClusterInfo::kInvalidAttributeId, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
         }
         else if (CHIP_END_OF_TLV == err)
         {

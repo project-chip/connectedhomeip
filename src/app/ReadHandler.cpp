@@ -333,18 +333,19 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         AttributePath::Parser path;
         err = path.Init(reader);
         SuccessOrExit(err);
+        // TODO: Support wildcard paths here
         err = path.GetNodeId(&(clusterInfo.mNodeId));
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
         SuccessOrExit(err);
         err = path.GetEndpointId(&(clusterInfo.mEndpointId));
         SuccessOrExit(err);
         err = path.GetClusterId(&(clusterInfo.mClusterId));
         SuccessOrExit(err);
         err = path.GetFieldId(&(clusterInfo.mFieldId));
-        if (CHIP_NO_ERROR == err)
-        {
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
-        }
-        else if (CHIP_END_OF_TLV == err)
+        if (CHIP_END_OF_TLV == err)
         {
             err = CHIP_NO_ERROR;
         }
@@ -353,8 +354,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         err = path.GetListIndex(&(clusterInfo.mListIndex));
         if (CHIP_NO_ERROR == err)
         {
-            VerifyOrExit(clusterInfo.mFlags.Has(ClusterInfo::Flags::kFieldIdValid), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kListIndexValid);
+            VerifyOrExit(clusterInfo.mFieldId != ClusterInfo::kInvalidAttributeId, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -396,11 +396,7 @@ CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathL
         err = path.GetClusterId(&(clusterInfo.mClusterId));
         SuccessOrExit(err);
         err = path.GetEventId(&(clusterInfo.mEventId));
-        if (CHIP_NO_ERROR == err)
-        {
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kEventIdValid);
-        }
-        else if (CHIP_END_OF_TLV == err)
+        if (CHIP_END_OF_TLV == err)
         {
             err = CHIP_NO_ERROR;
         }
