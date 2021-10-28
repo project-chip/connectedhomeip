@@ -66,6 +66,11 @@
  */
 
 namespace chip {
+
+template <class T>
+class Span;
+using ByteSpan = Span<const uint8_t>;
+
 namespace Logging {
 
 using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, const char * msg, va_list args);
@@ -87,6 +92,8 @@ void SetLogRedirectCallback(LogRedirectCallback_t callback);
 
 void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);
 void Log(uint8_t module, uint8_t category, const char * msg, ...) ENFORCE_FORMAT(3, 4);
+
+void LogByteSpan(uint8_t module, uint8_t category, const ByteSpan & span);
 
 uint8_t GetLogFilter();
 void SetLogFilter(uint8_t category);
@@ -156,6 +163,15 @@ void SetLogFilter(uint8_t category);
 #endif
 #else
 #define ChipLogDetail(MOD, MSG, ...) ((void) 0)
+#endif
+
+#if CHIP_DETAIL_LOGGING
+#ifndef ChipLogByteSpan
+#define ChipLogByteSpan(MOD, DATA)                                                                                                 \
+    chip::Logging::LogByteSpan(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Detail, DATA)
+#endif
+#else
+#define ChipLogByteSpan(MOD, DATA) ((void) 0)
 #endif
 
 #if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING

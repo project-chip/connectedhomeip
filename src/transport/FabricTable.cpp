@@ -187,7 +187,12 @@ CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId 
     uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
     MutableByteSpan compressedFabricIdSpan(compressedFabricIdBuf);
     P256PublicKey rootPubkey(GetRootPubkey());
+    ChipLogDetail(Inet, "Generating compressed fabric ID using uncompressed fabric ID 0x" ChipLogFormatX64 " and root pubkey",
+                  ChipLogValueX64(fabricId));
+    ChipLogByteSpan(Inet, ByteSpan(rootPubkey.ConstBytes(), rootPubkey.Length()));
     ReturnErrorOnFailure(GenerateCompressedFabricId(rootPubkey, fabricId, compressedFabricIdSpan));
+    ChipLogDetail(Inet, "Generated compressed fabric ID");
+    ChipLogByteSpan(Inet, compressedFabricIdSpan);
 
     // Decode compressed fabric ID accounting for endianness, as GenerateCompressedFabricId()
     // returns a binary buffer and is agnostic of usage of the output as an integer type.
@@ -325,12 +330,19 @@ CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpa
 
     Encoding::LittleEndian::BufferWriter bbuf(destinationMessage, sizeof(destinationMessage));
 
+    ChipLogDetail(Inet,
+                  "Generating DestinationID. Fabric ID 0x" ChipLogFormatX64 ", Dest node ID 0x" ChipLogFormatX64 ", Random data",
+                  ChipLogValueX64(mFabricId), ChipLogValueX64(destNodeId));
+    ChipLogByteSpan(Inet, random);
+
     bbuf.Put(random.data(), random.size());
     // TODO: In the current implementation this check is required because in some cases the
     //       GenerateDestinationID() is called before mRootCert is initialized and GetRootPubkey() returns
     //       empty Span.
     if (!rootPubkeySpan.empty())
     {
+        ChipLogDetail(Inet, "Root pubkey");
+        ChipLogByteSpan(Inet, rootPubkeySpan);
         bbuf.Put(rootPubkeySpan.data(), rootPubkeySpan.size());
     }
     bbuf.Put64(mFabricId);
@@ -339,8 +351,13 @@ CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpa
     size_t written = 0;
     VerifyOrReturnError(bbuf.Fit(written), CHIP_ERROR_BUFFER_TOO_SMALL);
 
+    ChipLogDetail(Inet, "IPK");
+    ChipLogByteSpan(Inet, ipk);
+
     CHIP_ERROR err =
         hmac.HMAC_SHA256(ipk.data(), ipk.size(), destinationMessage, written, destinationId.data(), destinationId.size());
+    ChipLogDetail(Inet, "Generated DestinationID output");
+    ChipLogByteSpan(Inet, destinationId);
     return err;
 }
 
