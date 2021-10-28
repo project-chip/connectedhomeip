@@ -49,11 +49,7 @@ ModeSelectAttrAccess gModeSelectAttrAccess;
 
 CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aPath.mClusterId != ModeSelect::Id)
-    {
-        // We shouldn't have been called at all.
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    VerifyOrDie(aPath.mClusterId == ModeSelect::Id);
 
     const ModeSelect::StaticSupportedModesManager & gSupportedModeManager =
         ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
