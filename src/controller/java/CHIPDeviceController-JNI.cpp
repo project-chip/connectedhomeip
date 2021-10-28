@@ -384,7 +384,7 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     jfieldID ipAddressID = env->GetFieldID(discoveredDevicecls, "ipAddress", "Ljava/lang/String;");
 
     jobject discoveredObj = env->NewObject(discoveredDevicecls, constructor);
-    
+
     env->SetLongField(discoveredObj, discrminatorID, data->longDiscriminator);
 
     char ipAddress[100];
