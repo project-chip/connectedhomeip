@@ -171,7 +171,6 @@ void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
     chip::app::ClusterInfo dirtyPath;
     dirtyPath.mClusterId  = kTestClusterId;
     dirtyPath.mEndpointId = kTestEndpointId;
-    dirtyPath.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
     printf("MutateClusterHandler is triggered...");
     // send dirty change
     if (!testSyncReport)

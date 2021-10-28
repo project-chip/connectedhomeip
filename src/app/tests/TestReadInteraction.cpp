@@ -906,34 +906,28 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     chip::app::ClusterInfo dirtyPath1;
     dirtyPath1.mClusterId  = kTestClusterId;
     dirtyPath1.mEndpointId = kTestEndpointId;
-    dirtyPath1.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath1.mFieldId = 1;
+    dirtyPath1.mFieldId    = 1;
 
     chip::app::ClusterInfo dirtyPath2;
     dirtyPath2.mClusterId  = kTestClusterId;
     dirtyPath2.mEndpointId = kTestEndpointId;
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath2.mFieldId = 2;
+    dirtyPath2.mFieldId    = 2;
 
     chip::app::ClusterInfo dirtyPath3;
-    dirtyPath2.mClusterId  = kTestClusterId;
-    dirtyPath2.mEndpointId = kTestEndpointId;
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kListIndexValid);
-    dirtyPath2.mFieldId   = 2;
-    dirtyPath2.mListIndex = 1;
+    dirtyPath3.mClusterId  = kTestClusterId;
+    dirtyPath3.mEndpointId = kTestEndpointId;
+    dirtyPath3.mFieldId    = 2;
+    dirtyPath3.mListIndex  = 1;
 
     chip::app::ClusterInfo dirtyPath4;
     dirtyPath4.mClusterId  = kTestClusterId;
     dirtyPath4.mEndpointId = kTestEndpointId;
-    dirtyPath4.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath4.mFieldId = 3;
+    dirtyPath4.mFieldId    = 3;
 
     chip::app::ClusterInfo dirtyPath5;
     dirtyPath5.mClusterId  = kTestClusterId;
     dirtyPath5.mEndpointId = kTestEndpointId;
-    dirtyPath5.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath5.mFieldId = 4;
+    dirtyPath5.mFieldId    = 4;
 
     // Test report with 2 different path
     delegate.mpReadHandler->mHoldReport = false;

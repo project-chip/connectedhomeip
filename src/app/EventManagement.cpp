@@ -663,6 +663,7 @@ static bool IsInterestedEventPaths(EventLoadOutContext * eventLoadOutContext, co
     }
     while (interestedEventPaths != nullptr)
     {
+        // TODO: Support wildcard event path
         if (interestedEventPaths->mNodeId == event.mNodeId && interestedEventPaths->mEndpointId == event.mEndpointId &&
             interestedEventPaths->mClusterId == event.mClusterId && interestedEventPaths->mEventId == event.mEventId)
         {

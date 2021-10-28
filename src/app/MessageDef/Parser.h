@@ -86,10 +86,10 @@ protected:
         CHIP_ERROR err = CHIP_NO_ERROR;
         chip::TLV::TLVReader reader;
 
-        *apLValue = 0;
-
         err = mReader.FindElementWithTag(chip::TLV::ContextTag(aContextTag), reader);
         SuccessOrExit(err);
+
+        *apLValue = 0;
 
         VerifyOrExit(aTLVType == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
