@@ -86,8 +86,8 @@ steps:
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob 'android-arm64-chip-tool' build
-              --create-archives /workspace/artifacts/
+              --target-glob 'android-arm64-chip-tool' build --create-archives
+              /workspace/artifacts/
       waitFor:
           - Bootstrap
           - Linux
