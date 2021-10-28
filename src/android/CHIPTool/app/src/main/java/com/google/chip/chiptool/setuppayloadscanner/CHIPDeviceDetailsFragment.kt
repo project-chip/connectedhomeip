@@ -25,9 +25,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.chip.chiptool.R
-import com.google.chip.chiptool.SelectActionFragment
 import com.google.chip.chiptool.util.FragmentUtil
-import kotlinx.android.synthetic.main.chip_device_info_fragment.view.*
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.discoveryCapabilitiesTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.discriminatorTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.productIdTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.setupCodeTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorIdTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorTagsContainer
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorTagsLabelTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.versionTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.commissioningFlowTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.customFlowBtn
 
 /** Show the [CHIPDeviceInfo]. */
 class CHIPDeviceDetailsFragment : Fragment() {
@@ -76,7 +84,7 @@ class CHIPDeviceDetailsFragment : Fragment() {
         customFlowBtn.setOnClickListener {
           FragmentUtil.getHost(this@CHIPDeviceDetailsFragment, Callback::class.java)
             ?.handleReadFromLedgerClicked(deviceInfo)
-        };
+        }
       }
     }
   }

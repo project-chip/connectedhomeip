@@ -57,7 +57,7 @@ class SelectActionFragment : Fragment() {
       basicClusterBtn.setOnClickListener{ getCallback()?.handleBasicClicked() }
       attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
       clusterInteractionBtn.setOnClickListener { getCallback()?.handleClusterInteractionClicked() }
-      provisionCustomFlowBtn.setOnClickListener{ getCallback()?.handleCustomFlownClicked() }
+      provisionCustomFlowBtn.setOnClickListener{ getCallback()?.handleCustomFlowClicked() }
     }
   }
 
@@ -127,7 +127,7 @@ class SelectActionFragment : Fragment() {
     /** Notifies listener of cluster interaction button click.. */
     fun handleClusterInteractionClicked()
     /** Notifies listener of provision-custom-flow button click. */
-    fun handleCustomFlownClicked()
+    fun handleCustomFlowClicked()
   }
 
   companion object {

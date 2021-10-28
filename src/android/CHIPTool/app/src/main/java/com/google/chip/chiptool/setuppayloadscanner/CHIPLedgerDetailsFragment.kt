@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2021 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,10 @@ import com.android.volley.toolbox.Volley
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.util.FragmentUtil
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.chip_ledger_info_fragment.view.*
+import kotlinx.android.synthetic.main.chip_ledger_info_fragment.view.vendorIdTv
+import kotlinx.android.synthetic.main.chip_ledger_info_fragment.view.productIdTv
+import kotlinx.android.synthetic.main.chip_ledger_info_fragment.view.commissioningFlowUrlTv
+import kotlinx.android.synthetic.main.chip_ledger_info_fragment.view.redirectBtn
 
 /** Show the [CHIPDeviceInfo] from Ledger */
 class CHIPLedgerDetailsFragment : Fragment() {

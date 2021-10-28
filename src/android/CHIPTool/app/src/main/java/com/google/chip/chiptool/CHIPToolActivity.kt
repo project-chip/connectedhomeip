@@ -145,7 +145,7 @@ class CHIPToolActivity :
     showFragment(AttestationTestFragment.newInstance())
   }
 
-  override  fun handleReadFromLedgerClicked(deviceInfo: CHIPDeviceInfo) {
+  override fun handleReadFromLedgerClicked(deviceInfo: CHIPDeviceInfo) {
     showFragment(CHIPLedgerDetailsFragment.newInstance(deviceInfo))
   }
 
@@ -163,7 +163,7 @@ class CHIPToolActivity :
     }
   }
 
-  override fun handleCustomFlownClicked() {
+  override fun handleCustomFlowClicked() {
     showFragment(BarcodeFragment.newInstance())
   }
 
