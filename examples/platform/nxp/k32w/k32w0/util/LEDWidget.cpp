@@ -61,9 +61,9 @@ void LEDWidget::Animate()
     {
         uint64_t nowMS            = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
         uint64_t stateDurMS       = mState ? mBlinkOnTimeMS : mBlinkOffTimeMS;
-        uint64_t nextChangeTimeMS = mLastChangeTimeMS + stateDurUS;
+        uint64_t nextChangeTimeMS = mLastChangeTimeMS + stateDurMS;
 
-        if (nextChangeTimeMS < nowUS)
+        if (nextChangeTimeMS < nowMS)
         {
             DoSet(!mState);
             mLastChangeTimeMS = nowMS;

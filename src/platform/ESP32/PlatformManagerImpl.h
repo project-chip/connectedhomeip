@@ -26,6 +26,7 @@
 #pragma once
 
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -69,7 +70,7 @@ private:
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
 
-    uint64_t mStartTimeMilliseconds = 0;
+    chip::System::Clock::Timestamp mStartTime = System::Clock::Zero;
 
     static PlatformManagerImpl sInstance;
 };

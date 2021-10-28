@@ -146,8 +146,8 @@ public:
     bool IsWiFiStationEnabled();
     bool IsWiFiStationApplicationControlled();
     bool IsWiFiStationConnected();
-    uint32_t GetWiFiStationReconnectIntervalMS();
-    CHIP_ERROR SetWiFiStationReconnectIntervalMS(uint32_t val);
+    System::Clock::Timeout GetWiFiStationReconnectInterval();
+    CHIP_ERROR SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool IsWiFiStationProvisioned();
     void ClearWiFiStationProvision();
     CHIP_ERROR GetAndLogWifiStatsCounters();
@@ -160,8 +160,8 @@ public:
     void DemandStartWiFiAP();
     void StopOnDemandWiFiAP();
     void MaintainOnDemandWiFiAP();
-    uint32_t GetWiFiAPIdleTimeoutMS();
-    void SetWiFiAPIdleTimeoutMS(uint32_t val);
+    System::Clock::Timeout GetWiFiAPIdleTimeout();
+    void SetWiFiAPIdleTimeout(System::Clock::Timeout val);
 
     // Thread Methods
     ThreadMode GetThreadMode();
@@ -341,14 +341,14 @@ inline bool ConnectivityManager::IsWiFiStationConnected()
     return static_cast<ImplClass *>(this)->_IsWiFiStationConnected();
 }
 
-inline uint32_t ConnectivityManager::GetWiFiStationReconnectIntervalMS()
+inline System::Clock::Timeout ConnectivityManager::GetWiFiStationReconnectInterval()
 {
-    return static_cast<ImplClass *>(this)->_GetWiFiStationReconnectIntervalMS();
+    return static_cast<ImplClass *>(this)->_GetWiFiStationReconnectInterval();
 }
 
-inline CHIP_ERROR ConnectivityManager::SetWiFiStationReconnectIntervalMS(uint32_t val)
+inline CHIP_ERROR ConnectivityManager::SetWiFiStationReconnectInterval(System::Clock::Timeout val)
 {
-    return static_cast<ImplClass *>(this)->_SetWiFiStationReconnectIntervalMS(val);
+    return static_cast<ImplClass *>(this)->_SetWiFiStationReconnectInterval(val);
 }
 
 inline bool ConnectivityManager::IsWiFiStationProvisioned()
@@ -396,14 +396,14 @@ inline void ConnectivityManager::MaintainOnDemandWiFiAP()
     static_cast<ImplClass *>(this)->_MaintainOnDemandWiFiAP();
 }
 
-inline uint32_t ConnectivityManager::GetWiFiAPIdleTimeoutMS()
+inline System::Clock::Timeout ConnectivityManager::GetWiFiAPIdleTimeout()
 {
-    return static_cast<ImplClass *>(this)->_GetWiFiAPIdleTimeoutMS();
+    return static_cast<ImplClass *>(this)->_GetWiFiAPIdleTimeout();
 }
 
-inline void ConnectivityManager::SetWiFiAPIdleTimeoutMS(uint32_t val)
+inline void ConnectivityManager::SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
-    static_cast<ImplClass *>(this)->_SetWiFiAPIdleTimeoutMS(val);
+    static_cast<ImplClass *>(this)->_SetWiFiAPIdleTimeout(val);
 }
 
 inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()

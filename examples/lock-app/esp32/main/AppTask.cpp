@@ -114,7 +114,7 @@ CHIP_ERROR AppTask::Init()
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
-    Clock::Timestamp lastChangeTime { 0 };
+    Clock::Timestamp lastChangeTime{ 0 };
 
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
@@ -171,7 +171,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         sLockLED.Animate();
 
         Clock::Timestamp now            = SystemClock().GetMonotonicTimestamp();
-        Clock::Timestamp nextChangeTime = lastChangeTimeUS + System::Clock::Seconds16(5);
+        Clock::Timestamp nextChangeTime = lastChangeTime + Clock::Seconds16(5);
 
         if (nextChangeTime < now)
         {

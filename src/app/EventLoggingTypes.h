@@ -117,14 +117,15 @@ struct Timestamp
     Timestamp() {}
     Timestamp(Type aType) : mType(aType) { mValue = 0; }
     Timestamp(Type aType, uint64_t aValue) : mType(aType), mValue(aValue) {}
+    Timestamp(System::Clock::Timestamp aValue) : mType(Type::kSystem), mValue(aValue.count()) {}
     static Timestamp UTC(uint64_t aValue)
     {
         Timestamp timestamp(Type::kUTC, aValue);
         return timestamp;
     }
-    static Timestamp System(uint64_t aValue)
+    static Timestamp System(System::Clock::Timestamp aValue)
     {
-        Timestamp timestamp(Type::kSystem, aValue);
+        Timestamp timestamp(Type::kSystem, aValue.count());
         return timestamp;
     }
 

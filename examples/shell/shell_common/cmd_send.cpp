@@ -47,7 +47,7 @@ public:
     {
         mProtocolId   = 0x0002;
         mMessageType  = 1;
-        mLastSendTime = 0;
+        mLastSendTime = System::Clock::Zero;
         mPayloadSize  = 32;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         mUsingTCP = false;
@@ -56,8 +56,8 @@ public:
         mPort     = CHIP_PORT;
     }
 
-    uint64_t GetLastSendTime() const { return mLastSendTime; }
-    void SetLastSendTime(uint64_t value) { mLastSendTime = value; }
+    System::Clock::Timestamp GetLastSendTime() const { return mLastSendTime; }
+    void SetLastSendTime(System::Clock::Timestamp value) { mLastSendTime = value; }
 
     uint16_t GetProtocolId() const { return mProtocolId; }
     void SetProtocolId(uint16_t value) { mProtocolId = value; }
@@ -81,7 +81,7 @@ public:
 
 private:
     // The last time a CHIP message was attempted to be sent.
-    uint64_t mLastSendTime;
+    System::Clock::Timestamp mLastSendTime;
 
     uint32_t mPayloadSize;
     uint16_t mProtocolId;
@@ -101,12 +101,12 @@ public:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
-        uint64_t respTime    = System::SystemClock().GetMonotonicMilliseconds();
-        uint64_t transitTime = respTime - gSendArguments.GetLastSendTime();
-        streamer_t * sout    = streamer_get();
+        System::Clock::Timestamp respTime         = System::SystemClock().GetMonotonicTimestamp();
+        System::Clock::Milliseconds64 transitTime = respTime - gSendArguments.GetLastSendTime();
+        streamer_t * sout                         = streamer_get();
 
-        streamer_printf(sout, "Response received: len=%u time=%.3fms\n", buffer->DataLength(),
-                        static_cast<double>(transitTime) / 1000);
+        streamer_printf(sout, "Response received: len=%u time=%.3fs\n", buffer->DataLength(),
+                        static_cast<double>(transitTime.count()) / 1000);
 
         return CHIP_NO_ERROR;
     }
@@ -148,7 +148,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     ec->SetResponseTimeout(kResponseTimeOut);
     sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse);
 
-    gSendArguments.SetLastSendTime(System::SystemClock().GetMonotonicMilliseconds());
+    gSendArguments.SetLastSendTime(System::SystemClock().GetMonotonicTimestamp());
 
     streamer_printf(stream, "\nSend CHIP message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
@@ -187,7 +187,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Establish secure session failed, err: %s\n", ErrorStr(err));
-        gSendArguments.SetLastSendTime(System::SystemClock().GetMonotonicMilliseconds());
+        gSendArguments.SetLastSendTime(System::SystemClock().GetMonotonicTimestamp());
     }
     else
     {

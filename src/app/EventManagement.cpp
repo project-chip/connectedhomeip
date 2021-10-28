@@ -87,7 +87,7 @@ struct EventEnvelopeContext
 
     uint16_t mFieldsToRead = 0;
     /* PriorityLevel and DeltaSystemTimestamp are there if that is not first event when putting events in report*/
-    Timestamp mDeltaSystemTime = Timestamp::System(0);
+    Timestamp mDeltaSystemTime = Timestamp::System(System::Clock::Zero);
     Timestamp mDeltaUtc        = Timestamp::UTC(0);
     PriorityLevel mPriority    = PriorityLevel::First;
     NodeId mNodeId             = 0;
@@ -496,7 +496,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
     CircularEventBuffer * buffer   = nullptr;
     EventLoadOutContext ctxt       = EventLoadOutContext(writer, aEventOptions.mpEventSchema->mPriority,
                                                    GetPriorityBuffer(aEventOptions.mpEventSchema->mPriority)->GetLastEventNumber());
-    Timestamp timestamp(Timestamp::Type::kSystem, System::SystemClock().GetMonotonicMilliseconds());
+    Timestamp timestamp(System::SystemClock().GetMonotonicTimestamp());
     EventOptions opts = EventOptions(timestamp);
     // Start the event container (anonymous structure) in the circular buffer
     writer.Init(*mpEventBuffer);
@@ -854,8 +854,8 @@ void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, Circu
     mPriority                  = aPriorityLevel;
     mFirstEventNumber          = 1;
     mLastEventNumber           = 0;
-    mFirstEventSystemTimestamp = Timestamp::System(0);
-    mLastEventSystemTimestamp  = Timestamp::System(0);
+    mFirstEventSystemTimestamp = Timestamp::System(System::Clock::Zero);
+    mLastEventSystemTimestamp  = Timestamp::System(System::Clock::Zero);
     mpEventNumberCounter       = nullptr;
 }
 
