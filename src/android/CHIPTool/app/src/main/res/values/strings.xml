@@ -1,3 +1,5 @@
+
+
 <resources>
     <string name="app_name">CHIPTool</string>
     <string name="barcode_scanner_activity_toolbar_title">QR Scan</string>
@@ -98,7 +100,7 @@
     <string name="op_cred_client_btn_text">Operational Credentials cluster</string>
     <string name="op_cred_client_read_supported_fabric_btn_text">Read Supported Fabric count</string>
     <string name="op_cred_client_read_commissioned_fabric_btn_text">Read Commissioned Fabric count</string>
-    
+
     <string name="basic_cluster_btn_text">Basic cluster</string>
     <string name="basic_cluster_read_user_label_btn_text">Read User Label</string>
     <string name="basic_cluster_write_user_label_btn_text">Write User Label</string>
@@ -109,4 +111,5 @@
     <string name="subscribe_dialog_subscribe_btn_text">Subscribe</string>
     <string name="subscribe_dialog_min_interval_hint">Minimum interval (seconds)</string>
     <string name="subscribe_dialog_max_interval_hint">Maximum interval (seconds)</string>
+    <string name="retrieve_endpoint_list">Retrieve Endpoint List</string>
 </resources>
