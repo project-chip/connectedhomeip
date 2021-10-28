@@ -49,11 +49,8 @@
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
 
-#define ONOFF_CLUSTER_ENDPOINT 1
-
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
-using namespace ::chip::app::Clusters;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
@@ -367,19 +364,4 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::UpdateClusterState()
-{
-    EmberStatus status;
-
-    ChipLogProgress(NotSpecified, "UpdateClusterState");
-
-    // Write the new values
-
-    bool onOffState = !PumpMgr().IsStopped();
-
-    status = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, onOffState);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogError(NotSpecified, "ERR: Updating On/Off state %" PRIx8, status);
-    }
-}
+void AppTask::UpdateClusterState() {}
