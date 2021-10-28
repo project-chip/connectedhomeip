@@ -91,12 +91,17 @@ bool PumpManager::InitiateAction(int32_t aActor, Action_t aAction)
         mCurrentActor    = aActor;
         new_state        = kState_StartInitiated;
     }
-    {
-        // If auto start timer has been armed and someone initiates start,
-        // cancel the timer and continue as normal.
-        mAutoStartTimerArmed = false;
 
-        CancelTimer();
+    if (action_initiated)
+    {
+        if (mAutoStartTimerArmed && new_state == kState_StartInitiated)
+        {
+            // If auto start timer has been armed and someone initiates start,
+            // cancel the timer and continue as normal.
+            mAutoStartTimerArmed = false;
+
+            CancelTimer();
+        }
     }
 
     PumpTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
