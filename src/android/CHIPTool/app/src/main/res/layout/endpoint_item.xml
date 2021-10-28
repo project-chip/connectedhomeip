@@ -12,20 +12,18 @@
       android:layout_margin="4dp">
 
     <TextView
-        android:id="@+id/endpoint_id"
+        android:id="@+id/endpointTv"
         android:textStyle="bold"
         android:width="100dp"
         android:height="70dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="endpoint 1"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         android:background="@color/cardview_shadow_start_color"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 
