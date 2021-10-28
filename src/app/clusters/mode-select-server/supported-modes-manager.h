@@ -85,7 +85,7 @@ public:
     /**
      * Given the endpointId, returns all its supported modes options.
      * @param endpointId
-     * @return The iterator facotry for the endpoint, or nullptr if the endpoint doesn't support ModeSelectCluster.
+     * @return The iterator factory for the endpoint, or nullptr if the endpoint doesn't support ModeSelectCluster.
      */
     virtual const ModeOptionStructIteratorFactory * getIteratorFactory(EndpointId endpointId) const = 0;
 
