@@ -123,7 +123,7 @@ private:
 
     /**
      * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
-     * within the same excution context.
+     * within the same execution context to avoid applying too much pressure on platforms that use small, fixed size event queues.
      *
      */
     bool mScheduleRunPending = false;
