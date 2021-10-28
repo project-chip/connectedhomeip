@@ -53,7 +53,7 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
 pthread_t sPlatformMainThread;
 
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-//uint32_t sBluetoothAdapterId = 0;
+// uint32_t sBluetoothAdapterId = 0;
 #endif
 
 void * PlatformMainLoop(void *)
@@ -79,13 +79,15 @@ extern "C" {
 //     return CHIP_NO_ERROR;
 // }
 
-using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
+using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                             uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
 
-class PythonServerDelegate// : public ServerDelegate
+class PythonServerDelegate // : public ServerDelegate
 {
 public:
-    void SetPostAttributeChangeCallback(PostAttributeChangeCallback cb) {
-        //ChipLogProgress(NotSpecified, "callback %p", cb);
+    void SetPostAttributeChangeCallback(PostAttributeChangeCallback cb)
+    {
+        // ChipLogProgress(NotSpecified, "callback %p", cb);
         mPostAttributeChangeCallback = cb;
     };
     PostAttributeChangeCallback mPostAttributeChangeCallback = nullptr;
@@ -95,7 +97,7 @@ PythonServerDelegate gPythonServerDelegate;
 
 void pychip_server_set_callbacks(PostAttributeChangeCallback cb)
 {
-    //ChipLogProgress(NotSpecified, "setting cb");
+    // ChipLogProgress(NotSpecified, "setting cb");
     gPythonServerDelegate.SetPostAttributeChangeCallback(cb);
 }
 
@@ -113,7 +115,7 @@ void pychip_server_native_init()
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-//    PrintOnboardingCodes(chip::RendezvousInformationFlag::kOnNetwork);
+    //    PrintOnboardingCodes(chip::RendezvousInformationFlag::kOnNetwork);
 
 #if defined(PW_RPC_ENABLED)
     chip::rpc::Init();
@@ -128,7 +130,7 @@ void pychip_server_native_init()
     chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
 #endif
 
-//    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+    //    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -140,13 +142,13 @@ void pychip_server_native_init()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
-// #if CHIP_ENABLE_OPENTHREAD
-//     if (LinuxDeviceOptions::GetInstance().mThread)
-//     {
-//         SuccessOrExit(err = chip::DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
-//         ChipLogProgress(NotSpecified, "Thread initialized.");
-//     }
-// #endif // CHIP_ENABLE_OPENTHREAD
+    // #if CHIP_ENABLE_OPENTHREAD
+    //     if (LinuxDeviceOptions::GetInstance().mThread)
+    //     {
+    //         SuccessOrExit(err = chip::DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+    //         ChipLogProgress(NotSpecified, "Thread initialized.");
+    //     }
+    // #endif // CHIP_ENABLE_OPENTHREAD
 
     InitServer();
 
@@ -165,17 +167,20 @@ exit:
     }
     return /*err*/;
 }
-
 }
 
 void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                         uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
-    //ChipLogProgress(NotSpecified, "emberAfPostAttributeChangeCallback()");
-    if (gPythonServerDelegate.mPostAttributeChangeCallback != nullptr ) {
-        //ChipLogProgress(NotSpecified, "callback %p", gPythonServerDelegate.mPostAttributeChangeCallback);
-        gPythonServerDelegate.mPostAttributeChangeCallback(endpoint, clusterId, attributeId, mask, manufacturerCode, type, size, value);
-    } else {
-        //ChipLogProgress(NotSpecified, "callback nullptr");
+    // ChipLogProgress(NotSpecified, "emberAfPostAttributeChangeCallback()");
+    if (gPythonServerDelegate.mPostAttributeChangeCallback != nullptr)
+    {
+        // ChipLogProgress(NotSpecified, "callback %p", gPythonServerDelegate.mPostAttributeChangeCallback);
+        gPythonServerDelegate.mPostAttributeChangeCallback(endpoint, clusterId, attributeId, mask, manufacturerCode, type, size,
+                                                           value);
+    }
+    else
+    {
+        // ChipLogProgress(NotSpecified, "callback nullptr");
     }
 };
