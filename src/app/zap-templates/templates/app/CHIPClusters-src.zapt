@@ -3,23 +3,7 @@
 {{#if (chip_has_client_clusters)}}
 #include "CHIPClusters.h"
 
-#include <cstdint>
-
-
-#include <app/InteractionModelEngine.h>
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/util/basic-types.h>
-#include <app/CommandSender.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <controller/CommandSenderAllocator.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/BufferWriter.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
 namespace chip {
