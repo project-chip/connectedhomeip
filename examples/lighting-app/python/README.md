@@ -43,10 +43,10 @@ source ./out/python_env/bin/activate
 chip-device-ctrl
 
 chip-device-ctrl > connect -ble 3840 20202021 12344321
-chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 12344321 0 0 ssid=str:YOURSSID credentials=str:YOURPASSWD breadcrumb=0 timeoutMs=1000 
+chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 12344321 0 0 ssid=str:YOURSSID credentials=str:YOURPASSWD breadcrumb=0 timeoutMs=1000
 chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 12344321 0 0 networkID=str:YOURSSID breadcrumb=0 timeoutMs=1000
-chip-device-ctrl > close-ble 
-chip-device-ctrl > resolve 5544332211 1 (pass appropriate fabric ID and node ID, you can get this from get-fabricid) 
+chip-device-ctrl > close-ble
+chip-device-ctrl > resolve 5544332211 1 (pass appropriate fabric ID and node ID, you can get this from get-fabricid)
 chip-device-ctrl > zcl OnOff Toggle 12344321 1 0
 ```
 
@@ -77,7 +77,7 @@ sudo service docker stop
 
 sudo nano /etc/apparmor.d/sbin.dhclient
 
-  @{PROC}/@{pids}/task/[0-9]*/comm rw,
+@{PROC}/@{pids}/task/[0-9]\*/comm rw,
 
 ## disable avahi v6 (since dhclient only requests v4)
 
@@ -92,7 +92,7 @@ use-ipv6=no
 
 possibly this would help
 
-sudo setcap CAP_NET_BIND_SERVICE,CAP_NET_RAW=+ep $(which dhclient)
+sudo setcap CAP_NET_BIND_SERVICE,CAP_NET_RAW=+ep \$(which dhclient)
 
 ## avahi
 
