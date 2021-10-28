@@ -23,6 +23,10 @@
 #include "capsense.h"
 #endif
 
+#ifdef CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
 #include "mbedtls/platform.h"
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -43,6 +47,16 @@ int main()
 
 #ifdef CAPSENSE_ENABLED
     Capsense::getInstance().init();
+#endif
+
+#if CHIP_PW_RPC
+    auto rpcThread = chip::rpc::Init();
+    if (rpcThread == NULL)
+    {
+        ChipLogError(NotSpecified, "RPC service initialization and run failed");
+        ret = EXIT_FAILURE;
+        goto exit;
+    }
 #endif
 
     ChipLogProgress(NotSpecified, "Mbed lock-app example application start");

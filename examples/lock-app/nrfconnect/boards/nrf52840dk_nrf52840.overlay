@@ -25,3 +25,29 @@
 		zephyr,entropy = &rng;
 	};
 };
+
+/* Disable unused peripherals to reduce power consumption */
+&adc {
+	status = "disabled";
+};
+&uart1 {
+	status = "disabled";
+};
+&gpio1 {
+	status = "disabled";
+};
+&i2c0 {
+	status = "disabled";
+};
+&pwm0 {
+	status = "disabled";
+};
+&spi1 {
+	status = "disabled";
+};
+&spi3 {
+	status = "disabled";
+};
+&usbd {
+	status = "disabled";
+};

@@ -109,6 +109,17 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
 
 void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::DiscoveredNodeData & nodeData)
 {
+    if (nodeData.numIPs == 0)
+    {
+        ChipLogError(AppServer, "SetUDCClientProcessingState no IP addresses returned for instance name=%s", nodeData.instanceName);
+        return;
+    }
+    if (nodeData.port == 0)
+    {
+        ChipLogError(AppServer, "SetUDCClientProcessingState no port returned for instance name=%s", nodeData.instanceName);
+        return;
+    }
+
     UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.instanceName);
     if (client != nullptr && client->GetUDCClientProcessingState() == UDCClientProcessingState::kDiscoveringNode)
     {
@@ -116,10 +127,51 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
                       (int) client->GetUDCClientProcessingState(), (int) UDCClientProcessingState::kPromptingUser);
         client->SetUDCClientProcessingState(UDCClientProcessingState::kPromptingUser);
 
+        // currently IPv6 addresses do not work for some reason
+        bool foundV4 = false;
+        for (int i = 0; i < nodeData.numIPs; ++i)
+        {
+            if (nodeData.ipAddress[i].IsIPv4())
+            {
+                foundV4 = true;
+                client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[i], nodeData.port));
+                break;
+            }
+        }
+        // use IPv6 as last resort
+        if (!foundV4)
+        {
+            client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
+        }
+
+        // client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
+        client->SetDeviceName(nodeData.deviceName);
+        client->SetLongDiscriminator(nodeData.longDiscriminator);
+
         // Call the registered mUserConfirmationProvider, if any.
         if (mUserConfirmationProvider != nullptr)
         {
-            mUserConfirmationProvider->OnUserDirectedCommissioningRequest(nodeData);
+            mUserConfirmationProvider->OnUserDirectedCommissioningRequest(*client);
+        }
+    }
+}
+
+void UserDirectedCommissioningServer::PrintUDCClients()
+{
+    for (uint8_t i = 0; i < kMaxUDCClients; i++)
+    {
+        UDCClientState * state = GetUDCClients().GetUDCClientState(i);
+        if (state == nullptr)
+        {
+            ChipLogProgress(AppServer, "UDC Client[%d] null", i);
+        }
+        else
+        {
+            char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
+            state->GetPeerAddress().ToString(addrBuffer);
+
+            ChipLogProgress(AppServer, "UDC Client[%d] instance=%s deviceName=%s address=%s, disc=%d", i, state->GetInstanceName(),
+                            state->GetDeviceName(), addrBuffer, state->GetLongDiscriminator());
         }
     }
 }

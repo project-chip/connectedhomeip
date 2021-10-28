@@ -786,6 +786,17 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace PollControl
 
+namespace BridgedActions {
+namespace Attributes {
+
+namespace SetupUrl {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace SetupUrl
+
+} // namespace Attributes
+} // namespace BridgedActions
+
 namespace Basic {
 namespace Attributes {
 

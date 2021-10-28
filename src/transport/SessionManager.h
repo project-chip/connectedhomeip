@@ -269,6 +269,9 @@ public:
         return session.HasValue() ? MakeOptional<SessionHandle>(session.Value()) : NullOptional;
     }
 
+    // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
+    SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
+
 private:
     /**
      *    The State of a secure transport object.

@@ -140,7 +140,7 @@ public:
      *      destination \c addr (with \c intfId used as the scope
      *      identifier for IPv6 link-local destinations) and \c port.
      */
-    CHIP_ERROR Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
+    CHIP_ERROR Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId = InterfaceId::Null());
 
     /**
      * @brief   Extract IP address and TCP port of remote endpoint.

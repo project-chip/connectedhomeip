@@ -144,7 +144,7 @@ Transport::PeerAddress GetEchoPeerAddress()
 #endif
     {
 
-        return Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID);
+        return Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), ::chip::Inet::InterfaceId::Null());
     }
 }
 

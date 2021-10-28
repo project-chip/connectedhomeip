@@ -100,8 +100,10 @@ CHIP_ERROR Device::SendCommands(app::CommandSender * commandObj)
 {
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+    VerifyOrReturnError(mState == ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return commandObj->SendCommandRequest(mDeviceId, mFabricIndex, mSecureSession);
+    return commandObj->SendCommandRequest(mSecureSession.Value());
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -142,8 +144,8 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     serializable.mDeviceTransport = to_underlying(mDeviceAddress.GetTransportType());
 
-    ReturnErrorOnFailure(Inet::GetInterfaceName(mDeviceAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
-                                                sizeof(serializable.mInterfaceName)));
+    ReturnErrorOnFailure(mDeviceAddress.GetInterface().GetInterfaceName(Uint8::to_char(serializable.mInterfaceName),
+                                                                        sizeof(serializable.mInterfaceName)));
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
     mDeviceAddress.GetIPAddress().ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
@@ -202,13 +204,13 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 
     // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
     // LwIP stack.
-    Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
+    Inet::InterfaceId interfaceId;
     if (serializable.mInterfaceName[0] != '\0')
     {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         LOCK_TCPIP_CORE();
 #endif
-        CHIP_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), interfaceId);
+        CHIP_ERROR inetErr = Inet::InterfaceId::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), interfaceId);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         UNLOCK_TCPIP_CORE();
 #endif
@@ -308,11 +310,29 @@ void Device::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
 void Device::OnOpenPairingWindowSuccessResponse(void * context)
 {
     ChipLogProgress(Controller, "Successfully opened pairing window on the device");
+    Device * device = reinterpret_cast<Device *>(context);
+    if (device->mCommissioningWindowCallback != nullptr)
+    {
+        device->mCommissioningWindowCallback->mCall(device->mCommissioningWindowCallback->mContext, device->GetDeviceId(),
+                                                    CHIP_NO_ERROR, device->mSetupPayload);
+    }
 }
 
 void Device::OnOpenPairingWindowFailureResponse(void * context, uint8_t status)
 {
     ChipLogError(Controller, "Failed to open pairing window on the device. Status %d", status);
+    Device * device = reinterpret_cast<Device *>(context);
+    if (device->mCommissioningWindowCallback != nullptr)
+    {
+        CHIP_ERROR error = CHIP_ERROR_INVALID_PASE_PARAMETER;
+        // TODO - Use cluster enum chip::app::Clusters::AdministratorCommissioning::StatusCode::kBusy
+        if (status == 1)
+        {
+            error = CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS;
+        }
+        device->mCommissioningWindowCallback->mCall(device->mCommissioningWindowCallback->mContext, device->GetDeviceId(), error,
+                                                    SetupPayload());
+    }
 }
 
 CHIP_ERROR Device::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
@@ -325,7 +345,8 @@ CHIP_ERROR Device::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincod
 }
 
 CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, CommissioningWindowOption option,
-                                           const ByteSpan & salt, SetupPayload & setupPayload)
+                                           const ByteSpan & salt, Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                           SetupPayload & setupPayload)
 {
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
@@ -335,6 +356,7 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
     Callback::Cancelable * successCallback = mOpenPairingSuccessCallback.Cancel();
     Callback::Cancelable * failureCallback = mOpenPairingFailureCallback.Cancel();
 
+    mCommissioningWindowCallback = callback;
     if (option != CommissioningWindowOption::kOriginalSetupCode)
     {
         bool randomSetupPIN = (option == CommissioningWindowOption::kTokenWithRandomPIN);
@@ -361,6 +383,8 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
     setupPayload.version               = 0;
     setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
 
+    mSetupPayload = setupPayload;
+
     return CHIP_NO_ERROR;
 }
 
@@ -368,7 +392,7 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, CommissioningWindowOption
 {
     ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
 
-    return OpenCommissioningWindow(timeout, kPBKDFMinimumIterations, option, salt, setupPayload);
+    return OpenCommissioningWindow(timeout, kPBKDFMinimumIterations, option, salt, nullptr, setupPayload);
 }
 
 void Device::UpdateSession(bool connected)
@@ -739,6 +763,8 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
     aPath.mNodeId            = GetDeviceId();
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+    VerifyOrReturnError(mState == ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
     {
@@ -806,6 +832,8 @@ CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Cal
     CHIP_ERROR err           = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+    VerifyOrReturnError(mState == ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     app::WriteClient * writeClient = aHandle.Get();
 
@@ -813,7 +841,7 @@ CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Cal
     {
         AddIMResponseHandler(writeClient, onSuccessCallback, onFailureCallback);
     }
-    if ((err = aHandle.SendWriteRequest(GetDeviceId(), 0, mSecureSession)) != CHIP_NO_ERROR)
+    if ((err = aHandle.SendWriteRequest(mSecureSession.Value())) != CHIP_NO_ERROR)
     {
         CancelIMResponseHandler(writeClient);
     }

@@ -45,7 +45,7 @@ bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 
 uint32_t GetInterfaceId(chip::Inet::InterfaceId interfaceId)
 {
-    return (interfaceId == INET_NULL_INTERFACEID) ? kDNSServiceInterfaceIndexAny : interfaceId;
+    return interfaceId.IsPresent() ? interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
 }
 
 std::string GetFullType(const char * type, DnssdServiceProtocol protocol)
@@ -304,10 +304,11 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }
 
-void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, const char * domain, uint32_t interfaceId)
+void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, const char * domain,
+                 chip::Inet::InterfaceId interfaceId)
 {
     ChipLogDetail(DeviceLayer, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %d", __func__, name, type, domain,
-                  interfaceId);
+                  interfaceId.GetPlatformInterface());
 
     VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
 
@@ -328,10 +329,11 @@ void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, 
     context->services.push_back(service);
 }
 
-void OnBrowseRemove(BrowseContext * context, const char * name, const char * type, const char * domain, uint32_t interfaceId)
+void OnBrowseRemove(BrowseContext * context, const char * name, const char * type, const char * domain,
+                    chip::Inet::InterfaceId interfaceId)
 {
     ChipLogDetail(DeviceLayer, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %d", __func__, name, type, domain,
-                  interfaceId);
+                  interfaceId.GetPlatformInterface());
 
     VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
 
@@ -347,8 +349,8 @@ static void OnBrowse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interf
     BrowseContext * sdCtx = reinterpret_cast<BrowseContext *>(context);
     VerifyOrReturn(CheckForSuccess(sdCtx, __func__, err, true));
 
-    (flags & kDNSServiceFlagsAdd) ? OnBrowseAdd(sdCtx, name, type, domain, interfaceId)
-                                  : OnBrowseRemove(sdCtx, name, type, domain, interfaceId);
+    (flags & kDNSServiceFlagsAdd) ? OnBrowseAdd(sdCtx, name, type, domain, Inet::InterfaceId(interfaceId))
+                                  : OnBrowseRemove(sdCtx, name, type, domain, Inet::InterfaceId(interfaceId));
 
     if (!(flags & kDNSServiceFlagsMoreComing))
     {
@@ -397,7 +399,7 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     service.mAddress.SetValue(chip::Inet::IPAddress::FromSockAddr(*address));
     Platform::CopyString(service.mName, sdCtx->name);
     Platform::CopyString(service.mHostName, hostname);
-    service.mInterface = sdCtx->interfaceId;
+    service.mInterface = Inet::InterfaceId(sdCtx->interfaceId);
 
     sdCtx->callback(sdCtx->context, &service, CHIP_NO_ERROR);
     MdnsContexts::GetInstance().Remove(sdCtx);

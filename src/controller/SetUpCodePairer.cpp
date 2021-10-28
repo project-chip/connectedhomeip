@@ -167,7 +167,7 @@ void SetUpCodePairer::OnDiscoveredDevice(const Dnssd::DiscoveredNodeData & nodeD
     LogErrorOnFailure(StopConnectOverIP());
     LogErrorOnFailure(StopConnectOverSoftAP());
 
-    Inet::InterfaceId interfaceId      = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId[0] : INET_NULL_INTERFACEID;
+    Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId[0] : Inet::InterfaceId::Null();
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port, interfaceId);
     RendezvousParameters params        = RendezvousParameters().SetPeerAddress(peerAddress);
     OnDeviceDiscovered(params);

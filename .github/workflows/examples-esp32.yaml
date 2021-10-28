@@ -38,10 +38,9 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:latest
+            image: connectedhomeip/chip-build-esp32:0.5.23
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/output_binaries:/tmp/output_binaries"
 
         steps:
             - name: Checkout
@@ -104,25 +103,6 @@ jobs:
             - name: Build example IPv6 Only App
               timeout-minutes: 10
               run: scripts/examples/esp_example.sh ipv6only-app sdkconfig.defaults
-            - name: Binary artifact suffix
-              id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
-              if: ${{ !env.ACT }}
-              with:
-                  cond: ${{ github.event.pull_request.number == '' }}
-                  if_true: "${{ github.sha }}"
-                  if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Copy aside bloat report & binaries
-              run: |
-                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
-            - name: Uploading Binaries
-              uses: actions/upload-artifact@v2
-              if: ${{ !env.ACT }}
-              with:
-                  name:
-                      ${{ env.BUILD_TYPE }}-example-build-${{
-                      steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
