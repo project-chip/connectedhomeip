@@ -513,14 +513,14 @@ CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&ResolveRetryCallback, this);
 
-    Optional<uint32_t> delayMs = mActiveResolves.GetMsUntilNextExpectedResponse();
+    Optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
 
-    if (!delayMs.HasValue())
+    if (!delay.HasValue())
     {
         return CHIP_NO_ERROR;
     }
 
-    return mSystemLayer->StartTimer(System::Clock::Milliseconds32(delayMs.Value()), &ResolveRetryCallback, this);
+    return mSystemLayer->StartTimer(delay.Value(), &ResolveRetryCallback, this);
 }
 
 void MinMdnsResolver::ResolveRetryCallback(System::Layer *, void * self)

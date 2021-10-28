@@ -28,7 +28,6 @@
 #include "pw_sys_io/sys_io.h"
 #include "pw_sys_io_mbed/init.h"
 
-#include <platform/CHIPDeviceLayer.h>
 #include <support/logging/CHIPLogging.h>
 
 #ifdef CHIP_PW_RPC_ECHO_PROTO

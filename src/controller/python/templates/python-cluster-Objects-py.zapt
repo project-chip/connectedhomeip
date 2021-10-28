@@ -42,12 +42,12 @@ class {{asUpperCamelCase name}}:
                 return ClusterObjectDescriptor(
                     Fields = [
                         {{#zcl_struct_items}}
-                            ClusterObjectFieldDescriptor(Label="{{ asUpperCamelCase label }}", Tag={{ index }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}{{#if isArray}}, IsArray=True{{/if}}),
+                            ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ index }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}{{#if isArray}}, IsArray=True{{/if}}),
                         {{/zcl_struct_items}}
                     ])
 
             {{#zcl_struct_items}}
-            {{ asUpperCamelCase label }}: {{#if isArray}}typing.List[{{/if}}'{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}'{{#if isArray}}]{{/if}} = None
+            {{ asLowerCamelCase label }}: {{#if isArray}}typing.List[{{/if}}'{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}'{{#if isArray}}]{{/if}} = None
             {{/zcl_struct_items}}
 
 {{#last}}
@@ -63,18 +63,23 @@ class {{asUpperCamelCase name}}:
         class {{asUpperCamelCase name}}(ClusterCommand):
             cluster_id: typing.ClassVar[int] = {{ asHex parent.code 4 }}
             command_id: typing.ClassVar[int] = {{ asHex code 4 }}
+{{#if (isServer source)}}
+            is_client: typing.ClassVar[bool] = False
+{{else}}
+            is_client: typing.ClassVar[bool] = True
+{{/if}}       
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
                         {{#zcl_command_arguments}}
-                            ClusterObjectFieldDescriptor(Label="{{ asUpperCamelCase label }}", Tag={{ index }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}{{#if isArray}}, IsArray=True{{/if}}),
+                            ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ index }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}{{#if isArray}}, IsArray=True{{/if}}),
                         {{/zcl_command_arguments}}
                     ])
 
             {{#zcl_command_arguments}}
-            {{ asUpperCamelCase label }}: {{#if isArray}}typing.List[{{/if}}'{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}'{{#if isArray}}]{{/if}} = None
+            {{ asLowerCamelCase label }}: {{#if isArray}}typing.List[{{/if}}'{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}'{{#if isArray}}]{{/if}} = None
             {{/zcl_command_arguments}}
 
 {{/zcl_commands}}

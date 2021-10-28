@@ -100,8 +100,9 @@ class Esp32Builder(Builder):
         self.enable_ipv4 = enable_ipv4
 
     def _IdfEnvExecute(self, cmd, title=None):
+        # Run activate.sh after export.sh to ensure using the chip environment.
         self._Execute(
-            ['bash', '-c', 'source $IDF_PATH/export.sh; %s' % cmd],
+            ['bash', '-c', 'source $IDF_PATH/export.sh; source scripts/activate.sh; %s' % cmd],
             title=title)
 
     @property

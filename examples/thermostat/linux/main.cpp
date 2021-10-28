@@ -17,18 +17,17 @@
  */
 
 #include "AppMain.h"
-
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/Command.h>
-#include <app/ConcreteAttributePath.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/util/af.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
+// using namespace chip::app::Clusters;
 
-bool emberAfBasicClusterMfgSpecificPingCallback(Command * commandObj)
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -41,12 +40,52 @@ Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const Concr
                                                                      uint8_t type, uint16_t size, uint8_t * value)
 {
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
-    if (attributePath.mClusterId == Thermostat::Id)
+    if (attributePath.mClusterId == chip::app::Clusters::Thermostat::Id)
     {
         status = MatterThermostatClusterServerPreAttributeChangedCallback(attributePath, type, size, value);
     }
     return status;
 }
+
+void OnIdentifyStart(Identify *)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStart");
+}
+
+void OnIdentifyStop(Identify *)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStop");
+}
+
+void OnTriggerEffect(Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        return;
+    }
+}
+
+static Identify gIdentify0 = {
+    chip::EndpointId{ 0 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
+};
+
+static Identify gIdentify1 = {
+    chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
+};
 
 int main(int argc, char * argv[])
 {

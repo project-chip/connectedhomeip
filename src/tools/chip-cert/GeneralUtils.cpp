@@ -177,15 +177,6 @@ bool ContainsPEMMarker(const char * marker, const uint8_t * data, uint32_t dataL
     return false;
 }
 
-bool ParseChip64bitAttr(const char * str, uint64_t & val)
-{
-    char * parseEnd;
-
-    errno = 0;
-    val   = strtoull(str, &parseEnd, 16);
-    return parseEnd > str && *parseEnd == 0 && (val != ULLONG_MAX || errno == 0);
-}
-
 bool ParseDateTime(const char * str, struct tm & date)
 {
     const char * p;

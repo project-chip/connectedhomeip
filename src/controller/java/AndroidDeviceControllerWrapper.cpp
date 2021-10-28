@@ -209,12 +209,13 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     chip::Controller::FactoryInitParams initParams;
     chip::Controller::SetupParams setupParams;
 
-    initParams.storageDelegate = wrapper.get();
-    initParams.systemLayer     = systemLayer;
-    initParams.inetLayer       = inetLayer;
+    initParams.systemLayer   = systemLayer;
+    initParams.inetLayer     = inetLayer;
+    initParams.fabricStorage = wrapper.get();
     // move bleLayer into platform/android to share with app server
     initParams.bleLayer                        = DeviceLayer::ConnectivityMgr().GetBleLayer();
     initParams.listenPort                      = CHIP_PORT + 1;
+    setupParams.storageDelegate                = wrapper.get();
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = wrapper.get();
 
@@ -352,3 +353,19 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
     ChipLogProgress(chipTool, "KVS: Deleting key %s", key);
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
 }
+
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncStore(chip::FabricIndex fabricIndex, const char * key, const void * buffer,
+                                                     uint16_t size)
+{
+    return SyncSetKeyValue(key, buffer, size);
+};
+
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncLoad(chip::FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size)
+{
+    return SyncGetKeyValue(key, buffer, size);
+};
+
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncDelete(chip::FabricIndex fabricIndex, const char * key)
+{
+    return SyncDeleteKeyValue(key);
+};

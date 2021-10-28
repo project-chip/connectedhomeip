@@ -18,13 +18,17 @@ esp32-devkitc-shell
 esp32-devkitc-temperature-measurement
 esp32-m5stack-all-clusters
 esp32-m5stack-all-clusters-ipv6only
+esp32-m5stack-all-clusters-rpc
+esp32-m5stack-all-clusters-rpc-ipv6only
 infineon-p6-lock
 nrf-nrf52840-light
+nrf-nrf52840-light-rpc
 nrf-nrf52840-lock
 nrf-nrf52840-pump
 nrf-nrf52840-pump-controller
 nrf-nrf52840-shell
 nrf-nrf5340-light
+nrf-nrf5340-light-rpc
 nrf-nrf5340-lock
 nrf-nrf5340-pump
 nrf-nrf5340-pump-controller

@@ -340,6 +340,12 @@ class ChipDeviceController(object):
         return returnDevice
 
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None):
+        '''
+        Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive the response.
+        If a valid responseType is passed in, that will be used to deserialize the object. If not, the type will be automatically deduced
+        from the metadata received over the wire.
+        '''
+
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
