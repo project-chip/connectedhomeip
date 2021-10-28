@@ -239,7 +239,8 @@ public:
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
+                                 bool * apDataExists)
 {
     uint64_t version = 0;
     ChipLogDetail(DataManagement, "TEST Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aPath.mClusterId, aPath.mAttributeId);
@@ -260,7 +261,7 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
                              chip::Protocols::InteractionModel::Status::UnsupportedAttribute);
     }
 
-    ReturnErrorOnFailure(AttributeValueEncoder(apWriter).Encode(kTestFieldValue1));
+    ReturnErrorOnFailure(AttributeValueEncoder(apWriter, 0).Encode(kTestFieldValue1));
     return apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
 }
 
