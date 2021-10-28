@@ -19,8 +19,8 @@
 #include <memory>
 #include <type_traits>
 
+#include <app/DeviceProxy.h>
 #include <app/WriteClient.h>
-#include <controller/CHIPDevice.h>
 #include <lib/support/CodeUtils.h>
 
 #include <cstdio>
@@ -33,7 +33,7 @@ using PyObject = void *;
 
 extern "C" {
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
-chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, Controller::Device * device, size_t n, ...);
+chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t n, ...);
 }
 
 namespace chip {
@@ -97,7 +97,7 @@ void pychip_WriteClient_InitCallbacks(OnWriteResponseCallback onWriteResponseCal
     gOnWriteDoneCallback     = onWriteDoneCallback;
 }
 
-chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, Controller::Device * device, size_t n, ...)
+chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t n, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

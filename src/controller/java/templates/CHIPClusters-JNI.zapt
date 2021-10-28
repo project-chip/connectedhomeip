@@ -141,7 +141,7 @@ JNI_METHOD(jlong, {{asUpperCamelCase name}}Cluster, initWithDevice)(JNIEnv * env
     chip::DeviceLayer::StackLock lock;
     {{asUpperCamelCase name}}Cluster * cppCluster = new {{asUpperCamelCase name}}Cluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 

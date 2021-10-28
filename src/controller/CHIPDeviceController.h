@@ -28,12 +28,13 @@
 
 #pragma once
 
+#include <app/DeviceControllerInteractionModelDelegate.h>
 #include <app/InteractionModelDelegate.h>
+#include <app/OperationalDeviceProxy.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
-#include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
-#include <controller/DeviceControllerInteractionModelDelegate.h>
+#include <controller/CommissioneeDeviceProxy.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
 #include <credentials/DeviceAttestationVerifier.h>
@@ -42,6 +43,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/Pool.h>
 #include <lib/support/SerializableIntegerSet.h>
 #include <lib/support/Span.h>
 #include <messaging/ExchangeMgr.h>
@@ -53,6 +55,8 @@
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
+
+#include <controller/CHIPDeviceControllerSystemState.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -172,6 +176,8 @@ struct CommissionerInitParams : public ControllerInitParams
     DevicePairingDelegate * pairingDelegate = nullptr;
 };
 
+typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
+
 /**
  * @brief
  *   Controller applications can use this class to communicate with already paired CHIP devices. The
@@ -191,6 +197,13 @@ public:
     DeviceController();
     virtual ~DeviceController() {}
 
+    enum class CommissioningWindowOption
+    {
+        kOriginalSetupCode = 0,
+        kTokenWithRandomPIN,
+        kTokenWithProvidedPIN,
+    };
+
     CHIP_ERROR Init(ControllerInitParams params);
 
     /**
@@ -204,17 +217,16 @@ public:
      */
     virtual CHIP_ERROR Shutdown();
 
-    /**
-     * @brief
-     *   This function is similar to the other GetDevice object, except it reads the serialized object from
-     *   the persistent storage.
-     *
-     * @param[in] deviceId   Node ID for the CHIP device
-     * @param[out] device    The output device object
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
+    CHIP_ERROR GetOperationalDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                    Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+    {
+        return GetOperationalDeviceWithAddress(deviceId, Transport::PeerAddress::UDP(Inet::IPAddress::Any), onConnection,
+                                               onFailure);
+    }
+
+    CHIP_ERROR GetOperationalDeviceWithAddress(NodeId deviceId, const Transport::PeerAddress & addr,
+                                               Callback::Callback<OnDeviceConnected> * onConnection,
+                                               Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
@@ -229,13 +241,16 @@ public:
      *   Once the connection is successfully establishes (or if it's already connected), it calls `onConnectedDevice`
      *   callback. If it fails to establish the connection, it calls `onError` callback.
      */
-    CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+    virtual CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                          Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+    {
+        return GetOperationalDeviceWithAddress(deviceId, Transport::PeerAddress::UDP(Inet::IPAddress::Any), onConnection,
+                                               onFailure);
+    }
 
     /**
      * @brief
-     *   This function update the device informations asynchronously using mdns.
-     *   If new device informations has been found, it will be persisted.
+     *   This function update the device informations asynchronously using dnssd.
      *
      * @param[in] deviceId  Node ID for the CHIP device
      *
@@ -243,11 +258,69 @@ public:
      */
     CHIP_ERROR UpdateDevice(NodeId deviceId);
 
-    void PersistDevice(Device * device);
+    /**
+     * @brief
+     *   Compute a PASE verifier and passcode ID for the desired setup pincode.
+     *
+     *   This can be used to open a commissioning window on the device for
+     *   additional administrator commissioning.
+     *
+     * @param[in] iterations      The number of iterations to use when generating the verifier
+     * @param[in] setupPincode    The desired PIN code to use
+     * @param[in] salt            The 16-byte salt for verifier computation
+     * @param[out] outVerifier    The PASEVerifier to be populated on success
+     * @param[out] outPasscodeId  The passcode ID to be populated on success
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
+                                   uint32_t & outPasscodeId);
 
-    virtual void ReleaseDevice(Device * device);
+    /**
+     * @brief
+     *   Trigger a paired device to re-enter the commissioning mode. The device will exit the commissioning mode
+     *   after a successful commissioning, or after the given `timeout` time.
+     *
+     * @param[in] deviceId        The device Id.
+     * @param[in] timeout         The commissioning mode should terminate after this much time.
+     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+     *                            PAKE passcode verifier to be used for this commissioning.
+     * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
+     * @param[in] option          The commissioning window can be opened using the original setup code, or an
+     *                            onboarding token can be generated using a random setup PIN code (or with
+     *                            the PIN code provied in the setupPayload).
+     * @param[out] payload        The generated setup payload.
+     *                            - The payload is generated only if the user didn't ask for using the original setup code.
+     *                            - If the user asked to use the provided setup PIN, the PIN must be provided as part of
+     *                              this payload
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+                                       uint8_t option, SetupPayload & payload)
+    {
+        return OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr);
+    }
 
-    void ReleaseDeviceById(NodeId remoteDeviceId);
+    /**
+     * @brief
+     *   Trigger a paired device to re-enter the commissioning mode. The device will exit the commissioning mode
+     *   after a successful commissioning, or after the given `timeout` time.
+     *
+     * @param[in] deviceId        The device Id.
+     * @param[in] timeout         The commissioning mode should terminate after this much time.
+     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+     *                            PAKE passcode verifier to be used for this commissioning.
+     * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
+     * @param[in] option          The commissioning window can be opened using the original setup code, or an
+     *                            onboarding token can be generated using a random setup PIN code (or with
+     *                            the PIN code provied in the setupPayload).
+     * @param[in] callback        The function to be called on success or failure of opening of commissioning window.
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+                                                   uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
@@ -273,6 +346,8 @@ public:
         return nullptr;
     }
 
+    void ReleaseOperationalDevice(NodeId remoteDeviceId);
+
 protected:
     enum class State
     {
@@ -282,11 +357,7 @@ protected:
 
     State mState;
 
-    /* A list of device objects that can be used for communicating with corresponding
-       CHIP devices. The list does not contain all the paired devices, but only the ones
-       which the controller application is currently accessing.
-    */
-    Device mActiveDevices[kNumMaxActiveDevices];
+    BitMapObjectPool<OperationalDeviceProxy, kNumMaxActiveDevices> mOperationalDevices;
 
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
@@ -296,6 +367,8 @@ protected:
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    Transport::PeerAddress ToPeerAddress(const chip::Dnssd::ResolvedNodeData & nodeData) const;
+
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
@@ -303,10 +376,6 @@ protected:
 #endif
     DeviceControllerSystemState * mSystemState = nullptr;
 
-    uint16_t GetInactiveDeviceIndex();
-    uint16_t FindDeviceIndex(SessionHandle session);
-    uint16_t FindDeviceIndex(NodeId id);
-    void ReleaseDevice(uint16_t index);
     CHIP_ERROR InitializePairedDeviceList();
     CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
@@ -321,6 +390,10 @@ protected:
 
     uint16_t mVendorId;
 
+    //////////// ExchangeMgrDelegate Implementation ///////////////
+    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
@@ -334,13 +407,25 @@ private:
                                  System::PacketBufferHandle && msgBuf) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    OperationalDeviceProxy * FindOperationalDevice(SessionHandle session);
+    OperationalDeviceProxy * FindOperationalDevice(NodeId id);
+    void ReleaseOperationalDevice(OperationalDeviceProxy * device);
 
     void ReleaseAllDevices();
 
+    Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
+    Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
+
+    // TODO - Support opening commissioning window simultaneously on multiple devices
+    Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
+    SetupPayload mSetupPayload;
+    NodeId mDeviceWithCommissioningWindowOpen;
+
+    static void OnOpenPairingWindowSuccessResponse(void * context);
+    static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
+
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
+    uint16_t mPAKEVerifierID = 1;
 };
 
 /**
@@ -412,6 +497,11 @@ public:
      */
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & params);
 
+    CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
+
+    CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                  Callback::Callback<OnDeviceConnectionFailure> * onFailure) override;
+
     /**
      * @brief
      *   This function stops a pairing process that's in progress. It does not delete the pairing of a previously
@@ -433,65 +523,11 @@ public:
      */
     CHIP_ERROR UnpairDevice(NodeId remoteDeviceId);
 
-    /**
-     *   This function call indicates that the device has been provisioned with operational
-     *   credentials, and is reachable on operational network. At this point, the device is
-     *   available for CASE session establishment.
-     *
-     *   The function updates the state of device proxy object such that all subsequent messages
-     *   will use secure session established via CASE handshake.
-     */
-    CHIP_ERROR OperationalDiscoveryComplete(NodeId remoteDeviceId);
-
-    /**
-     * @brief
-     *   Trigger a paired device to re-enter the commissioning mode. The device will exit the commissioning mode
-     *   after a successful commissioning, or after the given `timeout` time.
-     *
-     * @param[in] deviceId        The device Id.
-     * @param[in] timeout         The commissioning mode should terminate after this much time.
-     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
-     *                            PAKE passcode verifier to be used for this commissioning.
-     * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
-     * @param[in] option          The commissioning window can be opened using the original setup code, or an
-     *                            onboarding token can be generated using a random setup PIN code (or with
-     *                            the PIN code provied in the setupPayload).
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
-                                       uint8_t option)
-    {
-        return OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr);
-    }
-
-    /**
-     * @brief
-     *   Trigger a paired device to re-enter the commissioning mode. The device will exit the commissioning mode
-     *   after a successful commissioning, or after the given `timeout` time.
-     *
-     * @param[in] deviceId        The device Id.
-     * @param[in] timeout         The commissioning mode should terminate after this much time.
-     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
-     *                            PAKE passcode verifier to be used for this commissioning.
-     * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
-     * @param[in] option          The commissioning window can be opened using the original setup code, or an
-     *                            onboarding token can be generated using a random setup PIN code (or with
-     *                            the PIN code provied in the setupPayload).
-     * @param[in] callback        The function to be called on success or failure of opening of commissioning window.
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
-                                                   uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback);
-
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 
     void RendezvousCleanup(CHIP_ERROR status);
-
-    void ReleaseDevice(Device * device) override;
 
     void AdvanceCommissioningStage(CHIP_ERROR err);
 
@@ -578,10 +614,7 @@ public:
 private:
     DevicePairingDelegate * mPairingDelegate;
 
-    /* This field is an index in mActiveDevices list. The object at this index in the list
-       contains the device object that's tracking the state of the device that's being paired.
-       If no device is currently being paired, this value will be kNumMaxPairedDevices.  */
-    uint16_t mDeviceBeingPaired;
+    CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
 
     Credentials::CertificateType mCertificateTypeBeingRequested = Credentials::CertificateType::kUnknown;
 
@@ -598,6 +631,8 @@ private:
 
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
 
+    BitMapObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
@@ -605,42 +640,45 @@ private:
     uint16_t mUdcListenPort                 = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-    void PersistDeviceList();
-
     void FreeRendezvousSession();
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
 
     void OnSessionEstablishmentTimeout();
 
+    //////////// ExchangeMgrDelegate Implementation ///////////////
+    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendCertificateChainRequestCommand(Device * device, Credentials::CertificateType certificateType);
+    CHIP_ERROR SendCertificateChainRequestCommand(CommissioneeDeviceProxy * device, Credentials::CertificateType certificateType);
     /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendAttestationRequestCommand(Device * device, const ByteSpan & attestationNonce);
+    CHIP_ERROR SendAttestationRequestCommand(CommissioneeDeviceProxy * device, const ByteSpan & attestationNonce);
     /* This function sends an OpCSR request to the device.
        The function does not hold a refernce to the device object.
      */
-    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(Device * device);
+    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(CommissioneeDeviceProxy * device);
     /* This function sends the operational credentials to the device.
        The function does not hold a refernce to the device object.
      */
-    CHIP_ERROR SendOperationalCertificate(Device * device, const ByteSpan & nocCertBuf, const ByteSpan & icaCertBuf);
+    CHIP_ERROR SendOperationalCertificate(CommissioneeDeviceProxy * device, const ByteSpan & nocCertBuf,
+                                          const ByteSpan & icaCertBuf);
     /* This function sends the trusted root certificate to the device.
        The function does not hold a refernce to the device object.
      */
-    CHIP_ERROR SendTrustedRootCertificate(Device * device, const ByteSpan & rcac);
+    CHIP_ERROR SendTrustedRootCertificate(CommissioneeDeviceProxy * device, const ByteSpan & rcac);
 
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
        The function does not hold a refernce to the device object.
        */
-    CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(Device * device);
+    CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device);
 
     /* Callback when the previously sent CSR request results in failure */
     static void OnCSRFailureResponse(void * context, uint8_t status);
@@ -672,7 +710,7 @@ private:
     /* Callback called when adding root cert to device results in failure */
     static void OnRootCertFailureResponse(void * context, uint8_t status);
 
-    static void OnDeviceConnectedFn(void * context, Device * device);
+    static void OnDeviceConnectedFn(void * context, DeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
@@ -704,6 +742,10 @@ private:
     CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature);
 
     void HandleAttestationResult(CHIP_ERROR err);
+
+    CommissioneeDeviceProxy * FindCommissioneeDevice(SessionHandle session);
+    CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
+    void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
     // Cluster callbacks for advancing commissioning flows
     Callback::Callback<BasicSuccessCallback> mSuccess;

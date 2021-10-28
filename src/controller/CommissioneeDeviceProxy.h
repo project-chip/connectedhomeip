@@ -18,33 +18,30 @@
 
 /**
  *  @file
- *    This file contains definitions for Device class. The objects of this
- *    class will be used by Controller applications to interact with CHIP
- *    devices. The class provides mechanism to construct, send and receive
+ *    This file contains definitions for DeviceProxy for a device that's undergoing
+ *    commissioning process. The objects of this will be used by Controller applications
+ *    to interact with the device. The class provides mechanism to construct, send and receive
  *    messages to and from the corresponding CHIP devices.
  */
 
 #pragma once
 
 #include <app/CommandSender.h>
-#include <app/InteractionModelEngine.h>
+#include <app/DeviceProxy.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
-#include <controller/DeviceControllerInteractionModelDelegate.h>
+#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
+#include <controller/CHIPDeviceControllerSystemState.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/support/Base64.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
-#include <protocols/secure_channel/CASESession.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
-#include <setup_payload/SetupPayload.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -56,26 +53,12 @@
 #endif
 
 namespace chip {
-namespace Controller {
 
-class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-constexpr size_t kMaxBlePendingPackets   = 1;
 constexpr size_t kOpCSRNonceLength       = 32;
 constexpr size_t kAttestationNonceLength = 32;
-
-using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
-#if INET_CONFIG_ENABLE_IPV4
-                                        ,
-                                        Transport::UDP /* IPv4 */
-#endif
-#if CONFIG_NETWORK_LAYER_BLE
-                                        ,
-                                        Transport::BLE<kMaxBlePendingPackets> /* BLE */
-#endif
-                                        >;
 
 using DeviceIPTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
@@ -95,32 +78,17 @@ struct ControllerDeviceInitParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
-    FabricTable * fabricsTable                            = nullptr;
-    DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
+    FabricTable * fabricsTable = nullptr;
+
+    Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 };
 
-class Device;
-
-typedef void (*OnDeviceConnected)(void * context, Device * device);
-typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
-typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
-
-class Device : public Messaging::ExchangeDelegate, public SessionEstablishmentDelegate
+class CommissioneeDeviceProxy : public DeviceProxy, Messaging::ExchangeDelegate
 {
 public:
-    ~Device();
-    Device() :
-        mOpenPairingSuccessCallback(OnOpenPairingWindowSuccessResponse, this),
-        mOpenPairingFailureCallback(OnOpenPairingWindowFailureResponse, this)
-    {}
-    Device(const Device &) = delete;
-
-    enum class CommissioningWindowOption
-    {
-        kOriginalSetupCode = 0,
-        kTokenWithRandomPIN,
-        kTokenWithProvidedPIN,
-    };
+    ~CommissioneeDeviceProxy();
+    CommissioneeDeviceProxy() {}
+    CommissioneeDeviceProxy(const CommissioneeDeviceProxy &) = delete;
 
     /**
      * @brief
@@ -132,23 +100,11 @@ public:
      */
     void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
 
-    // ----- Messaging -----
-    CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
-                                        Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
-
-    CHIP_ERROR SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalFloorSeconds,
-                                             uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
-                                             Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ShutdownSubscriptions();
-
-    CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
-                                         Callback::Cancelable * onFailureCallback);
-
     /**
      * @brief
      *   Send the command in internal command sender.
      */
-    CHIP_ERROR SendCommands(app::CommandSender * commandObj);
+    CHIP_ERROR SendCommands(app::CommandSender * commandObj) override;
 
     /**
      * @brief Get the IP address and port assigned to the device.
@@ -158,7 +114,7 @@ public:
      *
      * @return true, if the IP address and port were filled in the out parameters, false otherwise
      */
-    bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const;
+    bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
 
     /**
      * @brief
@@ -215,27 +171,6 @@ public:
         mDeviceAddress = peerAddress;
     }
 
-    /** @brief Serialize the Pairing Session to a string. It's guaranteed that the string
-     *         will be null terminated, and there won't be any embedded null characters.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR Serialize(SerializedDevice & output);
-
-    /** @brief Deserialize the Pairing Session from the string. It's expected that the string
-     *         will be null terminated, and there won't be any embedded null characters.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR Deserialize(const SerializedDevice & input);
-
-    /**
-     * @brief Serialize and store the Device in persistent storage
-     *
-     * @return Returns a CHIP_ERROR if either serialization or storage fails
-     */
-    CHIP_ERROR Persist();
-
     /**
      * @brief
      *   Called when a new pairing is being established
@@ -252,7 +187,7 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnConnectionExpired(SessionHandle session);
+    void OnConnectionExpired(SessionHandle session) override;
 
     /**
      * @brief
@@ -276,75 +211,11 @@ public:
     void OnResponseTimeout(Messaging::ExchangeContext * exchange) override;
 
     /**
-     * @brief
-     *   Trigger a paired device to re-enter the commissioning mode. If an onboarding token is provided, the device will use
-     *   the provided setup PIN code and the discriminator to advertise itself for commissioning availability. If the token
-     *   is not provided, the device will use the manufacturer assigned setup PIN code and discriminator.
-     *
-     *   The device will exit the commissioning mode after a successful commissioning, or after the given `timeout` time.
-     *
-     * @param[in] timeout         The commissioning mode should terminate after this much time.
-     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
-     *                            PAKE passcode verifier to be used for this commissioning.
-     * @param[in] option          The commissioning window can be opened using the original setup code, or an
-     *                            onboarding token can be generated using a random setup PIN code (or with
-     *                            the PIN code provied in the setupPayload).
-     * @param[in] salt            The PAKE Salt associated with the PAKE Passcode ID and ephemeral PAKE passcode
-     *                            verifier to be used for this commissioning.
-     * @param[in] callback        The function to be called on success or failure of opening of commissioning window.
-     * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, CommissioningWindowOption option,
-                                       const ByteSpan & salt, Callback::Callback<OnOpenCommissioningWindow> * callback,
-                                       SetupPayload & setupPayload);
-
-    /**
-     * @brief
-     *   Trigger a paired device to re-enter the commissioning mode. If an onboarding token is provided, the device will use
-     *   the provided setup PIN code and the discriminator to advertise itself for commissioning availability. If the token
-     *   is not provided, the device will use the manufacturer assigned setup PIN code and discriminator.
-     *
-     *   The device will exit the commissioning mode after a successful commissioning, or after the given `timeout` time.
-     *
-     * @param[in] timeout         The commissioning mode should terminate after this much time.
-     * @param[in] option          The commissioning window can be opened using the original setup code, or an
-     *                            onboarding token can be generated using a random setup PIN code (or with
-     *                            the PIN code provied in the setupPayload). This argument selects one of these
-     *                            methods.
-     * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR OpenPairingWindow(uint16_t timeout, CommissioningWindowOption option, SetupPayload & setupPayload);
-
-    /**
-     * @brief
-     *   Compute a PASE verifier and passcode ID for the desired setup pincode.
-     *
-     *   This can be used to open a commissioning window on the device for
-     *   additional administrator commissioning.
-     *
-     * @param[in] iterations      The number of iterations to use when generating the verifier
-     * @param[in] setupPincode    The desired PIN code to use
-     * @param[in] salt            The 16-byte salt for verifier computation
-     * @param[out] outVerifier    The PASEVerifier to be populated on success
-     * @param[out] outPasscodeId  The passcode ID to be populated on success
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
-                                   uint32_t & outPasscodeId);
-
-    // TODO: This is a workaround for OperationalDeviceProxy class to call OnNewConnection/OnConnectionExpired. Once
-    // https://github.com/project-chip/connectedhomeip/issues/10423 is complete, this function can be removed.
-    void UpdateSession(bool connected);
-
-    /**
      *  In case there exists an open session to the device, mark it as expired.
      */
     CHIP_ERROR CloseSession();
+
+    CHIP_ERROR Disconnect() override { return CloseSession(); }
 
     /**
      * @brief
@@ -366,23 +237,23 @@ public:
      *   Return whether the current device object is actively associated with a paired CHIP
      *   device. An active object can be used to communicate with the corresponding device.
      */
-    bool IsActive() const { return mActive; }
+    bool IsActive() const override { return mActive; }
 
     void SetActive(bool active) { mActive = active; }
 
-    bool IsSecureConnected() const { return IsActive() && mState == ConnectionState::SecureConnected; }
+    bool IsSecureConnected() const override { return IsActive() && mState == ConnectionState::SecureConnected; }
 
     bool IsSessionSetupInProgress() const { return IsActive() && mState == ConnectionState::Connecting; }
 
     void Reset();
 
-    NodeId GetDeviceId() const { return mDeviceId; }
+    NodeId GetDeviceId() const override { return mDeviceId; }
 
     bool MatchesSession(SessionHandle session) const { return mSecureSession.HasValue() && mSecureSession.Value() == session; }
 
-    chip::Optional<SessionHandle> GetSecureSession() const { return mSecureSession; }
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession; }
 
-    Messaging::ExchangeManager * GetExchangeManager() const { return mExchangeMgr; }
+    Messaging::ExchangeManager * GetExchangeManager() const override { return mExchangeMgr; }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
@@ -394,28 +265,13 @@ public:
 
     PASESessionSerializable & GetPairing() { return mPairing; }
 
-    uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
-    void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback,
-                          app::TLVDataFilter tlvDataFilter);
-    // Interaction model uses the object and callback interface instead of sequence number to mark different transactions.
-    void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              app::TLVDataFilter tlvDataFilter = nullptr);
-    void CancelIMResponseHandler(void * commandObj);
-
-    void OperationalCertProvisioned();
-    bool IsOperationalCertProvisioned() const { return mDeviceOperationalCertProvisioned; }
+    uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
 
     CHIP_ERROR LoadSecureSessionParametersIfNeeded()
     {
         bool loadedSecureSession = false;
         return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
     };
-
-    //////////// SessionEstablishmentDelegate Implementation ///////////////
-    void OnSessionEstablishmentError(CHIP_ERROR error) override;
-    void OnSessionEstablished() override;
-
-    CASESession & GetCASESession() { return mCASESession; }
 
     CHIP_ERROR SetCSRNonce(ByteSpan csrNonce)
     {
@@ -455,24 +311,13 @@ public:
 
     ByteSpan GetICACert() const { return ByteSpan(mICACertBuffer, mICACertBufferSize); }
 
-    /*
-     * This function can be called to establish a secure session with the device.
-     *
-     * If the device doesn't have operational credentials, and is under commissioning process,
-     * PASE keys will be used for secure session.
-     *
-     * If the device has been commissioned and has operational credentials, CASE session
-     * setup will be triggered.
-     *
-     * On establishing the session, the callback function `onConnection` will be called. If the
-     * session setup fails, `onFailure` will be called.
-     *
-     * If the session already exists, `onConnection` will be called immediately.
-     */
-    CHIP_ERROR EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
-                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+    Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mpIMDelegate; };
 
-    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() { return mpIMDelegate; };
+    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval) const
+    {
+        idleInterval   = mMrpIdleInterval;
+        activeInterval = mMrpActiveInterval;
+    }
 
 private:
     enum class ConnectionState
@@ -516,14 +361,12 @@ private:
 
     Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
 
-    DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
+    Controller::DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 
     uint8_t mSequenceNumber = 0;
 
     uint32_t mLocalMessageCounter = 0;
     uint32_t mPeerMessageCounter  = 0;
-
-    app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
 
     /**
      * @brief
@@ -543,26 +386,13 @@ private:
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
-    /**
-     *   This function triggers CASE session setup if the device has been provisioned with
-     *   operational credentials, and there is no currently active session.
-     */
-
-    CHIP_ERROR WarmupCASESession();
-
     void ReleaseDAC();
     void ReleasePAI();
-
-    static void OnOpenPairingWindowSuccessResponse(void * context);
-    static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
     FabricTable * mFabricsTable = nullptr;
 
-    bool mDeviceOperationalCertProvisioned = false;
-
-    CASESession mCASESession;
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
     // TODO: Offload Nonces and DAC/PAI into a new struct
@@ -582,51 +412,8 @@ private:
 
     SessionIDAllocator * mIDAllocator = nullptr;
 
-    uint16_t mPAKEVerifierID = 1;
-
-    Callback::CallbackDeque mConnectionSuccess;
-    Callback::CallbackDeque mConnectionFailure;
-
-    Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
-    SetupPayload mSetupPayload;
-
-    Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
-    Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
-};
-
-/**
- * This class defines an interface for an object that the user of Device
- * can register as a delegate. The delegate object will be called by the
- * Device when a new message or status update is received from the corresponding
- * CHIP device.
- */
-class DeviceStatusDelegate
-{
-public:
-    virtual ~DeviceStatusDelegate() {}
-
-    /**
-     * @brief
-     *   Called when a message is received from the device.
-     *
-     * @param[in] msg Received message buffer.
-     */
-    virtual void OnMessage(System::PacketBufferHandle && msg) = 0;
-
-    /**
-     * @brief
-     *   Called when response to OpenPairingWindow is received from the device.
-     *
-     * @param[in] status CHIP_NO_ERROR on success, or corresponding error.
-     */
-    virtual void OnPairingWindowOpenStatus(CHIP_ERROR status){};
-
-    /**
-     * @brief
-     *   Called when device status is updated.
-     *
-     */
-    virtual void OnStatusChange(void){};
+    uint32_t mMrpIdleInterval   = CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL;
+    uint32_t mMrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
 };
 
 #ifdef IFNAMSIZ
@@ -657,5 +444,4 @@ typedef struct SerializedDevice
     uint8_t inner[BASE64_ENCODED_LEN(sizeof(SerializableDevice) + sizeof(uint64_t))];
 } SerializedDevice;
 
-} // namespace Controller
 } // namespace chip

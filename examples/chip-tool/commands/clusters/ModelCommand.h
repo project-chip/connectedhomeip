@@ -31,7 +31,7 @@
 class ModelCommand : public CHIPCommand
 {
 public:
-    using ChipDevice = ::chip::Controller::Device;
+    using ChipDevice = ::chip::DeviceProxy;
 
     ModelCommand(const char * commandName) :
         CHIPCommand(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
@@ -57,6 +57,6 @@ private:
     static void OnDeviceConnectedFn(void * context, ChipDevice * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
-    chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
-    chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 };

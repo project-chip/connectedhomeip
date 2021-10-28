@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/OperationalDeviceProxy.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <inet/InetConfig.h>
@@ -70,6 +71,13 @@ public:
     SessionManager & GetSecureSessionManager() { return mSessions; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
+
+    chip::OperationalDeviceProxy * GetOperationalDeviceProxy() { return mOperationalDeviceProxy; }
+
+    void SetOperationalDeviceProxy(chip::OperationalDeviceProxy * operationalDeviceProxy)
+    {
+        mOperationalDeviceProxy = operationalDeviceProxy;
+    }
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * getBleLayerObject() { return mBleLayer; }
@@ -147,6 +155,8 @@ private:
 
     ServerStorageDelegate mServerStorage;
     CommissioningWindowManager mCommissioningWindowManager;
+
+    chip::OperationalDeviceProxy * mOperationalDeviceProxy = nullptr;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;

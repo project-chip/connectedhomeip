@@ -170,7 +170,8 @@ void registerCommandsPairing(Commands & commands)
         make_unique<PairOnNetworkDeviceType>(),
         make_unique<PairOnNetworkInstanceName>(),
         make_unique<OpenCommissioningWindow>(),
-        make_unique<CommissionedListCommand>(),
+        // TODO - enable CommissionedListCommand once DNS Cache is implemented
+        //        make_unique<CommissionedListCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);

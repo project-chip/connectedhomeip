@@ -40,6 +40,8 @@ static_library("app") {
     "Command.h",
     "CommandHandler.cpp",
     "CommandSender.cpp",
+    "DeviceProxy.cpp",
+    "DeviceProxy.h",
     "EventManagement.cpp",
     "InteractionModelEngine.cpp",
     "MessageDef/ArrayBuilder.cpp",
@@ -102,6 +104,8 @@ static_library("app") {
     "MessageDef/TimedRequestMessage.cpp",
     "MessageDef/WriteRequestMessage.cpp",
     "MessageDef/WriteResponseMessage.cpp",
+    "OperationalDeviceProxy.cpp",
+    "OperationalDeviceProxy.h",
     "ReadClient.cpp",
     "ReadHandler.cpp",
     "WriteClient.cpp",
@@ -121,6 +125,7 @@ static_library("app") {
 
   public_deps = [
     ":app_buildconfig",
+    "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/secure_channel",
