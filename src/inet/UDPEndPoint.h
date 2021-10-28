@@ -57,33 +57,35 @@ class DLL_EXPORT UDPEndPoint : public EndPointBasis
 public:
     UDPEndPoint() = default;
 
+    UDPEndPoint(const UDPEndPoint &) = delete;
+    UDPEndPoint(UDPEndPoint &&)      = delete;
+    UDPEndPoint & operator=(const UDPEndPoint &) = delete;
+    UDPEndPoint & operator=(UDPEndPoint &&) = delete;
+
     /**
-     * @brief   Type of message text reception event handling function.
+     * Type of message text reception event handling function.
      *
      * @param[in]   endPoint    The endpoint associated with the event.
      * @param[in]   msg         The message text received.
      * @param[in]   pktInfo     The packet's IP information.
      *
-     * @details
      *  Provide a function of this type to the \c OnMessageReceived delegate
      *  member to process message text reception events on \c endPoint where
      *  \c msg is the message text received from the sender at \c senderAddr.
      */
-    typedef void (*OnMessageReceivedFunct)(UDPEndPoint * endPoint, chip::System::PacketBufferHandle && msg,
-                                           const IPPacketInfo * pktInfo);
+    using OnMessageReceivedFunct = void (*)(UDPEndPoint *, chip::System::PacketBufferHandle &&, const IPPacketInfo *);
 
     /**
-     * @brief   Type of reception error event handling function.
+     * Type of reception error event handling function.
      *
      * @param[in]   endPoint    The endpoint associated with the event.
      * @param[in]   err         The reason for the error.
      *
-     * @details
      *  Provide a function of this type to the \c OnReceiveError delegate
      *  member to process reception error events on \c endPoint. The \c err
      *  argument provides specific detail about the type of the error.
      */
-    typedef void (*OnReceiveErrorFunct)(UDPEndPoint * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+    using OnReceiveErrorFunct = void (*)(UDPEndPoint *, CHIP_ERROR, const IPPacketInfo *);
 
     /**
      * Set whether IP multicast traffic should be looped back.
@@ -158,12 +160,13 @@ public:
 
     /**
      * Get the bound interface on this endpoint.
-     *
-     * @return InterfaceId   The bound interface id.
      */
-    InterfaceId GetBoundInterface();
+    InterfaceId GetBoundInterface() const;
 
-    uint16_t GetBoundPort();
+    /**
+     * Get the bound port on this endpoint.
+     */
+    uint16_t GetBoundPort() const;
 
     /**
      * Prepare the endpoint to receive UDP messages.
@@ -249,7 +252,7 @@ public:
 private:
     friend class InetLayer;
 
-    // XXX Temporary: start of import from IPEndPointBasis
+    void Init(InetLayer * inetLayer);
 
     /**
      * Basic dynamic state of the underlying endpoint.
@@ -267,8 +270,6 @@ private:
         kClosed    = 3  /**< Endpoint closed, ready for release. */
     } mState;
 
-    void IpInit(InetLayer * aInetLayer);
-
     /** The endpoint's message reception event handling function delegate. */
     OnMessageReceivedFunct OnMessageReceived;
 
@@ -279,27 +280,19 @@ private:
     CHIP_ERROR IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join);
     CHIP_ERROR IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join);
 
-    // XXX Temporary: end of import from IPEndPointBasis
-
-    UDPEndPoint(const UDPEndPoint &) = delete;
-
     static chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
 
-    CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId);
-    CHIP_ERROR BindInterfaceImpl(IPAddressType addrType, InterfaceId intfId);
+    CHIP_ERROR BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port, InterfaceId interfaceId);
+    CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId);
     CHIP_ERROR ListenImpl();
     CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg);
     void CloseImpl();
 
-    void Init(InetLayer * inetLayer);
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    // XXX Temporary: start of import from IPEndPointBasis
-public:
     static struct netif * FindNetifFromInterfaceId(InterfaceId aInterfaceId);
+    static CHIP_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId);
 
-private:
     void HandleDataReceived(chip::System::PacketBufferHandle && aBuffer);
 
     /**
@@ -322,9 +315,7 @@ private:
      *  happen for extremely large IPv4 packets that arrive without an Ethernet header.
      */
     static IPPacketInfo * GetPacketInfo(const chip::System::PacketBufferHandle & aBuffer);
-    // XXX Temporary: end of import from IPEndPointBasis
 
-    void IpHandleDataReceived(chip::System::PacketBufferHandle && msg);
     CHIP_ERROR GetPCB(IPAddressType addrType4);
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
     static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr, u16_t port);
@@ -335,14 +326,9 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    // XXX Temporary: start of import from IPEndPointBasis
-    InterfaceId mBoundIntfId;
-
-    CHIP_ERROR IpBind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, InterfaceId aInterfaceId);
-    CHIP_ERROR IpBindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
-    CHIP_ERROR IpSendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer);
-    CHIP_ERROR IpGetSocket(IPAddressType aAddressType, int aType, int aProtocol);
-    void IpHandlePendingIO(uint16_t aPort);
+    CHIP_ERROR GetSocket(IPAddressType addressType);
+    void HandlePendingIO(System::SocketEvents events);
+    static void HandlePendingIO(System::SocketEvents events, intptr_t data);
 
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 public:
@@ -355,13 +341,8 @@ private:
     static MulticastGroupHandler sLeaveMulticastGroupHandler;
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
-    // XXX Temporary: end of import from IPEndPointBasis
-
+    InterfaceId mBoundIntfId;
     uint16_t mBoundPort;
-
-    CHIP_ERROR GetSocket(IPAddressType addrType);
-    void HandlePendingIO(System::SocketEvents events);
-    static void HandlePendingIO(System::SocketEvents events, intptr_t data);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_source_t mReadableSource = nullptr;
@@ -369,7 +350,6 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    // XXX Temporary: start of import from IPEndPointBasis
     nw_listener_t mListener;
     dispatch_semaphore_t mListenerSemaphore;
     dispatch_queue_t mListenerQueue;
@@ -378,19 +358,16 @@ private:
     dispatch_queue_t mDispatchQueue;
     dispatch_semaphore_t mSendSemaphore;
 
-    CHIP_ERROR IpBind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, const nw_parameters_t & aParameters);
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
-    CHIP_ERROR IpSendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer);
     CHIP_ERROR StartListener();
     CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
     CHIP_ERROR GetEndPoint(nw_endpoint_t & aEndpoint, const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort);
     CHIP_ERROR StartConnection(nw_connection_t & aConnection);
     void GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
-    void IpHandleDataReceived(const nw_connection_t & aConnection);
+    void HandleDataReceived(const nw_connection_t & aConnection);
     CHIP_ERROR ReleaseListener();
     CHIP_ERROR ReleaseConnection();
     void ReleaseAll();
-    // XXX Temporary: end of import from IPEndPointBasis
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 };
 
