@@ -186,7 +186,7 @@
  *
  * @brief Defines the maximum number of ReadHandler, limits the number of active read transactions on server.
  */
-#define CHIP_IM_MAX_NUM_READ_HANDLER 2
+#define CHIP_IM_MAX_NUM_READ_HANDLER 3
 
 /**
  * @def CHIP_IM_MAX_NUM_READ_CLIENT
@@ -207,7 +207,7 @@
  *
  * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
  */
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 4
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 9
 
 /**
  * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
