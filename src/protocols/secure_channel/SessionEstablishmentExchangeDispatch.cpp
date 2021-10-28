@@ -32,12 +32,14 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SessionHandle se
                                                                 System::PacketBufferHandle && message,
                                                                 EncryptedPacketBufferHandle & preparedMessage)
 {
+    printf("\n---- SessionEstablishmentExchangeDispatch::PrepareMessage\n");
     return mSessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage);
 }
 
 CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SessionHandle session,
                                                                      const EncryptedPacketBufferHandle & preparedMessage) const
 {
+    printf("\n---- SessionEstablishmentExchangeDispatch::SendPreparedMessage\n");
     return mSessionManager->SendPreparedMessage(session, preparedMessage);
 }
 

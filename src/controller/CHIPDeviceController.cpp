@@ -300,6 +300,7 @@ bool DeviceController::DoesDevicePairingExist(const PeerId & deviceId)
 CHIP_ERROR DeviceController::GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
+    printf("\n---- DeviceController::GetConnectedDevice\n");
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
 

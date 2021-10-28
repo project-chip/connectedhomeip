@@ -82,6 +82,7 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
 {
+    printf("\n---- ExchangeContext::SendMessage\n");
     bool isStandaloneAck =
         (protocolId == Protocols::SecureChannel::Id) && msgType == to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck);
     if (!isStandaloneAck)

@@ -9081,6 +9081,8 @@ exit:
 
 CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
+    printf("\nOnOffCluster::Toggle\n");
+
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
     uint8_t argSeqNumber    = 0;

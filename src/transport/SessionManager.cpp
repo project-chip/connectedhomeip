@@ -105,6 +105,8 @@ void SessionManager::Shutdown()
 CHIP_ERROR SessionManager::PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
 {
+    printf("\n---- SessionManager::PrepareMessage\n");
+
     PacketHeader packetHeader;
     if (IsControlMessage(payloadHeader))
     {
@@ -160,6 +162,8 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle session, PayloadHeader &
 
 CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage)
 {
+    printf("\n---- SessionManager::SendPreparedMessage\n");
+
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!preparedMessage.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 

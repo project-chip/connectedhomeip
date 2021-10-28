@@ -30,6 +30,8 @@ using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
 CHIP_ERROR CHIPCommand::Run()
 {
+    printf("\n---- CHIPCommand::Run\n");
+
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
     ReturnLogErrorOnFailure(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, true));

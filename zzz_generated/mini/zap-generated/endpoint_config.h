@@ -759,7 +759,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 116
+#define GENERATED_ATTRIBUTE_COUNT 119
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -902,6 +902,13 @@
             { 0x0003, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },             /* CommissionedFabrics */                          \
             { 0x0004, ZAP_TYPE(ARRAY), 400, 0, ZAP_LONG_DEFAULTS_INDEX(1940) }, /* TrustedRootCertificates */                      \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Groups (client) */                                                                            \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */              \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Groups (server) */                                                                            \
+            { 0x0000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },  /* name support */                                          \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */                                       \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -926,10 +933,13 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayEthernetNetworkDiagnosticsServer[] = {                                        \
         (EmberAfGenericClusterFunction) emberAfEthernetNetworkDiagnosticsClusterServerInitCallback,                                \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {                                                            \
+        (EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback,                                                    \
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 10
+#define GENERATED_CLUSTER_COUNT 12
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0028,                                                                                                                  \
@@ -980,6 +990,15 @@
             {                                                                                                                      \
                 0x003E, ZAP_ATTRIBUTE_INDEX(111), 5, 724, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
+            {                                                                                                                      \
+                0x0004, ZAP_ATTRIBUTE_INDEX(116), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+            }, /* Endpoint: 1, Cluster: Groups (client) */                                                                         \
+            { 0x0004,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(117),                                                                                            \
+              2,                                                                                                                   \
+              3,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayGroupsServer }, /* Endpoint: 1, Cluster: Groups (server) */                                             \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
@@ -987,7 +1006,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 10, 2404 }, { ZAP_CLUSTER_INDEX(10), 0, 0 }, { ZAP_CLUSTER_INDEX(10), 0, 0 },                      \
+        { ZAP_CLUSTER_INDEX(0), 10, 2404 }, { ZAP_CLUSTER_INDEX(10), 2, 5 }, { ZAP_CLUSTER_INDEX(12), 0, 0 },                      \
     }
 
 // Largest attribute size is needed for various buffers
@@ -997,7 +1016,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (245)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (2404)
+#define ATTRIBUTE_MAX_SIZE (2409)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)

@@ -25,6 +25,8 @@ using namespace ::chip;
 
 CHIP_ERROR ModelCommand::RunCommand()
 {
+    printf("\n---- ModelCommand::RunCommand\n");
+    
     ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
 
     CHIP_ERROR err = mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
@@ -38,6 +40,8 @@ exit:
 
 void ModelCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
 {
+    printf("\n---- ModelCommand::OnDeviceConnectedFn\n");
+
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr,
                    ChipLogError(chipTool, "Device connected, but cannot send the command, as the context is null"));
@@ -46,6 +50,8 @@ void ModelCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device 
 
 void ModelCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
 {
+    printf("\n---- ModelCommand::OnDeviceConnectionFailureFn\n");
+
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %" CHIP_ERROR_FORMAT, deviceId, error.Format());
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "ModelCommand context is null"));

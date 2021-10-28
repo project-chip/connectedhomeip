@@ -44,6 +44,7 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
                                                 ReliableMessageContext * reliableMessageContext, bool isReliableTransmission,
                                                 Protocols::Id protocol, uint8_t type, System::PacketBufferHandle && message)
 {
+    printf("\n---- ExchangeMessageDispatch::SendMessage\n");
     ReturnErrorCodeIf(!MessagePermitted(protocol.GetProtocolId(), type), CHIP_ERROR_INVALID_ARGUMENT);
 
     PayloadHeader payloadHeader;

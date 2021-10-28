@@ -24,6 +24,8 @@ namespace chip {
 
 CHIP_ERROR TransportMgrBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
+
+    printf("\n---- TransportMgrBase::SendMessage\n");
     return mTransport->SendMessage(address, std::move(msgBuf));
 }
 
