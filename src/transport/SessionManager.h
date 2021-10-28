@@ -289,8 +289,8 @@ private:
 
     System::Layer * mSystemLayer = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
-    Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
-    State mState;                                                                          // < Initialization state of the object
+    Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions; // < Active connections to other peers
+    State mState;                                                                         // < Initialization state of the object
 
     SessionManagerDelegate * mCB                                       = nullptr;
     TransportMgrBase * mTransportMgr                                   = nullptr;

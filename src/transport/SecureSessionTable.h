@@ -18,6 +18,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Pool.h>
 #include <system/TimeSource.h>
 #include <transport/SecureSession.h>
 
@@ -43,10 +44,10 @@ public:
     /**
      * Allocates a new secure session out of the internal resource pool.
      *
-     * @param peerNode represents peer Node's ID
-     * @param peerSessionId represents the encryption key ID assigned by peer node
      * @param localSessionId represents the encryption key ID assigned by local node
-     * @param state [out] will contain the session if one was available. May be null if no return value is desired.
+     * @param peerNodeId represents peer Node's ID
+     * @param peerSessionId represents the encryption key ID assigned by peer node
+     * @param fabric represents fabric ID for the session
      *
      * @note the newly created state will have an 'active' time set based on the current time source.
      *
@@ -54,140 +55,43 @@ public:
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR CreateNewSecureSession(NodeId peerNode, uint16_t peerSessionId, uint16_t localSessionId, SecureSession ** state)
+    SecureSession * CreateNewSecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric)
     {
-        CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
-
-        if (state)
-        {
-            *state = nullptr;
-        }
-
-        for (size_t i = 0; i < kMaxSessionCount; i++)
-        {
-            if (!mStates[i].IsInitialized())
-            {
-                mStates[i] = SecureSession();
-                mStates[i].SetPeerNodeId(peerNode);
-                mStates[i].SetPeerSessionId(peerSessionId);
-                mStates[i].SetLocalSessionId(localSessionId);
-                mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
-
-                if (state)
-                {
-                    *state = &mStates[i];
-                }
-
-                err = CHIP_NO_ERROR;
-                break;
-            }
-        }
-
-        return err;
+        return mEntries.CreateObject(localSessionId, peerNodeId, peerSessionId, fabric, mTimeSource.GetCurrentMonotonicTimeMs());
     }
 
-    /**
-     * Get a secure session given a Node Id.
-     *
-     * @param nodeId is the session to find (based on nodeId).
-     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
-     *
-     * @return the state found, nullptr if not found
-     */
-    CHECK_RETURN_VALUE
-    SecureSession * FindSecureSession(NodeId nodeId, SecureSession * begin)
+    void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
+
+    template <typename Function>
+    bool ForEachSession(Function && function)
     {
-        SecureSession * state = nullptr;
-        SecureSession * iter  = &mStates[0];
-
-        if (begin >= iter && begin < &mStates[kMaxSessionCount])
-        {
-            iter = begin + 1;
-        }
-
-        for (; iter < &mStates[kMaxSessionCount]; iter++)
-        {
-            if (!iter->IsInitialized())
-            {
-                continue;
-            }
-            if (iter->GetPeerNodeId() == nodeId)
-            {
-                state = iter;
-                break;
-            }
-        }
-        return state;
+        return mEntries.ForEachActiveObject(std::forward<Function>(function));
     }
 
     /**
      * Get a secure session given a Node Id and Peer's Encryption Key Id.
      *
      * @param localSessionId Encryption key ID used by the local node.
-     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
      *
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    SecureSession * FindSecureSessionByLocalKey(uint16_t localSessionId, SecureSession * begin)
+    SecureSession * FindSecureSessionByLocalKey(uint16_t localSessionId)
     {
-        SecureSession * state = nullptr;
-        SecureSession * iter  = &mStates[0];
-
-        if (begin >= iter && begin < &mStates[kMaxSessionCount])
-        {
-            iter = begin + 1;
-        }
-
-        for (; iter < &mStates[kMaxSessionCount]; iter++)
-        {
-            if (!iter->IsInitialized())
+        SecureSession * result = nullptr;
+        mEntries.ForEachActiveObject([&](auto session) {
+            if (session->GetLocalSessionId() == localSessionId)
             {
-                continue;
+                result = session;
+                return false;
             }
-            if (iter->GetLocalSessionId() == localSessionId)
-            {
-                state = iter;
-                break;
-            }
-        }
-        return state;
-    }
-
-    /**
-     * Get the first session that matches the given fabric index.
-     *
-     * @param fabric The fabric index to match
-     *
-     * @return the session found, nullptr if not found
-     */
-    CHECK_RETURN_VALUE
-    SecureSession * FindSecureSessionByFabric(FabricIndex fabric)
-    {
-        for (auto & state : mStates)
-        {
-            if (!state.IsInitialized())
-            {
-                continue;
-            }
-            if (state.GetFabricIndex() == fabric)
-            {
-                return &state;
-            }
-        }
-        return nullptr;
+            return true;
+        });
+        return result;
     }
 
     /// Convenience method to mark a session as active
     void MarkSessionActive(SecureSession * state) { state->SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs()); }
-
-    /// Convenience method to expired a session and fired the related callback
-    template <typename Callback>
-    void MarkSessionExpired(SecureSession * state, Callback callback)
-    {
-        callback(*state);
-        *state = SecureSession(PeerAddress::Uninitialized());
-    }
 
     /**
      * Iterates through all active sessions and expires any sessions with an idle time
@@ -199,22 +103,14 @@ public:
     void ExpireInactiveSessions(uint64_t maxIdleTimeMs, Callback callback)
     {
         const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
-
-        for (size_t i = 0; i < kMaxSessionCount; i++)
-        {
-            if (!mStates[i].IsInitialized())
+        mEntries.ForEachActiveObject([&](auto session) {
+            if (session->GetLastActivityTimeMs() + maxIdleTimeMs < currentTime)
             {
-                continue; // not an active session
+                callback(*session);
+                ReleaseSession(session);
             }
-
-            uint64_t sessionActiveTime = mStates[i].GetLastActivityTimeMs();
-            if (sessionActiveTime + maxIdleTimeMs >= currentTime)
-            {
-                continue; // not expired
-            }
-
-            MarkSessionExpired(&mStates[i], callback);
-        }
+            return true;
+        });
     }
 
     /// Allows access to the underlying time source used for keeping track of session active time
@@ -222,7 +118,7 @@ public:
 
 private:
     Time::TimeSource<kTimeSource> mTimeSource;
-    SecureSession mStates[kMaxSessionCount];
+    BitMapObjectPool<SecureSession, kMaxSessionCount> mEntries;
 };
 
 } // namespace Transport
