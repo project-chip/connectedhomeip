@@ -592,4 +592,12 @@ SecureSession * SessionManager::GetSecureSession(SessionHandle session)
     }
 }
 
+SessionHandle SessionManager::FindSecureSessionForNode(NodeId peerNodeId)
+{
+    SecureSession * session = mPeerConnections.FindSecureSession(peerNodeId, nullptr);
+    VerifyOrDie(session != nullptr);
+    return SessionHandle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(),
+                         session->GetFabricIndex());
+}
+
 } // namespace chip
