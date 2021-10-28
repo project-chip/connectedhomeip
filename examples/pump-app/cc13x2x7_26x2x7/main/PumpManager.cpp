@@ -102,20 +102,18 @@ bool PumpManager::InitiateAction(int32_t aActor, Action_t aAction)
 
             CancelTimer();
         }
+
+        PumpTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
+
+        // Since the timer started successfully, update the state and trigger callback
+        mState = new_state;
+
+        if (mActionInitiated_CB)
+        {
+            mActionInitiated_CB(aAction, aActor);
+        }
     }
-
-    PumpTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
-
-    // Since the timer started successfully, update the state and trigger callback
-    mState = new_state;
-
-    if (mActionInitiated_CB)
-    {
-        mActionInitiated_CB(aAction, aActor);
-    }
-}
-
-return action_initiated;
+    return action_initiated;
 }
 
 void PumpManager::PumpTimer(uint32_t aTimeoutMs)
