@@ -1959,18 +1959,20 @@ bool emberAfTestClusterClusterTestListInt8UReverseResponseCallback(EndpointId en
 }
 
 bool emberAfTestClusterClusterTestNullableOptionalResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                   bool wasPresent, bool wasNull, uint8_t value)
+                                                                   bool wasPresent, bool wasNull, uint8_t value,
+                                                                   uint8_t originalValue)
 {
     ChipLogProgress(Zcl, "TestNullableOptionalResponse:");
     ChipLogProgress(Zcl, "  wasPresent: %d", wasPresent);
     ChipLogProgress(Zcl, "  wasNull: %d", wasNull);
     ChipLogProgress(Zcl, "  value: %" PRIu8 "", value);
+    ChipLogProgress(Zcl, "  originalValue: %" PRIu8 "", originalValue);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestNullableOptionalResponseCallback");
 
     Callback::Callback<TestClusterClusterTestNullableOptionalResponseCallback> * cb =
         Callback::Callback<TestClusterClusterTestNullableOptionalResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, wasPresent, wasNull, value);
+    cb->mCall(cb->mContext, wasPresent, wasNull, value, originalValue);
     return true;
 }
 

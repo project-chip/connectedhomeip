@@ -20871,11 +20871,14 @@ class TestCluster:
                             Label="wasNull", Tag=1, Type=bool),
                         ClusterObjectFieldDescriptor(
                             Label="value", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="originalValue", Tag=3, Type=uint),
                     ])
 
             wasPresent: 'bool' = None
             wasNull: 'bool' = None
             value: 'uint' = None
+            originalValue: 'uint' = None
 
         @dataclass
         class TestStructArgumentRequest(ClusterCommand):

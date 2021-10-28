@@ -5364,11 +5364,12 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             break;
         }
         case Commands::TestNullableOptionalResponse::Id: {
-            expectArgumentCount = 3;
+            expectArgumentCount = 4;
             bool wasPresent;
             bool wasNull;
             uint8_t value;
-            bool argExists[3];
+            uint8_t originalValue;
+            bool argExists[4];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -5381,7 +5382,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 3)
+                if (currentDecodeTagId < 4)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -5406,6 +5407,9 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 case 2:
                     TLVUnpackError = aDataTlv.Get(value);
                     break;
+                case 3:
+                    TLVUnpackError = aDataTlv.Get(originalValue);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
@@ -5423,10 +5427,10 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfTestClusterClusterTestNullableOptionalResponseCallback(aCommandPath.mEndpointId, apCommandObj,
-                                                                                           wasPresent, wasNull, value);
+                wasHandled = emberAfTestClusterClusterTestNullableOptionalResponseCallback(
+                    aCommandPath.mEndpointId, apCommandObj, wasPresent, wasNull, value, originalValue);
             }
             break;
         }
