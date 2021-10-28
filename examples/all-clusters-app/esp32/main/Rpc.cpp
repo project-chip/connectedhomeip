@@ -44,13 +44,26 @@
 #include "pw_containers/flat_map.h"
 #include "pw_status/status.h"
 #include "pw_status/try.h"
+#include "pw_trace_tokenized/trace_rpc_service_nanopb.h"
 #include "wifi_service/wifi_service.rpc.pb.h"
+#include <pw_trace/trace.h>
 
 #include "WiFiProvisioning.h"
 
 #include "ESP32Utils.h"
 
 static const char * TAG = "RPC";
+
+// Define trace time for pw_trace
+PW_TRACE_TIME_TYPE pw_trace_GetTraceTime()
+{
+    return (PW_TRACE_TIME_TYPE) chip::System::SystemClock().GetMonotonicMicroseconds64().count();
+}
+// Microsecond time source
+size_t pw_trace_GetTraceTimeTicksPerSecond()
+{
+    return 1000000;
+}
 
 namespace chip {
 namespace rpc {
@@ -291,6 +304,7 @@ Esp32Button button_service;
 Esp32Device device_service;
 Lighting lighting_service;
 Wifi wifi_service;
+pw::trace::TraceService trace_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
@@ -298,6 +312,8 @@ void RegisterServices(pw::rpc::Server & server)
     server.RegisterService(device_service);
     server.RegisterService(lighting_service);
     server.RegisterService(wifi_service);
+    server.RegisterService(trace_service);
+    PW_TRACE_SET_ENABLED(true);
 }
 
 void RunRpcService(void *)
