@@ -58,28 +58,11 @@ android_library("java") {
   ]
 
   sources = [
-<<<<<<< HEAD
-<<<<<<< HEAD
-    "src/chip/clusterinfo/ClusterCommandCallback.java",
-    "src/chip/clusterinfo/ClusterInfo.java",
-    "src/chip/clusterinfo/CommandInfo.java",
-<<<<<<< HEAD
-    "src/chip/clusterinfo/CommandParameterInfo.java",
-    "src/chip/clusterinfo/DelegatedClusterCallback.java",
-=======
-    "src/chip/clusterinfo/CommandParameter.java",
-    "src/chip/clusterinfo/DelegatedClusterCallback.java",
-    "src/chip/clusterinfo/ParameterType.java",
->>>>>>> 9199ce0a6 (Restyled by gn)
-=======
->>>>>>> fde1d13c0 (fix comments)
-=======
     "src/chip/clusterinfo/ClusterCommandCallback.java",
     "src/chip/clusterinfo/ClusterInfo.java",
     "src/chip/clusterinfo/CommandInfo.java",
     "src/chip/clusterinfo/CommandParameterInfo.java",
     "src/chip/clusterinfo/DelegatedClusterCallback.java",
->>>>>>> 0411123b5 (Restyled by gn)
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
@@ -87,30 +70,7 @@ android_library("java") {
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
-=======
-    "zap-generated/chip/devicecontroller/ClusterInfo.java",
->>>>>>> cdefa1b91 (basic code generation template, but not able to import to tool app)
-=======
-    "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
->>>>>>> a4fd0282e (no error code generation)
-=======
->>>>>>> fde1d13c0 (fix comments)
-=======
-    "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
-<<<<<<< HEAD
-    "src/chip/clusterinfo/ClusterInfo.java",
-    "src/chip/clusterinfo/ClusterCommandCallback.java",
-    "src/chip/clusterinfo/CommandInfo.java",
-    "src/chip/clusterinfo/CommandParameterInfo.java",
-    "src/chip/clusterinfo/DelegatedClusterCallback.java",
->>>>>>> 75ba092b5 (resolve build issues)
-=======
->>>>>>> 0411123b5 (Restyled by gn)
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

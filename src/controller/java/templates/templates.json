@@ -38,20 +38,8 @@
         },
         {
             "path": "ClusterInfo-java.zapt",
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> fde1d13c0 (fix comments)
             "name": "Cluster information mapping for Java",
             "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterInfoMapping.java"
-=======
-            "name": "ClusterInfo Maping for Java",
-<<<<<<< HEAD
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterInfo.java"
->>>>>>> cdefa1b91 (basic code generation template, but not able to import to tool app)
-=======
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterInfoMapping.java"
->>>>>>> a4fd0282e (no error code generation)
         }
     ]
 }
