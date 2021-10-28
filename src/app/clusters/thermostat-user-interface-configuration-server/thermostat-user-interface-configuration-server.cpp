@@ -25,31 +25,36 @@ using namespace chip::app::Clusters;
 Protocols::InteractionModel::Status MatterThermostatUserInterfaceConfigurationClusterServerPreAttributeChangedCallback(
     const app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    if (ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id == attributePath.mAttributeId)
+    if (size != 0)
     {
-        EmberAfTemperatureDisplayMode mode = static_cast<EmberAfTemperatureDisplayMode>(chip::Encoding::Get8(value));
-        if ((EMBER_ZCL_TEMPERATURE_DISPLAY_MODE_CELSIUS != mode) && (EMBER_ZCL_TEMPERATURE_DISPLAY_MODE_FAHRENHEIT != mode))
+        if (ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id == attributePath.mAttributeId)
         {
-            return Protocols::InteractionModel::Status::Failure;
+            EmberAfTemperatureDisplayMode mode = static_cast<EmberAfTemperatureDisplayMode>(chip::Encoding::Get8(value));
+            if ((EMBER_ZCL_TEMPERATURE_DISPLAY_MODE_CELSIUS != mode) && (EMBER_ZCL_TEMPERATURE_DISPLAY_MODE_FAHRENHEIT != mode))
+            {
+                return Protocols::InteractionModel::Status::Failure;
+            }
+        }
+        else if (ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id == attributePath.mAttributeId)
+        {
+            EmberAfKeypadLockout lockout = static_cast<EmberAfKeypadLockout>(chip::Encoding::Get8(value));
+            if ((EMBER_ZCL_KEYPAD_LOCKOUT_NO_LOCKOUT != lockout) && (EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_ONE_LOCKOUT != lockout) &&
+                (EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_TWO_LOCKOUT != lockout) &&
+                (EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_THREE_LOCKOUT != lockout) &&
+                (EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_FOUR_LOCKOUT != lockout) && (EMBER_ZCL_KEYPAD_LOCKOUT_LEVELFIVE_LOCKOUT != lockout))
+            {
+                return Protocols::InteractionModel::Status::Failure;
+            }
+        }
+        else if (ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id == attributePath.mAttributeId)
+        {
+            uint8_t prog = chip::Encoding::Get8(value);
+            if (prog > 1)
+            {
+                return Protocols::InteractionModel::Status::Failure;
+            }
         }
     }
-    else if (ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id == attributePath.mAttributeId)
-    {
-        EmberAfKeypadLockout lockout = static_cast<EmberAfKeypadLockout>(chip::Encoding::Get8(value));
-        if ((EMBER_ZCL_KEYPAD_LOCKOUT_NO_LOCKOUT != lockout) && (EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_ONE_LOCKOUT != lockout) &&
-            (EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_TWO_LOCKOUT != lockout) && (EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_THREE_LOCKOUT != lockout) &&
-            (EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_FOUR_LOCKOUT != lockout) && (EMBER_ZCL_KEYPAD_LOCKOUT_LEVELFIVE_LOCKOUT != lockout))
-        {
-            return Protocols::InteractionModel::Status::Failure;
-        }
-    }
-    else if (ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id == attributePath.mAttributeId)
-    {
-        uint8_t prog = static_cast<uint8_t>(chip::Encoding::Get8(value));
-        if (prog > 1)
-        {
-            return Protocols::InteractionModel::Status::Failure;
-        }
-    }
+
     return Protocols::InteractionModel::Status::Success;
 }
