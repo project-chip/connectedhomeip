@@ -98,7 +98,7 @@
     <string name="op_cred_client_btn_text">Operational Credentials cluster</string>
     <string name="op_cred_client_read_supported_fabric_btn_text">Read Supported Fabric count</string>
     <string name="op_cred_client_read_commissioned_fabric_btn_text">Read Commissioned Fabric count</string>
-    
+
     <string name="basic_cluster_btn_text">Basic cluster</string>
     <string name="basic_cluster_read_user_label_btn_text">Read User Label</string>
     <string name="basic_cluster_write_user_label_btn_text">Write User Label</string>
@@ -123,5 +123,5 @@
     <string name="dcl_response_key">result</string>
     <string name="dcl_custom_flow_url_key">custom</string>
     <string name="custom_flow_return_url"></string>
-
+    <string name="retrieve_endpoint_list">Retrieve Endpoint List</string>
 </resources>
