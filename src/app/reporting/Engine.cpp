@@ -334,8 +334,14 @@ void Engine::Run(System::Layer * aSystemLayer, void * apAppState)
 
 CHIP_ERROR Engine::ScheduleRun()
 {
+    if (mScheduleRunPending)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     if (InteractionModelEngine::GetInstance()->GetExchangeManager() != nullptr)
     {
+        mScheduleRunPending = true;
         return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->ScheduleWork(Run,
                                                                                                                              this);
     }
@@ -351,6 +357,8 @@ void Engine::Run()
 
     InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
     ReadHandler * readHandler         = imEngine->mReadHandlers + mCurReadHandlerIdx;
+
+    mScheduleRunPending = false;
 
     while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < CHIP_IM_MAX_NUM_READ_HANDLER))
     {
