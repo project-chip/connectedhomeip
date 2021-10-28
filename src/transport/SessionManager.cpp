@@ -419,7 +419,7 @@ void SessionManager::SecureMessageCounterDispatch(const PacketHeader & packetHea
     CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
     SessionManagerDelegate::DuplicateMessage isDuplicate = SessionManagerDelegate::DuplicateMessage::No;
-    SecureSession * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetSessionId(), nullptr);
+    SecureSession * state = mPeerConnections.FindSecureSessionByLocalKey(packetHeader.GetSessionId(), nullptr);
 
     SuccessOrExit(err = payloadHeader.DecodeAndConsume(msg));
 
