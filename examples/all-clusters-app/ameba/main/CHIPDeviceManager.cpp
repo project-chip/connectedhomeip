@@ -58,6 +58,11 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     err = PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
+    if (CONFIG_NETWORK_LAYER_BLE)
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    }
+
     err = Platform::MemoryInit();
     SuccessOrExit(err);
 

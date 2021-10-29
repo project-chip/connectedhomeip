@@ -444,6 +444,8 @@ bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
         {
             response.value.SetValue(commandData.arg1.Value().Value());
         }
+
+        response.originalValue.Emplace(commandData.arg1.Value());
     }
 
     CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);

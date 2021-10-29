@@ -25,7 +25,7 @@
 namespace chip {
 namespace Shell {
 
-void RegisterDiscoverCommands(chip::Controller::DeviceCommissioner * commissioner);
+void RegisterControllerCommands(chip::Controller::DeviceCommissioner * commissioner);
 
 } // namespace Shell
 } // namespace chip

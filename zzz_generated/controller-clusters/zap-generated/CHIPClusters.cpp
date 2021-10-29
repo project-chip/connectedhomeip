@@ -19,22 +19,7 @@
 
 #include "CHIPClusters.h"
 
-#include <cstdint>
-
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/CommandSender.h>
-#include <app/InteractionModelEngine.h>
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/util/basic-types.h>
-#include <controller/CommandSenderAllocator.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/BufferWriter.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
 namespace chip {
@@ -146,17 +131,6 @@ CHIP_ERROR AccountLoginCluster::ReadAttributeClusterRevision(Callback::Cancelabl
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type,
-                                               chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType>(
-    const chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AccountLogin::Commands::Login::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AccountLogin::Commands::Login::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // AdministratorCommissioning Cluster Commands
 CHIP_ERROR AdministratorCommissioningCluster::OpenBasicCommissioningWindow(Callback::Cancelable * onSuccessCallback,
@@ -310,23 +284,6 @@ CHIP_ERROR AdministratorCommissioningCluster::ReadAttributeClusterRevision(Callb
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // ApplicationBasic Cluster Commands
 CHIP_ERROR ApplicationBasicCluster::ChangeStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint8_t status)
@@ -466,11 +423,6 @@ CHIP_ERROR ApplicationBasicCluster::ReadAttributeClusterRevision(Callback::Cance
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // ApplicationLauncher Cluster Commands
 CHIP_ERROR ApplicationLauncherCluster::LaunchApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  chip::CharSpan data, uint16_t catalogVendorId, chip::CharSpan applicationId)
@@ -565,13 +517,6 @@ CHIP_ERROR ApplicationLauncherCluster::ReadAttributeClusterRevision(Callback::Ca
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type,
-                           chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType>(
-    const chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // AudioOutput Cluster Commands
 CHIP_ERROR AudioOutputCluster::RenameOutput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -694,16 +639,6 @@ CHIP_ERROR AudioOutputCluster::ReadAttributeClusterRevision(Callback::Cancelable
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // BarrierControl Cluster Commands
 CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Cancelable * onSuccessCallback,
@@ -848,16 +783,6 @@ CHIP_ERROR BarrierControlCluster::ReadAttributeClusterRevision(Callback::Cancela
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // Basic Cluster Commands
 CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
@@ -966,10 +891,6 @@ CHIP_ERROR BasicCluster::ReadAttributeUserLabel(Callback::Cancelable * onSuccess
                                              BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::UserLabel::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::UserLabel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  chip::CharSpan value)
 {
@@ -991,10 +912,6 @@ CHIP_ERROR BasicCluster::ReadAttributeLocation(Callback::Cancelable * onSuccessC
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<CharStringAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::Location::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BasicCluster::WriteAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                 chip::CharSpan value)
@@ -1125,10 +1042,6 @@ CHIP_ERROR BasicCluster::ReadAttributeLocalConfigDisabled(Callback::Cancelable *
                                              BasicAttributeFilter<BooleanAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo>(
-    const chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR BasicCluster::WriteAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -1163,11 +1076,6 @@ CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // BinaryInputBasic Cluster Commands
 // BinaryInputBasic Cluster Attributes
 CHIP_ERROR BinaryInputBasicCluster::ReadAttributeOutOfService(Callback::Cancelable * onSuccessCallback,
@@ -1181,10 +1089,6 @@ CHIP_ERROR BinaryInputBasicCluster::ReadAttributeOutOfService(Callback::Cancelab
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<BooleanAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
-    const chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BinaryInputBasicCluster::WriteAttributeOutOfService(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, bool value)
@@ -1208,10 +1112,6 @@ CHIP_ERROR BinaryInputBasicCluster::ReadAttributePresentValue(Callback::Cancelab
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<BooleanAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
-    const chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BinaryInputBasicCluster::WriteAttributePresentValue(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, bool value)
@@ -1392,16 +1292,6 @@ CHIP_ERROR BindingCluster::ReadAttributeClusterRevision(Callback::Cancelable * o
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Binding::Commands::Bind::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Binding::Commands::Bind::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Binding::Commands::Unbind::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Binding::Commands::Unbind::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // BooleanState Cluster Commands
 // BooleanState Cluster Attributes
@@ -2033,66 +1923,6 @@ CHIP_ERROR BridgedActionsCluster::ReadAttributeClusterRevision(Callback::Cancela
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::DisableAction::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::DisableAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::EnableAction::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::EnableAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::InstantAction::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::InstantAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::PauseAction::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::PauseAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StartAction::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::StartAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StopAction::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BridgedActions::Commands::StopAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // BridgedDeviceBasic Cluster Commands
 // BridgedDeviceBasic Cluster Attributes
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback,
@@ -2142,10 +1972,6 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeUserLabel(Callback::Cancelabl
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<CharStringAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::UserLabel::TypeInfo>(
-    const chip::app::Clusters::BridgedDeviceBasic::Attributes::UserLabel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR BridgedDeviceBasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, chip::CharSpan value)
@@ -3445,10 +3271,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorControlOptions(Callback::Cance
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlCluster::WriteAttributeColorControlOptions(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3700,10 +3522,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeWhitePointX(Callback::Cancelable * 
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointX(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3726,10 +3544,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeWhitePointY(Callback::Cancelable * 
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointY(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -3754,10 +3568,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRX(Callback::Cancelable *
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRX(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3780,10 +3590,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRY(Callback::Cancelable *
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRY(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -3808,10 +3614,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRIntensity(Callback::Canc
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -3834,10 +3636,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGX(Callback::Cancelable *
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGX(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -3862,10 +3660,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGY(Callback::Cancelable *
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGY(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3888,10 +3682,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGIntensity(Callback::Canc
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -3916,10 +3706,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBX(Callback::Cancelable *
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBX(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3943,10 +3729,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBY(Callback::Cancelable *
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBY(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -3969,10 +3751,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBIntensity(Callback::Canc
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -4129,11 +3907,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeStartUpColorTemperatureMireds(Callb
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
-    const chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ColorControlCluster::WriteAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint16_t value)
@@ -4157,101 +3930,6 @@ CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Cancelabl
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveColor::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveColor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveHue::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToColor::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveToColor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToHue::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveToHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepColor::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::StepColor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepHue::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::StepHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepSaturation::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::StepSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // ContentLauncher Cluster Commands
 CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -4377,19 +4055,6 @@ CHIP_ERROR ContentLauncherCluster::ReadAttributeClusterRevision(Callback::Cancel
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type,
-                           chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType>(
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type,
-                                               chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType>(
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // Descriptor Cluster Commands
 // Descriptor Cluster Attributes
 CHIP_ERROR DescriptorCluster::ReadAttributeDeviceList(Callback::Cancelable * onSuccessCallback,
@@ -4500,12 +4165,6 @@ exit:
 }
 
 // DiagnosticLogs Cluster Attributes
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type,
-                                               chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType>(
-    const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // DoorLock Cluster Commands
 CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -5562,147 +5221,6 @@ CHIP_ERROR DoorLockCluster::ReadAttributeClusterRevision(Callback::Cancelable * 
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearAllPins::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearAllPins::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearAllRfids::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearAllRfids::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type,
-                           chip::app::Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearPin::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearPinResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearPin::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearPinResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearRfid::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearRfid::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearWeekdaySchedule::Type,
-                           chip::app::Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearWeekdaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearYeardaySchedule::Type,
-                           chip::app::Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearYeardaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetPin::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetPinResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetPin::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetPinResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetRfid::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetRfidResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetRfid::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetRfidResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetUserType::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetUserType::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetWeekdaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetWeekdaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetYeardaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetYeardaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::LockDoor::Type,
-                                               chip::app::Clusters::DoorLock::Commands::LockDoorResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::LockDoor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::LockDoorResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetPin::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetPinResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetPin::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetPinResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetRfid::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetRfidResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetRfid::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetRfidResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetUserType::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetUserType::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetWeekdaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetWeekdaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetYeardaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetYeardaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type,
-                                               chip::app::Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type,
-                                               chip::app::Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // ElectricalMeasurement Cluster Commands
 // ElectricalMeasurement Cluster Attributes
 CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeMeasurementType(Callback::Cancelable * onSuccessCallback,
@@ -6011,11 +5529,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeClusterRevision(Callb
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // FixedLabel Cluster Commands
 // FixedLabel Cluster Attributes
 CHIP_ERROR FixedLabelCluster::ReadAttributeLabelList(Callback::Cancelable * onSuccessCallback,
@@ -6253,10 +5766,6 @@ CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBreadcrumb(Callback::Cancel
                                              BasicAttributeFilter<Int64uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo>(
-    const chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR GeneralCommissioningCluster::WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -6291,28 +5800,6 @@ CHIP_ERROR GeneralCommissioningCluster::ReadAttributeClusterRevision(Callback::C
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType>(
-    const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType>(
-    const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type &, void *,
-    CommandResponseSuccessCallback<
-        chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType>(
-    const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // GeneralDiagnostics Cluster Commands
 // GeneralDiagnostics Cluster Attributes
@@ -6701,40 +6188,6 @@ CHIP_ERROR GroupsCluster::ReadAttributeClusterRevision(Callback::Cancelable * on
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::AddGroup::Type,
-                                               chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType>(
-    const chip::app::Clusters::Groups::Commands::AddGroup::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::GetGroupMembership::Type,
-                                               chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType>(
-    const chip::app::Clusters::Groups::Commands::GetGroupMembership::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::RemoveGroup::Type,
-                                               chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType>(
-    const chip::app::Clusters::Groups::Commands::RemoveGroup::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::ViewGroup::Type,
-                                               chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType>(
-    const chip::app::Clusters::Groups::Commands::ViewGroup::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // Identify Cluster Commands
 CHIP_ERROR IdentifyCluster::Identify(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                      uint16_t identifyTime)
@@ -6871,10 +6324,6 @@ CHIP_ERROR IdentifyCluster::ReadAttributeIdentifyTime(Callback::Cancelable * onS
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(
-    const chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR IdentifyCluster::WriteAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -6909,22 +6358,6 @@ CHIP_ERROR IdentifyCluster::ReadAttributeClusterRevision(Callback::Cancelable * 
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::Identify::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Identify::Commands::Identify::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::IdentifyQuery::Type,
-                                               chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType>(
-    const chip::app::Clusters::Identify::Commands::IdentifyQuery::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::TriggerEffect::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Identify::Commands::TriggerEffect::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // IlluminanceMeasurement Cluster Commands
 // IlluminanceMeasurement Cluster Attributes
@@ -7072,12 +6505,6 @@ CHIP_ERROR KeypadInputCluster::ReadAttributeClusterRevision(Callback::Cancelable
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::KeypadInput::Commands::SendKey::Type,
-                                               chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType>(
-    const chip::app::Clusters::KeypadInput::Commands::SendKey::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // LevelControl Cluster Commands
 CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -7552,10 +6979,6 @@ CHIP_ERROR LevelControlCluster::ReadAttributeOptions(Callback::Cancelable * onSu
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlCluster::WriteAttributeOptions(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -7578,10 +7001,6 @@ CHIP_ERROR LevelControlCluster::ReadAttributeOnOffTransitionTime(Callback::Cance
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR LevelControlCluster::WriteAttributeOnOffTransitionTime(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -7606,10 +7025,6 @@ CHIP_ERROR LevelControlCluster::ReadAttributeOnLevel(Callback::Cancelable * onSu
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlCluster::WriteAttributeOnLevel(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -7632,10 +7047,6 @@ CHIP_ERROR LevelControlCluster::ReadAttributeOnTransitionTime(Callback::Cancelab
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR LevelControlCluster::WriteAttributeOnTransitionTime(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, uint16_t value)
@@ -7660,10 +7071,6 @@ CHIP_ERROR LevelControlCluster::ReadAttributeOffTransitionTime(Callback::Cancela
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlCluster::WriteAttributeOffTransitionTime(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -7686,10 +7093,6 @@ CHIP_ERROR LevelControlCluster::ReadAttributeDefaultMoveRate(Callback::Cancelabl
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR LevelControlCluster::WriteAttributeDefaultMoveRate(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -7714,10 +7117,6 @@ CHIP_ERROR LevelControlCluster::ReadAttributeStartUpCurrentLevel(Callback::Cance
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
-    const chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR LevelControlCluster::WriteAttributeStartUpCurrentLevel(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -7740,46 +7139,6 @@ CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelabl
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Move::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::Move::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Step::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::Step::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Stop::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::Stop::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // LowPower Cluster Commands
 CHIP_ERROR LowPowerCluster::Sleep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -7832,11 +7191,6 @@ CHIP_ERROR LowPowerCluster::ReadAttributeClusterRevision(Callback::Cancelable * 
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LowPower::Commands::Sleep::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LowPower::Commands::Sleep::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // MediaInput Cluster Commands
 CHIP_ERROR MediaInputCluster::HideInputStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -8035,26 +7389,6 @@ CHIP_ERROR MediaInputCluster::ReadAttributeClusterRevision(Callback::Cancelable 
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::RenameInput::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::MediaInput::Commands::RenameInput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::SelectInput::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::MediaInput::Commands::SelectInput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // MediaPlayback Cluster Commands
 CHIP_ERROR MediaPlaybackCluster::MediaFastForward(Callback::Cancelable * onSuccessCallback,
@@ -8594,75 +7928,6 @@ CHIP_ERROR MediaPlaybackCluster::ReadAttributeClusterRevision(Callback::Cancelab
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type,
-                           chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type,
-                           chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type,
-                           chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // ModeSelect Cluster Commands
 CHIP_ERROR ModeSelectCluster::ChangeToMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                            uint8_t newMode)
@@ -8760,10 +8025,6 @@ CHIP_ERROR ModeSelectCluster::ReadAttributeOnMode(Callback::Cancelable * onSucce
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo>(
-    const chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ModeSelectCluster::WriteAttributeOnMode(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -8810,11 +8071,6 @@ CHIP_ERROR ModeSelectCluster::ReadAttributeClusterRevision(Callback::Cancelable 
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // NetworkCommissioning Cluster Commands
 CHIP_ERROR NetworkCommissioningCluster::AddThreadNetwork(Callback::Cancelable * onSuccessCallback,
@@ -9263,68 +8519,6 @@ CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::C
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // OtaSoftwareUpdateProvider Cluster Commands
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback,
@@ -9488,26 +8682,6 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReadAttributeClusterRevision(Callba
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type,
-                           chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::DecodableType>(
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type &, void *,
-    CommandResponseSuccessCallback<
-        chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type,
-                           chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType>(
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // OtaSoftwareUpdateRequestor Cluster Commands
 CHIP_ERROR OtaSoftwareUpdateRequestorCluster::AnnounceOtaProvider(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback,
@@ -9572,11 +8746,6 @@ CHIP_ERROR OtaSoftwareUpdateRequestorCluster::ReadAttributeDefaultOtaProvider(Ca
                                              BasicAttributeFilter<OctetStringAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo>(
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OtaSoftwareUpdateRequestorCluster::WriteAttributeDefaultOtaProvider(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
                                                                                chip::ByteSpan value)
@@ -9613,11 +8782,6 @@ CHIP_ERROR OtaSoftwareUpdateRequestorCluster::ReadAttributeClusterRevision(Callb
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // OccupancySensing Cluster Commands
 // OccupancySensing Cluster Attributes
@@ -9980,10 +9144,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeOnTime(Callback::Cancelable * onSuccessCal
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-    const chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OnOffCluster::WriteAttributeOnTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                               uint16_t value)
 {
@@ -10007,10 +9167,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeOffWaitTime(Callback::Cancelable * onSucce
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-    const chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR OnOffCluster::WriteAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -10033,10 +9189,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeStartUpOnOff(Callback::Cancelable * onSucc
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
-    const chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR OnOffCluster::WriteAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -10072,36 +9224,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Off::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::Off::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OffWithEffect::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::OffWithEffect::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::On::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::On::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Toggle::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::Toggle::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // OnOffSwitchConfiguration Cluster Commands
 // OnOffSwitchConfiguration Cluster Attributes
 CHIP_ERROR OnOffSwitchConfigurationCluster::ReadAttributeSwitchType(Callback::Cancelable * onSuccessCallback,
@@ -10127,10 +9249,6 @@ CHIP_ERROR OnOffSwitchConfigurationCluster::ReadAttributeSwitchActions(Callback:
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo>(
-    const chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR OnOffSwitchConfigurationCluster::WriteAttributeSwitchActions(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -10607,62 +9725,6 @@ CHIP_ERROR OperationalCredentialsCluster::ReadAttributeClusterRevision(Callback:
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type,
-                           chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type,
-                           chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // PowerSource Cluster Commands
 // PowerSource Cluster Attributes
@@ -11144,11 +10206,6 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeOperationMode(Callba
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -11171,11 +10228,6 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeControlMode(Callback
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
-    const chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeControlMode(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -11706,47 +10758,6 @@ CHIP_ERROR ScenesCluster::ReadAttributeClusterRevision(Callback::Cancelable * on
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::AddScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::AddScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type,
-                                               chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RecallScene::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Scenes::Commands::RecallScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type,
-                                               chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RemoveScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::RemoveScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::StoreScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::StoreScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::ViewScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::ViewScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // SoftwareDiagnostics Cluster Commands
 CHIP_ERROR SoftwareDiagnosticsCluster::ResetWatermarks(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
@@ -11836,11 +10847,6 @@ CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Ca
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // Switch Cluster Commands
 // Switch Cluster Attributes
@@ -12074,22 +11080,6 @@ CHIP_ERROR TvChannelCluster::ReadAttributeClusterRevision(Callback::Cancelable *
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::ChangeChannel::Type,
-                                               chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType>(
-    const chip::app::Clusters::TvChannel::Commands::ChangeChannel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::SkipChannel::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TvChannel::Commands::SkipChannel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // TargetNavigator Cluster Commands
 CHIP_ERROR TargetNavigatorCluster::NavigateTarget(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback, uint8_t target, chip::CharSpan data)
@@ -12158,13 +11148,6 @@ CHIP_ERROR TargetNavigatorCluster::ReadAttributeClusterRevision(Callback::Cancel
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type,
-                           chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType>(
-    const chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // TemperatureMeasurement Cluster Commands
 // TemperatureMeasurement Cluster Attributes
@@ -12749,10 +11732,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeBoolean(Callback::Cancelable * onSuc
                                              BasicAttributeFilter<BooleanAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeBoolean(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -12775,10 +11754,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeBitmap8(Callback::Cancelable * onSuc
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TestClusterCluster::WriteAttributeBitmap8(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -12803,10 +11778,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeBitmap16(Callback::Cancelable * onSu
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeBitmap16(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -12829,10 +11800,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeBitmap32(Callback::Cancelable * onSu
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int32uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TestClusterCluster::WriteAttributeBitmap32(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint32_t value)
@@ -12857,10 +11824,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeBitmap64(Callback::Cancelable * onSu
                                              BasicAttributeFilter<Int64uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeBitmap64(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -12883,10 +11846,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeInt8u(Callback::Cancelable * onSucce
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TestClusterCluster::WriteAttributeInt8u(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -12911,10 +11870,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeInt16u(Callback::Cancelable * onSucc
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeInt16u(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -12937,10 +11892,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeInt32u(Callback::Cancelable * onSucc
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int32uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TestClusterCluster::WriteAttributeInt32u(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint32_t value)
@@ -12965,10 +11916,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeInt64u(Callback::Cancelable * onSucc
                                              BasicAttributeFilter<Int64uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeInt64u(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint64_t value)
 {
@@ -12991,10 +11938,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeInt8s(Callback::Cancelable * onSucce
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8sAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TestClusterCluster::WriteAttributeInt8s(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, int8_t value)
@@ -13019,10 +11962,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeInt16s(Callback::Cancelable * onSucc
                                              BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeInt16s(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -13045,10 +11984,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeInt32s(Callback::Cancelable * onSucc
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int32sAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TestClusterCluster::WriteAttributeInt32s(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, int32_t value)
@@ -13073,10 +12008,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeInt64s(Callback::Cancelable * onSucc
                                              BasicAttributeFilter<Int64sAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeInt64s(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, int64_t value)
 {
@@ -13099,10 +12030,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeEnum8(Callback::Cancelable * onSucce
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TestClusterCluster::WriteAttributeEnum8(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -13127,10 +12054,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeEnum16(Callback::Cancelable * onSucc
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeEnum16(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint16_t value)
 {
@@ -13153,10 +12076,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeOctetString(Callback::Cancelable * o
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<OctetStringAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TestClusterCluster::WriteAttributeOctetString(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
@@ -13217,10 +12136,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeLongOctetString(Callback::Cancelable
                                              BasicAttributeFilter<OctetStringAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeLongOctetString(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
 {
@@ -13243,10 +12158,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeCharString(Callback::Cancelable * on
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<CharStringAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TestClusterCluster::WriteAttributeCharString(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, chip::CharSpan value)
@@ -13271,10 +12182,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeLongCharString(Callback::Cancelable 
                                              BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeLongCharString(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, chip::CharSpan value)
 {
@@ -13297,10 +12204,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeEpochUs(Callback::Cancelable * onSuc
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int64uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TestClusterCluster::WriteAttributeEpochUs(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint64_t value)
@@ -13325,10 +12228,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeEpochS(Callback::Cancelable * onSucc
                                              BasicAttributeFilter<Int32uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeEpochS(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint32_t value)
 {
@@ -13351,10 +12250,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeVendorId(Callback::Cancelable * onSu
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR TestClusterCluster::WriteAttributeVendorId(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, chip::VendorId value)
@@ -13379,10 +12274,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeUnsupported(Callback::Cancelable * o
                                              BasicAttributeFilter<BooleanAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(
-    const chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR TestClusterCluster::WriteAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback, bool value)
 {
@@ -13405,68 +12296,6 @@ CHIP_ERROR TestClusterCluster::ReadAttributeClusterRevision(Callback::Cancelable
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::Test::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::Test::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type,
-                                               chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType>(
-    const chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type,
-                                               chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType>(
-    const chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type,
-                           chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType>(
-    const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type,
-                           chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType>(
-    const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestSpecific::Type,
-                                               chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType>(
-    const chip::app::Clusters::TestCluster::Commands::TestSpecific::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // Thermostat Cluster Commands
 CHIP_ERROR ThermostatCluster::ClearWeeklySchedule(Callback::Cancelable * onSuccessCallback,
@@ -13771,10 +12600,6 @@ CHIP_ERROR ThermostatCluster::ReadAttributeOccupiedCoolingSetpoint(Callback::Can
                                              BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatCluster::WriteAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -13797,10 +12622,6 @@ CHIP_ERROR ThermostatCluster::ReadAttributeOccupiedHeatingSetpoint(Callback::Can
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16sAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ThermostatCluster::WriteAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback, int16_t value)
@@ -13825,10 +12646,6 @@ CHIP_ERROR ThermostatCluster::ReadAttributeMinHeatSetpointLimit(Callback::Cancel
                                              BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatCluster::WriteAttributeMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -13851,10 +12668,6 @@ CHIP_ERROR ThermostatCluster::ReadAttributeMaxHeatSetpointLimit(Callback::Cancel
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16sAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ThermostatCluster::WriteAttributeMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, int16_t value)
@@ -13879,10 +12692,6 @@ CHIP_ERROR ThermostatCluster::ReadAttributeMinCoolSetpointLimit(Callback::Cancel
                                              BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatCluster::WriteAttributeMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, int16_t value)
 {
@@ -13905,10 +12714,6 @@ CHIP_ERROR ThermostatCluster::ReadAttributeMaxCoolSetpointLimit(Callback::Cancel
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16sAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ThermostatCluster::WriteAttributeMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback, int16_t value)
@@ -13933,10 +12738,6 @@ CHIP_ERROR ThermostatCluster::ReadAttributeMinSetpointDeadBand(Callback::Cancela
                                              BasicAttributeFilter<Int8sAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatCluster::WriteAttributeMinSetpointDeadBand(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback, int8_t value)
 {
@@ -13960,10 +12761,6 @@ CHIP_ERROR ThermostatCluster::ReadAttributeControlSequenceOfOperation(Callback::
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatCluster::WriteAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -13986,10 +12783,6 @@ CHIP_ERROR ThermostatCluster::ReadAttributeSystemMode(Callback::Cancelable * onS
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(
-    const chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ThermostatCluster::WriteAttributeSystemMode(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -14062,31 +12855,6 @@ CHIP_ERROR ThermostatCluster::ReadAttributeClusterRevision(Callback::Cancelable 
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // ThermostatUserInterfaceConfiguration Cluster Commands
 // ThermostatUserInterfaceConfiguration Cluster Attributes
 CHIP_ERROR
@@ -14101,12 +12869,6 @@ ThermostatUserInterfaceConfigurationCluster::ReadAttributeTemperatureDisplayMode
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<
-    chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
-    const chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo::Type &
-        requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeTemperatureDisplayMode(
     Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -14133,11 +12895,6 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::ReadAttributeKeypadLocko
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-    const chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo::Type & requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeKeypadLockout(Callback::Cancelable * onSuccessCallback,
                                                                                     Callback::Cancelable * onFailureCallback,
                                                                                     uint8_t value)
@@ -14163,12 +12920,6 @@ ThermostatUserInterfaceConfigurationCluster::ReadAttributeScheduleProgrammingVis
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::WriteAttribute<
-    chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
-    const chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo::Type &
-        requestData,
-    void * context, WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
 
 CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeScheduleProgrammingVisibility(
     Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
@@ -15005,11 +13756,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeClusterRevision(Callbac
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // WakeOnLan Cluster Commands
 // WakeOnLan Cluster Attributes
 CHIP_ERROR WakeOnLanCluster::ReadAttributeWakeOnLanMacAddress(Callback::Cancelable * onSuccessCallback,
@@ -15244,11 +13990,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeClusterRevision(Callback:
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // WindowCovering Cluster Commands
 CHIP_ERROR WindowCoveringCluster::DownOrClose(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -15866,10 +14607,6 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeMode(Callback::Cancelable * onSuc
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(
-    const chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo::Type & requestData, void * context,
-    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
-
 CHIP_ERROR WindowCoveringCluster::WriteAttributeMode(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint8_t value)
 {
@@ -15933,86 +14670,6 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeClusterRevision(Callback::Cancela
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::StopMotion::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::StopMotion::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template <typename RequestDataT, typename ResponseDataT>
-CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
-                                      CommandResponseSuccessCallback<ResponseDataT> successCb,
-                                      CommandResponseFailureCallback failureCb)
-{
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
-
-    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
-                                            const ResponseDataT & responseData) { successCb(context, responseData); };
-
-    auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
-        failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
-    };
-
-    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                               requestData, onSuccessCb, onFailureCb);
-};
-
-template <typename AttributeInfo>
-CHIP_ERROR ClusterBase::WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
-                                       WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
-{
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
-
-    auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
-        if (successCb != nullptr)
-        {
-            successCb(context);
-        }
-    };
-
-    auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
-                                            CHIP_ERROR aError) {
-        if (failureCb != nullptr)
-        {
-            failureCb(context, app::ToEmberAfStatus(status.mStatus));
-        }
-    };
-
-    return chip::Controller::WriteAttribute<AttributeInfo>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
-                                                           mEndpoint, requestData, onSuccessCb, onFailureCb);
 }
 
 } // namespace Controller

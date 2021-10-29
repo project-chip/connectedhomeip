@@ -1357,12 +1357,13 @@ void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccess
 };
 
 void CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge::OnSuccessFn(
-    void * context, bool wasPresent, bool wasNull, uint8_t value)
+    void * context, bool wasPresent, bool wasNull, uint8_t value, uint8_t originalValue)
 {
     DispatchSuccess(context, @ {
         @"wasPresent" : [NSNumber numberWithBool:wasPresent],
         @"wasNull" : [NSNumber numberWithBool:wasNull],
         @"value" : [NSNumber numberWithUnsignedChar:value],
+        @"originalValue" : [NSNumber numberWithUnsignedChar:originalValue],
     });
 };
 

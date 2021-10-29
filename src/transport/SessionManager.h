@@ -28,7 +28,6 @@
 #include <utility>
 
 #include <inet/IPAddress.h>
-#include <inet/IPEndPointBasis.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -268,6 +267,9 @@ public:
         Optional<Transport::UnauthenticatedSessionHandle> session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
         return session.HasValue() ? MakeOptional<SessionHandle>(session.Value()) : NullOptional;
     }
+
+    // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
+    SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
 
 private:
     /**

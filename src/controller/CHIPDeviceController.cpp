@@ -1580,9 +1580,17 @@ void DeviceCommissioner::FindCommissionableNode(char * instanceName)
     DiscoverCommissionableNodes(filter);
 }
 
-void DeviceCommissioner::OnUserDirectedCommissioningRequest(const Dnssd::DiscoveredNodeData & nodeData)
+void DeviceCommissioner::OnUserDirectedCommissioningRequest(UDCClientState state)
 {
-    ChipLogDetail(Controller, "------PROMPT USER!! OnUserDirectedCommissioningRequest instance=%s", nodeData.instanceName);
+    ChipLogDetail(Controller, "------PROMPT USER!! OnUserDirectedCommissioningRequest instance=%s deviceName=%s",
+                  state.GetInstanceName(), state.GetDeviceName());
+
+    if (mUdcServer != nullptr)
+    {
+        mUdcServer->PrintUDCClients();
+    }
+
+    ChipLogDetail(Controller, "------To Accept Enter: discover udc-commission <pincode> <udc-client-index>");
 }
 
 void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData)

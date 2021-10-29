@@ -1956,6 +1956,7 @@ static void OnTestClusterTestNullableOptionalResponseSuccess(
     ChipLogProgress(Zcl, "  wasPresent: %d", data.wasPresent);
     ChipLogProgress(Zcl, "  wasNull: Optional printing is not implemented yet.");
     ChipLogProgress(Zcl, "  value: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  originalValue: Optional printing is not implemented yet.");
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);

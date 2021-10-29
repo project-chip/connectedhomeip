@@ -14211,7 +14211,8 @@ bool emberAfTestClusterClusterTestStructArrayArgumentRequestCallback(
  * @brief Test Cluster Cluster TestNullableOptionalResponse Command callback (from server)
  */
 bool emberAfTestClusterClusterTestNullableOptionalResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                   bool wasPresent, bool wasNull, uint8_t value);
+                                                                   bool wasPresent, bool wasNull, uint8_t value,
+                                                                   uint8_t originalValue);
 /**
  * @brief Test Cluster Cluster TestStructArgumentRequest Command callback (from client)
  */

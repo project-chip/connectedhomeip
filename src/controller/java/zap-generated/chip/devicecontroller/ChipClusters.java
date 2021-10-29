@@ -6143,7 +6143,7 @@ public class ChipClusters {
     }
 
     public interface TestNullableOptionalResponseCallback {
-      void onSuccess(boolean wasPresent, boolean wasNull, int value);
+      void onSuccess(boolean wasPresent, boolean wasNull, int value, int originalValue);
 
       void onError(Exception error);
     }

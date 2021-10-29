@@ -20,50 +20,66 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
-#else
+#include <lib/support/BitFlags.h>
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
-#endif
-#include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 
-namespace chip {
+#include <wifi_conf.h>
+
 namespace Inet {
 class IPAddress;
 } // namespace Inet
-} // namespace chip
 
 namespace chip {
 namespace DeviceLayer {
 
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-                                      public Internal::GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>,
-#else
-                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
-#endif
-                                      public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>
+                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
 private:
+    using Flags = GenericConnectivityManagerImpl_WiFi::ConnectivityFlags;
     // ===== Members that implement the ConnectivityManager abstract interface.
 
+    WiFiStationMode _GetWiFiStationMode(void);
+    CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
+    bool _IsWiFiStationEnabled(void);
+    bool _IsWiFiStationApplicationControlled(void);
+    bool _IsWiFiStationConnected(void);
+    uint32_t _GetWiFiStationReconnectIntervalMS(void);
+    CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
+    bool _IsWiFiStationProvisioned(void);
+    void _ClearWiFiStationProvision(void);
+    WiFiAPMode _GetWiFiAPMode(void);
+    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
+    bool _IsWiFiAPActive(void);
+    bool _IsWiFiAPApplicationControlled(void);
+    void _DemandStartWiFiAP(void);
+    void _StopOnDemandWiFiAP(void);
+    void _MaintainOnDemandWiFiAP(void);
+    uint32_t _GetWiFiAPIdleTimeoutMS(void);
+    void _SetWiFiAPIdleTimeoutMS(uint32_t val);
+    CHIP_ERROR _GetAndLogWifiStatsCounters(void);
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
+    bool _CanStartWiFiScan();
+    void _OnWiFiScanDone();
+    void _OnWiFiStationProvisionChange();
 
     // ===== Members for internal use by the following friends.
 
@@ -71,7 +87,80 @@ private:
     friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
     static ConnectivityManagerImpl sInstance;
+
+    // ===== Private members reserved for use by this class only.
+
+    uint64_t mLastStationConnectFailTime;
+    uint64_t mLastAPDemandTime;
+    WiFiStationMode mWiFiStationMode;
+    WiFiStationState mWiFiStationState;
+    WiFiAPMode mWiFiAPMode;
+    WiFiAPState mWiFiAPState;
+    uint32_t mWiFiStationReconnectIntervalMS;
+    uint32_t mWiFiAPIdleTimeoutMS;
+    BitFlags<Flags> mFlags;
+
+    void DriveStationState(void);
+    void OnStationConnected(void);
+    void OnStationDisconnected(void);
+    void ChangeWiFiStationState(WiFiStationState newState);
+    static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
+
+    void DriveAPState(void);
+    CHIP_ERROR ConfigureWiFiAP(void);
+    void ChangeWiFiAPState(WiFiAPState newState);
+    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
+
+    void UpdateInternetConnectivityState(void);
+    void OnStationIPv4AddressAvailable(void);
+    void OnStationIPv4AddressLost(void);
+    void OnIPv6AddressAvailable(void);
+
+    static void RefreshMessageLayer(void);
+    static void RtkWiFiStationConnectedHandler(char * buf, int buf_len, int flags, void * userdata);
+    void DHCPProcess(void);
+    static void DHCPProcessThread(void * param);
 };
+
+inline bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
+{
+    return mWiFiStationMode == kWiFiStationMode_ApplicationControlled;
+}
+
+inline bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
+{
+    return mWiFiStationState == kWiFiStationState_Connected;
+}
+
+inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled(void)
+{
+    return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
+}
+
+inline uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS(void)
+{
+    return mWiFiStationReconnectIntervalMS;
+}
+
+inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode(void)
+{
+    return mWiFiAPMode;
+}
+
+inline bool ConnectivityManagerImpl::_IsWiFiAPActive(void)
+{
+    return mWiFiAPState == kWiFiAPState_Active;
+}
+
+inline uint32_t ConnectivityManagerImpl::_GetWiFiAPIdleTimeoutMS(void)
+{
+    return mWiFiAPIdleTimeoutMS;
+}
+
+inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
+{
+    return mWiFiStationState != kWiFiStationState_Connecting;
+}
 
 /**
  * Returns the public interface of the ConnectivityManager singleton object.
