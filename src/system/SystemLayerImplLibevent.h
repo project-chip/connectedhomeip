@@ -53,6 +53,7 @@ public:
     CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
+    CHIP_ERROR ScheduleLambdaBridge(LambdaBridge && event) override;
 
     // LayerSocket overrides.
     CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut) override;
@@ -109,6 +110,8 @@ private:
     CHIP_ERROR UpdateWatch(SocketWatch * watch, short eventFlags);
     static void SocketCallbackHandler(evutil_socket_t fd, short eventFlags, void * data);
 
+    static void RunScheduledLambda(Layer * aLayer, void * appState);
+
     event_base * mEventBase; ///< libevent shared state.
 
     std::list<std::unique_ptr<LibeventTimer>> mTimers;
@@ -117,6 +120,7 @@ private:
 
     std::list<std::unique_ptr<SocketWatch>> mSocketWatches;
     std::list<SocketWatch *> mActiveSocketWatches;
+    std::list<LambdaBridge> mScheduledLambdas;
 
     ObjectLifeCycle mLayerState;
     WakeEvent mWakeEvent;

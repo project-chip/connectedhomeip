@@ -29,7 +29,7 @@ class Object;
 class PlatformEventing
 {
 public:
-    static CHIP_ERROR ScheduleLambdaBridge(System::Layer & aLayer, const LambdaBridge & bridge);
+    static CHIP_ERROR ScheduleLambdaBridge(System::Layer & aLayer, LambdaBridge && bridge);
     static CHIP_ERROR PostEvent(System::Layer & aLayer, Object & aTarget, EventType aType, uintptr_t aArgument);
     static CHIP_ERROR StartTimer(System::Layer & aLayer, System::Clock::Timeout aTimeout);
 };
