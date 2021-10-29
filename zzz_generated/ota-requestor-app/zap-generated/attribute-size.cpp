@@ -147,6 +147,33 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             entryOffset = static_cast<uint16_t>(entryOffset + 34);
             break;
         }
+        case 0x0004: // TrustedRootCertificates
+        {
+            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, static_cast<uint16_t>(index - 1));
+            if (entryOffset == 0)
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+
+            ByteSpan * trustedRootCertificatesSpan         = reinterpret_cast<ByteSpan *>(write ? src : dest); // OCTET_STRING
+            uint16_t trustedRootCertificatesRemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, trustedRootCertificatesRemainingSpace, trustedRootCertificatesSpan)
+                       : ReadByteSpan(src + entryOffset, trustedRootCertificatesRemainingSpace, trustedRootCertificatesSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+
+            if (!CanCastTo<uint16_t>(trustedRootCertificatesSpan->size()))
+            {
+                ChipLogError(Zcl, "Span size %zu is too large", trustedRootCertificatesSpan->size());
+                return 0;
+            }
+            entryLength = static_cast<uint16_t>(trustedRootCertificatesSpan->size());
+            break;
+        }
         }
         break;
     }
@@ -184,6 +211,10 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0001: // fabrics list
             // Struct _FabricDescriptor
             entryLength = 120;
+            break;
+        case 0x0004: // TrustedRootCertificates
+            // chip::ByteSpan
+            return GetByteSpanOffsetFromIndex(buffer, 402, entryCount);
             break;
         }
         break;

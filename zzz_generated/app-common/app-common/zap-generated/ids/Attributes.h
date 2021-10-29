@@ -1736,6 +1736,10 @@ namespace TrustedRootCertificates {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace TrustedRootCertificates
 
+namespace CurrentFabricIndex {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace CurrentFabricIndex
+
 namespace FeatureMap {
 static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 } // namespace FeatureMap

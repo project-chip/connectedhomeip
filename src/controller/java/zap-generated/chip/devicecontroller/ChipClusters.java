@@ -4940,6 +4940,10 @@ public class ChipClusters {
       readTrustedRootCertificatesAttribute(chipClusterPtr, callback);
     }
 
+    public void readCurrentFabricIndexAttribute(IntegerAttributeCallback callback) {
+      readCurrentFabricIndexAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -4955,6 +4959,9 @@ public class ChipClusters {
 
     private native void readTrustedRootCertificatesAttribute(
         long chipClusterPtr, TrustedRootCertificatesAttributeCallback callback);
+
+    private native void readCurrentFabricIndexAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

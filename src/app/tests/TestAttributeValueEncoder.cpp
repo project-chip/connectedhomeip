@@ -36,7 +36,7 @@ namespace {
 
 struct TestSetup
 {
-    TestSetup(nlTestSuite * aSuite) : encoder(&writer)
+    TestSetup(nlTestSuite * aSuite) : encoder(&writer, 0)
     {
         writer.Init(buf);
         TLVType ignored;

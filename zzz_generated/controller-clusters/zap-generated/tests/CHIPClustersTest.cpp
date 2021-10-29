@@ -1955,6 +1955,17 @@ CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeCommissionedFabrics(
         chip::app::AttributePathParams(mEndpoint, mClusterId, OperationalCredentials::Attributes::CommissionedFabrics::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
+CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeCurrentFabricIndex(Callback::Cancelable * onSuccessCallback,
+                                                                               Callback::Cancelable * onFailureCallback,
+                                                                               chip::FabricIndex value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, OperationalCredentials::Attributes::CurrentFabricIndex::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
 CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback,
                                                                             uint16_t value)

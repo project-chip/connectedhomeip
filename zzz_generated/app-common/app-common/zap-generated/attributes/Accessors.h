@@ -1641,6 +1641,11 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace CommissionedFabrics
 
+namespace CurrentFabricIndex {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::FabricIndex * value); // fabric_idx
+EmberAfStatus Set(chip::EndpointId endpoint, chip::FabricIndex value);
+} // namespace CurrentFabricIndex
+
 } // namespace Attributes
 } // namespace OperationalCredentials
 
