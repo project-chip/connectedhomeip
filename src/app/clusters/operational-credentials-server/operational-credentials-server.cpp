@@ -164,134 +164,13 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & 
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr uint16_t kMaxRspLen = 900;
 
-/*
- * Temporary flow for fabric management until addOptCert + fabric index are implemented:
- * 1) When Commissioner pairs with CHIP device, store device nodeId in Fabric table as NodeId
- *    and store commissioner nodeId in Fabric table as FabricId (This is temporary until AddOptCert is implemented and
- * Fabrics are implemented correctely) 2) When pairing is complete, commissioner calls SetFabric to set the vendorId on the newly
- * created fabric. The corresponding fabric is found by looking in fabric table and finding a fabric that has the matching
- * commissioner node ID as fabricId + device nodeId as nodeId and an uninitialized vendorId. 3) RemoveFabric uses the passed in
- * fabricId, nodeId, vendorID to find matching entry and remove it from fabric table. Once fabricIndex is implemented, it
- * should use that instead.
- */
-
-EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
+void fabricListChanged()
 {
-    EmberAfAttributeSearchRecord record;
-    record.endpoint         = 0;
-    record.clusterId        = OperationalCredentials::Id;
-    record.clusterMask      = CLUSTER_MASK_SERVER;
-    record.manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE;
-    record.attributeId      = Attributes::FabricsList::Id;
-
-    // When reading or writing a List attribute the 'index' value could have 3 types of values:
-    //  -1: Read/Write the whole list content, including the number of elements in the list
-    //   0: Read/Write the number of elements in the list, represented as a uint16_t
-    //   n: Read/Write the nth element of the list
-    //
-    // Since the first 2 bytes of the attribute are used to store the number of elements, elements indexing starts
-    // at 1. In order to hide this to the rest of the code of this file, the element index is incremented by 1 here.
-    // This also allows calling writeAttribute() with no index arg to mean "write the length".
-
-    return emAfReadOrWriteAttribute(&record,
-                                    NULL, // metadata
-                                    buffer,
-                                    0,    // read length
-                                    true, // write ?
-                                    index + 1);
-}
-
-EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nodeId, uint16_t vendorId, CharSpan & fabricLabel,
-                          Credentials::P256PublicKeySpan rootPubkey, uint8_t index)
-{
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-
-    auto * fabricDescriptor = chip::Platform::New<::FabricDescriptor>();
-    VerifyOrReturnError(fabricDescriptor != nullptr, EMBER_ZCL_STATUS_FAILURE);
-
-    fabricDescriptor->FabricIndex   = fabricIndex;
-    fabricDescriptor->RootPublicKey = ByteSpan(rootPubkey.data(), rootPubkey.size());
-
-    fabricDescriptor->VendorId = vendorId;
-    fabricDescriptor->FabricId = fabricId;
-    fabricDescriptor->NodeId   = nodeId;
-    if (!fabricLabel.empty())
-    {
-        fabricDescriptor->Label = fabricLabel;
-    }
-
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                   "OpCreds: Writing fabric into attribute store at index %d: fabricId 0x" ChipLogFormatX64
-                   ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
-                   index, ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
-    status = writeFabricAttribute((uint8_t *) fabricDescriptor, static_cast<int32_t>(index));
-    chip::Platform::Delete(fabricDescriptor);
-    return status;
-}
-
-CHIP_ERROR writeFabricsIntoFabricsListAttribute()
-{
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to writeFabricsIntoFabricsListAttribute");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Loop through fabrics
-    uint8_t fabricIndex = 0;
-    for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
-    {
-        NodeId nodeId        = fabricInfo.GetPeerId().GetNodeId();
-        uint64_t fabricId    = fabricInfo.GetFabricId();
-        uint16_t vendorId    = fabricInfo.GetVendorId();
-        CharSpan fabricLabel = fabricInfo.GetFabricLabel();
-
-        // Skip over uninitialized fabrics
-        if (nodeId == kUndefinedNodeId)
-        {
-            emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                           "OpCreds: Skipping over uninitialized fabric with fabricId 0x" ChipLogFormatX64
-                           ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
-                           ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
-            continue;
-        }
-        else if (writeFabric(fabricInfo.GetFabricIndex(), fabricId, nodeId, vendorId, fabricLabel, fabricInfo.GetRootPubkey(),
-                             fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                           "OpCreds: Failed to write fabric with fabricId 0x" ChipLogFormatX64 " in fabrics list",
-                           ChipLogValueX64(fabricId));
-            err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-            break;
-        }
-        fabricIndex++;
-    }
-
-    // Store the count of fabrics we just stored
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIu8 " fabrics in fabrics list attribute.", fabricIndex);
-    uint16_t u16Index = fabricIndex;
-    if (writeFabricAttribute(reinterpret_cast<uint8_t *>(&u16Index)) != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabric count %" PRIu8 " in fabrics list", fabricIndex);
-        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-    }
-
-    if (err == CHIP_NO_ERROR && Attributes::CommissionedFabrics::Set(0, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fabrics",
-                       fabricIndex);
-        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-    }
-
-    if (err == CHIP_NO_ERROR && Attributes::SupportedFabrics::Set(0, CHIP_CONFIG_MAX_DEVICE_ADMINS) != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write %d in supported fabrics count attribute",
-                       CHIP_CONFIG_MAX_DEVICE_ADMINS);
-        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-    }
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to fabricListChanged");
 
     // Currently, we only manage FabricsList attribute in endpoint 0, OperationalCredentials cluster is always required to be on
     // EP0.
     MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::FabricsList::Id);
-
-    return err;
 }
 
 static FabricInfo * retrieveCurrentFabric()
@@ -319,7 +198,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     void OnFabricDeletedFromStorage(FabricIndex fabricId) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIu8 " was deleted from fabric storage.", fabricId);
-        writeFabricsIntoFabricsListAttribute();
+        fabricListChanged();
     }
 
     // Gets called when a fabric is loaded into the FabricTable from KVS store.
@@ -330,7 +209,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
                        fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
-        writeFabricsIntoFabricsListAttribute();
+        fabricListChanged();
     }
 
     // Gets called when a fabric in FabricTable is persisted to KVS store.
@@ -341,7 +220,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
                        ", NodeId " ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
                        fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
-        writeFabricsIntoFabricsListAttribute();
+        fabricListChanged();
     }
 };
 
@@ -356,7 +235,6 @@ void MatterOperationalCredentialsPluginServerInitCallback(void)
 #endif
 
     Server::GetInstance().GetFabricTable().SetFabricDelegate(&gFabricDelegate);
-    writeFabricsIntoFabricsListAttribute();
 }
 
 namespace {
@@ -395,7 +273,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     app::DnssdServer::Instance().StartServer();
 
 exit:
-    writeFabricsIntoFabricsListAttribute();
+    fabricListChanged();
     emberAfSendImmediateDefaultResponse(status);
     if (err == CHIP_NO_ERROR)
     {
@@ -443,7 +321,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
-    writeFabricsIntoFabricsListAttribute();
+    fabricListChanged();
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
