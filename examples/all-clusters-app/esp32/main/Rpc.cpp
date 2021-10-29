@@ -60,7 +60,10 @@ PW_TRACE_TIME_TYPE pw_trace_GetTraceTime()
     return (PW_TRACE_TIME_TYPE) chip::System::SystemClock().GetMonotonicMicroseconds64().count();
 }
 // Microsecond time source
-size_t pw_trace_GetTraceTimeTicksPerSecond() { return 1000000; }
+size_t pw_trace_GetTraceTimeTicksPerSecond()
+{
+    return 1000000;
+}
 
 namespace chip {
 namespace rpc {
