@@ -25,6 +25,7 @@
 #include <app/AppBuildConfig.h>
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/MessageDef/CommandList.h>
+#include <app/MessageDef/EventFilters.h>
 #include <app/MessageDef/InvokeCommand.h>
 #include <app/MessageDef/ReadRequest.h>
 #include <app/MessageDef/ReportData.h>
@@ -70,6 +71,56 @@ CHIP_ERROR DebugPrettyPrint(const chip::System::PacketBufferHandle & aMsgBuf)
     }
 
     return err;
+}
+
+void BuildEventFilterIB(nlTestSuite * apSuite, EventFilterIB::Builder & aEventFilterIBBuilder)
+{
+    aEventFilterIBBuilder.Node(1).EventMin(2).EndOfEventFilterIB();
+    NL_TEST_ASSERT(apSuite, aEventFilterIBBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseEventFilterIB(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EventFilterIB::Parser eventFilterIBParser;
+    chip::NodeId node = 1;
+    uint64_t eventMin = 2;
+
+    err = eventFilterIBParser.Init(aReader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = eventFilterIBParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+    err = eventFilterIBParser.GetNode(&node);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && node == 1);
+
+    err = eventFilterIBParser.GetEventMin(&eventMin);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && eventMin == 2);
+}
+
+void BuildEventFilters(nlTestSuite * apSuite, EventFilters::Builder & aEventFiltersBuilder)
+{
+    EventFilterIB::Builder eventFilterBuilder = aEventFiltersBuilder.CreateEventFilter();
+    NL_TEST_ASSERT(apSuite, aEventFiltersBuilder.GetError() == CHIP_NO_ERROR);
+    BuildEventFilterIB(apSuite, eventFilterBuilder);
+    aEventFiltersBuilder.EndOfEventFilters();
+    NL_TEST_ASSERT(apSuite, aEventFiltersBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseEventFilters(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EventFilters::Parser eventFiltersParser;
+    AttributePath::Parser attributePathParser;
+
+    err = eventFiltersParser.Init(aReader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = eventFiltersParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
 }
 
 void BuildAttributePath(nlTestSuite * apSuite, AttributePath::Builder & aAttributePathBuilder)
@@ -1039,6 +1090,53 @@ void ParseTimedRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     NL_TEST_ASSERT(apSuite, timeout == 1 && err == CHIP_NO_ERROR);
 }
 
+void EventFilterTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EventFilterIB::Builder eventFilterBuilder;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    eventFilterBuilder.Init(&writer);
+    BuildEventFilterIB(apSuite, eventFilterBuilder);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ParseEventFilterIB(apSuite, reader);
+}
+
+void EventFiltersTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    EventFilters::Builder eventFiltersBuilder;
+
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+
+    err = eventFiltersBuilder.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    BuildEventFilters(apSuite, eventFiltersBuilder);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ParseEventFilters(apSuite, reader);
+}
+
 void AttributePathTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1622,6 +1720,8 @@ void CheckPointRollbackTest(nlTestSuite * apSuite, void * apContext)
 // clang-format off
 const nlTest sTests[] =
         {
+                NL_TEST_DEF("EventFilterTest", EventFilterTest),
+                NL_TEST_DEF("EventFiltersTest", EventFiltersTest),
                 NL_TEST_DEF("AttributePathTest", AttributePathTest),
                 NL_TEST_DEF("AttributePathListTest", AttributePathListTest),
                 NL_TEST_DEF("EventPathTest", EventPathTest),
