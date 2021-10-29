@@ -41,6 +41,10 @@ class ConfigurationManagerImpl final : public Internal::GenericConfigurationMana
     // the implementation methods provided by this class.
     friend class ConfigurationManager;
 
+public:
+    // This returns an instance of this class.
+    static ConfigurationManagerImpl & GetDefaultInstance();
+
 private:
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.

@@ -46,6 +46,7 @@ class ConfigurationManagerImpl final : public Internal::GenericConfigurationMana
 
 public:
     void InitializeWithObject(jobject managerObject);
+    static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
