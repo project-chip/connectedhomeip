@@ -117,13 +117,13 @@ public:
 
     /// Maximum size of the string outputes by ToString. Format is of the form:
     /// "UDP:<ip>:<port>"
-    static constexpr size_t kMaxToStringSize = 3   // type: UDP/TCP/BLE
-        + 1                                        // splitter
-        + kInetMaxAddrLen + 1                      // address
-        + 5                                        // port: 16 bit interger
-        + 1                                        // splitter
-        + Inet::InterfaceId::kMaxIfNameLength      // interface
-        + 1; // NullTerminator
+    static constexpr size_t kMaxToStringSize = 3 // type: UDP/TCP/BLE
+        + 1                                      // splitter
+        + kInetMaxAddrLen + 1                    // address
+        + 5                                      // port: 16 bit interger
+        + 1                                      // splitter
+        + Inet::InterfaceId::kMaxIfNameLength    // interface
+        + 1;                                     // NullTerminator
 
     template <size_t N>
     inline void ToString(char (&buf)[N]) const
