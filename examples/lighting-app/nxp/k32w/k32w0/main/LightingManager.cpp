@@ -51,12 +51,12 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
     if (mState == kState_On && aAction == TURNOFF_ACTION)
     {
         action_initiated = true;
-        mState = kState_Off;
+        mState           = kState_Off;
     }
     else if (mState == kState_Off && aAction == TURNON_ACTION)
     {
         action_initiated = true;
-        mState = kState_On;
+        mState           = kState_On;
     }
 
     if (action_initiated)
