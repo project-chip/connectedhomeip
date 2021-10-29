@@ -632,12 +632,12 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     mUdcTransportMgr = chip::Platform::New<DeviceIPTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->InetLayer())
                                                     .SetAddressType(Inet::IPAddressType::kIPv6)
-                                                    .SetListenPort((uint16_t) (mUdcListenPort))
+                                                    .SetListenPort((uint16_t)(mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
                                                 Transport::UdpListenParameters(mSystemState->InetLayer())
                                                     .SetAddressType(Inet::IPAddressType::kIPv4)
-                                                    .SetListenPort((uint16_t) (mUdcListenPort))
+                                                    .SetListenPort((uint16_t)(mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
                                                     ));
 
