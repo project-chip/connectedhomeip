@@ -157,7 +157,7 @@ void TestStub(nlTestSuite * inSuite, void * inContext)
     // without an expected event.
     ChipLogError(Discovery, "Test platform returns error correctly");
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
     OperationalAdvertisingParameters params;
     NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(params) == CHIP_ERROR_UNEXPECTED_EVENT);
@@ -168,7 +168,7 @@ void TestOperational(nlTestSuite * inSuite, void * inContext)
     ChipLogError(Discovery, "Test operational");
     test::Reset();
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
 
     operationalCall1.callType = test::CallType::kStart;
@@ -189,7 +189,7 @@ void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
     ChipLogError(Discovery, "Test commissionable");
     test::Reset();
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
 
     commissionableSmall.callType = test::CallType::kStart;
