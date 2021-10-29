@@ -94,10 +94,18 @@ jobs:
             - name: Clean Build
               run: xcodebuild clean
               working-directory: src/darwin/Framework
-            - name: Run Build Test Server
+            - name: Build example All Clusters Server
               timeout-minutes: 10
               run: |
                 scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+            - name: Build example OTA Provider
+              timeout-minutes: 5
+              run: |
+                scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
+            - name: Build example OTA Requestor
+              timeout-minutes: 5
+              run: |
+                scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
