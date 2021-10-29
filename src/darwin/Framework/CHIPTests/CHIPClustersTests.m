@@ -12627,6 +12627,29 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTestOperationalCredentialsCluster_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read current fabric index"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOperationalCredentials * cluster = [[CHIPTestOperationalCredentials alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentFabricIndexWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read current fabric index Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertGreaterThanOrEqual([values[@"value"] unsignedCharValue], 1);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTestSubscribe_OnOff_000000_Off
 {
@@ -17443,6 +17466,25 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
     [cluster readAttributeTrustedRootCertificatesWithResponseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"OperationalCredentials TrustedRootCertificates Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterOperationalCredentialsReadAttributeCurrentFabricIndexWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"OperationalCredentialsReadAttributeCurrentFabricIndexWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentFabricIndexWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"OperationalCredentials CurrentFabricIndex Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

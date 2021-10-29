@@ -130,6 +130,9 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & 
     case Attributes::TrustedRootCertificates::Id: {
         return ReadRootCertificates(aPath.mEndpointId, aEncoder);
     }
+    case Attributes::CurrentFabricIndex::Id: {
+        return aEncoder.Encode(aEncoder.AccessingFabricIndex());
+    }
     default:
         break;
     }

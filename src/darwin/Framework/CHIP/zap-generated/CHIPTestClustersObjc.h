@@ -556,6 +556,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)writeAttributeSupportedFabricsWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeCommissionedFabricsWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeCurrentFabricIndexWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end

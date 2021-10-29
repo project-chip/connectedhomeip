@@ -10173,6 +10173,16 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::TrustedRootCertificates::Id; }
 };
 } // namespace TrustedRootCertificates
+namespace CurrentFabricIndex {
+struct TypeInfo
+{
+    using Type          = chip::FabricIndex;
+    using DecodableType = chip::FabricIndex;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFabricIndex::Id; }
+};
+} // namespace CurrentFabricIndex
 namespace FeatureMap {
 struct TypeInfo
 {

@@ -15636,6 +15636,7 @@ private:
 | * SupportedFabrics                                                  | 0x0002 |
 | * CommissionedFabrics                                               | 0x0003 |
 | * TrustedRootCertificates                                           | 0x0004 |
+| * CurrentFabricIndex                                                | 0x0005 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -16003,6 +16004,40 @@ private:
     chip::Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>(
             OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute CurrentFabricIndex
+ */
+class ReadOperationalCredentialsCurrentFabricIndex : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsCurrentFabricIndex() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-fabric-index");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsCurrentFabricIndex()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCurrentFabricIndex(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -27565,6 +27600,7 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<ReadOperationalCredentialsSupportedFabrics>(),         //
         make_unique<ReadOperationalCredentialsCommissionedFabrics>(),      //
         make_unique<ReadOperationalCredentialsTrustedRootCertificates>(),  //
+        make_unique<ReadOperationalCredentialsCurrentFabricIndex>(),       //
         make_unique<ReadOperationalCredentialsClusterRevision>(),          //
     };
 

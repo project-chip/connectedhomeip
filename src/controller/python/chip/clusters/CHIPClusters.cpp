@@ -5963,6 +5963,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_Trust
         .AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_CurrentFabricIndex(chip::Controller::Device * device,
+                                                                                              chip::EndpointId ZCLendpointId,
+                                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentFabricIndex(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(chip::Controller::Device * device,
                                                                                            chip::EndpointId ZCLendpointId,
                                                                                            chip::GroupId /* ZCLgroupId */)

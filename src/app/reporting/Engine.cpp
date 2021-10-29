@@ -62,7 +62,8 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 }
 
 CHIP_ERROR
-Engine::RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo)
+Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeDataList::Builder & aAttributeDataList,
+                            ClusterInfo & aClusterInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId);
@@ -79,7 +80,7 @@ Engine::RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, Clu
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId,
                   aClusterInfo.mFieldId);
 
-    err = ReadSingleClusterData(path, attributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
+    err = ReadSingleClusterData(aAccessingFabricIndex, path, attributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
     SuccessOrExit(err);
     attributeDataElementBuilder.MoreClusterData(false);
     attributeDataElementBuilder.EndOfAttributeDataElement();
@@ -109,7 +110,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
         if (apReadHandler->IsInitialReport())
         {
             // Retrieve data for this cluster instance and clear its dirty flag.
-            err = RetrieveClusterData(attributeDataList, *clusterInfo);
+            err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, *clusterInfo);
             VerifyOrExit(err == CHIP_NO_ERROR,
                          ChipLogError(DataManagement, "<RE:Run> Error retrieving data from cluster, aborting"));
             attributeClean = false;
@@ -120,11 +121,11 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
             {
                 if (clusterInfo->IsAttributePathSupersetOf(*path))
                 {
-                    err = RetrieveClusterData(attributeDataList, *path);
+                    err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, *path);
                 }
                 else if (path->IsAttributePathSupersetOf(*clusterInfo))
                 {
-                    err = RetrieveClusterData(attributeDataList, *clusterInfo);
+                    err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, *clusterInfo);
                 }
                 else
                 {

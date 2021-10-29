@@ -1835,6 +1835,13 @@ using chip::Callback::Cancelable;
     });
 }
 
+- (void)writeAttributeCurrentFabricIndexWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeCurrentFabricIndex(success, failure, value);
+    });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {

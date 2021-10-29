@@ -4499,6 +4499,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 } // namespace CommissionedFabrics
 
+namespace CurrentFabricIndex {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::FabricIndex * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, (uint8_t *) value, sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::FabricIndex value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, (uint8_t *) &value,
+                                       ZCL_FABRIC_IDX_ATTRIBUTE_TYPE);
+}
+
+} // namespace CurrentFabricIndex
+
 } // namespace Attributes
 } // namespace OperationalCredentials
 

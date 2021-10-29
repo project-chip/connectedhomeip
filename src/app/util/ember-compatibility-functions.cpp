@@ -187,7 +187,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 }
 
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
+                                 bool * apDataExists)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
@@ -198,7 +199,7 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
     {
         // TODO: We should probably clone the writer and convert failures here
         // into status responses, unless our caller already does that.
-        AttributeValueEncoder valueEncoder(apWriter);
+        AttributeValueEncoder valueEncoder(apWriter, aAccessingFabricIndex);
         ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
 
         if (valueEncoder.TriedEncode())
