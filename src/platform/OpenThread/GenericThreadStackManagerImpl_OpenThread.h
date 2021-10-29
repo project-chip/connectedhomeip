@@ -132,6 +132,7 @@ private:
     // ===== Private members for use by this class only.
 
     otInstance * mOTInst;
+    uint64_t mOverrunCount = 0;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     ConnectivityManager::SEDPollingConfig mPollingConfig;

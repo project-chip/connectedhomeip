@@ -793,10 +793,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts(void)
 {
+    // Based on the spec, only OverrunCount should be resetted.
+    mOverrunCount = 0;
     // Reset MAC counters
-    otLinkResetCounters(mOTInst);
-    otThreadResetMleCounters(mOTInst);
-    otThreadResetIp6Counters(mOTInst);
+    // otLinkResetCounters(mOTInst);
+    // otThreadResetMleCounters(mOTInst);
+    // otThreadResetIp6Counters(mOTInst);
 }
 /*
  * @brief Get runtime value from the thread network based on the given attribute ID.
@@ -861,8 +863,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::OverrunCount::Id: {
-        // TO DO
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        uint64_t overrunCount = mOverrunCount;
+        err  = encoder.Encode(overrunCount);
     }
     break;
 
