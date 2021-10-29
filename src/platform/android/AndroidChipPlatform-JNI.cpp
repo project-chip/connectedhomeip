@@ -43,7 +43,7 @@ using namespace chip;
 #define JNI_MDNSCALLBACK_METHOD(RETURN, METHOD_NAME)                                                                               \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_ChipMdnsCallbackImpl_##METHOD_NAME
 
-#if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUUID & uuid);
 #endif
 
@@ -99,16 +99,16 @@ void AndroidChipPlatformJNI_OnUnload(JavaVM * jvm, void * reserved)
 // for BLEManager
 JNI_METHOD(void, nativeSetBLEManager)(JNIEnv *, jobject, jobject manager)
 {
-#if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     chip::DeviceLayer::StackLock lock;
     chip::DeviceLayer::Internal::BLEMgrImpl().InitializeWithObject(manager);
-#endif // CONFIG_NETWORK_LAYER_BLE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 }
 
 JNI_METHOD(void, handleWriteConfirmation)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
-#if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -126,7 +126,7 @@ JNI_METHOD(void, handleWriteConfirmation)
 JNI_METHOD(void, handleIndicationReceived)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId, jbyteArray value)
 {
-#if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
     const auto valueBegin               = env->GetByteArrayElements(value, nullptr);
@@ -153,7 +153,7 @@ exit:
 JNI_METHOD(void, handleSubscribeComplete)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
-#if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -171,7 +171,7 @@ JNI_METHOD(void, handleSubscribeComplete)
 JNI_METHOD(void, handleUnsubscribeComplete)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
-#if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -188,7 +188,7 @@ JNI_METHOD(void, handleUnsubscribeComplete)
 
 JNI_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
 {
-#if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -225,7 +225,7 @@ JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)
     HandleResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
 }
 
-#if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUUID & uuid)
 {
     const auto valueBegin  = env->GetByteArrayElements(value, nullptr);

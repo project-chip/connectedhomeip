@@ -838,7 +838,7 @@ CHIP_ERROR OperationalCredentialsCluster::ReadAttributeClusterRevision(Callback:
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-// TODO: zzz_generated/tv-app/zap-generated deps src/controller, while src/controller deps zzz_generated/controller-clusters
+// zzz_generated/tv-app/zap-generated deps src/controller, while src/controller deps zzz_generated/controller-clusters
 // to avoid loop deps, add this impl
 CHIP_ERROR AdministratorCommissioningCluster::OpenCommissioningWindow(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback,
