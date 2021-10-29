@@ -24,6 +24,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemLayerImpl.h>
@@ -44,6 +45,7 @@ using TestTransportMgr = TransportMgr<Transport::UDP>;
 void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext)
 {
     Platform::MemoryInit();
+    chip::DeviceLayer::SetConfigurationMgr(chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
     DeviceTransportMgr transportMgr;
     SessionManager sessionManager;
     ExchangeManager exchangeMgr;
