@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
@@ -167,6 +168,19 @@ void JniReferences::ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * fun
         }
         ChipLogError(Support, "Error in %s : %s", functName, errStr);
     }
+}
+
+void JniReferences::ThrowError(JNIEnv * env, jclass exceptionCls, CHIP_ERROR errToThrow) {
+    env->ExceptionClear();
+    jmethodID constructor = env->GetMethodID(exceptionCls, "<init>", "(ILjava/lang/String;)V");
+    VerifyOrReturn(constructor != NULL);
+
+    jstring jerrStr = env->NewStringUTF(ErrorStr(errToThrow));
+
+    jthrowable outEx = (jthrowable) env->NewObject(exceptionCls, constructor, static_cast<jint>(errToThrow.AsInteger()),
+                                        jerrStr);
+    VerifyOrReturn(!env->ExceptionCheck());
+    env->Throw(outEx);
 }
 
 } // namespace chip
