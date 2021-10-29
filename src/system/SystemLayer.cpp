@@ -14,25 +14,28 @@
  *    limitations under the License.
  */
 
-#pragma once
+/**
+ *    @file
+ *      This file implements LayerImplLwIP using LwIP.
+ */
 
-#include <lib/core/CHIPError.h>
-#include <system/SystemEvent.h>
+#include <lib/support/CodeUtils.h>
+#include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
 
 namespace chip {
 namespace System {
 
-class Layer;
-class Object;
-
-class PlatformEventing
+CHIP_ERROR Layer::ScheduleLambdaBridge(LambdaBridge && bridge)
 {
-public:
-    static CHIP_ERROR ScheduleLambdaBridge(System::Layer & aLayer, const LambdaBridge & bridge);
-    static CHIP_ERROR PostEvent(System::Layer & aLayer, Object & aTarget, EventType aType, uintptr_t aArgument);
-    static CHIP_ERROR StartTimer(System::Layer & aLayer, System::Clock::Timeout aTimeout);
-};
+    CHIP_ERROR lReturn = PlatformEventing::ScheduleLambdaBridge(*this, std::move(bridge));
+    if (lReturn != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer lambda event: %s", ErrorStr(lReturn));
+    }
+    return lReturn;
+}
 
 } // namespace System
 } // namespace chip
+
