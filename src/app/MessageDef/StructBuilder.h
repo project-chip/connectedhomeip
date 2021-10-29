@@ -1,7 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,12 +27,12 @@
 
 namespace chip {
 namespace app {
-class ListBuilder : public Builder
+class StructBuilder : public Builder
 {
 public:
     /**
      * Init the TLV array container with an particular context tag.
-     * Required to implement arrays of arrays, and to test ListBuilder.
+     * Required to implement arrays of arrays, and to test StructBuilder.
      *
      * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
      * @param[in]   aContextTagToUse    A contextTag to use.
@@ -44,7 +43,7 @@ public:
     CHIP_ERROR Init(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
     /**
      * Init the TLV array container with an anonymous tag.
-     * Required to implement arrays of arrays, and to test ListBuilder.
+     * Required to implement arrays of arrays, and to test StructBuilder.
      *
      * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
      *

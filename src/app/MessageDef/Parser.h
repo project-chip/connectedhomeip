@@ -62,6 +62,13 @@ public:
      */
     void GetReader(chip::TLV::TLVReader * const apReader);
 
+    /**
+     *  @brief Iterate to next element
+     *
+     *  @return #CHIP_NO_ERROR on success
+     */
+    CHIP_ERROR Next();
+
 protected:
     chip::TLV::TLVReader mReader;
     chip::TLV::TLVType mOuterContainerType;

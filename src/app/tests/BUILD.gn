@@ -51,6 +51,7 @@ chip_test_suite("tests") {
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestStatusResponse.cpp",
+    "TestBuilderParser.cpp",
   ]
 
   if (chip_device_platform != "efr32") {

@@ -22,13 +22,13 @@
 
 namespace chip {
 namespace app {
-class ListParser : public Parser
+class StructParser : public Parser
 {
 public:
     /**
      *  @brief Initialize the parser object with TLVReader
      *
-     *  @param [in] aReader A pointer to a TLVReader, which should be on the element of the list element
+     *  @param [in] aReader A pointer to a TLVReader, which should be on the element of the struct element
      *
      *  @return #CHIP_NO_ERROR on success
      */

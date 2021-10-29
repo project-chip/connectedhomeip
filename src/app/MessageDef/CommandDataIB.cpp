@@ -36,21 +36,6 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR CommandDataIB::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // make a copy of the reader here
-    mReader.Init(aReader);
-
-    VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = mReader.EnterContainer(mOuterContainerType);
-
-exit:
-    return err;
-}
-
 CHIP_ERROR
 CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) const
 {
@@ -368,11 +353,6 @@ exit:
     ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
 
     return err;
-}
-
-CHIP_ERROR CommandDataIB::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
 }
 
 CommandPathIB::Builder & CommandDataIB::Builder::CreateCommandPathBuilder()

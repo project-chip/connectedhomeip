@@ -1,8 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -16,23 +14,28 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "ArrayBuilder.h"
 
-#include "Parser.h"
+#include <inttypes.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 namespace chip {
 namespace app {
-class ListParser : public Parser
+CHIP_ERROR ArrayBuilder::Init(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
 {
-public:
-    /**
-     *  @brief Initialize the parser object with TLVReader
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should be on the element of the list element
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(const TLV::TLVReader & aReader);
-};
+    mpWriter = apWriter;
+    mError   = mpWriter->StartContainer(TLV::ContextTag(aContextTagToUse), chip::TLV::kTLVType_Array, mOuterContainerType);
+
+    return mError;
+}
+
+CHIP_ERROR ArrayBuilder::Init(TLV::TLVWriter * const apWriter)
+{
+    mpWriter = apWriter;
+    mError   = mpWriter->StartContainer(TLV::AnonymousTag, chip::TLV::kTLVType_Array, mOuterContainerType);
+
+    return mError;
+}
 }; // namespace app
 }; // namespace chip
