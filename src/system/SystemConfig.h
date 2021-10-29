@@ -652,3 +652,13 @@ struct LwIPEvent;
 #define CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS 0
 #endif
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_SCHEDULE_LAMBDA_POOLSIZE
+ *
+ *  @brief
+ *      Define how much space allocated for ScheduleLambda API, when using select
+ */
+#ifndef CHIP_SYSTEM_CONFIG_SCHEDULE_LAMBDA_POOLSIZE
+#define CHIP_SYSTEM_CONFIG_SCHEDULE_LAMBDA_POOLSIZE 4
+#endif // CHIP_SYSTEM_CONFIG_SCHEDULE_LAMBDA_POOLSIZE

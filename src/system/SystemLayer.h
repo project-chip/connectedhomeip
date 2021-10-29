@@ -175,7 +175,7 @@ public:
 
         // Implicit cast a capture-less lambda into a raw function pointer.
         event.LambdaProxy = [](const std::aligned_storage<CHIP_CONFIG_LAMBDA_EVENT_SIZE, CHIP_CONFIG_LAMBDA_EVENT_ALIGN> & body) {
-            (*static_cast<const Lambda *>(&body))();
+            (*reinterpret_cast<const Lambda *>(&body))();
         };
         memcpy(&event.LambdaBody, &lambda, sizeof(Lambda));
 

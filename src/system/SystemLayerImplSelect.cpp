@@ -213,11 +213,12 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
 
 CHIP_ERROR LayerImplSelect::ScheduleLambdaBridge(LambdaBridge && event)
 {
-    mScheduledLambdas.emplace_back(std::move(event));
+    LambdaBridge * allocated = mScheduledLambdas.CreateObject(std::move(event));
+    if (allocated == nullptr) return CHIP_ERROR_NO_MEMORY;
     CHIP_ERROR err = ScheduleWork(RunScheduledLambda, this);
     if (err != CHIP_NO_ERROR)
     {
-        mScheduledLambdas.pop_back();
+        mScheduledLambdas.ReleaseObject(allocated);
     }
     return err;
 }
@@ -225,12 +226,11 @@ CHIP_ERROR LayerImplSelect::ScheduleLambdaBridge(LambdaBridge && event)
 void LayerImplSelect::RunScheduledLambda(Layer * aLayer, void * appState)
 {
     LayerImplSelect * me = static_cast<LayerImplSelect *>(appState);
-    while (!me->mScheduledLambdas.empty())
-    {
-        auto & event = me->mScheduledLambdas.front();
-        event.LambdaProxy(event.LambdaBody);
-        me->mScheduledLambdas.pop_front();
-    }
+    me->mScheduledLambdas.ForEachActiveObject([&] (LambdaBridge * event) {
+        event->LambdaProxy(event->LambdaBody);
+        me->mScheduledLambdas.ReleaseObject(event);
+        return true;
+    });
 }
 
 CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)

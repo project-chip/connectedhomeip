@@ -31,6 +31,7 @@
 #include <list>
 
 #include <lib/support/ObjectLifeCycle.h>
+#include <lib/support/Pool.h>
 #include <system/SystemLayer.h>
 #include <system/WakeEvent.h>
 
@@ -93,7 +94,7 @@ protected:
         intptr_t mCallbackData;
     };
     SocketWatch mSocketWatchPool[kSocketWatchMax];
-    std::list<LambdaBridge> mScheduledLambdas;
+    BitMapObjectPool<LambdaBridge, CHIP_SYSTEM_CONFIG_SCHEDULE_LAMBDA_POOLSIZE> mScheduledLambdas;
 
     Timer::MutexedList mTimerList;
     timeval mNextTimeout;
