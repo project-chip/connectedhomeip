@@ -42,9 +42,6 @@ namespace DeviceLayer {
 
 namespace Internal {
 
-extern chip::System::Layer * gSystemLayer;
-extern chip::System::LayerImpl gSystemLayerImpl;
-
 extern CHIP_ERROR InitEntropy();
 
 template <class ImplClass>
@@ -75,11 +72,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP system layer.
-    if (gSystemLayer == nullptr)
-    {
-        gSystemLayer = &gSystemLayerImpl;
-    }
-    err = gSystemLayer->Init();
+    err = SystemLayer().Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
@@ -87,7 +80,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP Inet layer.
-    err = InetLayer.Init(*gSystemLayer, nullptr);
+    err = InetLayer().Init(SystemLayer(), nullptr);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));
@@ -137,7 +130,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
     CHIP_ERROR err;
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
-    err = InetLayer.Shutdown();
+    err = InetLayer().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     ChipLogError(DeviceLayer, "BLE layer shutdown");
@@ -145,7 +138,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 #endif
 
     ChipLogError(DeviceLayer, "System Layer shutdown");
-    err = gSystemLayer->Shutdown();
+    err = SystemLayer().Shutdown();
 
     return err;
 }
