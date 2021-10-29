@@ -126,7 +126,7 @@ private:
      * within the same execution context to avoid applying too much pressure on platforms that use small, fixed size event queues.
      *
      */
-    bool mScheduleRunPending = false;
+    bool mRunScheduled = false;
 
     /**
      * The number of report date request in flight
