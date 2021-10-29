@@ -149,12 +149,12 @@ public class NsdManagerServiceResolver implements ServiceResolver {
 
           @Override
           public void onServiceRegistered(NsdServiceInfo serviceInfo) {
-            Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered:");
+            Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered");
           }
 
           @Override
           public void onServiceUnregistered(NsdServiceInfo serviceInfo) {
-            Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered:");
+            Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered");
           }
         };
     registrationListeners.add(registrationListener);
