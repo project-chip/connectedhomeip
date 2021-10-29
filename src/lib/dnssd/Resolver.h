@@ -47,10 +47,10 @@ struct ResolvedNodeData
         // Would be nice to log the interface id, but sorting out how to do so
         // across our differnet InterfaceId implementations is a pain.
         ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
-        for (int i = 0; i < mNumIPs; ++i)
+        for (size_t i = 0; i < mNumIPs; ++i)
         {
             mAddress[i].ToString(addrBuffer);
-            ChipLogProgress(Discovery, "    Addr %d: [%s]:%" PRIu16, i, addrBuffer, mPort);
+            ChipLogProgress(Discovery, "    Addr %zu: [%s]:%" PRIu16, i, addrBuffer, mPort);
         }
 #endif // CHIP_PROGRESS_LOGGING
     }
@@ -68,7 +68,7 @@ struct ResolvedNodeData
     }
 
     PeerId mPeerId;
-    int mNumIPs = 0;
+    size_t mNumIPs = 0;
     Inet::InterfaceId mInterfaceId;
     Inet::IPAddress mAddress[kMaxIPAddresses];
     uint16_t mPort                         = 0;
@@ -126,7 +126,7 @@ struct DiscoveredNodeData
         mrpRetryIntervalIdle   = kUndefinedRetryInterval;
         mrpRetryIntervalActive = kUndefinedRetryInterval;
         numIPs                 = 0;
-        for (int i = 0; i < kMaxIPAddresses; ++i)
+        for (size_t i = 0; i < kMaxIPAddresses; ++i)
         {
             ipAddress[i] = chip::Inet::IPAddress::Any;
         }

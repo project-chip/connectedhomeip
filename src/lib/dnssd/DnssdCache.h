@@ -117,7 +117,7 @@ public:
             {
                 MdnsLogProgress(Discovery, "Entry %d: node %lx fabric %lx, port = %d", i, e.mPeerId.GetNodeId(),
                                 e.peerId.GetFabricId(), e.port);
-                for (int j = 0; j < e.mNumIPs; ++j)
+                for (size_t j = 0; j < e.mNumIPs; ++j)
                 {
                     char address[Inet::IPAddress::kMaxStringLength];
                     e.mAddress[i].ToString(address);

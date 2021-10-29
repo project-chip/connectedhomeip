@@ -45,10 +45,10 @@ public:
 
         ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Port: %" PRIu16, nodeData.mPeerId.GetNodeId(), nodeData.mPort);
         ChipLogProgress(chipTool, "    Hostname: %s", nodeData.mHostName);
-        for (int i = 0; i < nodeData.mNumIPs; ++i)
+        for (size_t i = 0; i < nodeData.mNumIPs; ++i)
         {
             nodeData.mAddress[i].ToString(addrBuffer);
-            ChipLogProgress(chipTool, "    addr %d: %s", i, addrBuffer);
+            ChipLogProgress(chipTool, "    addr %zu: %s", i, addrBuffer);
         }
 
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();

@@ -582,8 +582,9 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     nodeData.mInterfaceId = result->mInterface;
     nodeData.mAddress[0]  = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
+    nodeData.mNumIPs      = 1;
     Time::TimeSource<Time::Source::kSystem> timeSource;
-    nodeData.mExpiryTime = timeSource.GetCurrentMonotonicTimeMs() + result->mTtl * 1000;
+    nodeData.mExpiryTime = timeSource.GetCurrentMonotonicTimeMs() + result->mTtlSeconds * 1000;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
