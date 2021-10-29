@@ -266,6 +266,7 @@ public:
     static void TestProcessSubscribeRequest(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeRoundtrip(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestReadInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext);
 
@@ -1037,6 +1038,56 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     engine->Shutdown();
 }
 
+// Verify that subscription can be shut down just after receiving SUBSCRIBE RESPONSE,
+// before receiving any subsequent REPORT DATA.
+void TestReadInteraction::TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                  = *static_cast<TestContext *>(apContext);
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    InteractionModelEngine & engine    = *InteractionModelEngine::GetInstance();
+    MockInteractionModelApp delegate;
+
+    // Initialize Interaction Model Engine
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+    NL_TEST_ASSERT(apSuite, engine.Init(&ctx.GetExchangeManager(), &delegate) == CHIP_NO_ERROR);
+
+    // Subscribe to the attribute
+    AttributePathParams attributePathParams;
+    attributePathParams.mNodeId     = chip::kTestDeviceNodeId;
+    attributePathParams.mEndpointId = kTestEndpointId;
+    attributePathParams.mClusterId  = kTestClusterId;
+    attributePathParams.mFieldId    = 1;
+    attributePathParams.mListIndex  = 0;
+    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 1;
+    readPrepareParams.mMinIntervalFloorSeconds     = 2;
+    readPrepareParams.mMaxIntervalCeilingSeconds   = 5;
+    readPrepareParams.mKeepSubscriptions           = false;
+
+    printf("Send subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
+    NL_TEST_ASSERT(apSuite, engine.SendSubscribeRequest(readPrepareParams, &delegate) == CHIP_NO_ERROR);
+
+    engine.GetReportingEngine().Run();
+    NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
+    NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 1);
+    NL_TEST_ASSERT(apSuite, delegate.mpReadHandler != nullptr);
+
+    // Shutdown the subscription
+    uint64_t subscriptionId = 0;
+    delegate.mpReadHandler->GetSubscriptionId(subscriptionId);
+
+    NL_TEST_ASSERT(apSuite, subscriptionId != 0);
+    NL_TEST_ASSERT(apSuite, engine.ShutdownSubscription(subscriptionId) == CHIP_NO_ERROR);
+
+    // Cleanup
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+    engine.Shutdown();
+}
+
 void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -1106,6 +1157,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestProcessSubscribeResponse", chip::app::TestReadInteraction::TestProcessSubscribeResponse),
     NL_TEST_DEF("TestProcessSubscribeRequest", chip::app::TestReadInteraction::TestProcessSubscribeRequest),
     NL_TEST_DEF("TestSubscribeRoundtrip", chip::app::TestReadInteraction::TestSubscribeRoundtrip),
+    NL_TEST_DEF("TestSubscribeEarlyShutdown", chip::app::TestReadInteraction::TestSubscribeEarlyShutdown),
     NL_TEST_DEF("TestSubscribeInvalidAttributePathRoundtrip", chip::app::TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip),
     NL_TEST_DEF("TestReadInvalidAttributePathRoundtrip", chip::app::TestReadInteraction::TestReadInvalidAttributePathRoundtrip),
     NL_TEST_SENTINEL()
