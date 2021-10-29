@@ -213,7 +213,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.inetLayer     = inetLayer;
     initParams.fabricStorage = wrapper.get();
     // move bleLayer into platform/android to share with app server
+#if CONFIG_NETWORK_LAYER_BLE
     initParams.bleLayer                        = DeviceLayer::ConnectivityMgr().GetBleLayer();
+#endif
     initParams.listenPort                      = CHIP_PORT + 1;
     setupParams.storageDelegate                = wrapper.get();
     setupParams.pairingDelegate                = wrapper.get();
