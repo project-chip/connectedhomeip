@@ -67,7 +67,7 @@ void AbstractDnssdDiscoveryController::OnNodeDiscoveryComplete(const chip::Dnssd
 CHIP_ERROR AbstractDnssdDiscoveryController::SetUpNodeDiscovery()
 {
 #if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(mResolver->Init(&DeviceLayer::InetLayer));
+    ReturnErrorOnFailure(mResolver->Init(&DeviceLayer::InetLayer()));
 #endif
     mResolver->SetResolverDelegate(this);
 

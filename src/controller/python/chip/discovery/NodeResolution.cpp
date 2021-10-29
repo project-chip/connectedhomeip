@@ -93,7 +93,7 @@ extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, ui
     CHIP_ERROR result = CHIP_NO_ERROR;
 
     chip::python::ChipMainThreadScheduleAndWait([&] {
-        result = Resolver::Instance().Init(&chip::DeviceLayer::InetLayer);
+        result = Resolver::Instance().Init(&chip::DeviceLayer::InetLayer());
         ReturnOnFailure(result);
         Resolver::Instance().SetResolverDelegate(&gPythonResolverDelegate);
 
