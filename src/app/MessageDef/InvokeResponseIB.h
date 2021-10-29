@@ -1,7 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,17 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines CommandList parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
-
-#include "ArrayBuilder.h"
-#include "ArrayParser.h"
-#include "CommandDataIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -34,10 +24,21 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "CommandDataIB.h"
+#include "CommandStatusIB.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
+
 namespace chip {
 namespace app {
-namespace CommandList {
-class Parser : public ArrayParser
+namespace InvokeResponseIB {
+enum class Tag : uint8_t
+{
+    kCommand = 0,
+    kStatus  = 1,
+};
+
+class Parser : public StructParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -56,9 +57,29 @@ public:
      */
     CHIP_ERROR CheckSchemaValidity() const;
 #endif
+
+    /**
+     *  @brief Get a parser for a Command.
+     *
+     *  @param [in] apCommand    A pointer to the CommandDataIB parser.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetCommand(CommandDataIB::Parser * const apCommand) const;
+
+    /**
+     *  @brief Get a parser for a Status.
+     *
+     *  @param [in] apCommand    A pointer to the CommandStatusIB parser.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetStatus(CommandStatusIB::Parser * const apStatus) const;
 };
 
-class Builder : public ArrayBuilder
+class Builder : public StructBuilder
 {
 public:
     /**
@@ -66,23 +87,36 @@ public:
      *
      *  @return A reference to CommandDataIB::Builder
      */
-    CommandDataIB::Builder & CreateCommandDataIBBuilder();
+    CommandDataIB::Builder & CreateCommand();
 
     /**
      *  @return A reference to CommandDataIB::Builder
      */
-    CommandDataIB::Builder & GetCommandDataIBBuilder() { return mCommandDataIBBuilder; };
+    CommandDataIB::Builder & GetCommand() { return mCommand; }
 
     /**
-     *  @brief Mark the end of this CommandList
+     *  @return A reference to CommandStatusIB::Builder
+     */
+    CommandStatusIB::Builder & GetStatus() { return mStatus; }
+
+    /**
+     *  @brief Initialize a CommandStatusIB::Builder for writing into the TLV stream
+     *
+     *  @return A reference to CommandStatusIB::Builder
+     */
+    CommandStatusIB::Builder & CreateStatus();
+
+    /**
+     *  @brief Mark the end of this InvokeCommand
      *
      *  @return A reference to *this
      */
-    CommandList::Builder & EndOfCommandList();
+    InvokeResponseIB::Builder & EndOfInvokeResponseIB();
 
 private:
-    CommandDataIB::Builder mCommandDataIBBuilder;
+    CommandDataIB::Builder mCommand;
+    CommandStatusIB::Builder mStatus;
 };
-}; // namespace CommandList
-}; // namespace app
-}; // namespace chip
+} // namespace InvokeResponseIB
+} // namespace app
+} // namespace chip

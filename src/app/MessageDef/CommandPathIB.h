@@ -15,11 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines CommandPathIB parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
 
@@ -132,9 +127,8 @@ public:
      *
      *  @return A reference to *this
      */
-    CommandPathIB::Builder & EndOfCommandPath();
+    CommandPathIB::Builder & EndOfCommandPathIB();
 };
-}; // namespace CommandPathIB
-
-}; // namespace app
-}; // namespace chip
+} // namespace CommandPathIB
+} // namespace app
+} // namespace chip
