@@ -44,8 +44,8 @@
 
 #include <AppTask.h>
 
-const uint16_t shell_task_size     = 3096;
-const uint8_t shell_task_priority  = 0;
+const uint16_t shell_task_size    = 3096;
+const uint8_t shell_task_priority = 0;
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -137,9 +137,7 @@ extern "C" void main_task(void const * argument)
     cmd_ping_init();
     cmd_send_init();
 
-    shellTaskHandle = xTaskCreate(shell_task, "shell_task",
-                                  shell_task_size / sizeof(StackType_t), NULL,
-                                  shell_task_priority, NULL);
+    shellTaskHandle = xTaskCreate(shell_task, "shell_task", shell_task_size / sizeof(StackType_t), NULL, shell_task_priority, NULL);
     if (!shellTaskHandle)
     {
         K32W_LOG("Error while creating the shell task!");

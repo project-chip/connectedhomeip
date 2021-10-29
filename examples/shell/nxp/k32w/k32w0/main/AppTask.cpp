@@ -91,7 +91,6 @@ CHIP_ERROR AppTask::Init()
     /* start with all LEDS turnedd off */
     sStatusLED.Init(SYSTEM_STATE_LED);
 
-
     /* intialize the Keyboard and button press calback */
     KBD_Init(KBD_Callback);
 
