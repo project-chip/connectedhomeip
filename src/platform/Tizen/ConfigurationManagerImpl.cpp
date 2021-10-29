@@ -51,6 +51,12 @@ void SetConfigurationMgr(ConfigurationManager & configurationManager)
     gInstance = &configurationManager;
 }
 
+ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
+{
+    static ConfigurationManagerImpl sInstance;
+    return sInstance;
+}
+
 CHIP_ERROR ConfigurationManagerImpl::Init(void)
 {
     return Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();

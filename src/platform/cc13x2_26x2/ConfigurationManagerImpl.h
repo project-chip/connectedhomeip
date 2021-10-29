@@ -40,6 +40,10 @@ class ConfigurationManagerImpl final : public Internal::GenericConfigurationMana
     // defined on this class.
     friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
+public:
+    // This returns an instance of this class.
+    static ConfigurationManagerImpl & GetDefaultInstance();
+
 private:
     // ===== Members that implement the ConfigurationManager public interface.
 

@@ -54,6 +54,7 @@ public:
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types

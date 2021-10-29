@@ -56,6 +56,12 @@ void SetConfigurationMgr(ConfigurationManager & configurationManager)
     gInstance = &configurationManager;
 }
 
+ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
+{
+    static ConfigurationManagerImpl sInstance;
+    return sInstance;
+}
+
 void ConfigurationManagerImpl::InitializeWithObject(jobject managerObject)
 {
     JNIEnv * env                     = JniReferences::GetInstance().GetEnvForCurrentThread();
