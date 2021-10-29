@@ -80,6 +80,12 @@ private:
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetBootReasons(uint32_t & bootReasons) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreBootReasons(uint32_t bootReasons) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #if !defined(NDEBUG)
     CHIP_ERROR RunUnitTests(void) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif

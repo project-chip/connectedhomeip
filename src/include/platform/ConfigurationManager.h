@@ -100,6 +100,12 @@ public:
     virtual CHIP_ERROR StoreRegulatoryLocation(uint32_t location)                      = 0;
     virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen)             = 0;
     virtual CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb)                            = 0;
+    virtual CHIP_ERROR GetRebootCount(uint32_t & rebootCount)                          = 0;
+    virtual CHIP_ERROR StoreRebootCount(uint32_t rebootCount)                          = 0;
+    virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours)      = 0;
+    virtual CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours)      = 0;
+    virtual CHIP_ERROR GetBootReasons(uint32_t & bootReasons)                          = 0;
+    virtual CHIP_ERROR StoreBootReasons(uint32_t bootReasons)                          = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 

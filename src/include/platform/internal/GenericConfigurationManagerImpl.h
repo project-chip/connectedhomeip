@@ -97,6 +97,12 @@ public:
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
     CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override;
     CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) override;
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetBootReasons(uint32_t & bootReasons) override;
+    CHIP_ERROR StoreBootReasons(uint32_t bootReasons) override;
 #if !defined(NDEBUG)
     CHIP_ERROR RunUnitTests(void) override;
 #endif
