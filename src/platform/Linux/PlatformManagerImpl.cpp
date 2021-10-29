@@ -27,8 +27,8 @@
 #include <app-common/zap-generated/enums.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/PlatformManager.h>
 #include <platform/Linux/PlatformManagerImpl.h>
+#include <platform/PlatformManager.h>
 
 #include <thread>
 

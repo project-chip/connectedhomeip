@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
+#include <platform/POSIX/GenericPlatformManagerImpl_POSIX.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/POSIX/GenericPlatformManagerImpl_POSIX.h>
 
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>

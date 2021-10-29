@@ -102,10 +102,10 @@ public:
         return ShutdownInner();
     }
 
-    virtual CHIP_ERROR InitChipStackInner() = 0;
-    virtual CHIP_ERROR ShutdownInner() = 0;
+    virtual CHIP_ERROR InitChipStackInner()                                         = 0;
+    virtual CHIP_ERROR ShutdownInner()                                              = 0;
     virtual CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0) = 0;
-    virtual void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) = 0;
+    virtual void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0)    = 0;
 
     /**
      * ScheduleWork can be called after InitChipStack has been called.  Calls
@@ -164,24 +164,24 @@ public:
      * returns.
      */
     virtual CHIP_ERROR StopEventLoopTask() = 0;
-    virtual void LockChipStack() = 0;
-    virtual bool TryLockChipStack() = 0;
-    virtual void UnlockChipStack() = 0;
+    virtual void LockChipStack()           = 0;
+    virtual bool TryLockChipStack()        = 0;
+    virtual void UnlockChipStack()         = 0;
 
     /**
      * Software Diagnostics methods.
      */
-    virtual CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) = 0;
-    virtual CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) = 0;
+    virtual CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree)                   = 0;
+    virtual CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed)                   = 0;
     virtual CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) = 0;
 
     /**
      * General Diagnostics methods.
      */
-    virtual CHIP_ERROR GetRebootCount(uint16_t & rebootCount) = 0;
-    virtual CHIP_ERROR GetUpTime(uint64_t & upTime) = 0;
+    virtual CHIP_ERROR GetRebootCount(uint16_t & rebootCount)                     = 0;
+    virtual CHIP_ERROR GetUpTime(uint64_t & upTime)                               = 0;
     virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) = 0;
-    virtual CHIP_ERROR GetBootReasons(uint8_t & bootReasons) = 0;
+    virtual CHIP_ERROR GetBootReasons(uint8_t & bootReasons)                      = 0;
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     virtual bool IsChipStackLockedByCurrentThread() const = 0;
@@ -226,15 +226,15 @@ public:
     {
         CHIP_ERROR status = PostEvent(event);
         VerifyOrDieWithMsg(status == CHIP_NO_ERROR, DeviceLayer, "Failed to post event %d: %" CHIP_ERROR_FORMAT,
-            static_cast<int>(event->Type), status.Format());
+                           static_cast<int>(event->Type), status.Format());
     }
 
-    virtual void DispatchEvent(const ChipDeviceEvent * event) = 0;
+    virtual void DispatchEvent(const ChipDeviceEvent * event)          = 0;
     virtual CHIP_ERROR StartChipTimer(System::Clock::Timeout duration) = 0;
 
 protected:
     // Construction/destruction limited to subclasses.
-    PlatformManager()  = default;
+    PlatformManager()          = default;
     virtual ~PlatformManager() = default;
 
 private:

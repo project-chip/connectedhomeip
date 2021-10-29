@@ -57,9 +57,9 @@ private:
     CHIP_ERROR StartEventLoopTask() override;
     CHIP_ERROR StopEventLoopTask() override;
     void RunEventLoop() override;
-    void LockChipStack() override {};
+    void LockChipStack() override{};
     bool TryLockChipStack() override { return false; };
-    void UnlockChipStack() override {};
+    void UnlockChipStack() override{};
     CHIP_ERROR PostEvent(const ChipDeviceEvent * event) override;
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED

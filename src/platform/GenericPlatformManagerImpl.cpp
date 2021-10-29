@@ -18,10 +18,10 @@
 
 #include <inttypes.h>
 #include <new>
+#include <platform/GenericPlatformManagerImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/EventLogging.h>
-#include <platform/GenericPlatformManagerImpl.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>

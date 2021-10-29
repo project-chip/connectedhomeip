@@ -25,8 +25,8 @@
 
 #include <memory>
 
-#include <platform/PlatformManager.h>
 #include <platform/POSIX/GenericPlatformManagerImpl_POSIX.h>
+#include <platform/PlatformManager.h>
 
 #if CHIP_WITH_GIO
 #include <gio/gio.h>
@@ -65,7 +65,6 @@ private:
     friend class Internal::BLEManagerImpl;
 
     uint64_t mStartTimeMilliseconds = 0;
-
 
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
     // This should be removed or find a better place once we depercate the rendezvous session.
