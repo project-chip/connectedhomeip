@@ -260,7 +260,12 @@
                 "nrf-nrf5340-shell",
                 "qpg-qpg6100-lock",
                 "telink-tlsr9518adk80d-light",
-                "tizen-arm-light"
+                "tizen-arm-light",
+                "mbed-CY8CPROTO_062_4343W-all-clusters-release",
+                "mbed-CY8CPROTO_062_4343W-light-release",
+                "mbed-CY8CPROTO_062_4343W-lock-release",
+                "mbed-CY8CPROTO_062_4343W-pigweed-release",
+                "mbed-CY8CPROTO_062_4343W-shell-release"
             ]
         }
     ]
