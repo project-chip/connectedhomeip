@@ -22,7 +22,7 @@ from enum import Enum, auto
 from .builder import Builder
 
 from mbed_tools.project import MbedProgram
-from mbed_tools.build import generate_config, build_project
+from mbed_tools.build import generate_config
 
 class MbedApp(Enum):
     LOCK = auto()
@@ -102,11 +102,8 @@ class MbedBuilder(Builder):
         self.board = board
         self.profile = profile
         self.toolchain = "GCC_ARM"
-        self.mbed_os_path = os.path.join(os.environ['PW_PROJECT_ROOT'], 'third_party', 'mbed-os', 'repo')
-        self.mbed_os_posix_socket_path = os.path.join(os.environ['PW_PROJECT_ROOT'], 'third_party', 'mbed-os-posix-socket', 'repo')
-
-        cmake_build_subdir = pathlib.Path(self.board.BoardName.upper(), self.profile.ProfileName.lower(), self.toolchain.upper())
-        self.program = MbedProgram.from_existing(pathlib.Path(self.ExamplePath), cmake_build_subdir, pathlib.Path(self.mbed_os_path))
+        self.mbed_os_path = os.path.join(self.root, 'third_party', 'mbed-os', 'repo')
+        self.mbed_os_posix_socket_path = os.path.join(self.root, 'third_party', 'mbed-os-posix-socket', 'repo')
         
     @property
     def ExamplePath(self):
@@ -114,9 +111,12 @@ class MbedBuilder(Builder):
 
     def generate(self):
         if not os.path.exists(self.output_dir):
-            self.program.files.cmake_build_dir = pathlib.Path(self.output_dir)
-            _, output_path = generate_config(self.board.BoardName.upper(), self.toolchain, self.program)
-            logging.info(f"mbed_config.cmake has been generated and written to '{str(output_path.resolve())}'")
+            if not self._runner.dry_run:
+                cmake_build_subdir = pathlib.Path(self.board.BoardName.upper(), self.profile.ProfileName.lower(), self.toolchain.upper())
+                program = MbedProgram.from_existing(pathlib.Path(self.ExamplePath), cmake_build_subdir, pathlib.Path(self.mbed_os_path))
+                program.files.cmake_build_dir = pathlib.Path(self.output_dir)
+                _, output_path = generate_config(self.board.BoardName.upper(), self.toolchain, program)
+                logging.info(f"mbed_config.cmake has been generated and written to '{str(output_path.resolve())}'")
 
             self._Execute(['cmake', '-S', shlex.quote(self.ExamplePath), '-B', shlex.quote(self.output_dir), '-GNinja', 
                         '-DCMAKE_BUILD_TYPE={}'.format(self.profile.ProfileName.lower()),
@@ -130,7 +130,7 @@ class MbedBuilder(Builder):
         if pathlib.Path(self.output_dir, self.app.AppNamePrefix + '.elf').is_file():
             for filename in glob.glob(os.path.join(self.output_dir, self.app.AppNamePrefix + '*')):
                 os.remove(filename)
-        build_project(pathlib.Path(self.output_dir))
+        self._Execute(['cmake', '--build', shlex.quote(self.output_dir)], title='Building ' + self.identifier)
 
     def build_outputs(self):
         return {
