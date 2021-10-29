@@ -69,9 +69,23 @@ public:
     CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
+    CHIP_ERROR ReadSupportedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadCommissionedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadRootCertificates(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
+
+CHIP_ERROR OperationalCredentialsAttrAccess::ReadSupportedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    uint8_t fabricCount = CHIP_CONFIG_MAX_DEVICE_ADMINS;
+
+    return aEncoder.Encode(fabricCount);
+}
+
+CHIP_ERROR OperationalCredentialsAttrAccess::ReadCommissionedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(Server::GetInstance().GetFabricTable().FabricCount());
+}
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
@@ -124,6 +138,12 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & 
 
     switch (aPath.mAttributeId)
     {
+    case Attributes::SupportedFabrics::Id: {
+        return ReadSupportedFabrics(aPath.mEndpointId, aEncoder);
+    }
+    case Attributes::CommissionedFabrics::Id: {
+        return ReadCommissionedFabrics(aPath.mEndpointId, aEncoder);
+    }
     case Attributes::FabricsList::Id: {
         return ReadFabricsList(aPath.mEndpointId, aEncoder);
     }
