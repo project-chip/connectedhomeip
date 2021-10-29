@@ -74,5 +74,35 @@ exit:
     return err;
 }
 
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+{
+    size_t freeHeapSize;
+
+    freeHeapSize = xPortGetFreeHeapSize();
+    currentHeapFree = static_cast<uint64_t>(freeHeapSize);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+{
+    size_t freeHeapSize;
+    size_t usedHeapSize;
+
+    freeHeapSize = xPortGetFreeHeapSize();
+    usedHeapSize = HEAP_SIZE - freeHeapSize;
+
+    currentHeapUsed = static_cast<uint64_t>(usedHeapSize);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+{
+    size_t highWatermarkHeapSize;
+
+    highWatermarkHeapSize = HEAP_SIZE - xPortGetMinimumEverFreeHeapSize();
+    currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
+    return CHIP_NO_ERROR;
+}
+
 } // namespace DeviceLayer
 } // namespace chip
