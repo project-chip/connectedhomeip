@@ -17,10 +17,10 @@
  */
 
 #include <app/AppBuildConfig.h>
-#include <app/MessageDef/ListBuilder.h>
-#include <app/MessageDef/ListParser.h>
 #include <app/MessageDef/ArrayBuilder.h>
 #include <app/MessageDef/ArrayParser.h>
+#include <app/MessageDef/ListBuilder.h>
+#include <app/MessageDef/ListParser.h>
 #include <app/MessageDef/StructBuilder.h>
 #include <app/MessageDef/StructParser.h>
 #include <lib/core/CHIPError.h>
