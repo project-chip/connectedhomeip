@@ -1,7 +1,6 @@
 package com.google.chip.chiptool.clusterclient.clusterinteraction
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,11 +16,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 
 /**
- * ClusterDetailFragment is the next displayed fragment after clicking on the list of available
- * endpoints. ClusterDetailFragment allows user to pick cluster, command, specify parameters and see
+ * ClusterDetailFragment allows user to pick cluster, command, specify parameters and see
  * the callback result.
  */
-
 class ClusterDetailFragment : Fragment(){
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())

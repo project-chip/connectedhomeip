@@ -8,12 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.chip.chiptool.R
 
 /**
- * EndpointAdapter implements the endpointList(RecycleView) Adapter
+ * EndpointAdapter implements the endpointList(RecycleView) Adapter and associates different
+ * endpoint with the same onClick function provided in [ClusterInteractionFragment.EndpointListener]
  */
 class EndpointAdapter(
   private val endpointList: List<EndpointItem>,
   private val listener: OnItemClickListener
-
 ) : RecyclerView.Adapter<EndpointAdapter.EndpointViewHolder>() {
 
   inner class EndpointViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),

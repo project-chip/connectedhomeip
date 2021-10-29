@@ -30,8 +30,6 @@ class ClusterInteractionFragment : Fragment() {
   private val scope = CoroutineScope(Dispatchers.Main + Job())
   private lateinit var addressUpdateFragment: AddressUpdateFragment
   private lateinit var clusterMap: Map<String, ClusterInfo>
-  private var devicePtr = 0L
-
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -42,8 +40,6 @@ class ClusterInteractionFragment : Fragment() {
       deviceController.setCompletionListener(ChipControllerCallback())
       getEndpointListBtn.setOnClickListener {
         scope.launch {
-          devicePtr =
-            ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
           showMessage("Retrieving endpoints")
           endpointList.visibility = View.VISIBLE
         }
