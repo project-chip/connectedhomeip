@@ -31,14 +31,6 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR EventFilterIB::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    mReader.Init(aReader);
-    VerifyOrReturnError(chip::TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
 {
@@ -115,11 +107,6 @@ CHIP_ERROR EventFilterIB::Parser::GetNode(NodeId * const apNode) const
 CHIP_ERROR EventFilterIB::Parser::GetEventMin(uint64_t * const apEventMin) const
 {
     return GetUnsignedInteger(to_underlying(Tag::kEventMin), apEventMin);
-}
-
-CHIP_ERROR EventFilterIB::Builder::Init(TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
 }
 
 EventFilterIB::Builder & EventFilterIB::Builder::Node(const NodeId aNode)

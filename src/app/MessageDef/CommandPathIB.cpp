@@ -36,22 +36,6 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR CommandPathIB::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // make a copy of the reader here
-    mReader.Init(aReader);
-
-    VerifyOrExit(chip::TLV::kTLVType_List == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = mReader.EnterContainer(mOuterContainerType);
-
-exit:
-
-    return err;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
 {
@@ -152,26 +136,6 @@ CHIP_ERROR CommandPathIB::Parser::GetClusterId(chip::ClusterId * const apCluster
 CHIP_ERROR CommandPathIB::Parser::GetCommandId(chip::CommandId * const apCommandId) const
 {
     return GetUnsignedInteger(kCsTag_CommandId, apCommandId);
-}
-
-CHIP_ERROR CommandPathIB::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
-{
-    mpWriter = apWriter;
-    mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_List, mOuterContainerType);
-    SuccessOrExit(mError);
-
-exit:
-    return mError;
-}
-
-CHIP_ERROR CommandPathIB::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return _Init(apWriter, chip::TLV::AnonymousTag);
-}
-
-CHIP_ERROR CommandPathIB::Builder::Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
-{
-    return _Init(apWriter, chip::TLV::ContextTag(aContextTagToUse));
 }
 
 CommandPathIB::Builder & CommandPathIB::Builder::EndpointId(const chip::EndpointId aEndpointId)

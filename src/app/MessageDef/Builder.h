@@ -85,14 +85,14 @@ public:
      */
     void Rollback(const chip::TLV::TLVWriter & aPoint) { *mpWriter = aPoint; }
 
+    void EndOfContainer();
+
 protected:
     CHIP_ERROR mError;
     chip::TLV::TLVWriter * mpWriter;
     chip::TLV::TLVType mOuterContainerType;
 
     Builder();
-    void EndOfContainer();
-
     CHIP_ERROR InitAnonymousStructure(chip::TLV::TLVWriter * const apWriter);
 };
 }; // namespace app
