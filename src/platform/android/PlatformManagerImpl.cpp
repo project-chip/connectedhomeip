@@ -22,21 +22,20 @@
  *          for Android platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/android/PlatformManagerImpl.h>
 
-#include <lib/support/CHIPMem.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
-
-#include <thread>
+#include <platform/android/AndroidConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+PlatformManager & PlatformMgr()
+{
+    static PlatformManagerImpl sInstance;
+    return sInstance;
+}
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack()
+CHIP_ERROR PlatformManagerImpl::InitChipStackInner()
 {
     CHIP_ERROR err;
 
@@ -46,7 +45,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_POSIX::InitChipStackInner();
     SuccessOrExit(err);
 
 exit:

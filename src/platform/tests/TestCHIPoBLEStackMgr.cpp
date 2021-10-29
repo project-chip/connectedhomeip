@@ -39,9 +39,9 @@ int TestCHIPoBLEStackManager()
 {
     chip::Platform::MemoryInit();
 
-    chip::DeviceLayer::PlatformMgrImpl().InitChipStack();
+    chip::DeviceLayer::PlatformMgr().InitChipStack();
 
-    chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+    chip::DeviceLayer::PlatformMgr().AddEventHandler(EventHandler, 0);
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("CHIP0001");
 
@@ -51,7 +51,7 @@ int TestCHIPoBLEStackManager()
 
     ChipLogProgress(DeviceLayer, "Start Chip Over Ble stack Done");
 
-    chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
     ChipLogProgress(DeviceLayer, "Start EventLoop");
 
     return 0;

@@ -25,6 +25,10 @@
 
 #include <platform/CHIPDeviceEvent.h>
 
+#include <ble/BleConfig.h>
+#include <lib/core/CHIPError.h>
+#include <system/SystemPacketBuffer.h>
+
 namespace chip {
 namespace DeviceLayer {
 

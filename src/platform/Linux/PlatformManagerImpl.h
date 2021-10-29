@@ -25,8 +25,7 @@
 
 #include <memory>
 
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
+#include <platform/POSIX/GenericPlatformManagerImpl_POSIX.h>
 
 #if CHIP_WITH_GIO
 #include <gio/gio.h>
@@ -38,18 +37,8 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the PlatformManager singleton object for Linux platforms.
  */
-class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>
+class PlatformManagerImpl final : public Internal::GenericPlatformManagerImpl_POSIX
 {
-    // Allow the PlatformManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend PlatformManager;
-
-    // Allow the generic implementation base class to call helper methods on
-    // this class.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;
-#endif
-
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 #if CHIP_WITH_GIO
@@ -59,26 +48,22 @@ public:
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    CHIP_ERROR _InitChipStack();
-    CHIP_ERROR _Shutdown();
-    CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
-    CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
-    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
+    CHIP_ERROR InitChipStackInner() override;
+    CHIP_ERROR ShutdownInner() override;
+    CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
+    CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
+    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
 
-    CHIP_ERROR _GetRebootCount(uint16_t & rebootCount);
-    CHIP_ERROR _GetUpTime(uint64_t & upTime);
-    CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
+    CHIP_ERROR GetUpTime(uint64_t & upTime) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR GetBootReasons(uint8_t & bootReasons) override;
 
     // ===== Members for internal use by the following friends.
 
-    friend PlatformManager & PlatformMgr();
-    friend PlatformManagerImpl & PlatformMgrImpl();
     friend class Internal::BLEManagerImpl;
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
-
-    static PlatformManagerImpl sInstance;
 
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
     // This should be removed or find a better place once we depercate the rendezvous session.
@@ -94,28 +79,6 @@ private:
     UniqueGDBusConnection mpGDBusConnection;
 #endif
 };
-
-/**
- * Returns the public interface of the PlatformManager singleton object.
- *
- * chip applications should use this to access features of the PlatformManager object
- * that are common to all platforms.
- */
-inline PlatformManager & PlatformMgr()
-{
-    return PlatformManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the PlatformManager singleton object.
- *
- * chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
- */
-inline PlatformManagerImpl & PlatformMgrImpl()
-{
-    return PlatformManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

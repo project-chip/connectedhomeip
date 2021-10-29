@@ -28,6 +28,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/Darwin/PlatformManagerImpl.h>
 
 using namespace chip::Dnssd;
 

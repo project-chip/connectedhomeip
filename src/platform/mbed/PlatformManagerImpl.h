@@ -37,8 +37,8 @@
 #endif
 #include <mstd_atomic>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/GenericPlatformManagerImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl.h>
 #include <sys/select.h>
 
 namespace chip {
@@ -53,18 +53,8 @@ class CHIPService;
 /**
  * Concrete implementation of the PlatformManager singleton object for the nRF Connect SDK platforms.
  */
-class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl<PlatformManagerImpl>
+class PlatformManagerImpl final : public Internal::GenericPlatformManagerImpl
 {
-    // Allow the PlatformManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend PlatformManager;
-
-    // Allow the generic implementation base class to call helper methods on
-    // this class.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend Internal::GenericPlatformManagerImpl<PlatformManagerImpl>;
-#endif
-
     // Members for select() loop
     int mMaxFd;
     fd_set mReadSet;
@@ -80,30 +70,24 @@ public:
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    CHIP_ERROR _InitChipStack(void);
-    void _LockChipStack();
-    bool _TryLockChipStack();
-    void _UnlockChipStack();
-    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
-    void _RunEventLoop();
-    void _ProcessDeviceEvents();
-    CHIP_ERROR _StartEventLoopTask();
-    CHIP_ERROR _StopEventLoopTask();
-    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
-    CHIP_ERROR _Shutdown();
+    CHIP_ERROR InitChipStackInner(void) override;
+    CHIP_ERROR ShutdownInner() override;
+    void LockChipStack() override;
+    bool TryLockChipStack() override;
+    void UnlockChipStack() override;
+    CHIP_ERROR PostEvent(const ChipDeviceEvent * event) override;
+    void RunEventLoop() override;
+    void ProcessDeviceEvents() override;
+    CHIP_ERROR StartEventLoopTask() override;
+    CHIP_ERROR StopEventLoopTask() override;
+    CHIP_ERROR StartChipTimer(System::Clock::Timeout duration) override;
 
     // ===== Members for internal use by the following friends.
 
-    friend PlatformManager & PlatformMgr(void);
-    friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
     friend class ConnectivityManagerImpl;
     friend class Internal::GapEventHandler;
     friend class Internal::CHIPService;
-
-    using PlatformManager::PostEvent;
-    using PlatformManager::PostEventOrDie;
-    static PlatformManagerImpl sInstance;
 
     // ===== Members for internal use.
     static CHIP_ERROR TranslateOsStatus(osStatus status);
@@ -124,26 +108,12 @@ private:
 };
 
 /**
- * Returns the public interface of the PlatformManager singleton object.
- *
- * chip applications should use this to access features of the PlatformManager object
- * that are common to all platforms.
- */
-inline PlatformManager & PlatformMgr(void)
-{
-    return PlatformManagerImpl::sInstance;
-}
-
-/**
  * Returns the platform-specific implementation of the PlatformManager singleton object.
  *
  * chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the Mbed platform.
+ * that are specific to the ESP32 platform.
  */
-inline PlatformManagerImpl & PlatformMgrImpl()
-{
-    return PlatformManagerImpl::sInstance;
-}
+PlatformManagerImpl & PlatformMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

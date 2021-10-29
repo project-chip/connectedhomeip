@@ -15,22 +15,9 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Contains non-inline method definitions for the
- *          GenericPlatformManagerImpl_POSIX<> template.
- */
-
-#ifndef GENERIC_PLATFORM_MANAGER_IMPL_POSIX_CPP
-#define GENERIC_PLATFORM_MANAGER_IMPL_POSIX_CPP
-
+#include <platform/POSIX/GenericPlatformManagerImpl_POSIX.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
-
-// Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
-// from which the GenericPlatformManagerImpl_POSIX<> template inherits.
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
 
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
@@ -46,18 +33,10 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-namespace {
-System::LayerSocketsLoop & SystemLayerSocketsLoop()
-{
-    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
-}
-} // anonymous namespace
-
-template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
+CHIP_ERROR GenericPlatformManagerImpl_POSIX::InitChipStackInner()
 {
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
-    ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
+    ReturnErrorOnFailure(GenericPlatformManagerImpl::InitChipStackInner());
 
     mShouldRunEventLoop.store(true, std::memory_order_relaxed);
 
@@ -72,8 +51,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_LockChipStack()
+void GenericPlatformManagerImpl_POSIX::LockChipStack()
 {
     int err = pthread_mutex_lock(&mChipStackLock);
     assert(err == 0);
@@ -84,8 +62,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_LockChipStack()
 #endif
 }
 
-template <class ImplClass>
-bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack()
+bool GenericPlatformManagerImpl_POSIX::TryLockChipStack()
 {
     bool locked = (pthread_mutex_trylock(&mChipStackLock) == 0);
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
@@ -98,8 +75,7 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack()
     return locked;
 }
 
-template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
+void GenericPlatformManagerImpl_POSIX::UnlockChipStack()
 {
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     if (!mChipStackIsLocked)
@@ -114,41 +90,36 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
 }
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
-template <class ImplClass>
-bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThread() const
+bool GenericPlatformManagerImpl_POSIX::IsChipStackLockedByCurrentThread() const
 {
     return !mMainLoopStarted || (mChipStackIsLocked && (pthread_equal(pthread_self(), mChipStackLockOwnerThread)));
 }
 #endif
 
-template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(System::Clock::Timeout delay)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX::StartChipTimer(System::Clock::Timeout delay)
 {
     // Let System::LayerSocketsLoop.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX::PostEvent(const ChipDeviceEvent * event)
 {
     mChipEventQueue.Push(*event);
 
-    SystemLayerSocketsLoop().Signal(); // Trigger wake select on CHIP thread
+    DeviceLayer::SystemLayerSocketsLoop().Signal(); // Trigger wake select on CHIP thread
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_ProcessDeviceEvents()
+void GenericPlatformManagerImpl_POSIX::ProcessDeviceEvents()
 {
     while (!mChipEventQueue.Empty())
     {
         const ChipDeviceEvent event = mChipEventQueue.PopFront();
-        Impl()->DispatchEvent(&event);
+        DispatchEvent(&event);
     }
 }
 
-template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
+void GenericPlatformManagerImpl_POSIX::RunEventLoop()
 {
     pthread_mutex_lock(&mStateLock);
 
@@ -167,24 +138,24 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     mEventQueueHasStopped = false;
     pthread_mutex_unlock(&mStateLock);
 
-    Impl()->LockChipStack();
+    LockChipStack();
 
-    SystemLayerSocketsLoop().EventLoopBegins();
+    DeviceLayer::SystemLayerSocketsLoop().EventLoopBegins();
     do
     {
-        SystemLayerSocketsLoop().PrepareEvents();
+        DeviceLayer::SystemLayerSocketsLoop().PrepareEvents();
 
-        Impl()->UnlockChipStack();
-        SystemLayerSocketsLoop().WaitForEvents();
-        Impl()->LockChipStack();
+        UnlockChipStack();
+        DeviceLayer::SystemLayerSocketsLoop().WaitForEvents();
+        LockChipStack();
 
-        SystemLayerSocketsLoop().HandleEvents();
+        DeviceLayer::SystemLayerSocketsLoop().HandleEvents();
 
-        _ProcessDeviceEvents();
+        ProcessDeviceEvents();
     } while (mShouldRunEventLoop.load(std::memory_order_relaxed));
-    SystemLayerSocketsLoop().EventLoopEnds();
+    DeviceLayer::SystemLayerSocketsLoop().EventLoopEnds();
 
-    Impl()->UnlockChipStack();
+    UnlockChipStack();
 
     pthread_mutex_lock(&mStateLock);
     mEventQueueHasStopped = true;
@@ -199,17 +170,16 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     return;
 }
 
-template <class ImplClass>
-void * GenericPlatformManagerImpl_POSIX<ImplClass>::EventLoopTaskMain(void * arg)
+void * GenericPlatformManagerImpl_POSIX::EventLoopTaskMain(void * arg)
 {
+    GenericPlatformManagerImpl_POSIX * me = static_cast<GenericPlatformManagerImpl_POSIX *>(arg);
     ChipLogDetail(DeviceLayer, "CHIP task running");
-    static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(arg)->Impl()->mMainLoopStarted = true;
-    static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(arg)->Impl()->RunEventLoop();
+    me->mMainLoopStarted = true;
+    me->RunEventLoop();
     return nullptr;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
+CHIP_ERROR GenericPlatformManagerImpl_POSIX::StartEventLoopTask()
 {
     int err;
     err = pthread_attr_init(&mChipTaskAttr);
@@ -242,8 +212,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
     return CHIP_ERROR_POSIX(err);
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
+CHIP_ERROR GenericPlatformManagerImpl_POSIX::StopEventLoopTask()
 {
     int err = 0;
 
@@ -266,9 +235,9 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
         // We need to grab the lock to protect critical sections accessed by the WakeSelect() call within
         // System::Layer.
         //
-        Impl()->LockChipStack();
-        SystemLayerSocketsLoop().Signal();
-        Impl()->UnlockChipStack();
+        LockChipStack();
+        DeviceLayer::SystemLayerSocketsLoop().Signal();
+        UnlockChipStack();
 
         pthread_mutex_lock(&mStateLock);
 
@@ -299,8 +268,7 @@ exit:
     return CHIP_ERROR_POSIX(err);
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
+CHIP_ERROR GenericPlatformManagerImpl_POSIX::ShutdownInner()
 {
     pthread_mutex_destroy(&mStateLock);
     pthread_cond_destroy(&mEventQueueStoppedCond);
@@ -309,14 +277,9 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
     //
-    return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+    return GenericPlatformManagerImpl::ShutdownInner();
 }
-
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // GENERIC_PLATFORM_MANAGER_IMPL_POSIX_CPP

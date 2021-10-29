@@ -37,7 +37,7 @@ static void CheckScheduleLambda(nlTestSuite * inSuite, void * aContext)
     chip::DeviceLayer::SystemLayer().ScheduleLambda([called] { *called = true; });
     while (!*called)
     {
-        chip::DeviceLayer::PlatformMgrImpl().ProcessDeviceEvents();
+        chip::DeviceLayer::PlatformMgr().ProcessDeviceEvents();
     }
 #endif
     NL_TEST_ASSERT(inSuite, *called);

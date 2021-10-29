@@ -24,7 +24,7 @@
 #pragma once
 
 #include <platform/CHIPDeviceConfig.h>
-#include <platform/internal/GenericPlatformManagerImpl.h>
+#include <platform/GenericPlatformManagerImpl.h>
 
 #include <sys/select.h>
 #include <zephyr.h>
@@ -33,16 +33,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-/**
- * Provides a generic implementation of PlatformManager features that works on Zephyr RTOS platforms.
- *
- * This template contains implementations of selected features from the PlatformManager abstract
- * interface that are suitable for use on Zephyr-based platforms.  It is intended to be inherited
- * (directly or indirectly) by the PlatformManagerImpl class, which also appears as the template's
- * ImplClass parameter.
- */
-template <class ImplClass>
-class GenericPlatformManagerImpl_Zephyr : public GenericPlatformManagerImpl<ImplClass>
+/// Provides a generic implementation of PlatformManager features that works on Zephyr RTOS platforms.
+class GenericPlatformManagerImpl_Zephyr : public GenericPlatformManagerImpl
 {
 protected:
     using ThreadStack = k_thread_stack_t[K_THREAD_STACK_LEN(CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE)];
@@ -70,32 +62,28 @@ protected:
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    CHIP_ERROR _InitChipStack();
-    void _LockChipStack(void);
-    bool _TryLockChipStack(void);
-    void _UnlockChipStack(void);
-    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
-    void _RunEventLoop(void);
-    void _ProcessDeviceEvents();
-    CHIP_ERROR _StartEventLoopTask(void);
-    CHIP_ERROR _StopEventLoopTask();
-    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
-    CHIP_ERROR _Shutdown(void);
+    CHIP_ERROR InitChipStackInner() override;
+    CHIP_ERROR ShutdownInner(void) override;
+    void LockChipStack(void) override;
+    bool TryLockChipStack(void) override;
+    void UnlockChipStack(void) override;
+    CHIP_ERROR PostEvent(const ChipDeviceEvent * event) override;
+    void RunEventLoop(void) override;
+    void ProcessDeviceEvents() override;
+    CHIP_ERROR StartEventLoopTask(void) override;
+    CHIP_ERROR StopEventLoopTask() override;
+    CHIP_ERROR StartChipTimer(System::Clock::Timeout duration) override;
 
     // ===== Methods available to the implementation subclass.
     explicit GenericPlatformManagerImpl_Zephyr(ThreadStack & stack) : mChipThreadStack(stack) {}
 
 private:
     // ===== Private members for use by this class only.
-    ImplClass * Impl() { return static_cast<ImplClass *>(this); }
     void SysUpdate();
     void SysProcess();
 
     static void EventLoopTaskMain(void * thisPtr, void *, void *);
 };
-
-// Instruct the compiler to instantiate the template only when explicitly told to do so.
-extern template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

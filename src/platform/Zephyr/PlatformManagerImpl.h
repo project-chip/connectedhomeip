@@ -22,8 +22,7 @@
 
 #pragma once
 
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_Zephyr.h>
+#include <platform/Zephyr/GenericPlatformManagerImpl_Zephyr.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -31,63 +30,17 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the PlatformManager singleton object for the nRF Connect SDK platforms.
  */
-class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>
+class PlatformManagerImpl final : public Internal::GenericPlatformManagerImpl_Zephyr
 {
-    // Allow the PlatformManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend PlatformManager;
-
-    // Allow the generic implementation base class to call helper methods on
-    // this class.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
-#endif
-
 public:
-    // ===== Platform-specific members that may be accessed directly by the application.
-
-    /* none so far */
+    explicit PlatformManagerImpl(ThreadStack & stack) : Internal::GenericPlatformManagerImpl_Zephyr(stack) {}
 
 private:
-    // ===== Methods that implement the PlatformManager abstract interface.
-
-    CHIP_ERROR _InitChipStack(void);
-    CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
-    CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
-    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
-
-    // ===== Members for internal use by the following friends.
-
-    friend PlatformManager & PlatformMgr(void);
-    friend PlatformManagerImpl & PlatformMgrImpl(void);
-    friend class Internal::BLEManagerImpl;
-
-    explicit PlatformManagerImpl(ThreadStack & stack) : Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>(stack) {}
-
-    static PlatformManagerImpl sInstance;
+    CHIP_ERROR InitChipStackInner(void) override;
+    CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
+    CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
+    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
 };
-
-/**
- * Returns the public interface of the PlatformManager singleton object.
- *
- * chip applications should use this to access features of the PlatformManager object
- * that are common to all platforms.
- */
-inline PlatformManager & PlatformMgr(void)
-{
-    return PlatformManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the PlatformManager singleton object.
- *
- * chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
- */
-inline PlatformManagerImpl & PlatformMgrImpl()
-{
-    return PlatformManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -36,6 +36,8 @@ static_library("Linux") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../POSIX/GenericPlatformManagerImpl_POSIX.cpp",
+    "../POSIX/GenericPlatformManagerImpl_POSIX.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",

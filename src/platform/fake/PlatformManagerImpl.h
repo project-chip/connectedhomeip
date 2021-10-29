@@ -34,24 +34,20 @@ namespace DeviceLayer {
  */
 class PlatformManagerImpl final : public PlatformManager
 {
-    // Allow the PlatformManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend PlatformManager;
-
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    CHIP_ERROR _InitChipStack() { return CHIP_NO_ERROR; }
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
+    CHIP_ERROR InitChipStackInner() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ShutdownInner() override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR _AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    void _RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) {}
-    void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) {}
+    CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) override {}
+    void ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) override {}
 
-    void _RunEventLoop()
+    void RunEventLoop() override
     {
         do
         {
@@ -59,31 +55,31 @@ private:
         } while (mShouldRunEventLoop);
     }
 
-    void _ProcessDeviceEvents()
+    void ProcessDeviceEvents() override
     {
         while (!mQueue.empty())
         {
             const ChipDeviceEvent & event = mQueue.front();
-            _DispatchEvent(&event);
+            DispatchEvent(&event);
             mQueue.pop();
         }
     }
 
-    CHIP_ERROR _StartEventLoopTask() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StartEventLoopTask() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    CHIP_ERROR _StopEventLoopTask()
+    CHIP_ERROR StopEventLoopTask() override
     {
         mShouldRunEventLoop = false;
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event)
+    CHIP_ERROR PostEvent(const ChipDeviceEvent * event) override
     {
         mQueue.emplace(*event);
         return CHIP_NO_ERROR;
     }
 
-    void _DispatchEvent(const ChipDeviceEvent * event)
+    void DispatchEvent(const ChipDeviceEvent * event) override
     {
         switch (event->Type)
         {
@@ -96,54 +92,29 @@ private:
         }
     }
 
-    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StartChipTimer(System::Clock::Timeout duration) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    void _LockChipStack() {}
-    bool _TryLockChipStack() { return true; }
-    void _UnlockChipStack() {}
+    void LockChipStack() override {}
+    bool TryLockChipStack() override { return true; }
+    void UnlockChipStack() override {}
 
-    CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
-    CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
-    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
+    CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR _GetRebootCount(uint16_t & rebootCount);
-    CHIP_ERROR _GetUpTime(uint64_t & upTime);
-    CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetUpTime(uint64_t & upTime) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetBootReasons(uint8_t & bootReasons) override { return CHIP_NO_ERROR; }
 
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
+    bool IsChipStackLockedByCurrentThread() const override { return true; };
+#endif
     // ===== Members for internal use by the following friends.
-
-    friend PlatformManager & PlatformMgr();
-    friend PlatformManagerImpl & PlatformMgrImpl();
-    friend class Internal::BLEManagerImpl;
-
-    static PlatformManagerImpl sInstance;
 
     bool mShouldRunEventLoop = true;
     std::queue<ChipDeviceEvent> mQueue;
 };
-
-/**
- * Returns the public interface of the PlatformManager singleton object.
- *
- * chip applications should use this to access features of the PlatformManager object
- * that are common to all platforms.
- */
-inline PlatformManager & PlatformMgr()
-{
-    return PlatformManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the PlatformManager singleton object.
- *
- * chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
- */
-inline PlatformManagerImpl & PlatformMgrImpl()
-{
-    return PlatformManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

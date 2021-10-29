@@ -25,7 +25,7 @@
 #pragma once
 
 #include <platform/DeviceSafeQueue.h>
-#include <platform/internal/GenericPlatformManagerImpl.h>
+#include <platform/GenericPlatformManagerImpl.h>
 
 #include <fcntl.h>
 #include <sched.h>
@@ -48,8 +48,7 @@ namespace Internal {
  * (directly or indirectly) by the PlatformManagerImpl class, which also appears as the template's
  * ImplClass parameter.
  */
-template <class ImplClass>
-class GenericPlatformManagerImpl_POSIX : public GenericPlatformManagerImpl<ImplClass>
+class GenericPlatformManagerImpl_POSIX : public GenericPlatformManagerImpl
 {
 protected:
     // OS-specific members (pthread)
@@ -84,22 +83,21 @@ protected:
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    CHIP_ERROR
-    _InitChipStack();
-    void _LockChipStack();
-    bool _TryLockChipStack();
-    void _UnlockChipStack();
-    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
-    void _RunEventLoop();
-    void _ProcessDeviceEvents();
+    CHIP_ERROR InitChipStackInner() override;
+    CHIP_ERROR ShutdownInner() override;
 
-    CHIP_ERROR _StartEventLoopTask();
-    CHIP_ERROR _StopEventLoopTask();
-    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
-    CHIP_ERROR _Shutdown();
+    void LockChipStack() override;
+    bool TryLockChipStack() override;
+    void UnlockChipStack() override;
+    CHIP_ERROR PostEvent(const ChipDeviceEvent * event) override;
+    void RunEventLoop() override;
+    void ProcessDeviceEvents() override;
+    CHIP_ERROR StartEventLoopTask() override;
+    CHIP_ERROR StopEventLoopTask() override;
+    CHIP_ERROR StartChipTimer(System::Clock::Timeout duration) override;
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
-    bool _IsChipStackLockedByCurrentThread() const;
+    bool IsChipStackLockedByCurrentThread() const override;
 #endif
 
     // ===== Methods available to the implementation subclass.
@@ -107,15 +105,10 @@ protected:
 private:
     // ===== Private members for use by this class only.
 
-    inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
-
     DeviceSafeQueue mChipEventQueue;
     std::atomic<bool> mShouldRunEventLoop;
     static void * EventLoopTaskMain(void * arg);
 };
-
-// Instruct the compiler to instantiate the template only when explicitly told to do so.
-extern template class GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer
