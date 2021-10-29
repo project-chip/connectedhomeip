@@ -64,12 +64,12 @@ public:
     };
 
     /**
-     * A factory that can return the ModeOptionStructIterators for a specific endpoint. 
+     * A factory that can return the ModeOptionStructIterators for a specific endpoint.
      */
     struct ModeOptionStructIteratorFactory
     {
         using const_pointer = const ModeOptionStructIterator*;
-        
+
         /**
          * Returns the ModeOptionStructIterator to the first option.
          */
