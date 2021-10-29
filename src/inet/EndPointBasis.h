@@ -68,6 +68,9 @@ public:
      */
     bool IsCreatedByInetLayer(const InetLayer & aInetLayer) const { return mInetLayer == &aInetLayer; }
 
+private:
+    InetLayer * mInetLayer; /**< Pointer to the InetLayer object that owns this object. */
+
 protected:
     void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = nullptr);
     void DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic);
@@ -106,9 +109,6 @@ protected:
         TCP     = 4
     } mLwIPEndPointType;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-private:
-    InetLayer * mInetLayer; /**< Pointer to the InetLayer object that owns this object. */
 };
 
 } // namespace Inet
