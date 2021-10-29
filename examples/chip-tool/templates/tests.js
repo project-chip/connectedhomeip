@@ -149,9 +149,7 @@ function getTests()
     'TestOperationalCredentialsCluster',
   ];
 
-  const SoftwareDiagnostics = [
-    "Test_TC_DIAGSW_1_1"
-  ];
+  const SoftwareDiagnostics = [ "Test_TC_DIAGSW_1_1" ];
 
   const Subscriptions = [
     'TestSubscribe_OnOff',
