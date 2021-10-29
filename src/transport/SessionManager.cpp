@@ -401,37 +401,14 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decrypt(session, payloadHeader, packetHeader, msg),
                  ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding"));
 
-    // Verify message counter
-    if (packetHeader.IsSecureSessionControlMsg())
+    err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
+    if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
-        // TODO: control message counter is not implemented yet
+        isDuplicate = SessionManagerDelegate::DuplicateMessage::Yes;
+        err         = CHIP_NO_ERROR;
     }
-    else
+    if (err != CHIP_NO_ERROR)
     {
-        if (!session->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized())
-        {
-            // Queue and start message sync procedure
-            err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
-                packetHeader,
-                SessionHandle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(),
-                              session->GetFabricIndex()),
-                session, peerAddress, std::move(msg));
-
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Inet,
-                             "Message counter synchronization for received message, failed to "
-                             "QueueReceivedMessageAndStartSync, err = %" CHIP_ERROR_FORMAT,
-                             err.Format());
-            }
-            else
-            {
-                ChipLogDetail(Inet, "Received message have been queued due to peer counter is not synced");
-            }
-
-            return;
-        }
-
         err = session->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
         if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
         {
@@ -444,6 +421,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         }
         SuccessOrExit(err);
     }
+    SuccessOrExit(err);
 
     mSecureSessions.MarkSessionActive(session);
 
@@ -461,14 +439,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         }
     }
 
-    if (packetHeader.IsSecureSessionControlMsg())
-    {
-        // TODO: control message counter is not implemented yet
-    }
-    else
-    {
-        session->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
-    }
+    session->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
 
     // TODO: once mDNS address resolution is available reconsider if this is required
     // This updates the peer address once a packet is received from a new address
@@ -502,6 +473,24 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
+    // MCSP check
+    if (packetHeader.IsSecureSessionControlMsg())
+    {
+        if (packetHeader.GetDestinationNodeId().HasValue() && packetHeader.HasPrivacyFlag())
+        {
+            // TODO
+            // if (packetHeader.GetDestinationNodeId().Value() == ThisDeviceNodeID)
+            // {
+            //     MCSP processing..
+            // }
+        }
+        else
+        {
+            ChipLogError(Inet, "Invalid condition found in packet header");
+            ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
+        }
+    }
+
     // TODO: Handle Group message counter here spec 4.7.3
     // spec 4.5.1.2 for msg counter
 
@@ -523,21 +512,14 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         }
     }
 
-    if (packetHeader.IsSecureSessionControlMsg())
-    {
-        // TODO: control message counter is not implemented yet
-    }
-    else
-    {
-        // TODO: Commit Group Message Counter
-    }
+    // TODO: Commit Group Message Counter
 
     if (mCB != nullptr)
     {
         // TODO: Update Session Handle for Group messages.
         // SessionHandle session(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(),
         //                       session->GetFabricIndex());
-        // mCB->OnMessageReceived(packetHeader, payloadHeader, nullptr, peerAddress, isDuplicate, std::move(msg));
+        // mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, isDuplicate, std::move(msg));
     }
 
 exit:
