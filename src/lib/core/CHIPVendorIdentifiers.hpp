@@ -38,7 +38,7 @@ namespace chip {
 enum VendorId : uint16_t
 {
     Common       = 0x0000u,
-    NestLabs     = 0x235Au,
+    GoogleNest   = 0x235Au,
     TestVendor1  = 0xFFF1u,
     TestVendor2  = 0xFFF2u,
     TestVendor3  = 0xFFF3u,
