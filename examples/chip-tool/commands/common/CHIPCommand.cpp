@@ -23,6 +23,7 @@
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 
@@ -74,10 +75,7 @@ CHIP_ERROR CHIPCommand::Run()
     commissionerParams.controllerRCAC                 = rcacSpan;
     commissionerParams.controllerICAC                 = icacSpan;
     commissionerParams.controllerNOC                  = nocSpan;
-
-    // Set controller vendor ID to Test Vendor #1
-    // As per specifications (section 2.5.2 Vendor Identifier)
-    commissionerParams.controllerVendorId = 0xFFF1;
+    commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
 
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, mController));

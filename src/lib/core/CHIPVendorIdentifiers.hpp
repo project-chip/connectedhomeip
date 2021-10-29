@@ -34,10 +34,15 @@ namespace chip {
 // CHIP Vendor Identifiers (16 bits max)
 //
 
+// As per specifications (section 2.5.2 Vendor Identifier)
 enum VendorId : uint16_t
 {
     Common       = 0x0000u,
     NestLabs     = 0x235Au,
+    TestVendor1  = 0xFFF1u,
+    TestVendor2  = 0xFFF2u,
+    TestVendor3  = 0xFFF3u,
+    TestVendor4  = 0xFFF4u,
     NotSpecified = 0xFFFFu
 };
 
