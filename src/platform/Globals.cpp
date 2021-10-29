@@ -47,6 +47,11 @@ chip::System::LayerSockets & SystemLayerSockets()
 {
     return SystemLayerImpl();
 }
+
+chip::System::LayerSocketsLoop & SystemLayerSocketsLoop()
+{
+    return SystemLayerImpl();
+}
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace DeviceLayer

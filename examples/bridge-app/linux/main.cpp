@@ -534,7 +534,7 @@ int main(int argc, char * argv[])
     err = PrintQRCodeContent();
     SuccessOrExit(err);
 
-    chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+    chip::DeviceLayer::PlatformMgr().AddEventHandler(EventHandler, 0);
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
 

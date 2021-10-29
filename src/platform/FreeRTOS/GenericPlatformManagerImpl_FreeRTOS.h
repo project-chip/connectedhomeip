@@ -25,7 +25,7 @@
 #pragma once
 
 #include <platform/CHIPDeviceConfig.h>
-#include <platform/internal/GenericPlatformManagerImpl.h>
+#include <platform/GenericPlatformManagerImpl.h>
 
 #if defined(ESP_PLATFORM)
 #include "freertos/FreeRTOS.h"
@@ -51,8 +51,7 @@ namespace Internal {
  * (directly or indirectly) by the PlatformManagerImpl class, which also appears as the template's
  * ImplClass parameter.
  */
-template <class ImplClass>
-class GenericPlatformManagerImpl_FreeRTOS : public GenericPlatformManagerImpl<ImplClass>
+class GenericPlatformManagerImpl_FreeRTOS : public GenericPlatformManagerImpl
 {
 
 protected:
@@ -65,26 +64,23 @@ protected:
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    CHIP_ERROR _InitChipStack();
-    void _LockChipStack(void);
-    bool _TryLockChipStack(void);
-    void _UnlockChipStack(void);
-    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
-    void _RunEventLoop(void);
-    CHIP_ERROR _StartEventLoopTask(void);
-    CHIP_ERROR _StopEventLoopTask();
-    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
-    CHIP_ERROR _Shutdown(void);
+    CHIP_ERROR InitChipStackInner() override;
+    void LockChipStack(void) override;
+    bool TryLockChipStack(void) override;
+    void UnlockChipStack(void) override;
+    CHIP_ERROR PostEvent(const ChipDeviceEvent * event) override;
+    void RunEventLoop(void) override;
+    CHIP_ERROR StartEventLoopTask(void) override;
+    CHIP_ERROR StopEventLoopTask() override;
+    CHIP_ERROR StartChipTimer(System::Clock::Timeout duration) override;
+    CHIP_ERROR ShutdownInner(void) override;
 
-    // ===== Methods available to the implementation subclass.
+    // = override=== Methods available to the implementation subclass.
 
     void PostEventFromISR(const ChipDeviceEvent * event, BaseType_t & yieldRequired);
 
 private:
     // ===== Private members for use by this class only.
-
-    inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
-
     static void EventLoopTaskMain(void * arg);
 
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE) && CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
@@ -97,9 +93,6 @@ private:
     StaticTask_t mventLoopTaskStruct;
 #endif
 };
-
-// Instruct the compiler to instantiate the template only when explicitly told to do so.
-extern template class GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

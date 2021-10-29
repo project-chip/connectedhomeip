@@ -26,18 +26,21 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 
 namespace chip {
 namespace DeviceLayer {
 
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+PlatformManager & PlatformMgr()
+{
+    static PlatformManagerImpl sInstance;
+    return sInstance;
+}
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::InitChipStackInner()
 {
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
 
-    return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
+    return Internal::GenericPlatformManagerImpl_POSIX::InitChipStackInner();
 }
 
 } // namespace DeviceLayer

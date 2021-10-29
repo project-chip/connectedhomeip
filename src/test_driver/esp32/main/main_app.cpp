@@ -76,7 +76,7 @@ extern "C" void app_main()
 
     // Initialize the LwIP core lock.  This must be done before the ESP
     // tcpip_adapter layer is initialized.
-    CHIP_ERROR error = PlatformMgrImpl().InitLwIPCoreLock();
+    CHIP_ERROR error = Internal::InitLwIPCoreLock();
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "PlatformMgr().InitLocks() failed: %s", ErrorStr(error));

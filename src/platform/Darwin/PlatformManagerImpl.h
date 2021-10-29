@@ -34,12 +34,8 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the PlatformManager singleton object for Darwin platforms.
  */
-class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl<PlatformManagerImpl>
+class PlatformManagerImpl final : public Internal::GenericPlatformManagerImpl
 {
-    // Allow the PlatformManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend PlatformManager;
-
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
@@ -55,17 +51,16 @@ public:
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
-    CHIP_ERROR _InitChipStack();
-    CHIP_ERROR _Shutdown();
+    CHIP_ERROR InitChipStackInner() override;
 
-    CHIP_ERROR _StartChipTimer(System::Clock::Timeout delay) { return CHIP_ERROR_NOT_IMPLEMENTED; };
-    CHIP_ERROR _StartEventLoopTask();
-    CHIP_ERROR _StopEventLoopTask();
-    void _RunEventLoop();
-    void _LockChipStack(){};
-    bool _TryLockChipStack() { return false; };
-    void _UnlockChipStack(){};
-    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
+    CHIP_ERROR StartChipTimer(System::Clock::Timeout delay) override { return CHIP_ERROR_NOT_IMPLEMENTED; };
+    CHIP_ERROR StartEventLoopTask() override;
+    CHIP_ERROR StopEventLoopTask() override;
+    void RunEventLoop() override;
+    void LockChipStack() override {};
+    bool TryLockChipStack() override { return false; };
+    void UnlockChipStack() override {};
+    CHIP_ERROR PostEvent(const ChipDeviceEvent * event) override;
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool _IsChipStackLockedByCurrentThread() const { return false; };
@@ -73,31 +68,14 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-    friend PlatformManager & PlatformMgr(void);
-    friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
-
-    static PlatformManagerImpl sInstance;
 
     dispatch_queue_t mWorkQueue = nullptr;
     // Semaphore used to implement blocking behavior in _RunEventLoop.
     dispatch_semaphore_t mRunLoopSem;
 
     bool mIsWorkQueueRunning = false;
-
-    inline ImplClass * Impl() { return static_cast<PlatformManagerImpl *>(this); }
 };
-
-/**
- * Returns the public interface of the PlatformManager singleton object.
- *
- * chip applications should use this to access features of the PlatformManager object
- * that are common to all platforms.
- */
-inline PlatformManager & PlatformMgr(void)
-{
-    return PlatformManagerImpl::sInstance;
-}
 
 /**
  * Returns the platform-specific implementation of the PlatformManager singleton object.
@@ -105,9 +83,17 @@ inline PlatformManager & PlatformMgr(void)
  * chip applications can use this to gain access to features of the PlatformManager
  * that are specific to the ESP32 platform.
  */
-inline PlatformManagerImpl & PlatformMgrImpl(void)
+PlatformManagerImpl & PlatformMgrImpl();
+
+/**
+ * Returns the public interface of the PlatformManager singleton object.
+ *
+ * chip applications should use this to access features of the PlatformManager object
+ * that are common to all platforms.
+ */
+inline PlatformManager & PlatformMgr()
 {
-    return PlatformManagerImpl::sInstance;
+    return PlatformMgrImpl()
 }
 
 } // namespace DeviceLayer

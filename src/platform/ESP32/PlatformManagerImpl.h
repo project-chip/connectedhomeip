@@ -33,68 +33,30 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the PlatformManager singleton object for the ESP32 platform.
  */
-class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
+class PlatformManagerImpl final : public Internal::GenericPlatformManagerImpl_FreeRTOS
 {
-    // Allow the PlatformManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend PlatformManager;
-
-    // Allow the generic implementation base class to call helper methods on
-    // this class.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
-#endif
-
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    CHIP_ERROR InitLwIPCoreLock(void);
     static void HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData);
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    CHIP_ERROR _InitChipStack(void);
-    CHIP_ERROR _Shutdown();
-    CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
-    CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
-    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
+    CHIP_ERROR InitChipStackInner(void) override;
+    CHIP_ERROR ShutdownInner() override;
+    CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
+    CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
+    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
 
-    CHIP_ERROR _GetRebootCount(uint16_t & rebootCount);
-    CHIP_ERROR _GetUpTime(uint64_t & upTime);
-    CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
+    CHIP_ERROR GetUpTime(uint64_t & upTime) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR GetBootReasons(uint8_t & bootReasons) override;
     // ===== Members for internal use by the following friends.
 
-    friend PlatformManager & PlatformMgr(void);
-    friend PlatformManagerImpl & PlatformMgrImpl(void);
-
     uint64_t mStartTimeMilliseconds = 0;
-
-    static PlatformManagerImpl sInstance;
 };
-
-/**
- * Returns the public interface of the PlatformManager singleton object.
- *
- * Chip applications should use this to access features of the PlatformManager object
- * that are common to all platforms.
- */
-inline PlatformManager & PlatformMgr(void)
-{
-    return PlatformManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the PlatformManager singleton object.
- *
- * Chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
- */
-inline PlatformManagerImpl & PlatformMgrImpl(void)
-{
-    return PlatformManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

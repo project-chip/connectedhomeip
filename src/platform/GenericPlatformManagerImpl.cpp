@@ -16,22 +16,12 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Contains non-inline method definitions for the
- *          GenericPlatformManagerImpl<> template.
- */
-
-#ifndef GENERIC_PLATFORM_MANAGER_IMPL_CPP
-#define GENERIC_PLATFORM_MANAGER_IMPL_CPP
-
 #include <inttypes.h>
 #include <new>
 #include <platform/PlatformManager.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/EventLogging.h>
-#include <platform/internal/GenericPlatformManagerImpl.h>
+#include <platform/GenericPlatformManagerImpl.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -44,8 +34,7 @@ namespace Internal {
 
 extern CHIP_ERROR InitEntropy();
 
-template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
+CHIP_ERROR GenericPlatformManagerImpl::InitChipStackInner()
 {
     CHIP_ERROR err;
 
@@ -125,8 +114,7 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
+CHIP_ERROR GenericPlatformManagerImpl::ShutdownInner()
 {
     CHIP_ERROR err;
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
@@ -143,8 +131,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
     return err;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_AddEventHandler(PlatformManager::EventHandlerFunct handler, intptr_t arg)
+CHIP_ERROR GenericPlatformManagerImpl::AddEventHandler(PlatformManager::EventHandlerFunct handler, intptr_t arg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AppEventHandler * eventHandler;
@@ -171,8 +158,7 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager::EventHandlerFunct handler, intptr_t arg)
+void GenericPlatformManagerImpl::RemoveEventHandler(PlatformManager::EventHandlerFunct handler, intptr_t arg)
 {
     AppEventHandler ** eventHandlerIndirectPtr;
 
@@ -192,23 +178,21 @@ void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager:
     }
 }
 
-template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
+void GenericPlatformManagerImpl::ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
     ChipDeviceEvent event;
     event.Type                    = DeviceEventType::kCallWorkFunct;
     event.CallWorkFunct.WorkFunct = workFunct;
     event.CallWorkFunct.Arg       = arg;
 
-    CHIP_ERROR status = Impl()->PostEvent(&event);
+    CHIP_ERROR status = PostEvent(&event);
     if (status != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, status.Format());
     }
 }
 
-template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent * event)
+void GenericPlatformManagerImpl::DispatchEvent(const ChipDeviceEvent * event)
 {
 #if CHIP_PROGRESS_LOGGING
     uint64_t startUS = System::SystemClock().GetMonotonicMicroseconds();
@@ -222,7 +206,7 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 
     case DeviceEventType::kChipSystemLayerEvent:
         // If the event is a CHIP System or Inet Layer event, deliver it to the System::Layer event handler.
-        Impl()->DispatchEventToSystemLayer(event);
+        DispatchEventToSystemLayer(event);
         break;
 
     case DeviceEventType::kChipLambdaEvent:
@@ -236,13 +220,13 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 
     default:
         // For all other events, deliver the event to each of the components in the Device Layer.
-        Impl()->DispatchEventToDeviceLayer(event);
+        DispatchEventToDeviceLayer(event);
 
         // If the event is not an internal event, also deliver it to the application's registered
         // event handlers.
         if (!event->IsInternal())
         {
-            Impl()->DispatchEventToApplication(event);
+            DispatchEventToApplication(event);
         }
 
         break;
@@ -258,8 +242,7 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 #endif // CHIP_PROGRESS_LOGGING
 }
 
-template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const ChipDeviceEvent * event)
+void GenericPlatformManagerImpl::DispatchEventToSystemLayer(const ChipDeviceEvent * event)
 {
     // TODO(#788): remove ifdef LWIP once System::Layer event APIs are generally available
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -276,8 +259,7 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const Chi
 #endif
 }
 
-template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::DispatchEventToDeviceLayer(const ChipDeviceEvent * event)
+void GenericPlatformManagerImpl::DispatchEventToDeviceLayer(const ChipDeviceEvent * event)
 {
     // Dispatch the event to all the components in the Device Layer.
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -289,8 +271,7 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToDeviceLayer(const Chi
     ConnectivityMgr().OnPlatformEvent(event);
 }
 
-template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::DispatchEventToApplication(const ChipDeviceEvent * event)
+void GenericPlatformManagerImpl::DispatchEventToApplication(const ChipDeviceEvent * event)
 {
     // Dispatch the event to each of the registered application event handlers.
     for (AppEventHandler * eventHandler = mAppEventHandlerList; eventHandler != nullptr; eventHandler = eventHandler->Next)
@@ -299,26 +280,6 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToApplication(const Chi
     }
 }
 
-template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::HandleMessageLayerActivityChanged(bool messageLayerIsActive)
-{
-    GenericPlatformManagerImpl<ImplClass> & self = PlatformMgrImpl();
-
-    if (messageLayerIsActive != self.mMsgLayerWasActive)
-    {
-        self.mMsgLayerWasActive = messageLayerIsActive;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ThreadStackMgr().OnMessageLayerActivityChanged(messageLayerIsActive);
-#endif
-    }
-}
-
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericPlatformManagerImpl<PlatformManagerImpl>;
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // GENERIC_PLATFORM_MANAGER_IMPL_CPP
