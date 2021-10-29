@@ -14,6 +14,7 @@
 
 import logging
 import os
+import platform
 import glob
 import shlex
 import pathlib
@@ -21,8 +22,9 @@ import pathlib
 from enum import Enum, auto
 from .builder import Builder
 
-from mbed_tools.project import MbedProgram
-from mbed_tools.build import generate_config
+if platform.system() != 'Darwin':
+    from mbed_tools.project import MbedProgram
+    from mbed_tools.build import generate_config
 
 class MbedApp(Enum):
     LOCK = auto()
