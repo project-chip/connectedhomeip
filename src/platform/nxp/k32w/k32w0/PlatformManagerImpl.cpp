@@ -78,7 +78,7 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     size_t freeHeapSize;
 
-    freeHeapSize = xPortGetFreeHeapSize();
+    freeHeapSize    = xPortGetFreeHeapSize();
     currentHeapFree = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
 }
@@ -99,7 +99,7 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentH
 {
     size_t highWatermarkHeapSize;
 
-    highWatermarkHeapSize = HEAP_SIZE - xPortGetMinimumEverFreeHeapSize();
+    highWatermarkHeapSize    = HEAP_SIZE - xPortGetMinimumEverFreeHeapSize();
     currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
     return CHIP_NO_ERROR;
 }
