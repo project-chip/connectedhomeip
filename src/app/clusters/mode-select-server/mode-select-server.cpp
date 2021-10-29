@@ -51,7 +51,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
 {
     VerifyOrDie(aPath.mClusterId == ModeSelect::Id);
 
-    const ModeSelect::StaticSupportedModesManager & gSupportedModeManager = 
+    const ModeSelect::StaticSupportedModesManager & gSupportedModeManager =
     ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
 
     if (ModeSelect::Attributes::SupportedModes::Id == aPath.mAttributeId)
@@ -91,7 +91,7 @@ bool emberAfModeSelectClusterChangeToModeCallback(
     uint8_t newMode       = commandData.newMode;
     // Check that the newMode matches one of the supported options
     const ModeSelect::Structs::ModeOptionStruct::Type * modeOptionPtr;
-    const ModeSelect::StaticSupportedModesManager & gSupportedModeManager = 
+    const ModeSelect::StaticSupportedModesManager & gSupportedModeManager =
     ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
     EmberAfStatus checkSupportedModeStatus = gSupportedModeManager.getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
     if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
