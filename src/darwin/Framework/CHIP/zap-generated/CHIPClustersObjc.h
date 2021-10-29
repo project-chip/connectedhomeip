@@ -1669,6 +1669,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeVendorIdWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeListNullablesAndOptionalsStructWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
 

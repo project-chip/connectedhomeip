@@ -172,11 +172,11 @@ OnApplicationLauncherApplicationLauncherListListAttributeResponse(void * context
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "INT16U[%" PRIu16 "]: %" PRIu16 "", i, entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -201,14 +201,14 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "AudioOutputInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  index: %" PRIu8 "", entry.index);
         ChipLogProgress(chipTool, "  outputType: %" PRIu8 "", entry.outputType);
         ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -233,17 +233,17 @@ static void OnBridgedActionsActionListListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "ActionStruct[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  actionID: %" PRIu16 "", entry.actionID);
+        ChipLogProgress(chipTool, "  ActionID: %" PRIu16 "", entry.actionID);
         ChipLogProgress(Zcl, "  Name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
-        ChipLogProgress(chipTool, "  type: %" PRIu8 "", entry.type);
-        ChipLogProgress(chipTool, "  endpointListID: %" PRIu16 "", entry.endpointListID);
-        ChipLogProgress(chipTool, "  supportedCommands: %" PRIu16 "", entry.supportedCommands);
-        ChipLogProgress(chipTool, "  status: %" PRIu8 "", entry.status);
+        ChipLogProgress(chipTool, "  Type: %" PRIu8 "", entry.type);
+        ChipLogProgress(chipTool, "  EndpointListID: %" PRIu16 "", entry.endpointListID);
+        ChipLogProgress(chipTool, "  SupportedCommands: %" PRIu16 "", entry.supportedCommands);
+        ChipLogProgress(chipTool, "  Status: %" PRIu8 "", entry.status);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -269,15 +269,15 @@ static void OnBridgedActionsEndpointListListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "EndpointListStruct[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  endpointListID: %" PRIu16 "", entry.endpointListID);
+        ChipLogProgress(chipTool, "  EndpointListID: %" PRIu16 "", entry.endpointListID);
         ChipLogProgress(Zcl, "  Name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
-        ChipLogProgress(chipTool, "  type: %" PRIu8 "", entry.type);
+        ChipLogProgress(chipTool, "  Type: %" PRIu8 "", entry.type);
         ChipLogProgress(Zcl, "  Endpoints: %zu", entry.endpoints.size());
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -302,11 +302,11 @@ OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context,
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(Zcl, "  : %zu", entry.size());
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -331,11 +331,11 @@ static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "ContentLaunchStreamingType[%" PRIu16 "]: %" PRIu8 "", i, entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -360,13 +360,13 @@ static void OnDescriptorDeviceListListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "DeviceType[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  type: %" PRIu32 "", entry.type);
         ChipLogProgress(chipTool, "  revision: %" PRIu16 "", entry.revision);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -390,11 +390,11 @@ static void OnDescriptorServerListListAttributeResponse(void * context,
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu32 "", i, entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -418,11 +418,11 @@ static void OnDescriptorClientListListAttributeResponse(void * context,
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu32 "", i, entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -446,11 +446,11 @@ static void OnDescriptorPartsListListAttributeResponse(void * context,
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "ENDPOINT_NO[%" PRIu16 "]: %" PRIu16 "", i, entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -475,13 +475,13 @@ static void OnFixedLabelLabelListListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "LabelStruct[%" PRIu16 "]:", i);
         ChipLogProgress(Zcl, "  label: %.*s", static_cast<int>(entry.label.size()), entry.label.data());
         ChipLogProgress(Zcl, "  value: %.*s", static_cast<int>(entry.value.size()), entry.value.data());
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -507,12 +507,12 @@ static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeRespons
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "BasicCommissioningInfoType[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  failSafeExpiryLengthMs: %" PRIu32 "", entry.failSafeExpiryLengthMs);
+        ChipLogProgress(chipTool, "  FailSafeExpiryLengthMs: %" PRIu32 "", entry.failSafeExpiryLengthMs);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -538,17 +538,17 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "NetworkInterfaceType[%" PRIu16 "]:", i);
         ChipLogProgress(Zcl, "  Name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
-        ChipLogProgress(chipTool, "  fabricConnected: %d", entry.fabricConnected);
-        ChipLogProgress(chipTool, "  offPremiseServicesReachableIPv4: %d", entry.offPremiseServicesReachableIPv4);
-        ChipLogProgress(chipTool, "  offPremiseServicesReachableIPv6: %d", entry.offPremiseServicesReachableIPv6);
+        ChipLogProgress(chipTool, "  FabricConnected: %d", entry.fabricConnected);
+        ChipLogProgress(chipTool, "  OffPremiseServicesReachableIPv4: %d", entry.offPremiseServicesReachableIPv4);
+        ChipLogProgress(chipTool, "  OffPremiseServicesReachableIPv6: %d", entry.offPremiseServicesReachableIPv6);
         ChipLogProgress(Zcl, "  HardwareAddress: %zu", entry.hardwareAddress.size());
-        ChipLogProgress(chipTool, "  type: %" PRIu8 "", entry.type);
+        ChipLogProgress(chipTool, "  Type: %" PRIu8 "", entry.type);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -573,14 +573,14 @@ static void OnGroupKeyManagementGroupsListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "GroupState[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  vendorId: %" PRIu16 "", entry.vendorId);
-        ChipLogProgress(chipTool, "  vendorGroupId: %" PRIu16 "", entry.vendorGroupId);
-        ChipLogProgress(chipTool, "  groupKeySetIndex: %" PRIu16 "", entry.groupKeySetIndex);
+        ChipLogProgress(chipTool, "  VendorId: %" PRIu16 "", entry.vendorId);
+        ChipLogProgress(chipTool, "  VendorGroupId: %" PRIu16 "", entry.vendorGroupId);
+        ChipLogProgress(chipTool, "  GroupKeySetIndex: %" PRIu16 "", entry.groupKeySetIndex);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -605,16 +605,16 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "GroupKey[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  vendorId: %" PRIu16 "", entry.vendorId);
-        ChipLogProgress(chipTool, "  groupKeyIndex: %" PRIu16 "", entry.groupKeyIndex);
+        ChipLogProgress(chipTool, "  VendorId: %" PRIu16 "", entry.vendorId);
+        ChipLogProgress(chipTool, "  GroupKeyIndex: %" PRIu16 "", entry.groupKeyIndex);
         ChipLogProgress(Zcl, "  GroupKeyRoot: %zu", entry.groupKeyRoot.size());
-        ChipLogProgress(chipTool, "  groupKeyEpochStartTime: %" PRIu64 "", entry.groupKeyEpochStartTime);
-        ChipLogProgress(chipTool, "  groupKeySecurityPolicy: %" PRIu8 "", entry.groupKeySecurityPolicy);
+        ChipLogProgress(chipTool, "  GroupKeyEpochStartTime: %" PRIu64 "", entry.groupKeyEpochStartTime);
+        ChipLogProgress(chipTool, "  GroupKeySecurityPolicy: %" PRIu8 "", entry.groupKeySecurityPolicy);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -639,15 +639,15 @@ static void OnMediaInputMediaInputListListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "MediaInputInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  index: %" PRIu8 "", entry.index);
         ChipLogProgress(chipTool, "  inputType: %" PRIu8 "", entry.inputType);
         ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "  description: %.*s", static_cast<int>(entry.description.size()), entry.description.data());
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -673,17 +673,17 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "FabricDescriptor[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  fabricIndex: %" PRIu8 "", entry.fabricIndex);
+        ChipLogProgress(chipTool, "  FabricIndex: %" PRIu8 "", entry.fabricIndex);
         ChipLogProgress(Zcl, "  RootPublicKey: %zu", entry.rootPublicKey.size());
-        ChipLogProgress(chipTool, "  vendorId: %" PRIu16 "", entry.vendorId);
-        ChipLogProgress(chipTool, "  fabricId: %" PRIu64 "", entry.fabricId);
-        ChipLogProgress(chipTool, "  nodeId: %" PRIu64 "", entry.nodeId);
+        ChipLogProgress(chipTool, "  VendorId: %" PRIu16 "", entry.vendorId);
+        ChipLogProgress(chipTool, "  FabricId: %" PRIu64 "", entry.fabricId);
+        ChipLogProgress(chipTool, "  NodeId: %" PRIu64 "", entry.nodeId);
         ChipLogProgress(Zcl, "  Label: %.*s", static_cast<int>(entry.label.size()), entry.label.data());
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -707,11 +707,11 @@ static void OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(Zcl, "  : %zu", entry.size());
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -735,11 +735,11 @@ static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "ENUM8[%" PRIu16 "]: %" PRIu8 "", i, entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -764,10 +764,9 @@ static void OnTvChannelTvChannelListListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "TvChannelInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  majorNumber: %" PRIu16 "", entry.majorNumber);
         ChipLogProgress(chipTool, "  minorNumber: %" PRIu16 "", entry.minorNumber);
@@ -775,6 +774,7 @@ static void OnTvChannelTvChannelListListAttributeResponse(
         ChipLogProgress(Zcl, "  callSign: %.*s", static_cast<int>(entry.callSign.size()), entry.callSign.data());
         ChipLogProgress(Zcl, "  affiliateCallSign: %.*s", static_cast<int>(entry.affiliateCallSign.size()),
                         entry.affiliateCallSign.data());
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -800,13 +800,13 @@ static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "NavigateTargetTargetInfo[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  identifier: %" PRIu8 "", entry.identifier);
         ChipLogProgress(Zcl, "  name: %.*s", static_cast<int>(entry.name.size()), entry.name.data());
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -829,11 +829,11 @@ static void OnTestClusterListInt8uListAttributeResponse(void * context, const ch
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "INT8U[%" PRIu16 "]: %" PRIu8 "", i, entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -857,11 +857,11 @@ static void OnTestClusterListOctetStringListAttributeResponse(void * context,
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(Zcl, "  : %zu", entry.size());
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -886,13 +886,144 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "TestListStructOctet[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  fabricIndex: %" PRIu64 "", entry.fabricIndex);
         ChipLogProgress(Zcl, "  operationalCert: %zu", entry.operationalCert.size());
+#endif // CHIP_PROGRESS_LOGGING
+    }
+    command->SetCommandExitStatus(iter.GetStatus());
+}
+
+static void OnTestClusterListNullablesAndOptionalsStructListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list)
+{
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        command->SetCommandExitStatus(err);
+        return;
+    }
+
+    ChipLogProgress(chipTool, "OnTestClusterListNullablesAndOptionalsStructListAttributeResponse: %zu entries", count);
+
+    auto iter  = list.begin();
+    uint16_t i = 0;
+    while (iter.Next())
+    {
+        ++i;
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+        ChipLogProgress(chipTool, "NullablesAndOptionalsStruct[%" PRIu16 "]:", i);
+        if (entry.nullableInt.IsNull())
+        {
+            ChipLogProgress(chipTool, "  NullableInt: null");
+        }
+        else
+        {
+            ChipLogProgress(chipTool, "  NullableInt: %" PRIu16 "", entry.nullableInt.Value());
+        }
+        if (entry.optionalInt.HasValue())
+        {
+            ChipLogProgress(chipTool, "  OptionalInt: %" PRIu16 "", entry.optionalInt.Value());
+        }
+        if (entry.nullableOptionalInt.HasValue())
+        {
+            if (entry.nullableOptionalInt.Value().IsNull())
+            {
+                ChipLogProgress(chipTool, "  NullableOptionalInt: null");
+            }
+            else
+            {
+                ChipLogProgress(chipTool, "  NullableOptionalInt: %" PRIu16 "", entry.nullableOptionalInt.Value().Value());
+            }
+        }
+        if (entry.nullableString.IsNull())
+        {
+            ChipLogProgress(chipTool, "  NullableString: null");
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "  NullableString: %.*s", static_cast<int>(entry.nullableString.Value().size()),
+                            entry.nullableString.Value().data());
+        }
+        if (entry.optionalString.HasValue())
+        {
+            ChipLogProgress(Zcl, "  OptionalString: %.*s", static_cast<int>(entry.optionalString.Value().size()),
+                            entry.optionalString.Value().data());
+        }
+        if (entry.nullableOptionalString.HasValue())
+        {
+            if (entry.nullableOptionalString.Value().IsNull())
+            {
+                ChipLogProgress(chipTool, "  NullableOptionalString: null");
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "  NullableOptionalString: %.*s",
+                                static_cast<int>(entry.nullableOptionalString.Value().Value().size()),
+                                entry.nullableOptionalString.Value().Value().data());
+            }
+        }
+        if (entry.nullableStruct.IsNull())
+        {
+            ChipLogProgress(chipTool, "  NullableStruct: null");
+        }
+        else
+        {
+            ChipLogProgress(chipTool,
+                            "  NullableStruct: struct member of struct element of list attribute printing not supported yet");
+        }
+        if (entry.optionalStruct.HasValue())
+        {
+            ChipLogProgress(chipTool,
+                            "  OptionalStruct: struct member of struct element of list attribute printing not supported yet");
+        }
+        if (entry.nullableOptionalStruct.HasValue())
+        {
+            if (entry.nullableOptionalStruct.Value().IsNull())
+            {
+                ChipLogProgress(chipTool, "  NullableOptionalStruct: null");
+            }
+            else
+            {
+                ChipLogProgress(
+                    chipTool,
+                    "  NullableOptionalStruct: struct member of struct element of list attribute printing not supported yet");
+            }
+        }
+        if (entry.nullableList.IsNull())
+        {
+            ChipLogProgress(chipTool, "  NullableList: null");
+        }
+        else
+        {
+            ChipLogProgress(chipTool, "  NullableList: list member of struct element of list attribute printing not supported yet");
+        }
+        if (entry.optionalList.HasValue())
+        {
+            ChipLogProgress(chipTool, "  OptionalList: list member of struct element of list attribute printing not supported yet");
+        }
+        if (entry.nullableOptionalList.HasValue())
+        {
+            if (entry.nullableOptionalList.Value().IsNull())
+            {
+                ChipLogProgress(chipTool, "  NullableOptionalList: null");
+            }
+            else
+            {
+                ChipLogProgress(
+                    chipTool, "  NullableOptionalList: list member of struct element of list attribute printing not supported yet");
+            }
+        }
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -918,25 +1049,25 @@ static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "NeighborTable[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  extAddress: %" PRIu64 "", entry.extAddress);
-        ChipLogProgress(chipTool, "  age: %" PRIu32 "", entry.age);
-        ChipLogProgress(chipTool, "  rloc16: %" PRIu16 "", entry.rloc16);
-        ChipLogProgress(chipTool, "  linkFrameCounter: %" PRIu32 "", entry.linkFrameCounter);
-        ChipLogProgress(chipTool, "  mleFrameCounter: %" PRIu32 "", entry.mleFrameCounter);
-        ChipLogProgress(chipTool, "  lqi: %" PRIu8 "", entry.lqi);
-        ChipLogProgress(chipTool, "  averageRssi: %" PRId8 "", entry.averageRssi);
-        ChipLogProgress(chipTool, "  lastRssi: %" PRId8 "", entry.lastRssi);
-        ChipLogProgress(chipTool, "  frameErrorRate: %" PRIu8 "", entry.frameErrorRate);
-        ChipLogProgress(chipTool, "  messageErrorRate: %" PRIu8 "", entry.messageErrorRate);
-        ChipLogProgress(chipTool, "  rxOnWhenIdle: %d", entry.rxOnWhenIdle);
-        ChipLogProgress(chipTool, "  fullThreadDevice: %d", entry.fullThreadDevice);
-        ChipLogProgress(chipTool, "  fullNetworkData: %d", entry.fullNetworkData);
-        ChipLogProgress(chipTool, "  isChild: %d", entry.isChild);
+        ChipLogProgress(chipTool, "  ExtAddress: %" PRIu64 "", entry.extAddress);
+        ChipLogProgress(chipTool, "  Age: %" PRIu32 "", entry.age);
+        ChipLogProgress(chipTool, "  Rloc16: %" PRIu16 "", entry.rloc16);
+        ChipLogProgress(chipTool, "  LinkFrameCounter: %" PRIu32 "", entry.linkFrameCounter);
+        ChipLogProgress(chipTool, "  MleFrameCounter: %" PRIu32 "", entry.mleFrameCounter);
+        ChipLogProgress(chipTool, "  LQI: %" PRIu8 "", entry.lqi);
+        ChipLogProgress(chipTool, "  AverageRssi: %" PRId8 "", entry.averageRssi);
+        ChipLogProgress(chipTool, "  LastRssi: %" PRId8 "", entry.lastRssi);
+        ChipLogProgress(chipTool, "  FrameErrorRate: %" PRIu8 "", entry.frameErrorRate);
+        ChipLogProgress(chipTool, "  MessageErrorRate: %" PRIu8 "", entry.messageErrorRate);
+        ChipLogProgress(chipTool, "  RxOnWhenIdle: %d", entry.rxOnWhenIdle);
+        ChipLogProgress(chipTool, "  FullThreadDevice: %d", entry.fullThreadDevice);
+        ChipLogProgress(chipTool, "  FullNetworkData: %d", entry.fullNetworkData);
+        ChipLogProgress(chipTool, "  IsChild: %d", entry.isChild);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -962,21 +1093,21 @@ static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "RouteTable[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  extAddress: %" PRIu64 "", entry.extAddress);
-        ChipLogProgress(chipTool, "  rloc16: %" PRIu16 "", entry.rloc16);
-        ChipLogProgress(chipTool, "  routerId: %" PRIu8 "", entry.routerId);
-        ChipLogProgress(chipTool, "  nextHop: %" PRIu8 "", entry.nextHop);
-        ChipLogProgress(chipTool, "  pathCost: %" PRIu8 "", entry.pathCost);
+        ChipLogProgress(chipTool, "  ExtAddress: %" PRIu64 "", entry.extAddress);
+        ChipLogProgress(chipTool, "  Rloc16: %" PRIu16 "", entry.rloc16);
+        ChipLogProgress(chipTool, "  RouterId: %" PRIu8 "", entry.routerId);
+        ChipLogProgress(chipTool, "  NextHop: %" PRIu8 "", entry.nextHop);
+        ChipLogProgress(chipTool, "  PathCost: %" PRIu8 "", entry.pathCost);
         ChipLogProgress(chipTool, "  LQIIn: %" PRIu8 "", entry.LQIIn);
         ChipLogProgress(chipTool, "  LQIOut: %" PRIu8 "", entry.LQIOut);
-        ChipLogProgress(chipTool, "  age: %" PRIu8 "", entry.age);
-        ChipLogProgress(chipTool, "  allocated: %d", entry.allocated);
-        ChipLogProgress(chipTool, "  linkEstablished: %d", entry.linkEstablished);
+        ChipLogProgress(chipTool, "  Age: %" PRIu8 "", entry.age);
+        ChipLogProgress(chipTool, "  Allocated: %d", entry.allocated);
+        ChipLogProgress(chipTool, "  LinkEstablished: %d", entry.linkEstablished);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -1002,13 +1133,13 @@ static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "SecurityPolicy[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  rotationTime: %" PRIu16 "", entry.rotationTime);
-        ChipLogProgress(chipTool, "  flags: %" PRIu16 "", entry.flags);
+        ChipLogProgress(chipTool, "  RotationTime: %" PRIu16 "", entry.rotationTime);
+        ChipLogProgress(chipTool, "  Flags: %" PRIu16 "", entry.flags);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -1034,23 +1165,23 @@ static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeR
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "OperationalDatasetComponents[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  activeTimestampPresent: %d", entry.activeTimestampPresent);
-        ChipLogProgress(chipTool, "  pendingTimestampPresent: %d", entry.pendingTimestampPresent);
-        ChipLogProgress(chipTool, "  masterKeyPresent: %d", entry.masterKeyPresent);
-        ChipLogProgress(chipTool, "  networkNamePresent: %d", entry.networkNamePresent);
-        ChipLogProgress(chipTool, "  extendedPanIdPresent: %d", entry.extendedPanIdPresent);
-        ChipLogProgress(chipTool, "  meshLocalPrefixPresent: %d", entry.meshLocalPrefixPresent);
-        ChipLogProgress(chipTool, "  delayPresent: %d", entry.delayPresent);
-        ChipLogProgress(chipTool, "  panIdPresent: %d", entry.panIdPresent);
-        ChipLogProgress(chipTool, "  channelPresent: %d", entry.channelPresent);
-        ChipLogProgress(chipTool, "  pskcPresent: %d", entry.pskcPresent);
-        ChipLogProgress(chipTool, "  securityPolicyPresent: %d", entry.securityPolicyPresent);
-        ChipLogProgress(chipTool, "  channelMaskPresent: %d", entry.channelMaskPresent);
+        ChipLogProgress(chipTool, "  ActiveTimestampPresent: %d", entry.activeTimestampPresent);
+        ChipLogProgress(chipTool, "  PendingTimestampPresent: %d", entry.pendingTimestampPresent);
+        ChipLogProgress(chipTool, "  MasterKeyPresent: %d", entry.masterKeyPresent);
+        ChipLogProgress(chipTool, "  NetworkNamePresent: %d", entry.networkNamePresent);
+        ChipLogProgress(chipTool, "  ExtendedPanIdPresent: %d", entry.extendedPanIdPresent);
+        ChipLogProgress(chipTool, "  MeshLocalPrefixPresent: %d", entry.meshLocalPrefixPresent);
+        ChipLogProgress(chipTool, "  DelayPresent: %d", entry.delayPresent);
+        ChipLogProgress(chipTool, "  PanIdPresent: %d", entry.panIdPresent);
+        ChipLogProgress(chipTool, "  ChannelPresent: %d", entry.channelPresent);
+        ChipLogProgress(chipTool, "  PskcPresent: %d", entry.pskcPresent);
+        ChipLogProgress(chipTool, "  SecurityPolicyPresent: %d", entry.securityPolicyPresent);
+        ChipLogProgress(chipTool, "  ChannelMaskPresent: %d", entry.channelMaskPresent);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -1074,11 +1205,11 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
     uint16_t i = 0;
     while (iter.Next())
     {
+        ++i;
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
-        ++i;
         ChipLogProgress(chipTool, "NetworkFault[%" PRIu16 "]: %" PRIu8 "", i, entry);
+#endif // CHIP_PROGRESS_LOGGING
     }
     command->SetCommandExitStatus(iter.GetStatus());
 }
@@ -19334,6 +19465,7 @@ private:
 | * EpochUs                                                           | 0x0020 |
 | * EpochS                                                            | 0x0021 |
 | * VendorId                                                          | 0x0022 |
+| * ListNullablesAndOptionalsStruct                                   | 0x0023 |
 | * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -21175,6 +21307,41 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::VendorId mValue;
+};
+
+/*
+ * Attribute ListNullablesAndOptionalsStruct
+ */
+class ReadTestClusterListNullablesAndOptionalsStruct : public ModelCommand
+{
+public:
+    ReadTestClusterListNullablesAndOptionalsStruct() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "list-nullables-and-optionals-struct");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterListNullablesAndOptionalsStruct()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeListNullablesAndOptionalsStruct(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback>(
+            OnTestClusterListNullablesAndOptionalsStructListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -27791,67 +27958,68 @@ void registerClusterTestCluster(Commands & commands)
     const char * clusterName = "TestCluster";
 
     commands_list clusterCommands = {
-        make_unique<TestClusterTest>(),                          //
-        make_unique<TestClusterTestAddArguments>(),              //
-        make_unique<TestClusterTestEnumsRequest>(),              //
-        make_unique<TestClusterTestListInt8UArgumentRequest>(),  //
-        make_unique<TestClusterTestListInt8UReverseRequest>(),   //
-        make_unique<TestClusterTestListStructArgumentRequest>(), //
-        make_unique<TestClusterTestNotHandled>(),                //
-        make_unique<TestClusterTestNullableOptionalRequest>(),   //
-        make_unique<TestClusterTestSpecific>(),                  //
-        make_unique<TestClusterTestStructArgumentRequest>(),     //
-        make_unique<TestClusterTestUnknownCommand>(),            //
-        make_unique<ReadTestClusterBoolean>(),                   //
-        make_unique<WriteTestClusterBoolean>(),                  //
-        make_unique<ReadTestClusterBitmap8>(),                   //
-        make_unique<WriteTestClusterBitmap8>(),                  //
-        make_unique<ReadTestClusterBitmap16>(),                  //
-        make_unique<WriteTestClusterBitmap16>(),                 //
-        make_unique<ReadTestClusterBitmap32>(),                  //
-        make_unique<WriteTestClusterBitmap32>(),                 //
-        make_unique<ReadTestClusterBitmap64>(),                  //
-        make_unique<WriteTestClusterBitmap64>(),                 //
-        make_unique<ReadTestClusterInt8u>(),                     //
-        make_unique<WriteTestClusterInt8u>(),                    //
-        make_unique<ReadTestClusterInt16u>(),                    //
-        make_unique<WriteTestClusterInt16u>(),                   //
-        make_unique<ReadTestClusterInt32u>(),                    //
-        make_unique<WriteTestClusterInt32u>(),                   //
-        make_unique<ReadTestClusterInt64u>(),                    //
-        make_unique<WriteTestClusterInt64u>(),                   //
-        make_unique<ReadTestClusterInt8s>(),                     //
-        make_unique<WriteTestClusterInt8s>(),                    //
-        make_unique<ReadTestClusterInt16s>(),                    //
-        make_unique<WriteTestClusterInt16s>(),                   //
-        make_unique<ReadTestClusterInt32s>(),                    //
-        make_unique<WriteTestClusterInt32s>(),                   //
-        make_unique<ReadTestClusterInt64s>(),                    //
-        make_unique<WriteTestClusterInt64s>(),                   //
-        make_unique<ReadTestClusterEnum8>(),                     //
-        make_unique<WriteTestClusterEnum8>(),                    //
-        make_unique<ReadTestClusterEnum16>(),                    //
-        make_unique<WriteTestClusterEnum16>(),                   //
-        make_unique<ReadTestClusterOctetString>(),               //
-        make_unique<WriteTestClusterOctetString>(),              //
-        make_unique<ReadTestClusterListInt8u>(),                 //
-        make_unique<ReadTestClusterListOctetString>(),           //
-        make_unique<ReadTestClusterListStructOctetString>(),     //
-        make_unique<ReadTestClusterLongOctetString>(),           //
-        make_unique<WriteTestClusterLongOctetString>(),          //
-        make_unique<ReadTestClusterCharString>(),                //
-        make_unique<WriteTestClusterCharString>(),               //
-        make_unique<ReadTestClusterLongCharString>(),            //
-        make_unique<WriteTestClusterLongCharString>(),           //
-        make_unique<ReadTestClusterEpochUs>(),                   //
-        make_unique<WriteTestClusterEpochUs>(),                  //
-        make_unique<ReadTestClusterEpochS>(),                    //
-        make_unique<WriteTestClusterEpochS>(),                   //
-        make_unique<ReadTestClusterVendorId>(),                  //
-        make_unique<WriteTestClusterVendorId>(),                 //
-        make_unique<ReadTestClusterUnsupported>(),               //
-        make_unique<WriteTestClusterUnsupported>(),              //
-        make_unique<ReadTestClusterClusterRevision>(),           //
+        make_unique<TestClusterTest>(),                                //
+        make_unique<TestClusterTestAddArguments>(),                    //
+        make_unique<TestClusterTestEnumsRequest>(),                    //
+        make_unique<TestClusterTestListInt8UArgumentRequest>(),        //
+        make_unique<TestClusterTestListInt8UReverseRequest>(),         //
+        make_unique<TestClusterTestListStructArgumentRequest>(),       //
+        make_unique<TestClusterTestNotHandled>(),                      //
+        make_unique<TestClusterTestNullableOptionalRequest>(),         //
+        make_unique<TestClusterTestSpecific>(),                        //
+        make_unique<TestClusterTestStructArgumentRequest>(),           //
+        make_unique<TestClusterTestUnknownCommand>(),                  //
+        make_unique<ReadTestClusterBoolean>(),                         //
+        make_unique<WriteTestClusterBoolean>(),                        //
+        make_unique<ReadTestClusterBitmap8>(),                         //
+        make_unique<WriteTestClusterBitmap8>(),                        //
+        make_unique<ReadTestClusterBitmap16>(),                        //
+        make_unique<WriteTestClusterBitmap16>(),                       //
+        make_unique<ReadTestClusterBitmap32>(),                        //
+        make_unique<WriteTestClusterBitmap32>(),                       //
+        make_unique<ReadTestClusterBitmap64>(),                        //
+        make_unique<WriteTestClusterBitmap64>(),                       //
+        make_unique<ReadTestClusterInt8u>(),                           //
+        make_unique<WriteTestClusterInt8u>(),                          //
+        make_unique<ReadTestClusterInt16u>(),                          //
+        make_unique<WriteTestClusterInt16u>(),                         //
+        make_unique<ReadTestClusterInt32u>(),                          //
+        make_unique<WriteTestClusterInt32u>(),                         //
+        make_unique<ReadTestClusterInt64u>(),                          //
+        make_unique<WriteTestClusterInt64u>(),                         //
+        make_unique<ReadTestClusterInt8s>(),                           //
+        make_unique<WriteTestClusterInt8s>(),                          //
+        make_unique<ReadTestClusterInt16s>(),                          //
+        make_unique<WriteTestClusterInt16s>(),                         //
+        make_unique<ReadTestClusterInt32s>(),                          //
+        make_unique<WriteTestClusterInt32s>(),                         //
+        make_unique<ReadTestClusterInt64s>(),                          //
+        make_unique<WriteTestClusterInt64s>(),                         //
+        make_unique<ReadTestClusterEnum8>(),                           //
+        make_unique<WriteTestClusterEnum8>(),                          //
+        make_unique<ReadTestClusterEnum16>(),                          //
+        make_unique<WriteTestClusterEnum16>(),                         //
+        make_unique<ReadTestClusterOctetString>(),                     //
+        make_unique<WriteTestClusterOctetString>(),                    //
+        make_unique<ReadTestClusterListInt8u>(),                       //
+        make_unique<ReadTestClusterListOctetString>(),                 //
+        make_unique<ReadTestClusterListStructOctetString>(),           //
+        make_unique<ReadTestClusterLongOctetString>(),                 //
+        make_unique<WriteTestClusterLongOctetString>(),                //
+        make_unique<ReadTestClusterCharString>(),                      //
+        make_unique<WriteTestClusterCharString>(),                     //
+        make_unique<ReadTestClusterLongCharString>(),                  //
+        make_unique<WriteTestClusterLongCharString>(),                 //
+        make_unique<ReadTestClusterEpochUs>(),                         //
+        make_unique<WriteTestClusterEpochUs>(),                        //
+        make_unique<ReadTestClusterEpochS>(),                          //
+        make_unique<WriteTestClusterEpochS>(),                         //
+        make_unique<ReadTestClusterVendorId>(),                        //
+        make_unique<WriteTestClusterVendorId>(),                       //
+        make_unique<ReadTestClusterListNullablesAndOptionalsStruct>(), //
+        make_unique<ReadTestClusterUnsupported>(),                     //
+        make_unique<WriteTestClusterUnsupported>(),                    //
+        make_unique<ReadTestClusterClusterRevision>(),                 //
     };
 
     commands.Register(clusterName, clusterCommands);

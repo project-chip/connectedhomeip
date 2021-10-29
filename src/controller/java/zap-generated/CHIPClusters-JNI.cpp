@@ -6320,7 +6320,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry    = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jint index      = entry.index;
             jint outputType = entry.outputType;
             UtfString nameStr(env, entry.name);
@@ -6410,7 +6411,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry  = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jint actionID = entry.actionID;
             UtfString nameStr(env, entry.name);
             jstring name(nameStr.jniValue());
@@ -6506,7 +6508,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry        = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jint endpointListID = entry.endpointListID;
             UtfString nameStr(env, entry.name);
             jstring name(nameStr.jniValue());
@@ -6748,7 +6751,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry  = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jlong type    = entry.type;
             jint revision = entry.revision;
 
@@ -7059,6 +7063,7 @@ public:
         while (iter.Next())
         {
             auto & entry = iter.GetValue();
+            (void) entry;
             UtfString labelStr(env, entry.label);
             jstring label(labelStr.jniValue());
             UtfString valueStr(env, entry.value);
@@ -7154,7 +7159,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry                 = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jlong failSafeExpiryLengthMs = entry.failSafeExpiryLengthMs;
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, failSafeExpiryLengthMs);
@@ -7246,6 +7252,7 @@ public:
         while (iter.Next())
         {
             auto & entry = iter.GetValue();
+            (void) entry;
             UtfString nameStr(env, entry.name);
             jstring name(nameStr.jniValue());
             jboolean fabricConnected                 = entry.fabricConnected;
@@ -7343,7 +7350,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry          = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jint vendorId         = entry.vendorId;
             jint vendorGroupId    = entry.vendorGroupId;
             jint groupKeySetIndex = entry.groupKeySetIndex;
@@ -7432,7 +7440,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry            = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jint vendorId           = entry.vendorId;
             jint groupKeyIndex      = entry.groupKeyIndex;
             jbyteArray groupKeyRoot = env->NewByteArray(entry.groupKeyRoot.size());
@@ -7526,7 +7535,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry   = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jint index     = entry.index;
             jint inputType = entry.inputType;
             UtfString nameStr(env, entry.name);
@@ -7620,7 +7630,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry             = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jint fabricIndex         = entry.fabricIndex;
             jbyteArray rootPublicKey = env->NewByteArray(entry.rootPublicKey.size());
             env->SetByteArrayRegion(rootPublicKey, 0, entry.rootPublicKey.size(),
@@ -7865,7 +7876,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry     = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jint majorNumber = entry.majorNumber;
             jint minorNumber = entry.minorNumber;
             UtfString nameStr(env, entry.name);
@@ -7963,7 +7975,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry    = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jint identifier = entry.identifier;
             UtfString nameStr(env, entry.name);
             jstring name(nameStr.jniValue());
@@ -8201,7 +8214,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry               = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jlong fabricIndex          = entry.fabricIndex;
             jbyteArray operationalCert = env->NewByteArray(entry.operationalCert.size());
             env->SetByteArrayRegion(operationalCert, 0, entry.operationalCert.size(),
@@ -8214,6 +8228,98 @@ public:
         }
         VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
                        ChipLogError(Zcl, "Error decoding ListStructOctetStringAttribute value: %" CHIP_ERROR_FORMAT,
+                                    iter.GetStatus().Format()));
+
+        env->ExceptionClear();
+        env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback
+    : public Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback>
+{
+public:
+    CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback(jobject javaCallback) :
+        Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list)
+    {
+        chip::DeviceLayer::StackUnlock unlock;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+
+        VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+        std::unique_ptr<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback> cppCallback(
+            reinterpret_cast<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback *>(context));
+
+        // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+        javaCallbackRef = cppCallback.get()->javaCallbackRef;
+        VerifyOrReturn(javaCallbackRef != nullptr,
+                       ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+        jclass arrayListClass;
+        err = JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
+        JniClass arrayListJniClass(arrayListClass);
+        jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
+        jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+        VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
+                       ChipLogError(Zcl, "Error finding Java ArrayList methods"));
+        jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
+        VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+
+        jmethodID javaMethod;
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+        jclass attributeClass;
+        err = JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipClusters$TestClusterCluster$ListNullablesAndOptionalsStructAttribute", attributeClass);
+        VerifyOrReturn(
+            err == CHIP_NO_ERROR,
+            ChipLogError(Zcl,
+                         "Could not find class "
+                         "chip/devicecontroller/ChipClusters$TestClusterCluster$ListNullablesAndOptionalsStructAttribute"));
+        JniClass attributeJniClass(attributeClass);
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "()V");
+        VerifyOrReturn(attributeCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ListNullablesAndOptionalsStructAttribute constructor"));
+
+        auto iter = list.begin();
+        while (iter.Next())
+        {
+            auto & entry = iter.GetValue();
+            (void) entry;
+
+            jobject attributeObj = env->NewObject(attributeClass, attributeCtor);
+            VerifyOrReturn(attributeObj != nullptr,
+                           ChipLogError(Zcl, "Could not create ListNullablesAndOptionalsStructAttribute object"));
+
+            env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        }
+        VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Error decoding ListNullablesAndOptionalsStructAttribute value: %" CHIP_ERROR_FORMAT,
                                     iter.GetStatus().Format()));
 
         env->ExceptionClear();
@@ -8294,7 +8400,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry              = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jlong extAddress          = entry.extAddress;
             jlong age                 = entry.age;
             jint rloc16               = entry.rloc16;
@@ -8399,7 +8506,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry             = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jlong extAddress         = entry.extAddress;
             jint rloc16              = entry.rloc16;
             jint routerId            = entry.routerId;
@@ -8499,7 +8607,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry      = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jint rotationTime = entry.rotationTime;
             jint flags        = entry.flags;
 
@@ -8594,7 +8703,8 @@ public:
         auto iter = list.begin();
         while (iter.Next())
         {
-            auto & entry                     = iter.GetValue();
+            auto & entry = iter.GetValue();
+            (void) entry;
             jboolean activeTimestampPresent  = entry.activeTimestampPresent;
             jboolean pendingTimestampPresent = entry.pendingTimestampPresent;
             jboolean masterKeyPresent        = entry.masterKeyPresent;
@@ -27958,6 +28068,34 @@ JNI_METHOD(void, TestClusterCluster, writeVendorIdAttribute)
 
     err = cppCluster->WriteAttributeVendorId(onSuccess->Cancel(), onFailure->Cancel(), static_cast<chip::VendorId>(value));
     VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, TestClusterCluster, readListNullablesAndOptionalsStructAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback,
+                    void (*)(CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback *)>
+        onSuccess(Platform::New<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback>(callback),
+                  Platform::Delete<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    err = cppCluster->ReadAttributeListNullablesAndOptionalsStruct(onSuccess->Cancel(), onFailure->Cancel());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReturnIllegalStateException(env, callback, "Error reading attribute", err));
 
     onSuccess.release();
     onFailure.release();

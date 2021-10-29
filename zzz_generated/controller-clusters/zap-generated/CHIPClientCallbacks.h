@@ -282,6 +282,13 @@ typedef void (*TestClusterListStructOctetStringListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
         data);
+void TestClusterClusterListNullablesAndOptionalsStructListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                          chip::Callback::Cancelable * onSuccessCallback,
+                                                                          chip::Callback::Cancelable * onFailureCallback);
+typedef void (*TestClusterListNullablesAndOptionalsStructListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & data);
 void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                          chip::Callback::Cancelable * onSuccessCallback,
                                                                          chip::Callback::Cancelable * onFailureCallback);

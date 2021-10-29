@@ -24325,6 +24325,16 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorId::Id; }
 };
 } // namespace VendorId
+namespace ListNullablesAndOptionalsStruct {
+struct TypeInfo
+{
+    using Type          = DataModel::List<const Structs::NullablesAndOptionalsStruct::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ListNullablesAndOptionalsStruct::Id; }
+};
+} // namespace ListNullablesAndOptionalsStruct
 namespace Unsupported {
 struct TypeInfo
 {
