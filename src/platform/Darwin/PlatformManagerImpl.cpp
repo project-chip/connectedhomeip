@@ -43,6 +43,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(ConfigurationManagerImpl::GetDefaultInstance());
 
     mRunLoopSem = dispatch_semaphore_create(0);
 

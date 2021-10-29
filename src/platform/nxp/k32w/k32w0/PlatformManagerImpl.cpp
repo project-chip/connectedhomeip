@@ -58,6 +58,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize the configuration system.
     err = Internal::K32WConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(ConfigurationManagerImpl::GetDefaultInstance());
 
     // Initialize LwIP.
     tcpip_init(NULL, NULL);

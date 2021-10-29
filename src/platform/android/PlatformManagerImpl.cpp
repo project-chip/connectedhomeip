@@ -43,6 +43,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     err = Internal::AndroidConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(ConfigurationManagerImpl::GetDefaultInstance());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
