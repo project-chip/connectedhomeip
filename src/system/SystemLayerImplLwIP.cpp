@@ -122,11 +122,11 @@ CHIP_ERROR LayerImplLwIP::AddEventHandlerDelegate(EventHandlerDelegate & aDelega
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LayerImplLwIP::ScheduleLambdaBridge(const LambdaBridge & bridge)
+CHIP_ERROR LayerImplLwIP::ScheduleLambdaBridge(LambdaBridge && bridge)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR lReturn = PlatformEventing::ScheduleLambdaBridge(*this, bridge);
+    CHIP_ERROR lReturn = PlatformEventing::ScheduleLambdaBridge(*this, std::move(bridge));
     if (lReturn != CHIP_NO_ERROR)
     {
         ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer lambda event: %s", ErrorStr(lReturn));

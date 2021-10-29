@@ -211,6 +211,28 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR LayerImplSelect::ScheduleLambdaBridge(LambdaBridge && event)
+{
+    mScheduledLambdas.emplace_back(std::move(event));
+    CHIP_ERROR err = ScheduleWork(RunScheduledLambda, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        mScheduledLambdas.pop_back();
+    }
+    return err;
+}
+
+void LayerImplSelect::RunScheduledLambda(Layer * aLayer, void * appState)
+{
+    LayerImplSelect * me = static_cast<LayerImplSelect *>(appState);
+    while (!me->mScheduledLambdas.empty())
+    {
+        auto & event = me->mScheduledLambdas.front();
+        event.LambdaProxy(event.LambdaBody);
+        me->mScheduledLambdas.pop_front();
+    }
+}
+
 CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)
 {
     // Find a free slot.

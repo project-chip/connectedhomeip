@@ -28,6 +28,7 @@
 #include <atomic>
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+#include <list>
 
 #include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemLayer.h>
@@ -49,6 +50,7 @@ public:
     CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
+    CHIP_ERROR ScheduleLambdaBridge(LambdaBridge && event) override;
 
     // LayerSocket overrides.
     CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut) override;
@@ -75,6 +77,8 @@ public:
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 protected:
+    static void RunScheduledLambda(Layer * aLayer, void * appState);
+
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
 
     static constexpr int kSocketWatchMax = (INET_CONFIG_ENABLE_TCP_ENDPOINT ? INET_CONFIG_NUM_TCP_ENDPOINTS : 0) +
@@ -89,6 +93,7 @@ protected:
         intptr_t mCallbackData;
     };
     SocketWatch mSocketWatchPool[kSocketWatchMax];
+    std::list<LambdaBridge> mScheduledLambdas;
 
     Timer::MutexedList mTimerList;
     timeval mNextTimeout;

@@ -213,6 +213,28 @@ CHIP_ERROR LayerImplLibevent::ScheduleWork(TimerCompleteCallback onComplete, voi
     return StartTimer(Clock::Zero, onComplete, appState);
 }
 
+CHIP_ERROR LayerImplLibevent::ScheduleLambdaBridge(LambdaBridge && event)
+{
+    mScheduledLambdas.emplace_back(std::move(event));
+    CHIP_ERROR err = ScheduleWork(RunScheduledLambda, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        mScheduledLambdas.pop_back();
+    }
+    return err;
+}
+
+void LayerImplLibevent::RunScheduledLambda(Layer * aLayer, void * appState)
+{
+    LayerImplLibevent * me = static_cast<LayerImplLibevent *>(appState);
+    while (!me->mScheduledLambdas.empty())
+    {
+        auto & event = me->mScheduledLambdas.front();
+        event.LambdaProxy(event.LambdaBody);
+        me->mScheduledLambdas.pop_front();
+    }
+}
+
 // static
 void LayerImplLibevent::TimerCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
 {
