@@ -46,19 +46,18 @@ public:
         using iterator_category = std::forward_iterator_tag;
         using difference_type   = std::ptrdiff_t;
         using value_type        = const ModeOptionStructType;
-        using pointer           = value_type*;
-        using reference         = value_type&;
+        using pointer           = value_type *;
+        using reference         = value_type &;
 
         virtual reference operator*() const = 0;
-        virtual pointer operator->() = 0;
-        virtual pointer operator->() const = 0;
+        virtual pointer operator->()        = 0;
+        virtual pointer operator->() const  = 0;
 
         // Prefix increment
-        virtual ModeOptionStructIterator& operator++() = 0;
+        virtual ModeOptionStructIterator & operator++() = 0;
 
-        virtual bool operator== (const ModeOptionStructIterator& other) const = 0;
-        virtual bool operator!= (const ModeOptionStructIterator& other) const = 0;
-
+        virtual bool operator==(const ModeOptionStructIterator & other) const = 0;
+        virtual bool operator!=(const ModeOptionStructIterator & other) const = 0;
 
         virtual ~ModeOptionStructIterator() {}
     };
@@ -68,7 +67,7 @@ public:
      */
     struct ModeOptionStructIteratorFactory
     {
-        using const_pointer = const ModeOptionStructIterator*;
+        using const_pointer = const ModeOptionStructIterator *;
 
         /**
          * Returns the ModeOptionStructIterator to the first option.
@@ -95,13 +94,12 @@ public:
      * @param endpointId The endpoint for which to search the ModeOptionStruct.
      * @param mode The mode for which to search the ModeOptionStruct.
      * @param dataPtr The pointer to receive the ModeOptionStruct, if one is found.
-     * @return EMBER_ZCL_STATUS_SUCCESS if sucessfully found the option. Otherwise, returns appropriate status code (found in <app/util/af-enums.h>)
+     * @return EMBER_ZCL_STATUS_SUCCESS if sucessfully found the option. Otherwise, returns appropriate status code (found in
+     * <app/util/af-enums.h>)
      */
     virtual EmberAfStatus getModeOptionByMode(EndpointId endpointId, uint8_t mode, const ModeOptionStructType ** dataPtr) const = 0;
 
-    virtual ~SupportedModesManager(){}
-
-
+    virtual ~SupportedModesManager() {}
 };
 
 } // namespace ModeSelect

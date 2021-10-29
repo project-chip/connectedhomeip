@@ -52,12 +52,12 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
     VerifyOrDie(aPath.mClusterId == ModeSelect::Id);
 
     const ModeSelect::StaticSupportedModesManager & gSupportedModeManager =
-    ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
+        ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
 
     if (ModeSelect::Attributes::SupportedModes::Id == aPath.mAttributeId)
     {
-        const ModeSelect::StaticSupportedModesManager::IteratorFactory* iteratorFactory =
-        gSupportedModeManager.getIteratorFactory(aPath.mEndpointId);
+        const ModeSelect::StaticSupportedModesManager::IteratorFactory * iteratorFactory =
+            gSupportedModeManager.getIteratorFactory(aPath.mEndpointId);
         if (iteratorFactory == nullptr)
         {
             aEncoder.Encode(DataModel::List<ModeSelect::Structs::ModeOptionStruct::Type>());
@@ -69,8 +69,8 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
             for (auto it = *(iteratorFactory->begin()); it != end; ++it)
             {
                 emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: dereferencing it");
-                emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: it= %p", (void*) it.operator->());
-                auto& modeOption = *it;
+                emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: it= %p", (void *) it.operator->());
+                auto & modeOption = *it;
                 ReturnErrorOnFailure(encoder.Encode(modeOption));
             }
             return CHIP_NO_ERROR;
@@ -82,9 +82,8 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
 
 } // anonymous namespace
 
-bool emberAfModeSelectClusterChangeToModeCallback(
-    CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
-    const ModeSelect::Commands::ChangeToMode::DecodableType & commandData)
+bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
+                                                  const ModeSelect::Commands::ChangeToMode::DecodableType & commandData)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Entering emberAfModeSelectClusterChangeToModeCallback");
     EndpointId endpointId = commandPath.mEndpointId;
@@ -92,7 +91,7 @@ bool emberAfModeSelectClusterChangeToModeCallback(
     // Check that the newMode matches one of the supported options
     const ModeSelect::Structs::ModeOptionStruct::Type * modeOptionPtr;
     const ModeSelect::StaticSupportedModesManager & gSupportedModeManager =
-    ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
+        ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
     EmberAfStatus checkSupportedModeStatus = gSupportedModeManager.getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
     if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
     {
