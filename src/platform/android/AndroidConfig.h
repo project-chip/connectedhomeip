@@ -27,8 +27,6 @@
 #include <inttypes.h>
 #include <jni.h>
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {

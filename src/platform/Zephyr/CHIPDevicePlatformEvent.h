@@ -24,6 +24,7 @@
 #pragma once
 
 #include <platform/CHIPDeviceEvent.h>
+#include <system/SystemPacketBuffer.h>
 
 #include <bluetooth/bluetooth.h>
 

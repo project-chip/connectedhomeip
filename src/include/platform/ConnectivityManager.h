@@ -43,12 +43,7 @@ class BLEEndPoint;
 namespace DeviceLayer {
 
 namespace Internal {
-template <class>
 class GenericPlatformManagerImpl;
-template <class>
-class GenericPlatformManagerImpl_FreeRTOS;
-template <class>
-class GenericPlatformManagerImpl_POSIX;
 } // namespace Internal
 
 // 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
@@ -277,13 +272,7 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-    friend class PlatformManagerImpl;
-    template <class>
     friend class Internal::GenericPlatformManagerImpl;
-    template <class>
-    friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
-    template <class>
-    friend class Internal::GenericPlatformManagerImpl_POSIX;
 
     CHIP_ERROR Init();
     void OnPlatformEvent(const ChipDeviceEvent * event);

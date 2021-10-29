@@ -34,6 +34,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/android/AndroidChipPlatform-JNI.h>
+#include <platform/android/PlatformManagerImpl.h>
 #include <platform/internal/BLEManager.h>
 
 using namespace chip;

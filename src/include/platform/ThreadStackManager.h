@@ -43,11 +43,9 @@ class ConfigurationManagerImpl;
 namespace Internal {
 class DeviceControlServer;
 class BLEManagerImpl;
-template <class>
 class GenericPlatformManagerImpl;
 template <class>
 class GenericConfigurationManagerImpl;
-template <class>
 class GenericPlatformManagerImpl_FreeRTOS;
 template <class>
 class GenericConnectivityManagerImpl_Thread;
@@ -127,11 +125,9 @@ private:
     friend class Internal::BLEManagerImpl;
 #endif
     friend class Internal::DeviceControlServer;
-    template <class>
     friend class Internal::GenericPlatformManagerImpl;
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
-    template <class>
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
     template <class>
     friend class Internal::GenericConnectivityManagerImpl_Thread;

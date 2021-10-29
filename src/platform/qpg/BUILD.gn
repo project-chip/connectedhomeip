@@ -24,6 +24,8 @@ if (chip_enable_openthread) {
 
 static_library("qpg") {
   sources = [
+    "../FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.cpp",
+    "../FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.h",
     "../FreeRTOS/SystemTimeSupport.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",

@@ -28,8 +28,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_Zephyr.cpp>
+#include <platform/Zephyr/PlatformManagerImpl.h>
 
 #include <drivers/entropy.h>
 #include <malloc.h>
@@ -39,7 +38,11 @@ namespace DeviceLayer {
 
 static K_THREAD_STACK_DEFINE(sChipThreadStack, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE);
 
-PlatformManagerImpl PlatformManagerImpl::sInstance{ sChipThreadStack };
+PlatformManager & PlatformMgr()
+{
+    static PlatformManagerImpl sInstance{ sChipThreadStack };
+    return sInstance;
+}
 
 #if !CONFIG_NORDIC_SECURITY_BACKEND
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
@@ -60,7 +63,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 }
 #endif // !CONFIG_NORDIC_SECURITY_BACKEND
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::InitChipStackInner(void)
 {
     CHIP_ERROR err;
 
@@ -80,14 +83,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif // !CONFIG_NORDIC_SECURITY_BACKEND
 
     // Call _InitChipStack() on the generic implementation base class to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_Zephyr::InitChipStackInner();
     SuccessOrExit(err);
 
 exit:
     return err;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
 #ifdef CONFIG_NEWLIB_LIBC
     // This will return the amount of memory which has been allocated from the system, but is not
@@ -100,7 +103,7 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
 #endif
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
 #ifdef CONFIG_NEWLIB_LIBC
     currentHeapUsed = mallinfo().uordblks;
@@ -110,7 +113,7 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 #endif
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
 #ifdef CONFIG_NEWLIB_LIBC
     // ARM newlib does not provide a way to obtain the peak heap usage, so for now just return

@@ -26,8 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/cc13x2_26x2/PlatformManagerImpl.h>
 
 #include <lwip/tcpip.h>
 
@@ -47,7 +46,11 @@ TRNG_Handle TRNG_handle_app;
 namespace chip {
 namespace DeviceLayer {
 
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+PlatformManager & PlatformMgr()
+{
+    static PlatformManagerImpl sInstance;
+    return sInstance;
+}
 
 static int app_get_random(uint8_t * aOutput, size_t aLen)
 {
@@ -99,7 +102,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
     return 0;
 }
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::InitChipStackInner()
 {
     CHIP_ERROR err;
 
@@ -138,7 +141,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_FreeRTOS::InitChipStackInner();
     SuccessOrExit(err);
 
 exit:

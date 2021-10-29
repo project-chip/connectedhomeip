@@ -30,6 +30,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/mbed/PlatformManager.h>
 
 #include <type_traits>
 

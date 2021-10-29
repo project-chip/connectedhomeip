@@ -28,8 +28,7 @@
 #include <app-common/zap-generated/enums.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/ESP32/ESP32Utils.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/ESP32/PlatformManagerImpl.h>
 
 #include "esp_event.h"
 #include "esp_heap_caps_init.h"
@@ -46,7 +45,11 @@ namespace Internal {
 extern CHIP_ERROR InitLwIPCoreLock(void);
 }
 
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+PlatformManager & PlatformMgr()
+{
+    static PlatformManagerImpl sInstance;
+    return sInstance;
+}
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
@@ -55,7 +58,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
     return 0;
 }
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::InitChipStackInner()
 {
     esp_err_t err;
     // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
@@ -115,19 +118,19 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
 
-    // Call _InitChipStack() on the generic implementation base class
+    // Call InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
+    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS::InitChipStackInner());
 
 exit:
     return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
+CHIP_ERROR PlatformManagerImpl::ShutdownInner()
 {
     uint64_t upTime = 0;
 
-    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    if (GetUpTime(upTime) == CHIP_NO_ERROR)
     {
         uint32_t totalOperationalHours = 0;
 
@@ -145,28 +148,28 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
-    return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+    return Internal::GenericPlatformManagerImpl_FreeRTOS::ShutdownInner();
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     currentHeapFree = esp_get_free_heap_size();
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
     currentHeapUsed = heap_caps_get_total_size(MALLOC_CAP_DEFAULT) - esp_get_free_heap_size();
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
     currentHeapHighWatermark = heap_caps_get_total_size(MALLOC_CAP_DEFAULT) - esp_get_minimum_free_heap_size();
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
+CHIP_ERROR PlatformManagerImpl::GetRebootCount(uint16_t & rebootCount)
 {
     uint32_t count = 0;
 
@@ -181,7 +184,7 @@ CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
     return err;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
+CHIP_ERROR PlatformManagerImpl::GetUpTime(uint64_t & upTime)
 {
     System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
@@ -194,11 +197,11 @@ CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperationalHours)
+CHIP_ERROR PlatformManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
     uint64_t upTime = 0;
 
-    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    if (GetUpTime(upTime) == CHIP_NO_ERROR)
     {
         uint32_t totalHours = 0;
         if (ConfigurationMgrImpl().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
@@ -212,7 +215,7 @@ CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperat
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReason)
+CHIP_ERROR PlatformManagerImpl::GetBootReasons(uint8_t & bootReason)
 {
     bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
     uint8_t reason;
@@ -239,11 +242,6 @@ CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReason)
         /* Reboot can be due to hardware or software watchdog*/
     }
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
-{
-    return Internal::InitLwIPCoreLock();
 }
 
 void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData)
@@ -316,7 +314,7 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
         }
     }
 
-    sInstance.PostEventOrDie(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 } // namespace DeviceLayer

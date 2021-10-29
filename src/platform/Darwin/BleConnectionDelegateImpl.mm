@@ -32,6 +32,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
+#include <platform/Darwin/PlatformManagerImpl.h>
 #include <setup_payload/SetupPayload.h>
 
 #import "UUIDHelper.h"

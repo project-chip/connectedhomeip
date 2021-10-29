@@ -51,6 +51,7 @@ chip::System::Layer & SystemLayer();
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 chip::System::LayerSockets & SystemLayerSockets();
+chip::System::LayerSocketsLoop & SystemLayerSocketsLoop();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace DeviceLayer

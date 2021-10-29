@@ -24,6 +24,8 @@ if (chip_enable_openthread) {
 
 static_library("cc13x2_26x2") {
   sources = [
+    "../FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.cpp",
+    "../FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.h",
     "../FreeRTOS/SystemTimeSupport.cpp",
     "BlePlatformConfig.h",
     "CC13X2_26X2Config.cpp",

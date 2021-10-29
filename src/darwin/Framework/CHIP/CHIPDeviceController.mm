@@ -130,7 +130,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     });
 
     // StopEventLoopTask will block until blocks are executed
-    chip::DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 
     return YES;
 }
@@ -139,7 +139,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
        vendorId:(uint16_t)vendorId
       nocSigner:(id<CHIPKeypair>)nocSigner
 {
-    chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 
     __block BOOL commissionerInitialized = NO;
     if ([self isRunning]) {

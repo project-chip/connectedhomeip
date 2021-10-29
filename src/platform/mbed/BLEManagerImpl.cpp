@@ -184,7 +184,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         ChipDeviceEvent chip_event;
         chip_event.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
         chip_event.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-        PlatformMgrImpl().PostEventOrDie(&chip_event);
+        PlatformMgr().PostEventOrDie(&chip_event);
 
         PlatformMgr().ScheduleWork(ble_manager.DriveBLEState, 0);
     }
@@ -208,7 +208,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         ChipDeviceEvent chip_event;
         chip_event.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
         chip_event.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-        PlatformMgrImpl().PostEventOrDie(&chip_event);
+        PlatformMgr().PostEventOrDie(&chip_event);
 
         if (event.isConnected())
         {
@@ -305,7 +305,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
             chip_event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
             break;
         }
-        PlatformMgrImpl().PostEventOrDie(&chip_event);
+        PlatformMgr().PostEventOrDie(&chip_event);
 
         ChipLogProgress(DeviceLayer, "BLE connection terminated, mbed-os reason: %d", reason.value());
         ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
@@ -397,7 +397,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             chip_event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
             chip_event.CHIPoBLEWriteReceived.ConId = params->connHandle;
             chip_event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
-            PlatformMgrImpl().PostEventOrDie(&chip_event);
+            PlatformMgr().PostEventOrDie(&chip_event);
         }
         else
         {
@@ -447,7 +447,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             ChipDeviceEvent chip_event;
             chip_event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
             chip_event.CHIPoBLESubscribe.ConId = params.connHandle;
-            PlatformMgrImpl().PostEventOrDie(&chip_event);
+            PlatformMgr().PostEventOrDie(&chip_event);
         }
     }
 
@@ -460,7 +460,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             ChipDeviceEvent chip_event;
             chip_event.Type                      = DeviceEventType::kCHIPoBLEUnsubscribe;
             chip_event.CHIPoBLEUnsubscribe.ConId = params.connHandle;
-            PlatformMgrImpl().PostEventOrDie(&chip_event);
+            PlatformMgr().PostEventOrDie(&chip_event);
         }
     }
 
@@ -473,7 +473,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             ChipDeviceEvent chip_event;
             chip_event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
             chip_event.CHIPoBLEIndicateConfirm.ConId = params.connHandle;
-            PlatformMgrImpl().PostEventOrDie(&chip_event);
+            PlatformMgr().PostEventOrDie(&chip_event);
         }
     }
 
@@ -931,7 +931,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-        PlatformMgrImpl().PostEventOrDie(&connEstEvent);
+        PlatformMgr().PostEventOrDie(&connEstEvent);
     }
     break;
 

@@ -65,8 +65,8 @@ int TestThreadStackManager()
     dataset.SetMasterKey(masterKey);
 
     chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformMgrImpl().InitChipStack();
-    chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+    chip::DeviceLayer::PlatformMgr().InitChipStack();
+    chip::DeviceLayer::PlatformMgr().AddEventHandler(EventHandler, 0);
 
     impl.InitThreadStack();
     impl.StartThreadTask();
@@ -75,7 +75,7 @@ int TestThreadStackManager()
 
     printf("Start Thread task done\n");
 
-    chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
     return -1;
 }

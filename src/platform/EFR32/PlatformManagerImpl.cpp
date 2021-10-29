@@ -24,8 +24,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/EFR32/PlatformManagerImpl.h>
 
 #include <lwip/tcpip.h>
 
@@ -35,9 +34,13 @@
 namespace chip {
 namespace DeviceLayer {
 
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+PlatformManager & PlatformMgr()
+{
+    static PlatformManagerImpl sInstance;
+    return sInstance;
+}
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::InitChipStackInner()
 {
     CHIP_ERROR err;
 
@@ -50,7 +53,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_FreeRTOS::InitChipStackInner();
     SuccessOrExit(err);
 
 exit:
@@ -64,14 +67,14 @@ exit:
  * number of free bytes remaining, but says nothing about fragmentation.
  */
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     size_t freeHeapSize = xPortGetFreeHeapSize();
     currentHeapFree     = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
     // Calculate the Heap used based on Total heap - Free heap
     int64_t heapUsed = (configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize());
@@ -82,7 +85,7 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
     // FreeRTOS records the lowest amount of available heap during runtime
     // currentHeapHighWatermark wants the highest heap usage point so we calculate it here

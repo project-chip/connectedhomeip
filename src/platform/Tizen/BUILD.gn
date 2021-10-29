@@ -26,6 +26,8 @@ static_library("Tizen") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../POSIX/GenericPlatformManagerImpl_POSIX.cpp",
+    "../POSIX/GenericPlatformManagerImpl_POSIX.h",
     "AppPreference.cpp",
     "AppPreference.h",
     "BLEManagerImpl.cpp",

@@ -22,9 +22,12 @@ static_library("telink") {
   sources = [
     "../Zephyr/BLEManagerImpl.cpp",
     "../Zephyr/ConfigurationManagerImpl.cpp",
+    "../Zephyr/GenericPlatformManagerImpl_Zephyr.cpp",
+    "../Zephyr/GenericPlatformManagerImpl_Zephyr.h",
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
     "../Zephyr/Logging.cpp",
     "../Zephyr/PlatformManagerImpl.cpp",
+    "../Zephyr/PlatformManagerImpl.h",
     "../Zephyr/SystemTimeSupport.cpp",
     "../Zephyr/ZephyrConfig.cpp",
     "../Zephyr/ZephyrConfig.h",

@@ -25,6 +25,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <system/PlatformEventSupport.h>
+
 #include <platform/PlatformManager.h>
 
 namespace chip {
