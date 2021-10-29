@@ -27,8 +27,7 @@
 #include <app-common/zap-generated/enums.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+#include <platform/Linux/PlatformManagerImpl.h>
 
 #include <thread>
 
@@ -43,8 +42,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-
-PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 namespace {
 
@@ -178,7 +175,7 @@ void PlatformManagerImpl::WiFIIPChangeListener()
 }
 #endif // #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack()
+CHIP_ERROR PlatformManagerImpl::InitChipStackInner()
 {
     CHIP_ERROR err;
     struct sigaction action;
@@ -209,9 +206,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
-    // Call _InitChipStack() on the generic implementation base class
-    // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_POSIX::InitChipStackInner();
     SuccessOrExit(err);
 
     mStartTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
@@ -220,11 +215,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
+CHIP_ERROR PlatformManagerImpl::ShutdownInner()
 {
     uint64_t upTime = 0;
 
-    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    if (GetUpTime(upTime) == CHIP_NO_ERROR)
     {
         uint32_t totalOperationalHours = 0;
 
@@ -242,10 +237,10 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
-    return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
+    return Internal::GenericPlatformManagerImpl_POSIX::ShutdownInner();
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     struct mallinfo mallocInfo = mallinfo();
 
@@ -256,7 +251,7 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
     struct mallinfo mallocInfo = mallinfo();
 
@@ -267,7 +262,7 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+CHIP_ERROR PlatformManagerImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
     struct mallinfo mallocInfo = mallinfo();
 
@@ -283,7 +278,7 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentH
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
+CHIP_ERROR PlatformManagerImpl::GetRebootCount(uint16_t & rebootCount)
 {
     uint32_t count = 0;
 
@@ -298,7 +293,7 @@ CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
     return err;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
+CHIP_ERROR PlatformManagerImpl::GetUpTime(uint64_t & upTime)
 {
     uint64_t currentTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
 
@@ -311,11 +306,11 @@ CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperationalHours)
+CHIP_ERROR PlatformManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
     uint64_t upTime = 0;
 
-    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    if (GetUpTime(upTime) == CHIP_NO_ERROR)
     {
         uint32_t totalHours = 0;
         if (ConfigurationMgrImpl().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
@@ -328,7 +323,7 @@ CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperat
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
+CHIP_ERROR PlatformManagerImpl::GetBootReasons(uint8_t & bootReasons)
 {
     uint32_t reason = 0;
 
@@ -349,6 +344,12 @@ GDBusConnection * PlatformManagerImpl::GetGDBusConnection()
     return this->mpGDBusConnection.get();
 }
 #endif
+
+PlatformManager & PlatformMgr()
+{
+    static PlatformManagerImpl sInstance;
+    return sInstance;
+}
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -139,7 +139,7 @@ int ChipLinuxAppInit(int argc, char ** argv)
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
 #endif // defined(PW_RPC_ENABLED)
 
-    chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+    chip::DeviceLayer::PlatformMgr().AddEventHandler(EventHandler, 0);
 
 #if CONFIG_NETWORK_LAYER_BLE
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)

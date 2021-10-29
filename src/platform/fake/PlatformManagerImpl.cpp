@@ -20,14 +20,16 @@
  *    @file
  *          Stub for PlatformManagerImpl for fake platform.
  */
-#include <platform/PlatformManager.h>
+#include <platform/fake/PlatformManagerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-/** Singleton instance of the KeyValueStoreManager implementation object.
- */
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+PlatformManager & PlatformMgr()
+{
+    static PlatformManagerImpl sInstance;
+    return sInstance;
+}
 
 } // namespace DeviceLayer
 } // namespace chip

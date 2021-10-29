@@ -24,19 +24,22 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/PlatformManager.h>
-
-// Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/Darwin/PlatformManagerImpl.h>
 
 #include <CoreFoundation/CoreFoundation.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+PlatformManagerImpl & PlatformMgrImpl()
+{
+    static PlatformManagerImpl sInstance;
+    return sInstance;
+}
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack()
+PlatformManager & PlatformMgr(){ return PlatformMgrImpl() }
+
+CHIP_ERROR PlatformManagerImpl::InitChipStackInner()
 {
     CHIP_ERROR err;
 
@@ -48,16 +51,16 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl::InitChipStackInner();
     SuccessOrExit(err);
 
-    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
+    DeviceLayer::SystemLayerSocketsLoop().SetDispatchQueue(GetWorkQueue());
 
 exit:
     return err;
 }
 
-CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
+CHIP_ERROR PlatformManagerImpl::StartEventLoopTask()
 {
     if (mIsWorkQueueRunning == false)
     {
@@ -68,7 +71,7 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
     return CHIP_NO_ERROR;
 };
 
-CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
+CHIP_ERROR PlatformManagerImpl::StopEventLoopTask()
 {
     if (mIsWorkQueueRunning == true)
     {
@@ -97,9 +100,9 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
     return CHIP_NO_ERROR;
 }
 
-void PlatformManagerImpl::_RunEventLoop()
+void PlatformManagerImpl::RunEventLoop()
 {
-    _StartEventLoopTask();
+    StartEventLoopTask();
 
     //
     // Block on the semaphore till we're signalled to stop by
@@ -108,17 +111,11 @@ void PlatformManagerImpl::_RunEventLoop()
     dispatch_semaphore_wait(mRunLoopSem, DISPATCH_TIME_FOREVER);
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
-{
-    // Call up to the base class _Shutdown() to perform the bulk of the shutdown.
-    return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
-}
-
-CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR PlatformManagerImpl::PostEvent(const ChipDeviceEvent * event)
 {
     const ChipDeviceEvent eventCopy = *event;
     dispatch_async(mWorkQueue, ^{
-        Impl()->DispatchEvent(&eventCopy);
+        DispatchEvent(&eventCopy);
     });
     return CHIP_NO_ERROR;
 }

@@ -21,6 +21,8 @@
 
 #include <glib.h>
 
+#include <vector>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {

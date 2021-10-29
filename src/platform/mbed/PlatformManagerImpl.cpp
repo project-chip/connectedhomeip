@@ -4,9 +4,8 @@
 
 #include <inet/InetLayer.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
 #include <platform/ScopedLock.h>
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/mbed/PlatformManagerImpl.h>
 #include <rtos/ThisThread.h>
 
 #include "MbedEventTimeout.h"
@@ -24,12 +23,13 @@ using namespace ::chip::System;
 namespace chip {
 namespace DeviceLayer {
 
-namespace {
-System::LayerSocketsLoop & SystemLayerSocketsLoop()
+PlatformManagerImpl & PlatformMgrImpl()
 {
-    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+    static PlatformManagerImpl sInstance;
+    return sInstance;
 }
-} // anonymous namespace
+
+PlatformManager & PlatformMgr(){ return PlatformMgrImpl() }
 
 // TODO: Event and timer processing is not efficient from a memory perspective.
 // Both occupy at least 24 bytes when only 4 bytes is required.
@@ -37,7 +37,7 @@ System::LayerSocketsLoop & SystemLayerSocketsLoop()
 // and register a single mbed event in the event queue to process all of them.
 // A similar design can be used for timers.
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::InitChipStackInner(void)
 {
     // Members are initialized by the stack
     if (!mInitialized)
@@ -92,7 +92,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
-    auto err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
+    auto err = GenericPlatformManagerImpl::InitChipStackInner();
     SuccessOrExit(err);
     mInitialized = true;
 
@@ -100,21 +100,21 @@ exit:
     return err;
 }
 
-void PlatformManagerImpl::_LockChipStack()
+void PlatformManagerImpl::LockChipStack()
 {
     mChipStackMutex.lock();
 }
 
-bool PlatformManagerImpl::_TryLockChipStack()
+bool PlatformManagerImpl::TryLockChipStack()
 {
     return mChipStackMutex.trylock();
 }
-void PlatformManagerImpl::_UnlockChipStack()
+void PlatformManagerImpl::UnlockChipStack()
 {
     mChipStackMutex.unlock();
 }
 
-CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
+CHIP_ERROR PlatformManagerImpl::PostEvent(const ChipDeviceEvent * eventPtr)
 {
     auto handle = mQueue.call([event = *eventPtr, this] {
         LockChipStack();
@@ -135,7 +135,7 @@ void PlatformManagerImpl::ProcessDeviceEvents()
     mQueue.dispatch(0);
 }
 
-void PlatformManagerImpl::_RunEventLoop()
+void PlatformManagerImpl::RunEventLoop()
 {
     // Update the internal state first.
     // We may run on the current thread instead of the external task
@@ -192,7 +192,7 @@ void PlatformManagerImpl::_RunEventLoop()
     }
 }
 
-CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
+CHIP_ERROR PlatformManagerImpl::StartEventLoopTask()
 {
     mbed::ScopedLock<rtos::Mutex> lock(mThisStateMutex);
 
@@ -218,7 +218,7 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
     return TranslateOsStatus(error);
 }
 
-CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
+CHIP_ERROR PlatformManagerImpl::StopEventLoopTask()
 {
     mbed::ScopedLock<rtos::Mutex> lock(mThisStateMutex);
 
@@ -257,19 +257,19 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
     return TranslateOsStatus(err);
 }
 
-CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout duration)
+CHIP_ERROR PlatformManagerImpl::StartChipTimer(System::Clock::Timeout duration)
 {
     // Let LayerSocketsLoop::PrepareSelect() handle timers.
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
+CHIP_ERROR PlatformManagerImpl::ShutdownInner()
 {
     //
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
     //
-    auto err = GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+    auto err = GenericPlatformManagerImpl::ShutdownInner();
     if (err == CHIP_NO_ERROR)
     {
         mInitialized = false;
@@ -306,10 +306,6 @@ bool PlatformManagerImpl::IsLoopActive()
         return true;
     }
 }
-
-// ===== Members for internal use by the following friends.
-
-PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 } // namespace DeviceLayer
 } // namespace chip

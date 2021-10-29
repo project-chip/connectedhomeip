@@ -26,8 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/P6/PlatformManagerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -36,9 +35,13 @@ namespace Internal {
 extern CHIP_ERROR InitLwIPCoreLock(void);
 }
 
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+PlatformManager & PlatformMgr()
+{
+    static PlatformManagerImpl sInstance;
+    return sInstance;
+}
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::InitChipStackInner(void)
 {
     CHIP_ERROR err;
 
@@ -48,7 +51,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_FreeRTOS::InitChipStackInner();
     SuccessOrExit(err);
 
 exit:
