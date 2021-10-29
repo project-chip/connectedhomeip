@@ -9584,6 +9584,959 @@ private:
     }
 };
 
+class Test_TC_CC_9_2 : public TestCommand
+{
+public:
+    Test_TC_CC_9_2() : TestCommand("Test_TC_CC_9_2"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_CC_9_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_CC_9_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition: Turn on light for color control tests\n");
+            err = TestPreconditionTurnOnLightForColorControlTests_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Precondition: Check on/off attribute value is true after on command\n");
+            err = TestPreconditionCheckOnOffAttributeValueIsTrueAfterOnCommand_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Sends ColorLoopSet Command - Set all Attributes\n");
+            err = TestSendsColorLoopSetCommandSetAllAttributes_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read ColorLoopActive attribute from DUT\n");
+            err = TestReadColorLoopActiveAttributeFromDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read ColorLoopDirection attribute from DUT.\n");
+            err = TestReadColorLoopDirectionAttributeFromDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read ColorLoopTime attribute from DUT.\n");
+            err = TestReadColorLoopTimeAttributeFromDut_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read ColorLoopStartEnhancedHue attribute from DUT.\n");
+            err = TestReadColorLoopStartEnhancedHueAttributeFromDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Color Loop Set Command - Set all Attributes\n");
+            err = TestColorLoopSetCommandSetAllAttributes_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read ColorLoopActive attribute from DUT.\n");
+            err = TestReadColorLoopActiveAttributeFromDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Color Loop Set Command - Start Color Loop\n");
+            err = TestColorLoopSetCommandStartColorLoop_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Read ColorLoopDirection attribute from DUT.\n");
+            err = TestReadColorLoopDirectionAttributeFromDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Color Loop Set Command - Start Color Loop\n");
+            err = TestColorLoopSetCommandStartColorLoop_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Read ColorLoopActive attribute from DUT\n");
+            err = TestReadColorLoopActiveAttributeFromDut_12();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 13;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopDirection)> mOnSuccessCallback_4{ OnSuccessCallback_4,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopTime)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopStartEnhancedHue)> mOnSuccessCallback_6{
+        OnSuccessCallback_6, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopDirection)> mOnSuccessCallback_10{ OnSuccessCallback_10,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_12{ OnFailureCallback_12, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_12{ OnSuccessCallback_12, this };
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, bool onOff)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_1(onOff);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint8_t colorLoopActive)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_3(colorLoopActive);
+    }
+
+    static void OnFailureCallback_4(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint8_t colorLoopDirection)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_4(colorLoopDirection);
+    }
+
+    static void OnFailureCallback_5(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context, uint16_t colorLoopTime)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_5(colorLoopTime);
+    }
+
+    static void OnFailureCallback_6(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, uint16_t colorLoopStartEnhancedHue)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_6(colorLoopStartEnhancedHue);
+    }
+
+    static void OnFailureCallback_8(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context, uint8_t colorLoopActive)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_8(colorLoopActive);
+    }
+
+    static void OnFailureCallback_10(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, uint8_t colorLoopDirection)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_10(colorLoopDirection);
+    }
+
+    static void OnFailureCallback_12(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_12(status);
+    }
+
+    static void OnSuccessCallback_12(void * context, uint8_t colorLoopActive)
+    {
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_12(colorLoopActive);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_0()
+    {
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::OnOff::Commands::On::Type request;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_0();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_0(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0() { NextTest(); }
+
+    CHIP_ERROR TestPreconditionCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
+    {
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(bool onOff)
+    {
+        VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_2()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 30U;
+        request.startHue        = 160U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_2();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_2(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2() { NextTest(); }
+
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_3()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint8_t colorLoopActive)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopActive", colorLoopActive, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_4()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint8_t colorLoopDirection)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopDirection", colorLoopDirection, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_5()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(uint16_t colorLoopTime)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorLoopTime", colorLoopTime, 30U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadColorLoopStartEnhancedHueAttributeFromDut_6()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(uint16_t colorLoopStartEnhancedHue)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorLoopStartEnhancedHue", colorLoopStartEnhancedHue, 160U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_7()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 0U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_7(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7() { NextTest(); }
+
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_8()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(uint8_t colorLoopActive)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopActive", colorLoopActive, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestColorLoopSetCommandStartColorLoop_9()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
+        request.time            = 0U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_9(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_10()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
+    }
+
+    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(uint8_t colorLoopDirection)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopDirection", colorLoopDirection, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestColorLoopSetCommandStartColorLoop_11()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 0U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_11();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_11(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_12()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
+    }
+
+    void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12(uint8_t colorLoopActive)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopActive", colorLoopActive, 0));
+        NextTest();
+    }
+};
+
+class Test_TC_CC_9_3 : public TestCommand
+{
+public:
+    Test_TC_CC_9_3() : TestCommand("Test_TC_CC_9_3"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_CC_9_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_CC_9_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition: Turn on light for color control tests\n");
+            err = TestPreconditionTurnOnLightForColorControlTests_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Precondition: Check on/off attribute value is true after on command\n");
+            err = TestPreconditionCheckOnOffAttributeValueIsTrueAfterOnCommand_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Sends ColorLoopSet Command - Set all Attributes\n");
+            err = TestSendsColorLoopSetCommandSetAllAttributes_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read ColorLoopActive attribute from DUT\n");
+            err = TestReadColorLoopActiveAttributeFromDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read ColorLoopDirection attribute from DUT.\n");
+            err = TestReadColorLoopDirectionAttributeFromDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read ColorLoopTime attribute from DUT.\n");
+            err = TestReadColorLoopTimeAttributeFromDut_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read ColorLoopStartEnhancedHue attribute from DUT.\n");
+            err = TestReadColorLoopStartEnhancedHueAttributeFromDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Color Loop Set Command - Set all Attributes\n");
+            err = TestColorLoopSetCommandSetAllAttributes_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read ColorLoopActive attribute from DUT.\n");
+            err = TestReadColorLoopActiveAttributeFromDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Color Loop Set Command - Start Color Loop\n");
+            err = TestColorLoopSetCommandStartColorLoop_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Read ColorLoopTime attribute from DUT.\n");
+            err = TestReadColorLoopTimeAttributeFromDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Color Loop Set Command - Start Color Loop\n");
+            err = TestColorLoopSetCommandStartColorLoop_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Read ColorLoopActive attribute from DUT\n");
+            err = TestReadColorLoopActiveAttributeFromDut_12();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 13;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, bool onOff)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopDirection)> mOnSuccessCallback_4{ OnSuccessCallback_4,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopTime)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopStartEnhancedHue)> mOnSuccessCallback_6{
+        OnSuccessCallback_6, this
+    };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_8{ OnSuccessCallback_8, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t colorLoopTime)> mOnSuccessCallback_10{ OnSuccessCallback_10, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_12{ OnFailureCallback_12, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t colorLoopActive)> mOnSuccessCallback_12{ OnSuccessCallback_12, this };
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, bool onOff)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_1(onOff);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint8_t colorLoopActive)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_3(colorLoopActive);
+    }
+
+    static void OnFailureCallback_4(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint8_t colorLoopDirection)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_4(colorLoopDirection);
+    }
+
+    static void OnFailureCallback_5(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context, uint16_t colorLoopTime)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_5(colorLoopTime);
+    }
+
+    static void OnFailureCallback_6(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, uint16_t colorLoopStartEnhancedHue)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_6(colorLoopStartEnhancedHue);
+    }
+
+    static void OnFailureCallback_8(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context, uint8_t colorLoopActive)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_8(colorLoopActive);
+    }
+
+    static void OnFailureCallback_10(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, uint16_t colorLoopTime)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_10(colorLoopTime);
+    }
+
+    static void OnFailureCallback_12(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_12(status);
+    }
+
+    static void OnSuccessCallback_12(void * context, uint8_t colorLoopActive)
+    {
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_12(colorLoopActive);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_0()
+    {
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::OnOff::Commands::On::Type request;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_0();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_0(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0() { NextTest(); }
+
+    CHIP_ERROR TestPreconditionCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
+    {
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(bool onOff)
+    {
+        VerifyOrReturn(CheckValue<bool>("onOff", onOff, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_2()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 30U;
+        request.startHue        = 160U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_2();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_2(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2() { NextTest(); }
+
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_3()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint8_t colorLoopActive)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopActive", colorLoopActive, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_4()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint8_t colorLoopDirection)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopDirection", colorLoopDirection, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_5()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(uint16_t colorLoopTime)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorLoopTime", colorLoopTime, 30U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadColorLoopStartEnhancedHueAttributeFromDut_6()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(uint16_t colorLoopStartEnhancedHue)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorLoopStartEnhancedHue", colorLoopStartEnhancedHue, 160U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_7()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 0U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_7(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7() { NextTest(); }
+
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_8()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(uint8_t colorLoopActive)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopActive", colorLoopActive, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestColorLoopSetCommandStartColorLoop_9()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 60U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_9(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_10()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
+    }
+
+    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(uint16_t colorLoopTime)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("colorLoopTime", colorLoopTime, 60U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestColorLoopSetCommandStartColorLoop_11()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 0U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_11();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_11(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_12()
+    {
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
+    }
+
+    void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12(uint8_t colorLoopActive)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("colorLoopActive", colorLoopActive, 0));
+        NextTest();
+    }
+};
+
 class Test_TC_DM_1_1 : public TestCommand
 {
 public:
@@ -16150,6 +17103,120 @@ private:
     void OnSuccessResponse_10(uint8_t mode)
     {
         VerifyOrReturn(CheckValue<uint8_t>("mode", mode, 7));
+        NextTest();
+    }
+};
+
+class Test_TC_WNCV_2_5 : public TestCommand
+{
+public:
+    Test_TC_WNCV_2_5() : TestCommand("Test_TC_WNCV_2_5"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_2_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_2_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Reads EndProductType attribute from DUT\n");
+            err = TestReadsEndProductTypeAttributeFromDut_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads EndProductType attribute constraints from DUT\n");
+            err = TestReadsEndProductTypeAttributeConstraintsFromDut_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t endProductType)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t endProductType)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_WNCV_2_5 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint8_t endProductType)
+    {
+        (static_cast<Test_TC_WNCV_2_5 *>(context))->OnSuccessResponse_0(endProductType);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_WNCV_2_5 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t endProductType)
+    {
+        (static_cast<Test_TC_WNCV_2_5 *>(context))->OnSuccessResponse_1(endProductType);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadsEndProductTypeAttributeFromDut_0()
+    {
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeEndProductType(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t endProductType)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("endProductType", endProductType, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsEndProductTypeAttributeConstraintsFromDut_1()
+    {
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeEndProductType(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t endProductType)
+    {
+        VerifyOrReturn(CheckConstraintType("endProductType", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("endProductType", endProductType, 23));
         NextTest();
     }
 };
@@ -23724,6 +24791,161 @@ private:
     }
 };
 
+class Test_TC_DIAGSW_1_1 : public TestCommand
+{
+public:
+    Test_TC_DIAGSW_1_1() : TestCommand("Test_TC_DIAGSW_1_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGSW_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGSW_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Reads CurrentHeapFree non-global attribute value from DUT\n");
+            err = TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads CurrentHeapUsed non-global attribute value from DUT\n");
+            err = TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapHighWaterMark non-global attribute value from DUT\n");
+            err = TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t currentHeapFree)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t currentHeapUsed)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint64_t currentHeapHighWatermark)> mOnSuccessCallback_2{ OnSuccessCallback_2,
+                                                                                                                this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint64_t currentHeapFree)
+    {
+        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnSuccessResponse_0(currentHeapFree);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint64_t currentHeapUsed)
+    {
+        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnSuccessResponse_1(currentHeapUsed);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint64_t currentHeapHighWatermark)
+    {
+        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnSuccessResponse_2(currentHeapHighWatermark);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_0()
+    {
+        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentHeapFree(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_0(uint64_t currentHeapFree)
+    {
+        VerifyOrReturn(CheckConstraintType("currentHeapFree", "", "uint64"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_1()
+    {
+        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentHeapUsed(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint64_t currentHeapUsed)
+    {
+        VerifyOrReturn(CheckConstraintType("currentHeapUsed", "", "uint64"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_2()
+    {
+        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentHeapHighWatermark(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+    }
+
+    void OnFailureResponse_2(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint64_t currentHeapHighWatermark)
+    {
+        VerifyOrReturn(CheckConstraintType("currentHeapHighWatermark", "", "uint64"));
+        NextTest();
+    }
+};
+
 class TestSubscribe_OnOff : public TestCommand
 {
 public:
@@ -24031,6 +25253,8 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_CC_7_3>(),
         make_unique<Test_TC_CC_7_4>(),
         make_unique<Test_TC_CC_8_1>(),
+        make_unique<Test_TC_CC_9_2>(),
+        make_unique<Test_TC_CC_9_3>(),
         make_unique<Test_TC_DM_1_1>(),
         make_unique<Test_TC_DM_3_1>(),
         make_unique<Test_TC_FLW_1_1>(),
@@ -24065,6 +25289,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_DIAGTH_1_1>(),
         make_unique<Test_TC_WNCV_1_1>(),
         make_unique<Test_TC_WNCV_2_1>(),
+        make_unique<Test_TC_WNCV_2_5>(),
         make_unique<Test_TC_WNCV_3_1>(),
         make_unique<Test_TC_WNCV_3_2>(),
         make_unique<Test_TC_WNCV_3_3>(),
@@ -24088,6 +25313,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestBasicInformation>(),
         make_unique<TestIdentifyCluster>(),
         make_unique<TestOperationalCredentialsCluster>(),
+        make_unique<Test_TC_DIAGSW_1_1>(),
         make_unique<TestSubscribe_OnOff>(),
     };
 
