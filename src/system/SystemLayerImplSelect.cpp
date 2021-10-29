@@ -214,7 +214,8 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
 CHIP_ERROR LayerImplSelect::ScheduleLambdaBridge(LambdaBridge && event)
 {
     LambdaBridge * allocated = mScheduledLambdas.CreateObject(std::move(event));
-    if (allocated == nullptr) return CHIP_ERROR_NO_MEMORY;
+    if (allocated == nullptr)
+        return CHIP_ERROR_NO_MEMORY;
     CHIP_ERROR err = ScheduleWork(RunScheduledLambda, this);
     if (err != CHIP_NO_ERROR)
     {
@@ -226,7 +227,7 @@ CHIP_ERROR LayerImplSelect::ScheduleLambdaBridge(LambdaBridge && event)
 void LayerImplSelect::RunScheduledLambda(Layer * aLayer, void * appState)
 {
     LayerImplSelect * me = static_cast<LayerImplSelect *>(appState);
-    me->mScheduledLambdas.ForEachActiveObject([&] (LambdaBridge * event) {
+    me->mScheduledLambdas.ForEachActiveObject([&](LambdaBridge * event) {
         event->LambdaProxy(event->LambdaBody);
         me->mScheduledLambdas.ReleaseObject(event);
         return true;
