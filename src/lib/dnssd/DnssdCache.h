@@ -120,7 +120,7 @@ public:
                 for (int j = 0; j < e.mNumIPs; ++j)
                 {
                     char address[Inet::IPAddress::kMaxStringLength];
-                    e.mAddress[i].ToString(address, sizeof(address));
+                    e.mAddress[i].ToString(address);
                     MdnsLogProgress(Discovery, "    address %d: %s", j, address);
                 }
             }
