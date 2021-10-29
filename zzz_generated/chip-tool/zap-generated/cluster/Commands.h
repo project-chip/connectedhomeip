@@ -652,6 +652,38 @@ static void OnMediaInputMediaInputListListAttributeResponse(
     command->SetCommandExitStatus(iter.GetStatus());
 }
 
+static void OnModeSelectSupportedModesListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & list)
+{
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        command->SetCommandExitStatus(err);
+        return;
+    }
+
+    ChipLogProgress(chipTool, "OnModeSelectSupportedModesListAttributeResponse: %zu entries", count);
+
+    auto iter  = list.begin();
+    uint16_t i = 0;
+    while (iter.Next())
+    {
+        ++i;
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+        ChipLogProgress(chipTool, "ModeOptionStruct[%" PRIu16 "]:", i);
+        ChipLogProgress(Zcl, "  Label: %.*s", static_cast<int>(entry.label.size()), entry.label.data());
+        ChipLogProgress(chipTool, "  Mode: %" PRIu8 "", entry.mode);
+        ChipLogProgress(chipTool, "  SemanticTag: %" PRIu32 "", entry.semanticTag);
+#endif // CHIP_PROGRESS_LOGGING
+    }
+    command->SetCommandExitStatus(iter.GetStatus());
+}
+
 static void OnOperationalCredentialsFabricsListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<
@@ -2106,6 +2138,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | LowPower                                                            | 0x0508 |
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
+| ModeSelect                                                          | 0x0050 |
 | NetworkCommissioning                                                | 0x0031 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OtaSoftwareUpdateRequestor                                          | 0x002A |
@@ -14213,6 +14246,330 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster ModeSelect                                                  | 0x0050 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ChangeToMode                                                      |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * CurrentMode                                                       | 0x0000 |
+| * SupportedModes                                                    | 0x0001 |
+| * OnMode                                                            | 0x0002 |
+| * StartUpMode                                                       | 0x0003 |
+| * Description                                                       | 0x0004 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ChangeToMode
+ */
+class ModeSelectChangeToMode : public ModelCommand
+{
+public:
+    ModeSelectChangeToMode() : ModelCommand("change-to-mode")
+    {
+        AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000000) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ModeSelectCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+    }
+
+private:
+    chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type mRequest;
+};
+
+/*
+ * Attribute CurrentMode
+ */
+class ReadModeSelectCurrentMode : public ModelCommand
+{
+public:
+    ReadModeSelectCurrentMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectCurrentMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0050) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ModeSelectCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCurrentMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportModeSelectCurrentMode : public ModelCommand
+{
+public:
+    ReportModeSelectCurrentMode() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "current-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportModeSelectCurrentMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0050) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ModeSelectCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeCurrentMode(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.SubscribeAttributeCurrentMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                     mMaxInterval);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+};
+
+/*
+ * Attribute SupportedModes
+ */
+class ReadModeSelectSupportedModes : public ModelCommand
+{
+public:
+    ReadModeSelectSupportedModes() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-modes");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectSupportedModes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0050) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ModeSelectCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSupportedModes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<ModeSelectSupportedModesListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<ModeSelectSupportedModesListAttributeCallback>(OnModeSelectSupportedModesListAttributeResponse,
+                                                                                    this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute OnMode
+ */
+class ReadModeSelectOnMode : public ModelCommand
+{
+public:
+    ReadModeSelectOnMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "on-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectOnMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0050) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ModeSelectCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeOnMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteModeSelectOnMode : public ModelCommand
+{
+public:
+    WriteModeSelectOnMode() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "on-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteModeSelectOnMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0050) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ModeSelectCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeOnMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mValue;
+};
+
+/*
+ * Attribute StartUpMode
+ */
+class ReadModeSelectStartUpMode : public ModelCommand
+{
+public:
+    ReadModeSelectStartUpMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "start-up-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectStartUpMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0050) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ModeSelectCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeStartUpMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Description
+ */
+class ReadModeSelectDescription : public ModelCommand
+{
+public:
+    ReadModeSelectDescription() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "description");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectDescription()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0050) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ModeSelectCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeDescription(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadModeSelectClusterRevision : public ModelCommand
+{
+public:
+    ReadModeSelectClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0050) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -27649,6 +28006,24 @@ void registerClusterMediaPlayback(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterModeSelect(Commands & commands)
+{
+    const char * clusterName = "ModeSelect";
+
+    commands_list clusterCommands = {
+        make_unique<ModeSelectChangeToMode>(),        //
+        make_unique<ReadModeSelectCurrentMode>(),     //
+        make_unique<ReportModeSelectCurrentMode>(),   //
+        make_unique<ReadModeSelectSupportedModes>(),  //
+        make_unique<ReadModeSelectOnMode>(),          //
+        make_unique<WriteModeSelectOnMode>(),         //
+        make_unique<ReadModeSelectStartUpMode>(),     //
+        make_unique<ReadModeSelectDescription>(),     //
+        make_unique<ReadModeSelectClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterNetworkCommissioning(Commands & commands)
 {
     const char * clusterName = "NetworkCommissioning";
@@ -28272,6 +28647,7 @@ void registerClusters(Commands & commands)
     registerClusterLowPower(commands);
     registerClusterMediaInput(commands);
     registerClusterMediaPlayback(commands);
+    registerClusterModeSelect(commands);
     registerClusterNetworkCommissioning(commands);
     registerClusterOtaSoftwareUpdateProvider(commands);
     registerClusterOtaSoftwareUpdateRequestor(commands);

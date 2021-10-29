@@ -149,6 +149,10 @@
 @property (readonly) chip::Controller::MediaPlaybackCluster cppCluster;
 @end
 
+@interface CHIPModeSelect ()
+@property (readonly) chip::Controller::ModeSelectCluster cppCluster;
+@end
+
 @interface CHIPNetworkCommissioning ()
 @property (readonly) chip::Controller::NetworkCommissioningCluster cppCluster;
 @end
