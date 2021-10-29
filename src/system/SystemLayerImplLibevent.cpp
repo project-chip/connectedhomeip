@@ -217,7 +217,8 @@ CHIP_ERROR LayerImplLibevent::ScheduleLambdaBridge(LambdaBridge && event)
 {
     mScheduledLambdas.emplace_back(std::move(event));
     CHIP_ERROR err = ScheduleWork(RunScheduledLambda, this);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         mScheduledLambdas.pop_back();
     }
     return err;
