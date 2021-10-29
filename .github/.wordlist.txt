@@ -569,7 +569,6 @@ MaxInterval
 MaxIntervalCeilingSeconds
 MaxRtrAdvInterval
 mbed
-Mbed
 MbedCommissioning
 MbedNewTarget
 mbedos
@@ -672,7 +671,6 @@ OnOff
 OnOffClusterTest
 OnPlatformEvent
 OO
-openocd
 OpenOCD
 OpenSSL
 OpenThread
@@ -830,7 +828,6 @@ SDK
 sdkconfig
 SDK's
 SDKs
-SDK's
 SDKTARGETSYSROOT
 sdl
 segger
