@@ -374,7 +374,7 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
         ChipLogDetail(Inet,
                       "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
                       " on exchange " ChipLogFormatExchangeId,
-                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromSentHeader(payloadHeader));
+                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
     }
 
     session->GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
@@ -459,7 +459,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         ChipLogDetail(Inet,
                       "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
                       " on exchange " ChipLogFormatExchangeId,
-                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromSentHeader(payloadHeader));
+                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
         if (!payloadHeader.NeedsAck())
         {
             // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
@@ -521,7 +521,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         ChipLogDetail(Inet,
                       "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
                       " on exchange " ChipLogFormatExchangeId,
-                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromSentHeader(payloadHeader));
+                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
         if (!payloadHeader.NeedsAck())
         {
             // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
