@@ -27,19 +27,19 @@
 
 namespace chip {
 namespace app {
-namespace TimedRequest {
-enum
+namespace TimedRequestMessage {
+enum class Tag : uint8_t
 {
-    kCsTag_TimeoutMs = 0,
+    kTimeoutMs = 0,
 };
 
 class Parser : public chip::app::Parser
 {
 public:
     /**
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this response
+     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this request
      */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
+    CHIP_ERROR Init(const TLV::TLVReader & aReader);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
@@ -69,14 +69,14 @@ public:
 class Builder : public chip::app::Builder
 {
 public:
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
+    CHIP_ERROR Init(TLV::TLVWriter * const apWriter);
 
     /**
      *  @brief Timeout value, sent by a client to a server, if there is a preceding successful Timed Request action,
      *  the following action SHALL be received before the end of the Timeout interval.
      */
-    TimedRequest::Builder & TimeoutMs(const uint16_t aTimeoutMs);
+    TimedRequestMessage::Builder & TimeoutMs(const uint16_t aTimeoutMs);
 };
-} // namespace TimedRequest
+} // namespace TimedRequestMessage
 } // namespace app
 } // namespace chip
