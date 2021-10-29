@@ -56,7 +56,7 @@ exit:
 CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint16_t TagPresenceMask = 0;
+    int TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
     PRETTY_PRINT("CommandPathIB =");
     PRETTY_PRINT("{");
@@ -204,7 +204,7 @@ CommandPathIB::Builder & CommandPathIB::Builder::CommandId(const chip::CommandId
     return *this;
 }
 
-CommandPathIB::Builder & CommandPathIB::Builder::EndOfCommandPath()
+CommandPathIB::Builder & CommandPathIB::Builder::EndOfCommandPathIB()
 {
     EndOfContainer();
     return *this;

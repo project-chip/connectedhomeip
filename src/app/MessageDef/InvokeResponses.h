@@ -23,10 +23,6 @@
 
 #pragma once
 
-#include "CommandDataIB.h"
-#include "ListBuilder.h"
-#include "ListParser.h"
-
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -34,9 +30,13 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "InvokeResponseIB.h"
+#include "ListBuilder.h"
+#include "ListParser.h"
+
 namespace chip {
 namespace app {
-namespace CommandList {
+namespace InvokeResponses {
 class Parser : public ListParser
 {
 public:
@@ -64,25 +64,25 @@ public:
     /**
      *  @brief Initialize a CommandDataIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to CommandDataIB::Builder
+     *  @return A reference to InvokeResponseIB::Builder
      */
-    CommandDataIB::Builder & CreateCommandDataIBBuilder();
+    InvokeResponseIB::Builder & CreateInvokeResponse();
 
     /**
-     *  @return A reference to CommandDataIB::Builder
+     *  @return A reference to InvokeResponseIB::Builder
      */
-    CommandDataIB::Builder & GetCommandDataIBBuilder() { return mCommandDataIBBuilder; };
+    InvokeResponseIB::Builder & GetInvokeResponse() { return mInvokeResponse; };
 
     /**
-     *  @brief Mark the end of this CommandList
+     *  @brief Mark the end of this InvokeResponses
      *
      *  @return A reference to *this
      */
-    CommandList::Builder & EndOfCommandList();
+    InvokeResponses::Builder & EndOfInvokeResponses();
 
 private:
-    CommandDataIB::Builder mCommandDataIBBuilder;
+    InvokeResponseIB::Builder mInvokeResponse;
 };
-}; // namespace CommandList
+}; // namespace InvokeResponses
 }; // namespace app
 }; // namespace chip

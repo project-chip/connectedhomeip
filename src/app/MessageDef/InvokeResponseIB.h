@@ -1,7 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,17 +16,11 @@
  */
 /**
  *    @file
- *      This file defines CommandDataIB parser and builder in CHIP interaction model
+ *      This file defines InvokeResponse parser and builder in CHIP interaction model
  *
  */
 
 #pragma once
-
-#include "Builder.h"
-#include "CommandPathIB.h"
-
-#include "Parser.h"
-#include "StatusIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -36,13 +29,18 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "Builder.h"
+#include "CommandDataIB.h"
+#include "CommandStatusIB.h"
+#include "Parser.h"
+
 namespace chip {
 namespace app {
-namespace CommandDataIB {
+namespace InvokeResponseIB {
 enum class Tag : uint8_t
 {
-    kPath = 0,
-    kData = 1,
+    kCommand = 0,
+    kStatus  = 1,
 };
 
 class Parser : public chip::app::Parser
@@ -51,7 +49,7 @@ public:
     /**
      *  @brief Initialize the parser object with TLVReader
      *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this CommandDataIB
+     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this request
      *
      *  @return #CHIP_NO_ERROR on success
      */
@@ -75,36 +73,31 @@ public:
 #endif
 
     /**
-     *  @brief Get a TLVReader for the CommandPathIB. Next() must be called before accessing them.
+     *  @brief Get a parser for a Command.
      *
-     *  @param [in] apPath    A pointer to apCommandPath
+     *  @param [in] apCommand    A pointer to the CommandDataIB parser.
      *
      *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetPath(CommandPathIB::Parser * const apPath) const;
+    CHIP_ERROR GetCommand(CommandDataIB::Parser * const apCommand) const;
 
     /**
-     *  @brief Get a TLVReader for the Data. Next() must be called before accessing them.
+     *  @brief Get a parser for a Status.
      *
-     *  @param [in] apReader    A pointer to apReader
+     *  @param [in] apCommand    A pointer to the CommandStatusIB parser.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetData(chip::TLV::TLVReader * const apReader) const;
-
-protected:
-    // A recursively callable function to parse a data element and pretty-print it.
-    CHIP_ERROR ParseData(chip::TLV::TLVReader & aReader, int aDepth) const;
+    CHIP_ERROR GetStatus(CommandStatusIB::Parser * const apStatus) const;
 };
 
 class Builder : public chip::app::Builder
 {
 public:
     /**
-     *  @brief Initialize a CommandDataIB::Builder for writing into a TLV stream
+     *  @brief Initialize a InvokeResponse::Builder for writing into a TLV stream
      *
      *  @param [in] apWriter    A pointer to TLVWriter
      *
@@ -113,34 +106,40 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     * Init the AttributeDataIB container with an particular context tag.
+     *  @brief Initialize a CommandDataIB::Builder for writing into the TLV stream
      *
-     * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
-     * @param[in]   aContextTagToUse    A contextTag to use.
-     *
-     * @return                  CHIP_ERROR codes returned by chip::TLV objects.
+     *  @return A reference to CommandDataIB::Builder
      */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
+    CommandDataIB::Builder & CreateCommand();
 
     /**
-     *  @brief Initialize a CommandPathIB::Builder for writing into the TLV stream
-     *
-     *  @return A reference to CommandPathIB::Builder
+     *  @return A reference to CommandDataIB::Builder
      */
-    CommandPathIB::Builder & CreatePath();
+    CommandDataIB::Builder & GetCommand() { return mCommand; }
 
     /**
-     *  @brief Mark the end of this CommandDataIB
+     *  @return A reference to CommandStatusIB::Builder
+     */
+    CommandStatusIB::Builder & GetStatus() { return mStatus; }
+
+    /**
+     *  @brief Initialize a CommandStatusIB::Builder for writing into the TLV stream
+     *
+     *  @return A reference to CommandStatusIB::Builder
+     */
+    CommandStatusIB::Builder & CreateStatus();
+
+    /**
+     *  @brief Mark the end of this InvokeCommand
      *
      *  @return A reference to *this
      */
-    CommandDataIB::Builder & EndOfCommandDataIB();
+    InvokeResponseIB::Builder & EndOfInvokeResponseIB();
 
 private:
-    CHIP_ERROR _Init(TLV::TLVWriter * const apWriter, const TLV::Tag aTag);
-
-    CommandPathIB::Builder mPath;
+    CommandDataIB::Builder mCommand;
+    CommandStatusIB::Builder mStatus;
 };
-}; // namespace CommandDataIB
+}; // namespace InvokeResponseIB
 }; // namespace app
 }; // namespace chip

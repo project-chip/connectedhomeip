@@ -39,7 +39,6 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/ClusterInfo.h>
-#include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>

@@ -607,7 +607,6 @@ exit:
 
 namespace chip {
 namespace app {
-
 bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // Always return true in test.

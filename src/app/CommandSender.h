@@ -39,8 +39,8 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/Command.h>
-#include <app/MessageDef/CommandPathIB.h>
-#include <app/MessageDef/StatusIB.h>
+#include <app/MessageDef/InvokeRequestMessage.h>
+#include <app/MessageDef/InvokeResponseMessage.h>
 
 #define COMMON_STATUS_SUCCESS 0
 
@@ -118,6 +118,18 @@ public:
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr);
 
+    /*
+     * Allocates a packet buffer used for encoding an invoke request payload.
+     *
+     * This can be called multiple times safely, as it will only allocate the buffer once for the lifetime
+     * of this object.
+     */
+    CHIP_ERROR AllocateBuffer();
+
+    CHIP_ERROR ProcessInvokeResponse(InvokeResponseIB::Parser & aInvokeResponse);
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
+    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
+    TLV::TLVWriter * GetCommandDataIBTLVWriter();
     /**
      * API for adding a data request.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
@@ -133,7 +145,7 @@ public:
         ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::kCsTag_Data), aData));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
@@ -156,6 +168,7 @@ public:
     CHIP_ERROR SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
+    friend class TestCommandInteraction;
     // ExchangeDelegate interface implementation.  Private so people won't
     // accidentally call it on us when we're not being treated as an actual
     // ExchangeDelegate.
@@ -170,10 +183,14 @@ private:
     //
     void Close();
 
-    CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement) override;
+    CHIP_ERROR ProcessInvokeResponseMessage(System::PacketBufferHandle && payload);
 
     Callback * mpCallback                      = nullptr;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
+    InvokeRequestMessage::Builder mInvokeRequestMessage;
+    TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
+    bool mSuppressResponse                 = false;
+    bool mTimedRequest                     = false;
 };
 
 } // namespace app

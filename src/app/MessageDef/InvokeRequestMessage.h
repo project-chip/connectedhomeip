@@ -17,17 +17,11 @@
  */
 /**
  *    @file
- *      This file defines CommandDataIB parser and builder in CHIP interaction model
+ *      This file defines InvokeCommand parser and builder in CHIP interaction model
  *
  */
 
 #pragma once
-
-#include "Builder.h"
-#include "CommandPathIB.h"
-
-#include "Parser.h"
-#include "StatusIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -36,13 +30,18 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "Builder.h"
+#include "InvokeRequests.h"
+#include "Parser.h"
+
 namespace chip {
 namespace app {
-namespace CommandDataIB {
+namespace InvokeRequestMessage {
 enum class Tag : uint8_t
 {
-    kPath = 0,
-    kData = 1,
+    kSuppressResponse = 0,
+    kTimedRequest     = 1,
+    kInvokeRequests   = 2,
 };
 
 class Parser : public chip::app::Parser
@@ -51,7 +50,7 @@ public:
     /**
      *  @brief Initialize the parser object with TLVReader
      *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this CommandDataIB
+     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this request
      *
      *  @return #CHIP_NO_ERROR on success
      */
@@ -75,36 +74,37 @@ public:
 #endif
 
     /**
-     *  @brief Get a TLVReader for the CommandPathIB. Next() must be called before accessing them.
-     *
-     *  @param [in] apPath    A pointer to apCommandPath
+     *  @brief Get SuppressResponse. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetPath(CommandPathIB::Parser * const apPath) const;
+    CHIP_ERROR GetSuppressResponse(bool * const apSuppressResponse) const;
 
     /**
-     *  @brief Get a TLVReader for the Data. Next() must be called before accessing them.
-     *
-     *  @param [in] apReader    A pointer to apReader
+     *  @brief Get TimedRequest. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetData(chip::TLV::TLVReader * const apReader) const;
+    CHIP_ERROR GetTimedRequest(bool * const apTimedRequest) const;
 
-protected:
-    // A recursively callable function to parse a data element and pretty-print it.
-    CHIP_ERROR ParseData(chip::TLV::TLVReader & aReader, int aDepth) const;
+    /**
+     *  @brief Get a parser for a InvokeRequest.
+     *
+     *  @param [in] apInvokeRequests    A pointer to the invoke response list parser.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetInvokeRequests(InvokeRequests::Parser * const apInvokeRequests) const;
 };
 
 class Builder : public chip::app::Builder
 {
 public:
     /**
-     *  @brief Initialize a CommandDataIB::Builder for writing into a TLV stream
+     *  @brief Initialize a InvokeCommand::Builder for writing into a TLV stream
      *
      *  @param [in] apWriter    A pointer to TLVWriter
      *
@@ -113,34 +113,39 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     * Init the AttributeDataIB container with an particular context tag.
-     *
-     * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
-     * @param[in]   aContextTagToUse    A contextTag to use.
-     *
-     * @return                  CHIP_ERROR codes returned by chip::TLV objects.
+     *  @brief when sets to true, it means do not send a response to this action
      */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
+    InvokeRequestMessage::Builder & SuppressResponse(const bool aSuppressResponse);
 
     /**
-     *  @brief Initialize a CommandPathIB::Builder for writing into the TLV stream
-     *
-     *  @return A reference to CommandPathIB::Builder
+     *  @brief This is flag to indication if ths action is part of a timed invoke transaction
      */
-    CommandPathIB::Builder & CreatePath();
+    InvokeRequestMessage::Builder & TimedRequest(const bool aTimedRequest);
 
     /**
-     *  @brief Mark the end of this CommandDataIB
+     *  @brief Initialize a InvokeRequests::Builder for writing into the TLV stream
+     *
+     *  @return A reference to InvokeRequests::Builder
+     */
+    InvokeRequests::Builder & CreateInvokeRequests();
+
+    /**
+     *  @brief Get reference to InvokeRequests::Builder
+     *
+     *  @return A reference to InvokeRequests::Builder
+     */
+    InvokeRequests::Builder & GetInvokeRequests() { return mInvokeRequests; }
+
+    /**
+     *  @brief Mark the end of this InvokeCommand
      *
      *  @return A reference to *this
      */
-    CommandDataIB::Builder & EndOfCommandDataIB();
+    InvokeRequestMessage::Builder & EndOfInvokeRequestMessage();
 
 private:
-    CHIP_ERROR _Init(TLV::TLVWriter * const apWriter, const TLV::Tag aTag);
-
-    CommandPathIB::Builder mPath;
+    InvokeRequests::Builder mInvokeRequests;
 };
-}; // namespace CommandDataIB
+}; // namespace InvokeRequestMessage
 }; // namespace app
 }; // namespace chip

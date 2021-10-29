@@ -21,7 +21,7 @@
  *
  */
 
-#include "CommandList.h"
+#include "InvokeResponses.h"
 
 #include "MessageDefHelper.h"
 
@@ -37,13 +37,13 @@ using namespace chip::TLV;
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR CommandList::Parser::CheckSchemaValidity() const
+CHIP_ERROR InvokeResponses::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    size_t NumCommands = 0;
-    chip::TLV::TLVReader reader;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    size_t numInvokeResponses = 0;
+    TLV::TLVReader reader;
 
-    PRETTY_PRINT("CommandList =");
+    PRETTY_PRINT("InvokeResponses =");
     PRETTY_PRINT("[");
 
     // make a copy of the reader
@@ -51,22 +51,16 @@ CHIP_ERROR CommandList::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(chip::TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
+        VerifyOrReturnError(TLV::AnonymousTag == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         {
-            CommandDataIB::Parser data;
-            err = data.Init(reader);
-            SuccessOrExit(err);
-
+            InvokeResponseIB::Parser invokeResponse;
+            ReturnErrorOnFailure(invokeResponse.Init(reader));
             PRETTY_PRINT_INCDEPTH();
-            err = data.CheckSchemaValidity();
-            SuccessOrExit(err);
-
+            ReturnErrorOnFailure(invokeResponse.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
         }
 
-        ++NumCommands;
+        ++numInvokeResponses;
     }
 
     PRETTY_PRINT("],");
@@ -76,33 +70,24 @@ CHIP_ERROR CommandList::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // if we have at least one data element
-        if (NumCommands > 0)
+        if (numInvokeResponses > 0)
         {
             err = CHIP_NO_ERROR;
         }
     }
-    SuccessOrExit(err);
-    err = reader.ExitContainer(mOuterContainerType);
-
-exit:
-
-    return err;
+    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
+    return CHIP_NO_ERROR;
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CommandDataIB::Builder & CommandList::Builder::CreateCommandDataIBBuilder()
+InvokeResponseIB::Builder & InvokeResponses::Builder::CreateInvokeResponse()
 {
-    // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mCommandDataIBBuilder.ResetError(mError));
-
-    mError = mCommandDataIBBuilder.Init(mpWriter);
-
-exit:
-    // on error, mCommandDataIBBuilder would be un-/partial initialized and cannot be used to write anything
-    return mCommandDataIBBuilder;
+    mError = mInvokeResponse.Init(mpWriter);
+    return mInvokeResponse;
 }
 
-CommandList::Builder & CommandList::Builder::EndOfCommandList()
+InvokeResponses::Builder & InvokeResponses::Builder::EndOfInvokeResponses()
 {
     EndOfContainer();
     return *this;

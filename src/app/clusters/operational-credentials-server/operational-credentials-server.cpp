@@ -424,7 +424,8 @@ namespace {
 
 FabricInfo gFabricBeingCommissioned;
 
-CHIP_ERROR SendNOCResponse(app::Command * commandObj, EmberAfNodeOperationalCertStatus status, uint8_t index, CharSpan debug_text)
+CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, EmberAfNodeOperationalCertStatus status, uint8_t index,
+                           CharSpan debug_text)
 {
     app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, OperationalCredentials::Id,
                                          Commands::NOCResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };

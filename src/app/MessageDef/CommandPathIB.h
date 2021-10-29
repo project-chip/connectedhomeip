@@ -161,7 +161,7 @@ public:
      *
      *  @return A reference to *this
      */
-    CommandPathIB::Builder & EndOfCommandPath();
+    CommandPathIB::Builder & EndOfCommandPathIB();
 
 private:
     CHIP_ERROR _Init(TLV::TLVWriter * const apWriter, const TLV::Tag aTag);
