@@ -42,6 +42,8 @@ function getTests()
     'Test_TC_CC_7_3',
     'Test_TC_CC_7_4',
     'Test_TC_CC_8_1',
+    'Test_TC_CC_9_2',
+    'Test_TC_CC_9_3',
   ];
 
   const DeviceManagement = [
@@ -121,6 +123,7 @@ function getTests()
   const WindowCovering = [
     'Test_TC_WNCV_1_1',
     'Test_TC_WNCV_2_1',
+    'Test_TC_WNCV_2_5',
     'Test_TC_WNCV_3_1',
     'Test_TC_WNCV_3_2',
     'Test_TC_WNCV_3_3',
@@ -135,6 +138,10 @@ function getTests()
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
+  ];
+
+  const SoftwareDiagnostics = [
+    "Test_TC_DIAGSW_1_1"
   ];
 
   const Subscriptions = [
@@ -158,6 +165,7 @@ function getTests()
     ThreadNetworkDiagnostics, //
     WindowCovering, //
     Others, //
+    SoftwareDiagnostics,
     Subscriptions, //
   ];
   return tests.flat(1);
