@@ -11748,17 +11748,10 @@ private:
     void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
-<<<<<<< HEAD
-class Test_TC_MC_2_1 : public TestCommand
-{
-public:
-    Test_TC_MC_2_1() : TestCommand("Test_TC_MC_2_1"), mTestIndex(0) {}
-=======
 class Test_TC_MC_3_6 : public TestCommand
 {
 public:
     Test_TC_MC_3_6() : TestCommand("Test_TC_MC_3_6"), mTestIndex(0) {}
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -11767,20 +11760,12 @@ public:
 
         if (0 == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_2_1\n");
-=======
             ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_6\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
         }
 
         if (mTestCount == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_2_1\n");
-=======
             ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_6\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -11793,13 +11778,6 @@ public:
         // incorrect mTestIndex value observed when we get the response.
         switch (mTestIndex++)
         {
-<<<<<<< HEAD
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Put the device into low power mode\n");
-            err = TestPutTheDeviceIntoLowPowerMode_0();
-            break;
-=======
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
         }
 
         if (CHIP_NO_ERROR != err)
@@ -11811,54 +11789,17 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-<<<<<<< HEAD
-    const uint16_t mTestCount = 1;
-=======
     const uint16_t mTestCount = 0;
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
 
     //
     // Tests methods
     //
-<<<<<<< HEAD
-
-    CHIP_ERROR TestPutTheDeviceIntoLowPowerMode_0()
-    {
-        chip::Controller::LowPowerClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        using requestType  = chip::app::Clusters::LowPower::Commands::Sleep::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LowPower::Commands::Sleep::Type request;
-
-        auto success = [](void * context, const responseType & data) {
-            (static_cast<Test_TC_MC_2_1 *>(context))->OnSuccessResponse_0();
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_MC_2_1 *>(context))->OnFailureResponse_0(status);
-        };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
-    }
-
-    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_0() { NextTest(); }
-};
-
-class Test_TC_MC_3_1 : public TestCommand
-{
-public:
-    Test_TC_MC_3_1() : TestCommand("Test_TC_MC_3_1"), mTestIndex(0) {}
-=======
 };
 
 class Test_TC_MC_3_7 : public TestCommand
 {
 public:
     Test_TC_MC_3_7() : TestCommand("Test_TC_MC_3_7"), mTestIndex(0) {}
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -11867,20 +11808,12 @@ public:
 
         if (0 == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_1\n");
-=======
             ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_7\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
         }
 
         if (mTestCount == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_1\n");
-=======
             ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_7\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -11911,17 +11844,10 @@ private:
     //
 };
 
-<<<<<<< HEAD
-class Test_TC_MC_3_2 : public TestCommand
-{
-public:
-    Test_TC_MC_3_2() : TestCommand("Test_TC_MC_3_2"), mTestIndex(0) {}
-=======
 class Test_TC_MC_3_8 : public TestCommand
 {
 public:
     Test_TC_MC_3_8() : TestCommand("Test_TC_MC_3_8"), mTestIndex(0) {}
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -11930,20 +11856,12 @@ public:
 
         if (0 == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_2\n");
-=======
             ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_8\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
         }
 
         if (mTestCount == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_2\n");
-=======
             ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_8\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -11974,17 +11892,10 @@ private:
     //
 };
 
-<<<<<<< HEAD
-class Test_TC_MC_3_3 : public TestCommand
-{
-public:
-    Test_TC_MC_3_3() : TestCommand("Test_TC_MC_3_3"), mTestIndex(0) {}
-=======
 class Test_TC_MC_3_9 : public TestCommand
 {
 public:
     Test_TC_MC_3_9() : TestCommand("Test_TC_MC_3_9"), mTestIndex(0) {}
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -11993,20 +11904,12 @@ public:
 
         if (0 == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_3\n");
-=======
             ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_9\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
         }
 
         if (mTestCount == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_3\n");
-=======
             ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_9\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -12037,17 +11940,10 @@ private:
     //
 };
 
-<<<<<<< HEAD
-class Test_TC_MC_3_4 : public TestCommand
-{
-public:
-    Test_TC_MC_3_4() : TestCommand("Test_TC_MC_3_4"), mTestIndex(0) {}
-=======
 class Test_TC_MC_3_10 : public TestCommand
 {
 public:
     Test_TC_MC_3_10() : TestCommand("Test_TC_MC_3_10"), mTestIndex(0) {}
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -12056,20 +11952,12 @@ public:
 
         if (0 == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_4\n");
-=======
             ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_10\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
         }
 
         if (mTestCount == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_4\n");
-=======
             ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_10\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -12100,17 +11988,10 @@ private:
     //
 };
 
-<<<<<<< HEAD
-class Test_TC_MC_3_5 : public TestCommand
-{
-public:
-    Test_TC_MC_3_5() : TestCommand("Test_TC_MC_3_5"), mTestIndex(0) {}
-=======
 class Test_TC_MC_3_11 : public TestCommand
 {
 public:
     Test_TC_MC_3_11() : TestCommand("Test_TC_MC_3_11"), mTestIndex(0) {}
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -12119,20 +12000,12 @@ public:
 
         if (0 == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_5\n");
-=======
             ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_11\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
         }
 
         if (mTestCount == mTestIndex)
         {
-<<<<<<< HEAD
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_5\n");
-=======
             ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_11\n");
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -22591,6 +22464,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Send Test Command without its optional arg.\n");
             err = TestSendTestCommandWithoutItsOptionalArg_8();
             break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Send Test Command with optional arg set to null.\n");
+            err = TestSendTestCommandWithOptionalArgSetToNull_9();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -22602,7 +22479,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
+    const uint16_t mTestCount = 10;
 
     //
     // Tests methods
@@ -22879,7 +22756,8 @@ private:
         request.arg1.Emplace().SetNonNull() = 5;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_7(data.wasPresent, data.wasNull, data.value);
+            (static_cast<TestClusterComplexTypes *>(context))
+                ->OnSuccessResponse_7(data.wasPresent, data.wasNull, data.value, data.originalValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -22890,7 +22768,8 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value)
+    void OnSuccessResponse_7(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+                             const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
     {
         VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
 
@@ -22899,6 +22778,10 @@ private:
 
         VerifyOrReturn(CheckValuePresent("value", value));
         VerifyOrReturn(CheckValue<uint8_t>("value.Value()", value.Value(), 5));
+
+        VerifyOrReturn(CheckValuePresent("originalValue", originalValue));
+        VerifyOrReturn(CheckValueNonNull("originalValue.Value()", originalValue.Value()));
+        VerifyOrReturn(CheckValue<uint8_t>("originalValue.Value().Value()", originalValue.Value().Value(), 5));
         NextTest();
     }
 
@@ -22913,7 +22796,8 @@ private:
         chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_8(data.wasPresent, data.wasNull, data.value);
+            (static_cast<TestClusterComplexTypes *>(context))
+                ->OnSuccessResponse_8(data.wasPresent, data.wasNull, data.value, data.originalValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -22924,10 +22808,48 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value)
+    void OnSuccessResponse_8(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+                             const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
     {
         VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, false));
 
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendTestCommandWithOptionalArgSetToNull_9()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
+        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
+
+        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
+        request.arg1.Emplace().SetNull();
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))
+                ->OnSuccessResponse_9(data.wasPresent, data.wasNull, data.value, data.originalValue);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_9(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+                             const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
+    {
+        VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
+
+        VerifyOrReturn(CheckValuePresent("wasNull", wasNull));
+        VerifyOrReturn(CheckValue<bool>("wasNull.Value()", wasNull.Value(), true));
+
+        VerifyOrReturn(CheckValuePresent("originalValue", originalValue));
+        VerifyOrReturn(CheckValueNull("originalValue.Value()", originalValue.Value()));
         NextTest();
     }
 };
@@ -24083,21 +24005,12 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_LVL_2_1>(),
         make_unique<Test_TC_LVL_3_1>(),
         make_unique<Test_TC_MC_1_1>(),
-<<<<<<< HEAD
-        make_unique<Test_TC_MC_2_1>(),
-        make_unique<Test_TC_MC_3_1>(),
-        make_unique<Test_TC_MC_3_2>(),
-        make_unique<Test_TC_MC_3_3>(),
-        make_unique<Test_TC_MC_3_4>(),
-        make_unique<Test_TC_MC_3_5>(),
-=======
         make_unique<Test_TC_MC_3_6>(),
         make_unique<Test_TC_MC_3_7>(),
         make_unique<Test_TC_MC_3_8>(),
         make_unique<Test_TC_MC_3_9>(),
         make_unique<Test_TC_MC_3_10>(),
         make_unique<Test_TC_MC_3_11>(),
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
         make_unique<Test_TC_OCC_1_1>(),
         make_unique<Test_TC_OCC_2_1>(),
         make_unique<Test_TC_OO_1_1>(),

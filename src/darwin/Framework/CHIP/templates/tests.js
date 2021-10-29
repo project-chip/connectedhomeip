@@ -68,21 +68,18 @@ function getTests()
 
   const MediaControl = [
     'Test_TC_MC_1_1',
-<<<<<<< HEAD
     'Test_TC_MC_2_1',
     'Test_TC_MC_3_1',
     'Test_TC_MC_3_2',
     'Test_TC_MC_3_3',
     'Test_TC_MC_3_4',
     'Test_TC_MC_3_5',
-=======
     'Test_TC_MC_3_6',
     'Test_TC_MC_3_7',
     'Test_TC_MC_3_8',
     'Test_TC_MC_3_9',
     'Test_TC_MC_3_10',
     'Test_TC_MC_3_11',
->>>>>>> 89bdaca2a9a72ca4387de0f8bab410a5802c383b
   ];
 
   const OnOff = [
