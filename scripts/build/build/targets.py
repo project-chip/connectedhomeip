@@ -164,10 +164,16 @@ def NrfTargets():
     for target in targets:
         yield target.Extend('lock', app=NrfApp.LOCK)
         yield target.Extend('light', app=NrfApp.LIGHT)
-        yield target.Extend('light-rpc', app=NrfApp.LIGHT, enable_rpcs=True).GlobBlacklist('Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760')
         yield target.Extend('shell', app=NrfApp.SHELL)
         yield target.Extend('pump', app=NrfApp.PUMP)
         yield target.Extend('pump-controller', app=NrfApp.PUMP_CONTROLLER)
+
+        rpc = target.Extend('light-rpc', app=NrfApp.LIGHT, enable_rpcs=True)
+
+        if '-nrf5340-' in  rpc.name
+           rpc = rpc.GlobBlacklist('Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760')
+        
+        yield rpc
 
 
 def AndroidTargets():
