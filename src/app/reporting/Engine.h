@@ -122,6 +122,13 @@ private:
     bool mMoreChunkedMessages = false;
 
     /**
+     * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
+     * within the same execution context to avoid applying too much pressure on platforms that use small, fixed size event queues.
+     *
+     */
+    bool mRunScheduled = false;
+
+    /**
      * The number of report date request in flight
      *
      */

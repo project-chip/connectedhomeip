@@ -28,6 +28,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
@@ -262,6 +263,10 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
                        CHIP_CONFIG_MAX_DEVICE_ADMINS);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
+
+    // Currently, we only manage FabricsList attribute in endpoint 0, OperationalCredentials cluster is always required to be on
+    // EP0.
+    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::FabricsList::Id);
 
     return err;
 }
@@ -785,6 +790,11 @@ exit:
         gFabricBeingCommissioned.Reset();
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddTrustedRootCert request.");
     }
+    else
+    {
+        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::TrustedRootCertificates::Id);
+    }
 
     return true;
 }
@@ -795,5 +805,9 @@ bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
+
+    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                           OperationalCredentials::Attributes::TrustedRootCertificates::Id);
+
     return true;
 }

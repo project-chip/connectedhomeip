@@ -504,4 +504,9 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     info.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
+
+    // Schedule work to run asynchronously on the CHIP thread. The scheduled work won't execute until the current execution context
+    // has completed. This ensures that we can 'gather up' multiple attribute changes that have occurred in the same execution
+    // context without requiring any explicit 'start' or 'end' change calls into the engine to book-end the change.
+    InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
