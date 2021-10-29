@@ -638,6 +638,11 @@ template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlaybac
     CommandResponseFailureCallback);
 
 template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type, chip::app::DataModel::NullObjectType>(
+    const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type &, void *,
+    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+
+template CHIP_ERROR
 ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type,
                            chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType>(
     const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type &, void *,
