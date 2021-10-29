@@ -50,10 +50,10 @@ class ConfigurationManagerImpl final : public Internal::GenericConfigurationMana
                                        private Internal::ESP32Config
 {
 public:
-    CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
-    CHIP_ERROR StoreRebootCount(uint32_t rebootCount);
-    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
 
 private:
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
