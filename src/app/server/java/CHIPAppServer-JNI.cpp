@@ -21,6 +21,7 @@
  *      Implementation of JNI bridge for CHIP App Server for Android TV apps
  *
  */
+#include "AppMain.h"
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
@@ -32,16 +33,13 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/KeyValueStoreManager.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/android/AndroidChipPlatform-JNI.h>
-#include "AppMain.h"
+#include <platform/internal/BLEManager.h>
 
 using namespace chip;
 using namespace chip::DeviceLayer;
 
-
-#define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
-    extern "C" JNIEXPORT RETURN JNICALL Java_chip_appserver_ChipAppServer_##METHOD_NAME
+#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_appserver_ChipAppServer_##METHOD_NAME
 
 #ifndef PTHREAD_NULL
 #define PTHREAD_NULL 0
@@ -51,7 +49,7 @@ static void * IOThreadAppMain(void * arg);
 
 namespace {
 JavaVM * sJVM;
-pthread_t sIOThread = PTHREAD_NULL;
+pthread_t sIOThread               = PTHREAD_NULL;
 jclass sChipAppServerExceptionCls = NULL;
 } // namespace
 
@@ -75,8 +73,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     ChipLogProgress(AppServer, "Loading Java class references.");
 
     // Get various class references need by the API.
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/appserver/ChipAppServerException",
-                                                   sChipAppServerExceptionCls);
+    err = JniReferences::GetInstance().GetClassRef(env, "chip/appserver/ChipAppServerException", sChipAppServerExceptionCls);
     SuccessOrExit(err);
     ChipLogProgress(AppServer, "Java class references loaded.");
 
@@ -122,7 +119,7 @@ JNI_METHOD(jboolean, startApp)(JNIEnv * env, jobject self)
 
     if (sIOThread == PTHREAD_NULL)
     {
-	    pthread_create(&sIOThread, NULL, IOThreadAppMain, NULL);
+        pthread_create(&sIOThread, NULL, IOThreadAppMain, NULL);
     }
 
 exit:

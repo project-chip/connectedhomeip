@@ -1,14 +1,14 @@
 #include "lib/core/CHIPError.h"
 #include "lib/support/JniTypeWrappers.h"
-#include <setup_payload/ManualSetupPayloadParser.h>
-#include <setup_payload/QRCodeSetupPayloadParser.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <vector>
 
@@ -205,7 +205,7 @@ jobject CreateCapabilitiesHashSet(JNIEnv * env, RendezvousInformationFlags flags
 
 JNI_METHOD(jstring, getQrCodeFromPayload)(JNIEnv * env, jobject self, jobject setupPayload)
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     SetupPayload payload;
     std::string qrString;
 
@@ -224,7 +224,7 @@ JNI_METHOD(jstring, getQrCodeFromPayload)(JNIEnv * env, jobject self, jobject se
 
 JNI_METHOD(jstring, getManualEntryCodeFromPayload)(JNIEnv * env, jobject self, jobject setupPayload)
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     SetupPayload payload;
     std::string outDecimalString;
 
@@ -253,12 +253,12 @@ void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPaylo
     jfieldID setUpPinCode          = env->GetFieldID(setupPayloadClass, "setupPinCode", "J");
     jfieldID discoveryCapabilities = env->GetFieldID(setupPayloadClass, "discoveryCapabilities", "Ljava/util/Set;");
 
-    payload.version = env->GetIntField(jPayload, version);
-    payload.vendorID = env->GetIntField(jPayload, vendorId);
-    payload.productID = env->GetIntField(jPayload, productId);
+    payload.version           = env->GetIntField(jPayload, version);
+    payload.vendorID          = env->GetIntField(jPayload, vendorId);
+    payload.productID         = env->GetIntField(jPayload, productId);
     payload.commissioningFlow = static_cast<CommissioningFlow>(env->GetIntField(jPayload, commissioningFlow));
-    payload.discriminator = env->GetIntField(jPayload, discriminator);
-    payload.setUpPINCode = env->GetLongField(jPayload, setUpPinCode);
+    payload.discriminator     = env->GetIntField(jPayload, discriminator);
+    payload.setUpPINCode      = env->GetLongField(jPayload, setUpPinCode);
 
     jobject discoveryCapabilitiesObj = env->GetObjectField(jPayload, discoveryCapabilities);
     CreateCapabilitiesFromHashSet(env, discoveryCapabilitiesObj, payload.rendezvousInformation);
@@ -266,31 +266,33 @@ void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPaylo
 
 void CreateCapabilitiesFromHashSet(JNIEnv * env, jobject discoveryCapabilitiesObj, RendezvousInformationFlags & flags)
 {
-    jclass hashSetClass          = env->FindClass("java/util/HashSet");
+    jclass hashSetClass             = env->FindClass("java/util/HashSet");
     jmethodID hashSetContainsMethod = env->GetMethodID(hashSetClass, "contains", "(Ljava/lang/Object;)Z");
 
     jboolean contains;
-    jclass capabilityEnum      = env->FindClass("chip/setuppayload/DiscoveryCapability");
+    jclass capabilityEnum = env->FindClass("chip/setuppayload/DiscoveryCapability");
 
     jfieldID bleCapability = env->GetStaticFieldID(capabilityEnum, "BLE", "Lchip/setuppayload/DiscoveryCapability;");
-    jobject bleObj        = env->GetStaticObjectField(capabilityEnum, bleCapability);
-    contains = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, bleObj);
-    if (contains) {
+    jobject bleObj         = env->GetStaticObjectField(capabilityEnum, bleCapability);
+    contains               = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, bleObj);
+    if (contains)
+    {
         flags.Set(chip::RendezvousInformationFlag::kBLE);
     }
 
     jfieldID softApCapability = env->GetStaticFieldID(capabilityEnum, "SOFT_AP", "Lchip/setuppayload/DiscoveryCapability;");
-    jobject softApObj        = env->GetStaticObjectField(capabilityEnum, softApCapability);
-    contains = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, softApObj);
-    if (contains) {
+    jobject softApObj         = env->GetStaticObjectField(capabilityEnum, softApCapability);
+    contains                  = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, softApObj);
+    if (contains)
+    {
         flags.Set(chip::RendezvousInformationFlag::kSoftAP);
     }
 
-    jfieldID onNetworkCapability =
-        env->GetStaticFieldID(capabilityEnum, "ON_NETWORK", "Lchip/setuppayload/DiscoveryCapability;");
-    jobject onNetworkObj = env->GetStaticObjectField(capabilityEnum, onNetworkCapability);
-    contains = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, onNetworkObj);
-    if (contains) {
+    jfieldID onNetworkCapability = env->GetStaticFieldID(capabilityEnum, "ON_NETWORK", "Lchip/setuppayload/DiscoveryCapability;");
+    jobject onNetworkObj         = env->GetStaticObjectField(capabilityEnum, onNetworkCapability);
+    contains                     = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, onNetworkObj);
+    if (contains)
+    {
         flags.Set(chip::RendezvousInformationFlag::kOnNetwork);
     }
 }

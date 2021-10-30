@@ -76,7 +76,8 @@ template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_LockChipStack()
 {
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
-    if(mChipStackIsLocked) {
+    if (mChipStackIsLocked)
+    {
         ChipLogError(DeviceLayer, "_LockChipStack may error status");
     }
 #endif
@@ -94,7 +95,8 @@ template <class ImplClass>
 bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack()
 {
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
-    if(mChipStackIsLocked) {
+    if (mChipStackIsLocked)
+    {
         ChipLogError(DeviceLayer, "_TryLockChipStack may error status");
     }
 #endif
@@ -114,7 +116,8 @@ template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
 {
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
-    if(!mChipStackIsLocked) {
+    if (!mChipStackIsLocked)
+    {
         ChipLogError(DeviceLayer, "_UnlockChipStack may error status");
     }
     mChipStackIsLocked = false;
