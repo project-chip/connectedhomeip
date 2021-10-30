@@ -98,7 +98,8 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
     ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %" PRIu8, announcementReason);
     if (commandData.metadataForNode.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %.*s", static_cast<int>(commandData.metadataForNode.Value().size()), commandData.metadataForNode.Value().data());
+        ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %.*s", static_cast<int>(commandData.metadataForNode.Value().size()),
+                      commandData.metadataForNode.Value().data());
     }
 
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
