@@ -207,6 +207,12 @@ template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::LevelContro
 
 // MediaPlayback Cluster Attributes
 
+// ModeSelect Cluster Attributes
+
+template CHIP_ERROR ClusterBase::WriteAttribute<chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo>(
+    const chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo::Type & requestData, void * context,
+    WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
+
 // NetworkCommissioning Cluster Attributes
 
 // OtaSoftwareUpdateProvider Cluster Attributes

@@ -548,6 +548,17 @@
 // Server attributes
 #define ZCL_STATE_VALUE_ATTRIBUTE_ID (0x0000)
 
+// Attribute ids for cluster: Mode Select
+
+// Client attributes
+
+// Server attributes
+#define ZCL_CURRENT_MODE_ATTRIBUTE_ID (0x0000)
+#define ZCL_SUPPORTED_MODES_ATTRIBUTE_ID (0x0001)
+#define ZCL_ON_MODE_ATTRIBUTE_ID (0x0002)
+#define ZCL_START_UP_MODE_ATTRIBUTE_ID (0x0003)
+#define ZCL_MODE_DESCRIPTION_ATTRIBUTE_ID (0x0004)
+
 // Attribute ids for cluster: Shade Configuration
 
 // Client attributes

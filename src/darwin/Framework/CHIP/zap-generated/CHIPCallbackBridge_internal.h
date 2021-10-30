@@ -346,6 +346,20 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list);
 };
 
+class CHIPModeSelectSupportedModesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ModeSelectSupportedModesListAttributeCallback>
+{
+public:
+    CHIPModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<ModeSelectSupportedModesListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
+            list);
+};
+
 class CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge
     : public CHIPCallbackBridge<OperationalCredentialsFabricsListListAttributeCallback>
 {

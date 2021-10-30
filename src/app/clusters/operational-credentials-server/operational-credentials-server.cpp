@@ -318,7 +318,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     // Gets called when a fabric is deleted from KVS store
     void OnFabricDeletedFromStorage(FabricIndex fabricId) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIX16 " was deleted from fabric storage.", fabricId);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIu8 " was deleted from fabric storage.", fabricId);
         writeFabricsIntoFabricsListAttribute();
     }
 
@@ -326,7 +326,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     void OnFabricRetrievedFromStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric 0x%" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
+                       "OpCreds: Fabric 0x%" PRIu8 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
                        fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());

@@ -533,6 +533,40 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
+    case 0x0050: // Mode Select Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0001: // SupportedModes
+        {
+            entryLength = 39;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _ModeOptionStruct
+            _ModeOptionStruct * entry = reinterpret_cast<_ModeOptionStruct *>(write ? src : dest);
+            ByteSpan LabelSpanStorage(Uint8::from_const_char(entry->Label.data()), entry->Label.size()); // CHAR_STRING
+            ByteSpan * LabelSpan = &LabelSpanStorage;
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 34, LabelSpan) : ReadByteSpan(src + entryOffset, 34, LabelSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            copyListMember(write ? dest : (uint8_t *) &entry->Mode, write ? (uint8_t *) &entry->Mode : src, write, &entryOffset,
+                           sizeof(entry->Mode)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->SemanticTag, write ? (uint8_t *) &entry->SemanticTag : src, write,
+                           &entryOffset, sizeof(entry->SemanticTag)); // INT32U
+            break;
+        }
+        }
+        break;
+    }
     case 0x003E: // Operational Credentials Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -1136,6 +1170,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0000: // media input list
             // Struct _MediaInputInfo
             entryLength = 70;
+            break;
+        }
+        break;
+    case 0x0050: // Mode Select Cluster
+        switch (attributeId)
+        {
+        case 0x0001: // SupportedModes
+            // Struct _ModeOptionStruct
+            entryLength = 39;
             break;
         }
         break;
