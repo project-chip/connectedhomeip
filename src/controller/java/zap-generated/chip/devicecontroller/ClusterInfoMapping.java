@@ -5332,7 +5332,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> modeSelectClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> modeSelectchangeToModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo modeSelectchangeToModeCommandParameterInfo =
         new CommandParameterInfo("ModeSelect", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo modeSelectchangeToModenewModeCommandParameterInfo =
