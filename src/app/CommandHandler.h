@@ -74,6 +74,10 @@ public:
                                       System::PacketBufferHandle && payload);
     CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus) override;
 
+    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus) override;
+
+    CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus) override;
+
     /**
      * API for adding a data response.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
@@ -107,6 +111,9 @@ private:
     CHIP_ERROR SendCommandResponse();
     CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement) override;
     CHIP_ERROR PrepareResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommand);
+    CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+                                 const Optional<ClusterStatus> & aClusterStatus);
+
     Callback * mpCallback = nullptr;
 };
 } // namespace app

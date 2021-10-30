@@ -36,8 +36,7 @@ CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager *
     mpCallback(apCallback), mpExchangeMgr(apExchangeMgr)
 {}
 
-CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
-                                             System::Clock::Timeout timeout)
+CHIP_ERROR CommandSender::SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle commandPacket;
@@ -48,7 +47,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabric
     SuccessOrExit(err);
 
     // Create a new exchange context.
-    mpExchangeCtx = mpExchangeMgr->NewContext(secureSession.ValueOr(SessionHandle(aNodeId, 1, 1, aFabricIndex)), this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mpExchangeCtx->SetResponseTimeout(timeout);
@@ -79,7 +78,9 @@ exit:
     {
         if (err != CHIP_NO_ERROR)
         {
-            mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, err);
+            StatusIB status;
+            status.mStatus = Protocols::InteractionModel::Status::Failure;
+            mpCallback->OnError(this, status, err);
         }
     }
 
@@ -95,7 +96,9 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
 
     if (mpCallback != nullptr)
     {
-        mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, CHIP_ERROR_TIMEOUT);
+        StatusIB status;
+        status.mStatus = Protocols::InteractionModel::Status::Failure;
+        mpCallback->OnError(this, status, CHIP_ERROR_TIMEOUT);
     }
 
     Close();
@@ -119,6 +122,8 @@ CHIP_ERROR CommandSender::ProcessCommandDataIB(CommandDataIB::Parser & aCommandE
     chip::ClusterId clusterId;
     chip::CommandId commandId;
     chip::EndpointId endpointId;
+    // Default to success when an invoke response is received.
+    StatusIB statusIB;
 
     {
         CommandPathIB::Parser commandPath;
@@ -140,8 +145,6 @@ CHIP_ERROR CommandSender::ProcessCommandDataIB(CommandDataIB::Parser & aCommandE
         bool hasDataResponse = false;
         chip::TLV::TLVReader commandDataReader;
 
-        // Default to success when an invoke response is received.
-        StatusIB statusIB;
         StatusIB::Parser statusIBParser;
         err = aCommandElement.GetStatusIB(&statusIBParser);
         if (CHIP_NO_ERROR == err)
@@ -182,12 +185,12 @@ CHIP_ERROR CommandSender::ProcessCommandDataIB(CommandDataIB::Parser & aCommandE
         {
             if (statusIB.mStatus == Protocols::InteractionModel::Status::Success)
             {
-                mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId),
+                mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
                                        hasDataResponse ? &commandDataReader : nullptr);
             }
             else
             {
-                mpCallback->OnError(this, statusIB.mStatus, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+                mpCallback->OnError(this, statusIB, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
             }
         }
     }

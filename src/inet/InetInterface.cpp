@@ -71,31 +71,36 @@ namespace Inet {
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-DLL_EXPORT CHIP_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_t nameBufSize)
+CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
 {
-    if (intfId != INET_NULL_INTERFACEID)
+    if (mPlatformInterface)
     {
-        int status = snprintf(nameBuf, nameBufSize, "%c%c%d", intfId->name[0], intfId->name[1], intfId->num);
+        int status = snprintf(nameBuf, nameBufSize, "%c%c%d", mPlatformInterface->name[0], mPlatformInterface->name[1],
+                              mPlatformInterface->num);
         if (status >= static_cast<int>(nameBufSize))
-            return CHIP_ERROR_NO_MEMORY;
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
         return CHIP_NO_ERROR;
     }
-
     if (nameBufSize < 1)
-        return CHIP_ERROR_NO_MEMORY;
-
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
     nameBuf[0] = 0;
     return CHIP_NO_ERROR;
 }
 
-DLL_EXPORT CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId)
+CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)
 {
     if (strlen(intfName) < 3)
+    {
         return INET_ERROR_UNKNOWN_INTERFACE;
+    }
     char * parseEnd;
     unsigned long intfNum = strtoul(intfName + 2, &parseEnd, 10);
     if (*parseEnd != 0 || intfNum > UINT8_MAX)
+    {
         return INET_ERROR_UNKNOWN_INTERFACE;
+    }
     struct netif * intf;
 #if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
     NETIF_FOREACH(intf)
@@ -105,17 +110,16 @@ DLL_EXPORT CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & int
     {
         if (intf->name[0] == intfName[0] && intf->name[1] == intfName[1] && intf->num == (uint8_t) intfNum)
         {
-            intfId = intf;
+            interface = InterfaceId(intf);
             return CHIP_NO_ERROR;
         }
     }
-    intfId = INET_NULL_INTERFACEID;
+    interface = InterfaceId::Null();
     return INET_ERROR_UNKNOWN_INTERFACE;
 }
 
 bool InterfaceIterator::Next()
 {
-
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
@@ -144,7 +148,7 @@ bool InterfaceIterator::Next()
 CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
-    return ::chip::Inet::GetInterfaceName(mCurNetif, nameBuf, nameBufSize);
+    return InterfaceId(mCurNetif).GetInterfaceName(nameBuf, nameBufSize);
 }
 
 bool InterfaceIterator::IsUp()
@@ -178,7 +182,7 @@ bool InterfaceAddressIterator::Next()
 
     while (mIntfIter.HasCurrent())
     {
-        struct netif * curIntf = mIntfIter.GetInterfaceId();
+        struct netif * curIntf = mIntfIter.GetInterfaceId().GetPlatformInterface();
 
         while (mCurAddrIndex < LWIP_IPV6_NUM_ADDRESSES)
         {
@@ -210,7 +214,7 @@ IPAddress InterfaceAddressIterator::GetAddress()
 {
     if (HasCurrent())
     {
-        struct netif * curIntf = mIntfIter.GetInterfaceId();
+        struct netif * curIntf = mIntfIter.GetInterfaceId().GetPlatformInterface();
 
         if (mCurAddrIndex < LWIP_IPV6_NUM_ADDRESSES)
         {
@@ -238,7 +242,7 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 #if INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
         else
         {
-            struct netif * curIntf = mIntfIter.GetInterfaceId();
+            struct netif * curIntf = mIntfIter.GetInterfaceId().GetPlatformInterface();
             return NetmaskToPrefixLength((const uint8_t *) netif_ip4_netmask(curIntf), 4);
         }
 #endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
@@ -248,11 +252,7 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 
 InterfaceId InterfaceAddressIterator::GetInterfaceId()
 {
-    if (HasCurrent())
-    {
-        return mIntfIter.GetInterfaceId();
-    }
-    return INET_NULL_INTERFACEID;
+    return HasCurrent() ? mIntfIter.GetInterfaceId() : InterfaceId::Null();
 }
 
 CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
@@ -263,60 +263,56 @@ CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nam
 
 bool InterfaceAddressIterator::IsUp()
 {
-    if (HasCurrent())
-    {
-        return mIntfIter.IsUp();
-    }
-    return false;
+    return HasCurrent() && mIntfIter.IsUp();
 }
 
 bool InterfaceAddressIterator::SupportsMulticast()
 {
-    if (HasCurrent())
-    {
-        return mIntfIter.SupportsMulticast();
-    }
-    return false;
+    return HasCurrent() && mIntfIter.SupportsMulticast();
 }
 
 bool InterfaceAddressIterator::HasBroadcastAddress()
 {
-    if (HasCurrent())
-    {
-        return mIntfIter.HasBroadcastAddress();
-    }
-    return false;
+    return HasCurrent() && mIntfIter.HasBroadcastAddress();
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
-DLL_EXPORT CHIP_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_t nameBufSize)
+CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
 {
-    if (intfId != INET_NULL_INTERFACEID)
+    if (mPlatformInterface)
     {
         char intfName[IF_NAMESIZE];
-        if (if_indextoname(intfId, intfName) == nullptr)
+        if (if_indextoname(mPlatformInterface, intfName) == nullptr)
+        {
             return CHIP_ERROR_POSIX(errno);
-        if (strlen(intfName) >= nameBufSize)
-            return CHIP_ERROR_NO_MEMORY;
-        strcpy(nameBuf, intfName);
+        }
+        size_t nameLength = strlen(intfName);
+        if (nameLength >= nameBufSize)
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        strncpy(nameBuf, intfName, nameLength + 1);
         return CHIP_NO_ERROR;
     }
-
     if (nameBufSize < 1)
-        return CHIP_ERROR_NO_MEMORY;
-
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
     nameBuf[0] = 0;
     return CHIP_NO_ERROR;
 }
 
-DLL_EXPORT CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId)
+CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)
 {
-    intfId = if_nametoindex(intfName);
+    unsigned int intfId = if_nametoindex(intfName);
+    interface           = InterfaceId(intfId);
     if (intfId == 0)
+    {
         return (errno == ENXIO) ? INET_ERROR_UNKNOWN_INTERFACE : CHIP_ERROR_POSIX(errno);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -532,7 +528,6 @@ bool InterfaceIterator::HasCurrent()
 
 bool InterfaceIterator::Next()
 {
-
     if (mIntfArray == nullptr)
     {
 #if __ANDROID__ && __ANDROID_API__ < 24
@@ -552,13 +547,13 @@ bool InterfaceIterator::Next()
 
 InterfaceId InterfaceIterator::GetInterfaceId()
 {
-    return (HasCurrent()) ? mIntfArray[mCurIntf].if_index : INET_NULL_INTERFACEID;
+    return HasCurrent() ? InterfaceId(mIntfArray[mCurIntf].if_index) : InterfaceId::Null();
 }
 
 CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(strlen(mIntfArray[mCurIntf].if_name) < nameBufSize, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(strlen(mIntfArray[mCurIntf].if_name) < nameBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
     strncpy(nameBuf, mIntfArray[mCurIntf].if_name, nameBufSize);
     return CHIP_NO_ERROR;
 }
@@ -593,7 +588,6 @@ short InterfaceIterator::GetFlags()
             mIntfFlags       = intfData.ifr_flags;
             mIntfFlagsCached = true;
         }
-        CloseIOCTLSocket();
     }
 
     return mIntfFlags;
@@ -656,12 +650,7 @@ bool InterfaceAddressIterator::Next()
 
 IPAddress InterfaceAddressIterator::GetAddress()
 {
-    if (HasCurrent())
-    {
-        return IPAddress::FromSockAddr(*mCurAddr->ifa_addr);
-    }
-
-    return IPAddress::Any;
+    return HasCurrent() ? IPAddress::FromSockAddr(*mCurAddr->ifa_addr) : IPAddress::Any;
 }
 
 uint8_t InterfaceAddressIterator::GetPrefixLength()
@@ -690,73 +679,63 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 
 InterfaceId InterfaceAddressIterator::GetInterfaceId()
 {
-    if (HasCurrent())
-    {
-        return if_nametoindex(mCurAddr->ifa_name);
-    }
-    return INET_NULL_INTERFACEID;
+    return HasCurrent() ? InterfaceId(if_nametoindex(mCurAddr->ifa_name)) : InterfaceId::Null();
 }
 
 CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(strlen(mCurAddr->ifa_name) < nameBufSize, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(strlen(mCurAddr->ifa_name) < nameBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
     strncpy(nameBuf, mCurAddr->ifa_name, nameBufSize);
     return CHIP_NO_ERROR;
 }
 
 bool InterfaceAddressIterator::IsUp()
 {
-    if (HasCurrent())
-    {
-        return (mCurAddr->ifa_flags & IFF_UP) != 0;
-    }
-    return false;
+    return HasCurrent() && (mCurAddr->ifa_flags & IFF_UP) != 0;
 }
 
 bool InterfaceAddressIterator::SupportsMulticast()
 {
-    if (HasCurrent())
-    {
-        return (mCurAddr->ifa_flags & IFF_MULTICAST) != 0;
-    }
-    return false;
+    return HasCurrent() && (mCurAddr->ifa_flags & IFF_MULTICAST) != 0;
 }
 
 bool InterfaceAddressIterator::HasBroadcastAddress()
 {
-    if (HasCurrent())
-    {
-        return (mCurAddr->ifa_flags & IFF_BROADCAST) != 0;
-    }
-    return false;
+    return HasCurrent() && (mCurAddr->ifa_flags & IFF_BROADCAST) != 0;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
-DLL_EXPORT CHIP_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_t nameBufSize)
+CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
 {
-    if (intfId != INET_NULL_INTERFACEID)
+    if (mPlatformInterface)
     {
-        net_if * currentInterface = net_if_get_by_index(intfId);
+        net_if * currentInterface = net_if_get_by_index(mPlatformInterface);
         if (!currentInterface)
+        {
             return CHIP_ERROR_INCORRECT_STATE;
+        }
         const char * name = net_if_get_device(currentInterface)->name;
-        if (strlen(name) >= nameBufSize)
-            return CHIP_ERROR_NO_MEMORY;
-        strcpy(nameBuf, name);
+        size_t nameLength = strlen(name);
+        if (nameLength >= nameBufSize)
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        strncpy(nameBuf, name, nameLength + 1);
         return CHIP_NO_ERROR;
     }
-
     if (nameBufSize < 1)
-        return CHIP_ERROR_NO_MEMORY;
-
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
     nameBuf[0] = 0;
     return CHIP_NO_ERROR;
 }
-DLL_EXPORT CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId)
+
+CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)
 {
     int currentId = 0;
     net_if * currentInterface;
@@ -765,10 +744,14 @@ DLL_EXPORT CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & int
     {
         if (strcmp(net_if_get_device(currentInterface)->name, intfName) == 0)
         {
-            intfId = currentId;
+            interface = InterfaceId(currentId);
             return CHIP_NO_ERROR;
         }
+#if __MBED__
+        CloseIOCTLSocket();
+#endif
     }
+    interface = InterfaceId::Null();
     return INET_ERROR_UNKNOWN_INTERFACE;
 }
 
@@ -787,13 +770,13 @@ bool InterfaceIterator::Next()
 
 InterfaceId InterfaceIterator::GetInterfaceId(void)
 {
-    return HasCurrent() ? mCurrentId : INET_NULL_INTERFACEID;
+    return HasCurrent() ? InterfaceId(mCurrentId) : InterfaceId::Null();
 }
 
 CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
-    return ::chip::Inet::GetInterfaceName(mCurrentId, nameBuf, nameBufSize);
+    return InterfaceId(mCurrentId).GetInterfaceName(nameBuf, nameBufSize);
 }
 
 bool InterfaceIterator::IsUp()
@@ -825,8 +808,9 @@ bool InterfaceAddressIterator::Next()
     {
         if (mCurAddrIndex == -1) // first address for the current interface
         {
-            const net_if_config * config = net_if_get_config(net_if_get_by_index(mIntfIter.GetInterfaceId()));
-            mIpv6                        = config->ip.ipv6;
+            const net_if_config * config =
+                net_if_get_config(net_if_get_by_index(mIntfIter.GetInterfaceId().GetPlatformInterface()));
+            mIpv6 = config->ip.ipv6;
         }
 
         while (++mCurAddrIndex < NET_IF_MAX_IPV6_ADDR)
@@ -842,19 +826,14 @@ bool InterfaceAddressIterator::Next()
 
 IPAddress InterfaceAddressIterator::GetAddress()
 {
-    if (HasCurrent())
-    {
-        return IPAddress(mIpv6->unicast[mCurAddrIndex].address.in6_addr);
-    }
-
-    return IPAddress::Any;
+    return HasCurrent() ? IPAddress(mIpv6->unicast[mCurAddrIndex].address.in6_addr) : IPAddress::Any;
 }
 
 uint8_t InterfaceAddressIterator::GetPrefixLength()
 {
     if (HasCurrent())
     {
-        net_if * const iface              = net_if_get_by_index(mIntfIter.GetInterfaceId());
+        net_if * const iface              = net_if_get_by_index(mIntfIter.GetInterfaceId().GetPlatformInterface());
         net_if_ipv6_prefix * const prefix = net_if_ipv6_prefix_get(iface, &mIpv6->unicast[mCurAddrIndex].address.in6_addr);
         return prefix ? prefix->len : 128;
     }
@@ -863,11 +842,7 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 
 InterfaceId InterfaceAddressIterator::GetInterfaceId()
 {
-    if (HasCurrent())
-    {
-        return mIntfIter.GetInterfaceId();
-    }
-    return INET_NULL_INTERFACEID;
+    return HasCurrent() ? mIntfIter.GetInterfaceId() : InterfaceId::Null();
 }
 
 CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
@@ -878,29 +853,17 @@ CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nam
 
 bool InterfaceAddressIterator::IsUp()
 {
-    if (HasCurrent())
-    {
-        return mIntfIter.IsUp();
-    }
-    return false;
+    return HasCurrent() && mIntfIter.IsUp();
 }
 
 bool InterfaceAddressIterator::SupportsMulticast()
 {
-    if (HasCurrent())
-    {
-        return mIntfIter.SupportsMulticast();
-    }
-    return false;
+    return HasCurrent() && mIntfIter.SupportsMulticast();
 }
 
 bool InterfaceAddressIterator::HasBroadcastAddress()
 {
-    if (HasCurrent())
-    {
-        return mIntfIter.HasBroadcastAddress();
-    }
-    return false;
+    return HasCurrent() && mIntfIter.HasBroadcastAddress();
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF

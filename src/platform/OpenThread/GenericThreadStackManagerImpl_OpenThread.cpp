@@ -1918,7 +1918,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
         mdnsService.mProtocol = chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolUnknown;
     }
     mdnsService.mPort        = serviceInfo.mPort;
-    mdnsService.mInterface   = INET_NULL_INTERFACEID;
+    mdnsService.mInterface   = Inet::InterfaceId::Null();
     mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
     mdnsService.mAddress     = chip::Optional<chip::Inet::IPAddress>(ToIPAddress(serviceInfo.mHostAddress));
 

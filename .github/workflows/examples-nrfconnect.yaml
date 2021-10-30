@@ -37,10 +37,9 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.22
+            image: connectedhomeip/chip-build-nrf-platform:0.5.23
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/output_binaries:/tmp/output_binaries"
 
         steps:
             - name: Checkout
@@ -145,29 +144,6 @@ jobs:
               timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh "scripts/tests/nrfconnect_native_posix_tests.sh native_posix_64"
-            - name: Copy aside build products
-              run: |
-                  mkdir -p /tmp/output_binaries/$BUILD_TYPE-build
-                  cp examples/lock-app/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
-                      /tmp/output_binaries/$BUILD_TYPE-build/chip-lock.elf
-                  cp examples/shell/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
-                      /tmp/output_binaries/$BUILD_TYPE-build/chip-shell.elf
-            - name: Binary artifact suffix
-              id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
-              if: ${{ !env.ACT }}
-              with:
-                  cond: ${{ github.event.pull_request.number == '' }}
-                  if_true: "${{ github.sha }}"
-                  if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Uploading Binaries
-              uses: actions/upload-artifact@v2
-              if: ${{ !env.ACT }}
-              with:
-                  name:
-                      ${{ env.BUILD_TYPE }}-example-build-${{
-                      steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}

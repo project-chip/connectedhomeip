@@ -251,7 +251,7 @@ void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
     CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
 }
 
-class TestPersistentStorageDelegate : public PersistentStorageDelegate
+class TestPersistentStorageDelegate : public PersistentStorageDelegate, public FabricStorage
 {
 public:
     TestPersistentStorageDelegate()
@@ -318,6 +318,18 @@ public:
     }
 
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
+    {
+        return SyncSetKeyValue(key, buffer, size);
+    };
+
+    CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override
+    {
+        return SyncGetKeyValue(key, buffer, size);
+    };
+
+    CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
 
 private:
     char * keys[16];
@@ -692,9 +704,9 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
 
     gTransportMgr.Init(&gLoopback);
-    ReturnErrorOnFailure(gIOContext.Init(&sSuite));
+    ReturnErrorOnFailure(gIOContext.Init());
 
-    ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr, &gIOContext));
+    ReturnErrorOnFailure(ctx.Init(&gTransportMgr, &gIOContext));
 
     ctx.SetBobNodeId(kPlaceholderNodeId);
     ctx.SetAliceNodeId(kPlaceholderNodeId);

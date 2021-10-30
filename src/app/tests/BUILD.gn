@@ -19,6 +19,24 @@ import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/platform/device.gni")
 
+static_library("helpers") {
+  output_name = "libAppTestHelpers"
+  output_dir = "${root_out_dir}/lib"
+
+  sources = [
+    "AppTestContext.cpp",
+    "AppTestContext.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging/tests:helpers",
+    "${chip_root}/src/transport/raw/tests:helpers",
+  ]
+}
+
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
@@ -49,11 +67,9 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/messaging/tests:helpers",
-    "${chip_root}/src/protocols",
-    "${chip_root}/src/transport/raw/tests:helpers",
     "${nlunit_test_root}:nlunit-test",
   ]
 

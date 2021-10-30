@@ -21,21 +21,21 @@ config:
 tests:
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       response:
           constraints:
               type: uint16
 
     - label: "read the mandatory attribute: MinMeasuredValue"
       command: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       response:
           constraints:
               type: uint16
 
     - label: "read the mandatory attribute: MaxMeasuredValue"
       command: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       response:
           constraints:
               type: uint16
@@ -43,7 +43,7 @@ tests:
     - label: "write the default value to optional attribute: MeasuredValue"
       disabled: true
       command: "writeAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       arguments:
           value: 0
       response:
@@ -51,7 +51,7 @@ tests:
 
     - label: "write the default value to optional attribute: MinMeasuredValue"
       command: "writeAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       arguments:
           value: 0
       response:
@@ -59,7 +59,7 @@ tests:
 
     - label: "write the default value to optional attribute: MaxMeasuredValue"
       command: "writeAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       arguments:
           value: 0
       response:
@@ -67,21 +67,21 @@ tests:
 
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       response:
           constraints:
               type: uint16
 
     - label: "read the mandatory attribute: MinMeasuredValue"
       command: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       response:
           constraints:
               type: uint16
 
     - label: "read the mandatory attribute: MaxMeasuredValue"
       command: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       response:
           constraints:
               type: uint16

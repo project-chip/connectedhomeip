@@ -186,6 +186,18 @@ public:
                                              uint16_t value);
 };
 
+class DLL_EXPORT BridgedActionsClusterTest : public BridgedActionsCluster
+{
+public:
+    BridgedActionsClusterTest() : BridgedActionsCluster() {}
+    ~BridgedActionsClusterTest() {}
+
+    CHIP_ERROR WriteAttributeSetupUrl(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      chip::CharSpan value);
+    CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t value);
+};
+
 class DLL_EXPORT BridgedDeviceBasicClusterTest : public BridgedDeviceBasicCluster
 {
 public:
@@ -435,6 +447,8 @@ public:
                                               int16_t value);
     CHIP_ERROR WriteAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                               int16_t value);
+    CHIP_ERROR WriteAttributeTolerance(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -497,6 +511,26 @@ public:
 
     CHIP_ERROR WriteAttributeIdentifyType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint8_t value);
+    CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t value);
+};
+
+class DLL_EXPORT IlluminanceMeasurementClusterTest : public IlluminanceMeasurementCluster
+{
+public:
+    IlluminanceMeasurementClusterTest() : IlluminanceMeasurementCluster() {}
+    ~IlluminanceMeasurementClusterTest() {}
+
+    CHIP_ERROR WriteAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t value);
+    CHIP_ERROR WriteAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t value);
+    CHIP_ERROR WriteAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t value);
+    CHIP_ERROR WriteAttributeTolerance(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t value);
+    CHIP_ERROR WriteAttributeLightSensorType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint8_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -782,6 +816,8 @@ public:
                                               uint16_t value);
     CHIP_ERROR WriteAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                               uint16_t value);
+    CHIP_ERROR WriteAttributeTolerance(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -872,6 +908,8 @@ public:
                                               int16_t value);
     CHIP_ERROR WriteAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                               int16_t value);
+    CHIP_ERROR WriteAttributeTolerance(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -1137,6 +1175,8 @@ public:
                                                       Callback::Cancelable * onFailureCallback, uint16_t value);
     CHIP_ERROR WriteAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint16_t value);
+    CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint32_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

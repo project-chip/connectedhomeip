@@ -42,6 +42,13 @@ const kResponseName      = 'response';
 const kDisabledName      = 'disabled';
 const kResponseErrorName = 'error';
 
+class NullObject {
+  toString()
+  {
+    return "YOU SHOULD HAVE CHECKED (isLiteralNull definedValue)"
+  }
+};
+
 function throwError(test, errorStr)
 {
   console.error('Error in: ' + test.filename + '.yaml for test with label: "' + test.label + '"\n');
@@ -396,6 +403,9 @@ function chip_tests_item_parameters(options)
 
       const expected = commandValues.find(value => value.name.toLowerCase() == commandArg.name.toLowerCase());
       if (!expected) {
+        if (commandArg.isOptional) {
+          return undefined;
+        }
         printErrorAndExit(this,
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
@@ -414,6 +424,8 @@ function chip_tests_item_parameters(options)
             }
             value[key] = attachGlobal(global, value[key]);
           }
+        } else if (value === null) {
+          value = new NullObject();
         } else {
           switch (typeof value) {
           case 'number':
@@ -438,7 +450,7 @@ function chip_tests_item_parameters(options)
       return commandArg;
     });
 
-    return commands;
+    return commands.filter(item => item !== undefined);
   });
 
   return asBlocks.call(this, promise, options);
@@ -484,6 +496,13 @@ function chip_tests_item_response_parameters(options)
   return asBlocks.call(this, promise, options);
 }
 
+function isLiteralNull(value, options)
+{
+  // Literal null might look different depending on whether it went through
+  // attachGlobal or not.
+  return (value === null) || (value instanceof NullObject);
+}
+
 //
 // Module exports
 //
@@ -493,3 +512,4 @@ exports.chip_tests_item_parameters          = chip_tests_item_parameters;
 exports.chip_tests_item_response_type       = chip_tests_item_response_type;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
+exports.isLiteralNull                       = isLiteralNull;

@@ -23,6 +23,9 @@
 #include <controller/CHIPDeviceController.h>
 
 namespace chip {
+namespace python {
+static constexpr ClusterStatus kUndefinedClusterStatus = 0xFF;
+}
 namespace Controller {
 
 // The command status will be used for python script.
@@ -30,6 +33,7 @@ namespace Controller {
 struct __attribute__((packed)) CommandStatus
 {
     Protocols::InteractionModel::Status status;
+    chip::ClusterStatus clusterStatus;
     chip::EndpointId endpointId;
     chip::ClusterId clusterId;
     chip::CommandId commandId;
@@ -39,7 +43,7 @@ struct __attribute__((packed)) CommandStatus
 static_assert(std::is_same<chip::EndpointId, uint16_t>::value && std::is_same<chip::ClusterId, uint32_t>::value &&
                   std::is_same<chip::CommandId, uint32_t>::value,
               "Members in CommandStatus does not match interaction_model/delegate.py");
-static_assert(sizeof(CommandStatus) == 2 + 2 + 4 + 4 + 1, "Size of CommandStatus might contain padding");
+static_assert(sizeof(CommandStatus) == 2 + 1 + 2 + 4 + 4 + 1, "Size of CommandStatus might contain padding");
 
 struct __attribute__((packed)) AttributePath
 {
@@ -93,12 +97,9 @@ void pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(PythonInte
 class PythonInteractionModelDelegate : public chip::Controller::DeviceControllerInteractionModelDelegate
 {
 public:
-    void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, TLV::TLVReader * aData) override;
-    void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aStatus,
-                 CHIP_ERROR aError) override;
-
-    CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient, const app::StatusIB & aStatusIB,
-                                   app::AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex) override;
+    void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+                    TLV::TLVReader * aData) override;
+    void OnError(const app::CommandSender * apCommandSender, const app::StatusIB & aStatus, CHIP_ERROR aError) override;
 
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
                       Protocols::InteractionModel::Status status) override;

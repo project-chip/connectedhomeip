@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include <app/data-model/Nullable.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
@@ -68,14 +70,46 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, Span<const char>
  *
  *
  */
-template <
-    typename X,
-    typename std::enable_if_t<std::is_class<X>::value &&
-                                  std::is_same<decltype(&X::Encode), CHIP_ERROR (X::*)(TLV::TLVWriter &, TLV::Tag) const>::value,
-                              X> * = nullptr>
+template <typename X,
+          typename std::enable_if_t<
+              std::is_class<X>::value &&
+                  std::is_same<decltype(std::declval<X>().Encode(std::declval<TLV::TLVWriter &>(), std::declval<TLV::Tag>())),
+                               CHIP_ERROR>::value,
+              X> * = nullptr>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
 {
     return x.Encode(writer, tag);
+}
+
+/*
+ * @brief
+ *
+ * Encodes an optional value (struct field, command field, event field).
+ */
+template <typename X>
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<X> & x)
+{
+    if (x.HasValue())
+    {
+        return Encode(writer, tag, x.Value());
+    }
+    // If no value, just do nothing.
+    return CHIP_NO_ERROR;
+}
+
+/*
+ * @brief
+ *
+ * Encodes a nullable value.
+ */
+template <typename X>
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const Nullable<X> & x)
+{
+    if (x.IsNull())
+    {
+        return writer.PutNull(tag);
+    }
+    return Encode(writer, tag, x.Value());
 }
 
 } // namespace DataModel

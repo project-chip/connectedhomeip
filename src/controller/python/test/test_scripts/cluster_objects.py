@@ -62,13 +62,13 @@ class ClusterObjectTests:
 
     @classmethod
     async def SendCommandWithResponse(cls, devCtrl):
-        req = Clusters.TestCluster.Commands.TestAddArguments(Arg1=2, Arg2=3)
-        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req, responseType=Clusters.TestCluster.Commands.TestAddArgumentsResponse)
+        req = Clusters.TestCluster.Commands.TestAddArguments(arg1=2, arg2=3)
+        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req)
         if not isinstance(res, Clusters.TestCluster.Commands.TestAddArgumentsResponse):
             logger.error(f"Unexpected response of type {type(res)} received.")
             raise ValueError()
         logger.info(f"Received response: {res}")
-        if res.ReturnValue != 5:
+        if res.returnValue != 5:
             raise ValueError()
 
     @classmethod

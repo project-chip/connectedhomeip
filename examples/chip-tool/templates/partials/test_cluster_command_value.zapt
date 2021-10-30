@@ -1,7 +1,25 @@
-{{#if isArray}}
+{{#if isOptional}}
+  {{#if ignore}}
+    {{>commandValue ns=ns container=(concat container ".Emplace()") definedValue=definedValue type=type isOptional=false ignore=true}}
+  {{else}}
+    {{>commandValue ns=ns container=(concat container "." (asLowerCamelCase label) ".Emplace()") definedValue=definedValue type=type isOptional=false ignore=true}}
+  {{/if}}
+{{else if isNullable}}
+  {{#if (isLiteralNull definedValue)}}
+    {{container}}{{#unless ignore}}.{{asLowerCamelCase label}}{{/unless}}.SetNull();
+  {{else}}
+    {{#if ignore}}
+      {{>commandValue ns=ns container=(concat container ".SetNonNull()") definedValue=definedValue type=type isNullable=false ignore=true}}
+    {{else}}
+      {{>commandValue ns=ns container=(concat container "." (asLowerCamelCase label) ".SetNonNull()") definedValue=definedValue type=type isNullable=false ignore=true}}
+    {{/if}}
+  {{/if}}
+{{else if isArray}}
 
-  {{! forceNotList=true because we really want the type of a single item here }}
-  {{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true}} {{asLowerCamelCase label}}List[{{definedValue.length}}];
+  {{! forceNotList=true because we really want the type of a single item here.
+      Similarly, forceNotOptional=true and forceNotNullable=true because we
+      have accounted for those already. }}
+  {{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}} {{asLowerCamelCase label}}List[{{definedValue.length}}];
   {{#each definedValue}}
   {{>commandValue ns=../ns container=(concat (asLowerCamelCase ../label) "List[" @index "]") definedValue=. type=../type ignore=true}}
   {{/each}}
@@ -12,15 +30,15 @@
 
     {{#zcl_struct_items_by_struct_name type}}
       {{#if ../ignore}}
-      {{>commandValue ns=parent.ns container=(concat parent.container "." label) definedValue=(lookup parent.definedValue name) ignore=../ignore}}
+      {{>commandValue ns=parent.ns container=(concat parent.container "." (asLowerCamelCase label)) definedValue=(lookup parent.definedValue name) ignore=../ignore}}
       {{else}}
-      {{>commandValue ns=parent.ns container=(concat parent.container "." parent.label) definedValue=(lookup parent.definedValue name) ignore=../ignore}}
+      {{>commandValue ns=parent.ns container=(concat parent.container "." (asLowerCamelCase parent.label)) definedValue=(lookup parent.definedValue name) ignore=../ignore}}
       {{/if}}
     {{/zcl_struct_items_by_struct_name}}
 
   {{else}}
     {{container}}{{#unless ignore}}.{{asLowerCamelCase label}}{{/unless}} =
-    {{#if_is_enum type}}
+    {{#if_chip_enum type}}
       static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});
     {{else if (isCharString type)}}
       chip::Span<const char>("{{definedValue}}", strlen("{{definedValue}}"));
@@ -32,6 +50,6 @@
       {{else}}
       {{definedValue}}{{asTypeLiteralSuffix type}};
       {{/if_is_bitmap}}
-    {{/if_is_enum}}
+    {{/if_chip_enum}}
   {{/if_is_struct}}
 {{/if}}

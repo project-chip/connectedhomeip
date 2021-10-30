@@ -21,15 +21,14 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <string>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AccountLogin;
 
 bool accountLoginClusterIsUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin);
@@ -38,8 +37,8 @@ std::string accountLoginClusterGetSetupPin(std::string requestTempAccountIdentif
 void sendResponse(app::CommandHandler * command, const char * responseSetupPin)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_ACCOUNT_LOGIN_CLUSTER_ID,
-                                         ZCL_GET_SETUP_PIN_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, AccountLogin::Id,
+                                         Commands::GetSetupPINResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
     TLV::TLVWriter * writer          = nullptr;
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
     VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

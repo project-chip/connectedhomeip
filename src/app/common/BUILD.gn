@@ -23,7 +23,6 @@ static_library("cluster-objects") {
   ]
 
   public_deps = [
-    "${chip_root}/src/app",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]

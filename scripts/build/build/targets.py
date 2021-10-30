@@ -94,6 +94,8 @@ def Esp32Targets():
 
     yield esp32_target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
     yield esp32_target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
+    yield esp32_target.Extend('m5stack-all-clusters-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True)
+    yield esp32_target.Extend('m5stack-all-clusters-rpc-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True, enable_ipv4=False)
     yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
     devkitc = esp32_target.Extend('devkitc', board=Esp32Board.DevKitC)
@@ -133,6 +135,7 @@ def NrfTargets():
     for target in targets:
         yield target.Extend('lock', app=NrfApp.LOCK)
         yield target.Extend('light', app=NrfApp.LIGHT)
+        yield target.Extend('light-rpc', app=NrfApp.LIGHT, enable_rpcs=True)
         yield target.Extend('shell', app=NrfApp.SHELL)
         yield target.Extend('pump', app=NrfApp.PUMP)
         yield target.Extend('pump-controller', app=NrfApp.PUMP_CONTROLLER)
@@ -146,7 +149,10 @@ def AndroidTargets():
     yield target.Extend('x64-chip-tool', board=AndroidBoard.X64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('x86-chip-tool', board=AndroidBoard.X86, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('arm64-chip-test', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TEST)
-    yield target.Extend('androidstudio-chip-tool', board=AndroidBoard.AndroidStudio, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('androidstudio-arm-chip-tool', board=AndroidBoard.AndroidStudio_ARM, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('androidstudio-arm64-chip-tool', board=AndroidBoard.AndroidStudio_ARM64, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('androidstudio-x86-chip-tool', board=AndroidBoard.AndroidStudio_X86, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('androidstudio-x64-chip-tool', board=AndroidBoard.AndroidStudio_X64, app=AndroidApp.CHIP_TOOL)
 
 
 ALL = []

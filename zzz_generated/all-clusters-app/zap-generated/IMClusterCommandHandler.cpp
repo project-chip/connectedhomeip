@@ -943,6 +943,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::TriggerEffect::Id: {
+            Commands::TriggerEffect::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfIdentifyClusterTriggerEffectCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         default: {
             // Unrecognized command ID, error status will apply.
             ReportCommandUnsupported(apCommandObj, aCommandPath);
@@ -1607,6 +1616,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::TestEnumsRequest::Id: {
+            Commands::TestEnumsRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfTestClusterClusterTestEnumsRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::TestListInt8UArgumentRequest::Id: {
             Commands::TestListInt8UArgumentRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
@@ -1671,6 +1689,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfTestClusterClusterTestNotHandledCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestNullableOptionalRequest::Id: {
+            Commands::TestNullableOptionalRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfTestClusterClusterTestNullableOptionalRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }

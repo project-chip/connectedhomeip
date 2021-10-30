@@ -169,6 +169,34 @@ public:
             list);
 };
 
+class CHIPBridgedActionsActionListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BridgedActionsActionListListAttributeCallback>
+{
+public:
+    CHIPBridgedActionsActionListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<BridgedActionsActionListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &
+            list);
+};
+
+class CHIPBridgedActionsEndpointListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BridgedActionsEndpointListListAttributeCallback>
+{
+public:
+    CHIPBridgedActionsEndpointListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BridgedActionsEndpointListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+            list);
+};
+
 class CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ContentLauncherAcceptsHeaderListListAttributeCallback>
 {
@@ -330,6 +358,18 @@ public:
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
                                 chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list);
+};
+
+class CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>
+{
+public:
+    CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
 };
 
 class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
@@ -1264,6 +1304,16 @@ public:
     static void OnSuccessFn(void * context, uint8_t returnValue);
 };
 
+class CHIPTestClusterClusterTestEnumsResponseCallbackBridge : public CHIPCallbackBridge<TestClusterClusterTestEnumsResponseCallback>
+{
+public:
+    CHIPTestClusterClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterClusterTestEnumsResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::VendorId arg1, uint8_t arg2);
+};
+
 class CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge
     : public CHIPCallbackBridge<TestClusterClusterTestListInt8UReverseResponseCallback>
 {
@@ -1274,6 +1324,18 @@ public:
                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context, /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+};
+
+class CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge
+    : public CHIPCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallback>
+{
+public:
+    CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, bool wasPresent, bool wasNull, uint8_t value, uint8_t originalValue);
 };
 
 class CHIPTestClusterClusterTestSpecificResponseCallbackBridge

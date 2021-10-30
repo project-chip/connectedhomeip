@@ -65,6 +65,7 @@ protected:
 
     ChipDeviceCommissioner mController;
     PersistentStorage mStorage;
+    chip::SimpleFabricStorage mFabricStorage;
 
 private:
     static void RunQueuedCommand(intptr_t commandArg);

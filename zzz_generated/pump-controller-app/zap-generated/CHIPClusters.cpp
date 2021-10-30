@@ -19,22 +19,7 @@
 
 #include "CHIPClusters.h"
 
-#include <cstdint>
-
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/CommandSender.h>
-#include <app/InteractionModelEngine.h>
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/util/basic-types.h>
-#include <controller/CommandSenderAllocator.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/BufferWriter.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
 namespace chip {
@@ -518,46 +503,6 @@ CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelabl
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Move::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::Move::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Step::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::Step::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Stop::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::Stop::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // OnOff Cluster Commands
 CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
@@ -696,21 +641,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Off::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::Off::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::On::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::On::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Toggle::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::Toggle::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // PressureMeasurement Cluster Commands
 // PressureMeasurement Cluster Attributes
@@ -888,16 +818,10 @@ CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callb
                                                                            Callback::Cancelable * onFailureCallback, uint8_t value)
 {
     app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000020;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::OperationMode::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
@@ -980,26 +904,6 @@ CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeClusterRevision(Callback:
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
-template <typename RequestDataT, typename ResponseDataT>
-CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
-                                      CommandResponseSuccessCallback<ResponseDataT> successCb,
-                                      CommandResponseFailureCallback failureCb)
-{
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
-
-    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
-        successCb(context, responseData);
-    };
-
-    auto onFailureCb = [context, failureCb](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
-        failureCb(context, app::ToEmberAfStatus(aIMStatus));
-    };
-
-    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                               requestData, onSuccessCb, onFailureCb);
-};
 
 } // namespace Controller
 } // namespace chip

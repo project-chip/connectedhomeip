@@ -78,7 +78,7 @@ private:
  *   hold by using UnauthenticatedSessionHandle, which increase the reference
  *   count by 1. If the reference count is not 0, the entry won't be pruned.
  */
-template <size_t kMaxConnectionCount, Time::Source kTimeSource = Time::Source::kSystem>
+template <size_t kMaxSessionCount, Time::Source kTimeSource = Time::Source::kSystem>
 class UnauthenticatedSessionTable
 {
 public:
@@ -111,14 +111,14 @@ public:
         session->SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
     }
 
-    /// Allows access to the underlying time source used for keeping track of connection active time
+    /// Allows access to the underlying time source used for keeping track of session active time
     Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
 
 private:
     /**
      * Allocates a new session out of the internal resource pool.
      *
-     * @returns CHIP_NO_ERROR if new session created. May fail if maximum connection count has been reached (with
+     * @returns CHIP_NO_ERROR if new session created. May fail if maximum session count has been reached (with
      * CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
@@ -198,7 +198,7 @@ private:
     }
 
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
-    BitMapObjectPool<UnauthenticatedSession, kMaxConnectionCount> mEntries;
+    BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount> mEntries;
 };
 
 } // namespace Transport

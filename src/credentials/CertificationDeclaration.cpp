@@ -48,14 +48,17 @@ static constexpr uint8_t sOID_SigAlgo_ECDSAWithSHA256[]     = { 0x2A, 0x86, 0x48
  */
 enum
 {
-    kTag_VendorId            = 1, /**< [ unsigned int ] Vedor identifier. */
-    kTag_ProductIds          = 2, /**< [ array ] Product identifiers (each is unsigned int). */
-    kTag_ServerCategoryId    = 3, /**< [ unsigned int ] Server category identifier. */
-    kTag_ClientCategoryId    = 4, /**< [ unsigned int ] Client category identifier. */
-    kTag_SecurityLevel       = 5, /**< [ unsigned int ] Security level. */
-    kTag_SecurityInformation = 6, /**< [ unsigned int ] Security information. */
-    kTag_VersionNumber       = 7, /**< [ unsigned int ] Version number. */
-    kTag_CertificationType   = 8, /**< [ unsigned int ] Certification Type. */
+    kTag_FormatVersion       = 0,  /**< [ unsigned int ] Format version. */
+    kTag_VendorId            = 1,  /**< [ unsigned int ] Vedor identifier. */
+    kTag_ProductIdArray      = 2,  /**< [ array ] Product identifiers (each is unsigned int). */
+    kTag_DeviceTypeId        = 3,  /**< [ unsigned int ] Device Type identifier. */
+    kTag_CertificateId       = 4,  /**< [ UTF-8 string, length 19 ] Certificate identifier. */
+    kTag_SecurityLevel       = 5,  /**< [ unsigned int ] Security level. */
+    kTag_SecurityInformation = 6,  /**< [ unsigned int ] Security information. */
+    kTag_VersionNumber       = 7,  /**< [ unsigned int ] Version number. */
+    kTag_CertificationType   = 8,  /**< [ unsigned int ] Certification Type. */
+    kTag_DACOriginVendorId   = 9,  /**< [ unsigned int, optional ] DAC origin vendor identifier. */
+    kTag_DACOriginProductId  = 10, /**< [ unsigned int, optional ] DAC origin product identifier. */
 };
 
 CHIP_ERROR EncodeCertificationElements(const CertificationElements & certElements, MutableByteSpan & encodedCertElements)
@@ -67,25 +70,30 @@ CHIP_ERROR EncodeCertificationElements(const CertificationElements & certElement
 
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Structure, outerContainer1));
 
+    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_FormatVersion), certElements.FormatVersion));
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_VendorId), certElements.VendorId));
 
     VerifyOrReturnError(certElements.ProductIdsCount > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(certElements.ProductIdsCount < kMaxProductIdsCountPerCD, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(certElements.ProductIdsCount <= kMaxProductIdsCountPerCD, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_ProductIds), kTLVType_Array, outerContainer2));
+    ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_ProductIdArray), kTLVType_Array, outerContainer2));
     for (uint8_t i = 0; i < certElements.ProductIdsCount; i++)
     {
         ReturnErrorOnFailure(writer.Put(AnonymousTag, certElements.ProductIds[i]));
     }
     ReturnErrorOnFailure(writer.EndContainer(outerContainer2));
 
-    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_ServerCategoryId), certElements.ServerCategoryId));
-    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_ClientCategoryId), certElements.ClientCategoryId));
+    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_DeviceTypeId), certElements.DeviceTypeId));
+    ReturnErrorOnFailure(writer.PutString(ContextTag(kTag_CertificateId), certElements.CertificateId));
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_SecurityLevel), certElements.SecurityLevel));
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_SecurityInformation), certElements.SecurityInformation));
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_VersionNumber), certElements.VersionNumber));
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_CertificationType), certElements.CertificationType));
-
+    if (certElements.DACOriginVIDandPIDPresent)
+    {
+        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_DACOriginVendorId), certElements.DACOriginVendorId));
+        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_DACOriginProductId), certElements.DACOriginProductId));
+    }
     ReturnErrorOnFailure(writer.EndContainer(outerContainer1));
 
     ReturnErrorOnFailure(writer.Finalize());
@@ -97,9 +105,9 @@ CHIP_ERROR EncodeCertificationElements(const CertificationElements & certElement
 
 CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, CertificationElements & certElements)
 {
+    CHIP_ERROR err;
     TLVReader reader;
     TLVType outerContainer1, outerContainer2;
-    uint64_t element;
 
     reader.Init(encodedCertElements);
 
@@ -107,55 +115,57 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
 
     ReturnErrorOnFailure(reader.EnterContainer(outerContainer1));
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(kTag_VendorId)));
-    ReturnErrorOnFailure(reader.Get(element));
-    VerifyOrReturnError(CanCastTo<uint16_t>(element), CHIP_ERROR_INVALID_TLV_ELEMENT);
-    certElements.VendorId = static_cast<uint16_t>(element);
+    ReturnErrorOnFailure(reader.Next(ContextTag(kTag_FormatVersion)));
+    ReturnErrorOnFailure(reader.Get(certElements.FormatVersion));
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_Array, ContextTag(kTag_ProductIds)));
+    ReturnErrorOnFailure(reader.Next(ContextTag(kTag_VendorId)));
+    ReturnErrorOnFailure(reader.Get(certElements.VendorId));
+
+    ReturnErrorOnFailure(reader.Next(kTLVType_Array, ContextTag(kTag_ProductIdArray)));
     ReturnErrorOnFailure(reader.EnterContainer(outerContainer2));
 
     certElements.ProductIdsCount = 0;
-    while (reader.Next(kTLVType_UnsignedInteger, AnonymousTag) == CHIP_NO_ERROR)
+    while ((err = reader.Next(AnonymousTag)) == CHIP_NO_ERROR)
     {
-        ReturnErrorOnFailure(reader.Get(element));
-        VerifyOrReturnError(CanCastTo<uint16_t>(element), CHIP_ERROR_INVALID_TLV_ELEMENT);
-        certElements.ProductIds[certElements.ProductIdsCount++] = static_cast<uint16_t>(element);
+        ReturnErrorOnFailure(reader.Get(certElements.ProductIds[certElements.ProductIdsCount++]));
     }
-    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerContainer2));
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(kTag_ServerCategoryId)));
-    ReturnErrorOnFailure(reader.Get(element));
-    VerifyOrReturnError(CanCastTo<uint16_t>(element), CHIP_ERROR_INVALID_TLV_ELEMENT);
-    certElements.ServerCategoryId = static_cast<uint16_t>(element);
+    ReturnErrorOnFailure(reader.Next(ContextTag(kTag_DeviceTypeId)));
+    ReturnErrorOnFailure(reader.Get(certElements.DeviceTypeId));
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(kTag_ClientCategoryId)));
-    ReturnErrorOnFailure(reader.Get(element));
-    VerifyOrReturnError(CanCastTo<uint16_t>(element), CHIP_ERROR_INVALID_TLV_ELEMENT);
-    certElements.ClientCategoryId = static_cast<uint16_t>(element);
+    ReturnErrorOnFailure(reader.Next(kTLVType_UTF8String, ContextTag(kTag_CertificateId)));
+    ReturnErrorOnFailure(reader.GetString(certElements.CertificateId, sizeof(certElements.CertificateId)));
+    VerifyOrReturnError(strlen(certElements.CertificateId) == kCertificateIdLength, CHIP_ERROR_INVALID_TLV_ELEMENT);
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(kTag_SecurityLevel)));
-    ReturnErrorOnFailure(reader.Get(element));
-    VerifyOrReturnError(CanCastTo<uint8_t>(element), CHIP_ERROR_INVALID_TLV_ELEMENT);
-    certElements.SecurityLevel = static_cast<uint8_t>(element);
+    ReturnErrorOnFailure(reader.Next(ContextTag(kTag_SecurityLevel)));
+    ReturnErrorOnFailure(reader.Get(certElements.SecurityLevel));
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(kTag_SecurityInformation)));
-    ReturnErrorOnFailure(reader.Get(element));
-    VerifyOrReturnError(CanCastTo<uint16_t>(element), CHIP_ERROR_INVALID_TLV_ELEMENT);
-    certElements.SecurityInformation = static_cast<uint16_t>(element);
+    ReturnErrorOnFailure(reader.Next(ContextTag(kTag_SecurityInformation)));
+    ReturnErrorOnFailure(reader.Get(certElements.SecurityInformation));
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(kTag_VersionNumber)));
-    ReturnErrorOnFailure(reader.Get(element));
-    VerifyOrReturnError(CanCastTo<uint16_t>(element), CHIP_ERROR_INVALID_TLV_ELEMENT);
-    certElements.VersionNumber = static_cast<uint16_t>(element);
+    ReturnErrorOnFailure(reader.Next(ContextTag(kTag_VersionNumber)));
+    ReturnErrorOnFailure(reader.Get(certElements.VersionNumber));
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(kTag_CertificationType)));
-    ReturnErrorOnFailure(reader.Get(element));
-    VerifyOrReturnError(CanCastTo<uint8_t>(element), CHIP_ERROR_INVALID_TLV_ELEMENT);
-    certElements.CertificationType = static_cast<uint8_t>(element);
+    ReturnErrorOnFailure(reader.Next(ContextTag(kTag_CertificationType)));
+    ReturnErrorOnFailure(reader.Get(certElements.CertificationType));
 
-    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
+    certElements.DACOriginVIDandPIDPresent = false;
+
+    // If kTag_DACOriginVendorId present then kTag_DACOriginProductId must be present.
+    if ((err = reader.Next(ContextTag(kTag_DACOriginVendorId))) == CHIP_NO_ERROR)
+    {
+        ReturnErrorOnFailure(reader.Get(certElements.DACOriginVendorId));
+
+        ReturnErrorOnFailure(reader.Next(ContextTag(kTag_DACOriginProductId)));
+        ReturnErrorOnFailure(reader.Get(certElements.DACOriginProductId));
+
+        certElements.DACOriginVIDandPIDPresent = true;
+
+        err = reader.Next();
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
 
     ReturnErrorOnFailure(reader.ExitContainer(outerContainer1));
 

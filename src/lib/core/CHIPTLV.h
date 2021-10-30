@@ -467,6 +467,26 @@ public:
     CHIP_ERROR Get(ByteSpan & v);
 
     /**
+     * Get the value of the current element as a FixedByteSpan
+     *
+     * @param[out]  v                       Receives the value associated with current TLV element.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV bytes array, or
+     *                                      the reader is not positioned on an element.
+     *
+     */
+    template <size_t N>
+    CHIP_ERROR Get(FixedByteSpan<N> & v)
+    {
+        const uint8_t * val;
+        ReturnErrorOnFailure(GetDataPtr(val));
+        VerifyOrReturnError(GetLength() == N, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+        v = FixedByteSpan<N>(val);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      * Get the value of the current element as a CharSpan
      *
      * @param[out]  v                       Receives the value associated with current TLV element.
@@ -861,6 +881,15 @@ public:
      * @retval other                       Other CHIP or platform error codes
      */
     CHIP_ERROR FindElementWithTag(Tag tagInApiForm, TLVReader & destReader) const;
+
+    /**
+     * Count how many elements remain in the currently-open container.  Will
+     * fail with CHIP_ERROR_INCORRECT_STATE if not currently in a container.
+     *
+     * @param[out] size On success, set to the number of items following the
+     *                  current reader position in the container.
+     */
+    CHIP_ERROR CountRemainingInContainer(size_t * size) const;
 
     /**
      * The profile id to be used for profile tags encoded in implicit form.

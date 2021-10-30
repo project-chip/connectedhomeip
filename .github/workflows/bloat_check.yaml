@@ -30,7 +30,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.22
+            image: connectedhomeip/chip-build:0.5.23
 
         steps:
             - name: Checkout
@@ -38,15 +38,9 @@ jobs:
 
             - name: Report
               run: |
-                  scripts/helpers/bloat_check.py                        \
-                       --github-repository project-chip/connectedhomeip \
-                       --github-api-token "${{ secrets.GITHUB_TOKEN }}"
-
-            - name: Report2
-              run: |
                   scripts/tools/memory/gh_report.py \
                     --verbose \
-                    --report-increases 1 \
+                    --report-increases 0.2 \
                     --report-pr \
                     --github-comment \
                     --github-limit-artifact-pages 50 \

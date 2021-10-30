@@ -54,7 +54,9 @@
 
 using namespace ::chip;
 using namespace ::chip::TLV;
+using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace {
 
@@ -93,7 +95,7 @@ CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
             {
                 ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
                 break;
@@ -158,7 +160,7 @@ CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionWiFi)
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
             {
                 ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
                 break;
@@ -508,6 +510,35 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
         g_error_free(err);
 }
 
+void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
+{
+    GError * err = nullptr;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    WpaFiW1Wpa_supplicant1BSS * bss = wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus_finish(res, &err);
+
+    if (mWpaSupplicant.bss)
+    {
+        g_object_unref(mWpaSupplicant.bss);
+        mWpaSupplicant.bss = nullptr;
+    }
+
+    if (bss != nullptr && err == nullptr)
+    {
+        mWpaSupplicant.bss = bss;
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant bss proxy");
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant bss proxy %s: %s",
+                        mWpaSupplicant.interfacePath, err ? err->message : "unknown error");
+    }
+
+    if (err != nullptr)
+        g_error_free(err);
+}
+
 void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     GError * err = nullptr;
@@ -524,6 +555,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
         wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
                                                               mWpaSupplicant.interfacePath, nullptr, _OnWpaInterfaceProxyReady,
                                                               nullptr);
+
+        wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
+                                                        mWpaSupplicant.interfacePath, nullptr, _OnWpaBssProxyReady, nullptr);
     }
     else
     {
@@ -554,6 +588,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
             wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
                                                                   kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,
                                                                   _OnWpaInterfaceProxyReady, nullptr);
+
+            wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
+                                                            mWpaSupplicant.interfacePath, nullptr, _OnWpaBssProxyReady, nullptr);
         }
         else
         {
@@ -596,6 +633,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * prox
         wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
                                                               mWpaSupplicant.interfacePath, nullptr, _OnWpaInterfaceProxyReady,
                                                               nullptr);
+
+        wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
+                                                        mWpaSupplicant.interfacePath, nullptr, _OnWpaBssProxyReady, nullptr);
     }
 }
 
@@ -625,6 +665,12 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * pr
         {
             g_object_unref(mWpaSupplicant.iface);
             mWpaSupplicant.iface = nullptr;
+        }
+
+        if (mWpaSupplicant.bss)
+        {
+            g_object_unref(mWpaSupplicant.bss);
+            mWpaSupplicant.bss = nullptr;
         }
 
         mWpaSupplicant.scanState = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
@@ -667,6 +713,7 @@ void ConnectivityManagerImpl::StartWiFiManagement()
     mWpaSupplicant.scanState     = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
     mWpaSupplicant.proxy         = nullptr;
     mWpaSupplicant.iface         = nullptr;
+    mWpaSupplicant.bss           = nullptr;
     mWpaSupplicant.interfacePath = nullptr;
     mWpaSupplicant.networkPath   = nullptr;
 
@@ -965,7 +1012,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             // This should be removed or find a better place once we depercate the rendezvous session.
             for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
             {
-                char ifName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+                char ifName[chip::Inet::InterfaceId::kMaxIfNameLength];
                 if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
                     strncmp(ifName, sWiFiIfName, sizeof(ifName)) == 0)
                 {
@@ -1034,6 +1081,71 @@ exit:
     return ret;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(NetworkInterface * netifp)
+{
+    while (netifp)
+    {
+        NetworkInterface * del = netifp;
+        netifp                 = netifp->Next;
+        delete del;
+    }
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    struct ifaddrs * ifaddr = nullptr;
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+    }
+    else
+    {
+        NetworkInterface * head = nullptr;
+
+        /* Walk through linked list, maintaining head pointer so we
+          can free list later */
+        for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_PACKET)
+            {
+                NetworkInterface * ifp = new NetworkInterface();
+
+                strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceId::kMaxIfNameLength);
+                ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
+
+                ifp->name                            = CharSpan(ifp->Name, strlen(ifp->Name));
+                ifp->fabricConnected                 = ifa->ifa_flags & IFF_RUNNING;
+                ifp->type                            = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
+                ifp->offPremiseServicesReachableIPv4 = false;
+                ifp->offPremiseServicesReachableIPv6 = false;
+
+                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, ifp->MacAddress, kMaxHardwareAddrSize) !=
+                    CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "Failed to get network hardware address");
+                }
+                else
+                {
+                    // Set 48-bit IEEE MAC Address
+                    ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
+                }
+
+                ifp->Next = head;
+                head      = ifp;
+            }
+        }
+
+        *netifpp = head;
+        err      = CHIP_NO_ERROR;
+
+        freeifaddrs(ifaddr);
+    }
+
+    return err;
+}
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthPHYRate(uint8_t & pHYRate)
 {
@@ -1142,7 +1254,7 @@ CHIP_ERROR ConnectivityManagerImpl::ResetEthernetStatsCount()
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
             {
                 ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
                 break;
@@ -1313,7 +1425,7 @@ CHIP_ERROR ConnectivityManagerImpl::ResetWiFiStatsCount()
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionWiFi)
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
             {
                 ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
                 break;

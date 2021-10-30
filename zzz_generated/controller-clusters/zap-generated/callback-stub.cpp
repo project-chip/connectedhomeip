@@ -59,6 +59,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BOOLEAN_STATE_CLUSTER_ID:
         emberAfBooleanStateClusterInitCallback(endpoint);
         break;
+    case ZCL_BRIDGED_ACTIONS_CLUSTER_ID:
+        emberAfBridgedActionsClusterInitCallback(endpoint);
+        break;
     case ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID:
         emberAfBridgedDeviceBasicClusterInitCallback(endpoint);
         break;
@@ -103,6 +106,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_IDENTIFY_CLUSTER_ID:
         emberAfIdentifyClusterInitCallback(endpoint);
+        break;
+    case ZCL_ILLUMINANCE_MEASUREMENT_CLUSTER_ID:
+        emberAfIlluminanceMeasurementClusterInitCallback(endpoint);
         break;
     case ZCL_KEYPAD_INPUT_CLUSTER_ID:
         emberAfKeypadInputClusterInitCallback(endpoint);
@@ -247,6 +253,11 @@ void __attribute__((weak)) emberAfBooleanStateClusterInitCallback(EndpointId end
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfBridgedActionsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfBridgedDeviceBasicClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -318,6 +329,11 @@ void __attribute__((weak)) emberAfGroupsClusterInitCallback(EndpointId endpoint)
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfIdentifyClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfIlluminanceMeasurementClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

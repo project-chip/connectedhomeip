@@ -57,9 +57,6 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::None:
         err = Unpair(remoteId);
         break;
-    case PairingMode::Bypass:
-        err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-        break;
     case PairingMode::QRCode:
         err = PairWithQRCode(remoteId);
         break;
@@ -151,12 +148,6 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
     return mController.DiscoverCommissionableNodes(filter);
 }
 
-CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress address)
-{
-    ChipSerializedDevice serializedTestDevice;
-    return mController.PairTestDeviceWithoutSecurity(remoteId, address, serializedTestDevice);
-}
-
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
     CHIP_ERROR err = mController.UnpairDevice(remoteId);
@@ -164,11 +155,22 @@ CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
     return err;
 }
 
+void PairingCommand::OnOpenCommissioningWindowResponse(void * context, NodeId remoteId, CHIP_ERROR err, chip::SetupPayload payload)
+{
+    PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool,
+                     "Failed in opening commissioning window on the device: 0x" ChipLogFormatX64 ", error %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(remoteId), err.Format());
+    }
+    command->SetCommandExitStatus(err);
+}
+
 CHIP_ERROR PairingCommand::OpenCommissioningWindow()
 {
-    CHIP_ERROR err = mController.OpenCommissioningWindow(mNodeId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption);
-    SetCommandExitStatus(err);
-    return err;
+    return mController.OpenCommissioningWindowWithCallback(mNodeId, mTimeout, mIteration, mDiscriminator,
+                                                           mCommissioningWindowOption, &mOnOpenCommissioningWindowCallback);
 }
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -437,7 +439,7 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & 
     // Stop Mdns discovery. Is it the right method ?
     mController.RegisterDeviceDiscoveryDelegate(nullptr);
 
-    Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId[0] : INET_NULL_INTERFACEID;
+    Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId[0] : Inet::InterfaceId::Null();
     PeerAddress peerAddress       = PeerAddress::UDP(nodeData.ipAddress[0], port, interfaceId);
     CHIP_ERROR err                = Pair(mNodeId, peerAddress);
     if (CHIP_NO_ERROR != err)

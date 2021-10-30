@@ -15,8 +15,6 @@
 name: ZAP - Regenerate
 
 on:
-    # push:
-    # pull_request:
     workflow_dispatch:
 
 concurrency:
@@ -24,26 +22,22 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    zap_regenerate:
-        name: ZAP - Regenerate
+    zap_regeneration:
+        name: ZAP Regeneration
         timeout-minutes: 60
 
         runs-on: ubuntu-18.04
         if: github.actor != 'restyled-io[bot]'
 
-        # container:
-        #     image: connectedhomeip/chip-build:latest
         steps:
             - name: Checkout
               uses: actions/checkout@v2
               with:
-                  # token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
-                  # ref: ${{ github.head_ref }}
                   submodules: true
             - name: Use Node.js 14.x
-              uses: actions/setup-node@v2
+              uses: actions/setup-node@v1
               with:
-                node-version: '14'
+                node-version: '14.x'
             - name: Use Java 
               uses: actions/setup-java@v2
               with:
@@ -51,7 +45,7 @@ jobs:
                 java-version: '11'
                 java-package: jre
             - run: sudo apt-get update
-            - run: sudo apt-get install -fy --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev python-autopep8
+            - run: sudo apt-get install --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev python-autopep8
             - name: Setup ZAP
               timeout-minutes: 5
               run: |
@@ -63,33 +57,17 @@ jobs:
             - name: Generate all
               timeout-minutes: 5
               run: scripts/tools/zap_regen_all.py
-            - name: Check for uncommited changes
-              run: git status
-                # git diff
-                # git add .
-                # git diff-index HEAD --
-                # git diff-index --quiet HEAD --
-            - name: Add generated paths
-              run: |
-                git add zzz_generated/*
-                git add src/darwin/Framework/*
-                git add src/controller/python/chip/clusters/*
-                git add src/controller/java/zap-generated/*
-            - uses: GuillaumeFalourd/git-commit-push@v1
-              with:
-                # email: ${{ github.actor }}@users.noreply.github.com
-                # name: ${{ github.actor }}
-                commit_message: Adding ZAP Generated Files
-                # target_branch: target_branch_name
-                # files: file1 file2 directory1 directory2/file3
-                # remote_repository: https://github.com/owner/another_repository
-                access_token: ${{ secrets.APPLE_PERSONAL_ACCESS_TOKEN }}
-                # force: true
-                # empty: true
-                # tags: true
-            # - name: Commit newly generated changes
-            #   uses: stefanzweifel/git-auto-commit-action@v4
-            #   with:
-            #     commit_message: Auto-regenerated ZAP Changes
-            #     file_pattern: "zzz_generated/* src/darwin/Framework/* src/controller/python/chip/clusters/* src/controller/java/zap-generated/*"
-            #     # branch: ${{ github.head_ref }}
+            - name: Add uncommitted changes
+              run: git add .
+            - name: Fix upstream
+              run:  |
+                git remote set-url origin https://x-access-token:$COMMITTER_TOKEN@github.com/$GITHUB_REPOSITORY.git
+                git config --global user.email "$USER_EMAIL"
+                git config --global user.name "$USER_NAME"
+              env:
+                COMMITTER_TOKEN: ${{ secrets.MATTER_PAT }}
+                USER_EMAIL: ${{ secrets.MATTER_PAT_EMAIL }}
+                USER_NAME: ${{ secrets.MATTER_PAT_NAME }}
+                GITHUB_REPOSITORY: ${{ github.GITHUB_REPOSITORY }}
+            - name: Push
+              run: git push

@@ -115,6 +115,53 @@ void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void
     DispatchSuccess(context, @ { @"value" : array });
 };
 
+void CHIPBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        [array addObject:@ {
+            @"ActionID" : [NSNumber numberWithUnsignedShort:entry.actionID],
+            @"Name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
+            @"Type" : [NSNumber numberWithUnsignedChar:entry.type],
+            @"EndpointListID" : [NSNumber numberWithUnsignedShort:entry.endpointListID],
+            @"SupportedCommands" : [NSNumber numberWithUnsignedShort:entry.supportedCommands],
+            @"Status" : [NSNumber numberWithUnsignedChar:entry.status],
+        }];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
+void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+        list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        [array addObject:@ {
+            @"EndpointListID" : [NSNumber numberWithUnsignedShort:entry.endpointListID],
+            @"Name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
+            @"Type" : [NSNumber numberWithUnsignedChar:entry.type],
+            @"Endpoints" : [NSData dataWithBytes:entry.endpoints.data() length:entry.endpoints.size()],
+        }];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
 void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
 {
@@ -369,6 +416,23 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
             @"NodeId" : [NSNumber numberWithUnsignedLongLong:entry.nodeId],
             @"Label" : [[NSString alloc] initWithBytes:entry.label.data() length:entry.label.size() encoding:NSUTF8StringEncoding],
         }];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
+void CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        [array addObject:[NSData dataWithBytes:entry.data() length:entry.size()]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
@@ -1253,6 +1317,14 @@ void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(v
     });
 };
 
+void CHIPTestClusterClusterTestEnumsResponseCallbackBridge::OnSuccessFn(void * context, chip::VendorId arg1, uint8_t arg2)
+{
+    DispatchSuccess(context, @ {
+        @"arg1" : [NSNumber numberWithUnsignedShort:arg1],
+        @"arg2" : [NSNumber numberWithUnsignedChar:arg2],
+    });
+};
+
 void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
     void * context, /* TYPE WARNING: array array defaults to */ uint8_t * arg1)
 {
@@ -1261,6 +1333,17 @@ void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccess
             // arg1 : /* TYPE WARNING: array array defaults to */ uint8_t *
             // Conversion from this type to Objc is not properly implemented yet
         });
+};
+
+void CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge::OnSuccessFn(
+    void * context, bool wasPresent, bool wasNull, uint8_t value, uint8_t originalValue)
+{
+    DispatchSuccess(context, @ {
+        @"wasPresent" : [NSNumber numberWithBool:wasPresent],
+        @"wasNull" : [NSNumber numberWithBool:wasNull],
+        @"value" : [NSNumber numberWithUnsignedChar:value],
+        @"originalValue" : [NSNumber numberWithUnsignedChar:originalValue],
+    });
 };
 
 void CHIPTestClusterClusterTestSpecificResponseCallbackBridge::OnSuccessFn(void * context, uint8_t returnValue)

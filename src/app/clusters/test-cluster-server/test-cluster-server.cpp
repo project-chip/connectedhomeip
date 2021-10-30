@@ -20,18 +20,12 @@
  * @brief Implementation for the Test Server Cluster
  ***************************************************************************/
 
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
@@ -94,7 +88,7 @@ EmberAfStatus writeAttribute(EndpointId endpoint, AttributeId attributeId, uint8
 {
     EmberAfAttributeSearchRecord record;
     record.endpoint         = endpoint;
-    record.clusterId        = ZCL_TEST_CLUSTER_ID;
+    record.clusterId        = TestCluster::Id;
     record.clusterMask      = CLUSTER_MASK_SERVER;
     record.manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE;
     record.attributeId      = attributeId;
@@ -394,15 +388,9 @@ bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
     CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
     Commands::TestListInt8UReverseRequest::DecodableType const & commandData)
 {
-    size_t count = 0;
-    {
-        auto iter = commandData.arg1.begin();
-        while (iter.Next())
-        {
-            ++count;
-        }
-        VerifyOrExit(iter.GetStatus() == CHIP_NO_ERROR, );
-    }
+    size_t count   = 0;
+    CHIP_ERROR err = commandData.arg1.ComputeSize(&count);
+    VerifyOrExit(err == CHIP_NO_ERROR, );
 
     {
         auto iter = commandData.arg1.begin();
@@ -427,6 +415,47 @@ exit:
     return true;
 }
 
+bool emberAfTestClusterClusterTestEnumsRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+                                                       TestEnumsRequest::DecodableType const & commandData)
+{
+    TestEnumsResponse::Type response;
+    response.arg1 = commandData.arg1;
+    response.arg2 = commandData.arg2;
+
+    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
+    if (err != CHIP_NO_ERROR)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+    return true;
+}
+
+bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
+    CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+    Commands::TestNullableOptionalRequest::DecodableType const & commandData)
+{
+    Commands::TestNullableOptionalResponse::Type response;
+    response.wasPresent = commandData.arg1.HasValue();
+    if (response.wasPresent)
+    {
+        bool wasNull = commandData.arg1.Value().IsNull();
+        response.wasNull.SetValue(wasNull);
+        if (!wasNull)
+        {
+            response.value.SetValue(commandData.arg1.Value().Value());
+        }
+
+        response.originalValue.Emplace(commandData.arg1.Value());
+    }
+
+    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
+    if (err != CHIP_NO_ERROR)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+    return true;
+}
+
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
@@ -440,7 +469,7 @@ void MatterTestClusterPluginServerInitCallback(void)
     for (uint8_t index = 0; index < emberAfEndpointCount(); index++)
     {
         EndpointId endpoint = emberAfEndpointFromIndex(index);
-        if (!emberAfContainsCluster(endpoint, ZCL_TEST_CLUSTER_ID))
+        if (!emberAfContainsCluster(endpoint, TestCluster::Id))
         {
             continue;
         }

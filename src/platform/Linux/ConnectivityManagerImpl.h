@@ -38,6 +38,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/Linux/dbus/wpa/DBusWpa.h>
+#include <platform/Linux/dbus/wpa/DBusWpaBss.h>
 #include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
 #endif
@@ -73,6 +74,7 @@ struct GDBusWpaSupplicant
 
     WpaFiW1Wpa_supplicant1 * proxy;
     WpaFiW1Wpa_supplicant1Interface * iface;
+    WpaFiW1Wpa_supplicant1BSS * bss;
     gchar * interfacePath;
     gchar * networkPath;
 };
@@ -148,12 +150,15 @@ private:
     static void _OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties, gpointer user_data);
     static void _OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
+    static void _OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
 
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
     static struct GDBusWpaSupplicant mWpaSupplicant;
     static std::mutex mWpaSupplicantMutex;
 #endif
 
+    void _ReleaseNetworkInterfaces(NetworkInterface * netifp);
+    CHIP_ERROR _GetNetworkInterfaces(NetworkInterface ** netifpp);
     CHIP_ERROR _GetEthPHYRate(uint8_t & pHYRate);
     CHIP_ERROR _GetEthFullDuplex(bool & fullDuplex);
     CHIP_ERROR _GetEthTimeSinceReset(uint64_t & timeSinceReset);

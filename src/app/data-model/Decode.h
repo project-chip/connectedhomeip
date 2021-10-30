@@ -18,9 +18,11 @@
 
 #pragma once
 
+#include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
@@ -84,13 +86,45 @@ inline CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
  * CHIP_ERROR <Object>::Decode(TLVReader &reader);
  *
  */
-template <
-    typename X,
-    typename std::enable_if_t<
-        std::is_class<X>::value && std::is_same<decltype(&X::Decode), CHIP_ERROR (X::*)(TLV::TLVReader &)>::value, X> * = nullptr>
+template <typename X,
+          typename std::enable_if_t<
+              std::is_class<X>::value &&
+                  std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>())), CHIP_ERROR>::value,
+              X> * = nullptr>
 CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 {
     return x.Decode(reader);
+}
+
+/*
+ * @brief
+ *
+ * Decodes an optional value (struct field, command field, event field).
+ */
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, Optional<X> & x)
+{
+    // If we are calling this, it means we found the right tag, so just decode
+    // the item.
+    return Decode(reader, x.Emplace());
+}
+
+/*
+ * @brief
+ *
+ * Decodes a nullable value.
+ */
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
+{
+    if (reader.GetType() == TLV::kTLVType_Null)
+    {
+        x.SetNull();
+        return CHIP_NO_ERROR;
+    }
+
+    // We have a value; decode it.
+    return Decode(reader, x.SetNonNull());
 }
 
 } // namespace DataModel

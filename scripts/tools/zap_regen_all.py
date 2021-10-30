@@ -40,6 +40,11 @@ def getGlobalTemplatesTargets():
         example_name = example_name[example_name.index('examples/') + 9:]
         example_name = example_name[:example_name.index('/')]
 
+        # Ignore placeholder examples since the zap files there are not intended to
+        # be part of the tree.
+        if example_name == "placeholder":
+            continue
+
         logging.info("Found example %s (via %s)" %
                      (example_name, str(filepath)))
 

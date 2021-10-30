@@ -21,12 +21,8 @@
  ***************************************************************************/
 
 #include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
@@ -53,6 +49,7 @@ using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalCredentials;
 
 namespace {
@@ -72,6 +69,7 @@ public:
 
 private:
     CHIP_ERROR ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadRootCertificates(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -99,6 +97,24 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
     });
 }
 
+CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+        {
+            ByteSpan cert;
+
+            if (!fabricInfo.IsInitialized())
+                continue;
+
+            ReturnErrorOnFailure(fabricInfo.GetRootCert(cert));
+            ReturnErrorOnFailure(encoder.Encode(cert));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+}
+
 OperationalCredentialsAttrAccess gAttrAccess;
 
 CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -109,6 +125,9 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & 
     {
     case Attributes::FabricsList::Id: {
         return ReadFabricsList(aPath.mEndpointId, aEncoder);
+    }
+    case Attributes::TrustedRootCertificates::Id: {
+        return ReadRootCertificates(aPath.mEndpointId, aEncoder);
     }
     default:
         break;
@@ -136,10 +155,10 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
 {
     EmberAfAttributeSearchRecord record;
     record.endpoint         = 0;
-    record.clusterId        = ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID;
+    record.clusterId        = OperationalCredentials::Id;
     record.clusterMask      = CLUSTER_MASK_SERVER;
     record.manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE;
-    record.attributeId      = ZCL_FABRICS_ATTRIBUTE_ID;
+    record.attributeId      = Attributes::FabricsList::Id;
 
     // When reading or writing a List attribute the 'index' value could have 3 types of values:
     //  -1: Read/Write the whole list content, including the number of elements in the list
@@ -254,7 +273,7 @@ static FabricInfo * retrieveCurrentFabric()
         return nullptr;
     }
 
-    FabricIndex index = emberAfCurrentCommand()->source->GetSecureSession().GetFabricIndex();
+    FabricIndex index = emberAfCurrentCommand()->source->GetSessionHandle().GetFabricIndex();
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
@@ -324,7 +343,7 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSecureSession().GetFabricIndex();
+        FabricIndex currentFabricIndex = ec->GetSessionHandle().GetFabricIndex();
         ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
     }
 };
@@ -353,7 +372,7 @@ exit:
     if (err == CHIP_NO_ERROR)
     {
         chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
-        FabricIndex currentFabricIndex        = ec->GetSecureSession().GetFabricIndex();
+        FabricIndex currentFabricIndex        = ec->GetSessionHandle().GetFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
         {
             // If the current fabric is being removed, expiring all the secure sessions causes crashes as
@@ -407,8 +426,8 @@ FabricInfo gFabricBeingCommissioned;
 
 CHIP_ERROR SendNOCResponse(app::Command * commandObj, EmberAfNodeOperationalCertStatus status, uint8_t index, CharSpan debug_text)
 {
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
-                                         ZCL_NOC_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, OperationalCredentials::Id,
+                                         Commands::NOCResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
     TLV::TLVWriter * writer          = nullptr;
 
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -653,7 +672,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
         ByteSpan attestationChallenge = commandObj->GetExchangeContext()
                                             ->GetExchangeMgr()
                                             ->GetSessionManager()
-                                            ->GetSecureSession(commandObj->GetExchangeContext()->GetSecureSession())
+                                            ->GetSecureSession(commandObj->GetExchangeContext()->GetSessionHandle())
                                             ->GetCryptoContext()
                                             .GetAttestationChallenge();
 

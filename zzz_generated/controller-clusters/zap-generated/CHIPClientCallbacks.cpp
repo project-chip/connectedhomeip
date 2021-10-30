@@ -131,9 +131,7 @@ namespace {
         return true;                                                                                                               \
     }
 
-// TODO: These IM related callbacks contains small or no generated code, should be put into seperate file to reduce the size of
-// template. Singleton instance of the callbacks manager
-
+// Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
 void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::TLVReader * tlvData,
@@ -179,6 +177,54 @@ void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvDa
 
     Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> * cb =
         Callback::Callback<AudioOutputAudioOutputListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
+
+void BridgedActionsClusterActionListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<BridgedActionsActionListListAttributeCallback> * cb =
+        Callback::Callback<BridgedActionsActionListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
+
+void BridgedActionsClusterEndpointListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<BridgedActionsEndpointListListAttributeCallback> * cb =
+        Callback::Callback<BridgedActionsEndpointListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
 #if !defined(__clang__)
@@ -496,6 +542,31 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
 
     Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
         Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
+
+void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                             Callback::Cancelable * onSuccessCallback,
+                                                                             Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::ByteSpan> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback> * cb =
+        Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
 #if !defined(__clang__)
@@ -1856,6 +1927,21 @@ bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(EndpointId endpoi
     return true;
 }
 
+bool emberAfTestClusterClusterTestEnumsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, chip::VendorId arg1,
+                                                        uint8_t arg2)
+{
+    ChipLogProgress(Zcl, "TestEnumsResponse:");
+    ChipLogProgress(Zcl, "  arg1: %" PRIu16 "", arg1);
+    ChipLogProgress(Zcl, "  arg2: %" PRIu8 "", arg2);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestEnumsResponseCallback");
+
+    Callback::Callback<TestClusterClusterTestEnumsResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterTestEnumsResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, arg1, arg2);
+    return true;
+}
+
 bool emberAfTestClusterClusterTestListInt8UReverseResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                                    /* TYPE WARNING: array array defaults to */ uint8_t * arg1)
 {
@@ -1867,6 +1953,24 @@ bool emberAfTestClusterClusterTestListInt8UReverseResponseCallback(EndpointId en
     Callback::Callback<TestClusterClusterTestListInt8UReverseResponseCallback> * cb =
         Callback::Callback<TestClusterClusterTestListInt8UReverseResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, arg1);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestNullableOptionalResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                                   bool wasPresent, bool wasNull, uint8_t value,
+                                                                   uint8_t originalValue)
+{
+    ChipLogProgress(Zcl, "TestNullableOptionalResponse:");
+    ChipLogProgress(Zcl, "  wasPresent: %d", wasPresent);
+    ChipLogProgress(Zcl, "  wasNull: %d", wasNull);
+    ChipLogProgress(Zcl, "  value: %" PRIu8 "", value);
+    ChipLogProgress(Zcl, "  originalValue: %" PRIu8 "", originalValue);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestNullableOptionalResponseCallback");
+
+    Callback::Callback<TestClusterClusterTestNullableOptionalResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterTestNullableOptionalResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, wasPresent, wasNull, value, originalValue);
     return true;
 }
 

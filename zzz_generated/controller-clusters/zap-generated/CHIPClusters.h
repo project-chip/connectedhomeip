@@ -247,6 +247,47 @@ public:
     CHIP_ERROR ReportAttributeStateValue(Callback::Cancelable * onReportCallback);
 };
 
+class DLL_EXPORT BridgedActionsCluster : public ClusterBase
+{
+public:
+    BridgedActionsCluster() : ClusterBase(app::Clusters::BridgedActions::Id) {}
+    ~BridgedActionsCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR DisableAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                             uint32_t invokeID);
+    CHIP_ERROR DisableActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         uint16_t actionID, uint32_t invokeID, uint32_t duration);
+    CHIP_ERROR EnableAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                            uint32_t invokeID);
+    CHIP_ERROR EnableActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint16_t actionID, uint32_t invokeID, uint32_t duration);
+    CHIP_ERROR InstantAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                             uint32_t invokeID);
+    CHIP_ERROR InstantActionWithTransition(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t actionID, uint32_t invokeID, uint16_t transitionTime);
+    CHIP_ERROR PauseAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                           uint32_t invokeID);
+    CHIP_ERROR PauseActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t actionID, uint32_t invokeID, uint32_t duration);
+    CHIP_ERROR ResumeAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                            uint32_t invokeID);
+    CHIP_ERROR StartAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                           uint32_t invokeID);
+    CHIP_ERROR StartActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t actionID, uint32_t invokeID, uint32_t duration);
+    CHIP_ERROR StopAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                          uint32_t invokeID);
+
+    // Cluster Attributes
+    CHIP_ERROR ReadAttributeActionList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeEndpointList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSetupUrl(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+};
+
 class DLL_EXPORT BridgedDeviceBasicCluster : public ClusterBase
 {
 public:
@@ -612,6 +653,7 @@ public:
     CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTolerance(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
@@ -711,6 +753,24 @@ public:
                                           uint16_t value);
 
 private:
+};
+
+class DLL_EXPORT IlluminanceMeasurementCluster : public ClusterBase
+{
+public:
+    IlluminanceMeasurementCluster() : ClusterBase(app::Clusters::IlluminanceMeasurement::Id) {}
+    ~IlluminanceMeasurementCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTolerance(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeLightSensorType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
 };
 
 class DLL_EXPORT KeypadInputCluster : public ClusterBase
@@ -921,7 +981,7 @@ public:
 
     // Cluster Commands
     CHIP_ERROR AnnounceOtaProvider(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::ByteSpan providerLocation, uint16_t vendorId, uint8_t announcementReason,
+                                   chip::NodeId providerLocation, chip::VendorId vendorId, uint8_t announcementReason,
                                    chip::ByteSpan metadataForNode);
 
     // Cluster Attributes
@@ -1032,6 +1092,8 @@ public:
     CHIP_ERROR ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTrustedRootCertificates(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
@@ -1131,10 +1193,14 @@ public:
     CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTolerance(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeTolerance(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeTolerance(Callback::Cancelable * onReportCallback);
 };
 
 class DLL_EXPORT ScenesCluster : public ClusterBase
@@ -1254,10 +1320,14 @@ public:
     CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTolerance(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeTolerance(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeTolerance(Callback::Cancelable * onReportCallback);
 };
 
 class DLL_EXPORT TestClusterCluster : public ClusterBase
@@ -1270,6 +1340,8 @@ public:
     CHIP_ERROR Test(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR TestAddArguments(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t arg1,
                                 uint8_t arg2);
+    CHIP_ERROR TestEnumsRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                chip::VendorId arg1, uint8_t arg2);
     CHIP_ERROR TestListInt8UArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                             uint8_t arg1);
     CHIP_ERROR TestListInt8UReverseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1277,6 +1349,8 @@ public:
     CHIP_ERROR TestListStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint8_t a, bool b, uint8_t c, chip::ByteSpan d, chip::CharSpan e, uint8_t f);
     CHIP_ERROR TestNotHandled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestNullableOptionalRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint8_t arg1);
     CHIP_ERROR TestSpecific(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR TestStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          uint8_t a, bool b, uint8_t c, chip::ByteSpan d, chip::CharSpan e, uint8_t f);
@@ -1308,6 +1382,7 @@ public:
     CHIP_ERROR ReadAttributeLongCharString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeEpochUs(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeEpochS(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1352,6 +1427,8 @@ public:
                                      uint64_t value);
     CHIP_ERROR WriteAttributeEpochS(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                     uint32_t value);
+    CHIP_ERROR WriteAttributeVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      chip::VendorId value);
     CHIP_ERROR WriteAttributeUnsupported(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          bool value);
 
@@ -1397,6 +1474,7 @@ public:
                                                  Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                  Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMinSetpointDeadBand(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeSystemMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -1419,6 +1497,8 @@ public:
                                                   Callback::Cancelable * onFailureCallback, int16_t value);
     CHIP_ERROR WriteAttributeMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback, int16_t value);
+    CHIP_ERROR WriteAttributeMinSetpointDeadBand(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 int8_t value);
     CHIP_ERROR WriteAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint8_t value);
     CHIP_ERROR WriteAttributeSystemMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1635,6 +1715,7 @@ public:
                                                      Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                   uint8_t value);

@@ -63,12 +63,17 @@ public:
     UDCClientState & operator=(const UDCClientState &) = default;
     UDCClientState & operator=(UDCClientState &&) = default;
 
-    const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-    PeerAddress & GetPeerAddress() { return mPeerAddress; }
+    const PeerAddress GetPeerAddress() const { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
     const char * GetInstanceName() const { return mInstanceName; }
     void SetInstanceName(const char * instanceName) { strncpy(mInstanceName, instanceName, sizeof(mInstanceName)); }
+
+    const char * GetDeviceName() const { return mDeviceName; }
+    void SetDeviceName(const char * deviceName) { strncpy(mDeviceName, deviceName, sizeof(mDeviceName)); }
+
+    uint16_t GetLongDiscriminator() const { return mLongDiscriminator; }
+    void SetLongDiscriminator(uint16_t value) { mLongDiscriminator = value; }
 
     UDCClientProcessingState GetUDCClientProcessingState() const { return mUDCClientProcessingState; }
     void SetUDCClientProcessingState(UDCClientProcessingState state) { mUDCClientProcessingState = state; }
@@ -95,6 +100,8 @@ public:
 private:
     PeerAddress mPeerAddress;
     char mInstanceName[Dnssd::Commissionable::kInstanceNameMaxLength + 1];
+    char mDeviceName[Dnssd::kMaxDeviceNameLen + 1];
+    uint16_t mLongDiscriminator = 0;
     UDCClientProcessingState mUDCClientProcessingState;
     uint64_t mExpirationTimeMs = 0;
 };

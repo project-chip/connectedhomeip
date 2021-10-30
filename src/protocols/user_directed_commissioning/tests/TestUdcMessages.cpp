@@ -19,10 +19,10 @@ using namespace chip::Protocols::UserDirectedCommissioning;
 class DLL_EXPORT TestCallback : public UserConfirmationProvider, public InstanceNameResolver
 {
 public:
-    void OnUserDirectedCommissioningRequest(const Dnssd::DiscoveredNodeData & nodeData)
+    void OnUserDirectedCommissioningRequest(UDCClientState state)
     {
         mOnUserDirectedCommissioningRequestCalled = true;
-        mNodeData                                 = nodeData;
+        mState                                    = state;
     }
 
     void FindCommissionableNode(char * instanceName)
@@ -32,7 +32,7 @@ public:
     }
 
     // virtual ~UserConfirmationProvider() = default;
-    Dnssd::DiscoveredNodeData mNodeData;
+    UDCClientState mState;
     char * mInstanceName;
 
     bool mOnUserDirectedCommissioningRequestCalled = false;
@@ -60,48 +60,67 @@ void TestUDCServerUserConfirmationProvider(nlTestSuite * inSuite, void * inConte
     TestCallback testCallback;
     const char * instanceName1 = "servertest1";
     const char * instanceName2 = "servertest2";
+    const char * deviceName2   = "device1";
+    uint16_t disc2             = 1234;
     UDCClientState * state;
+
+    chip::Inet::IPAddress address;
+    chip::Inet::IPAddress::FromString("127.0.0.1", address); // need to populate with something
 
     // setup for tests
     udcServer.SetUDCClientProcessingState((char *) instanceName1, UDCClientProcessingState::kUserDeclined);
 
+    Dnssd::DiscoveredNodeData nodeData1;
+    nodeData1.port         = 5540;
+    nodeData1.ipAddress[0] = address;
+    nodeData1.numIPs       = 1;
+    strncpy((char *) nodeData1.instanceName, instanceName1, sizeof(nodeData1.instanceName));
+
+    Dnssd::DiscoveredNodeData nodeData2;
+    nodeData2.port              = 5540;
+    nodeData2.ipAddress[0]      = address;
+    nodeData2.numIPs            = 1;
+    nodeData2.longDiscriminator = disc2;
+    strncpy((char *) nodeData2.instanceName, instanceName2, sizeof(nodeData2.instanceName));
+    strncpy((char *) nodeData2.deviceName, deviceName2, sizeof(nodeData2.deviceName));
+
     // test empty UserConfirmationProvider
-    Dnssd::DiscoveredNodeData nodeData;
-    strncpy((char *) nodeData.instanceName, instanceName2, sizeof(nodeData.instanceName));
-    udcServer.OnCommissionableNodeFound(nodeData);
-    strncpy((char *) nodeData.instanceName, instanceName1, sizeof(nodeData.instanceName));
-    udcServer.OnCommissionableNodeFound(nodeData);
+    udcServer.OnCommissionableNodeFound(nodeData2);
+    udcServer.OnCommissionableNodeFound(nodeData1);
     state = udcServer.GetUDCClients().FindUDCClientState(instanceName1);
     NL_TEST_ASSERT(inSuite, nullptr != state);
     NL_TEST_ASSERT(inSuite, UDCClientProcessingState::kUserDeclined == state->GetUDCClientProcessingState());
+    // test other fields on UDCClientState
+    NL_TEST_ASSERT(inSuite, 0 == strcmp(state->GetInstanceName(), instanceName1));
+    // check that instance2 was found
     state = udcServer.GetUDCClients().FindUDCClientState(instanceName2);
     NL_TEST_ASSERT(inSuite, nullptr == state);
 
     // test current state check
     udcServer.SetUDCClientProcessingState((char *) instanceName1, UDCClientProcessingState::kUserDeclined);
     udcServer.SetUDCClientProcessingState((char *) instanceName2, UDCClientProcessingState::kDiscoveringNode);
-    strncpy((char *) nodeData.instanceName, instanceName2, sizeof(nodeData.instanceName));
-    udcServer.OnCommissionableNodeFound(nodeData);
-    strncpy((char *) nodeData.instanceName, instanceName1, sizeof(nodeData.instanceName));
-    udcServer.OnCommissionableNodeFound(nodeData);
+    udcServer.OnCommissionableNodeFound(nodeData2);
+    udcServer.OnCommissionableNodeFound(nodeData1);
     state = udcServer.GetUDCClients().FindUDCClientState(instanceName1);
     NL_TEST_ASSERT(inSuite, nullptr != state);
     NL_TEST_ASSERT(inSuite, UDCClientProcessingState::kUserDeclined == state->GetUDCClientProcessingState());
     state = udcServer.GetUDCClients().FindUDCClientState(instanceName2);
     NL_TEST_ASSERT(inSuite, nullptr != state);
     NL_TEST_ASSERT(inSuite, UDCClientProcessingState::kPromptingUser == state->GetUDCClientProcessingState());
+    // test other fields on UDCClientState
+    NL_TEST_ASSERT(inSuite, 0 == strcmp(state->GetInstanceName(), instanceName2));
+    NL_TEST_ASSERT(inSuite, 0 == strcmp(state->GetDeviceName(), deviceName2));
+    NL_TEST_ASSERT(inSuite, state->GetLongDiscriminator() == disc2);
 
     // test non-empty UserConfirmationProvider
     udcServer.SetUserConfirmationProvider(&testCallback);
     udcServer.SetUDCClientProcessingState((char *) instanceName1, UDCClientProcessingState::kUserDeclined);
     udcServer.SetUDCClientProcessingState((char *) instanceName2, UDCClientProcessingState::kDiscoveringNode);
-    strncpy((char *) nodeData.instanceName, instanceName1, sizeof(nodeData.instanceName));
-    udcServer.OnCommissionableNodeFound(nodeData);
+    udcServer.OnCommissionableNodeFound(nodeData1);
     NL_TEST_ASSERT(inSuite, !testCallback.mOnUserDirectedCommissioningRequestCalled);
-    strncpy((char *) nodeData.instanceName, instanceName2, sizeof(nodeData.instanceName));
-    udcServer.OnCommissionableNodeFound(nodeData);
+    udcServer.OnCommissionableNodeFound(nodeData2);
     NL_TEST_ASSERT(inSuite, testCallback.mOnUserDirectedCommissioningRequestCalled);
-    NL_TEST_ASSERT(inSuite, 0 == strcmp(testCallback.mNodeData.instanceName, instanceName2));
+    NL_TEST_ASSERT(inSuite, 0 == strcmp(testCallback.mState.GetInstanceName(), instanceName2));
 }
 
 void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)

@@ -354,7 +354,7 @@ CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, 
     VerifyOrExit(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
     VerifyOrExit(ec != nullptr, ChipLogError(Controller, "OnMessageReceived was called with null exchange"));
 
-    index = FindDeviceIndex(ec->GetSecureSession().GetPeerNodeId());
+    index = FindDeviceIndex(ec->GetSessionHandle().GetPeerNodeId());
     VerifyOrExit(index < kNumMaxActiveDevices, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
     mActiveDevices[index].OnMessageReceived(ec, payloadHeader, std::move(msgBuf));
@@ -543,9 +543,9 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 void DeviceController::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    Device * device               = nullptr;
-    Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    Device * device = nullptr;
+    Inet::InterfaceId interfaceId;
 
     err = GetDevice(nodeData.mPeerId.GetNodeId(), &device);
     SuccessOrExit(err);
@@ -819,78 +819,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Transport::PeerAddress & peerAddress,
-                                                             SerializedDevice & serialized)
-{
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
-
-    SecurePairingUsingTestSecret * testSecurePairingSecret = nullptr;
-
-    // Check that the caller has provided an IP address (instead of a BLE peer address)
-    VerifyOrExit(peerAddress.GetTransportType() == Transport::Type::kUdp, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(IsOperationalNodeId(remoteDeviceId), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
-
-    testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>();
-    VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    mDeviceBeingPaired = GetInactiveDeviceIndex();
-    VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
-    device = &mActiveDevices[mDeviceBeingPaired];
-
-    testSecurePairingSecret->ToSerializable(device->GetPairing());
-
-    device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, mFabricIndex);
-
-    device->Serialize(serialized);
-
-    err = mSystemState->SessionMgr()->NewPairing(Optional<Transport::PeerAddress>::Value(peerAddress), device->GetDeviceId(),
-                                                 testSecurePairingSecret, CryptoContext::SessionRole::kInitiator, mFabricIndex);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
-        OnSessionEstablishmentError(err);
-    }
-    SuccessOrExit(err);
-
-    mPairedDevices.Insert(device->GetDeviceId());
-    mPairedDevicesUpdated = true;
-
-    // Note - This assumes storage is synchronous, the device must be in storage before we can cleanup
-    // the rendezvous session and mark pairing success
-    PersistDevice(device);
-    // Also persist the device list at this time
-    // This makes sure that a newly added device is immediately available
-    PersistDeviceList();
-
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
-    }
-
-    RendezvousCleanup(CHIP_NO_ERROR);
-
-exit:
-    if (testSecurePairingSecret != nullptr)
-    {
-        chip::Platform::Delete(testSecurePairingSecret);
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        if (device != nullptr)
-        {
-            ReleaseDevice(device);
-            mDeviceBeingPaired = kNumMaxActiveDevices;
-        }
-    }
-
-    return err;
-}
-
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -947,8 +875,9 @@ CHIP_ERROR DeviceCommissioner::OperationalDiscoveryComplete(NodeId remoteDeviceI
     return GetConnectedDevice(remoteDeviceId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
-CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration,
-                                                       uint16_t discriminator, uint8_t option)
+CHIP_ERROR DeviceCommissioner::OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration,
+                                                                   uint16_t discriminator, uint8_t option,
+                                                                   Callback::Callback<OnOpenCommissioningWindow> * callback)
 {
     ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, deviceId);
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -980,7 +909,7 @@ CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ReturnErrorOnFailure(device->OpenCommissioningWindow(timeout, iteration, commissioningWindowOption, salt, payload));
+    ReturnErrorOnFailure(device->OpenCommissioningWindow(timeout, iteration, commissioningWindowOption, salt, callback, payload));
 
     if (commissioningWindowOption != Device::CommissioningWindowOption::kOriginalSetupCode)
     {
@@ -1650,9 +1579,17 @@ void DeviceCommissioner::FindCommissionableNode(char * instanceName)
     DiscoverCommissionableNodes(filter);
 }
 
-void DeviceCommissioner::OnUserDirectedCommissioningRequest(const Dnssd::DiscoveredNodeData & nodeData)
+void DeviceCommissioner::OnUserDirectedCommissioningRequest(UDCClientState state)
 {
-    ChipLogDetail(Controller, "------PROMPT USER!! OnUserDirectedCommissioningRequest instance=%s", nodeData.instanceName);
+    ChipLogDetail(Controller, "------PROMPT USER!! OnUserDirectedCommissioningRequest instance=%s deviceName=%s",
+                  state.GetInstanceName(), state.GetDeviceName());
+
+    if (mUdcServer != nullptr)
+    {
+        mUdcServer->PrintUDCClients();
+    }
+
+    ChipLogDetail(Controller, "------To Accept Enter: discover udc-commission <pincode> <udc-client-index>");
 }
 
 void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData)
@@ -1668,7 +1605,8 @@ void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNo
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 void DeviceControllerInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSender,
-                                                          const app::ConcreteCommandPath & aPath, TLV::TLVReader * aData)
+                                                          const app::ConcreteCommandPath & aPath,
+                                                          const chip::app::StatusIB & aStatus, TLV::TLVReader * aData)
 {
     // Generally IM has more detailed errors than ember library, here we always use the, the actual handling of the
     // commands should implement full IMDelegate.
@@ -1686,7 +1624,7 @@ void DeviceControllerInteractionModelDelegate::OnResponse(app::CommandSender * a
 }
 
 void DeviceControllerInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender,
-                                                       Protocols::InteractionModel::Status aClusterStatus, CHIP_ERROR aError)
+                                                       const chip::app::StatusIB & aStatus, CHIP_ERROR aError)
 {
     // The IMDefaultResponseCallback started out life as an Ember function, so it only accepted
     // Ember status codes. Consequently, let's convert the IM code over to a meaningful Ember status before dispatching.
@@ -1695,7 +1633,7 @@ void DeviceControllerInteractionModelDelegate::OnError(const app::CommandSender 
     // well, this will be an even bigger problem.
     //
     // For now, #10331 tracks this issue.
-    IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aClusterStatus));
+    IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aStatus.mStatus));
 }
 
 void DeviceControllerInteractionModelDelegate::OnDone(app::CommandSender * apCommandSender)
@@ -1727,29 +1665,17 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(app::ReadClient * 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                                                         const app::StatusIB & aStatusIB,
-                                                                         app::AttributePathParams & aAttributePathParams,
-                                                                         uint8_t aAttributeIndex)
+void DeviceControllerInteractionModelDelegate::OnResponse(const app::WriteClient * apWriteClient,
+                                                          const app::ConcreteAttributePath & aPath, app::StatusIB attributeStatus)
 {
-    IMWriteResponseCallback(apWriteClient, chip::app::ToEmberAfStatus(aStatusIB.mStatus));
-    return CHIP_NO_ERROR;
+    IMWriteResponseCallback(apWriteClient, attributeStatus.mStatus);
+}
+void DeviceControllerInteractionModelDelegate::OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
+{
+    IMWriteResponseCallback(apWriteClient, Protocols::InteractionModel::Status::Failure);
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseProtocolError(const app::WriteClient * apWriteClient,
-                                                                                uint8_t aAttributeIndex)
-{
-    // When WriteResponseProtocolError occurred, it means server returned an invalid packet.
-    IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
-{
-    // When WriteResponseError occurred, it means we failed to receive the response from server.
-    IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
-    return CHIP_NO_ERROR;
-}
+void DeviceControllerInteractionModelDelegate::OnDone(app::WriteClient * apWriteClient) {}
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::SubscribeResponseProcessed(const app::ReadClient * apSubscribeClient)
 {

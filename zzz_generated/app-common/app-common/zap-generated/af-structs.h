@@ -39,6 +39,23 @@ typedef struct _SimpleStruct
     uint8_t f;
 } SimpleStruct;
 
+// Struct for NullablesAndOptionalsStruct
+typedef struct _NullablesAndOptionalsStruct
+{
+    uint16_t NullableInt;
+    uint16_t OptionalInt;
+    uint16_t NullableOptionalInt;
+    chip::CharSpan NullableString;
+    chip::CharSpan OptionalString;
+    chip::CharSpan NullableOptionalString;
+    SimpleStruct NullableStruct;
+    SimpleStruct OptionalStruct;
+    SimpleStruct NullableOptionalStruct;
+    /* TYPE WARNING: array array defaults to */ uint8_t * NullableList;
+    /* TYPE WARNING: array array defaults to */ uint8_t * OptionalList;
+    /* TYPE WARNING: array array defaults to */ uint8_t * NullableOptionalList;
+} NullablesAndOptionalsStruct;
+
 // Struct for NestedStruct
 typedef struct _NestedStruct
 {
@@ -79,6 +96,17 @@ typedef struct _ContentLaunchParamater
     chip::CharSpan Value;
     /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
 } ContentLaunchParamater;
+
+// Struct for ActionStruct
+typedef struct _ActionStruct
+{
+    uint16_t ActionID;
+    chip::CharSpan Name;
+    uint8_t Type;
+    uint16_t EndpointListID;
+    uint16_t SupportedCommands;
+    uint8_t Status;
+} ActionStruct;
 
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp
@@ -148,6 +176,15 @@ typedef struct _DeviceType
     chip::DeviceTypeId type;
     uint16_t revision;
 } DeviceType;
+
+// Struct for EndpointListStruct
+typedef struct _EndpointListStruct
+{
+    uint16_t EndpointListID;
+    chip::CharSpan Name;
+    uint8_t Type;
+    chip::ByteSpan Endpoints;
+} EndpointListStruct;
 
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor

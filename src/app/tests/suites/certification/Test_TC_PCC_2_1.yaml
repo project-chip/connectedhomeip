@@ -22,13 +22,13 @@ tests:
     - label: "read the mandatory attribute: MaxPressure"
       disabled: true
       command: "readAttribute"
-      attribute: "max pressure"
+      attribute: "MaxPressure"
       response:
           value: null
 
     - label: "read the mandatory attribute: MaxPressure"
       command: "readAttribute"
-      attribute: "max pressure"
+      attribute: "MaxPressure"
       response:
           constraints:
               type: int16
@@ -36,14 +36,14 @@ tests:
     - label: "read the mandatory attribute: MaxSpeed"
       disabled: true
       command: "readAttribute"
-      attribute: "max speed"
+      attribute: "MaxSpeed"
       response:
           value: null
 
     - label: "read the mandatory attribute: MaxSpeed"
       disabled: true
       command: "readAttribute"
-      attribute: "max speed"
+      attribute: "MaxSpeed"
       response:
           constraints:
               type: uint16
@@ -51,14 +51,14 @@ tests:
     - label: "read the mandatory attribute: MaxFlow"
       disabled: true
       command: "readAttribute"
-      attribute: "max flow"
+      attribute: "MaxFlow"
       response:
           value: null
 
     - label: "read the mandatory attribute: MaxFlow"
       disabled: true
       command: "readAttribute"
-      attribute: "max flow"
+      attribute: "MaxFlow"
       response:
           constraints:
               type: uint16
@@ -66,13 +66,13 @@ tests:
     - label: "read the mandatory attribute: EffectiveOperationMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective operation mode"
+      attribute: "EffectiveOperationMode"
       response:
           value: desc
 
     - label: "read the mandatory attribute: EffectiveOperationMode"
       command: "readAttribute"
-      attribute: "effective operation mode"
+      attribute: "EffectiveOperationMode"
       response:
           constraints:
               type: enum8
@@ -80,13 +80,13 @@ tests:
     - label: "read the mandatory attribute: EffectiveControlMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective control mode"
+      attribute: "EffectiveControlMode"
       response:
           value: desc
 
     - label: "read the mandatory attribute: EffectiveControlMode"
       command: "readAttribute"
-      attribute: "effective control mode"
+      attribute: "EffectiveControlMode"
       response:
           constraints:
               type: enum8
@@ -94,13 +94,13 @@ tests:
     - label: "read the mandatory attribute: Capacity"
       disabled: true
       command: "readAttribute"
-      attribute: "capacity"
+      attribute: "Capacity"
       response:
           value: null
 
     - label: "read the mandatory attribute: Capacity"
       command: "readAttribute"
-      attribute: "capacity"
+      attribute: "Capacity"
       response:
           constraints:
               type: int16
@@ -108,7 +108,7 @@ tests:
     - label: "write to the mandatory attribute: MaxPressure"
       disabled: true
       command: "writeAttribute"
-      attribute: "max pressure"
+      attribute: "MaxPressure"
       arguments:
           value: null
       response:
@@ -117,7 +117,7 @@ tests:
     - label: "write to the mandatory attribute: MaxSpeed"
       disabled: true
       command: "writeAttribute"
-      attribute: "max speed"
+      attribute: "MaxSpeed"
       arguments:
           value: null
       response:
@@ -126,7 +126,7 @@ tests:
     - label: "write to the mandatory attribute: MaxFlow"
       disabled: true
       command: "writeAttribute"
-      attribute: "max flow"
+      attribute: "MaxFlow"
       arguments:
           value: null
       response:
@@ -135,7 +135,7 @@ tests:
     - label: "write to the mandatory attribute: EffectiveOperationMode"
       disabled: true
       command: "writeAttribute"
-      attribute: "effective operation mode"
+      attribute: "EffectiveOperationMode"
       arguments:
           value: desc
       response:
@@ -144,7 +144,7 @@ tests:
     - label: "write to the mandatory attribute: EffectiveControlMode"
       disabled: true
       command: "writeAttribute"
-      attribute: "effective control mode"
+      attribute: "EffectiveControlMode"
       arguments:
           value: desc
       response:
@@ -153,7 +153,7 @@ tests:
     - label: "write to the mandatory attribute: Capacity"
       disabled: true
       command: "writeAttribute"
-      attribute: "capacity"
+      attribute: "Capacity"
       arguments:
           value: null
       response:
@@ -162,13 +162,13 @@ tests:
     - label: "read the mandatory attribute: MaxPressure"
       disabled: true
       command: "readAttribute"
-      attribute: "max pressure"
+      attribute: "MaxPressure"
       response:
           value: null
 
     - label: "read the mandatory attribute: MaxPressure"
       command: "readAttribute"
-      attribute: "max pressure"
+      attribute: "MaxPressure"
       response:
           constraints:
               type: int16
@@ -176,14 +176,14 @@ tests:
     - label: "read the mandatory attribute: MaxSpeed"
       disabled: true
       command: "readAttribute"
-      attribute: "max speed"
+      attribute: "MaxSpeed"
       response:
           value: null
 
     - label: "read the mandatory attribute: MaxSpeed"
       disabled: true
       command: "readAttribute"
-      attribute: "max speed"
+      attribute: "MaxSpeed"
       response:
           constraints:
               type: uint16
@@ -191,14 +191,14 @@ tests:
     - label: "read the mandatory attribute: MaxFlow"
       disabled: true
       command: "readAttribute"
-      attribute: "max flow"
+      attribute: "MaxFlow"
       response:
           value: null
 
     - label: "read the mandatory attribute: MaxFlow"
       disabled: true
       command: "readAttribute"
-      attribute: "max flow"
+      attribute: "MaxFlow"
       response:
           constraints:
               type: uint16
@@ -206,13 +206,13 @@ tests:
     - label: "read the mandatory attribute: EffectiveOperationMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective operation mode"
+      attribute: "EffectiveOperationMode"
       response:
           value: desc
 
     - label: "read the mandatory attribute: EffectiveOperationMode"
       command: "readAttribute"
-      attribute: "effective operation mode"
+      attribute: "EffectiveOperationMode"
       response:
           constraints:
               type: enum8
@@ -220,13 +220,13 @@ tests:
     - label: "read the mandatory attribute: EffectiveControlMode"
       disabled: true
       command: "readAttribute"
-      attribute: "effective control mode"
+      attribute: "EffectiveControlMode"
       response:
           value: desc
 
     - label: "read the mandatory attribute: EffectiveControlMode"
       command: "readAttribute"
-      attribute: "effective control mode"
+      attribute: "EffectiveControlMode"
       response:
           constraints:
               type: enum8
@@ -234,13 +234,13 @@ tests:
     - label: "read the mandatory attribute: Capacity"
       disabled: true
       command: "readAttribute"
-      attribute: "capacity"
+      attribute: "Capacity"
       response:
           value: null
 
     - label: "read the mandatory attribute: Capacity"
       command: "readAttribute"
-      attribute: "capacity"
+      attribute: "Capacity"
       response:
           constraints:
               type: int16
@@ -400,14 +400,14 @@ tests:
     - label: "read the optional attribute: PumpStatus"
       disabled: true
       command: "readAttribute"
-      attribute: "pump status"
+      attribute: "PumpStatus"
       response:
           value: 0
 
     - label: "read the optional attribute: PumpStatus"
       disabled: true
       command: "readAttribute"
-      attribute: "pump status"
+      attribute: "PumpStatus"
       response:
           constraints:
               type: map16
@@ -415,14 +415,14 @@ tests:
     - label: "read the optional attribute: Speed"
       disabled: true
       command: "readAttribute"
-      attribute: "speed"
+      attribute: "Speed"
       response:
           value: null
 
     - label: "read the optional attribute: Speed"
       disabled: true
       command: "readAttribute"
-      attribute: "speed"
+      attribute: "Speed"
       response:
           constraints:
               type: uint16
@@ -430,14 +430,14 @@ tests:
     - label: "read the optional attribute: LifetimeRunningHours"
       disabled: true
       command: "readAttribute"
-      attribute: "lifetime running hours"
+      attribute: "LifetimeRunningHours"
       response:
           value: 0
 
     - label: "read the optional attribute: LifetimeRunningHours"
       disabled: true
       command: "readAttribute"
-      attribute: "lifetime running hours"
+      attribute: "LifetimeRunningHours"
       response:
           constraints:
               type: uint24
@@ -445,14 +445,14 @@ tests:
     - label: "read the optional attribute: Power"
       disabled: true
       command: "readAttribute"
-      attribute: "power"
+      attribute: "Power"
       response:
           value: null
 
     - label: "read the optional attribute: Power"
       disabled: true
       command: "readAttribute"
-      attribute: "power"
+      attribute: "Power"
       response:
           constraints:
               type: uint24
@@ -460,14 +460,14 @@ tests:
     - label: "read the optional attribute: LifetimeEnergyConsumed"
       disabled: true
       command: "readAttribute"
-      attribute: "lifetime energy consumed"
+      attribute: "LifetimeEnergyConsumed"
       response:
           value: 0
 
     - label: "read the optional attribute: LifetimeEnergyConsumed"
       disabled: true
       command: "readAttribute"
-      attribute: "lifetime energy consumed"
+      attribute: "LifetimeEnergyConsumed"
       response:
           constraints:
               type: uint32
@@ -565,7 +565,7 @@ tests:
     - label: "write to the optional attribute: PumpStatus"
       disabled: true
       command: "writeAttribute"
-      attribute: "pump status"
+      attribute: "PumpStatus"
       arguments:
           value: 0
       response:
@@ -574,7 +574,7 @@ tests:
     - label: "write to the optional attribute: Speed"
       disabled: true
       command: "writeAttribute"
-      attribute: "speed"
+      attribute: "Speed"
       arguments:
           value: null
       response:
@@ -583,7 +583,7 @@ tests:
     - label: "write to the optional attribute: LifetimeRunningHours"
       disabled: true
       command: "writeAttribute"
-      attribute: "lifetime running hours"
+      attribute: "LifetimeRunningHours"
       arguments:
           value: 0
       response:
@@ -592,7 +592,7 @@ tests:
     - label: "write to the optional attribute: Power"
       disabled: true
       command: "writeAttribute"
-      attribute: "power"
+      attribute: "Power"
       arguments:
           value: null
       response:
@@ -601,7 +601,7 @@ tests:
     - label: "write to the optional attribute: LifetimeEnergyConsumed"
       disabled: true
       command: "writeAttribute"
-      attribute: "lifetime energy consumed"
+      attribute: "LifetimeEnergyConsumed"
       arguments:
           value: 0
       response:
@@ -762,14 +762,14 @@ tests:
     - label: "read the optional attribute: PumpStatus"
       disabled: true
       command: "readAttribute"
-      attribute: "pump status"
+      attribute: "PumpStatus"
       response:
           value: 0
 
     - label: "read the optional attribute: PumpStatus"
       disabled: true
       command: "readAttribute"
-      attribute: "pump status"
+      attribute: "PumpStatus"
       response:
           constraints:
               type: map16
@@ -777,14 +777,14 @@ tests:
     - label: "read the optional attribute: Speed"
       disabled: true
       command: "readAttribute"
-      attribute: "speed"
+      attribute: "Speed"
       response:
           value: null
 
     - label: "read the optional attribute: Speed"
       disabled: true
       command: "readAttribute"
-      attribute: "speed"
+      attribute: "Speed"
       response:
           constraints:
               type: uint16
@@ -792,14 +792,14 @@ tests:
     - label: "read the optional attribute: LifetimeRunningHours"
       disabled: true
       command: "readAttribute"
-      attribute: "lifetime running hours"
+      attribute: "LifetimeRunningHours"
       response:
           value: 0
 
     - label: "read the optional attribute: LifetimeRunningHours"
       disabled: true
       command: "readAttribute"
-      attribute: "lifetime running hours"
+      attribute: "LifetimeRunningHours"
       response:
           constraints:
               type: uint24
@@ -807,14 +807,14 @@ tests:
     - label: "read the optional attribute: Power"
       disabled: true
       command: "readAttribute"
-      attribute: "power"
+      attribute: "Power"
       response:
           value: null
 
     - label: "read the optional attribute: Power"
       disabled: true
       command: "readAttribute"
-      attribute: "power"
+      attribute: "Power"
       response:
           constraints:
               type: uint24
@@ -822,14 +822,14 @@ tests:
     - label: "read the optional attribute: LifetimeEnergyConsumed"
       disabled: true
       command: "readAttribute"
-      attribute: "lifetime energy consumed"
+      attribute: "LifetimeEnergyConsumed"
       response:
           value: 0
 
     - label: "read the optional attribute: LifetimeEnergyConsumed"
       disabled: true
       command: "readAttribute"
-      attribute: "lifetime energy consumed"
+      attribute: "LifetimeEnergyConsumed"
       response:
           constraints:
               type: uint32

@@ -99,7 +99,7 @@ void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
     packetInfo.DestAddress = ipAddress;
     packetInfo.SrcPort     = kMdnsPort;
     packetInfo.DestPort    = kMdnsPort;
-    packetInfo.Interface   = INET_NULL_INTERFACEID;
+    packetInfo.Interface   = InterfaceId::Null();
 
     responder.AddAllResponses(&packetInfo, &acc);
 }

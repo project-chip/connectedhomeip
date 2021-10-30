@@ -143,8 +143,11 @@ typedef void (*TvChannelClusterChangeChannelResponseCallback)(void * context,
                                                               uint8_t ErrorType);
 typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
 typedef void (*TestClusterClusterTestAddArgumentsResponseCallback)(void * context, uint8_t returnValue);
+typedef void (*TestClusterClusterTestEnumsResponseCallback)(void * context, chip::VendorId arg1, uint8_t arg2);
 typedef void (*TestClusterClusterTestListInt8UReverseResponseCallback)(void * context,
                                                                        /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+typedef void (*TestClusterClusterTestNullableOptionalResponseCallback)(void * context, bool wasPresent, bool wasNull, uint8_t value,
+                                                                       uint8_t originalValue);
 typedef void (*TestClusterClusterTestSpecificResponseCallback)(void * context, uint8_t returnValue);
 
 // List specific responses
@@ -159,6 +162,18 @@ void AudioOutputClusterAudioOutputListListAttributeFilter(chip::TLV::TLVReader *
 typedef void (*AudioOutputAudioOutputListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & data);
+void BridgedActionsClusterActionListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
+                                                        chip::Callback::Cancelable * onFailureCallback);
+typedef void (*BridgedActionsActionListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & data);
+void BridgedActionsClusterEndpointListListAttributeFilter(chip::TLV::TLVReader * data,
+                                                          chip::Callback::Cancelable * onSuccessCallback,
+                                                          chip::Callback::Cancelable * onFailureCallback);
+typedef void (*BridgedActionsEndpointListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+        data);
 void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                 chip::Callback::Cancelable * onSuccessCallback,
                                                                 chip::Callback::Cancelable * onFailureCallback);
@@ -229,6 +244,11 @@ typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & data);
+void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                             chip::Callback::Cancelable * onSuccessCallback,
+                                                                             chip::Callback::Cancelable * onFailureCallback);
+typedef void (*OperationalCredentialsTrustedRootCertificatesListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
 void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(chip::TLV::TLVReader * data,
                                                               chip::Callback::Cancelable * onSuccessCallback,
                                                               chip::Callback::Cancelable * onFailureCallback);

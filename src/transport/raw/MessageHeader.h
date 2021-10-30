@@ -110,6 +110,11 @@ enum class SecFlagValues : uint8_t
     kMsgExtensionFlag = 0b00100000,
 };
 
+enum SecFlagMask
+{
+    kSessionTypeMask = 0b00000011, ///< Mask to extract sessionType
+};
+
 using MsgFlags = BitFlags<MsgFlagValues>;
 using SecFlags = BitFlags<SecFlagValues>;
 
@@ -157,6 +162,18 @@ public:
 
     uint16_t GetSessionId() const { return mSessionId; }
     Header::SessionType GetSessionType() const { return mSessionType; }
+
+    uint8_t GetMessageFlags() const { return mMsgFlags.Raw(); }
+
+    uint8_t GetSecurityFlags() const { return mSecFlags.Raw(); }
+
+    void SetMessageFlags(uint8_t flags) { mMsgFlags.SetRaw(flags); }
+
+    void SetSecurityFlags(uint8_t securityFlags)
+    {
+        mSecFlags.SetRaw(securityFlags);
+        mSessionType = static_cast<Header::SessionType>(securityFlags & Header::SecFlagMask::kSessionTypeMask);
+    }
 
     bool IsGroupSession() const { return mSessionType == Header::SessionType::kGroupSession; }
     bool IsUnicastSession() const { return mSessionType == Header::SessionType::kUnicastSession; }

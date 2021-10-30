@@ -231,7 +231,7 @@ private:
  *
  *   @warning
  *     Do not alter the contents of this class without first reading and understanding
- *     the code/comments in IPEndPointBasis::GetPacketInfo().
+ *     the code/comments in UDPEndPoint::GetPacketInfo().
  */
 class IPPacketInfo
 {

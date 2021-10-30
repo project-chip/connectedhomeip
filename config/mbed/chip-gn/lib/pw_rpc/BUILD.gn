@@ -18,6 +18,9 @@ import("$dir_pw_build/target_types.gni")
 
 declare_args() {
   chip_build_pw_rpc_echo_proto = false
+  chip_build_pw_rpc_common_proto = false
+  chip_build_pw_rpc_lighting_proto = false
+  chip_build_pw_rpc_locking_proto = false
 }
 
 static_library("pw_rpc") {
@@ -35,6 +38,23 @@ static_library("pw_rpc") {
 
   if (chip_build_pw_rpc_echo_proto) {
     deps += [ "$dir_pw_rpc/nanopb:echo_service" ]
+  }
+
+  if (chip_build_pw_rpc_common_proto) {
+    deps += [
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+    ]
+  }
+
+  if (chip_build_pw_rpc_lighting_proto) {
+    deps +=
+        [ "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc" ]
+  }
+
+  if (chip_build_pw_rpc_locking_proto) {
+    deps +=
+        [ "${chip_root}/examples/common/pigweed:locking_service.nanopb_rpc" ]
   }
 
   deps += pw_build_LINK_DEPS

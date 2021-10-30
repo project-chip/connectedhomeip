@@ -27,6 +27,7 @@ import sys
 import logging
 import time
 import ctypes
+import chip.clusters as Clusters
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -186,6 +187,23 @@ class BaseTestHelper:
             return False
         return True
 
+    def TestOnOffCluster(self, nodeid: int, endpoint: int, group: int):
+        self.logger.info(
+            "Sending On/Off commands to device {} endpoint {}".format(nodeid, endpoint))
+        err, resp = self.devCtrl.ZCLSend("OnOff", "On", nodeid,
+                                         endpoint, group, {}, blocking=True)
+        if err != 0 or resp is None or resp.Status != 0:
+            self.logger.error(
+                "failed to send OnOff.On: error is {} with im response{}".format(err, resp))
+            return False
+        err, resp = self.devCtrl.ZCLSend("OnOff", "Off", nodeid,
+                                         endpoint, group, {}, blocking=True)
+        if err != 0 or resp is None or resp.Status != 0:
+            self.logger.error(
+                "failed to send OnOff.Off: error is {} with im response {}".format(err, resp))
+            return False
+        return True
+
     def TestLevelControlCluster(self, nodeid: int, endpoint: int, group: int):
         self.logger.info(
             f"Sending MoveToLevel command to device {nodeid} endpoint {endpoint}")
@@ -279,17 +297,21 @@ class BaseTestHelper:
         failed_zcl = []
         for req in requests:
             try:
-                res = self.devCtrl.ZCLWriteAttribute(cluster=req.cluster,
-                                                     attribute=req.attribute,
-                                                     nodeid=nodeid,
-                                                     endpoint=endpoint,
-                                                     groupid=group,
-                                                     value=req.value)
-                TestResult(f"Write attribute {req.cluster}.{req.attribute}", res).assertStatusEqual(
-                    req.expected_status)
-                if req.expected_status != IM.Status.Success:
-                    # If the write interaction is expected to success, proceed to verify it.
-                    continue
+                try:
+                    self.devCtrl.ZCLWriteAttribute(cluster=req.cluster,
+                                                   attribute=req.attribute,
+                                                   nodeid=nodeid,
+                                                   endpoint=endpoint,
+                                                   groupid=group,
+                                                   value=req.value)
+                    if req.expected_status != IM.Status.Success:
+                        raise AssertionError(
+                            f"Write attribute {req.cluster}.{req.attribute} expects failure but got success response")
+                except Exception as ex:
+                    if req.expected_status != IM.Status.Success:
+                        continue
+                    else:
+                        raise ex
                 res = self.devCtrl.ZCLReadAttribute(
                     cluster=req.cluster, attribute=req.attribute, nodeid=nodeid, endpoint=endpoint, groupid=group)
                 TestResult(f"Read attribute {req.cluster}.{req.attribute}", res).assertValueEqual(

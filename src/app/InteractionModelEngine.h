@@ -132,13 +132,13 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no WriteClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, uint64_t aApplicationIdentifier = 0);
+    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * callback);
 
     /**
      *  Allocate a ReadClient that can be used to do a read interaction.  If the call succeeds, the consumer
      *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
      *
-     *  @param[inout] 	apReadClient	    A double pointer to a ReadClient that is updated to point to a valid ReadClient
+     *  @param[in,out] 	apReadClient	      A double pointer to a ReadClient that is updated to point to a valid ReadClient
      *                                      on successful completion of this function. On failure, it will be updated to point to
      *                                      nullptr.
      *  @param[in]      aInteractionType    Type of interaction (read or subscription) that the requested ReadClient should execute.
@@ -155,6 +155,9 @@ public:
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadClients() const;
+
+    uint32_t GetNumActiveWriteHandlers() const;
+    uint32_t GetNumActiveWriteClients() const;
 
     /**
      *  Get read client index in mReadClients

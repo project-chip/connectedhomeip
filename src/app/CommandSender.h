@@ -66,9 +66,14 @@ public:
          *
          * @param[in] apCommandSender: The command sender object that initiated the command transaction.
          * @param[in] aPath: The command path field in invoke command response.
+         * @param[in] aStatusIB: It will always have a success status. If apData is null, it can be any success status, including
+         *                       possibly a cluster-specific one.   If apData is not null it aStatusIB will always be a generic
+         * SUCCESS status with no-cluster specific information.
          * @param[in] aData: The command data, will be nullptr if the server returns a StatusIB.
          */
-        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, TLV::TLVReader * aData) {}
+        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
+                                TLV::TLVReader * apData)
+        {}
 
         /**
          * OnError will be called when an error occurr *after* a successful call to SendCommandRequest(). The following
@@ -85,13 +90,10 @@ public:
          * receives an OnDone call to destroy and free the object.
          *
          * @param[in] apCommandSender: The command sender object that initiated the command transaction.
-         * @param[in] aInteractionModelStatus: Contains an IM status code. This SHALL never be IM::Success, and will contain a valid
-         * server-side emitted error if aProtocolError == CHIP_ERROR_IM_STATUS_CODE_RECEIVED.
+         * @param[in] aStatusIB: The status code including IM status code and optional cluster status code
          * @param[in] aError: A system error code that conveys the overall error code.
          */
-        virtual void OnError(const CommandSender * apCommandSender, Protocols::InteractionModel::Status aInteractionModelStatus,
-                             CHIP_ERROR aError)
-        {}
+        virtual void OnError(const CommandSender * apCommandSender, const StatusIB & aStatusIB, CHIP_ERROR aError) {}
 
         /**
          * OnDone will be called when CommandSender has finished all work and is safe to destory and free the
@@ -104,7 +106,7 @@ public:
          *
          * This function must be implemented to destroy the CommandSender object.
          *
-         * @param[in] apCommandSender: The command sender object of the terminated invoke command transaction.
+         * @param[in] apCommandSender   The command sender object of the terminated invoke command transaction.
          */
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
@@ -122,8 +124,8 @@ public:
      * object that can be encoded using the DataModel::Encode machinery and
      * exposes the right command id will work.
      *
-     * @param [in] aRequestCommandPath the path of the command being requested.
-     * @param [in] aData the data for the request.
+     * @param [in] aCommandPath  The path of the command being requested.
+     * @param [in] aData         The data for the request.
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
@@ -135,8 +137,6 @@ public:
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
-    // TODO: issue #6792 - the secure session parameter should be made non-optional and passed by reference.
-    //
     // Sends a queued up command request to the target encapsulated by the secureSession handle.
     //
     // Upon successful return from this call, all subsequent errors that occur during this interaction
@@ -153,8 +153,7 @@ public:
     // Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
     // Default timeout value will be used otherwise.
     //
-    CHIP_ERROR SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
-                                  System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
     // ExchangeDelegate interface implementation.  Private so people won't

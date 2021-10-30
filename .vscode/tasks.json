@@ -184,7 +184,13 @@
             "type": "pickString",
             "id": "mbedApp",
             "description": "What mbed application do you want to use?",
-            "options": ["lock-app", "lighting-app", "pigweed-app"],
+            "options": [
+                "lock-app",
+                "lighting-app",
+                "pigweed-app",
+                "all-clusters-app",
+                "shell"
+            ],
             "default": "lock-app"
         },
         {

@@ -28,7 +28,6 @@
 #include <utility>
 
 #include <inet/IPAddress.h>
-#include <inet/IPEndPointBasis.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -269,6 +268,9 @@ public:
         return session.HasValue() ? MakeOptional<SessionHandle>(session.Value()) : NullOptional;
     }
 
+    // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
+    SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
+
 private:
     /**
      *    The State of a secure transport object.
@@ -313,8 +315,12 @@ private:
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param);
 
-    void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                               System::PacketBufferHandle && msg);
+    void SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                      System::PacketBufferHandle && msg);
+
+    void SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                    System::PacketBufferHandle && msg);
+
     void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                          System::PacketBufferHandle && msg);
 

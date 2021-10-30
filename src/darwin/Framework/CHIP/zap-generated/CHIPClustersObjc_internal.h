@@ -61,6 +61,10 @@
 @property (readonly) chip::Controller::BooleanStateCluster cppCluster;
 @end
 
+@interface CHIPBridgedActions ()
+@property (readonly) chip::Controller::BridgedActionsCluster cppCluster;
+@end
+
 @interface CHIPBridgedDeviceBasic ()
 @property (readonly) chip::Controller::BridgedDeviceBasicCluster cppCluster;
 @end
@@ -119,6 +123,10 @@
 
 @interface CHIPIdentify ()
 @property (readonly) chip::Controller::IdentifyCluster cppCluster;
+@end
+
+@interface CHIPIlluminanceMeasurement ()
+@property (readonly) chip::Controller::IlluminanceMeasurementCluster cppCluster;
 @end
 
 @interface CHIPKeypadInput ()

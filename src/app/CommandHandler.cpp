@@ -82,6 +82,8 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     ReturnErrorOnFailure(Finalize(commandPacket));
     ReturnErrorOnFailure(
         mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket)));
+    // The ExchangeContext is automatically freed here, and it makes mpExchangeCtx be temporarily dangling, but in
+    // all cases, we are going to call Close immediately after this function, which nulls out mpExchangeCtx.
 
     MoveToState(CommandState::CommandSent);
 
@@ -153,7 +155,9 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus)
+CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aCommandPath,
+                                             const Protocols::InteractionModel::Status aStatus,
+                                             const Optional<ClusterStatus> & aClusterStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusIB::Builder statusIBBuilder;
@@ -174,7 +178,8 @@ CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, c
     // above is always an IM code. Instead of fixing all the callers (which is a fairly sizeable change), we'll embark on fixing
     // this more completely when we fix #9530.
     //
-    statusIB.mStatus = aStatus;
+    statusIB.mStatus        = aStatus;
+    statusIB.mClusterStatus = aClusterStatus;
     statusIBBuilder.EncodeStatusIB(statusIB);
     err = statusIBBuilder.GetError();
     SuccessOrExit(err);
@@ -183,6 +188,24 @@ CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, c
 
 exit:
     return err;
+}
+
+CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus)
+{
+    Optional<ClusterStatus> clusterStatus = Optional<ClusterStatus>::Missing();
+    return AddStatusInternal(aCommandPath, aStatus, clusterStatus);
+}
+
+CHIP_ERROR CommandHandler::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
+{
+    Optional<ClusterStatus> clusterStatus(aClusterStatus);
+    return AddStatusInternal(aCommandPath, Protocols::InteractionModel::Status::Success, clusterStatus);
+}
+
+CHIP_ERROR CommandHandler::AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
+{
+    Optional<ClusterStatus> clusterStatus(aClusterStatus);
+    return AddStatusInternal(aCommandPath, Protocols::InteractionModel::Status::Failure, clusterStatus);
 }
 
 CHIP_ERROR CommandHandler::PrepareResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommand)

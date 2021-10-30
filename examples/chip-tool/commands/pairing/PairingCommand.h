@@ -31,7 +31,6 @@
 enum class PairingMode
 {
     None,
-    Bypass,
     QRCode,
     ManualCode,
     Ble,
@@ -59,8 +58,10 @@ public:
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
         CHIPCommand(commandName),
         mPairingMode(mode), mNetworkType(networkType),
-        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, INET_NULL_INTERFACEID },
-        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() },
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
+        mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
 
@@ -81,10 +82,6 @@ public:
         switch (mode)
         {
         case PairingMode::None:
-            break;
-        case PairingMode::Bypass:
-            AddArgument("device-remote-ip", &mRemoteAddr);
-            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             break;
         case PairingMode::QRCode:
         case PairingMode::ManualCode:
@@ -176,7 +173,6 @@ private:
     CHIP_ERROR PairWithQRCode(NodeId remoteId);
     CHIP_ERROR PairWithManualCode(NodeId remoteId);
     CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
-    CHIP_ERROR PairWithoutSecurity(NodeId remoteId, PeerAddress address);
     CHIP_ERROR Unpair(NodeId remoteId);
     CHIP_ERROR OpenCommissioningWindow();
 
@@ -220,7 +216,9 @@ private:
 
     static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+    static void OnOpenCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload);
 
     chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindow> mOnOpenCommissioningWindowCallback;
 };

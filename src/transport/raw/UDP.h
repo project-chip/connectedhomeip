@@ -28,8 +28,8 @@
 #include <utility>
 
 #include <inet/IPAddress.h>
-#include <inet/IPEndPointBasis.h>
 #include <inet/InetInterface.h>
+#include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPCore.h>
 #include <transport/raw/Base.h>
 
@@ -74,7 +74,7 @@ private:
     Inet::InetLayer * mLayer         = nullptr;                    ///< Associated inet layer
     Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
     uint16_t mListenPort             = CHIP_PORT;                  ///< UDP listen port
-    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;      ///< Interface to listen on
+    Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();  ///< Interface to listen on
 };
 
 /** Implements a transport using UDP. */
@@ -122,7 +122,7 @@ public:
 
 private:
     // UDP message receive handler.
-    static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle && buffer,
+    static void OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle && buffer,
                              const Inet::IPPacketInfo * pktInfo);
 
     Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                       ///< UDP socket used by the transport

@@ -1344,6 +1344,200 @@
           ]
         },
         {
+          "name": "Bridged Actions",
+          "code": 37,
+          "mfgCode": null,
+          "define": "BRIDGED_ACTIONS_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "InstantAction",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "InstantActionWithTransition",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "StartAction",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "StartActionWithDuration",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "StopAction",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "PauseAction",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "PauseActionWithDuration",
+              "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "ResumeAction",
+              "code": 7,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "EnableAction",
+              "code": 8,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "EnableActionWithDuration",
+              "code": 9,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "DisableAction",
+              "code": 10,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "DisableActionWithDuration",
+              "code": 11,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Bridged Actions",
+          "code": 37,
+          "mfgCode": null,
+          "define": "BRIDGED_ACTIONS_CLUSTER",
+          "side": "server",
+          "enabled": 0,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "action list",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "endpoint list",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "setup url",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "www.signify.com",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Basic",
           "code": 40,
           "mfgCode": null,
@@ -5138,6 +5332,21 @@
               "reportableChange": 0
             },
             {
+              "name": "TrustedRootCertificates",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -6509,6 +6718,21 @@
               "reportableChange": 0
             },
             {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -6705,7 +6929,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "max pressure",
+              "name": "MaxPressure",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -6720,7 +6944,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max speed",
+              "name": "MaxSpeed",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -6735,7 +6959,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max flow",
+              "name": "MaxFlow",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -6750,7 +6974,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min const pressure",
+              "name": "MinConstPressure",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -6765,7 +6989,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max const pressure",
+              "name": "MaxConstPressure",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -6780,7 +7004,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min comp pressure",
+              "name": "MinCompPressure",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -6795,7 +7019,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max comp pressure",
+              "name": "MaxCompPressure",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -6810,7 +7034,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min const speed",
+              "name": "MinConstSpeed",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -6825,7 +7049,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max const speed",
+              "name": "MaxConstSpeed",
               "code": 8,
               "mfgCode": null,
               "side": "server",
@@ -6840,7 +7064,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min const flow",
+              "name": "MinConstFlow",
               "code": 9,
               "mfgCode": null,
               "side": "server",
@@ -6855,7 +7079,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max const flow",
+              "name": "MaxConstFlow",
               "code": 10,
               "mfgCode": null,
               "side": "server",
@@ -6870,7 +7094,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min const temp",
+              "name": "MinConstTemp",
               "code": 11,
               "mfgCode": null,
               "side": "server",
@@ -6885,7 +7109,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max const temp",
+              "name": "MaxConstTemp",
               "code": 12,
               "mfgCode": null,
               "side": "server",
@@ -6900,7 +7124,7 @@
               "reportableChange": 0
             },
             {
-              "name": "pump status",
+              "name": "PumpStatus",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -6915,7 +7139,7 @@
               "reportableChange": 0
             },
             {
-              "name": "effective operation mode",
+              "name": "EffectiveOperationMode",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -6930,7 +7154,7 @@
               "reportableChange": 0
             },
             {
-              "name": "effective control mode",
+              "name": "EffectiveControlMode",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -6945,7 +7169,7 @@
               "reportableChange": 0
             },
             {
-              "name": "capacity",
+              "name": "Capacity",
               "code": 19,
               "mfgCode": null,
               "side": "server",
@@ -6960,7 +7184,7 @@
               "reportableChange": 0
             },
             {
-              "name": "speed",
+              "name": "Speed",
               "code": 20,
               "mfgCode": null,
               "side": "server",
@@ -6975,7 +7199,7 @@
               "reportableChange": 0
             },
             {
-              "name": "lifetime running hours",
+              "name": "LifetimeRunningHours",
               "code": 21,
               "mfgCode": null,
               "side": "server",
@@ -6990,7 +7214,7 @@
               "reportableChange": 0
             },
             {
-              "name": "power",
+              "name": "Power",
               "code": 22,
               "mfgCode": null,
               "side": "server",
@@ -7005,7 +7229,7 @@
               "reportableChange": 0
             },
             {
-              "name": "lifetime energy consumed",
+              "name": "LifetimeEnergyConsumed",
               "code": 23,
               "mfgCode": null,
               "side": "server",
@@ -7020,7 +7244,7 @@
               "reportableChange": 0
             },
             {
-              "name": "operation mode",
+              "name": "OperationMode",
               "code": 32,
               "mfgCode": null,
               "side": "server",
@@ -7035,7 +7259,7 @@
               "reportableChange": 0
             },
             {
-              "name": "control mode",
+              "name": "ControlMode",
               "code": 33,
               "mfgCode": null,
               "side": "server",
@@ -7050,7 +7274,7 @@
               "reportableChange": 0
             },
             {
-              "name": "alarm mask",
+              "name": "AlarmMask",
               "code": 34,
               "mfgCode": null,
               "side": "server",
@@ -7382,6 +7606,21 @@
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "min setpoint dead band",
+              "code": 25,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "25",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -8574,6 +8813,133 @@
           ]
         },
         {
+          "name": "Illuminance Measurement",
+          "code": 1024,
+          "mfgCode": null,
+          "define": "ILLUMINANCE_MEASUREMENT_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Illuminance Measurement",
+          "code": 1024,
+          "mfgCode": null,
+          "define": "ILLUMINANCE_MEASUREMENT_CLUSTER",
+          "side": "server",
+          "enabled": 0,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "MeasuredValue",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0000",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "MinMeasuredValue",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "MaxMeasuredValue",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "Tolerance",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "LightSensorType",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xFF",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Temperature Measurement",
           "code": 1026,
           "mfgCode": null,
@@ -8609,7 +8975,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "measured value",
+              "name": "MeasuredValue",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8624,7 +8990,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min measured value",
+              "name": "MinMeasuredValue",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8639,7 +9005,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max measured value",
+              "name": "MaxMeasuredValue",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -8654,11 +9020,11 @@
               "reportableChange": 0
             },
             {
-              "name": "tolerance",
+              "name": "Tolerance",
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -8721,7 +9087,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "measured value",
+              "name": "MeasuredValue",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8736,7 +9102,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min measured value",
+              "name": "MinMeasuredValue",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8751,7 +9117,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max measured value",
+              "name": "MaxMeasuredValue",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -8766,7 +9132,7 @@
               "reportableChange": 0
             },
             {
-              "name": "tolerance",
+              "name": "Tolerance",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -8781,7 +9147,7 @@
               "reportableChange": 0
             },
             {
-              "name": "scaled value",
+              "name": "ScaledValue",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -8796,7 +9162,7 @@
               "reportableChange": 0
             },
             {
-              "name": "scaled tolerance",
+              "name": "ScaledTolerance",
               "code": 19,
               "mfgCode": null,
               "side": "server",
@@ -8863,7 +9229,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "measured value",
+              "name": "MeasuredValue",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8878,7 +9244,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min measured value",
+              "name": "MinMeasuredValue",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8893,7 +9259,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max measured value",
+              "name": "MaxMeasuredValue",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -8905,6 +9271,21 @@
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "Tolerance",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -9009,7 +9390,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -10842,6 +11223,22 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
+            },
+            {
+              "name": "TestEnumsRequest",
+              "code": 14,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "TestNullableOptionalRequest",
+              "code": 15,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -10889,6 +11286,22 @@
             {
               "name": "TestListInt8UReverseResponse",
               "code": 4,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "TestEnumsResponse",
+              "code": 5,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "TestNullableOptionalResponse",
+              "code": 6,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -11244,6 +11657,21 @@
             {
               "name": "epoch_s",
               "code": 33,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "vendor_id",
+              "code": 34,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -11669,6 +12097,5 @@
       "endpointVersion": null,
       "deviceIdentifier": null
     }
-  ],
-  "log": []
+  ]
 }
