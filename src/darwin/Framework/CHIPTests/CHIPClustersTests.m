@@ -7483,10 +7483,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000001_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 5000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 5000);
+    WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000002_ReadAttribute
@@ -7541,10 +7541,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000004_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 5000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 5000);
+    WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000005_ReadAttribute
@@ -7599,10 +7599,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000007_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 5000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 5000);
+    WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000008_ReadAttribute
@@ -7658,10 +7658,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000001_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 5000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 5000);
+    WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000002_ReadAttribute
@@ -7714,10 +7714,10 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000004_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 5000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 5000);
+    WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000005_Stop
