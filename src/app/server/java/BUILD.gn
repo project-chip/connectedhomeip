@@ -33,6 +33,7 @@ shared_library("jni") {
     "${chip_root}/examples/tv-app/android:android-tv-app",
     "${chip_root}/examples/tv-app/tv-common",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/inet",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/src/platform/android",
