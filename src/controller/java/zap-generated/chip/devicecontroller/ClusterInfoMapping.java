@@ -5437,6 +5437,34 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.MediaPlaybackCluster(ptr, endpointId),
             mediaPlaybackClusterCommandInfoMap);
     clusterMap.put("mediaPlayback", mediaPlaybackClusterInfo);
+    Map<String, CommandInfo> modeSelectClusterCommandInfoMap = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> modeSelectchangeToModeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    // PLEASE UPDATE LATER: fill out parameter types
+    CommandParameterInfo modeSelectchangeToModeCommandParameterInfo =
+        new CommandParameterInfo("ModeSelect", ChipClusters.DefaultClusterCallback.class);
+    CommandParameterInfo modeSelectchangeToModenewModeCommandParameterInfo =
+        new CommandParameterInfo("newMode", int.class);
+    modeSelectchangeToModeCommandParams.put(
+        "newMode", modeSelectchangeToModenewModeCommandParameterInfo);
+
+    // Populate commands
+    CommandInfo modeSelectchangeToModeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ModeSelectCluster) cluster)
+                  .changeToMode(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("newMode"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            modeSelectchangeToModeCommandParams);
+    modeSelectClusterCommandInfoMap.put("changeToMode", modeSelectchangeToModeCommandInfo);
+    // Populate cluster
+    ClusterInfo modeSelectClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ModeSelectCluster(ptr, endpointId),
+            modeSelectClusterCommandInfoMap);
+    clusterMap.put("modeSelect", modeSelectClusterInfo);
     Map<String, CommandInfo> networkCommissioningClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> networkCommissioningaddThreadNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

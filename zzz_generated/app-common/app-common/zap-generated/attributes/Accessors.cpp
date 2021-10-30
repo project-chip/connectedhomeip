@@ -4541,6 +4541,74 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 } // namespace Attributes
 } // namespace BooleanState
 
+namespace ModeSelect {
+namespace Attributes {
+
+namespace CurrentMode {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::ModeSelect::Id, Id, (uint8_t *) value, sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::ModeSelect::Id, Id, (uint8_t *) &value, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace CurrentMode
+
+namespace OnMode {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::ModeSelect::Id, Id, (uint8_t *) value, sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::ModeSelect::Id, Id, (uint8_t *) &value, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace OnMode
+
+namespace StartUpMode {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::ModeSelect::Id, Id, (uint8_t *) value, sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::ModeSelect::Id, Id, (uint8_t *) &value, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace StartUpMode
+
+namespace Description {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+{
+    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    uint8_t zclString[32 + 1];
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ModeSelect::Id, Id, zclString, sizeof(zclString));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    memcpy(value.data(), &zclString[1], 32);
+    value.reduce_size(emberAfStringLength(zclString));
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
+{
+    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    uint8_t zclString[32 + 1];
+    emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteServerAttribute(endpoint, Clusters::ModeSelect::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+}
+
+} // namespace Description
+
+} // namespace Attributes
+} // namespace ModeSelect
+
 namespace ShadeConfiguration {
 namespace Attributes {
 
