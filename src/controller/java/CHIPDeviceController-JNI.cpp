@@ -191,7 +191,7 @@ JNI_METHOD(void, pairDevice)
 
     RendezvousParameters params = RendezvousParameters()
                                       .SetSetupPINCode(pinCode)
-#if CONFIG_NETWORK_LAYER_BLE				      
+#if CONFIG_NETWORK_LAYER_BLE
                                       .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
 #endif
                                       .SetPeerAddress(Transport::PeerAddress::BLE());

@@ -29,14 +29,3 @@ public class ChipAppServer {
 
     public native boolean startApp();
 }
-
-
-
-
-
-
-
-
-
-
-
