@@ -171,6 +171,8 @@ void fabricListChanged()
     // Currently, we only manage FabricsList attribute in endpoint 0, OperationalCredentials cluster is always required to be on
     // EP0.
     MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::FabricsList::Id);
+    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
+                                           OperationalCredentials::Attributes::CommissionedFabrics::Id);
 }
 
 static FabricInfo * retrieveCurrentFabric()
