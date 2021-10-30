@@ -100,7 +100,7 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
     {
         ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %.*s", static_cast<int>(commandData.metadataForNode.Value().size()), commandData.metadataForNode.Value().data());
     }
-    
+
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
     uint32_t msToStart = 0;
