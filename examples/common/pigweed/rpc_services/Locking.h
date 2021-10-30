@@ -21,9 +21,8 @@
 #include "app/util/attribute-storage.h"
 #include "locking_service/locking_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 namespace chip {
 namespace rpc {
@@ -35,17 +34,15 @@ public:
 
     virtual pw::Status Set(ServerContext &, const chip_rpc_LockingState & request, pw_protobuf_Empty & response)
     {
-        uint8_t locked = request.locked;
-        RETURN_STATUS_IF_NOT_OK(emberAfWriteServerAttribute(kEndpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &locked,
-                                                            ZCL_BOOLEAN_ATTRIBUTE_TYPE));
+        bool locked = request.locked;
+        RETURN_STATUS_IF_NOT_OK(app::Clusters::OnOff::Attributes::OnOff::Set(kEndpoint, locked));
         return pw::OkStatus();
     }
 
     virtual pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LockingState & response)
     {
-        uint8_t locked;
-        RETURN_STATUS_IF_NOT_OK(
-            emberAfReadServerAttribute(kEndpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &locked, sizeof(locked)));
+        bool locked;
+        RETURN_STATUS_IF_NOT_OK(app::Clusters::OnOff::Attributes::OnOff::Get(kEndpoint, &locked));
         response.locked = locked;
         return pw::OkStatus();
     }

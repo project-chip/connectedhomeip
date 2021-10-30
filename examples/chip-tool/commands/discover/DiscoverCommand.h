@@ -35,8 +35,8 @@ public:
     void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override{};
 
     /////////// CHIPCommand Interface /////////
-    CHIP_ERROR Run(NodeId remoteId) override;
-    uint16_t GetWaitDurationInSeconds() const override { return 30; }
+    CHIP_ERROR RunCommand() override;
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }
 
     virtual CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) = 0;
 

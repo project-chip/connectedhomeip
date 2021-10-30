@@ -144,7 +144,7 @@ Transport::PeerAddress GetEchoPeerAddress()
 #endif
     {
 
-        return Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID);
+        return Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), ::chip::Inet::InterfaceId::Null());
     }
 }
 
@@ -211,7 +211,8 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     }
 
     gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicMilliseconds());
-    SuccessOrExit(chip::DeviceLayer::SystemLayer().StartTimer(gPingArguments.GetEchoInterval(), EchoTimerHandler, NULL));
+    SuccessOrExit(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(gPingArguments.GetEchoInterval()),
+                                                              EchoTimerHandler, NULL));
 
     streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
@@ -328,7 +329,7 @@ void StartPinging(streamer_t * stream, char * destination)
     err = EstablishSecureSession(stream, GetEchoPeerAddress());
     SuccessOrExit(err);
 
-    err = gEchoClient.Init(&gExchangeManager, SessionHandle(kTestDeviceNodeId, 0, 0, gFabricIndex));
+    err = gEchoClient.Init(&gExchangeManager, SessionHandle(kTestDeviceNodeId, 1, 1, gFabricIndex));
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.

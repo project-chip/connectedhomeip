@@ -28,6 +28,10 @@ AE
 aef
 algs
 alloc
+ameba
+Ameba
+amebad
+amebaiot
 AnnounceOTAProvider
 APIs
 apk
@@ -44,6 +48,7 @@ args
 argv
 armeabi
 armv
+asdk
 ASYNC
 att
 attId
@@ -52,6 +57,7 @@ attrListName
 attrMask
 attSizeBytes
 attType
+ATW
 AudioOutput
 auth
 autoconnect
@@ -113,7 +119,6 @@ CAfile
 cancelled
 CBB
 cbd
-CMD
 CCMP
 CCS
 CCSTUDIO
@@ -126,6 +131,7 @@ cgroup
 changeset
 characterised
 CharString
+checkmark
 ChipBLEMgr
 CHIPCirqueTest
 CHIPCryptoPALHsm
@@ -139,8 +145,8 @@ ChipImInitiator
 ChipImResponder
 ChipLight
 ChipMessageLayer
-CHIPTool
 CHIPTest
+CHIPTool
 chmod
 chrpath
 cipd
@@ -160,6 +166,7 @@ clusterListName
 ClusterRevision
 ClusterTestGeneration
 cmake
+CMD
 CMSIS
 CMVH
 cn
@@ -201,6 +208,7 @@ cpuapp
 cpython
 crypto
 cryptographic
+CSA
 csu
 csv
 ctl
@@ -269,6 +277,7 @@ DISTRO
 Distutils
 DK
 DL
+DM
 DMG
 DNS
 Dnsmasq
@@ -316,6 +325,7 @@ EndpointId
 endpointName
 eno
 entrypoint
+enum
 env
 esd
 ESPPORT
@@ -659,6 +669,7 @@ PacketBuffer
 PAI
 PairDevice
 PAKE
+pankore
 param
 params
 PartNumber
@@ -679,9 +690,9 @@ PID
 Pigweed
 PinCode
 pkgconfig
+plaintext
 PlatformManager
 PlatformManagerImpl
-plaintext
 plt
 png
 polymorphism
@@ -768,6 +779,7 @@ RPi
 rsn
 RSSI
 rsync
+RTL
 rtld
 RTOS
 RTT
@@ -798,8 +810,8 @@ SERIALDEVICE
 SerialNumber
 ServiceId
 SetDns
-SetUpPINCode
 SetpointRaiseLower
+SetUpPINCode
 SetupQRCode
 sexualized
 SIGINT
@@ -865,6 +877,7 @@ TCP
 teardown
 Telink
 TemperatureMeasurement
+testability
 TestArray
 TestCluster
 TestEmptyString
@@ -910,8 +923,8 @@ ttyUSB
 TvChannel
 txt
 uart
-udhcpc
 UART
+udhcpc
 UDP
 UDPEndPoint
 udpPort

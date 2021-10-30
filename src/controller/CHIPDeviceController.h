@@ -216,6 +216,8 @@ public:
      */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
 
+    CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
+
     /**
      *   This function returns true if the device corresponding to `deviceId` has previously been commissioned
      *   on the fabric.
@@ -244,6 +246,8 @@ public:
     void PersistDevice(Device * device);
 
     virtual void ReleaseDevice(Device * device);
+
+    void ReleaseDeviceById(NodeId remoteDeviceId);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
@@ -303,7 +307,6 @@ protected:
     uint16_t FindDeviceIndex(SessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
-    void ReleaseDeviceById(NodeId remoteDeviceId);
     CHIP_ERROR InitializePairedDeviceList();
     CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
@@ -409,9 +412,6 @@ public:
      */
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & params);
 
-    [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
-    PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Transport::PeerAddress & peerAddress, SerializedDevice & serialized);
-
     /**
      * @brief
      *   This function stops a pairing process that's in progress. It does not delete the pairing of a previously
@@ -460,7 +460,30 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
-                                       uint8_t option);
+                                       uint8_t option)
+    {
+        return OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr);
+    }
+
+    /**
+     * @brief
+     *   Trigger a paired device to re-enter the commissioning mode. The device will exit the commissioning mode
+     *   after a successful commissioning, or after the given `timeout` time.
+     *
+     * @param[in] deviceId        The device Id.
+     * @param[in] timeout         The commissioning mode should terminate after this much time.
+     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+     *                            PAKE passcode verifier to be used for this commissioning.
+     * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
+     * @param[in] option          The commissioning window can be opened using the original setup code, or an
+     *                            onboarding token can be generated using a random setup PIN code (or with
+     *                            the PIN code provied in the setupPayload).
+     * @param[in] callback        The function to be called on success or failure of opening of commissioning window.
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+                                                   uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -642,7 +665,7 @@ private:
     /* Callback when adding operational certs to device results in failure */
     static void OnAddNOCFailureResponse(void * context, uint8_t status);
     /* Callback when the device confirms that it has added the operational certificates */
-    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex, ByteSpan DebugText);
+    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex, CharSpan DebugText);
 
     /* Callback when the device confirms that it has added the root certificate */
     static void OnRootCertSuccessResponse(void * context);

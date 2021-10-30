@@ -19,8 +19,10 @@
 #pragma once
 
 #include "controller/ExampleOperationalCredentialsIssuer.h"
+#include <app/data-model/Nullable.h>
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
+#include <lib/core/Optional.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -143,6 +145,40 @@ public:
     size_t AddArgument(const char * name, int64_t min, uint64_t max, uint64_t * out)
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64);
+    }
+
+    template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, T * out)
+    {
+        return AddArgument(name, min, max, reinterpret_cast<std::underlying_type_t<T> *>(out));
+    }
+
+    template <typename T>
+    size_t AddArgument(const char * name, chip::Optional<T> * value)
+    {
+        // We always require our args to be provided for the moment.
+        return AddArgument(name, &value->Emplace());
+    }
+
+    template <typename T>
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<T> * value)
+    {
+        // We always require our args to be provided for the moment.
+        return AddArgument(name, min, max, &value->Emplace());
+    }
+
+    template <typename T>
+    size_t AddArgument(const char * name, chip::app::DataModel::Nullable<T> * value)
+    {
+        // We always require our args to be provided for the moment.
+        return AddArgument(name, &value->SetNonNull());
+    }
+
+    template <typename T>
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::app::DataModel::Nullable<T> * value)
+    {
+        // We always require our args to be provided for the moment.
+        return AddArgument(name, min, max, &value->SetNonNull());
     }
 
     virtual CHIP_ERROR Run() = 0;

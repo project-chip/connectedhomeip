@@ -185,6 +185,22 @@ static OptionSet *       sToolOptionSets[] =
 };
 // clang-format on
 
+namespace chip {
+namespace Inet {
+
+class TCPTest
+{
+public:
+    static bool StateIsConnected(const TCPEndPoint * endPoint) { return endPoint->mState == TCPEndPoint::State::kConnected; }
+    static bool StateIsConnectedOrReceiveShutdown(const TCPEndPoint * endPoint)
+    {
+        return endPoint->mState == TCPEndPoint::State::kConnected || endPoint->mState == TCPEndPoint::State::kReceiveShutdown;
+    }
+};
+
+} // namespace Inet
+} // namespace chip
+
 static void CheckSucceededOrFailed(TestState & aTestState, bool & aOutSucceeded, bool & aOutFailed)
 {
     const TransferStats & lStats = aTestState.mStats;
@@ -261,7 +277,7 @@ int main(int argc, char * argv[])
 
     if (gInterfaceName != nullptr)
     {
-        lStatus = InterfaceNameToId(gInterfaceName, gInterfaceId);
+        lStatus = InterfaceId::InterfaceNameToId(gInterfaceName, gInterfaceId);
         if (lStatus != CHIP_NO_ERROR)
         {
             PrintArgError("%s: unknown network interface %s\n", kToolName, gInterfaceName);
@@ -524,7 +540,7 @@ void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
 
         gSendIntervalExpired = false;
         gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);
-        gSystemLayer.StartTimer(gSendIntervalMs, Common::HandleSendTimerComplete, nullptr);
+        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         SetStatusFailed(sTestState.mStatus);
     }
@@ -570,7 +586,7 @@ static CHIP_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHan
     VerifyOrExit(aEndPoint != nullptr, lStatus = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!aBuffer.IsNull(), lStatus = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (aEndPoint->State != TCPEndPoint::kState_Connected)
+    if (!TCPTest::StateIsConnected(aEndPoint))
     {
         lStatus = aEndPoint->SetReceivedDataForTesting(std::move(aBuffer));
         INET_FAIL_ERROR(lStatus, "TCPEndPoint::PutBackReceivedData failed");
@@ -654,33 +670,18 @@ static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError
 
 static bool IsTransportReadyForSend()
 {
-    bool lStatus = false;
-
     if ((gOptFlags & kOptFlagUseUDPIP) == kOptFlagUseUDPIP)
     {
-        lStatus = (sUDPIPEndPoint != nullptr);
+        return (sUDPIPEndPoint != nullptr);
     }
-    else if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
+
+    if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
     {
-        if (sTCPIPEndPoint != nullptr)
-        {
-            if (sTCPIPEndPoint->PendingSendLength() == 0)
-            {
-                switch (sTCPIPEndPoint->State)
-                {
-                case TCPEndPoint::kState_Connected:
-                case TCPEndPoint::kState_ReceiveShutdown:
-                    lStatus = true;
-                    break;
-
-                default:
-                    break;
-                }
-            }
-        }
+        return (sTCPIPEndPoint != nullptr) && (sTCPIPEndPoint->PendingSendLength() == 0) &&
+            TCPTest::StateIsConnectedOrReceiveShutdown(sTCPIPEndPoint);
     }
 
-    return (lStatus);
+    return false;
 }
 
 static CHIP_ERROR PrepareTransportForSend()
@@ -760,7 +761,7 @@ void DriveSend()
     else
     {
         gSendIntervalExpired = false;
-        gSystemLayer.StartTimer(gSendIntervalMs, Common::HandleSendTimerComplete, nullptr);
+        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         if (sTestState.mStats.mTransmit.mActual < sTestState.mStats.mTransmit.mExpected)
         {
@@ -789,7 +790,7 @@ exit:
 
 static void StartTest()
 {
-    IPAddressType lIPAddressType = kIPAddressType_IPv6;
+    IPAddressType lIPAddressType = IPAddressType::kIPv6;
     IPAddress lAddress           = chip::Inet::IPAddress::Any;
     CHIP_ERROR lStatus;
 
@@ -799,7 +800,7 @@ static void StartTest()
 #if INET_CONFIG_ENABLE_IPV4
     if (gOptFlags & kOptFlagUseIPv4)
     {
-        lIPAddressType = kIPAddressType_IPv4;
+        lIPAddressType = IPAddressType::kIPv4;
         if (!gNetworkOptions.LocalIPv6Addr.empty())
             lAddress = gNetworkOptions.LocalIPv4Addr[0];
         else
@@ -822,7 +823,7 @@ static void StartTest()
         lStatus = gInet.NewUDPEndPoint(&sUDPIPEndPoint);
         INET_FAIL_ERROR(lStatus, "InetLayer::NewUDPEndPoint failed");
 
-        if (IsInterfaceIdPresent(gInterfaceId))
+        if (gInterfaceId.IsPresent())
         {
             lStatus = sUDPIPEndPoint->BindInterface(lIPAddressType, gInterfaceId);
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::BindInterface failed");

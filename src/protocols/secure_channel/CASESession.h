@@ -46,9 +46,6 @@
 
 namespace chip {
 
-// TODO: move this constant over to src/crypto/CHIPCryptoPAL.h - name it CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES
-constexpr uint16_t kAEADKeySize = 16;
-
 constexpr uint16_t kSigmaParamRandomNumberSize = 32;
 constexpr uint16_t kTrustedRootIdSize          = Credentials::kKeyIdentifierLength;
 constexpr uint16_t kMaxTrustedRootIds          = 5;
@@ -239,11 +236,6 @@ private:
                                       const ByteSpan & nonce, MutableByteSpan & resumeMIC);
     CHIP_ERROR ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const ByteSpan & initiatorRandom, const ByteSpan & resumptionID,
                                       const ByteSpan & skInfo, const ByteSpan & nonce);
-
-    static constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields)
-    {
-        return dataLen + (sizeof(uint64_t) * nFields);
-    }
 
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;

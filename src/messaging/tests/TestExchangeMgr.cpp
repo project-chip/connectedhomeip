@@ -100,7 +100,7 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
-    auto sessionPeerToLocal = ctx.GetSecureSessionManager().GetSecureSession(ec1->GetSecureSession());
+    auto sessionPeerToLocal = ctx.GetSecureSessionManager().GetSecureSession(ec1->GetSessionHandle());
     NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerNodeId() == ctx.GetBobNodeId());
     NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerSessionId() == ctx.GetBobKeyId());
     NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
@@ -108,7 +108,7 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec2 = ctx.NewExchangeToAlice(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
-    auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetSecureSession(ec2->GetSecureSession());
+    auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetSecureSession(ec2->GetSessionHandle());
     NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerNodeId() == ctx.GetAliceNodeId());
     NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerSessionId() == ctx.GetAliceKeyId());
 
@@ -124,7 +124,7 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
 
     // Expire the session this exchange is supposedly on.
-    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSecureSession());
+    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSessionHandle());
 
     MockAppDelegate receiveDelegate;
     CHIP_ERROR err =
@@ -154,7 +154,7 @@ void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
 
     // Expire the session this exchange is supposedly on.  This should close the
     // exchange.
-    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSecureSession());
+    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSessionHandle());
     NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
 }
 
@@ -254,11 +254,11 @@ int Initialize(void * aContext)
 {
     // Initialize System memory and resources
     VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init() == CHIP_NO_ERROR, FAILURE);
     VerifyOrReturnError(gTransportMgr.Init("LOOPBACK") == CHIP_NO_ERROR, FAILURE);
 
     auto * ctx = static_cast<TestContext *>(aContext);
-    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(ctx->Init(&gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     return SUCCESS;
 }

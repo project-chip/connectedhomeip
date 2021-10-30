@@ -42,7 +42,7 @@ public:
     // Register for the EthernetNetworkDiagnostics cluster on all endpoints.
     EthernetDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), EthernetNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
@@ -69,15 +69,15 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (Connectivit
 
 EthernetDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
+CHIP_ERROR EthernetDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aClusterInfo.mClusterId != EthernetNetworkDiagnostics::Id)
+    if (aPath.mClusterId != EthernetNetworkDiagnostics::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    switch (aClusterInfo.mFieldId)
+    switch (aPath.mAttributeId)
     {
     case PHYRate::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthPHYRate, aEncoder);

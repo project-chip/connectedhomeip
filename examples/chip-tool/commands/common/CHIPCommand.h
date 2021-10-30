@@ -54,10 +54,10 @@ protected:
     // 1) If error is returned, Run() must not call SetCommandExitStatus.
     // 2) If success is returned Run() must either have called
     //    SetCommandExitStatus() or scheduled async work that will do that.
-    virtual CHIP_ERROR Run(NodeId remoteId) = 0;
+    virtual CHIP_ERROR RunCommand() = 0;
 
     // Get the wait duration, in seconds, before the command times out.
-    virtual uint16_t GetWaitDurationInSeconds() const = 0;
+    virtual chip::System::Clock::Timeout GetWaitDuration() const = 0;
 
     // Shut down the command, in case any work needs to be done after the event
     // loop has been stopped.
@@ -72,7 +72,7 @@ private:
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
-    CHIP_ERROR StartWaiting(uint16_t seconds);
+    CHIP_ERROR StartWaiting(chip::System::Clock::Timeout seconds);
     void StopWaiting();
 
 #if CONFIG_USE_SEPARATE_EVENTLOOP

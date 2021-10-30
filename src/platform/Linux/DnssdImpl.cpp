@@ -49,11 +49,11 @@ AvahiProtocol ToAvahiProtocol(chip::Inet::IPAddressType addressType)
     switch (addressType)
     {
 #if INET_CONFIG_ENABLE_IPV4
-    case chip::Inet::IPAddressType::kIPAddressType_IPv4:
+    case chip::Inet::IPAddressType::kIPv4:
         protocol = AVAHI_PROTO_INET;
         break;
 #endif
-    case chip::Inet::IPAddressType::kIPAddressType_IPv6:
+    case chip::Inet::IPAddressType::kIPv6:
         protocol = AVAHI_PROTO_INET6;
         break;
     default:
@@ -72,14 +72,14 @@ chip::Inet::IPAddressType ToAddressType(AvahiProtocol protocol)
     {
 #if INET_CONFIG_ENABLE_IPV4
     case AVAHI_PROTO_INET:
-        type = chip::Inet::IPAddressType::kIPAddressType_IPv4;
+        type = chip::Inet::IPAddressType::kIPv4;
         break;
 #endif
     case AVAHI_PROTO_INET6:
-        type = chip::Inet::IPAddressType::kIPAddressType_IPv6;
+        type = chip::Inet::IPAddressType::kIPv6;
         break;
     default:
-        type = chip::Inet::IPAddressType::kIPAddressType_Unknown;
+        type = chip::Inet::IPAddressType::kUnknown;
         break;
     }
 
@@ -314,8 +314,8 @@ void Poller::SystemTimerUpdate(AvahiTimeout * timer)
     if ((mEarliestTimeout == std::chrono::steady_clock::time_point()) || (timer->mAbsTimeout < mEarliestTimeout))
     {
         mEarliestTimeout = timer->mAbsTimeout;
-        auto msDelay     = std::chrono::duration_cast<std::chrono::milliseconds>(steady_clock::now() - mEarliestTimeout).count();
-        DeviceLayer::SystemLayer().StartTimer(msDelay, SystemTimerCallback, this);
+        auto delay       = std::chrono::duration_cast<chip::System::Clock::Milliseconds32>(steady_clock::now() - mEarliestTimeout);
+        DeviceLayer::SystemLayer().StartTimer(delay, SystemTimerCallback, this);
     }
 }
 
@@ -461,7 +461,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service)
     CHIP_ERROR error       = CHIP_NO_ERROR;
     AvahiStringList * text = nullptr;
     AvahiIfIndex interface =
-        service.mInterface == INET_NULL_INTERFACEID ? AVAHI_IF_UNSPEC : static_cast<AvahiIfIndex>(service.mInterface);
+        service.mInterface.IsPresent() ? static_cast<AvahiIfIndex>(service.mInterface.GetPlatformInterface()) : AVAHI_IF_UNSPEC;
 
     keyBuilder << service.mName << "." << type << service.mPort << "." << interface;
     key = keyBuilder.str();
@@ -530,12 +530,12 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
 {
     AvahiServiceBrowser * browser;
     BrowseContext * browseContext = chip::Platform::New<BrowseContext>();
-    AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface);
+    AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
 
     browseContext->mInstance = this;
     browseContext->mContext  = context;
     browseContext->mCallback = callback;
-    if (interface == INET_NULL_INTERFACEID)
+    if (!interface.IsPresent())
     {
         avahiInterface = AVAHI_IF_UNSPEC;
     }
@@ -615,7 +615,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             CopyTypeWithoutProtocol(service.mType, type);
             service.mProtocol    = GetProtocolInType(type);
             service.mAddressType = ToAddressType(protocol);
-            service.mInterface   = INET_NULL_INTERFACEID;
+            service.mInterface   = Inet::InterfaceId::Null();
             if (interface != AVAHI_IF_UNSPEC)
             {
                 service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
@@ -650,14 +650,14 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
                               DnssdResolveCallback callback, void * context)
 {
     AvahiServiceResolver * resolver;
-    AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface);
+    AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
     ResolveContext * resolveContext = chip::Platform::New<ResolveContext>();
     CHIP_ERROR error                = CHIP_NO_ERROR;
 
     resolveContext->mInstance = this;
     resolveContext->mCallback = callback;
     resolveContext->mContext  = context;
-    if (interface == INET_NULL_INTERFACEID)
+    if (!interface.IsPresent())
     {
         avahiInterface = AVAHI_IF_UNSPEC;
     }
@@ -700,7 +700,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         result.mProtocol    = GetProtocolInType(type);
         result.mPort        = port;
         result.mAddressType = ToAddressType(protocol);
-        result.mInterface   = INET_NULL_INTERFACEID;
+        result.mInterface   = Inet::InterfaceId::Null();
         if (interface != AVAHI_IF_UNSPEC)
         {
             result.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
@@ -722,7 +722,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                 struct in_addr addr4;
 
                 memcpy(&addr4, &(address->data.ipv4), sizeof(addr4));
-                result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv4(addr4));
+                result.mAddress.SetValue(chip::Inet::IPAddress(addr4));
 #else
                 result_err = CHIP_ERROR_INVALID_ADDRESS;
                 ChipLogError(Discovery, "Ignoring IPv4 mDNS address.");
@@ -732,7 +732,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                 struct in6_addr addr6;
 
                 memcpy(&addr6, &(address->data.ipv6), sizeof(addr6));
-                result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv6(addr6));
+                result.mAddress.SetValue(chip::Inet::IPAddress(addr6));
                 break;
             default:
                 break;

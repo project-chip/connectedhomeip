@@ -288,7 +288,7 @@ int main(int argc, char * argv[])
 
     if (gInterfaceName != nullptr)
     {
-        lStatus = InterfaceNameToId(gInterfaceName, gInterfaceId);
+        lStatus = InterfaceId::InterfaceNameToId(gInterfaceName, gInterfaceId);
         if (lStatus != CHIP_NO_ERROR)
         {
             PrintArgError("%s: unknown network interface %s\n", kToolName, gInterfaceName);
@@ -300,7 +300,7 @@ int main(int argc, char * argv[])
     // If any multicast groups have been specified, ensure that a
     // network interface identifier has been specified and is valid.
 
-    if ((sGroupAddresses.mSize > 0) && !IsInterfaceIdPresent(gInterfaceId))
+    if ((sGroupAddresses.mSize > 0) && !gInterfaceId.IsPresent())
     {
         PrintArgError("%s: a network interface is required when specifying one or more multicast groups\n", kToolName);
         lSuccessful = false;
@@ -489,9 +489,7 @@ static IPAddress MakeIPv4Multicast(uint32_t aGroupIdentifier)
 
 static IPAddress MakeIPv6Multicast(uint32_t aGroupIdentifier)
 {
-    const uint8_t lFlags = kIPv6MulticastFlag_Transient;
-
-    return (IPAddress::MakeIPv6Multicast(lFlags, kIPv6MulticastScope_Site, aGroupIdentifier));
+    return (IPAddress::MakeIPv6Multicast(IPv6MulticastFlag::kTransient, kIPv6MulticastScope_Site, aGroupIdentifier));
 }
 
 static void SetGroup(GroupAddress & aGroupAddress, uint32_t aGroupIdentifier, uint32_t aExpectedRx, uint32_t aExpectedTx)
@@ -703,7 +701,7 @@ void DriveSend()
     else
     {
         gSendIntervalExpired = false;
-        gSystemLayer.StartTimer(gSendIntervalMs, Common::HandleSendTimerComplete, nullptr);
+        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         lStatus = DriveSendForGroups(sGroupAddresses);
         SuccessOrExit(lStatus);
@@ -718,7 +716,7 @@ exit:
 
 static void StartTest()
 {
-    IPAddressType lIPAddressType = kIPAddressType_IPv6;
+    IPAddressType lIPAddressType = IPAddressType::kIPv6;
     IPVersion lIPVersion         = kIPVersion_6;
     IPAddress lAddress           = IPAddress::Any;
     IPEndPointBasis * lEndPoint  = nullptr;
@@ -728,7 +726,7 @@ static void StartTest()
 #if INET_CONFIG_ENABLE_IPV4
     if (gOptFlags & kOptFlagUseIPv4)
     {
-        lIPAddressType = kIPAddressType_IPv4;
+        lIPAddressType = IPAddressType::kIPv4;
         lIPVersion     = kIPVersion_4;
     }
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -751,7 +749,7 @@ static void StartTest()
         lStatus = sUDPIPEndPoint->Bind(lIPAddressType, lAddress, kUDPPort);
         INET_FAIL_ERROR(lStatus, "UDPEndPoint::Bind failed");
 
-        if (IsInterfaceIdPresent(gInterfaceId))
+        if (gInterfaceId.IsPresent())
         {
             lStatus = sUDPIPEndPoint->BindInterface(lIPAddressType, gInterfaceId);
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::BindInterface failed");
@@ -777,7 +775,7 @@ static void StartTest()
         GroupAddress & lGroupAddress  = sGroupAddresses.mAddresses[i];
         IPAddress & lMulticastAddress = lGroupAddress.mMulticastAddress;
 
-        if ((lEndPoint != nullptr) && IsInterfaceIdPresent(gInterfaceId))
+        if ((lEndPoint != nullptr) && gInterfaceId.IsPresent())
         {
             if (gOptFlags & kOptFlagUseIPv4)
             {
@@ -824,7 +822,7 @@ static void CleanupTest()
         GroupAddress & lGroupAddress  = sGroupAddresses.mAddresses[i];
         IPAddress & lMulticastAddress = lGroupAddress.mMulticastAddress;
 
-        if ((lEndPoint != nullptr) && IsInterfaceIdPresent(gInterfaceId))
+        if ((lEndPoint != nullptr) && gInterfaceId.IsPresent())
         {
             lMulticastAddress.ToString(lAddressBuffer, sizeof(lAddressBuffer));
 

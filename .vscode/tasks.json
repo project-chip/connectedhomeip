@@ -184,7 +184,13 @@
             "type": "pickString",
             "id": "mbedApp",
             "description": "What mbed application do you want to use?",
-            "options": ["lock-app", "lighting-app"],
+            "options": [
+                "lock-app",
+                "lighting-app",
+                "pigweed-app",
+                "all-clusters-app",
+                "shell"
+            ],
             "default": "lock-app"
         },
         {
@@ -211,6 +217,7 @@
             "id": "exampleTarget",
             "description": "What target to build",
             "options": [
+                "ameba-amebad-all-clusters",
                 "android-arm-chip-tool",
                 "android-arm64-chip-test",
                 "android-arm64-chip-tool",

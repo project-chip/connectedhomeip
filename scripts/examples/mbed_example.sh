@@ -22,7 +22,7 @@ cd "$CHIP_ROOT"/examples
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
 SUPPORTED_TARGET_BOARD=(CY8CPROTO_062_4343W)
-SUPPORTED_APP=(lock-app lighting-app)
+SUPPORTED_APP=(lock-app lighting-app pigweed-app all-clusters-app shell)
 SUPPORTED_PROFILES=(release develop debug)
 SUPPORTED_COMMAND=(build flash build-flash)
 
@@ -128,5 +128,5 @@ if [[ "$COMMAND" == *"flash"* ]]; then
     MBED_FLASH_SCRIPTS_PATH=$CHIP_ROOT/config/mbed/scripts
 
     # Flash application
-    openocd -f "$MBED_FLASH_SCRIPTS_PATH/$TARGET_BOARD".tcl -c "program $BUILD_DIRECTORY/chip-mbed-$APP-example.elf verify reset exit"
+    "$OPENOCD_PATH"/bin/openocd -f "$MBED_FLASH_SCRIPTS_PATH/$TARGET_BOARD".tcl -c "program $BUILD_DIRECTORY/chip-mbed-$APP-example.elf verify reset exit"
 fi

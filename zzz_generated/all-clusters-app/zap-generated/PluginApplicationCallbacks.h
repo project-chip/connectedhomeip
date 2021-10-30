@@ -31,6 +31,8 @@
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterBinaryInputBasicPluginServerInitCallback();                                                                              \
     MatterBindingPluginServerInitCallback();                                                                                       \
+    MatterBooleanStatePluginServerInitCallback();                                                                                  \
+    MatterBridgedActionsPluginServerInitCallback();                                                                                \
     MatterBridgedDeviceBasicPluginServerInitCallback();                                                                            \
     MatterColorControlPluginServerInitCallback();                                                                                  \
     MatterContentLauncherPluginServerInitCallback();                                                                               \
@@ -47,6 +49,7 @@
     MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterIasZonePluginServerInitCallback();                                                                                       \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
+    MatterIlluminanceMeasurementPluginServerInitCallback();                                                                        \
     MatterKeypadInputPluginServerInitCallback();                                                                                   \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
     MatterLowPowerPluginServerInitCallback();                                                                                      \

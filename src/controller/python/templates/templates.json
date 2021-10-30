@@ -33,6 +33,11 @@
             "path": "python-CHIPClusters-py.zapt",
             "name": "CHIP ZCL API for Python",
             "output": "src/controller/python/chip/clusters/CHIPClusters.py"
+        },
+        {
+            "path": "python-cluster-Objects-py.zapt",
+            "name": "CHIP ClusterObjects for Python",
+            "output": "src/controller/python/chip/clusters/Objects.py"
         }
     ]
 }

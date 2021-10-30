@@ -80,12 +80,12 @@ CHIP_ERROR JoinMulticastGroup(chip::Inet::InterfaceId interfaceId, chip::Inet::U
 
     chip::Inet::IPAddress address;
 
-    if (addressType == chip::Inet::IPAddressType::kIPAddressType_IPv6)
+    if (addressType == chip::Inet::IPAddressType::kIPv6)
     {
         BroadcastIpAddresses::GetIpv6Into(address);
 #if INET_CONFIG_ENABLE_IPV4
     }
-    else if (addressType == chip::Inet::IPAddressType::kIPAddressType_IPv4)
+    else if (addressType == chip::Inet::IPAddressType::kIPv4)
     {
         BroadcastIpAddresses::GetIpv4Into(address);
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -102,10 +102,10 @@ const char * AddressTypeStr(chip::Inet::IPAddressType addressType)
 {
     switch (addressType)
     {
-    case chip::Inet::IPAddressType::kIPAddressType_IPv6:
+    case chip::Inet::IPAddressType::kIPv6:
         return "IPv6";
 #if INET_CONFIG_ENABLE_IPV4
-    case chip::Inet::IPAddressType::kIPAddressType_IPv4:
+    case chip::Inet::IPAddressType::kIPv4:
         return "IPv4";
 #endif // INET_CONFIG_ENABLE_IPV4
     default:
@@ -154,7 +154,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
     Shutdown(); // ensure everything starts fresh
 
     size_t endpointIndex                = 0;
-    chip::Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
+    chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
     chip::Inet::IPAddressType addressType;
 
     ShutdownOnError autoShutdown(this);
@@ -176,8 +176,8 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
         CHIP_ERROR err = JoinMulticastGroup(interfaceId, info->udp, addressType);
         if (err != CHIP_NO_ERROR)
         {
-            char interfaceName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
-            chip::Inet::GetInterfaceName(interfaceId, interfaceName, sizeof(interfaceName));
+            char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
+            interfaceId.GetInterfaceName(interfaceName, sizeof(interfaceName));
 
             // Log only as non-fatal error. Failure to join will mean we reply to unicast queries only.
             ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %s", interfaceName,
@@ -211,7 +211,7 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
 
         chip::Inet::InterfaceId boundIf = info->udp->GetBoundInterface();
 
-        if ((boundIf != INET_NULL_INTERFACEID) && (boundIf != interface))
+        if ((boundIf.IsPresent()) && (boundIf != interface))
         {
             continue;
         }
@@ -222,7 +222,8 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
     return CHIP_ERROR_NOT_CONNECTED;
 }
 
-CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface)
+CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface,
+                                     chip::Inet::IPAddressType addressType)
 {
     for (size_t i = 0; i < mEndpointCount; i++)
     {
@@ -233,7 +234,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
             continue;
         }
 
-        if ((info->udp->GetBoundInterface() != interface) && (info->udp->GetBoundInterface() != INET_NULL_INTERFACEID))
+        if ((info->interfaceId != interface) && (info->interfaceId != chip::Inet::InterfaceId::Null()))
+        {
+            continue;
+        }
+
+        if ((addressType != chip::Inet::IPAddressType::kAny) && (info->addressType != addressType))
         {
             continue;
         }
@@ -242,17 +248,17 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
 
         /// The same packet needs to be sent over potentially multiple interfaces.
         /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
+        /// for sending via `CloneData`
+        ///
         /// TODO: this wastes one copy of the data and that could be optimized away
-        chip::System::PacketBufferHandle copy = data.CloneData();
-
-        if (info->addressType == chip::Inet::kIPAddressType_IPv6)
+        if (info->addressType == chip::Inet::IPAddressType::kIPv6)
         {
-            err = info->udp->SendTo(mIpv6BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
+        else if (info->addressType == chip::Inet::IPAddressType::kIPv4)
         {
-            err = info->udp->SendTo(mIpv4BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }
 #endif
         else
@@ -295,17 +301,17 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
 
         /// The same packet needs to be sent over potentially multiple interfaces.
         /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
+        /// for sending via `CloneData`
+        ///
         /// TODO: this wastes one copy of the data and that could be optimized away
-        chip::System::PacketBufferHandle copy = data.CloneData();
-
-        if (info->addressType == chip::Inet::kIPAddressType_IPv6)
+        if (info->addressType == chip::Inet::IPAddressType::kIPv6)
         {
-            err = info->udp->SendTo(mIpv6BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
+        else if (info->addressType == chip::Inet::IPAddressType::kIPv4)
         {
-            err = info->udp->SendTo(mIpv4BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
         }
 #endif
         else
@@ -318,7 +324,6 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
         if (err == CHIP_NO_ERROR)
         {
             hadSuccesfulSend = true;
-            ChipLogProgress(Discovery, "mDNS broadcast success");
         }
         else
         {

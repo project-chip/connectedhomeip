@@ -174,7 +174,7 @@ void ShutdownSystemLayer()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static void PrintNetworkState()
 {
-    char intfName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+    char intfName[chip::Inet::InterfaceId::kMaxIfNameLength];
 
     for (size_t j = 0; j < gNetworkOptions.TapDeviceName.size(); j++)
     {
@@ -187,7 +187,7 @@ static void PrintNetworkState()
 
         TapInterface * tapIF = &(sTapIFs[j]);
 #endif // CHIP_TARGET_STYLE_UNIX
-        GetInterfaceName(netIF, intfName, sizeof(intfName));
+        InterfaceId(netIF).GetInterfaceName(intfName, sizeof(intfName));
 
         printf("LwIP interface ready\n");
         printf("  Interface Name: %s\n", intfName);
@@ -215,10 +215,6 @@ static void PrintNetworkState()
             }
         }
     }
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    char dnsServerAddrStr[DNS_MAX_NAME_LENGTH];
-    printf("  DNS Server: %s\n", gNetworkOptions.DNSServerAddr.ToString(dnsServerAddrStr, sizeof(dnsServerAddrStr)));
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -418,23 +414,6 @@ void InitNetwork()
         }
     }
 
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-    if (gNetworkOptions.DNSServerAddr != IPAddress::Any)
-    {
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-        ip_addr_t dnsServerAddr = gNetworkOptions.DNSServerAddr.ToLwIPAddr();
-#else // LWIP_VERSION_MAJOR <= 1
-#if INET_CONFIG_ENABLE_IPV4
-        ip_addr_t dnsServerAddr = gNetworkOptions.DNSServerAddr.ToIPv4();
-#else // !INET_CONFIG_ENABLE_IPV4
-#error "No support for DNS Resolver without IPv4!"
-#endif // !INET_CONFIG_ENABLE_IPV4
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-
-        dns_setserver(0, &dnsServerAddr);
-    }
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
     PrintNetworkState();
 
     AcquireLwIP();
@@ -463,7 +442,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
     // Start a timer (with a no-op callback) to ensure that WaitForEvents() does not block longer than aSleepTimeMilliseconds.
     gSystemLayer.StartTimer(
-        aSleepTimeMilliseconds, [](System::Layer *, void *) -> void {}, nullptr);
+        System::Clock::Milliseconds32(aSleepTimeMilliseconds), [](System::Layer *, void *) -> void {}, nullptr);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     gSystemLayer.PrepareEvents();

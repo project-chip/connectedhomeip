@@ -90,8 +90,8 @@
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(attrListName) EmberAfAttributeMetadata attrListName[] = {
 
-#define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(clusterRevision)                                                                        \
-    , { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(clusterRevision) } /* cluster revision */                               \
+#define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
+    , { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() } /* cluster revision */            \
     }
 
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
@@ -121,8 +121,6 @@ void emAfCallInits(void);
 
 // Initial configuration
 void emberAfEndpointConfigure(void);
-bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, chip::ClusterId clusterId, uint8_t * buffer,
-                              uint16_t bufferLength, uint16_t * bufferIndex, uint8_t startId, uint8_t maxIdCount);
 
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write, int32_t index = -1);

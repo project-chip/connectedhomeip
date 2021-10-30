@@ -56,30 +56,30 @@ void ConfigurationManagerImpl::InitializeWithObject(jobject managerObject)
     AndroidConfig::InitializeWithObject(managerObject);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_Init()
+CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool ConfigurationManagerImpl::_CanFactoryReset()
+bool ConfigurationManagerImpl::CanFactoryReset()
 {
     // TODO(#742): query the application to determine if factory reset is allowed.
     return true;
 }
 
-void ConfigurationManagerImpl::_InitiateFactoryReset() {}
+void ConfigurationManagerImpl::InitiateFactoryReset() {}
 
-CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

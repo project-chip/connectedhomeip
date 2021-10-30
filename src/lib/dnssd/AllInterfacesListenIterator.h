@@ -33,7 +33,7 @@ bool IsCurrentInterfaceUsable(T & iterator)
     {
         return false; // not a usable interface
     }
-    char name[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+    char name[chip::Inet::InterfaceId::kMaxIfNameLength];
     if (iterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to get interface name.");
@@ -73,14 +73,14 @@ public:
         if (mState == State::kIpV4)
         {
             *id    = mIterator.GetInterfaceId();
-            *type  = chip::Inet::kIPAddressType_IPv4;
+            *type  = chip::Inet::IPAddressType::kIPv4;
             mState = State::kIpV6;
             return true;
         }
 #endif
 
         *id   = mIterator.GetInterfaceId();
-        *type = chip::Inet::kIPAddressType_IPv6;
+        *type = chip::Inet::IPAddressType::kIPv6;
 #if INET_CONFIG_ENABLE_IPV4
         mState = State::kIpV4;
 #endif

@@ -59,8 +59,6 @@ template("qpg_sdk") {
     include_dirs += [
       "${qpg_sdk_root}/${qpg_target_ic}/comps/qvCHIP/inc",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/config",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/portable/GCC/ARM_CM3",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls",
       "${mbedtls_root}/repo/include",
       "${openthread_root}/include",
@@ -178,18 +176,6 @@ template("qpg_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/x509write_crt.c",
       "${chip_root}/third_party/mbedtls/repo/library/x509write_csr.c",
       "${chip_root}/third_party/mbedtls/repo/library/xtea.c",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/FreeRTOS.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/deprecated_definitions.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/list.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/mpu_wrappers.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/portable.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/projdefs.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/queue.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/semphr.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/stack_macros.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/task.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/include/timers.h",
-      "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/config/FreeRTOSConfig.h",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/config/hooks.c",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls/${qpg_target_ic}-mbedtls-config.h",
@@ -209,5 +195,6 @@ template("qpg_sdk") {
     }
 
     public_configs = [ ":${sdk_target_name}_config" ]
+    public_deps = [ "${chip_root}/third_party/qpg_sdk:freertos" ]
   }
 }

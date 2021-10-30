@@ -186,8 +186,8 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
                        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALT", 8), 0, &delegateAccessory) ==
-                       CHIP_NO_ERROR);
+                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALTsaltSALT", 16), 0,
+                                                   &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, contextCommissioner,
                                             &delegateCommissioner) == CHIP_NO_ERROR);
@@ -255,8 +255,8 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
                        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALT", 8), 0, &delegateAccessory) ==
-                       CHIP_NO_ERROR);
+                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALTsaltSALT", 16), 0,
+                                                   &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 4321, 0, contextCommissioner,
                                             &delegateCommissioner) == CHIP_NO_ERROR);
@@ -301,6 +301,10 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     uint8_t encrypted[64];
     PacketHeader header;
     MessageAuthenticationCode mac;
+
+    header.SetSessionId(1);
+    NL_TEST_ASSERT(inSuite, header.IsEncrypted() == true);
+    NL_TEST_ASSERT(inSuite, header.MICTagLength() == 16);
 
     // Let's try encrypting using original session, and decrypting using deserialized
     {
@@ -370,11 +374,11 @@ int TestSecurePairing_Setup(void * inContext)
 {
     // Initialize System memory and resources
     VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init() == CHIP_NO_ERROR, FAILURE);
     VerifyOrReturnError(gTransportMgr.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
 
     auto & ctx = *static_cast<TestContext *>(inContext);
-    VerifyOrReturnError(ctx.Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(ctx.Init(&gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     ctx.SetBobNodeId(kPlaceholderNodeId);
     ctx.SetAliceNodeId(kPlaceholderNodeId);

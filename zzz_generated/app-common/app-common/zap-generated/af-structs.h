@@ -35,8 +35,26 @@ typedef struct _SimpleStruct
     bool b;
     uint8_t c;
     chip::ByteSpan d;
-    uint8_t * e;
+    chip::CharSpan e;
+    uint8_t f;
 } SimpleStruct;
+
+// Struct for NullablesAndOptionalsStruct
+typedef struct _NullablesAndOptionalsStruct
+{
+    uint16_t NullableInt;
+    uint16_t OptionalInt;
+    uint16_t NullableOptionalInt;
+    chip::CharSpan NullableString;
+    chip::CharSpan OptionalString;
+    chip::CharSpan NullableOptionalString;
+    SimpleStruct NullableStruct;
+    SimpleStruct OptionalStruct;
+    SimpleStruct NullableOptionalStruct;
+    /* TYPE WARNING: array array defaults to */ uint8_t * NullableList;
+    /* TYPE WARNING: array array defaults to */ uint8_t * OptionalList;
+    /* TYPE WARNING: array array defaults to */ uint8_t * NullableOptionalList;
+} NullablesAndOptionalsStruct;
 
 // Struct for NestedStruct
 typedef struct _NestedStruct
@@ -67,23 +85,34 @@ typedef struct _DoubleNestedStructList
 // Struct for ContentLaunchAdditionalInfo
 typedef struct _ContentLaunchAdditionalInfo
 {
-    uint8_t * name;
-    uint8_t * value;
+    chip::CharSpan name;
+    chip::CharSpan value;
 } ContentLaunchAdditionalInfo;
 
 // Struct for ContentLaunchParamater
 typedef struct _ContentLaunchParamater
 {
     uint8_t Type;
-    uint8_t * Value;
+    chip::CharSpan Value;
     /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
 } ContentLaunchParamater;
+
+// Struct for ActionStruct
+typedef struct _ActionStruct
+{
+    uint16_t ActionID;
+    chip::CharSpan Name;
+    uint8_t Type;
+    uint16_t EndpointListID;
+    uint16_t SupportedCommands;
+    uint8_t Status;
+} ActionStruct;
 
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp
 {
     uint16_t catalogVendorId;
-    uint8_t * applicationId;
+    chip::CharSpan applicationId;
 } ApplicationLauncherApp;
 
 // Struct for AudioOutputInfo
@@ -91,7 +120,7 @@ typedef struct _AudioOutputInfo
 {
     uint8_t index;
     uint8_t outputType;
-    chip::ByteSpan name;
+    chip::CharSpan name;
 } AudioOutputInfo;
 
 // Struct for BasicCommissioningInfoType
@@ -117,7 +146,7 @@ typedef struct _BatFaultChangeType
 // Struct for ContentLaunchBrandingInformation
 typedef struct _ContentLaunchBrandingInformation
 {
-    uint8_t * providerName;
+    chip::CharSpan providerName;
     uint8_t background;
     uint8_t logo;
     uint8_t progressBar;
@@ -128,16 +157,16 @@ typedef struct _ContentLaunchBrandingInformation
 // Struct for ContentLaunchDimension
 typedef struct _ContentLaunchDimension
 {
-    uint8_t * width;
-    uint8_t * height;
+    chip::CharSpan width;
+    chip::CharSpan height;
     uint8_t metric;
 } ContentLaunchDimension;
 
 // Struct for ContentLaunchStyleInformation
 typedef struct _ContentLaunchStyleInformation
 {
-    uint8_t * imageUrl;
-    uint8_t * color;
+    chip::CharSpan imageUrl;
+    chip::CharSpan color;
     uint8_t size;
 } ContentLaunchStyleInformation;
 
@@ -148,20 +177,14 @@ typedef struct _DeviceType
     uint16_t revision;
 } DeviceType;
 
-// Struct for DiscoverAttributesInfoRecord
-typedef struct _DiscoverAttributesInfoRecord
+// Struct for EndpointListStruct
+typedef struct _EndpointListStruct
 {
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-} DiscoverAttributesInfoRecord;
-
-// Struct for ExtendedDiscoverAttributesInfoRecord
-typedef struct _ExtendedDiscoverAttributesInfoRecord
-{
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint8_t attributeAccessControl;
-} ExtendedDiscoverAttributesInfoRecord;
+    uint16_t EndpointListID;
+    chip::CharSpan Name;
+    uint8_t Type;
+    chip::ByteSpan Endpoints;
+} EndpointListStruct;
 
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor
@@ -171,7 +194,7 @@ typedef struct _FabricDescriptor
     uint16_t VendorId;
     chip::FabricId FabricId;
     chip::NodeId NodeId;
-    chip::ByteSpan Label;
+    chip::CharSpan Label;
 } FabricDescriptor;
 
 // Struct for GroupKey
@@ -202,8 +225,8 @@ typedef struct _IasAceZoneStatusResult
 // Struct for LabelStruct
 typedef struct _LabelStruct
 {
-    chip::ByteSpan label;
-    chip::ByteSpan value;
+    chip::CharSpan label;
+    chip::CharSpan value;
 } LabelStruct;
 
 // Struct for MediaInputInfo
@@ -211,8 +234,8 @@ typedef struct _MediaInputInfo
 {
     uint8_t index;
     uint8_t inputType;
-    chip::ByteSpan name;
-    chip::ByteSpan description;
+    chip::CharSpan name;
+    chip::CharSpan description;
 } MediaInputInfo;
 
 // Struct for MediaPlaybackPosition
@@ -233,7 +256,7 @@ typedef struct _NOCStruct
 typedef struct _NavigateTargetTargetInfo
 {
     uint8_t identifier;
-    chip::ByteSpan name;
+    chip::CharSpan name;
 } NavigateTargetTargetInfo;
 
 // Struct for NeighborTable
@@ -258,7 +281,7 @@ typedef struct _NeighborTable
 // Struct for NetworkInterfaceType
 typedef struct _NetworkInterfaceType
 {
-    chip::ByteSpan Name;
+    chip::CharSpan Name;
     bool FabricConnected;
     bool OffPremiseServicesReachableIPv4;
     bool OffPremiseServicesReachableIPv6;
@@ -377,7 +400,7 @@ typedef struct _ThreadInterfaceScanResult
 typedef struct _ThreadMetrics
 {
     uint64_t Id;
-    chip::ByteSpan Name;
+    chip::CharSpan Name;
     uint32_t StackFreeCurrent;
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
@@ -399,17 +422,17 @@ typedef struct _TvChannelInfo
 {
     uint16_t majorNumber;
     uint16_t minorNumber;
-    chip::ByteSpan name;
-    chip::ByteSpan callSign;
-    chip::ByteSpan affiliateCallSign;
+    chip::CharSpan name;
+    chip::CharSpan callSign;
+    chip::CharSpan affiliateCallSign;
 } TvChannelInfo;
 
 // Struct for TvChannelLineupInfo
 typedef struct _TvChannelLineupInfo
 {
-    uint8_t * operatorName;
-    uint8_t * lineupName;
-    uint8_t * postalCode;
+    chip::CharSpan operatorName;
+    chip::CharSpan lineupName;
+    chip::CharSpan postalCode;
     uint8_t lineupInfoType;
 } TvChannelLineupInfo;
 

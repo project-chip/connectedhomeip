@@ -29,6 +29,7 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
@@ -48,6 +49,16 @@ class GenericPlatformManagerImpl_FreeRTOS;
 template <class>
 class GenericPlatformManagerImpl_POSIX;
 } // namespace Internal
+
+// 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
+constexpr size_t kMaxHardwareAddrSize = 8;
+
+struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type
+{
+    char Name[Inet::InterfaceId::kMaxIfNameLength];
+    uint8_t MacAddress[kMaxHardwareAddrSize];
+    NetworkInterface * Next; /* Pointer to the next structure.  */
+};
 
 class ConnectivityManagerImpl;
 
@@ -166,6 +177,16 @@ public:
     void ErasePersistentInfo();
     void ResetThreadNetworkDiagnosticsCounts();
     CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
+
+    // General diagnostics methods
+
+    /*
+     * Get the linked list of network interfaces of the current plaform. After usage, each caller of GetNetworkInterfaces
+     * needs to release the network interface list it gets via ReleaseNetworkInterfaces.
+     *
+     */
+    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp);
+    void ReleaseNetworkInterfaces(NetworkInterface * netifp);
 
     // Ethernet network diagnostics methods
     CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
@@ -388,6 +409,16 @@ inline void ConnectivityManager::SetWiFiAPIdleTimeoutMS(uint32_t val)
 inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
 {
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
+}
+
+inline CHIP_ERROR ConnectivityManager::GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    return static_cast<ImplClass *>(this)->_GetNetworkInterfaces(netifpp);
+}
+
+inline void ConnectivityManager::ReleaseNetworkInterfaces(NetworkInterface * netifp)
+{
+    return static_cast<ImplClass *>(this)->_ReleaseNetworkInterfaces(netifp);
 }
 
 inline CHIP_ERROR ConnectivityManager::GetEthPHYRate(uint8_t & pHYRate)

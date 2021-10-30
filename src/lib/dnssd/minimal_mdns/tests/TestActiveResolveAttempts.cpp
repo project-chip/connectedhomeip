@@ -23,18 +23,19 @@
 namespace {
 
 using namespace chip;
+using namespace chip::System::Clock::Literals;
+using chip::System::Clock::Timeout;
 
-class MockClock : public System::ClockBase
+class MockClock : public System::Clock::ClockBase
 {
 public:
-    MonotonicMicroseconds GetMonotonicMicroseconds() override { return mUsec; }
-    MonotonicMilliseconds GetMonotonicMilliseconds() override { return mUsec / 1000; }
+    System::Clock::Microseconds64 GetMonotonicMicroseconds64() override { return mMsec; }
+    System::Clock::Milliseconds64 GetMonotonicMilliseconds64() override { return mMsec; }
 
-    void AdvanceMs(MonotonicMilliseconds ms) { mUsec += ms * 1000L; }
-    void AdvanceSec(uint32_t s) { AdvanceMs(s * 1000); }
+    void Advance(System::Clock::Milliseconds32 ms) { mMsec += ms; }
 
 private:
-    MonotonicMicroseconds mUsec = 0;
+    System::Clock::Milliseconds64 mMsec;
 };
 
 PeerId MakePeerId(NodeId nodeId)
@@ -48,41 +49,41 @@ void TestSinglePeerAddRemove(nlTestSuite * inSuite, void * inContext)
     MockClock mockClock;
     mdns::Minimal::ActiveResolveAttempts attempts(&mockClock);
 
-    mockClock.AdvanceMs(1234);
+    mockClock.Advance(1234_ms32);
 
     // Starting up, no scheduled peers are expected
-    NL_TEST_ASSERT(inSuite, !attempts.GetMsUntilNextExpectedResponse().HasValue());
+    NL_TEST_ASSERT(inSuite, !attempts.GetTimeUntilNextExpectedResponse().HasValue());
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 
     // Adding a single peer should result in it being scheduled
 
     attempts.MarkPending(MakePeerId(1));
 
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(0u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(0_ms32));
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(1)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 
     // one Next schedule is called, expect to have a delay of 1000 ms
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(1000u));
-    mockClock.AdvanceMs(500);
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(500u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(1000_ms32));
+    mockClock.Advance(500_ms32);
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(500_ms32));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 
     // past due date: timeout should be 0
-    mockClock.AdvanceMs(800);
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(0u));
+    mockClock.Advance(800_ms32);
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(0_ms32));
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(1)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 
     // one Next schedule is called, expect to have a delay of 2000 ms
     // sincve the timeout doubles every time
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(2000u));
-    mockClock.AdvanceMs(100);
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(1900u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(2000_ms32));
+    mockClock.Advance(100_ms32);
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(1900_ms32));
 
     // once complete, nothing to schedule
     attempts.Complete(MakePeerId(1));
-    NL_TEST_ASSERT(inSuite, !attempts.GetMsUntilNextExpectedResponse().HasValue());
+    NL_TEST_ASSERT(inSuite, !attempts.GetTimeUntilNextExpectedResponse().HasValue());
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 }
 
@@ -91,31 +92,31 @@ void TestRescheduleSamePeerId(nlTestSuite * inSuite, void * inContext)
     MockClock mockClock;
     mdns::Minimal::ActiveResolveAttempts attempts(&mockClock);
 
-    mockClock.AdvanceMs(112233);
+    mockClock.Advance(112233_ms32);
 
     attempts.MarkPending(MakePeerId(1));
 
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(0u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(0_ms32));
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(1)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 
     // one Next schedule is called, expect to have a delay of 1000 ms
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(1000u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(1000_ms32));
 
     // 2nd try goes to 2 seconds (once at least 1 second passes)
-    mockClock.AdvanceMs(1234);
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(0u));
+    mockClock.Advance(1234_ms32);
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(0_ms32));
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(1)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(2000u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(2000_ms32));
 
     // reschedule starts fresh
     attempts.MarkPending(MakePeerId(1));
 
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(0u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(0_ms32));
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(1)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(1000u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(1000_ms32));
 }
 
 void TestLRU(nlTestSuite * inSuite, void * inContext)
@@ -124,18 +125,18 @@ void TestLRU(nlTestSuite * inSuite, void * inContext)
     MockClock mockClock;
     mdns::Minimal::ActiveResolveAttempts attempts(&mockClock);
 
-    mockClock.AdvanceMs(334455);
+    mockClock.Advance(334455_ms32);
 
     // add a single very old peer
     attempts.MarkPending(MakePeerId(9999));
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(9999)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 
-    mockClock.AdvanceMs(1000);
+    mockClock.Advance(1000_ms32);
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(9999)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 
-    mockClock.AdvanceMs(2000);
+    mockClock.Advance(2000_ms32);
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(9999)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 
@@ -144,21 +145,21 @@ void TestLRU(nlTestSuite * inSuite, void * inContext)
     for (uint32_t i = 1; i < mdns::Minimal::ActiveResolveAttempts::kRetryQueueSize; i++)
     {
         attempts.MarkPending(MakePeerId(i));
-        mockClock.AdvanceMs(1);
+        mockClock.Advance(1_ms32);
 
         NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(i)));
         NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
     }
 
     // +2 because: 1 element skipped, one element is the "current" that has a delay of 1000ms
-    NL_TEST_ASSERT(
-        inSuite,
-        attempts.GetMsUntilNextExpectedResponse() ==
-            Optional<uint32_t>::Value(static_cast<uint32_t>(1000 - mdns::Minimal::ActiveResolveAttempts::kRetryQueueSize + 2)));
+    NL_TEST_ASSERT(inSuite,
+                   attempts.GetTimeUntilNextExpectedResponse() ==
+                       Optional<System::Clock::Timeout>::Value(
+                           System::Clock::Milliseconds32(1000 - mdns::Minimal::ActiveResolveAttempts::kRetryQueueSize + 2)));
 
     // add another element - this should overwrite peer 9999
     attempts.MarkPending(MakePeerId(mdns::Minimal::ActiveResolveAttempts::kRetryQueueSize));
-    mockClock.AdvanceSec(32);
+    mockClock.Advance(32_s16);
 
     for (Optional<PeerId> peerId = attempts.NextScheduledPeer(); peerId.HasValue(); peerId = attempts.NextScheduledPeer())
     {
@@ -166,7 +167,7 @@ void TestLRU(nlTestSuite * inSuite, void * inContext)
     }
 
     // Still have active pending items (queue is full)
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse().HasValue());
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse().HasValue());
 
     // expire all of them. Since we double timeout every expiry, we expect a
     // few iteratios to be able to expire the entire queue
@@ -175,13 +176,13 @@ void TestLRU(nlTestSuite * inSuite, void * inContext)
     int i = 0;
     for (; i < kMaxIterations; i++)
     {
-        Optional<uint32_t> ms = attempts.GetMsUntilNextExpectedResponse();
+        Optional<System::Clock::Timeout> ms = attempts.GetTimeUntilNextExpectedResponse();
         if (!ms.HasValue())
         {
             break;
         }
 
-        mockClock.AdvanceMs(ms.Value());
+        mockClock.Advance(ms.Value());
 
         Optional<PeerId> peerId = attempts.NextScheduledPeer();
         while (peerId.HasValue())
@@ -198,16 +199,16 @@ void TestNextPeerOrdering(nlTestSuite * inSuite, void * inContext)
     MockClock mockClock;
     mdns::Minimal::ActiveResolveAttempts attempts(&mockClock);
 
-    mockClock.AdvanceMs(123321);
+    mockClock.Advance(123321_ms32);
 
     // add a single peer that will be resolved quickly
     attempts.MarkPending(MakePeerId(1));
 
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(1)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(1000u));
-    mockClock.AdvanceMs(20);
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(980u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(1000_ms32));
+    mockClock.Advance(20_ms32);
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(980_ms32));
 
     // expect peerid to be resolve within 1 second from now
     attempts.MarkPending(MakePeerId(2));
@@ -215,14 +216,14 @@ void TestNextPeerOrdering(nlTestSuite * inSuite, void * inContext)
     // mock that we are querying 2 as well
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(2)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
-    mockClock.AdvanceMs(80);
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(900u));
+    mockClock.Advance(80_ms32);
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(900_ms32));
 
     // Peer 1 is done, now peer2 should be pending (in 980ms)
     attempts.Complete(MakePeerId(1));
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(920u));
-    mockClock.AdvanceMs(20);
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(900u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(920_ms32));
+    mockClock.Advance(20_ms32);
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(900_ms32));
 
     // Once peer 3 is added, queue should be
     //  - 900 ms until peer id 2 is pending
@@ -230,19 +231,19 @@ void TestNextPeerOrdering(nlTestSuite * inSuite, void * inContext)
     attempts.MarkPending(MakePeerId(3));
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(3)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(900u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(900_ms32));
 
     // After the clock advance
     //  - 400 ms until peer id 2 is pending
     //  - 500 ms until peer id 3 is pending
-    mockClock.AdvanceMs(500);
+    mockClock.Advance(500_ms32);
 
-    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(400u));
+    NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(400_ms32));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 
     // advancing the clock 'too long' will return both other entries, in  reverse order due to how
     // the internal cache is built
-    mockClock.AdvanceMs(500);
+    mockClock.Advance(500_ms32);
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(3)));
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(2)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());

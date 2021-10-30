@@ -67,8 +67,7 @@ limitations under the License.
   </enum>
   <struct name="NetworkInterfaceType">
     <cluster code="0x0033"/>
-    <!-- TODO: CHAR_STRING not supported yet in structs. -->
-    <item name="Name" type="OCTET_STRING" length="32"/>
+    <item name="Name" type="CHAR_STRING" length="32"/>
     <item name="FabricConnected" type="BOOLEAN"/>
     <item name="OffPremiseServicesReachableIPv4" type="BOOLEAN"/>
     <item name="OffPremiseServicesReachableIPv6" type="BOOLEAN"/>

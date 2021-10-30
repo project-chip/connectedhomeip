@@ -470,7 +470,7 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
         }
         else
         {
-            char subtypeStr[kMaxSubtypeDescSize];
+            char subtypeStr[Common::kSubTypeMaxLength + 1];
             ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
             qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
                                           kLocalDomain);
@@ -483,7 +483,7 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
         }
         else
         {
-            char subtypeStr[kMaxSubtypeDescSize];
+            char subtypeStr[Common::kSubTypeMaxLength + 1];
             ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
             qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
                                           kLocalDomain);
@@ -513,14 +513,14 @@ CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&ResolveRetryCallback, this);
 
-    Optional<uint32_t> delayMs = mActiveResolves.GetMsUntilNextExpectedResponse();
+    Optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
 
-    if (!delayMs.HasValue())
+    if (!delay.HasValue())
     {
         return CHIP_NO_ERROR;
     }
 
-    return mSystemLayer->StartTimer(delayMs.Value(), &ResolveRetryCallback, this);
+    return mSystemLayer->StartTimer(delay.Value(), &ResolveRetryCallback, this);
 }
 
 void MinMdnsResolver::ResolveRetryCallback(System::Layer *, void * self)

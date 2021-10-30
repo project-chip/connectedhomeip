@@ -31,7 +31,6 @@
 enum class PairingMode
 {
     None,
-    Bypass,
     QRCode,
     ManualCode,
     Ble,
@@ -59,9 +58,13 @@ public:
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
         CHIPCommand(commandName),
         mPairingMode(mode), mNetworkType(networkType),
-        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, INET_NULL_INTERFACEID },
-        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() },
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
+        mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this)
     {
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -79,10 +82,6 @@ public:
         switch (mode)
         {
         case PairingMode::None:
-            break;
-        case PairingMode::Bypass:
-            AddArgument("device-remote-ip", &mRemoteAddr);
-            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             break;
         case PairingMode::QRCode:
         case PairingMode::ManualCode:
@@ -146,8 +145,8 @@ public:
     }
 
     /////////// CHIPCommand Interface /////////
-    CHIP_ERROR Run(NodeId remoteId) override;
-    uint16_t GetWaitDurationInSeconds() const override { return 120; }
+    CHIP_ERROR RunCommand() override;
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(120); }
     void Shutdown() override;
 
     /////////// DevicePairingDelegate Interface /////////
@@ -164,8 +163,8 @@ public:
 
     /////////// Network Commissioning Callbacks /////////
     static void OnDefaultFailureResponse(void * context, uint8_t status);
-    static void OnAddNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
-    static void OnEnableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnAddNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void OnEnableNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -174,7 +173,6 @@ private:
     CHIP_ERROR PairWithQRCode(NodeId remoteId);
     CHIP_ERROR PairWithManualCode(NodeId remoteId);
     CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
-    CHIP_ERROR PairWithoutSecurity(NodeId remoteId, PeerAddress address);
     CHIP_ERROR Unpair(NodeId remoteId);
     CHIP_ERROR OpenCommissioningWindow();
 
@@ -192,7 +190,7 @@ private:
     const PairingNetworkType mNetworkType;
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
-    NodeId mRemoteId;
+    NodeId mNodeId;
     uint16_t mRemotePort;
     uint64_t mFabricId;
     uint16_t mTimeout;
@@ -218,7 +216,9 @@ private:
 
     static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+    static void OnOpenCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload);
 
     chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindow> mOnOpenCommissioningWindowCallback;
 };

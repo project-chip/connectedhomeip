@@ -269,9 +269,6 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
-    // TODO - Move EstimateTLVStructOverhead to CHIPTLV header file
-    constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }
-
     void CloseExchange();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
@@ -339,8 +336,10 @@ class SecurePairingUsingTestSecret : public PairingSession
 public:
     SecurePairingUsingTestSecret()
     {
-        SetLocalSessionId(0);
-        SetPeerSessionId(0);
+        // Do not set to 0 to prevent unwanted unsecured session
+        // since the session type is unknown.
+        SetLocalSessionId(1);
+        SetPeerSessionId(1);
     }
 
     SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId)

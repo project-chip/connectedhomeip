@@ -45,7 +45,7 @@ public:
             mSuccessCallback(                                                         //
                 nodeData.mPeerId.GetCompressedFabricId(),                             //
                 nodeData.mPeerId.GetNodeId(),                                         //
-                nodeData.mInterfaceId,                                                //
+                nodeData.mInterfaceId.GetPlatformInterface(),                         //
                 nodeData.mAddress.ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
                 nodeData.mPort                                                        //
             );
@@ -98,7 +98,7 @@ extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, ui
         Resolver::Instance().SetResolverDelegate(&gPythonResolverDelegate);
 
         result = Resolver::Instance().ResolveNodeId(chip::PeerId().SetCompressedFabricId(fabricId).SetNodeId(nodeId),
-                                                    chip::Inet::IPAddressType::kIPAddressType_Any);
+                                                    chip::Inet::IPAddressType::kAny);
     });
 
     return result.AsInteger();

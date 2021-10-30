@@ -73,7 +73,7 @@ protected:
     void _RunEventLoop(void);
     CHIP_ERROR _StartEventLoopTask(void);
     CHIP_ERROR _StopEventLoopTask();
-    CHIP_ERROR _StartChipTimer(uint32_t durationMS);
+    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
     CHIP_ERROR _Shutdown(void);
 
     // ===== Methods available to the implementation subclass.

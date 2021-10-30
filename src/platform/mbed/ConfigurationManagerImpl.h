@@ -26,23 +26,15 @@
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <platform/mbed/MbedConfig.h>
 
-// Forward declare test method that run the tests.
-int cmd_device_test_config(int argc, char ** argv);
-
 namespace chip {
 namespace DeviceLayer {
 
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Zephyr platform.
  */
-class ConfigurationManagerImpl final : public ConfigurationManager,
-                                       public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
                                        private Internal::MbedConfig
 {
-    // Allow the ConfigurationManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend class ConfigurationManager;
-
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -52,12 +44,12 @@ class ConfigurationManagerImpl final : public ConfigurationManager,
 private:
     // ===== Members that implement the ConfigurationManager public interface.
 
-    CHIP_ERROR _Init(void);
-    CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
-    bool _CanFactoryReset(void);
-    void _InitiateFactoryReset(void);
-    CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
-    CHIP_ERROR _WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
+    CHIP_ERROR Init(void) override;
+    CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
+    bool CanFactoryReset(void) override;
+    void InitiateFactoryReset(void) override;
+    CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
+    CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
@@ -71,10 +63,6 @@ private:
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
-
-    // ===== Members for internal use by the following friends (testing in shell application)
-    friend int ::cmd_device_test_config(int argc, char ** argv);
-    using MbedConfig::RunConfigUnitTest;
 };
 
 /**

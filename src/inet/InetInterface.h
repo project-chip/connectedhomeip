@@ -59,63 +59,102 @@ class IPAddress;
 class IPPrefix;
 
 /**
- * @typedef     InterfaceId
- *
- * @brief       Indicator for system network interfaces.
- *
- * @details
- *  Portability depends on never witnessing this alias. It may be replaced by a
- *  concrete opaque class in the future.
- *
- *  Note Well: The term "interface identifier" also conventionally refers to
- *  the lower 64 bits of an IPv6 address in all the relevant IETF standards
- *  documents, where the abbreviation "IID" is often used. In this text, the
- *  term "interface indicator" refers to values of this type alias.
+ * Indicator for system network interfaces.
  */
-
+class InterfaceId
+{
+public:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-typedef struct netif * InterfaceId;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    using PlatformType                       = struct netif *;
+    static constexpr size_t kMaxIfNameLength = 13; // Names are formatted as %c%c%d
+#endif                                             // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-typedef unsigned InterfaceId;
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+    using PlatformType                       = unsigned int;
+    static constexpr size_t kMaxIfNameLength = IF_NAMESIZE;
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-typedef int InterfaceId;
+    using PlatformType                       = int;
+    static constexpr size_t kMaxIfNameLength = Z_DEVICE_MAX_NAME_LEN;
 #endif
 
-/**
- * @def     INET_NULL_INTERFACEID
- *
- * @brief   The distinguished value indicating no network interface.
- *
- * @details
- *  Note Well: This is not the indicator of a "null" network interface. This
- *  value can be used to indicate the absence of a specific network interface,
- *  or to specify that any applicable network interface is acceptable. Usage
- *  varies depending on context.
- */
+public:
+    ~InterfaceId() = default;
 
+    constexpr InterfaceId() : mPlatformInterface(kPlatformNull) {}
+    explicit constexpr InterfaceId(PlatformType interface) : mPlatformInterface(interface) {}
+
+    constexpr InterfaceId(const InterfaceId & other) : mPlatformInterface(other.mPlatformInterface) {}
+    constexpr InterfaceId & operator=(const InterfaceId & other)
+    {
+        mPlatformInterface = other.mPlatformInterface;
+        return *this;
+    }
+
+    static constexpr InterfaceId Null() { return InterfaceId(); }
+
+    constexpr bool operator==(const InterfaceId & other) const { return mPlatformInterface == other.mPlatformInterface; }
+    constexpr bool operator!=(const InterfaceId & other) const { return mPlatformInterface != other.mPlatformInterface; }
+
+    /**
+     * Test for inequivalence with the null interface.
+     */
+    bool IsPresent() const { return mPlatformInterface != kPlatformNull; }
+
+    /**
+     * Get the underlying platform representation of the interface.
+     */
+    PlatformType GetPlatformInterface() const { return mPlatformInterface; }
+
+    /**
+     * Get the name of the network interface
+     *
+     * @param[in]   nameBuf     Region of memory to write the interface name.
+     * @param[in]   nameBufSize Size of the region denoted by \c nameBuf.
+     *
+     * @retval  CHIP_NO_ERROR               Successful result, interface name written.
+     * @retval  CHIP_ERROR_BUFFER_TOO_SMALL Buffer is too small for the interface name.
+     * @retval  other                       Another system or platform error.
+     *
+     *  Writes the name of the network interface as a \c NUL terminated text string at \c nameBuf.
+     *  The name of the unspecified network interface is the empty string.
+     */
+    CHIP_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize) const;
+
+    /**
+     * Search the list of network interfaces for the indicated name.
+     *
+     * @param[in]   intfName    Name of the network interface to find.
+     * @param[out]  intfId      Indicator of the network interface to assign.
+     *
+     * @retval  CHIP_NO_ERROR                   Success, network interface indicated.
+     * @retval  INET_ERROR_UNKNOWN_INTERFACE    No network interface found.
+     * @retval  other                           Another system or platform error.
+     *
+     * @note
+     *  On LwIP, this function must be called with the LwIP stack lock acquired.
+     */
+    static CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId);
+
+private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#define INET_NULL_INTERFACEID NULL
+    static constexpr PlatformType kPlatformNull = nullptr;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-#define INET_NULL_INTERFACEID 0
-#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+    static constexpr PlatformType kPlatformNull = 0;
+#endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+    static constexpr PlatformType kPlatformNull = 0;
+#endif
+    PlatformType mPlatformInterface;
+};
 
 /**
- * @brief   Test \c ID for inequivalence with \c INET_NULL_INTERFACEID
- *
- * @details
- *  This macro resolves to an expression that evaluates \c false if the
- *  argument is equivalent to \c INET_NULL_INTERFACEID and \c true otherwise.
+ * Compute a prefix length from a variable-length netmask.
  */
-#define IsInterfaceIdPresent(intfId) ((intfId) != INET_NULL_INTERFACEID)
-
-extern CHIP_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_t nameBufSize);
-extern CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId);
 extern uint8_t NetmaskToPrefixLength(const uint8_t * netmask, uint16_t netmaskLen);
 
 /**
@@ -142,30 +181,90 @@ extern uint8_t NetmaskToPrefixLength(const uint8_t * netmask, uint16_t netmaskLe
 class InterfaceIterator
 {
 public:
+    /**
+     * Constructs an InterfaceIterator object.
+     *
+     *  Starts the iterator at the first network interface. On some platforms,
+     *  this constructor may allocate resources recycled by the destructor.
+     */
     InterfaceIterator();
     ~InterfaceIterator();
 
+    /**
+     * Test whether the iterator is positioned on an interface
+     *
+     * @return  \c true if the iterator is positioned on an interface;
+     *          \c false if positioned beyond the end of the interface list.
+     */
     bool HasCurrent();
-    bool Next();
-    InterfaceId GetInterface();
-    InterfaceId GetInterfaceId();
-    CHIP_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize);
-    bool IsUp();
-    bool SupportsMulticast();
-    bool HasBroadcastAddress();
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static constexpr size_t kMaxIfNameLength = 13; // Names are formatted as %c%c%d
-#elif CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-    static constexpr size_t kMaxIfNameLength = IF_NAMESIZE;
-#elif CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-    static constexpr size_t kMaxIfNameLength = Z_DEVICE_MAX_NAME_LEN;
-#elif defined(IFNAMSIZ)
-    static constexpr size_t kMaxIfNameLength = IFNAMSIZ;
-#else
-    // No constant available here - set some reasonable size
-    static constexpr size_t kMaxIfNameLength = 33;
-#endif
+    /**
+     * Advance the iterator to the next network interface.
+     *
+     * @return  \c false if advanced beyond the end, else \c true.
+     *
+     *  Advances the internal iterator to the next network interface or to a position
+     *  beyond the end of the interface list.
+     *
+     *  On multi-threaded LwIP systems, this method is thread-safe relative to other
+     *  threads accessing the global LwIP state provided that: 1) the other threads
+     *  hold the LwIP core lock while mutating the list of netifs; and 2) netif objects
+     *  themselves are never destroyed.
+     *
+     *  Iteration is stable in the face of changes to the underlying system's
+     *  interfaces, *except* in the case of LwIP systems when the currently selected
+     *  interface is removed from the list, which causes iteration to end immediately.
+     */
+    bool Next();
+
+    /**
+     * InterfaceId InterfaceIterator::GetInterfaceId(void)
+     *
+     * Returns the network interface id at the current iterator position.
+     *
+     * @retval  id                   The current network interface id.
+     * @retval  InterfaceId()   If advanced beyond the end of the list.
+     */
+    InterfaceId GetInterfaceId();
+
+    /**
+     * Get the name of the current network interface
+     *
+     * @param[in]   nameBuf     Region of memory to write the interface name.
+     * @param[in]   nameBufSize Size of the region denoted by \c nameBuf.
+     *
+     * @retval  CHIP_NO_ERROR               Successful result, interface name written.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  Iterator is positioned beyond the end of the list.
+     * @retval  CHIP_ERROR_BUFFER_TOO_SMALL Name is too large to be written in buffer.
+     * @retval  other                       Another system or platform error.
+     *
+     *  Writes the name of the network interface as \c NUL terminated text string at \c nameBuf.
+     */
+    CHIP_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize);
+
+    /**
+     * Returns whether the current network interface is up.
+     *
+     * @return  \c true if current network interface is up, \c false if not
+     *          or if the iterator is positioned beyond the end of the list.
+     */
+    bool IsUp();
+
+    /**
+     * Returns whether the current network interface supports multicast.
+     *
+     * @return  \c true if current network interface supports multicast, \c false
+     *          if not, or if the iterator is positioned beyond the end of the list.
+     */
+    bool SupportsMulticast();
+
+    /**
+     * Returns whether the current network interface has a broadcast address.
+     *
+     * @return  \c true if current network interface has a broadcast address, \c false
+     *          if not, or if the iterator is positioned beyond the end of the list.
+     */
+    bool HasBroadcastAddress();
 
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -182,8 +281,8 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-    InterfaceId mCurrentId     = 1;
-    net_if * mCurrentInterface = nullptr;
+    InterfaceId::PlatformType mCurrentId = 1;
+    net_if * mCurrentInterface           = nullptr;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 };
 
@@ -212,20 +311,139 @@ protected:
 class DLL_EXPORT InterfaceAddressIterator
 {
 public:
+    /**
+     * Constructs an InterfaceAddressIterator object.
+     *
+     *  Starts the iterator at the first network address. On some platforms,
+     *  this constructor may allocate resources recycled by the destructor.
+     */
     InterfaceAddressIterator();
+
+    /**
+     * Destroys an InterfaceAddressIterator object.
+     *
+     *  Recycles any resources allocated by the constructor.
+     */
     ~InterfaceAddressIterator();
 
+    /**
+     * Test whether the iterator is positioned on an interface address
+     *
+     * @return  \c true if the iterator is positioned on an interface address;
+     *          \c false if positioned beyond the end of the address list.
+     */
     bool HasCurrent();
+
+    /**
+     * @fn      bool InterfaceAddressIterator::Next(void)
+     *
+     * @brief   Advance the iterator to the next interface address.
+     *
+     * @return  \c false if advanced beyond the end, else \c true.
+     *
+     * @details
+     *     Advances the iterator to the next interface address or to a position
+     *     beyond the end of the address list.
+     *
+     *     On LwIP, this method is thread-safe provided that: 1) other threads hold
+     *     the LwIP core lock while mutating the netif list; and 2) netif objects
+     *     themselves are never destroyed.  Additionally, iteration on LwIP systems
+     *     will terminate early if the current interface is removed from the list.
+     */
     bool Next();
+
+    /**
+     * @fn      IPAddress InterfaceAddressIterator::GetAddress(void)
+     *
+     * @brief   Get the current interface address.
+     *
+     * @return  the current interface address or \c IPAddress::Any if the iterator
+     *          is positioned beyond the end of the address list.
+     */
     IPAddress GetAddress();
+
+    /**
+     * @fn      uint8_t InterfaceAddressIterator::GetPrefixLength(void)
+     *
+     * @brief   Gets the network prefix associated with the current interface address.
+     *
+     * @return  the network prefix (in bits) or 0 if the iterator is positioned beyond
+     *          the end of the address list.
+     *
+     * @details
+     *     On LwIP, this method simply returns the hard-coded constant 64.
+     *
+     *     Note Well: the standard subnet prefix on all links other than PPP
+     *     links is 64 bits. On PPP links and some non-broadcast multipoint access
+     *     links, the convention is either 127 bits or 128 bits, but it might be
+     *     something else. On most platforms, the system's interface address
+     *     structure can represent arbitrary prefix lengths between 0 and 128.
+     */
     uint8_t GetPrefixLength();
-    uint8_t GetIPv6PrefixLength();
+
+    /**
+     * @fn       void InterfaceAddressIterator::GetAddressWithPrefix(IPPrefix & addrWithPrefix)
+     *
+     * @brief    Returns an IPPrefix containing the address and prefix length
+     *           for the current address.
+     */
     void GetAddressWithPrefix(IPPrefix & addrWithPrefix);
-    InterfaceId GetInterface();
+
+    /**
+     * @fn      InterfaceId InterfaceAddressIterator::GetInterfaceId(void)
+     *
+     * @brief   Returns the network interface id associated with the current
+     *          interface address.
+     *
+     * @return  the interface id or \c InterfaceId() if the iterator
+     *          is positioned beyond the end of the address list.
+     */
     InterfaceId GetInterfaceId();
+
+    /**
+     * @fn      CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
+     *
+     * @brief   Get the name of the network interface associated with the
+     *          current interface address.
+     *
+     * @param[in]   nameBuf     region of memory to write the interface name
+     * @param[in]   nameBufSize size of the region denoted by \c nameBuf
+     *
+     * @retval  CHIP_NO_ERROR           successful result, interface name written
+     * @retval  CHIP_ERROR_BUFFER_TOO_SMALL    name is too large to be written in buffer
+     * @retval  CHIP_ERROR_INCORRECT_STATE
+     *                                  the iterator is not currently positioned on an
+     *                                  interface address
+     * @retval  other                   another system or platform error
+     *
+     * @details
+     *     Writes the name of the network interface as \c NUL terminated text string
+     *     at \c nameBuf.
+     */
     CHIP_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize);
+
+    /**
+     * Returns whether the network interface associated with the current interface address is up.
+     *
+     * @return  \c true if current network interface is up, \c false if not, or
+     *          if the iterator is not positioned on an interface address.
+     */
     bool IsUp();
+
+    /**
+     * Returns whether the network interface associated with the current interface address supports multicast.
+     *
+     * @return  \c true if multicast is supported, \c false if not, or
+     *          if the iterator is not positioned on an interface address.
+     */
     bool SupportsMulticast();
+
+    /**
+     * Returns whether the network interface associated with the current interface address has an IPv4 broadcast address.
+     *
+     * @return  \c true if the interface has a broadcast address, \c false if not, or
+     *          if the iterator is not positioned on an interface address.
+     */
     bool HasBroadcastAddress();
 
 private:
@@ -267,7 +485,7 @@ inline bool InterfaceIterator::HasCurrent(void)
 
 inline InterfaceId InterfaceIterator::GetInterfaceId(void)
 {
-    return mCurNetif;
+    return InterfaceId(mCurNetif);
 }
 
 inline InterfaceAddressIterator::InterfaceAddressIterator(void)
@@ -283,30 +501,6 @@ inline InterfaceAddressIterator::~InterfaceAddressIterator(void) {}
 inline InterfaceIterator::~InterfaceIterator()               = default;
 inline InterfaceAddressIterator::~InterfaceAddressIterator() = default;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-
-/**
- * @brief    Deprecated alias for \c GetInterfaceId(void)
- */
-inline InterfaceId InterfaceIterator::GetInterface()
-{
-    return GetInterfaceId();
-}
-
-/**
- * @brief    Deprecated alias for \c GetInterfaceId(void)
- */
-inline InterfaceId InterfaceAddressIterator::GetInterface()
-{
-    return GetInterfaceId();
-}
-
-/**
- * @brief    Deprecated alias for \c GetPrefixLength(void)
- */
-inline uint8_t InterfaceAddressIterator::GetIPv6PrefixLength()
-{
-    return GetPrefixLength();
-}
 
 } // namespace Inet
 } // namespace chip

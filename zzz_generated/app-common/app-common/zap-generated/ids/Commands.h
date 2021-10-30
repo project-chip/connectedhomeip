@@ -449,6 +449,60 @@ static constexpr CommandId Id = 0x00000003;
 } // namespace Commands
 } // namespace PollControl
 
+namespace BridgedActions {
+namespace Commands {
+
+namespace InstantAction {
+static constexpr CommandId Id = 0x00000000;
+} // namespace InstantAction
+
+namespace InstantActionWithTransition {
+static constexpr CommandId Id = 0x00000001;
+} // namespace InstantActionWithTransition
+
+namespace StartAction {
+static constexpr CommandId Id = 0x00000002;
+} // namespace StartAction
+
+namespace StartActionWithDuration {
+static constexpr CommandId Id = 0x00000003;
+} // namespace StartActionWithDuration
+
+namespace StopAction {
+static constexpr CommandId Id = 0x00000004;
+} // namespace StopAction
+
+namespace PauseAction {
+static constexpr CommandId Id = 0x00000005;
+} // namespace PauseAction
+
+namespace PauseActionWithDuration {
+static constexpr CommandId Id = 0x00000006;
+} // namespace PauseActionWithDuration
+
+namespace ResumeAction {
+static constexpr CommandId Id = 0x00000007;
+} // namespace ResumeAction
+
+namespace EnableAction {
+static constexpr CommandId Id = 0x00000008;
+} // namespace EnableAction
+
+namespace EnableActionWithDuration {
+static constexpr CommandId Id = 0x00000009;
+} // namespace EnableActionWithDuration
+
+namespace DisableAction {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace DisableAction
+
+namespace DisableActionWithDuration {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace DisableActionWithDuration
+
+} // namespace Commands
+} // namespace BridgedActions
+
 namespace Basic {
 namespace Commands {
 
@@ -1572,13 +1626,69 @@ namespace TestAddArguments {
 static constexpr CommandId Id = 0x00000004;
 } // namespace TestAddArguments
 
+namespace TestListInt8UReverseResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace TestListInt8UReverseResponse
+
 namespace TestSimpleArgumentRequest {
 static constexpr CommandId Id = 0x00000005;
 } // namespace TestSimpleArgumentRequest
 
+namespace TestEnumsResponse {
+static constexpr CommandId Id = 0x00000005;
+} // namespace TestEnumsResponse
+
 namespace TestStructArrayArgumentRequest {
 static constexpr CommandId Id = 0x00000006;
 } // namespace TestStructArrayArgumentRequest
+
+namespace TestNullableOptionalResponse {
+static constexpr CommandId Id = 0x00000006;
+} // namespace TestNullableOptionalResponse
+
+namespace TestStructArgumentRequest {
+static constexpr CommandId Id = 0x00000007;
+} // namespace TestStructArgumentRequest
+
+namespace TestComplexNullableOptionalResponse {
+static constexpr CommandId Id = 0x00000007;
+} // namespace TestComplexNullableOptionalResponse
+
+namespace TestNestedStructArgumentRequest {
+static constexpr CommandId Id = 0x00000008;
+} // namespace TestNestedStructArgumentRequest
+
+namespace TestListStructArgumentRequest {
+static constexpr CommandId Id = 0x00000009;
+} // namespace TestListStructArgumentRequest
+
+namespace TestListInt8UArgumentRequest {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace TestListInt8UArgumentRequest
+
+namespace TestNestedStructListArgumentRequest {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace TestNestedStructListArgumentRequest
+
+namespace TestListNestedStructListArgumentRequest {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace TestListNestedStructListArgumentRequest
+
+namespace TestListInt8UReverseRequest {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace TestListInt8UReverseRequest
+
+namespace TestEnumsRequest {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace TestEnumsRequest
+
+namespace TestNullableOptionalRequest {
+static constexpr CommandId Id = 0x0000000F;
+} // namespace TestNullableOptionalRequest
+
+namespace TestComplexNullableOptionalRequest {
+static constexpr CommandId Id = 0x00000010;
+} // namespace TestComplexNullableOptionalRequest
 
 } // namespace Commands
 } // namespace TestCluster

@@ -101,17 +101,17 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mWiFiStationMode                = kWiFiStationMode_NotSupported;
-    mWiFiStationState               = kWiFiStationState_NotConnected;
-    mIsProvisioned                  = false;
-    mIp4Address                     = IPAddress::Any;
-    mIp6Address                     = IPAddress::Any;
-    mWiFiAPMode                     = kWiFiAPMode_NotSupported;
-    mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
-    mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
-    mSecurityType                   = NSAPI_SECURITY_WPA_WPA2;
+    mWiFiStationMode              = kWiFiStationMode_NotSupported;
+    mWiFiStationState             = kWiFiStationState_NotConnected;
+    mIsProvisioned                = false;
+    mIp4Address                   = IPAddress::Any;
+    mIp6Address                   = IPAddress::Any;
+    mWiFiAPMode                   = kWiFiAPMode_NotSupported;
+    mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
+    mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
+    mSecurityType                 = NSAPI_SECURITY_WPA_WPA2;
 
-    NetworkInterface * net_if = NetworkInterface::get_default_instance();
+    ::NetworkInterface * net_if = ::NetworkInterface::get_default_instance();
     if (net_if == nullptr)
     {
         ChipLogError(DeviceLayer, "No network interface available");
@@ -138,16 +138,18 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     return err;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectIntervalMS(uint32_t val)
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectInterval(System::Clock::Timeout val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mWiFiStationReconnectIntervalMS != val)
+    if (mWiFiStationReconnectInterval != val)
     {
-        ChipLogProgress(DeviceLayer, "WiFi station reconnect interval MS change: %lu -> %lu", mWiFiStationReconnectIntervalMS, val);
+        ChipLogProgress(DeviceLayer, "WiFi station reconnect interval change: %lu ms -> %lu ms",
+                        System::Clock::Milliseconds32(mWiFiStationReconnectInterval).count(),
+                        System::Clock::Milliseconds32(val).count());
     }
 
-    mWiFiStationReconnectIntervalMS = val;
+    mWiFiStationReconnectInterval = val;
 
     return err;
 }

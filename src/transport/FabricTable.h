@@ -29,6 +29,7 @@
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/Optional.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
@@ -110,6 +111,7 @@ public:
     // TODO - Optimize persistent storage of NOC and Root Cert in FabricInfo.
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert) { return SetCert(mRootCert, cert); }
     CHIP_ERROR SetICACert(const chip::ByteSpan & cert) { return SetCert(mICACert, cert); }
+    CHIP_ERROR SetICACert(const Optional<ByteSpan> & cert) { return SetICACert(cert.ValueOr(ByteSpan())); }
     CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert) { return SetCert(mNOCCert, cert); }
 
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
@@ -123,7 +125,7 @@ public:
     // TODO - Refactor storing and loading of fabric info from persistent storage.
     //        The op cert array doesn't need to be in RAM except when it's being
     //        transmitted to peer node during CASE session setup.
-    CHIP_ERROR GetRootCert(ByteSpan & cert)
+    CHIP_ERROR GetRootCert(ByteSpan & cert) const
     {
         ReturnErrorCodeIf(mRootCert.empty(), CHIP_ERROR_INCORRECT_STATE);
         cert = mRootCert;

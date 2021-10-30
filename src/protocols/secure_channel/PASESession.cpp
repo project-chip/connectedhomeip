@@ -62,7 +62,7 @@ const char * kSpake2pKeyExchangeSalt = "SPAKE2P Key Salt";
 // Wait at most 30 seconds for the response from the peer.
 // This timeout value assumes the underlying transport is reliable.
 // The session establishment fails if the response is not received with in timeout window.
-static constexpr ExchangeContext::Timeout kSpake2p_Response_Timeout = 30000;
+static constexpr ExchangeContext::Timeout kSpake2p_Response_Timeout = System::Clock::Seconds16(30);
 
 #ifdef ENABLE_HSM_PBKDF2
 using PBKDF2_sha256_crypto = PBKDF2_sha256HSM;
@@ -352,8 +352,13 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 {
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
-    const size_t max_msg_len =
-        EstimateTLVStructOverhead(kPBKDFParamRandomNumberSize + sizeof(uint16_t) + sizeof(uint16_t) + sizeof(uint8_t), 4);
+    const size_t max_msg_len       = EstimateTLVStructOverhead(kPBKDFParamRandomNumberSize, // initiatorRandom,
+                                                         sizeof(uint16_t),            // initiatorSessionId
+                                                         sizeof(uint16_t),            // passcodeId,
+                                                         sizeof(uint8_t)              // hasPBKDFParameters
+                                                         /* EstimateTLVStructOverhead(sizeof(uint16_t),
+                                                            sizeof(uint16)_t), // initiatorMRPParams */
+    );
     System::PacketBufferHandle req = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!req.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -367,6 +372,8 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mPasscodeID));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
     // TODO - Add optional MRP parameter support to PASE
+    // When we add MRP params here, adjust the EstimateTLVStructOverhead call
+    // above accordingly.
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&req));
 
@@ -443,8 +450,14 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
 {
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
-    const size_t max_msg_len = EstimateTLVStructOverhead(
-        kPBKDFParamRandomNumberSize + kPBKDFParamRandomNumberSize + sizeof(uint16_t) + sizeof(uint16_t) + sizeof(uint8_t), 5);
+    const size_t max_msg_len =
+        EstimateTLVStructOverhead(kPBKDFParamRandomNumberSize,                             // initiatorRandom
+                                  kPBKDFParamRandomNumberSize,                             // responderRandom
+                                  sizeof(uint16_t),                                        // responderSessionId
+                                  EstimateTLVStructOverhead(sizeof(uint32_t), mSaltLength) // pbkdf_parameters
+                                  /* EstimateTLVStructOverhead(sizeof(uint16_t),
+                                     sizeof(uint16)_t), // responderMRPParams */
+        );
     System::PacketBufferHandle resp = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!resp.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -466,6 +479,9 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
         ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), mSalt, mSaltLength));
         ReturnErrorOnFailure(tlvWriter.EndContainer(pbkdfParamContainer));
     }
+
+    // When we add MRP params here, adjust the EstimateTLVStructOverhead call
+    // above accordingly.
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&resp));
@@ -566,7 +582,7 @@ exit:
 
 CHIP_ERROR PASESession::SendMsg1()
 {
-    const size_t max_msg_len       = EstimateTLVStructOverhead(kMAX_Point_Length, 1);
+    const size_t max_msg_len       = EstimateTLVStructOverhead(kMAX_Point_Length);
     System::PacketBufferHandle msg = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -633,7 +649,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
     msg1 = nullptr;
 
     {
-        const size_t max_msg_len    = EstimateTLVStructOverhead(Y_len + verifier_len, 2);
+        const size_t max_msg_len    = EstimateTLVStructOverhead(Y_len, verifier_len);
         constexpr uint8_t kPake2_pB = 1;
         constexpr uint8_t kPake2_cB = 2;
 
@@ -710,7 +726,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     msg2 = nullptr;
 
     {
-        const size_t max_msg_len    = EstimateTLVStructOverhead(verifier_len, 1);
+        const size_t max_msg_len    = EstimateTLVStructOverhead(verifier_len);
         constexpr uint8_t kPake3_cB = 1;
 
         System::PacketBufferHandle msg3 = System::PacketBufferHandle::New(max_msg_len);

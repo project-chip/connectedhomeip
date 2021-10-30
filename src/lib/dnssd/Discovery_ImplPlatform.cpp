@@ -114,7 +114,7 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
 
 CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
 {
-    if (maxLength < (chip::Dnssd::kMaxInstanceNameSize + 1))
+    if (maxLength < (chip::Dnssd::Commissionable::kInstanceNameMaxLength + 1))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -217,7 +217,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 1];
     char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 1];
     // size of subTypes array should be count of SubTypes above
-    const char * subTypes[kSubTypeMaxNumber];
+    const char * subTypes[Commissionable::kSubTypeMaxNumber];
     size_t subTypeSize = 0;
 
     if (!mDnssdInitialized)
@@ -345,10 +345,10 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     service.mTextEntries   = textEntries;
     service.mTextEntrySize = textEntrySize;
     service.mPort          = params.GetPort();
-    service.mInterface     = INET_NULL_INTERFACEID;
+    service.mInterface     = Inet::InterfaceId::Null();
     service.mSubTypes      = subTypes;
     service.mSubTypeSize   = subTypeSize;
-    service.mAddressType   = Inet::kIPAddressType_Any;
+    service.mAddressType   = Inet::IPAddressType::kAny;
     error                  = ChipDnssdPublishService(&service);
 
     if (error == CHIP_NO_ERROR)
@@ -394,7 +394,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     char compressedFabricIdSub[kSubTypeCompressedFabricIdMaxLength + 1];
-    const char * subTypes[1];
+    const char * subTypes[Operational::kSubTypeMaxNumber];
     size_t subTypeSize = 0;
 
     mOperationalAdvertisingParams = params;
@@ -427,8 +427,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     service.mPort          = params.GetPort();
     service.mTextEntries   = txtEntries;
     service.mTextEntrySize = textEntrySize;
-    service.mInterface     = INET_NULL_INTERFACEID;
-    service.mAddressType   = Inet::kIPAddressType_Any;
+    service.mInterface     = Inet::InterfaceId::Null();
+    service.mAddressType   = Inet::IPAddressType::kAny;
     service.mSubTypes      = subTypes;
     service.mSubTypeSize   = subTypeSize;
     error                  = ChipDnssdPublishService(&service);
@@ -489,7 +489,7 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
     service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolTcp;
     service.mAddressType = type;
-    return ChipDnssdResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
+    return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, this);
 }
 
 void DiscoveryImplPlatform::HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error)
@@ -542,8 +542,8 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter
     char serviceName[kMaxCommisisonableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
-    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
-                           HandleNodeBrowse, this);
+    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
+                           Inet::InterfaceId::Null(), HandleNodeBrowse, this);
 }
 
 CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
@@ -552,8 +552,8 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
     char serviceName[kMaxCommisisonerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
 
-    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
-                           HandleNodeBrowse, this);
+    return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
+                           Inet::InterfaceId::Null(), HandleNodeBrowse, this);
 }
 
 void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERROR error)

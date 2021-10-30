@@ -36,7 +36,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
-    auto & expiryLengthSeconds = commandData.expiryLengthSeconds;
+    auto expiryLengthSeconds = System::Clock::Seconds16(commandData.expiryLengthSeconds);
 
     CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().ArmFailSafe(expiryLengthSeconds);
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);

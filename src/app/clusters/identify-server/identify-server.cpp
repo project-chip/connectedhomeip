@@ -88,6 +88,7 @@ static inline void reg(Identify * inst)
         if (nullptr == instances[i])
         {
             instances[i] = inst;
+            break;
         }
     }
 }
@@ -105,7 +106,7 @@ static inline void unreg(Identify * inst)
 
 void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
 {
-    (void) endpoint;
+    (void) Clusters::Identify::Attributes::IdentifyType::Set(endpoint, inst(endpoint)->mIdentifyType);
 }
 
 static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appState)
@@ -169,7 +170,7 @@ void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttr
                 /* finish identify process */
                 if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT == identify->mCurrentEffectIdentifier && identifyTime > 0)
                 {
-                    (void) chip::DeviceLayer::SystemLayer().StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick,
+                    (void) chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onIdentifyClusterTick,
                                                                        identify);
                     return;
                 }
@@ -196,7 +197,7 @@ void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttr
                 /* we only start if both callbacks are set */
                 identify_activate(identify);
 
-                (void) chip::DeviceLayer::SystemLayer().StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick, identify);
+                (void) chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onIdentifyClusterTick, identify);
                 return;
             }
             else
@@ -263,7 +264,7 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(CommandHandler * commandObj, co
         VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), identifyTime));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
@@ -315,11 +316,10 @@ Identify::Identify(chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart,
                    EmberAfIdentifyIdentifyType identifyType, onEffectIdentifierCb onEffectIdentifier,
                    EmberAfIdentifyEffectIdentifier effectIdentifier, EmberAfIdentifyEffectVariant effectVariant) :
     mEndpoint(endpoint),
-    mOnIdentifyStart(onIdentifyStart), mOnIdentifyStop(onIdentifyStop), mOnEffectIdentifier(onEffectIdentifier),
-    mCurrentEffectIdentifier(effectIdentifier), mTargetEffectIdentifier(effectIdentifier),
+    mOnIdentifyStart(onIdentifyStart), mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType),
+    mOnEffectIdentifier(onEffectIdentifier), mCurrentEffectIdentifier(effectIdentifier), mTargetEffectIdentifier(effectIdentifier),
     mEffectVariant(static_cast<uint8_t>(effectVariant))
 {
-    (void) Clusters::Identify::Attributes::IdentifyType::Set(endpoint, identifyType);
     reg(this);
 };
 

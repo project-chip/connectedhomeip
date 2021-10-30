@@ -27,121 +27,70 @@ namespace DeviceLayer {
  */
 class ConfigurationManagerImpl final : public ConfigurationManager
 {
-    // Allow the ConfigurationManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend class ConfigurationManager;
+    virtual ~ConfigurationManagerImpl() = default;
 
 private:
-    CHIP_ERROR _Init() { return CHIP_NO_ERROR; }
-    CHIP_ERROR _GetVendorName(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetVendorId(uint16_t & vendorId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetProductName(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetProductId(uint16_t & productId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetProductRevisionString(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetProductRevision(uint16_t & productRev) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreProductRevision(uint16_t productRev) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetFirmwareRevisionString(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetFirmwareRevision(uint32_t & firmwareRev) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
-                                     uint8_t & second)
+    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductId(uint16_t & productId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductRevision(uint16_t & productRev) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreProductRevision(uint16_t productRev) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR _GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreSerialNumber(const char * serialNum, size_t serialNumLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetPrimaryMACAddress(MutableByteSpan buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StorePrimaryWiFiMACAddress(const uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetPollPeriod(uint32_t & buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StorePrimary802154MACAddress(const uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetDeviceId(uint64_t & deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR _GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetManufacturerDeviceId(uint64_t & deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreManufacturerDeviceId(uint64_t deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR _StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR _StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR _GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR _StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetSetupPinCode(uint32_t & setupPinCode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreSetupPinCode(uint32_t setupPinCode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetSetupDiscriminator(uint16_t & setupDiscriminator) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreSetupDiscriminator(uint16_t setupDiscriminator) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetFabricId(uint64_t & fabricId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreFabricId(uint64_t fabricId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-    CHIP_ERROR _GetLifetimeCounter(uint16_t & lifetimeCounter) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _IncrementLifetimeCounter() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
-    CHIP_ERROR _GetServiceId(uint64_t & serviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StorePairedAccountId(const char * accountId, size_t accountIdLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen,
-                                             const char * accountId, size_t accountIdLen)
+    CHIP_ERROR GetFailSafeArmed(bool & val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR SetFailSafeArmed(bool val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR _ClearServiceProvisioningData() { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetFailSafeArmed(bool & val) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _SetFailSafeArmed(bool val) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetQRCodeString(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetWiFiAPSSID(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
-    bool _IsCommissionableDeviceTypeEnabled() { return false; }
-    CHIP_ERROR _GetDeviceType(uint16_t & deviceType) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    bool _IsCommissionableDeviceNameEnabled() { return false; }
-    CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetInitialPairingHint(uint16_t & pairingHint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetInitialPairingInstruction(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetSecondaryPairingHint(uint16_t & pairingHint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetSecondaryPairingInstruction(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetRegulatoryLocation(uint32_t & location) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreRegulatoryLocation(uint32_t location) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreCountryCode(const char * code, size_t codeLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetBreadcrumb(uint64_t & breadcrumb) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreBreadcrumb(uint64_t breadcrumb) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _ConfigureChipStack() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    bool IsCommissionableDeviceTypeEnabled() override { return false; }
+    CHIP_ERROR GetDeviceTypeId(uint16_t & deviceType) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    bool IsCommissionableDeviceNameEnabled() override { return false; }
+    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetRegulatoryLocation(uint32_t & location) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreRegulatoryLocation(uint32_t location) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #if !defined(NDEBUG)
-    CHIP_ERROR _RunUnitTests(void) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR RunUnitTests(void) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
-    bool _IsServiceProvisioned() { return false; }
-    bool _IsMemberOfFabric() { return false; }
-    bool _IsPairedToAccount() { return false; }
-    bool _IsFullyProvisioned() { return false; }
-    CHIP_ERROR _ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    void _UseManufacturerCredentialsAsOperational(bool val) {}
-    void _LogDeviceConfig() {}
-    bool _CanFactoryReset() { return true; }
-    void _InitiateFactoryReset() {}
-    CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+    bool IsFullyProvisioned() override { return false; }
+    void LogDeviceConfig() override {}
+    bool CanFactoryReset() override { return true; }
+    void InitiateFactoryReset() override {}
+    CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR _WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+    CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }

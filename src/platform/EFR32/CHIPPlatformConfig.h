@@ -115,6 +115,18 @@
 #define CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS 4
 #endif // CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
 
+/**
+ *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *
+ *  @brief
+ *    Maximum number of administrators that can provision the device. Each admin
+ *    can provision the device with their unique operational credentials and manage
+ *    their access control lists.
+ */
+#ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
+#define CHIP_CONFIG_MAX_DEVICE_ADMINS 5 // 4 fabrics + 1 for rotation slack
+#endif
+
 // ==================== Security Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_APPLICATION_GROUPS

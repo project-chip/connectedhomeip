@@ -33,21 +33,23 @@ namespace Controller {
 PythonInteractionModelDelegate gPythonInteractionModelDelegate;
 
 void PythonInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
-                                                TLV::TLVReader * aData)
+                                                const app::StatusIB & aStatus, TLV::TLVReader * aData)
 {
-    CommandStatus status{ Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(),
-                          to_underlying(Protocols::InteractionModel::Status::Success),
-                          aPath.mEndpointId,
-                          aPath.mClusterId,
-                          aPath.mCommandId,
-                          1 }; // This indicates the index of the command if multiple command/status payloads are present in the
-                               // message. For now, we don't support this in the IM layer, so just always set this to 1.
+    CommandStatus status{
+        aStatus.mStatus,
+        aStatus.mClusterStatus.HasValue() ? aStatus.mClusterStatus.Value() : chip::python::kUndefinedClusterStatus,
+        aPath.mEndpointId,
+        aPath.mClusterId,
+        aPath.mCommandId,
+        1
+    }; // This indicates the index of the command if multiple command/status payloads are present in the
+       // message. For now, we don't support this in the IM layer, so just always set this to 1.
     if (commandResponseStatusFunct != nullptr)
     {
         commandResponseStatusFunct(reinterpret_cast<uint64_t>(apCommandSender), &status, sizeof(status));
     }
 
-    DeviceControllerInteractionModelDelegate::OnResponse(apCommandSender, aPath, aData);
+    DeviceControllerInteractionModelDelegate::OnResponse(apCommandSender, aPath, aStatus, aData);
 
     if (commandResponseErrorFunct != nullptr)
     {
@@ -55,10 +57,16 @@ void PythonInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSe
     }
 }
 
-void PythonInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender,
-                                             Protocols::InteractionModel::Status aProtocolCode, CHIP_ERROR aError)
+void PythonInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender, const app::StatusIB & aStatus,
+                                             CHIP_ERROR aError)
 {
-    CommandStatus status{ Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(), to_underlying(aProtocolCode), 0, 0, 0, 1 };
+    CommandStatus status{ aStatus.mStatus,
+                          aStatus.mClusterStatus.HasValue() ? aStatus.mClusterStatus.Value()
+                                                            : chip::python::kUndefinedClusterStatus,
+                          0,
+                          0,
+                          0,
+                          1 };
 
     if (commandResponseStatusFunct != nullptr)
     {
@@ -69,29 +77,7 @@ void PythonInteractionModelDelegate::OnError(const app::CommandSender * apComman
     {
         commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), aError.AsInteger());
     }
-    DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aProtocolCode, aError);
-}
-
-CHIP_ERROR PythonInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                                               const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                                               const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                                                               app::AttributePathParams & aAttributePathParams,
-                                                               uint8_t aCommandIndex)
-{
-    if (onWriteResponseFunct != nullptr)
-    {
-        AttributeWriteStatus status{ apWriteClient->GetSourceNodeId(),
-                                     apWriteClient->GetAppIdentifier(),
-                                     aProtocolId,
-                                     aProtocolCode,
-                                     aAttributePathParams.mEndpointId,
-                                     aAttributePathParams.mClusterId,
-                                     aAttributePathParams.mFieldId };
-        onWriteResponseFunct(&status, sizeof(status));
-    }
-    DeviceControllerInteractionModelDelegate::WriteResponseStatus(apWriteClient, aGeneralCode, aProtocolId, aProtocolCode,
-                                                                  aAttributePathParams, aCommandIndex);
-    return CHIP_NO_ERROR;
+    DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aStatus, aError);
 }
 
 void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,

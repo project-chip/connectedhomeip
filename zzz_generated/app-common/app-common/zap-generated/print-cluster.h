@@ -114,6 +114,12 @@
 #define CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_BRIDGED_ACTIONS_CLUSTER_SERVER) || defined(ZCL_USING_BRIDGED_ACTIONS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER { ZCL_BRIDGED_ACTIONS_CLUSTER_ID, 37, "Bridged Actions" },
+#else
+#define CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER
+#endif
+
 #if defined(ZCL_USING_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BASIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_BASIC_CLUSTER { ZCL_BASIC_CLUSTER_ID, 40, "Basic" },
 #else
@@ -220,6 +226,12 @@
 #define CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_BOOLEAN_STATE_CLUSTER_SERVER) || defined(ZCL_USING_BOOLEAN_STATE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER { ZCL_BOOLEAN_STATE_CLUSTER_ID, 69, "Boolean State" },
+#else
+#define CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER
+#endif
+
 #if defined(ZCL_USING_SHADE_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_SHADE_CONFIG_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER { ZCL_SHADE_CONFIG_CLUSTER_ID, 256, "Shade Configuration" },
 #else
@@ -287,16 +299,11 @@
 #define CHIP_PRINTCLUSTER_BALLAST_CONFIGURATION_CLUSTER
 #endif
 
-#if defined(ZCL_USING_ILLUM_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_ILLUM_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ILLUM_MEASUREMENT_CLUSTER { ZCL_ILLUM_MEASUREMENT_CLUSTER_ID, 1024, "Illuminance Measurement" },
+#if defined(ZCL_USING_ILLUMINANCE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_ILLUMINANCE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ILLUMINANCE_MEASUREMENT_CLUSTER                                                                          \
+    { ZCL_ILLUMINANCE_MEASUREMENT_CLUSTER_ID, 1024, "Illuminance Measurement" },
 #else
-#define CHIP_PRINTCLUSTER_ILLUM_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_ILLUM_LEVEL_SENSING_CLUSTER_SERVER) || defined(ZCL_USING_ILLUM_LEVEL_SENSING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ILLUM_LEVEL_SENSING_CLUSTER { ZCL_ILLUM_LEVEL_SENSING_CLUSTER_ID, 1025, "Illuminance Level Sensing" },
-#else
-#define CHIP_PRINTCLUSTER_ILLUM_LEVEL_SENSING_CLUSTER
+#define CHIP_PRINTCLUSTER_ILLUMINANCE_MEASUREMENT_CLUSTER
 #endif
 
 #if defined(ZCL_USING_TEMP_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_TEMP_MEASUREMENT_CLUSTER_CLIENT)
@@ -747,6 +754,7 @@
     CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
+    CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER                                                                                        \
@@ -764,6 +772,7 @@
     CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
@@ -775,8 +784,7 @@
     CHIP_PRINTCLUSTER_THERMOSTAT_UI_CONFIG_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_COLOR_CONTROL_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_BALLAST_CONFIGURATION_CLUSTER                                                                                \
-    CHIP_PRINTCLUSTER_ILLUM_MEASUREMENT_CLUSTER                                                                                    \
-    CHIP_PRINTCLUSTER_ILLUM_LEVEL_SENSING_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_ILLUMINANCE_MEASUREMENT_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_TEMP_MEASUREMENT_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_PRESSURE_MEASUREMENT_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_FLOW_MEASUREMENT_CLUSTER                                                                                     \
