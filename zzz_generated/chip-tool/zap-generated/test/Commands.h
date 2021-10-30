@@ -11748,6 +11748,322 @@ private:
     void OnSuccessResponse_0(uint16_t clusterRevision) { ThrowSuccessResponse(); }
 };
 
+class Test_TC_MC_2_1 : public TestCommand
+{
+public:
+    Test_TC_MC_2_1() : TestCommand("Test_TC_MC_2_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Put the device into low power mode\n");
+            err = TestPutTheDeviceIntoLowPowerMode_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestPutTheDeviceIntoLowPowerMode_0()
+    {
+        chip::Controller::LowPowerClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::LowPower::Commands::Sleep::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::LowPower::Commands::Sleep::Type request;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<Test_TC_MC_2_1 *>(context))->OnSuccessResponse_0();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_MC_2_1 *>(context))->OnFailureResponse_0(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0() { NextTest(); }
+};
+
+class Test_TC_MC_3_1 : public TestCommand
+{
+public:
+    Test_TC_MC_3_1() : TestCommand("Test_TC_MC_3_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_3_2 : public TestCommand
+{
+public:
+    Test_TC_MC_3_2() : TestCommand("Test_TC_MC_3_2"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_3_3 : public TestCommand
+{
+public:
+    Test_TC_MC_3_3() : TestCommand("Test_TC_MC_3_3"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_3_4 : public TestCommand
+{
+public:
+    Test_TC_MC_3_4() : TestCommand("Test_TC_MC_3_4"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_4\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_3_5 : public TestCommand
+{
+public:
+    Test_TC_MC_3_5() : TestCommand("Test_TC_MC_3_5"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    //
+    // Tests methods
+    //
+};
+
 class Test_TC_MC_3_6 : public TestCommand
 {
 public:
@@ -22464,6 +22780,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Send Test Command without its optional arg.\n");
             err = TestSendTestCommandWithoutItsOptionalArg_8();
             break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Send Test Command with optional arg set to null.\n");
+            err = TestSendTestCommandWithOptionalArgSetToNull_9();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -22475,7 +22795,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
+    const uint16_t mTestCount = 10;
 
     //
     // Tests methods
@@ -22752,7 +23072,8 @@ private:
         request.arg1.Emplace().SetNonNull() = 5;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_7(data.wasPresent, data.wasNull, data.value);
+            (static_cast<TestClusterComplexTypes *>(context))
+                ->OnSuccessResponse_7(data.wasPresent, data.wasNull, data.value, data.originalValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -22763,7 +23084,8 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value)
+    void OnSuccessResponse_7(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+                             const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
     {
         VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
 
@@ -22772,6 +23094,10 @@ private:
 
         VerifyOrReturn(CheckValuePresent("value", value));
         VerifyOrReturn(CheckValue<uint8_t>("value.Value()", value.Value(), 5));
+
+        VerifyOrReturn(CheckValuePresent("originalValue", originalValue));
+        VerifyOrReturn(CheckValueNonNull("originalValue.Value()", originalValue.Value()));
+        VerifyOrReturn(CheckValue<uint8_t>("originalValue.Value().Value()", originalValue.Value().Value(), 5));
         NextTest();
     }
 
@@ -22786,7 +23112,8 @@ private:
         chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_8(data.wasPresent, data.wasNull, data.value);
+            (static_cast<TestClusterComplexTypes *>(context))
+                ->OnSuccessResponse_8(data.wasPresent, data.wasNull, data.value, data.originalValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -22797,10 +23124,48 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value)
+    void OnSuccessResponse_8(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+                             const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
     {
         VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, false));
 
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendTestCommandWithOptionalArgSetToNull_9()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
+        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
+
+        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
+        request.arg1.Emplace().SetNull();
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))
+                ->OnSuccessResponse_9(data.wasPresent, data.wasNull, data.value, data.originalValue);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_9(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+                             const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
+    {
+        VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
+
+        VerifyOrReturn(CheckValuePresent("wasNull", wasNull));
+        VerifyOrReturn(CheckValue<bool>("wasNull.Value()", wasNull.Value(), true));
+
+        VerifyOrReturn(CheckValuePresent("originalValue", originalValue));
+        VerifyOrReturn(CheckValueNull("originalValue.Value()", originalValue.Value()));
         NextTest();
     }
 };
@@ -23562,6 +23927,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Read number of commissioned fabrics\n");
             err = TestReadNumberOfCommissionedFabrics_1();
             break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read current fabric index\n");
+            err = TestReadCurrentFabricIndex_2();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -23573,13 +23942,17 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 3;
 
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t supportedFabrics)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
     chip::Callback::Callback<void (*)(void * context, uint8_t commissionedFabrics)> mOnSuccessCallback_1{ OnSuccessCallback_1,
                                                                                                           this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, chip::FabricIndex currentFabricIndex)> mOnSuccessCallback_2{
+        OnSuccessCallback_2, this
+    };
 
     static void OnFailureCallback_0(void * context, uint8_t status)
     {
@@ -23599,6 +23972,16 @@ private:
     static void OnSuccessCallback_1(void * context, uint8_t commissionedFabrics)
     {
         (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_1(commissionedFabrics);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, chip::FabricIndex currentFabricIndex)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_2(currentFabricIndex);
     }
 
     //
@@ -23638,6 +24021,332 @@ private:
         VerifyOrReturn(CheckConstraintMinValue<uint8_t>("commissionedFabrics", commissionedFabrics, 1));
         NextTest();
     }
+
+    CHIP_ERROR TestReadCurrentFabricIndex_2()
+    {
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeCurrentFabricIndex(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(chip::FabricIndex currentFabricIndex)
+    {
+        VerifyOrReturn(CheckConstraintType("currentFabricIndex", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::FabricIndex>("currentFabricIndex", currentFabricIndex, 1));
+        NextTest();
+    }
+};
+
+class TestModeSelectCluster : public TestCommand
+{
+public:
+    TestModeSelectCluster() : TestCommand("TestModeSelectCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestModeSelectCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestModeSelectCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Read CurrentMode\n");
+            err = TestReadCurrentMode_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read OnMode\n");
+            err = TestReadOnMode_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read StartUpMode\n");
+            err = TestReadStartUpMode_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read Description\n");
+            err = TestReadDescription_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read SupportedModes\n");
+            err = TestReadSupportedModes_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Change to Supported Mode\n");
+            err = TestChangeToSupportedMode_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Verify Current Mode Change\n");
+            err = TestVerifyCurrentModeChange_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Change to Unsupported Mode\n");
+            err = TestChangeToUnsupportedMode_7();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 8;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentMode)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t onMode)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t startUpMode)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context, chip::CharSpan description)> mOnSuccessCallback_3{ OnSuccessCallback_3,
+                                                                                                         this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
+    chip::Callback::Callback<void (*)(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
+            supportedModes)>
+        mOnSuccessCallback_4{ OnSuccessCallback_4, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t currentMode)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint8_t currentMode)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_0(currentMode);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t onMode)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_1(onMode);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint8_t startUpMode)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_2(startUpMode);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, chip::CharSpan description)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_3(description);
+    }
+
+    static void OnFailureCallback_4(void * context, uint8_t status)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
+            supportedModes)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_4(supportedModes);
+    }
+
+    static void OnFailureCallback_6(void * context, uint8_t status)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, uint8_t currentMode)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_6(currentMode);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadCurrentMode_0()
+    {
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentMode(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t currentMode)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentMode", currentMode, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadOnMode_1()
+    {
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeOnMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t onMode)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("onMode", onMode, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadStartUpMode_2()
+    {
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeStartUpMode(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint8_t startUpMode)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("startUpMode", startUpMode, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadDescription_3()
+    {
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeDescription(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(chip::CharSpan description)
+    {
+        VerifyOrReturn(CheckValueAsString("description", description, "Coffee"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadSupportedModes_4()
+    {
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeSupportedModes(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
+            supportedModes)
+    {
+        VerifyOrReturn(CheckValueAsListLength("supportedModes", supportedModes, 3));
+        NextTest();
+    }
+
+    CHIP_ERROR TestChangeToSupportedMode_5()
+    {
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type request;
+        request.newMode = 4;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_5(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCurrentModeChange_6()
+    {
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttributeCurrentMode(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(uint8_t currentMode)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("currentMode", currentMode, 4));
+        NextTest();
+    }
+
+    CHIP_ERROR TestChangeToUnsupportedMode_7()
+    {
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type request;
+        request.newMode = 2;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_7(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_7(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_7() { ThrowSuccessResponse(); }
 };
 
 class TestSubscribe_OnOff : public TestCommand
@@ -23956,6 +24665,12 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_LVL_2_1>(),
         make_unique<Test_TC_LVL_3_1>(),
         make_unique<Test_TC_MC_1_1>(),
+        make_unique<Test_TC_MC_2_1>(),
+        make_unique<Test_TC_MC_3_1>(),
+        make_unique<Test_TC_MC_3_2>(),
+        make_unique<Test_TC_MC_3_3>(),
+        make_unique<Test_TC_MC_3_4>(),
+        make_unique<Test_TC_MC_3_5>(),
         make_unique<Test_TC_MC_3_6>(),
         make_unique<Test_TC_MC_3_7>(),
         make_unique<Test_TC_MC_3_8>(),
@@ -24004,6 +24719,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestBasicInformation>(),
         make_unique<TestIdentifyCluster>(),
         make_unique<TestOperationalCredentialsCluster>(),
+        make_unique<TestModeSelectCluster>(),
         make_unique<TestSubscribe_OnOff>(),
     };
 

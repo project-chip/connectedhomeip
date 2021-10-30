@@ -100,11 +100,19 @@ CHIP_ERROR AppTask::Init()
     /* HW init leds */
     LED_Init();
 
+    if (LightingMgr().Init() != 0)
+    {
+        K32W_LOG("LightingMgr().Init() failed");
+        assert(0);
+    }
+
+    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
     /* start with all LEDS turnedd off */
     sStatusLED.Init(SYSTEM_STATE_LED);
 
     sLightLED.Init(LIGHT_STATE_LED);
-    sLightLED.Set(LightingMgr().IsTurnedOff());
+    sLightLED.Set(!LightingMgr().IsTurnedOff());
     UpdateClusterState();
 
     /* intialize the Keyboard and button press calback */
@@ -117,21 +125,13 @@ CHIP_ERROR AppTask::Init()
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
+
     if (sFunctionTimer == NULL)
     {
         err = APP_ERROR_CREATE_TIMER_FAILED;
         K32W_LOG("app_timer_create() failed");
         assert(err == CHIP_NO_ERROR);
     }
-
-    int status = LightingMgr().Init();
-    if (status != 0)
-    {
-        K32W_LOG("LightingMgr().Init() failed");
-        assert(status == 0);
-    }
-
-    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Print the current software version
     char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength + 1] = { 0 };

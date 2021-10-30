@@ -1,25 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clusterInteraction"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+  <Button
+      android:id="@+id/getEndpointListBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="132dp"
+      android:layout_marginStart="16dp"
+      android:text="@string/retrieve_endpoint_list"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
   <androidx.fragment.app.FragmentContainerView
       android:id="@+id/addressUpdateFragment"
       android:name="com.google.chip.chiptool.clusterclient.AddressUpdateFragment"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"/>
-
+      app:layout_constraintTop_toTopOf="parent" />
   <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/endpointList"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
+      android:layout_height="wrap_content"
       android:clipToPadding="false"
-      android:layout_marginTop="48dp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/addressUpdateFragment" />
+      app:layout_constraintTop_toBottomOf="@+id/getEndpointListBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

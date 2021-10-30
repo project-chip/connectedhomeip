@@ -1,0 +1,153 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+
+package chip.devicecontroller;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
+import chip.clusterinfo.ClusterInfo;
+import chip.clusterinfo.CommandInfo;
+import chip.clusterinfo.CommandParameterInfo;
+import chip.clusterinfo.DelegatedClusterCallback;
+import chip.clusterinfo.ClusterCommandCallback;
+import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
+
+
+public class ClusterInfoMapping {
+
+  class DelegatedDefaultClusterCallback implements DefaultClusterCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    // Parameters and list-adds here should be generated - refer to the template code that creates each callback interface.
+    @Override
+    public void onSuccess() {
+      List<Object> responseValues = new ArrayList<>();
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception e) {
+      callback.onFailure(e);
+    }
+  }
+  {{#chip_client_clusters}}
+  {{#chip_cluster_responses}}
+      public class Delegated{{asUpperCamelCase name}}Callback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Callback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+        @Override
+        public void onSuccess(
+        {{#chip_cluster_response_arguments}}
+        {{#if isArray}}
+           // {{asSymbol label}}: {{asUnderlyingZclType type}}
+           // Conversion from this type to Java is not properly implemented yet
+           {{else if (isOctetString type)}}
+              {{omitCommaForFirstNonStatusCommand parent.id index}}byte[] {{asSymbol label}}
+           {{else if (isShortString type)}}
+              {{omitCommaForFirstNonStatusCommand parent.id index}}String {{asSymbol label}}
+           {{else}}
+              {{omitCommaForFirstNonStatusCommand parent.id index}}{{asJavaBasicTypeForZclType type false}} {{asSymbol label}}
+           {{/if}}
+        {{/chip_cluster_response_arguments}}
+        ) {
+           List<Object> responseValues = new ArrayList<>();
+           {{#chip_cluster_response_arguments}}
+             {{#if isArray}}
+               // {{asSymbol label}}: {{asUnderlyingZclType type}}
+               // Conversion from this type to Java is not properly implemented yet
+             {{else}}
+           responseValues.add({{asSymbol label}});
+             {{/if}}
+           {{/chip_cluster_response_arguments}}
+           callback.onSuccess(responseValues);
+        }
+
+        @Override
+        public void onError(Exception error) {
+          callback.onFailure(error);
+        }
+      }
+
+  {{/chip_cluster_responses}}
+  {{/chip_client_clusters}}
+
+ public Map<String, ClusterInfo> getClusterMap() {
+     Map<String, ClusterInfo> clusterMap = new HashMap<>();
+     {{#chip_client_clusters}}
+     Map<String, CommandInfo> {{asLowerCamelCase name}}ClusterCommandInfoMap = new LinkedHashMap<>();
+     {{#chip_cluster_commands}}
+     Map<String, CommandParameterInfo> {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+     {{! TODO: fill out parameter types }}
+     {{#if (zcl_command_arguments_count this.id)}}
+     {{#if hasSpecificResponse}}
+       CommandParameterInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameterInfo = new CommandParameterInfo("{{asUpperCamelCase ../name}}", ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback.class);
+     {{else}}
+       CommandParameterInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameterInfo = new CommandParameterInfo("{{asUpperCamelCase ../name}}", ChipClusters.DefaultClusterCallback.class);
+     {{/if}}
+     {{#chip_cluster_command_arguments_with_structs_expanded}}
+       CommandParameterInfo {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo = new CommandParameterInfo("{{asLowerCamelCase label}}", {{asJavaBasicType type}}.class);
+       {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}CommandParams.put("{{asLowerCamelCase label}}",{{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo);
+     {{#not_last}} {{/not_last}}
+     {{/chip_cluster_command_arguments_with_structs_expanded}}
+     {{else}}
+     {{#if hasSpecificResponse}}
+       CommandParameterInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameterInfo = new CommandParameterInfo("{{asUpperCamelCase ../name}}", ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback.class);
+     {{else}}
+       CommandParameterInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameterInfo = new CommandParameterInfo("{{asUpperCamelCase ../name}}", ChipClusters.DefaultClusterCallback.class);
+     {{/if}}
+     {{/if}}
+     // Populate commands
+     {{#if hasSpecificResponse}}
+       CommandInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandInfo = new CommandInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
+           .{{asLowerCamelCase name}}((ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback) callback
+           {{#chip_cluster_command_arguments_with_structs_expanded}},
+           ({{asJavaBoxedType type}})
+           commandArguments.get("{{asLowerCamelCase label}}")
+           {{/chip_cluster_command_arguments_with_structs_expanded}}
+           );
+         },
+         () -> new Delegated{{asUpperCamelCase responseName}}Callback(),
+           {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams
+       );
+     {{else}}
+       CommandInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandInfo = new CommandInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
+           .{{asLowerCamelCase name}}((DefaultClusterCallback) callback
+           {{#chip_cluster_command_arguments_with_structs_expanded}},
+           ({{asJavaBoxedType type}})
+           commandArguments.get("{{asLowerCamelCase label}}")
+           {{/chip_cluster_command_arguments_with_structs_expanded}}
+           );
+         },
+         () -> new DelegatedDefaultClusterCallback(),
+           {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams
+       );
+     {{/if}}
+       {{asLowerCamelCase ../name}}ClusterCommandInfoMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandInfo);
+     {{/chip_cluster_commands}}
+     // Populate cluster
+     ClusterInfo {{asLowerCamelCase name}}ClusterInfo = new ClusterInfo(
+       (ptr, endpointId) -> new ChipClusters.{{asUpperCamelCase name}}Cluster(ptr, endpointId), {{asLowerCamelCase name}}ClusterCommandInfoMap);
+     clusterMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInfo);
+     {{/chip_client_clusters}}
+     return clusterMap;
+  }
+}
+
+{{/if}}

@@ -135,6 +135,8 @@ limitations under the License.
     <attribute side="server" code="0x0021" define="EPOCH_S" type="EPOCH_S" writable="true" optional="false">epoch_s</attribute>
     <attribute side="server" code="0x0022" define="TEST_VENDOR_ID" type="vendor_id"
                writable="true" optional="false" default="0">vendor_id</attribute>
+    <attribute side="server" code="0x0023" define="LIST_OF_STRUCTS_WITH_OPTIONALS" type="ARRAY" entryType="NullablesAndOptionalsStruct"
+               writable="false" optional="false">list_nullables_and_optionals_struct</attribute>
     <!-- Can't enable the SimpleEnum test until we stop force-lowercasing
          attribute types in ZAP -->
     <!--<attribute side="server" code="0x0023" define="SIMPLE_ENUM" type="SimpleEnum" writable="true" optional="false">simple_enum</attribute>-->
@@ -367,11 +369,13 @@ limitations under the License.
 
     <command source="server" code="0x06" name="TestNullableOptionalResponse" optional="false" disableDefaultResponse="true">
       <description>
-        Delivers information about the argument TestNullableOptionalRequest had.
+        Delivers information about the argument TestNullableOptionalRequest had,
+        and the original value if there was one.
       </description>
       <arg name="wasPresent" type="BOOLEAN"/>
       <arg name="wasNull" type="BOOLEAN" optional="true"/>
       <arg name="value" type="INT8U" optional="true"/>
+      <arg name="originalValue" type="INT8U" optional="true" isNullable="true"/>
     </command>
 
     <command source="server" code="0x07" name="TestComplexNullableOptionalResponse" optional="false" disableDefaultResponse="true">

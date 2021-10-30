@@ -100,8 +100,10 @@ CHIP_ERROR Device::SendCommands(app::CommandSender * commandObj)
 {
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+    VerifyOrReturnError(mState == ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return commandObj->SendCommandRequest(mDeviceId, mFabricIndex, mSecureSession);
+    return commandObj->SendCommandRequest(mSecureSession.Value());
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -761,6 +763,8 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
     aPath.mNodeId            = GetDeviceId();
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+    VerifyOrReturnError(mState == ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
     {
@@ -828,6 +832,8 @@ CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Cal
     CHIP_ERROR err           = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+    VerifyOrReturnError(mState == ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     app::WriteClient * writeClient = aHandle.Get();
 
@@ -835,7 +841,7 @@ CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Cal
     {
         AddIMResponseHandler(writeClient, onSuccessCallback, onFailureCallback);
     }
-    if ((err = aHandle.SendWriteRequest(GetDeviceId(), 0, mSecureSession)) != CHIP_NO_ERROR)
+    if ((err = aHandle.SendWriteRequest(mSecureSession.Value())) != CHIP_NO_ERROR)
     {
         CancelIMResponseHandler(writeClient);
     }

@@ -36,8 +36,7 @@ CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager *
     mpCallback(apCallback), mpExchangeMgr(apExchangeMgr)
 {}
 
-CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
-                                             System::Clock::Timeout timeout)
+CHIP_ERROR CommandSender::SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle commandPacket;
@@ -48,7 +47,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabric
     SuccessOrExit(err);
 
     // Create a new exchange context.
-    mpExchangeCtx = mpExchangeMgr->NewContext(secureSession.ValueOr(SessionHandle(aNodeId, 1, 1, aFabricIndex)), this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mpExchangeCtx->SetResponseTimeout(timeout);

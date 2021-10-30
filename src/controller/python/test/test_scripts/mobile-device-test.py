@@ -109,6 +109,11 @@ def main():
                                         endpoint=233,
                                         group=GROUP_ID), "Failed to test on off cluster on non-exist endpoint")
 
+    # Test experimental Python cluster objects API
+    logger.info("Testing cluster objects API")
+    FailIfNot(asyncio.run(ClusterObjectTests.RunTest(test.devCtrl)),
+              "Failed when testing Python Cluster Object APIs")
+
     logger.info("Testing attribute reading")
     FailIfNot(test.TestReadBasicAttributes(nodeid=1,
                                            endpoint=ENDPOINT_ID,
@@ -140,11 +145,6 @@ def main():
     FailIfNot(test.TestOnOffCluster(nodeid=1,
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
-
-    # Test experimental Python cluster objects API
-    logger.info("Testing cluster objects API")
-    FailIfNot(asyncio.run(ClusterObjectTests.RunTest(test.devCtrl)),
-              "Failed when testing Python Cluster Object APIs")
 
     logger.info("Testing non-controller APIs")
     FailIfNot(test.TestNonControllerAPIs(), "Non controller API test failed")

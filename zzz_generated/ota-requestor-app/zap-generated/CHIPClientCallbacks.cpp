@@ -131,9 +131,7 @@ namespace {
         return true;                                                                                                               \
     }
 
-// TODO: These IM related callbacks contains small or no generated code, should be put into seperate file to reduce the size of
-// template. Singleton instance of the callbacks manager
-
+// Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
 bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,

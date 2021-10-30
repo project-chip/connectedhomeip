@@ -28,6 +28,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
@@ -68,9 +69,23 @@ public:
     CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
+    CHIP_ERROR ReadSupportedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadCommissionedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadRootCertificates(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
+
+CHIP_ERROR OperationalCredentialsAttrAccess::ReadSupportedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    uint8_t fabricCount = CHIP_CONFIG_MAX_DEVICE_ADMINS;
+
+    return aEncoder.Encode(fabricCount);
+}
+
+CHIP_ERROR OperationalCredentialsAttrAccess::ReadCommissionedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(Server::GetInstance().GetFabricTable().FabricCount());
+}
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
@@ -123,11 +138,20 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & 
 
     switch (aPath.mAttributeId)
     {
+    case Attributes::SupportedFabrics::Id: {
+        return ReadSupportedFabrics(aPath.mEndpointId, aEncoder);
+    }
+    case Attributes::CommissionedFabrics::Id: {
+        return ReadCommissionedFabrics(aPath.mEndpointId, aEncoder);
+    }
     case Attributes::FabricsList::Id: {
         return ReadFabricsList(aPath.mEndpointId, aEncoder);
     }
     case Attributes::TrustedRootCertificates::Id: {
         return ReadRootCertificates(aPath.mEndpointId, aEncoder);
+    }
+    case Attributes::CurrentFabricIndex::Id: {
+        return aEncoder.Encode(aEncoder.AccessingFabricIndex());
     }
     default:
         break;
@@ -263,6 +287,10 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
+    // Currently, we only manage FabricsList attribute in endpoint 0, OperationalCredentials cluster is always required to be on
+    // EP0.
+    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::FabricsList::Id);
+
     return err;
 }
 
@@ -290,7 +318,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     // Gets called when a fabric is deleted from KVS store
     void OnFabricDeletedFromStorage(FabricIndex fabricId) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIX16 " was deleted from fabric storage.", fabricId);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIu8 " was deleted from fabric storage.", fabricId);
         writeFabricsIntoFabricsListAttribute();
     }
 
@@ -298,7 +326,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     void OnFabricRetrievedFromStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric 0x%" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
+                       "OpCreds: Fabric 0x%" PRIu8 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
                        fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
@@ -782,6 +810,11 @@ exit:
         gFabricBeingCommissioned.Reset();
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddTrustedRootCert request.");
     }
+    else
+    {
+        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::TrustedRootCertificates::Id);
+    }
 
     return true;
 }
@@ -792,5 +825,9 @@ bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
+
+    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                           OperationalCredentials::Attributes::TrustedRootCertificates::Id);
+
     return true;
 }

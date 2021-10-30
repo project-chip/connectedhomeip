@@ -57,6 +57,7 @@ class SelectActionFragment : Fragment() {
       basicClusterBtn.setOnClickListener{ getCallback()?.handleBasicClicked() }
       attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
       clusterInteractionBtn.setOnClickListener { getCallback()?.handleClusterInteractionClicked() }
+      provisionCustomFlowBtn.setOnClickListener{ getCallback()?.handleCustomFlowClicked() }
     }
   }
 
@@ -125,6 +126,8 @@ class SelectActionFragment : Fragment() {
     fun onShowDeviceAddressInput()
     /** Notifies listener of cluster interaction button click.. */
     fun handleClusterInteractionClicked()
+    /** Notifies listener of provision-custom-flow button click. */
+    fun handleCustomFlowClicked()
   }
 
   companion object {

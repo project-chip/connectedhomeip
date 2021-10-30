@@ -110,7 +110,15 @@ public class ChipClusters {
   {{#if isStruct}}
     public static class {{asUpperCamelCase name}}Attribute {
     {{#chip_attribute_list_entryTypes}}
-      {{#if (isOctetString type)}}
+      {{#if isOptional}}
+      {{! TODO: Add support for optional types here }}
+      {{else if isNullable}}
+      {{! TODO: Add support for nullable types here }}
+      {{else if isArray}}
+      {{! TODO: Add support for lists here }}
+      {{else if isStruct}}
+      {{! TODO: Add support for structs here }}
+      {{else if (isOctetString type)}}
       public byte[] {{asLowerCamelCase name}};
       {{else if (isCharString type)}}
       public String {{asLowerCamelCase name}};
@@ -121,7 +129,15 @@ public class ChipClusters {
 
       public {{asUpperCamelCase name}}Attribute(
         {{#chip_attribute_list_entryTypes}}
-        {{#if (isOctetString type)}}
+        {{#if isOptional}}
+        {{! TODO: Add support for optional types here }}
+        {{else if isNullable}}
+        {{! TODO: Add support for nullable types here }}
+        {{else if isArray}}
+        {{! TODO: Add support for lists here }}
+        {{else if isStruct}}
+        {{! TODO: Add support for structs here }}
+        {{else if (isOctetString type)}}
         byte[] {{asLowerCamelCase name}}{{#not_last}},{{/not_last}}
         {{else if (isCharString type)}}
         String {{asLowerCamelCase name}}{{#not_last}},{{/not_last}}
@@ -131,7 +147,17 @@ public class ChipClusters {
         {{/chip_attribute_list_entryTypes}}
       ) {
         {{#chip_attribute_list_entryTypes}}
+        {{#if isOptional}}
+        {{! TODO: Add support for optional types here }}
+        {{else if isNullable}}
+        {{! TODO: Add support for nullable types here }}
+        {{else if isArray}}
+        {{! TODO: Add support for lists here }}
+        {{else if isStruct}}
+        {{! TODO: Add support for structs here }}
+        {{else}}
         this.{{asLowerCamelCase name}} = {{asLowerCamelCase name}};
+        {{/if}}
         {{/chip_attribute_list_entryTypes}}
       }
     }

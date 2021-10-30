@@ -94,7 +94,8 @@ private:
 
     CHIP_ERROR BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
     CHIP_ERROR BuildSingleReportDataEventList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
-    CHIP_ERROR RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo);
+    CHIP_ERROR RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeDataList::Builder & aAttributeDataList,
+                                   ClusterInfo & aClusterInfo);
     EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
 
     /**
@@ -120,6 +121,13 @@ private:
      *
      */
     bool mMoreChunkedMessages = false;
+
+    /**
+     * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
+     * within the same execution context to avoid applying too much pressure on platforms that use small, fixed size event queues.
+     *
+     */
+    bool mRunScheduled = false;
 
     /**
      * The number of report date request in flight

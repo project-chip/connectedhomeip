@@ -1,7 +1,6 @@
-package com.google.chip.chiptool.clusterclient
+package com.google.chip.chiptool.clusterclient.clusterinteraction
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 
-class ClusterInteractionFragment : Fragment() {
+/**
+ * ClusterDetailFragment allows user to pick cluster, command, specify parameters and see
+ * the callback result.
+ */
+class ClusterDetailFragment : Fragment(){
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
 
@@ -27,8 +30,8 @@ class ClusterInteractionFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    return inflater.inflate(R.layout.cluster_interaction_fragment, container, false).apply {
-      deviceController.setCompletionListener(ChipControllerCallback())
+    return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
+      deviceController.setCompletionListener(GenericChipDeviceListener())
     }
   }
 
@@ -38,32 +41,13 @@ class ClusterInteractionFragment : Fragment() {
     }
   }
 
-  inner class ChipControllerCallback : GenericChipDeviceListener() {
-    override fun onConnectDeviceComplete() {}
-
-    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-    }
-
-    override fun onNotifyChipConnectionClosed() {
-      Log.d(TAG, "onNotifyChipConnectionClosed")
-    }
-
-    override fun onCloseBleComplete() {
-      Log.d(TAG, "onCloseBleComplete")
-    }
-
-    override fun onError(error: Throwable?) {
-      Log.d(TAG, "onError: $error")
-    }
-  }
-
   override fun onStop() {
     super.onStop()
     scope.cancel()
   }
 
   companion object {
-    private const val TAG = "ClusterInteractionFragment"
-    fun newInstance(): ClusterInteractionFragment = ClusterInteractionFragment()
+    private const val TAG = "ClusterDetailFragment"
+    fun newInstance(): ClusterDetailFragment = ClusterDetailFragment()
   }
 }

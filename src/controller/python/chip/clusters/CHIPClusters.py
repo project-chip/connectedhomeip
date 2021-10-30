@@ -2289,6 +2289,53 @@ class ChipClusters:
             },
         },
     }
+    _MODE_SELECT_CLUSTER_INFO = {
+        "clusterName": "ModeSelect",
+        "clusterId": 0x00000050,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000001,
+                "type": "",
+            },
+            0x00000002: {
+                "attributeName": "OnMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000003,
+                "type": "int",
+            },
+            0x00000004: {
+                "attributeName": "Description",
+                "attributeId": 0x00000004,
+                "type": "str",
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+            },
+        },
+    }
     _NETWORK_COMMISSIONING_CLUSTER_INFO = {
         "clusterName": "NetworkCommissioning",
         "clusterId": 0x00000031,
@@ -2699,6 +2746,11 @@ class ChipClusters:
                 "attributeName": "TrustedRootCertificates",
                 "attributeId": 0x00000004,
                 "type": "bytes",
+            },
+            0x00000005: {
+                "attributeName": "CurrentFabricIndex",
+                "attributeId": 0x00000005,
+                "type": "int",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
@@ -3470,6 +3522,11 @@ class ChipClusters:
                 "attributeId": 0x00000022,
                 "type": "int",
                 "writable": True,
+            },
+            0x00000023: {
+                "attributeName": "ListNullablesAndOptionalsStruct",
+                "attributeId": 0x00000023,
+                "type": "",
             },
             0x000000FF: {
                 "attributeName": "Unsupported",
@@ -4301,6 +4358,7 @@ class ChipClusters:
         0x00000508: _LOW_POWER_CLUSTER_INFO,
         0x00000507: _MEDIA_INPUT_CLUSTER_INFO,
         0x00000506: _MEDIA_PLAYBACK_CLUSTER_INFO,
+        0x00000050: _MODE_SELECT_CLUSTER_INFO,
         0x00000031: _NETWORK_COMMISSIONING_CLUSTER_INFO,
         0x00000029: _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
         0x0000002A: _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
@@ -4360,6 +4418,7 @@ class ChipClusters:
         "LowPower": _LOW_POWER_CLUSTER_INFO,
         "MediaInput": _MEDIA_INPUT_CLUSTER_INFO,
         "MediaPlayback": _MEDIA_PLAYBACK_CLUSTER_INFO,
+        "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
         "NetworkCommissioning": _NETWORK_COMMISSIONING_CLUSTER_INFO,
         "OtaSoftwareUpdateProvider": _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
         "OtaSoftwareUpdateRequestor": _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
@@ -5013,6 +5072,11 @@ class ChipClusters:
     def ClusterMediaPlayback_CommandMediaStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStop(
             device, ZCLendpoint, ZCLgroupid
+        )
+
+    def ClusterModeSelect_CommandChangeToMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, newMode: int):
+        return self._chipLib.chip_ime_AppendCommand_ModeSelect_ChangeToMode(
+            device, ZCLendpoint, ZCLgroupid, newMode
         )
 
     def ClusterNetworkCommissioning_CommandAddThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
@@ -6126,6 +6190,30 @@ class ChipClusters:
     def ClusterMediaPlayback_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterModeSelect_ReadAttributeCurrentMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_CurrentMode(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterModeSelect_SubscribeAttributeCurrentMode(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_ModeSelect_CurrentMode(device, ZCLendpoint, minInterval, maxInterval)
+
+    def ClusterModeSelect_ReadAttributeSupportedModes(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_SupportedModes(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterModeSelect_ReadAttributeOnMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_OnMode(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterModeSelect_WriteAttributeOnMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ModeSelect_OnMode(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterModeSelect_ReadAttributeStartUpMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_StartUpMode(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterModeSelect_ReadAttributeDescription(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_Description(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterModeSelect_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterNetworkCommissioning_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_FeatureMap(device, ZCLendpoint, ZCLgroupid)
 
@@ -6218,6 +6306,9 @@ class ChipClusters:
 
     def ClusterOperationalCredentials_ReadAttributeTrustedRootCertificates(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_TrustedRootCertificates(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterOperationalCredentials_ReadAttributeCurrentFabricIndex(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CurrentFabricIndex(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterOperationalCredentials_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -6598,6 +6689,9 @@ class ChipClusters:
 
     def ClusterTestCluster_WriteAttributeVendorId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeListNullablesAndOptionalsStruct(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterTestCluster_ReadAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid)
@@ -8530,6 +8624,43 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster ModeSelect
+        # Cluster ModeSelect Command ChangeToMode
+        self._chipLib.chip_ime_AppendCommand_ModeSelect_ChangeToMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ModeSelect_ChangeToMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute CurrentMode
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_CurrentMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_CurrentMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect SubscribeAttribute CurrentMode
+        self._chipLib.chip_ime_SubscribeAttribute_ModeSelect_CurrentMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_ModeSelect_CurrentMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute SupportedModes
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_SupportedModes.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_SupportedModes.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute OnMode
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_OnMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_OnMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect WriteAttribute OnMode
+        self._chipLib.chip_ime_WriteAttribute_ModeSelect_OnMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_ModeSelect_OnMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute StartUpMode
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_StartUpMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_StartUpMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute Description
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_Description.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_Description.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_ClusterRevision.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_ClusterRevision.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning
         # Cluster NetworkCommissioning Command AddThreadNetwork
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork.argtypes = [
@@ -8773,6 +8904,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_TrustedRootCertificates.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_TrustedRootCertificates.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials ReadAttribute CurrentFabricIndex
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CurrentFabricIndex.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CurrentFabricIndex.restype = ctypes.c_uint32
         # Cluster OperationalCredentials ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -9380,6 +9515,10 @@ class ChipClusters:
         self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute ListNullablesAndOptionalsStruct
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Unsupported
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

@@ -247,8 +247,7 @@ CHIP_ERROR SendCommandRequest(std::unique_ptr<chip::app::CommandSender> && comma
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, chip::Optional<chip::SessionHandle>::Missing(),
-                                            gMessageTimeout);
+    err = commandSender->SendCommandRequest(gSessionManager.FindSecureSessionForNode(chip::kTestDeviceNodeId), gMessageTimeout);
     SuccessOrExit(err);
 
     gCommandCount++;
@@ -284,8 +283,7 @@ CHIP_ERROR SendBadCommandRequest(std::unique_ptr<chip::app::CommandSender> && co
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, chip::Optional<chip::SessionHandle>::Missing(),
-                                            gMessageTimeout);
+    err = commandSender->SendCommandRequest(gSessionManager.FindSecureSessionForNode(chip::kTestDeviceNodeId), gMessageTimeout);
     SuccessOrExit(err);
     gCommandCount++;
     commandSender.release();
@@ -359,8 +357,8 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
 
     SuccessOrExit(err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true));
     SuccessOrExit(err = apWriteClient->FinishAttribute());
-    SuccessOrExit(err = apWriteClient.SendWriteRequest(chip::kTestDeviceNodeId, gFabricIndex,
-                                                       chip::Optional<chip::SessionHandle>::Missing(), gMessageTimeout));
+    SuccessOrExit(
+        err = apWriteClient.SendWriteRequest(gSessionManager.FindSecureSessionForNode(chip::kTestDeviceNodeId), gMessageTimeout));
 
     gWriteCount++;
 
@@ -639,7 +637,8 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     gLastCommandResult = TestCommandResult::kSuccess;
 }
 
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
+                                 bool * apDataExists)
 {
     // We do not really care about the value, just return a not found status code.
     VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);

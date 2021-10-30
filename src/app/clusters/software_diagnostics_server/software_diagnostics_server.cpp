@@ -118,12 +118,7 @@ exit:
     return true;
 }
 
-void emberAfSoftwareDiagnosticsClusterServerInitCallback(EndpointId endpoint)
+void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gAttrAccess);
-        attrAccessRegistered = true;
-    }
+    registerAttributeAccessOverride(&gAttrAccess);
 }

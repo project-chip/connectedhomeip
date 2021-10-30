@@ -58,6 +58,7 @@ private:
     CHIP_ERROR ReadListInt8uAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadListStructOctetStringAttribute(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder);
 };
 
 TestAttrAccess gAttrAccess;
@@ -74,6 +75,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeVa
     }
     case ListStructOctetString::Id: {
         return ReadListStructOctetStringAttribute(aEncoder);
+    }
+    case ListNullablesAndOptionalsStruct::Id: {
+        return ReadListNullablesAndOptionalsStructAttribute(aEncoder);
     }
     default: {
         break;
@@ -221,6 +225,18 @@ CHIP_ERROR TestAttrAccess::ReadListStructOctetStringAttribute(AttributeValueEnco
         return CHIP_NO_ERROR;
     });
 }
+
+CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        // Just encode a single default-initialized
+        // entry for now.
+        Structs::NullablesAndOptionalsStruct::Type entry;
+        ReturnErrorOnFailure(encoder.Encode(entry));
+        return CHIP_NO_ERROR;
+    });
+}
+
 } // namespace
 
 bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
@@ -444,6 +460,8 @@ bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
         {
             response.value.SetValue(commandData.arg1.Value().Value());
         }
+
+        response.originalValue.Emplace(commandData.arg1.Value());
     }
 
     CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);

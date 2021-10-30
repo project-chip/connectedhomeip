@@ -111,16 +111,37 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
     {
 #if CHIP_PROGRESS_LOGGING
         auto & entry = iter.GetValue();
-#endif // CHIP_PROGRESS_LOGGING
         {{#if isStruct}}
         ChipLogProgress(Zcl, "    {");
         {{#chip_attribute_list_entryTypes}}
-        {{#if (isOctetString type)}}
-        ChipLogProgress(Zcl, "      {{asSymbol label}}: %s,", ByteSpanToString(entry.{{asLowerCamelCase name}}).c_str());
+        {{~#*inline "field"}}entry.{{asLowerCamelCase name}}{{#if isOptional}}.Value(){{/if}}{{/inline~}}
+        {{~#*inline "fieldValue"}}{{>field}}{{#if isNullable}}.Value(){{/if}}{{/inline~}}
+        {{#if isOptional}}
+        if (entry.{{asLowerCamelCase name}}.HasValue()) {
+        {{/if}}
+        {{#if isNullable}}
+        if ({{>field}}.IsNull()) {
+          ChipLogProgress(chipTool, "  {{asSymbol label}}: null");
+        } else {
+        {{/if}}
+        {{#if isArray}}
+        {{! TODO: Add support for printing list member of struct element of list attribute }}
+        ChipLogProgress(chipTool, "  {{asSymbol label}}: list member of struct element of list attribute printing not supported yet");
+        {{else if (isOctetString type)}}
+        ChipLogProgress(Zcl, "      {{asSymbol label}}: %s,", ByteSpanToString({{>fieldValue}}).c_str());
         {{else if (isCharString type)}}
-        ChipLogProgress(Zcl, "      {{asSymbol label}}: %.*s,", static_cast<int>(entry.{{asLowerCamelCase name}}.size()), entry.{{asLowerCamelCase name}}.data());
+        ChipLogProgress(Zcl, "      {{asSymbol label}}: %.*s,", static_cast<int>({{>fieldValue}}.size()), {{>fieldValue}}.data());
+        {{else if isStruct}}
+        {{! TODO: Add support for printing struct member of struct element of list attribute }}
+        ChipLogProgress(chipTool, "  {{asSymbol label}}: struct member of struct element of list attribute printing not supported yet");
         {{else}}
-        ChipLogProgress(Zcl, "      {{asSymbol label}}: {{asPrintFormat type}},", entry.{{asLowerCamelCase name}});
+        ChipLogProgress(Zcl, "      {{asSymbol label}}: {{asPrintFormat type}},", {{>fieldValue}});
+        {{/if}}
+        {{#if isNullable}}
+        }
+        {{/if}}
+        {{#if isOptional}}
+        }
         {{/if}}
         {{/chip_attribute_list_entryTypes}}
         ChipLogProgress(Zcl, "    },");
@@ -131,6 +152,7 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
         {{else}}
         ChipLogProgress(Zcl, "    {{asPrintFormat type}},", entry);
         {{/if}}
+#endif // CHIP_PROGRESS_LOGGING
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {

@@ -407,6 +407,8 @@ tests:
                 value: false
               - name: "value"
                 value: 5
+              - name: "originalValue"
+                value: 5
 
     - label: "Send Test Command without its optional arg."
       command: "testNullableOptionalRequest"
@@ -416,7 +418,6 @@ tests:
                 value: false
 
     - label: "Send Test Command with optional arg set to null."
-      disabled: true
       command: "testNullableOptionalRequest"
       arguments:
           values:
@@ -427,4 +428,6 @@ tests:
               - name: "wasPresent"
                 value: true
               - name: "wasNull"
-                value: false
+                value: true
+              - name: "originalValue"
+                value: null

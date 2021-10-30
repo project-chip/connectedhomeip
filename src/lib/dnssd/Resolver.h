@@ -118,6 +118,7 @@ struct DiscoveredNodeData
         mrpRetryIntervalIdle   = kUndefinedRetryInterval;
         mrpRetryIntervalActive = kUndefinedRetryInterval;
         numIPs                 = 0;
+        port                   = 0;
         for (int i = 0; i < kMaxIPAddresses; ++i)
         {
             ipAddress[i] = chip::Inet::IPAddress::Any;

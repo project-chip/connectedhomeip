@@ -104,6 +104,7 @@ static_library("core") {
     "DataModelTypes.h",
     "GroupId.h",
     "NodeId.h",
+    "PasscodeId.h",
     "PeerId.h",
   ]
 

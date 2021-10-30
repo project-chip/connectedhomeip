@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipClusters.BasicCluster
@@ -14,9 +16,13 @@ import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import kotlinx.android.synthetic.main.basic_client_fragment.basicClusterCommandStatus
 import kotlinx.android.synthetic.main.basic_client_fragment.userLabelEd
-import kotlinx.android.synthetic.main.basic_client_fragment.view.readProductNameBtn
-import kotlinx.android.synthetic.main.basic_client_fragment.view.readUserLabelBtn
+import kotlinx.android.synthetic.main.basic_client_fragment.locationEd
+import kotlinx.android.synthetic.main.basic_client_fragment.attributeNameSpinner
 import kotlinx.android.synthetic.main.basic_client_fragment.view.writeUserLabelBtn
+import kotlinx.android.synthetic.main.basic_client_fragment.view.writeLocationBtn
+import kotlinx.android.synthetic.main.basic_client_fragment.view.writeLocalConfigDisabledSwitch
+import kotlinx.android.synthetic.main.basic_client_fragment.view.attributeNameSpinner
+import kotlinx.android.synthetic.main.basic_client_fragment.view.readAttributeBtn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -42,9 +48,20 @@ class BasicClientFragment : Fragment() {
       addressUpdateFragment =
         childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
-      readUserLabelBtn.setOnClickListener { scope.launch { sendReadUserLabelCommandClick() }}
-      writeUserLabelBtn.setOnClickListener { scope.launch { sendWriteUserLabelCommandClick() }}
-      readProductNameBtn.setOnClickListener { scope.launch { sendReadProductNameCommandClick() }}
+      writeUserLabelBtn.setOnClickListener { scope.launch {
+        sendWriteUserLabelAttribute()
+        userLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
+      }}
+      writeLocationBtn.setOnClickListener { scope.launch {
+        sendWriteLocationAttribute()
+        locationEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
+      }}
+      writeLocalConfigDisabledSwitch.setOnCheckedChangeListener { _, isChecked ->
+        scope.launch { sendWriteLocalConfigDisabledAttribute(isChecked) }
+      }
+      makeAttributeList()
+      attributeNameSpinner.adapter = makeAttributeNamesAdapter()
+      readAttributeBtn.setOnClickListener { scope.launch { readAttributeButtonClick() }}
     }
   }
 
@@ -73,44 +90,373 @@ class BasicClientFragment : Fragment() {
     scope.cancel()
   }
 
-  private suspend fun sendReadProductNameCommandClick() {
+  private fun makeAttributeNamesAdapter(): ArrayAdapter<String> {
+    return ArrayAdapter(
+      requireContext(),
+      android.R.layout.simple_spinner_dropdown_item,
+      ATTRIBUTES.toList()
+    ).apply {
+      setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+    }
+  }
+
+  private suspend fun readAttributeButtonClick() {
+    try {
+      readBasicClusters(attributeNameSpinner.selectedItemPosition)
+    } catch (ex: Exception) {
+      showMessage("readBasicCluster failed: $ex")
+    }
+  }
+
+  private suspend fun readBasicClusters(itemIndex: Int) {
+    when(ATTRIBUTES[itemIndex]) {
+      getString(R.string.basic_cluster_interaction_mode_version_text) -> sendReadInteractionModelVersionAttribute()
+      getString(R.string.basic_cluster_vendor_name_text) -> sendReadVendorNameAttribute()
+      getString(R.string.basic_cluster_vendor_id_text) -> sendReadVendorIDAttribute()
+      getString(R.string.basic_cluster_product_name_text) -> sendReadProductNameAttribute()
+      getString(R.string.basic_cluster_product_id_text) -> sendReadProductIDAttribute()
+      getString(R.string.basic_cluster_user_label_text) -> sendReadUserLabelAttribute()
+      getString(R.string.basic_cluster_location_text) -> sendReadLocationAttribute()
+      getString(R.string.basic_cluster_hardware_version_text) -> sendReadHardwareVersionAttribute()
+      getString(R.string.basic_cluster_hardware_version_string_text) -> sendReadHardwareVersionStringAttribute()
+      getString(R.string.basic_cluster_software_version_text) -> sendReadSoftwareVersionAttribute()
+      getString(R.string.basic_cluster_software_version_string_text) -> sendReadSoftwareVersionStringAttribute()
+      getString(R.string.basic_cluster_manufacturing_date_text) -> sendReadManufacturingDateAttribute()
+      getString(R.string.basic_cluster_part_number_text) -> sendReadPartNumberAttribute()
+      getString(R.string.basic_cluster_product_url_text) -> sendReadProductURLAttribute()
+      getString(R.string.basic_cluster_product_label_text) -> sendReadProductLabelAttribute()
+      getString(R.string.basic_cluster_serial_number_text) -> sendReadSerialNumberAttribute()
+      getString(R.string.basic_cluster_local_config_disabled_text) -> sendReadLocalConfigDisabledAttribute()
+      getString(R.string.basic_cluster_reachable_text) -> sendReadReachableAttribute()
+      getString(R.string.basic_cluster_cluster_revision_text) -> sendReadClusterRevisionAttribute()
+    }
+  }
+
+  private fun makeAttributeList() {
+    ATTRIBUTES.add(getString(R.string.basic_cluster_interaction_mode_version_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_vendor_name_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_vendor_id_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_product_name_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_product_id_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_user_label_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_location_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_hardware_version_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_hardware_version_string_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_software_version_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_software_version_string_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_manufacturing_date_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_part_number_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_product_url_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_product_label_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_serial_number_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_local_config_disabled_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_reachable_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_cluster_revision_text))
+  }
+
+  private suspend fun sendReadInteractionModelVersionAttribute() {
+    getBasicClusterForDevice().readInteractionModelVersionAttribute(object : ChipClusters.IntegerAttributeCallback {
+      override fun onSuccess(value: Int) {
+        Log.i(TAG,"[Read Success] InteractionModelVersion: $value")
+        showMessage("[Read Success] InteractionModelVersion: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read InteractionModelVersion failure $ex")
+        Log.e(TAG, "Read InteractionModelVersion failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadVendorNameAttribute() {
+    getBasicClusterForDevice().readVendorNameAttribute(object : ChipClusters.CharStringAttributeCallback {
+      override fun onSuccess(value: String) {
+        Log.i(TAG,"[Read Success] VendorName: $value")
+        showMessage("[Read Success] VendorName: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read VendorName failure $ex")
+        Log.e(TAG, "Read VendorName failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadVendorIDAttribute() {
+    getBasicClusterForDevice().readVendorIDAttribute(object : ChipClusters.IntegerAttributeCallback {
+      override fun onSuccess(value: Int) {
+        Log.i(TAG,"[Read Success] VendorID: $value")
+        showMessage("[Read Success] VendorID: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read VendorID failure $ex")
+        Log.e(TAG, "Read VendorID failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadProductNameAttribute() {
     getBasicClusterForDevice().readProductNameAttribute(object : ChipClusters.CharStringAttributeCallback {
       override fun onSuccess(value: String) {
-        showMessage("Read ProductName command success: value: $value")
+        Log.i(TAG,"[Read Success] ProductName: $value")
+        showMessage("[Read Success] ProductName: $value")
       }
 
       override fun onError(ex: Exception) {
-        showMessage("Read ProductName command failure $ex")
-        Log.e(TAG, "Read ProductName command failure", ex)
+        showMessage("Read ProductName failure $ex")
+        Log.e(TAG, "Read ProductName failure", ex)
       }
     })
   }
 
-  private suspend fun sendReadUserLabelCommandClick() {
+  private suspend fun sendReadProductIDAttribute() {
+    getBasicClusterForDevice().readProductIDAttribute(object : ChipClusters.IntegerAttributeCallback {
+      override fun onSuccess(value: Int) {
+        Log.i(TAG,"[Read Success] ProductID: $value")
+        showMessage("[Read Success] ProductID: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read ProductID failure $ex")
+        Log.e(TAG, "Read ProductID failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadUserLabelAttribute() {
     getBasicClusterForDevice().readUserLabelAttribute(object : ChipClusters.CharStringAttributeCallback {
       override fun onSuccess(value: String) {
-        showMessage("Read UserLabel command success: value: $value")
+        Log.i(TAG,"[Read Success] UserLabel: $value")
+        showMessage("[Read Success] UserLabel: $value")
       }
 
       override fun onError(ex: Exception) {
-        showMessage("Read UserLabel command failure $ex")
-        Log.e(TAG, "Read UserLabel command failure", ex)
+        showMessage("Read UserLabel failure $ex")
+        Log.e(TAG, "Read UserLabel failure", ex)
       }
     })
   }
 
-  private suspend fun sendWriteUserLabelCommandClick() {
+  private suspend fun sendWriteUserLabelAttribute() {
     getBasicClusterForDevice().writeUserLabelAttribute(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
-        showMessage("Write UserLabel command success")
+        showMessage("Write UserLabel success")
       }
 
       override fun onError(ex: Exception) {
-        showMessage("Write UserLabel command failure $ex")
-        Log.e(TAG, "Write UserLabel command failure", ex)
+        showMessage("Write UserLabel failure $ex")
+        Log.e(TAG, "Write UserLabel failure", ex)
+      }
+    }, userLabelEd.text.toString())
+  }
+
+  private suspend fun sendReadLocationAttribute() {
+    getBasicClusterForDevice().readLocationAttribute(object : ChipClusters.CharStringAttributeCallback {
+      override fun onSuccess(value: String) {
+        Log.i(TAG,"[Read Success] Location: $value")
+        showMessage("[Read Success] Location: $value")
       }
 
-    }, userLabelEd.text.toString())
+      override fun onError(ex: Exception) {
+        showMessage("Read Location failure $ex")
+        Log.e(TAG, "Read Location failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendWriteLocationAttribute() {
+    getBasicClusterForDevice().writeLocationAttribute(object : ChipClusters.DefaultClusterCallback {
+      override fun onSuccess() {
+        showMessage("Write Location success")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Write Location failure $ex")
+        Log.e(TAG, "Write Location failure", ex)
+      }
+    }, locationEd.text.toString())
+  }
+
+  private suspend fun sendReadHardwareVersionAttribute() {
+    getBasicClusterForDevice().readHardwareVersionAttribute(object : ChipClusters.IntegerAttributeCallback {
+      override fun onSuccess(value: Int) {
+        Log.i(TAG,"[Read Success] HardwareVersion: $value")
+        showMessage("[Read Success] HardwareVersion: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read HardwareVersion failure $ex")
+        Log.e(TAG, "Read HardwareVersion failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadHardwareVersionStringAttribute() {
+    getBasicClusterForDevice().readHardwareVersionStringAttribute(object : ChipClusters.CharStringAttributeCallback {
+      override fun onSuccess(value: String) {
+        Log.i(TAG,"[Read Success] HardwareVersionString: $value")
+        showMessage("[Read Success] HardwareVersionString: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read HardwareVersionString failure $ex")
+        Log.e(TAG, "Read HardwareVersionString failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadSoftwareVersionAttribute() {
+    getBasicClusterForDevice().readSoftwareVersionAttribute(object : ChipClusters.LongAttributeCallback {
+      override fun onSuccess(value: Long) {
+        Log.i(TAG,"[Read Success] SoftwareVersion: $value")
+        showMessage("[Read Success] SoftwareVersion: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read SoftwareVersion failure $ex")
+        Log.e(TAG, "Read SoftwareVersion failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadSoftwareVersionStringAttribute() {
+    getBasicClusterForDevice().readSoftwareVersionStringAttribute(object : ChipClusters.CharStringAttributeCallback {
+      override fun onSuccess(value: String) {
+        Log.i(TAG,"[Read Success] SoftwareVersionString $value")
+        showMessage("[Read Success] SoftwareVersionString: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read SoftwareVersionString failure $ex")
+        Log.e(TAG, "Read SoftwareVersionString failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadManufacturingDateAttribute() {
+    getBasicClusterForDevice().readManufacturingDateAttribute(object : ChipClusters.CharStringAttributeCallback {
+      override fun onSuccess(value: String) {
+        Log.i(TAG,"[Read Success] ManufacturingDate $value")
+        showMessage("[Read Success] ManufacturingDate: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read ManufacturingDate failure $ex")
+        Log.e(TAG, "Read ManufacturingDate failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadPartNumberAttribute() {
+    getBasicClusterForDevice().readPartNumberAttribute(object : ChipClusters.CharStringAttributeCallback {
+      override fun onSuccess(value: String) {
+        Log.i(TAG,"[Read Success] PartNumber $value")
+        showMessage("[Read Success] PartNumber: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read PartNumber failure $ex")
+        Log.e(TAG, "Read PartNumber failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadProductURLAttribute() {
+    getBasicClusterForDevice().readProductURLAttribute(object : ChipClusters.CharStringAttributeCallback {
+      override fun onSuccess(value: String) {
+        Log.i(TAG,"[Read Success] ProductURL $value")
+        showMessage("[Read Success] ProductURL: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read ProductURL failure $ex")
+        Log.e(TAG, "Read ProductURL failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadProductLabelAttribute() {
+    getBasicClusterForDevice().readProductLabelAttribute(object : ChipClusters.CharStringAttributeCallback {
+      override fun onSuccess(value: String) {
+        Log.i(TAG,"[Read Success] ProductLabel $value")
+        showMessage("[Read Success] ProductLabel: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read ProductLabel failure $ex")
+        Log.e(TAG, "Read ProductLabel failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadSerialNumberAttribute() {
+    getBasicClusterForDevice().readSerialNumberAttribute(object : ChipClusters.CharStringAttributeCallback {
+      override fun onSuccess(value: String) {
+        Log.i(TAG,"[Read Success] SerialNumber $value")
+        showMessage("[Read Success] SerialNumber: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read SerialNumber failure $ex")
+        Log.e(TAG, "Read SerialNumber failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadLocalConfigDisabledAttribute() {
+    getBasicClusterForDevice().readLocalConfigDisabledAttribute(object : ChipClusters.BooleanAttributeCallback {
+      override fun onSuccess(value: Boolean) {
+        Log.i(TAG,"[Read Success] LocalConfigDisabled $value")
+        showMessage("[Read Success] LocalConfigDisabled: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read LocalConfigDisabled failure $ex")
+        Log.e(TAG, "Read LocalConfigDisabled failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendWriteLocalConfigDisabledAttribute(localConfigDisabled: Boolean) {
+    getBasicClusterForDevice().writeLocalConfigDisabledAttribute(object : ChipClusters.DefaultClusterCallback {
+      override fun onSuccess() {
+        showMessage("Write LocalConfigDisabled success")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Write LocalConfigDisabled failure $ex")
+        Log.e(TAG, "Write LocalConfigDisabled failure", ex)
+      }
+    }, localConfigDisabled)
+  }
+
+  private suspend fun sendReadReachableAttribute() {
+    getBasicClusterForDevice().readReachableAttribute(object : ChipClusters.BooleanAttributeCallback {
+      override fun onSuccess(value: Boolean) {
+        Log.i(TAG,"[Read Success] Reachable $value")
+        showMessage("[Read Success] Reachable: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read Reachable failure $ex")
+        Log.e(TAG, "Read Reachable failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadClusterRevisionAttribute() {
+    getBasicClusterForDevice().readClusterRevisionAttribute(object : ChipClusters.IntegerAttributeCallback {
+      override fun onSuccess(value: Int) {
+        Log.i(TAG,"[Read Success] ClusterRevision $value")
+        showMessage("[Read Success] ClusterRevision: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read ClusterRevision failure $ex")
+        Log.e(TAG, "Read ClusterRevision failure", ex)
+      }
+    })
   }
 
   private fun showMessage(msg: String) {
@@ -121,12 +467,15 @@ class BasicClientFragment : Fragment() {
 
   private suspend fun getBasicClusterForDevice(): BasicCluster {
     return BasicCluster(
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId), 0
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId), ENDPOINT
     )
   }
 
   companion object {
     private const val TAG = "BasicClientFragment"
+    private const val ENDPOINT = 0
+    private val ATTRIBUTES: MutableList<String> = mutableListOf()
+
     fun newInstance(): BasicClientFragment = BasicClientFragment()
   }
 }
