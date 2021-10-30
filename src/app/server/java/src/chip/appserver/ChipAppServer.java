@@ -17,15 +17,13 @@
  */
 package chip.appserver;
 
-/**
- * Controller to interact with the CHIP device.
- */
+/** Controller to interact with the CHIP device. */
 public class ChipAppServer {
-    private static final String TAG = ChipAppServer.class.getSimpleName();
+  private static final String TAG = ChipAppServer.class.getSimpleName();
 
-    static {
-        System.loadLibrary("CHIPAppServer");
-    }
+  static {
+    System.loadLibrary("CHIPAppServer");
+  }
 
-    public native boolean startApp();
+  public native boolean startApp();
 }
