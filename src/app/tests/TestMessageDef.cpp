@@ -25,12 +25,13 @@
 #include <app/AppBuildConfig.h>
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/MessageDef/CommandList.h>
+#include <app/MessageDef/EventFilters.h>
 #include <app/MessageDef/InvokeCommand.h>
 #include <app/MessageDef/ReadRequest.h>
 #include <app/MessageDef/ReportData.h>
 #include <app/MessageDef/SubscribeRequest.h>
 #include <app/MessageDef/SubscribeResponse.h>
-#include <app/MessageDef/TimedRequest.h>
+#include <app/MessageDef/TimedRequestMessage.h>
 #include <app/MessageDef/WriteRequest.h>
 #include <app/MessageDef/WriteResponse.h>
 #include <lib/core/CHIPError.h>
@@ -70,6 +71,56 @@ CHIP_ERROR DebugPrettyPrint(const chip::System::PacketBufferHandle & aMsgBuf)
     }
 
     return err;
+}
+
+void BuildEventFilterIB(nlTestSuite * apSuite, EventFilterIB::Builder & aEventFilterIBBuilder)
+{
+    aEventFilterIBBuilder.Node(1).EventMin(2).EndOfEventFilterIB();
+    NL_TEST_ASSERT(apSuite, aEventFilterIBBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseEventFilterIB(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EventFilterIB::Parser eventFilterIBParser;
+    chip::NodeId node = 1;
+    uint64_t eventMin = 2;
+
+    err = eventFilterIBParser.Init(aReader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = eventFilterIBParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+    err = eventFilterIBParser.GetNode(&node);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && node == 1);
+
+    err = eventFilterIBParser.GetEventMin(&eventMin);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && eventMin == 2);
+}
+
+void BuildEventFilters(nlTestSuite * apSuite, EventFilters::Builder & aEventFiltersBuilder)
+{
+    EventFilterIB::Builder eventFilterBuilder = aEventFiltersBuilder.CreateEventFilter();
+    NL_TEST_ASSERT(apSuite, aEventFiltersBuilder.GetError() == CHIP_NO_ERROR);
+    BuildEventFilterIB(apSuite, eventFilterBuilder);
+    aEventFiltersBuilder.EndOfEventFilters();
+    NL_TEST_ASSERT(apSuite, aEventFiltersBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseEventFilters(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EventFilters::Parser eventFiltersParser;
+    AttributePath::Parser attributePathParser;
+
+    err = eventFiltersParser.Init(aReader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = eventFiltersParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
 }
 
 void BuildAttributePath(nlTestSuite * apSuite, AttributePath::Builder & aAttributePathBuilder)
@@ -1010,33 +1061,80 @@ void ParseSubscribeResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
     NL_TEST_ASSERT(apSuite, maxIntervalCeilingSeconds == 2 && err == CHIP_NO_ERROR);
 }
 
-void BuildTimedRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
+void BuildTimedRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    TimedRequest::Builder timedRequestBuilder;
+    TimedRequestMessage::Builder TimedRequestMessageBuilder;
 
-    err = timedRequestBuilder.Init(&aWriter);
+    err = TimedRequestMessageBuilder.Init(&aWriter);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    timedRequestBuilder.TimeoutMs(1);
-    NL_TEST_ASSERT(apSuite, timedRequestBuilder.GetError() == CHIP_NO_ERROR);
+    TimedRequestMessageBuilder.TimeoutMs(1);
+    NL_TEST_ASSERT(apSuite, TimedRequestMessageBuilder.GetError() == CHIP_NO_ERROR);
 }
 
-void ParseTimedRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+void ParseTimedRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TimedRequest::Parser timedRequestarser;
+    TimedRequestMessage::Parser TimedRequestMessagearser;
     uint16_t timeout = 0;
 
-    err = timedRequestarser.Init(aReader);
+    err = TimedRequestMessagearser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = timedRequestarser.CheckSchemaValidity();
+    err = TimedRequestMessagearser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
-    err = timedRequestarser.GetTimeoutMs(&timeout);
+    err = TimedRequestMessagearser.GetTimeoutMs(&timeout);
     NL_TEST_ASSERT(apSuite, timeout == 1 && err == CHIP_NO_ERROR);
+}
+
+void EventFilterTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EventFilterIB::Builder eventFilterBuilder;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    eventFilterBuilder.Init(&writer);
+    BuildEventFilterIB(apSuite, eventFilterBuilder);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ParseEventFilterIB(apSuite, reader);
+}
+
+void EventFiltersTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    EventFilters::Builder eventFiltersBuilder;
+
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+
+    err = eventFiltersBuilder.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    BuildEventFilters(apSuite, eventFiltersBuilder);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ParseEventFilters(apSuite, reader);
 }
 
 void AttributePathTest(nlTestSuite * apSuite, void * apContext)
@@ -1543,13 +1641,13 @@ void SubscribeResponseTest(nlTestSuite * apSuite, void * apContext)
     ParseSubscribeResponse(apSuite, reader);
 }
 
-void TimedRequestTest(nlTestSuite * apSuite, void * apContext)
+void TimedRequestMessageTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    BuildTimedRequest(apSuite, writer);
+    BuildTimedRequestMessage(apSuite, writer);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1559,7 +1657,7 @@ void TimedRequestTest(nlTestSuite * apSuite, void * apContext)
     reader.Init(std::move(buf));
     err = reader.Next();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    ParseTimedRequest(apSuite, reader);
+    ParseTimedRequestMessage(apSuite, reader);
 }
 
 void CheckPointRollbackTest(nlTestSuite * apSuite, void * apContext)
@@ -1622,6 +1720,8 @@ void CheckPointRollbackTest(nlTestSuite * apSuite, void * apContext)
 // clang-format off
 const nlTest sTests[] =
         {
+                NL_TEST_DEF("EventFilterTest", EventFilterTest),
+                NL_TEST_DEF("EventFiltersTest", EventFiltersTest),
                 NL_TEST_DEF("AttributePathTest", AttributePathTest),
                 NL_TEST_DEF("AttributePathListTest", AttributePathListTest),
                 NL_TEST_DEF("EventPathTest", EventPathTest),
@@ -1645,7 +1745,7 @@ const nlTest sTests[] =
                 NL_TEST_DEF("WriteResponseTest", WriteResponseTest),
                 NL_TEST_DEF("SubscribeRequestTest", SubscribeRequestTest),
                 NL_TEST_DEF("SubscribeResponseTest", SubscribeResponseTest),
-                NL_TEST_DEF("TimedRequestTest", TimedRequestTest),
+                NL_TEST_DEF("TimedRequestMessageTest", TimedRequestMessageTest),
                 NL_TEST_DEF("CheckPointRollbackTest", CheckPointRollbackTest),
                 NL_TEST_SENTINEL()
         };

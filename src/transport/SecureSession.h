@@ -49,42 +49,30 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
 class SecureSession
 {
 public:
-    SecureSession() : mPeerAddress(PeerAddress::Uninitialized()) {}
-    SecureSession(const PeerAddress & addr) : mPeerAddress(addr) {}
-    SecureSession(PeerAddress && addr) : mPeerAddress(addr) {}
+    SecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric, uint64_t currentTime) :
+        mPeerNodeId(peerNodeId), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mFabric(fabric)
+    {
+        SetLastActivityTimeMs(currentTime);
+    }
 
-    SecureSession(SecureSession &&)      = default;
-    SecureSession(const SecureSession &) = default;
-    SecureSession & operator=(const SecureSession &) = default;
-    SecureSession & operator=(SecureSession &&) = default;
+    SecureSession(SecureSession &&)      = delete;
+    SecureSession(const SecureSession &) = delete;
+    SecureSession & operator=(const SecureSession &) = delete;
+    SecureSession & operator=(SecureSession &&) = delete;
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
     PeerAddress & GetPeerAddress() { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
-    void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
-
-    uint16_t GetPeerSessionId() const { return mPeerSessionId; }
-    void SetPeerSessionId(uint16_t id) { mPeerSessionId = id; }
-
-    // TODO: Rename KeyID to SessionID
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
-    void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }
+    uint16_t GetPeerSessionId() const { return mPeerSessionId; }
+    FabricIndex GetFabricIndex() const { return mFabric; }
 
     uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
     void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
-
-    FabricIndex GetFabricIndex() const { return mFabric; }
-    void SetFabricIndex(FabricIndex fabricIndex) { mFabric = fabricIndex; }
-
-    bool IsInitialized()
-    {
-        return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerSessionId != UINT16_MAX ||
-                mLocalSessionId != UINT16_MAX);
-    }
 
     CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
                                  MessageAuthenticationCode & mac) const
@@ -101,14 +89,15 @@ public:
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
+    const NodeId mPeerNodeId;
+    const uint16_t mLocalSessionId;
+    const uint16_t mPeerSessionId;
+    const FabricIndex mFabric;
+
     PeerAddress mPeerAddress;
-    NodeId mPeerNodeId           = kUndefinedNodeId;
-    uint16_t mPeerSessionId      = UINT16_MAX;
-    uint16_t mLocalSessionId     = UINT16_MAX;
     uint64_t mLastActivityTimeMs = 0;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
-    FabricIndex mFabric = kUndefinedFabricIndex;
 };
 
 } // namespace Transport

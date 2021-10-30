@@ -131,9 +131,7 @@ namespace {
         return true;                                                                                                               \
     }
 
-// TODO: These IM related callbacks contains small or no generated code, should be put into seperate file to reduce the size of
-// template. Singleton instance of the callbacks manager
-
+// Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
 void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::TLVReader * tlvData,
@@ -526,6 +524,30 @@ void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData
 #pragma GCC diagnostic pop
 #endif // __clang__
 
+void ModeSelectClusterSupportedModesListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<ModeSelectSupportedModesListAttributeCallback> * cb =
+        Callback::Callback<ModeSelectSupportedModesListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
+
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
@@ -715,6 +737,31 @@ void TestClusterClusterListStructOctetStringListAttributeFilter(TLV::TLVReader *
 
     Callback::Callback<TestClusterListStructOctetStringListAttributeCallback> * cb =
         Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
+
+void TestClusterClusterListNullablesAndOptionalsStructListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                          Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback> * cb =
+        Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
 #if !defined(__clang__)
@@ -1959,18 +2006,20 @@ bool emberAfTestClusterClusterTestListInt8UReverseResponseCallback(EndpointId en
 }
 
 bool emberAfTestClusterClusterTestNullableOptionalResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                   bool wasPresent, bool wasNull, uint8_t value)
+                                                                   bool wasPresent, bool wasNull, uint8_t value,
+                                                                   uint8_t originalValue)
 {
     ChipLogProgress(Zcl, "TestNullableOptionalResponse:");
     ChipLogProgress(Zcl, "  wasPresent: %d", wasPresent);
     ChipLogProgress(Zcl, "  wasNull: %d", wasNull);
     ChipLogProgress(Zcl, "  value: %" PRIu8 "", value);
+    ChipLogProgress(Zcl, "  originalValue: %" PRIu8 "", originalValue);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestNullableOptionalResponseCallback");
 
     Callback::Callback<TestClusterClusterTestNullableOptionalResponseCallback> * cb =
         Callback::Callback<TestClusterClusterTestNullableOptionalResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, wasPresent, wasNull, value);
+    cb->mCall(cb->mContext, wasPresent, wasNull, value, originalValue);
     return true;
 }
 

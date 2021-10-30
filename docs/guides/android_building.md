@@ -116,9 +116,9 @@ which allows us to directly edit core Matter code in-IDE.
 
     See the table above for other values of `TARGET_CPU`.
 
-2. Modify the `matterSdkSourceBuild` variable to true and `matterBuildSrcDir`
-   point to the appropriate output directory (e.g.
-   `../../../../out/android_arm64`) in
+2. Modify the `matterSdkSourceBuild` variable to true, `matterBuildSrcDir` point
+   to the appropriate output directory (e.g. `../../../../out/android_arm64`),
+   and `matterSourceBuildAbiFilters` to the desired ABIs in
    [src/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/gradle.properties)
 
 3) Open the project in Android Studio and run **Sync Project with Gradle

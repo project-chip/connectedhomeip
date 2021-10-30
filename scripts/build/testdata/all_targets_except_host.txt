@@ -1,5 +1,8 @@
 ameba-amebad-all-clusters
-android-androidstudio-chip-tool
+android-androidstudio-arm-chip-tool
+android-androidstudio-arm64-chip-tool
+android-androidstudio-x64-chip-tool
+android-androidstudio-x86-chip-tool
 android-arm-chip-tool
 android-arm64-chip-test
 android-arm64-chip-tool
@@ -28,7 +31,7 @@ nrf-nrf52840-pump
 nrf-nrf52840-pump-controller
 nrf-nrf52840-shell
 nrf-nrf5340-light
-nrf-nrf5340-light-rpc
+nrf-nrf5340-light-rpc (NOGLOB: Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760)
 nrf-nrf5340-lock
 nrf-nrf5340-pump
 nrf-nrf5340-pump-controller

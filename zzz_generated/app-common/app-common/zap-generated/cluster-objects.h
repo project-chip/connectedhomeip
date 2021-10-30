@@ -10173,6 +10173,16 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::TrustedRootCertificates::Id; }
 };
 } // namespace TrustedRootCertificates
+namespace CurrentFabricIndex {
+struct TypeInfo
+{
+    using Type          = chip::FabricIndex;
+    using DecodableType = chip::FabricIndex;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFabricIndex::Id; }
+};
+} // namespace CurrentFabricIndex
 namespace FeatureMap {
 struct TypeInfo
 {
@@ -10323,6 +10333,157 @@ public:
 } // namespace StateChange
 } // namespace Events
 } // namespace BooleanState
+namespace ModeSelect {
+
+namespace Structs {
+namespace ModeOptionStruct {
+enum class Fields
+{
+    kLabel       = 0,
+    kMode        = 1,
+    kSemanticTag = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan label;
+    uint8_t mode;
+    uint32_t semanticTag;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ModeOptionStruct
+namespace SemanticTag {
+enum class Fields
+{
+    kMfgCode = 0,
+    kValue   = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t mfgCode;
+    uint16_t value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace SemanticTag
+} // namespace Structs
+
+namespace Commands {
+namespace ChangeToMode {
+enum class Fields
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    uint8_t newMode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    uint8_t newMode;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToMode
+} // namespace Commands
+
+namespace Attributes {
+namespace CurrentMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
+};
+} // namespace CurrentMode
+namespace SupportedModes {
+struct TypeInfo
+{
+    using Type          = DataModel::List<const Structs::ModeOptionStruct::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::ModeOptionStruct::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
+};
+} // namespace SupportedModes
+namespace OnMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
+};
+} // namespace OnMode
+namespace StartUpMode {
+struct TypeInfo
+{
+    using Type          = uint8_t;
+    using DecodableType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
+};
+} // namespace StartUpMode
+namespace Description {
+struct TypeInfo
+{
+    using Type          = chip::CharSpan;
+    using DecodableType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+};
+} // namespace Description
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type          = uint32_t;
+    using DecodableType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type          = uint16_t;
+    using DecodableType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace ModeSelect
 namespace ShadeConfiguration {
 
 namespace Attributes {
@@ -23603,9 +23764,10 @@ public:
 namespace TestNullableOptionalResponse {
 enum class Fields
 {
-    kWasPresent = 0,
-    kWasNull    = 1,
-    kValue      = 2,
+    kWasPresent    = 0,
+    kWasNull       = 1,
+    kValue         = 2,
+    kOriginalValue = 3,
 };
 
 struct Type
@@ -23618,6 +23780,7 @@ public:
     bool wasPresent;
     Optional<bool> wasNull;
     Optional<uint8_t> value;
+    Optional<DataModel::Nullable<uint8_t>> originalValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23631,6 +23794,7 @@ public:
     bool wasPresent;
     Optional<bool> wasNull;
     Optional<uint8_t> value;
+    Optional<DataModel::Nullable<uint8_t>> originalValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestNullableOptionalResponse
@@ -24312,6 +24476,16 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorId::Id; }
 };
 } // namespace VendorId
+namespace ListNullablesAndOptionalsStruct {
+struct TypeInfo
+{
+    using Type          = DataModel::List<const Structs::NullablesAndOptionalsStruct::Type>;
+    using DecodableType = DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ListNullablesAndOptionalsStruct::Id; }
+};
+} // namespace ListNullablesAndOptionalsStruct
 namespace Unsupported {
 struct TypeInfo
 {
