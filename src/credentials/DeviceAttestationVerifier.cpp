@@ -45,8 +45,8 @@ public:
         return AttestationVerificationResult::kNotImplemented;
     }
 
-    AttestationVerificationResult ValidateCertificationDeclaration(const ByteSpan & cmsEnvelopeBuffer,
-                                                                   ByteSpan & certDeclBuffer) override
+    AttestationVerificationResult ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
+                                                                            ByteSpan & certDeclBuffer) override
     {
         (void) cmsEnvelopeBuffer;
         (void) certDeclBuffer;
