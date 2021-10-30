@@ -37,36 +37,28 @@ struct VendorReservedElement
 class DeviceAttestationVendorReservedDeconstructor
 {
 
-private:
-    bool used;                    // set to true when we have valid data
-    size_t numVendorReservedData; // number of VendorReserved entries (could be 0)
-    ByteSpan AttestationData;
-    bool initialized;
-    TLV::ContiguousBufferTLVReader tlvReader;
-    TLV::TLVType containerType = TLV::kTLVType_Structure;
-
 public:
-    DeviceAttestationVendorReservedDeconstructor() : used(false), initialized(false) {}
+    DeviceAttestationVendorReservedDeconstructor() {}
 
     void SaveAttestationElements(size_t count, ByteSpan attestationElements)
     {
-        used                  = true;
-        numVendorReservedData = count;
+        mIsUsed                = true;
+        mNumVendorReservedData = count;
         if (count > 0)
         {
-            AttestationData = attestationElements;
+            mAttestationData = attestationElements;
         }
     }
 
     // read TLV until first profile tag
     CHIP_ERROR Init()
     {
-        if (!used)
+        if (!mIsUsed)
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        tlvReader.Init(AttestationData);
+        tlvReader.Init(mAttestationData);
         ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
         ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
@@ -78,17 +70,17 @@ public:
                 break;
         }
         // positioned to first context tag (vendor reserved data)
-        initialized = true;
+        mIsInitialized = true;
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR Next() { return tlvReader.Next(); }
 
-    size_t GetNumberOfElements() { return numVendorReservedData; }
+    size_t GetNumberOfElements() { return mNumVendorReservedData; }
 
     CHIP_ERROR GetNextVendorReservedElement(struct VendorReservedElement & element)
     {
-        if (used && !initialized)
+        if (mIsUsed && !mIsInitialized)
         {
             ReturnErrorOnFailure(Init());
         }
@@ -109,43 +101,50 @@ public:
             return tlvReader.GetByteView(element.vendorReservedData);
         }
     }
+
+private:
+    bool mIsUsed = false;          // set to true when we have valid data
+    size_t mNumVendorReservedData; // number of VendorReserved entries (could be 0)
+    ByteSpan mAttestationData;
+    bool mIsInitialized = false;
+    TLV::ContiguousBufferTLVReader tlvReader;
+    TLV::TLVType containerType = TLV::kTLVType_Structure;
 };
 
 class DeviceAttestationVendorReservedConstructor
 {
 public:
-    DeviceAttestationVendorReservedConstructor(struct VendorReservedElement * array, size_t size) :
-        elements(array), maxSize(size), used(0)
+    DeviceAttestationVendorReservedConstructor(struct VendorReservedElement * array, size_t size) : mElements(array), mMaxSize(size)
     {}
 
     typedef const struct VendorReservedElement * const_iterator;
 
     const_iterator Next()
     {
-        if (current + 1 == used)
+        if (mCurrent + 1 == mIsUsed)
         {
             return nullptr;
         }
-        return &elements[++current];
+        return &mElements[++mCurrent];
     }
 
     const_iterator cbegin()
     {
         do_sorting(); // when beginning to iterator, make a linked list and return the head element
-        current = 0;
-        return elements;
+        mCurrent = 0;
+        return mElements;
     }
 
     CHIP_ERROR addVendorReservedElement(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum, ByteSpan span)
     {
-        if (used == maxSize)
+        if (mIsUsed == mMaxSize)
             return CHIP_ERROR_NO_MEMORY;
 
-        elements[used].tagNum             = tagNum;
-        elements[used].profileNum         = profileNum;
-        elements[used].vendorId           = vendorId;
-        elements[used].vendorReservedData = span;
-        used++;
+        mElements[mIsUsed].tagNum             = tagNum;
+        mElements[mIsUsed].profileNum         = profileNum;
+        mElements[mIsUsed].vendorId           = vendorId;
+        mElements[mIsUsed].vendorReservedData = span;
+        mIsUsed++;
         return CHIP_NO_ERROR;
     }
 
@@ -160,41 +159,41 @@ private:
     {
         size_t starting = 0;
 
-        while (starting < used)
+        while (starting < mIsUsed)
         {
             uint32_t minVendor = UINT32_MAX;
 
             // find lowest vendorId
             size_t i;
-            for (i = starting; i < used; i++)
+            for (i = starting; i < mIsUsed; i++)
             {
-                if (elements[i].vendorId < minVendor)
+                if (mElements[i].vendorId < minVendor)
                 {
-                    minVendor = elements[i].vendorId;
+                    minVendor = mElements[i].vendorId;
                 }
             }
 
             uint32_t minProfile = UINT32_MAX;
             // find lowest ProfileNum
-            for (i = starting; i < used; i++)
+            for (i = starting; i < mIsUsed; i++)
             {
-                if (elements[i].vendorId == minVendor)
+                if (mElements[i].vendorId == minVendor)
                 {
-                    if (elements[i].profileNum < minProfile)
-                        minProfile = elements[i].profileNum;
+                    if (mElements[i].profileNum < minProfile)
+                        minProfile = mElements[i].profileNum;
                 }
             }
 
             // first lowest tagNum for this vendorId/profileNum
             uint64_t minTagNum = UINT64_MAX;
             size_t lowestIndex;
-            for (i = starting; i < used; i++)
+            for (i = starting; i < mIsUsed; i++)
             {
-                if (elements[i].vendorId == minVendor && elements[i].profileNum == minProfile)
+                if (mElements[i].vendorId == minVendor && mElements[i].profileNum == minProfile)
                 {
-                    if (elements[i].tagNum < minTagNum)
+                    if (mElements[i].tagNum < minTagNum)
                     {
-                        minTagNum   = elements[i].tagNum;
+                        minTagNum   = mElements[i].tagNum;
                         lowestIndex = i;
                     }
                 }
@@ -206,18 +205,18 @@ private:
                 //
                 VendorReservedElement tmpElement;
 
-                tmpElement            = elements[starting];
-                elements[starting]    = elements[lowestIndex];
-                elements[lowestIndex] = tmpElement;
+                tmpElement             = mElements[starting];
+                mElements[starting]    = mElements[lowestIndex];
+                mElements[lowestIndex] = tmpElement;
             }
             starting++;
         }
     }
 
-    VendorReservedElement * elements;
-    size_t maxSize;  // size of elements array
-    size_t used = 0; // elements used
-    size_t current;  // iterating from [0...maxSize -1]
+    VendorReservedElement * mElements;
+    size_t mMaxSize;    // size of elements array
+    size_t mIsUsed = 0; // elements used
+    size_t mCurrent;    // iterating from [0...maxSize -1]
 };
 
 // allocate space for DeviceAttestationVendorReserved on the stack

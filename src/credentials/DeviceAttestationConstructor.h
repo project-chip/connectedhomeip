@@ -33,7 +33,7 @@ namespace Credentials {
  *  @param[out]   timestamp
  *  @param[out]   firmwareInfo ByteSpan containing Firmware Information data if present within attestationElements.
  *                             Empty ByteSpan if not present in attestationElements.
- *  @param[out] DeviceAttestationVendorReserved
+ *  @param[out]   VendorReserved  Placeholder to for client to examine VendorReserved elements later
  */
 CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, ByteSpan & certificationDeclaration,
                                           ByteSpan & attestationNonce, uint32_t & timestamp, ByteSpan & firmwareInfo,
@@ -46,7 +46,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
  *  @param[in]  attestationNonce Attestation Nonce - 32 octets required.
  *  @param[in]  timestamp Timestamp data in epoch time format.
  *  @param[in]  firmwareInfo Optional Firmware Information data - Can be empty.
- *  @param[in]  DeviceAttestationVendorReserved
+ *  @param[in]  VendorReserved    Prefilled-in vendor reserved elements to be put into DA elements.
  *  @param[out] attestationElements Buffer used to write all AttestationElements data, formed with all the data fields above.
  *                                  Provided buffer needs to be capable to handle all data fields + tags.
  */

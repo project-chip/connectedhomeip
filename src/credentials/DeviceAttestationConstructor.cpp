@@ -93,7 +93,6 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
         {
         case kCertificationDeclarationTagId:
             VerifyOrReturnError(lastContextTagId == UINT32_MAX, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-            VerifyOrReturnError(certificationDeclarationExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
             ReturnErrorOnFailure(tlvReader.GetByteView(certificationDeclaration));
             certificationDeclarationExists = true;
             break;
@@ -127,7 +126,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
     VerifyOrReturnError(certificationDeclarationExists && attestationNonceExists && timestampExists,
                         CHIP_ERROR_MISSING_TLV_ELEMENT);
 
-    size_t count;
+    size_t count = 0;
     ReturnErrorOnFailure(CountVendorReservedElementsInDA(attestationElements, count));
     vendorReserved.SaveAttestationElements(count, attestationElements);
     return CHIP_NO_ERROR;
