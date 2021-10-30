@@ -18,9 +18,7 @@
 
 #include <ota-provider-common/OTAProviderExample.h>
 
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app/CommandPathParams.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <app/util/af.h>
 #include <crypto/RandUtils.h>
@@ -31,12 +29,10 @@
 #include <string.h>
 
 using chip::ByteSpan;
+using chip::CharSpan;
+using chip::Optional;
 using chip::Span;
-using chip::app::CommandPathFlags;
-using chip::app::CommandPathParams;
 using chip::app::Clusters::OTAProviderDelegate;
-using chip::TLV::ContextTag;
-using chip::TLV::TLVWriter;
 
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
@@ -97,10 +93,12 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
     }
 }
 
-EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId,
-                                                   uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported,
-                                                   const chip::Span<const char> & location, bool requestorCanConsent,
-                                                   const chip::ByteSpan & metadataForProvider)
+EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
+                                                   const chip::app::ConcreteCommandPath & commandPath, uint16_t vendorId,
+                                                   uint16_t productId, const Optional<uint16_t> & hardwareVersion,
+                                                   uint32_t softwareVersion, uint8_t protocolsSupported,
+                                                   const Optional<CharSpan> & location, const Optional<bool> & requestorCanConsent,
+                                                   const Optional<ByteSpan> & metadataForProvider)
 {
     // TODO: add confiuration for returning BUSY status
 
@@ -151,29 +149,26 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
     }
 
-    CommandPathParams cmdParams = { emberAfCurrentEndpoint(), 0 /* mGroupId */, ZCL_OTA_PROVIDER_CLUSTER_ID,
-                                    ZCL_QUERY_IMAGE_RESPONSE_COMMAND_ID, (CommandPathFlags::kEndpointIdValid) };
-    TLVWriter * writer          = nullptr;
-    uint8_t tagNum              = 0;
-    VerifyOrReturnError((commandObj->PrepareCommand(cmdParams) == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(tagNum++), queryStatus) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(tagNum++), mDelayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->PutString(ContextTag(tagNum++), uriBuf) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(tagNum++), newSoftwareVersion) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->PutString(ContextTag(tagNum++), kExampleSoftwareString) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->PutBytes(ContextTag(tagNum++), updateToken, kUpdateTokenLen) == CHIP_NO_ERROR,
-                        EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(tagNum++), userConsentNeeded) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->PutBytes(ContextTag(tagNum++), updateToken, kUpdateTokenLen) == CHIP_NO_ERROR,
-                        EMBER_ZCL_STATUS_FAILURE); // metadata
-    VerifyOrReturnError((commandObj->FinishCommand() == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
+    chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type response;
+    response.status                = queryStatus;
+    response.delayedActionTime     = mDelayedActionTimeSec;
+    response.imageURI              = chip::CharSpan(uriBuf, strlen(uriBuf));
+    response.softwareVersion       = newSoftwareVersion;
+    response.softwareVersionString = chip::CharSpan(kExampleSoftwareString, strlen(kExampleSoftwareString));
+    response.updateToken           = chip::ByteSpan(updateToken);
+    response.userConsentNeeded     = userConsentNeeded;
+    // TODO: Once our client is using APIs that handle optional arguments
+    // correctly, update QueryImageResponse to have the right things optional
+    // and just stop sending metadataForRequestor algether.
+    response.metadataForRequestor = chip::ByteSpan();
 
+    VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHandler * commandObj,
-                                                           const chip::ByteSpan & updateToken, uint32_t newVersion)
+                                                           const chip::app::ConcreteCommandPath & commandPath,
+                                                           const ByteSpan & updateToken, uint32_t newVersion)
 {
     // TODO: handle multiple transfers by tracking updateTokens
 
@@ -185,15 +180,10 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
 
     VerifyOrReturnError(commandObj != nullptr, EMBER_ZCL_STATUS_INVALID_VALUE);
 
-    CommandPathParams cmdParams = { emberAfCurrentEndpoint(), 0 /* mGroupId */, ZCL_OTA_PROVIDER_CLUSTER_ID,
-                                    ZCL_APPLY_UPDATE_REQUEST_RESPONSE_COMMAND_ID, (CommandPathFlags::kEndpointIdValid) };
-    TLVWriter * writer          = nullptr;
-
-    VerifyOrReturnError((commandObj->PrepareCommand(cmdParams) == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(0), updateAction) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(1), mDelayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError((commandObj->FinishCommand() == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
+    chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Type response;
+    response.action            = updateAction;
+    response.delayedActionTime = mDelayedActionTimeSec;
+    VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }

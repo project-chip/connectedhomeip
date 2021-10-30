@@ -4971,11 +4971,11 @@ class OtaSoftwareUpdateProvider:
                         ClusterObjectFieldDescriptor(
                             Label="productId", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="hardwareVersion", Tag=2, Type=uint),
+                            Label="softwareVersion", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="softwareVersion", Tag=3, Type=uint),
+                            Label="protocolsSupported", Tag=3, Type=OtaSoftwareUpdateProvider.Enums.OTADownloadProtocol),
                         ClusterObjectFieldDescriptor(
-                            Label="protocolsSupported", Tag=4, Type=OtaSoftwareUpdateProvider.Enums.OTADownloadProtocol),
+                            Label="hardwareVersion", Tag=4, Type=uint),
                         ClusterObjectFieldDescriptor(
                             Label="location", Tag=5, Type=str),
                         ClusterObjectFieldDescriptor(
@@ -4986,9 +4986,9 @@ class OtaSoftwareUpdateProvider:
 
             vendorId: 'uint' = None
             productId: 'uint' = None
-            hardwareVersion: 'uint' = None
             softwareVersion: 'uint' = None
             protocolsSupported: 'OtaSoftwareUpdateProvider.Enums.OTADownloadProtocol' = None
+            hardwareVersion: 'uint' = None
             location: 'str' = None
             requestorCanConsent: 'bool' = None
             metadataForProvider: 'bytes' = None
@@ -5069,7 +5069,7 @@ class OtaSoftwareUpdateProvider:
             metadataForRequestor: 'bytes' = None
 
         @dataclass
-        class ApplyUpdateRequestResponse(ClusterCommand):
+        class ApplyUpdateResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0029
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = False

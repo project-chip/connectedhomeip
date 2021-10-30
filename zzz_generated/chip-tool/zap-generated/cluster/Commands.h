@@ -1873,11 +1873,10 @@ static void OnNetworkCommissioningUpdateWiFiNetworkResponseSuccess(
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 };
 
-static void OnOtaSoftwareUpdateProviderApplyUpdateRequestResponseSuccess(
-    void * context,
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::DecodableType & data)
+static void OnOtaSoftwareUpdateProviderApplyUpdateResponseSuccess(
+    void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data)
 {
-    ChipLogProgress(Zcl, "Received ApplyUpdateRequestResponse:");
+    ChipLogProgress(Zcl, "Received ApplyUpdateResponse:");
     ChipLogProgress(Zcl, "  action: %" PRIu8 "", data.action);
     ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", data.delayedActionTime);
 
@@ -14942,8 +14941,7 @@ public:
 
         chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnOtaSoftwareUpdateProviderApplyUpdateRequestResponseSuccess,
-                                     OnDefaultFailure);
+        return cluster.InvokeCommand(mRequest, this, OnOtaSoftwareUpdateProviderApplyUpdateResponseSuccess, OnDefaultFailure);
     }
 
 private:
@@ -14986,11 +14984,11 @@ public:
     {
         AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
         AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId);
-        AddArgument("HardwareVersion", 0, UINT16_MAX, &mRequest.hardwareVersion);
         AddArgument("SoftwareVersion", 0, UINT32_MAX, &mRequest.softwareVersion);
         AddArgument(
             "ProtocolsSupported", 0, UINT8_MAX,
             reinterpret_cast<std::underlying_type_t<decltype(mRequest.protocolsSupported)> *>(&mRequest.protocolsSupported));
+        AddArgument("HardwareVersion", 0, UINT16_MAX, &mRequest.hardwareVersion);
         AddArgument("Location", &mRequest.location);
         AddArgument("RequestorCanConsent", 0, 1, &mRequest.requestorCanConsent);
         AddArgument("MetadataForProvider", &mRequest.metadataForProvider);

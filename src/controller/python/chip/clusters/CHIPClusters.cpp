@@ -5773,15 +5773,15 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_No
     return cluster.NotifyUpdateApplied(nullptr, nullptr, chip::ByteSpan(updateToken, updateToken_Len), softwareVersion).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t vendorId, uint16_t productId,
-    uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported, const uint8_t * location, uint32_t location_Len,
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, chip::VendorId vendorId, uint16_t productId,
+    uint32_t softwareVersion, uint8_t protocolsSupported, uint16_t hardwareVersion, const uint8_t * location, uint32_t location_Len,
     bool requestorCanConsent, const uint8_t * metadataForProvider, uint32_t metadataForProvider_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .QueryImage(nullptr, nullptr, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
+        .QueryImage(nullptr, nullptr, vendorId, productId, softwareVersion, protocolsSupported, hardwareVersion,
                     chip::CharSpan(reinterpret_cast<const char *>(location), location_Len), requestorCanConsent,
                     chip::ByteSpan(metadataForProvider, metadataForProvider_Len))
         .AsInteger();

@@ -4635,10 +4635,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorId)), vendorId));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProductId)), productId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kHardwareVersion)), hardwareVersion));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)), softwareVersion));
     ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProtocolsSupported)), protocolsSupported));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kHardwareVersion)), hardwareVersion));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLocation)), location));
     ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kRequestorCanConsent)), requestorCanConsent));
@@ -4665,14 +4665,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kProductId):
             ReturnErrorOnFailure(DataModel::Decode(reader, productId));
             break;
-        case to_underlying(Fields::kHardwareVersion):
-            ReturnErrorOnFailure(DataModel::Decode(reader, hardwareVersion));
-            break;
         case to_underlying(Fields::kSoftwareVersion):
             ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
             break;
         case to_underlying(Fields::kProtocolsSupported):
             ReturnErrorOnFailure(DataModel::Decode(reader, protocolsSupported));
+            break;
+        case to_underlying(Fields::kHardwareVersion):
+            ReturnErrorOnFailure(DataModel::Decode(reader, hardwareVersion));
             break;
         case to_underlying(Fields::kLocation):
             ReturnErrorOnFailure(DataModel::Decode(reader, location));
@@ -4833,7 +4833,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace QueryImageResponse.
-namespace ApplyUpdateRequestResponse {
+namespace ApplyUpdateResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -4870,7 +4870,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace ApplyUpdateRequestResponse.
+} // namespace ApplyUpdateResponse.
 } // namespace Commands
 
 namespace Events {

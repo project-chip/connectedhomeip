@@ -2461,9 +2461,9 @@ class ChipClusters:
                 "args": {
                     "vendorId": "int",
                     "productId": "int",
-                    "hardwareVersion": "int",
                     "softwareVersion": "int",
                     "protocolsSupported": "int",
+                    "hardwareVersion": "int",
                     "location": "str",
                     "requestorCanConsent": "bool",
                     "metadataForProvider": "bytes",
@@ -5144,10 +5144,10 @@ class ChipClusters:
                 updateToken), softwareVersion
         )
 
-    def ClusterOtaSoftwareUpdateProvider_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, hardwareVersion: int, softwareVersion: int, protocolsSupported: int, location: str, requestorCanConsent: bool, metadataForProvider: bytes):
+    def ClusterOtaSoftwareUpdateProvider_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, softwareVersion: int, protocolsSupported: int, hardwareVersion: int, location: str, requestorCanConsent: bool, metadataForProvider: bytes):
         location = location.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
-            device, ZCLendpoint, ZCLgroupid, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported, location, len(
+            device, ZCLendpoint, ZCLgroupid, vendorId, productId, softwareVersion, protocolsSupported, hardwareVersion, location, len(
                 location), requestorCanConsent, metadataForProvider, len(metadataForProvider)
         )
 
@@ -8717,7 +8717,7 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_NotifyUpdateApplied.restype = ctypes.c_uint32
         # Cluster OtaSoftwareUpdateProvider Command QueryImage
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_bool, ctypes.c_char_p, ctypes.c_uint32]
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_bool, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage.restype = ctypes.c_uint32
         # Cluster OtaSoftwareUpdateProvider ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision.argtypes = [

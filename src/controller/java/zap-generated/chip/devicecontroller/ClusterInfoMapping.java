@@ -1417,8 +1417,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedApplyUpdateRequestResponseCallback
-      implements ChipClusters.OtaSoftwareUpdateProviderCluster.ApplyUpdateRequestResponseCallback,
+  public class DelegatedApplyUpdateResponseCallback
+      implements ChipClusters.OtaSoftwareUpdateProviderCluster.ApplyUpdateResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -5706,7 +5706,7 @@ public class ClusterInfoMapping {
     CommandParameterInfo otaSoftwareUpdateProviderapplyUpdateRequestCommandParameterInfo =
         new CommandParameterInfo(
             "OtaSoftwareUpdateProvider",
-            ChipClusters.OtaSoftwareUpdateProviderCluster.ApplyUpdateRequestResponseCallback.class);
+            ChipClusters.OtaSoftwareUpdateProviderCluster.ApplyUpdateResponseCallback.class);
     CommandParameterInfo
         otaSoftwareUpdateProviderapplyUpdateRequestupdateTokenCommandParameterInfo =
             new CommandParameterInfo("updateToken", byte[].class);
@@ -5724,13 +5724,12 @@ public class ClusterInfoMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OtaSoftwareUpdateProviderCluster) cluster)
                   .applyUpdateRequest(
-                      (ChipClusters.OtaSoftwareUpdateProviderCluster
-                              .ApplyUpdateRequestResponseCallback)
+                      (ChipClusters.OtaSoftwareUpdateProviderCluster.ApplyUpdateResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("updateToken"),
                       (Long) commandArguments.get("newVersion"));
             },
-            () -> new DelegatedApplyUpdateRequestResponseCallback(),
+            () -> new DelegatedApplyUpdateResponseCallback(),
             otaSoftwareUpdateProviderapplyUpdateRequestCommandParams);
     otaSoftwareUpdateProviderClusterCommandInfoMap.put(
         "applyUpdateRequest", otaSoftwareUpdateProviderapplyUpdateRequestCommandInfo);
@@ -5782,11 +5781,6 @@ public class ClusterInfoMapping {
     otaSoftwareUpdateProviderqueryImageCommandParams.put(
         "productId", otaSoftwareUpdateProviderqueryImageproductIdCommandParameterInfo);
 
-    CommandParameterInfo otaSoftwareUpdateProviderqueryImagehardwareVersionCommandParameterInfo =
-        new CommandParameterInfo("hardwareVersion", int.class);
-    otaSoftwareUpdateProviderqueryImageCommandParams.put(
-        "hardwareVersion", otaSoftwareUpdateProviderqueryImagehardwareVersionCommandParameterInfo);
-
     CommandParameterInfo otaSoftwareUpdateProviderqueryImagesoftwareVersionCommandParameterInfo =
         new CommandParameterInfo("softwareVersion", long.class);
     otaSoftwareUpdateProviderqueryImageCommandParams.put(
@@ -5797,6 +5791,11 @@ public class ClusterInfoMapping {
     otaSoftwareUpdateProviderqueryImageCommandParams.put(
         "protocolsSupported",
         otaSoftwareUpdateProviderqueryImageprotocolsSupportedCommandParameterInfo);
+
+    CommandParameterInfo otaSoftwareUpdateProviderqueryImagehardwareVersionCommandParameterInfo =
+        new CommandParameterInfo("hardwareVersion", int.class);
+    otaSoftwareUpdateProviderqueryImageCommandParams.put(
+        "hardwareVersion", otaSoftwareUpdateProviderqueryImagehardwareVersionCommandParameterInfo);
 
     CommandParameterInfo otaSoftwareUpdateProviderqueryImagelocationCommandParameterInfo =
         new CommandParameterInfo("location", String.class);
@@ -5827,9 +5826,9 @@ public class ClusterInfoMapping {
                           callback,
                       (Integer) commandArguments.get("vendorId"),
                       (Integer) commandArguments.get("productId"),
-                      (Integer) commandArguments.get("hardwareVersion"),
                       (Long) commandArguments.get("softwareVersion"),
                       (Integer) commandArguments.get("protocolsSupported"),
+                      (Integer) commandArguments.get("hardwareVersion"),
                       (String) commandArguments.get("location"),
                       (Boolean) commandArguments.get("requestorCanConsent"),
                       (byte[]) commandArguments.get("metadataForProvider"));

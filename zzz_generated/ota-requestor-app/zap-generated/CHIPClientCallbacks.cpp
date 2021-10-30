@@ -134,17 +134,17 @@ namespace {
 // Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                               uint8_t action, uint32_t delayedActionTime)
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                                        uint8_t action, uint32_t delayedActionTime)
 {
-    ChipLogProgress(Zcl, "ApplyUpdateRequestResponse:");
+    ChipLogProgress(Zcl, "ApplyUpdateResponse:");
     ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
     ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback");
 
-    Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback> * cb =
-        Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, action, delayedActionTime);
     return true;
 }

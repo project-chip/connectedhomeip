@@ -92,7 +92,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    status = delegate->HandleApplyUpdateRequest(commandObj, updateToken, newVersion);
+    status = delegate->HandleApplyUpdateRequest(commandObj, commandPath, updateToken, newVersion);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
@@ -194,22 +194,22 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     ChipLogDetail(Zcl, "  RequestorCanConsent: %" PRIu8, requestorCanConsent);
     ChipLogDetail(Zcl, "  MetadataForProvider: %zu", metadataForProvider.size());
 
-    if (location.size() != kLocationLen)
+    if (location.HasValue() && location.Value().size() != kLocationLen)
     {
-        ChipLogError(Zcl, "location param length %zu != expected length %zu", location.size(), kLocationLen);
+        ChipLogError(Zcl, "location param length %zu != expected length %zu", location.Value().size(), kLocationLen);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
         return true;
     }
 
-    if (metadataForProvider.size() > kMaxMetadataLen)
+    if (metadataForProvider.HasValue() && metadataForProvider.Value().size() > kMaxMetadataLen)
     {
-        ChipLogError(Zcl, "metadata size %zu exceeds max %zu", metadataForProvider.size(), kMaxMetadataLen);
+        ChipLogError(Zcl, "metadata size %zu exceeds max %zu", metadataForProvider.Value().size(), kMaxMetadataLen);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
         return true;
     }
 
-    status = delegate->HandleQueryImage(commandObj, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
-                                        location, requestorCanConsent, metadataForProvider);
+    status = delegate->HandleQueryImage(commandObj, commandPath, vendorId, productId, hardwareVersion, softwareVersion,
+                                        protocolsSupported, location, requestorCanConsent, metadataForProvider);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);

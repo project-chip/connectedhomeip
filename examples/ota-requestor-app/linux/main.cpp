@@ -175,9 +175,8 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
         ChipLogError(SoftwareUpdate, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
-    err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleHWVersion,
-                             kExampleSoftwareVersion, kExampleProtocolsSupported, exampleLocation, kExampleClientCanConsent,
-                             metadata);
+    err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleSoftwareVersion,
+                             kExampleProtocolsSupported, kExampleHWVersion, exampleLocation, kExampleClientCanConsent, metadata);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "QueryImage() failed: %" CHIP_ERROR_FORMAT, err.Format());

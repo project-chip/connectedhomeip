@@ -12895,11 +12895,11 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
     chip::CharSpan imageURI, uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
     bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 /**
- * @brief OTA Software Update Provider Cluster ApplyUpdateRequestResponse Command callback (from server)
+ * @brief OTA Software Update Provider Cluster ApplyUpdateResponse Command callback (from server)
  */
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(chip::EndpointId endpoint,
-                                                                               chip::app::CommandSender * commandObj,
-                                                                               uint8_t action, uint32_t delayedActionTime);
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(chip::EndpointId endpoint,
+                                                                        chip::app::CommandSender * commandObj, uint8_t action,
+                                                                        uint32_t delayedActionTime);
 /**
  * @brief OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback (from client)
  */

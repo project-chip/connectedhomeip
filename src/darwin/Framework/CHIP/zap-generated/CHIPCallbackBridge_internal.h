@@ -1163,14 +1163,14 @@ public:
     static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
 };
 
-class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge
-    : public CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>
+class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge
+    : public CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>
 {
 public:
-    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                               keepAlive){};
+    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
 
     static void OnSuccessFn(void * context, uint8_t action, uint32_t delayedActionTime);
 };

@@ -1233,7 +1233,7 @@ void CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge::OnS
     });
 };
 
-void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge::OnSuccessFn(
+void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSuccessFn(
     void * context, uint8_t action, uint32_t delayedActionTime)
 {
     DispatchSuccess(context, @ {
