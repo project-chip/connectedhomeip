@@ -52,10 +52,9 @@ source_set("android-tv-app") {
   ]
 
   deps = [
-    "${chip_root}/third_party/inipp",
     "${chip_root}/examples/tv-app/tv-common",
     "${chip_root}/src/lib",
-   
+    "${chip_root}/third_party/inipp",
   ]
 
   cflags = [ "-Wconversion" ]

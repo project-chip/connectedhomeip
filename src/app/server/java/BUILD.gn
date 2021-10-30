@@ -24,19 +24,19 @@ shared_library("jni") {
   output_name = "libCHIPAppServer"
 
   sources = [
-    "CHIPAppServer-JNI.cpp",
     "AppMain.cpp",
     "AppMain.h",
+    "CHIPAppServer-JNI.cpp",
   ]
 
   deps = [
+    "${chip_root}/examples/tv-app/android:android-tv-app",
+    "${chip_root}/examples/tv-app/tv-common",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/src/platform/android",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/app/server",
-    "${chip_root}/examples/tv-app/tv-common",
     "${chip_root}/third_party/inipp",
-    "${chip_root}/examples/tv-app/android:android-tv-app",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]

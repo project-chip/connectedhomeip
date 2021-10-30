@@ -170,15 +170,15 @@ void JniReferences::ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * fun
     }
 }
 
-void JniReferences::ThrowError(JNIEnv * env, jclass exceptionCls, CHIP_ERROR errToThrow) {
+void JniReferences::ThrowError(JNIEnv * env, jclass exceptionCls, CHIP_ERROR errToThrow)
+{
     env->ExceptionClear();
     jmethodID constructor = env->GetMethodID(exceptionCls, "<init>", "(ILjava/lang/String;)V");
     VerifyOrReturn(constructor != NULL);
 
     jstring jerrStr = env->NewStringUTF(ErrorStr(errToThrow));
 
-    jthrowable outEx = (jthrowable) env->NewObject(exceptionCls, constructor, static_cast<jint>(errToThrow.AsInteger()),
-                                        jerrStr);
+    jthrowable outEx = (jthrowable) env->NewObject(exceptionCls, constructor, static_cast<jint>(errToThrow.AsInteger()), jerrStr);
     VerifyOrReturn(!env->ExceptionCheck());
     env->Throw(outEx);
 }

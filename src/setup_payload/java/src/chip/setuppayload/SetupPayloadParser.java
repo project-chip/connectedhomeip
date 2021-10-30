@@ -18,7 +18,8 @@ public class SetupPayloadParser {
   public native String getQrCodeFromPayload(SetupPayload payload) throws SetupPayloadException;
 
   /** Get manual entry code string from {@link SetupPayload}. */
-  public native String getManualEntryCodeFromPayload(SetupPayload payload) throws SetupPayloadException;
+  public native String getManualEntryCodeFromPayload(SetupPayload payload)
+      throws SetupPayloadException;
 
   private native SetupPayload fetchPayloadFromQrCode(String qrCodeString)
       throws UnrecognizedQrCodeException;

@@ -191,7 +191,7 @@ JNI_METHOD(void, pairDevice)
 
     RendezvousParameters params = RendezvousParameters()
                                       .SetSetupPINCode(pinCode)
-#if CONFIG_NETWORK_LAYER_BLE				      
+#if CONFIG_NETWORK_LAYER_BLE
                                       .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
 #endif
                                       .SetPeerAddress(Transport::PeerAddress::BLE());
@@ -222,7 +222,8 @@ JNI_METHOD(void, pairDeviceWithAddress)
     Inet::IPAddress addr;
     JniUtfString addrJniString(env, address);
     VerifyOrReturn(Inet::IPAddress::FromString(addrJniString.c_str(), addr),
-                   ChipLogError(Controller, "Failed to parse IP address."), JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT));
+                   ChipLogError(Controller, "Failed to parse IP address."),
+                   JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT));
 
     RendezvousParameters params = RendezvousParameters()
                                       .SetDiscriminator(discriminator)
