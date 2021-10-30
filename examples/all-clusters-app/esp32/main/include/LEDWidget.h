@@ -55,7 +55,7 @@ public:
 #endif
 
 private:
-    int64_t mLastChangeTimeMS;
+    int64_t mLastChangeTimeUS;
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
     uint8_t mDefaultOnBrightness;

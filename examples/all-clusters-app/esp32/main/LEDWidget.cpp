@@ -42,7 +42,7 @@ static led_strip_t * strip = NULL;
 #endif
 void LEDWidget::Init(gpio_num_t gpioNum)
 {
-    mLastChangeTimeMS = 0;
+    mLastChangeTimeUS = 0;
     mBlinkOnTimeMS    = 0;
     mBlinkOffTimeMS   = 0;
     mGPIONum          = gpioNum;
@@ -172,12 +172,12 @@ void LEDWidget::Animate()
     {
         int64_t nowUS            = ::esp_timer_get_time();
         int64_t stateDurUS       = ((mState) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
-        int64_t nextChangeTimeUS = mLastChangeTimeMS + stateDurUS;
+        int64_t nextChangeTimeUS = mLastChangeTimeUS + stateDurUS;
 
         if (nowUS > nextChangeTimeUS)
         {
             DoSet(!mState);
-            mLastChangeTimeMS = nowUS;
+            mLastChangeTimeUS = nowUS;
         }
     }
 }
