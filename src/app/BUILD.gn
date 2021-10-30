@@ -65,6 +65,8 @@ static_library("app") {
     "MessageDef/CommandPathIB.h",
     "MessageDef/EventDataElement.cpp",
     "MessageDef/EventDataElement.h",
+    "MessageDef/EventFilterIB.cpp",
+    "MessageDef/EventFilters.cpp",
     "MessageDef/EventList.cpp",
     "MessageDef/EventList.h",
     "MessageDef/EventPath.cpp",
