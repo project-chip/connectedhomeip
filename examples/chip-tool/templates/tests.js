@@ -49,7 +49,7 @@ function getTests()
     'Test_TC_DM_3_1',
   ];
 
-  const ElectricalMeasurement= [
+  const ElectricalMeasurement = [
     'Test_TC_EMR_1_1',
   ];
 
