@@ -40,13 +40,12 @@ class DeviceAttestationVendorReservedDeconstructor
 public:
     DeviceAttestationVendorReservedDeconstructor() {}
 
-
     // read TLV until first profile tag
-    CHIP_ERROR PrepareToReadVendorReservedElements(const ByteSpan &attestationElements, size_t count)
+    CHIP_ERROR PrepareToReadVendorReservedElements(const ByteSpan & attestationElements, size_t count)
     {
-	mIsUsed  = true;
-	mNumVendorReservedData = count;
-	mAttestationData = attestationElements;
+        mIsUsed                = true;
+        mNumVendorReservedData = count;
+        mAttestationData       = attestationElements;
 
         tlvReader.Init(mAttestationData);
         ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
@@ -79,7 +78,7 @@ public:
      */
     CHIP_ERROR GetNextVendorReservedElement(struct VendorReservedElement & element)
     {
-	VerifyOrReturnError(mIsUsed && mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mIsUsed && mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
         while (1)
         {
