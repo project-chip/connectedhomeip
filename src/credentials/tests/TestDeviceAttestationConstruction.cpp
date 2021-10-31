@@ -52,8 +52,8 @@ static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inCo
                                   0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31 };
     uint8_t vendorReserved3[]  = { 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
                                   0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65 };
-    uint16_t vendorId   = 0xbeef;
-    uint16_t profileNum = 0xdead;
+    uint16_t vendorId          = 0xbeef;
+    uint16_t profileNum        = 0xdead;
     CREATE_VENDOR_RESERVED(vendorReservedConstructor, 10);
 
     attestationElementsLen = sizeof(certificationDeclaration) + sizeof(attestationNonce) + sizeof(timestamp) +
@@ -112,11 +112,6 @@ static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inCo
     {
     }
 #endif
-
-
-
-
-
 }
 
 static void TestAttestationElements_Construction(nlTestSuite * inSuite, void * inContext)
@@ -266,9 +261,11 @@ static void TestVendorReservedData(nlTestSuite * inSuite, void * inContext)
     uint8_t strings[6][50];
     for (i = 0; i < ArraySize(inputArray); i++)
     {
-        snprintf(reinterpret_cast<char *>(strings[i]), sizeof(strings[i]), "Vendor Reserved Data #%d", (int) i); // for debugging use
-        CHIP_ERROR err = vendorReserved.addVendorReservedElement(inputArray[i].vendorId, inputArray[i].profileNum,
-                                                                 inputArray[i].tagNum, ByteSpan(strings[i], strlen(reinterpret_cast<char *>(strings[i]))));
+        snprintf(reinterpret_cast<char *>(strings[i]), sizeof(strings[i]), "Vendor Reserved Data #%d",
+                 (int) i); // for debugging use
+        CHIP_ERROR err =
+            vendorReserved.addVendorReservedElement(inputArray[i].vendorId, inputArray[i].profileNum, inputArray[i].tagNum,
+                                                    ByteSpan(strings[i], strlen(reinterpret_cast<char *>(strings[i]))));
 
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
