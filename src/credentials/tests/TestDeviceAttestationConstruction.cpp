@@ -52,7 +52,6 @@ static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inCo
                                   0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31 };
     uint8_t vendorReserved3[]  = { 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
                                   0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65 };
-    // ByteSpan vendorReservedArray[] = { ByteSpan(vendorReserved1), ByteSpan(vendorReserved3) };
     uint16_t vendorId   = 0xbeef;
     uint16_t profileNum = 0xdead;
     CREATE_VENDOR_RESERVED(vendorReservedConstructor, 10);
@@ -106,6 +105,18 @@ static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, timestamp == timestampDeconstructed);
 
     NL_TEST_ASSERT(inSuite, firmwareInfoSpan.empty());
+#if 0
+    // TODO  -- compare the size and content of vendorReserved elements
+    const VenderReservedElement *constructionElement = vendorReservedConstructor.cbegin();
+    while(constructionElement)
+    {
+    }
+#endif
+
+
+
+
+
 }
 
 static void TestAttestationElements_Construction(nlTestSuite * inSuite, void * inContext)
@@ -255,9 +266,9 @@ static void TestVendorReservedData(nlTestSuite * inSuite, void * inContext)
     uint8_t strings[6][50];
     for (i = 0; i < ArraySize(inputArray); i++)
     {
-        snprintf(reinterpret_cast<char *>(strings[i]), 50, "Vendor Reserved Data #%d", (int) i); // for debugging use
+        snprintf(reinterpret_cast<char *>(strings[i]), sizeof(strings[i]), "Vendor Reserved Data #%d", (int) i); // for debugging use
         CHIP_ERROR err = vendorReserved.addVendorReservedElement(inputArray[i].vendorId, inputArray[i].profileNum,
-                                                                 inputArray[i].tagNum, ByteSpan(strings[i]));
+                                                                 inputArray[i].tagNum, ByteSpan(strings[i], strlen(reinterpret_cast<char *>(strings[i]))));
 
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
@@ -278,7 +289,7 @@ static void TestVendorReservedData(nlTestSuite * inSuite, void * inContext)
     // add another element, it should fail
     uint8_t testByteSpan[] = { 0x1, 0x2, 0x3 };
     CHIP_ERROR err         = vendorReserved.addVendorReservedElement(5, 10, 20, ByteSpan(testByteSpan));
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
 }
 
 static void TestAttestationElements_DeconstructionWithFirmwareInfo(nlTestSuite * inSuite, void * inContext)
