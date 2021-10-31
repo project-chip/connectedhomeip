@@ -172,7 +172,7 @@ pw_python_action("python") {
 
   if (current_cpu == "x64") {
     cpu_tag = "x86_64"
-  } else if (current_cpu == "arm64") {
+  } else if (current_cpu == "arm64" && current_os == "linux") {
     cpu_tag = "aarch64"
   } else {
     cpu_tag = current_cpu
