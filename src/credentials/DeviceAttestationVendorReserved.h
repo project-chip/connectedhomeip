@@ -40,23 +40,13 @@ class DeviceAttestationVendorReservedDeconstructor
 public:
     DeviceAttestationVendorReservedDeconstructor() {}
 
-    void SaveAttestationElements(size_t count, ByteSpan attestationElements)
-    {
-        mIsUsed                = true;
-        mNumVendorReservedData = count;
-        if (count > 0)
-        {
-            mAttestationData = attestationElements;
-        }
-    }
 
     // read TLV until first profile tag
-    CHIP_ERROR Init()
+    CHIP_ERROR PrepareToReadVendorReservedElements(const ByteSpan &attestationElements, size_t count)
     {
-        if (!mIsUsed)
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+	mIsUsed  = true;
+	mNumVendorReservedData = count;
+	mAttestationData = attestationElements;
 
         tlvReader.Init(mAttestationData);
         ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
@@ -78,12 +68,18 @@ public:
 
     size_t GetNumberOfElements() { return mNumVendorReservedData; }
 
+    /**
+     *  @brief Return next VendorReserved element.   PrepareToReadVendorReservedElements must be called first.
+     *
+     *  @param[out] element  Next vendor Reserved element
+     *
+     *  @returns   CHIP_NO_ERROR on success
+     *             CHIP_ERROR_INCORRECT_STATE if PrepareToReadVendorReservedElements hasn't been called first
+     *             CHIP_END_OF_TLV if not further entries are present
+     */
     CHIP_ERROR GetNextVendorReservedElement(struct VendorReservedElement & element)
     {
-        if (mIsUsed && !mIsInitialized)
-        {
-            ReturnErrorOnFailure(Init());
-        }
+	VerifyOrReturnError(mIsUsed && mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
         while (1)
         {
