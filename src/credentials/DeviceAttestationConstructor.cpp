@@ -128,7 +128,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
 
     size_t count = 0;
     ReturnErrorOnFailure(CountVendorReservedElementsInDA(attestationElements, count));
-    vendorReserved.SaveAttestationElements(count, attestationElements);
+    ReturnErrorOnFailure(vendorReserved.PrepareToReadVendorReservedElements(attestationElements, count));
     return CHIP_NO_ERROR;
 }
 
