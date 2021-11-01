@@ -170,6 +170,11 @@ class ClusterAttributeDescriptor:
         obj_class = cls._cluster_object
         return obj_class.FromDict(obj_class.descriptor.TagDictToLabelDict('', {0: tlv.TLVReader(tlvBuffer).get().get('Any', {})})).Value
 
+    @classmethod
+    def FromTagDictOrRawValue(cls, val: Any):
+        obj_class = cls._cluster_object
+        return obj_class.FromDict(obj_class.descriptor.TagDictToLabelDict('', {0: val})).Value
+
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
         raise NotImplementedError()

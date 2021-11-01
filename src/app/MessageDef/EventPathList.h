@@ -23,10 +23,10 @@
 
 #pragma once
 
+#include "ArrayBuilder.h"
+#include "ArrayParser.h"
 #include "EventPath.h"
 #include "EventPathList.h"
-#include "ListBuilder.h"
-#include "ListParser.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -38,7 +38,7 @@
 namespace chip {
 namespace app {
 namespace EventPathList {
-class Parser : public ListParser
+class Parser : public ArrayParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -59,7 +59,7 @@ public:
 #endif
 };
 
-class Builder : public ListBuilder
+class Builder : public ArrayBuilder
 {
 public:
     /**

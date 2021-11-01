@@ -1,8 +1,8 @@
 /**
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -16,16 +16,23 @@
  *    limitations under the License.
  */
 
-#include "ListParser.h"
+#pragma once
+
+#include "Parser.h"
 
 namespace chip {
 namespace app {
-CHIP_ERROR ListParser::Init(const TLV::TLVReader & aReader)
+class StructParser : public Parser
 {
-    mReader.Init(aReader);
-    VerifyOrReturnError(TLV::kTLVType_List == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnLogErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
-}
+public:
+    /**
+     *  @brief Initialize the parser object with TLVReader
+     *
+     *  @param [in] aReader A pointer to a TLVReader, which should be on the element of the struct element
+     *
+     *  @return #CHIP_NO_ERROR on success
+     */
+    CHIP_ERROR Init(const TLV::TLVReader & aReader);
+};
 } // namespace app
 } // namespace chip

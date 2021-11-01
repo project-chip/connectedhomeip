@@ -1,8 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Google LLC.
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -16,14 +14,14 @@
  *    limitations under the License.
  */
 
-#include "ListParser.h"
+#include "StructParser.h"
 
 namespace chip {
 namespace app {
-CHIP_ERROR ListParser::Init(const TLV::TLVReader & aReader)
+CHIP_ERROR StructParser::Init(const TLV::TLVReader & aReader)
 {
     mReader.Init(aReader);
-    VerifyOrReturnError(TLV::kTLVType_List == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
     ReturnLogErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
     return CHIP_NO_ERROR;
 }

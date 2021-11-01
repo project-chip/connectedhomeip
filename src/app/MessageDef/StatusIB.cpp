@@ -135,18 +135,6 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR StatusIB::Builder::Init(TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
-}
-
-CHIP_ERROR StatusIB::Builder::Init(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
-{
-    mpWriter = apWriter;
-    mError   = mpWriter->StartContainer(TLV::ContextTag(aContextTagToUse), TLV::kTLVType_Structure, mOuterContainerType);
-    return mError;
-}
-
 StatusIB::Builder & StatusIB::Builder::EncodeStatusIB(const StatusIB & aStatusIB)
 {
     mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kStatus)), aStatusIB.mStatus);
