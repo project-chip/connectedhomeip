@@ -57,7 +57,7 @@ Test Plans:
                 - name: Invoke Request Action to DUT
                 - name: Invoke Response Action from DUT
             2:
-                - name: ReadRequestMessageMessage to DUT test cases
+                - name: ReadRequestMessage to DUT test cases
 
     Multiple Administrators:
         shortname: MA

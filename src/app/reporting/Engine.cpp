@@ -96,15 +96,15 @@ exit:
     return err;
 }
 
-CHIP_ERROR Engine::BuildSingleReportDataMessageAttributeDataList(ReportDataMessage::Builder & aReportDataMessageBuilder,
-                                                                 ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Builder & aReportDataBuilder,
+                                                          ReadHandler * apReadHandler)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     bool attributeClean = true;
     TLV::TLVWriter backup;
-    aReportDataMessageBuilder.Checkpoint(backup);
-    AttributeDataList::Builder attributeDataList = aReportDataMessageBuilder.CreateAttributeDataListBuilder();
-    SuccessOrExit(err = aReportDataMessageBuilder.GetError());
+    aReportDataBuilder.Checkpoint(backup);
+    AttributeDataList::Builder attributeDataList = aReportDataBuilder.CreateAttributeDataListBuilder();
+    SuccessOrExit(err = aReportDataBuilder.GetError());
     // TODO: Need to handle multiple chunk of message
     for (auto clusterInfo = apReadHandler->GetAttributeClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
     {
@@ -146,13 +146,12 @@ CHIP_ERROR Engine::BuildSingleReportDataMessageAttributeDataList(ReportDataMessa
 exit:
     if (attributeClean || err != CHIP_NO_ERROR)
     {
-        aReportDataMessageBuilder.Rollback(backup);
+        aReportDataBuilder.Rollback(backup);
     }
     return err;
 }
 
-CHIP_ERROR Engine::BuildSingleReportDataMessageEventList(ReportDataMessage::Builder & aReportDataMessageBuilder,
-                                                         ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
@@ -164,12 +163,12 @@ CHIP_ERROR Engine::BuildSingleReportDataMessageEventList(ReportDataMessage::Buil
     EventManagement & eventManager = EventManagement::GetInstance();
     EventList::Builder eventList;
 
-    aReportDataMessageBuilder.Checkpoint(backup);
+    aReportDataBuilder.Checkpoint(backup);
 
     VerifyOrExit(clusterInfoList != nullptr, );
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    eventList = aReportDataMessageBuilder.CreateEventDataListBuilder();
+    eventList = aReportDataBuilder.CreateEventDataListBuilder();
     SuccessOrExit(err = eventList.GetError());
 
     memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
@@ -250,12 +249,12 @@ CHIP_ERROR Engine::BuildSingleReportDataMessageEventList(ReportDataMessage::Buil
 exit:
     if (err != CHIP_NO_ERROR || eventCount == 0 || eventClean)
     {
-        aReportDataMessageBuilder.Rollback(backup);
+        aReportDataBuilder.Rollback(backup);
     }
     return err;
 }
 
-CHIP_ERROR Engine::BuildAndSendSingleReportDataMessage(ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter reportDataWriter;
@@ -277,10 +276,10 @@ CHIP_ERROR Engine::BuildAndSendSingleReportDataMessage(ReadHandler * apReadHandl
         reportDataBuilder.SubscriptionId(subscriptionId);
     }
 
-    err = BuildSingleReportDataMessageAttributeDataList(reportDataBuilder, apReadHandler);
+    err = BuildSingleReportDataAttributeDataList(reportDataBuilder, apReadHandler);
     SuccessOrExit(err);
 
-    err = BuildSingleReportDataMessageEventList(reportDataBuilder, apReadHandler);
+    err = BuildSingleReportDataEventList(reportDataBuilder, apReadHandler);
     SuccessOrExit(err);
 
     // TODO: Add mechanism to set mSuppressResponse to handle status reports for multiple reports
@@ -367,7 +366,7 @@ void Engine::Run()
     {
         if (readHandler->IsReportable())
         {
-            CHIP_ERROR err = BuildAndSendSingleReportDataMessage(readHandler);
+            CHIP_ERROR err = BuildAndSendSingleReportData(readHandler);
             if (err != CHIP_NO_ERROR)
             {
                 return;
@@ -445,7 +444,7 @@ CHIP_ERROR Engine::SendReport(ReadHandler * apReadHandler, System::PacketBufferH
 
     // We can only have 1 report in flight for any given read - increment and break out.
     mNumReportsInFlight++;
-    err = apReadHandler->SendReportDataMessage(std::move(aPayload));
+    err = apReadHandler->SendReportData(std::move(aPayload));
     return err;
 }
 

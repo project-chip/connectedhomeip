@@ -90,11 +90,10 @@ private:
      * Build Single Report Data including attribute changes and event data stream, and send out
      *
      */
-    CHIP_ERROR BuildAndSendSingleReportDataMessage(ReadHandler * apReadHandler);
+    CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler);
 
-    CHIP_ERROR BuildSingleReportDataMessageAttributeDataList(ReportDataMessage::Builder & reportDataBuilder,
-                                                             ReadHandler * apReadHandler);
-    CHIP_ERROR BuildSingleReportDataMessageEventList(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
+    CHIP_ERROR BuildSingleReportDataAttributeDataList(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
+    CHIP_ERROR BuildSingleReportDataEventList(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
     CHIP_ERROR RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeDataList::Builder & aAttributeDataList,
                                    ClusterInfo & aClusterInfo);
     EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);

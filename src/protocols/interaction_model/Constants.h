@@ -53,16 +53,16 @@ constexpr uint16_t kVersion = 0;
  */
 enum class MsgType : uint8_t
 {
-    StatusResponseMessage    = 0x01,
-    ReadRequestMessage       = 0x02,
-    SubscribeRequestMessage  = 0x03,
-    SubscribeResponseMessage = 0x04,
-    ReportDataMessage        = 0x05,
-    WriteRequestMessage      = 0x06,
-    WriteResponseMessage     = 0x07,
-    InvokeCommandRequest     = 0x08,
-    InvokeCommandResponse    = 0x09,
-    TimedRequestMessage      = 0x0a,
+    StatusResponse        = 0x01,
+    ReadRequest           = 0x02,
+    SubscribeRequest      = 0x03,
+    SubscribeResponse     = 0x04,
+    ReportData            = 0x05,
+    WriteRequest          = 0x06,
+    WriteResponse         = 0x07,
+    InvokeCommandRequest  = 0x08,
+    InvokeCommandResponse = 0x09,
+    TimedRequest          = 0x0a,
 };
 
 // This table comes from the IM's "Status Code Table" section from the Interaction Model spec.
