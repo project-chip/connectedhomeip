@@ -17,7 +17,7 @@
 
 #pragma once
 #include "Builder.h"
-#include "EventPathList.h"
+#include "EventPaths.h"
 #include "Parser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>

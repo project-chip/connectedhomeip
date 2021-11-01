@@ -17,11 +17,11 @@
  */
 /**
  *    @file
- *      This file defines EventPathList parser and builder in CHIP interaction model
+ *      This file defines EventPaths parser and builder in CHIP interaction model
  *
  */
 
-#include "EventPathList.h"
+#include "EventPaths.h"
 
 #include "MessageDefHelper.h"
 
@@ -31,22 +31,19 @@
 
 #include <app/AppBuildConfig.h>
 
-using namespace chip;
-using namespace chip::TLV;
-
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventPathList::Parser::CheckSchemaValidity() const
+CHIP_ERROR EventPaths::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     size_t NumPath = 0;
     chip::TLV::TLVReader reader;
 
-    PRETTY_PRINT("EventPathList =");
+    PRETTY_PRINT("EventPaths =");
     PRETTY_PRINT("[");
 
-    // make a copy of the EventPathList reader
+    // make a copy of the EventPaths reader
     reader.Init(mReader);
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
@@ -55,7 +52,7 @@ CHIP_ERROR EventPathList::Parser::CheckSchemaValidity() const
         VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
         {
-            EventPath::Parser path;
+            EventPathIB::Parser path;
             err = path.Init(reader);
             SuccessOrExit(err);
 
@@ -85,22 +82,18 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-EventPath::Builder & EventPathList::Builder::CreateEventPathBuilder()
+EventPathIB::Builder & EventPaths::Builder::CreateEventPath()
 {
-    // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mEventPathBuilder.ResetError(mError));
-
-    mError = mEventPathBuilder.Init(mpWriter);
-
-exit:
-    // on error, mPathBuilder would be un-/partial initialized and cannot be used to write anything
-    return mEventPathBuilder;
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mEventPath.Init(mpWriter);
+    }
+    return mEventPath;
 }
 
-EventPathList::Builder & EventPathList::Builder::EndOfEventPathList()
+EventPaths::Builder & EventPaths::Builder::EndOfEventPaths()
 {
     EndOfContainer();
-
     return *this;
 }
 }; // namespace app

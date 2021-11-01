@@ -258,8 +258,8 @@ public:
     static void TestReadHandler(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientGenerateAttributePathList(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientGenerateInvalidAttributePathList(nlTestSuite * apSuite, void * apContext);
-    static void TestReadClientGenerateOneEventPathList(nlTestSuite * apSuite, void * apContext);
-    static void TestReadClientGenerateTwoEventPathList(nlTestSuite * apSuite, void * apContext);
+    static void TestReadClientGenerateOneEventPaths(nlTestSuite * apSuite, void * apContext);
+    static void TestReadClientGenerateTwoEventPaths(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientInvalidReport(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext);
     static void TestProcessSubscribeResponse(nlTestSuite * apSuite, void * apContext);
@@ -547,7 +547,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     engine->Shutdown();
 }
 
-void TestReadInteraction::TestReadClientGenerateOneEventPathList(nlTestSuite * apSuite, void * apContext)
+void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -571,8 +571,8 @@ void TestReadInteraction::TestReadClientGenerateOneEventPathList(nlTestSuite * a
     eventPathParams[0].mClusterId  = 3;
     eventPathParams[0].mEventId    = 4;
 
-    EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
-    err = readClient.GenerateEventPathList(eventPathListBuilder, eventPathParams, 1 /*aEventPathParamsListSize*/);
+    EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
+    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 1 /*aEventPathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     request.EndOfReadRequest();
@@ -596,7 +596,7 @@ void TestReadInteraction::TestReadClientGenerateOneEventPathList(nlTestSuite * a
 #endif
 }
 
-void TestReadInteraction::TestReadClientGenerateTwoEventPathList(nlTestSuite * apSuite, void * apContext)
+void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -625,8 +625,8 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPathList(nlTestSuite * a
     eventPathParams[1].mClusterId  = 3;
     eventPathParams[1].mEventId    = 5;
 
-    EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
-    err = readClient.GenerateEventPathList(eventPathListBuilder, eventPathParams, 2 /*aEventPathParamsListSize*/);
+    EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
+    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 2 /*aEventPathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     request.EndOfReadRequest();
@@ -1099,8 +1099,8 @@ const nlTest sTests[] =
     NL_TEST_DEF("CheckReadHandler", chip::app::TestReadInteraction::TestReadHandler),
     NL_TEST_DEF("TestReadClientGenerateAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateAttributePathList),
     NL_TEST_DEF("TestReadClientGenerateInvalidAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateInvalidAttributePathList),
-    NL_TEST_DEF("TestReadClientGenerateOneEventPathList", chip::app::TestReadInteraction::TestReadClientGenerateOneEventPathList),
-    NL_TEST_DEF("TestReadClientGenerateTwoEventPathList", chip::app::TestReadInteraction::TestReadClientGenerateTwoEventPathList),
+    NL_TEST_DEF("TestReadClientGenerateOneEventPaths", chip::app::TestReadInteraction::TestReadClientGenerateOneEventPaths),
+    NL_TEST_DEF("TestReadClientGenerateTwoEventPaths", chip::app::TestReadInteraction::TestReadClientGenerateTwoEventPaths),
     NL_TEST_DEF("TestReadClientInvalidReport", chip::app::TestReadInteraction::TestReadClientInvalidReport),
     NL_TEST_DEF("TestReadHandlerInvalidAttributePath", chip::app::TestReadInteraction::TestReadHandlerInvalidAttributePath),
     NL_TEST_DEF("TestProcessSubscribeResponse", chip::app::TestReadInteraction::TestProcessSubscribeResponse),

@@ -36,7 +36,7 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
     AttributePathList::Parser attributePathList;
-    EventPathList::Parser eventPathList;
+    EventPaths::Parser eventPathList;
     AttributeDataVersionList::Parser attributeDataVersionList;
     PRETTY_PRINT("SubscribeRequest =");
     PRETTY_PRINT("{");
@@ -60,9 +60,9 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
             ReturnLogErrorOnFailure(attributePathList.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
             break;
-        case kCsTag_EventPathList:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_EventPathList)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_EventPathList);
+        case kCsTag_EventPaths:
+            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_EventPaths)), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_EventPaths);
             VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
             eventPathList.Init(reader);
@@ -173,12 +173,12 @@ CHIP_ERROR SubscribeRequest::Parser::GetAttributePathList(AttributePathList::Par
     return apAttributePathList->Init(reader);
 }
 
-CHIP_ERROR SubscribeRequest::Parser::GetEventPathList(EventPathList::Parser * const apEventPathList) const
+CHIP_ERROR SubscribeRequest::Parser::GetEventPaths(EventPaths::Parser * const apEventPaths) const
 {
     TLV::TLVReader reader;
-    ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventPathList), reader));
+    ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventPaths), reader));
     VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    return apEventPathList->Init(reader);
+    return apEventPaths->Init(reader);
 }
 
 CHIP_ERROR
@@ -230,14 +230,14 @@ AttributePathList::Builder & SubscribeRequest::Builder::CreateAttributePathListB
     return mAttributePathListBuilder;
 }
 
-EventPathList::Builder & SubscribeRequest::Builder::CreateEventPathListBuilder()
+EventPaths::Builder & SubscribeRequest::Builder::CreateEventPathsBuilder()
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mEventPathListBuilder.Init(mpWriter, kCsTag_EventPathList);
+        mError = mEventPathsBuilder.Init(mpWriter, kCsTag_EventPaths);
     }
 
-    return mEventPathListBuilder;
+    return mEventPathsBuilder;
 }
 
 AttributeDataVersionList::Builder & SubscribeRequest::Builder::CreateAttributeDataVersionListBuilder()

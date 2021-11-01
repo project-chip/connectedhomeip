@@ -137,10 +137,10 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
         if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
         {
-            EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
+            EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
             SuccessOrExit(err = eventPathListBuilder.GetError());
-            err = GenerateEventPathList(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
-                                        aReadPrepareParams.mEventPathParamsListSize);
+            err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
+                                     aReadPrepareParams.mEventPathParamsListSize);
             SuccessOrExit(err);
             if (aReadPrepareParams.mEventNumber != 0)
             {
@@ -227,25 +227,25 @@ CHIP_ERROR ReadClient::SendStatusResponse(CHIP_ERROR aError)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadClient::GenerateEventPathList(EventPathList::Builder & aEventPathListBuilder,
-                                             EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize)
+CHIP_ERROR ReadClient::GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
+                                          size_t aEventPathParamsListSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
     {
-        EventPath::Builder eventPathBuilder = aEventPathListBuilder.CreateEventPathBuilder();
-        EventPathParams eventPath           = apEventPathParamsList[eventIndex];
+        EventPathIB::Builder eventPathBuilder = aEventPathsBuilder.CreateEventPath();
+        EventPathParams eventPath             = apEventPathParamsList[eventIndex];
         eventPathBuilder.NodeId(eventPath.mNodeId)
             .EventId(eventPath.mEventId)
             .EndpointId(eventPath.mEndpointId)
             .ClusterId(eventPath.mClusterId)
-            .EndOfEventPath();
+            .EndOfEventPathIB();
         SuccessOrExit(err = eventPathBuilder.GetError());
     }
 
-    aEventPathListBuilder.EndOfEventPathList();
-    SuccessOrExit(err = aEventPathListBuilder.GetError());
+    aEventPathsBuilder.EndOfEventPaths();
+    SuccessOrExit(err = aEventPathsBuilder.GetError());
 
 exit:
     return err;
@@ -613,10 +613,10 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
     {
-        EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
+        EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
         SuccessOrExit(err = eventPathListBuilder.GetError());
-        err = GenerateEventPathList(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
-                                    aReadPrepareParams.mEventPathParamsListSize);
+        err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
+                                 aReadPrepareParams.mEventPathParamsListSize);
         SuccessOrExit(err);
 
         if (aReadPrepareParams.mEventNumber != 0)

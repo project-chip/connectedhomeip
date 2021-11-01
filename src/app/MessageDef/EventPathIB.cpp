@@ -21,7 +21,7 @@
  *
  */
 
-#include "EventPath.h"
+#include "EventPathIB.h"
 
 #include "MessageDefHelper.h"
 
@@ -36,24 +36,8 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR EventPath::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // make a copy of the reader here
-    mReader.Init(aReader);
-
-    VerifyOrExit(chip::TLV::kTLVType_List == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = mReader.EnterContainer(mOuterContainerType);
-
-exit:
-
-    return err;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventPath::Parser::CheckSchemaValidity() const
+CHIP_ERROR EventPathIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
@@ -110,10 +94,10 @@ CHIP_ERROR EventPath::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case chip::app::EventPath::kCsTag_EventId:
+        case chip::app::EventPathIB::kCsTag_EventId:
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << chip::app::EventPath::kCsTag_EventId)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << chip::app::EventPath::kCsTag_EventId);
+            VerifyOrExit(!(TagPresenceMask & (1 << chip::app::EventPathIB::kCsTag_EventId)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << chip::app::EventPathIB::kCsTag_EventId);
             VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -156,47 +140,27 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR EventPath::Parser::GetNodeId(chip::NodeId * const apNodeId) const
+CHIP_ERROR EventPathIB::Parser::GetNodeId(chip::NodeId * const apNodeId) const
 {
     return GetUnsignedInteger(kCsTag_NodeId, apNodeId);
 }
 
-CHIP_ERROR EventPath::Parser::GetEndpointId(chip::EndpointId * const apEndpointID) const
+CHIP_ERROR EventPathIB::Parser::GetEndpointId(chip::EndpointId * const apEndpointID) const
 {
     return GetUnsignedInteger(kCsTag_EndpointId, apEndpointID);
 }
 
-CHIP_ERROR EventPath::Parser::GetClusterId(chip::ClusterId * const apClusterId) const
+CHIP_ERROR EventPathIB::Parser::GetClusterId(chip::ClusterId * const apClusterId) const
 {
     return GetUnsignedInteger(kCsTag_ClusterId, apClusterId);
 }
 
-CHIP_ERROR EventPath::Parser::GetEventId(chip::EventId * const apEventId) const
+CHIP_ERROR EventPathIB::Parser::GetEventId(chip::EventId * const apEventId) const
 {
     return GetUnsignedInteger(kCsTag_EventId, apEventId);
 }
 
-CHIP_ERROR EventPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const Tag aTag)
-{
-    mpWriter = apWriter;
-    mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_List, mOuterContainerType);
-    SuccessOrExit(mError);
-
-exit:
-    return mError;
-}
-
-CHIP_ERROR EventPath::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return _Init(apWriter, chip::TLV::AnonymousTag);
-}
-
-CHIP_ERROR EventPath::Builder::Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
-{
-    return _Init(apWriter, chip::TLV::ContextTag(aContextTagToUse));
-}
-
-EventPath::Builder & EventPath::Builder::NodeId(const uint64_t aNodeId)
+EventPathIB::Builder & EventPathIB::Builder::NodeId(const uint64_t aNodeId)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -206,7 +170,7 @@ EventPath::Builder & EventPath::Builder::NodeId(const uint64_t aNodeId)
     return *this;
 }
 
-EventPath::Builder & EventPath::Builder::EndpointId(const chip::EndpointId aEndpointId)
+EventPathIB::Builder & EventPathIB::Builder::EndpointId(const chip::EndpointId aEndpointId)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -216,7 +180,7 @@ EventPath::Builder & EventPath::Builder::EndpointId(const chip::EndpointId aEndp
     return *this;
 }
 
-EventPath::Builder & EventPath::Builder::ClusterId(const chip::ClusterId aClusterId)
+EventPathIB::Builder & EventPathIB::Builder::ClusterId(const chip::ClusterId aClusterId)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -226,7 +190,7 @@ EventPath::Builder & EventPath::Builder::ClusterId(const chip::ClusterId aCluste
     return *this;
 }
 
-EventPath::Builder & EventPath::Builder::EventId(const chip::EventId aEventId)
+EventPathIB::Builder & EventPathIB::Builder::EventId(const chip::EventId aEventId)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -236,7 +200,7 @@ EventPath::Builder & EventPath::Builder::EventId(const chip::EventId aEventId)
     return *this;
 }
 
-EventPath::Builder & EventPath::Builder::EndOfEventPath()
+EventPathIB::Builder & EventPathIB::Builder::EndOfEventPathIB()
 {
     EndOfContainer();
     return *this;
