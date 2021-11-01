@@ -34,5 +34,5 @@ public:
      */
     CHIP_ERROR Init(const TLV::TLVReader & aReader);
 };
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

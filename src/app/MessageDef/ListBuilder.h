@@ -52,6 +52,5 @@ public:
      */
     CHIP_ERROR Init(TLV::TLVWriter * const apWriter);
 };
-
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

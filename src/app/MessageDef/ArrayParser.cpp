@@ -27,5 +27,5 @@ CHIP_ERROR ArrayParser::Init(const TLV::TLVReader & aReader)
     ReturnLogErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
     return CHIP_NO_ERROR;
 }
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

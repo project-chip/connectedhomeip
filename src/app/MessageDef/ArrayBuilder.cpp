@@ -37,5 +37,5 @@ CHIP_ERROR ArrayBuilder::Init(TLV::TLVWriter * const apWriter)
 
     return mError;
 }
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip
