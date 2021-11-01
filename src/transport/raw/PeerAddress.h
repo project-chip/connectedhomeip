@@ -119,6 +119,7 @@ public:
     /// "UDP:<ip>:<port>"
     static constexpr size_t kMaxToStringSize = 3 // type: UDP/TCP/BLE
         + 1                                      // splitter
+        + 2                                      // brackets around address
         + kInetMaxAddrLen + 1                    // address
         + 5                                      // port: 16 bit interger
         + 1                                      // splitter
@@ -135,8 +136,15 @@ public:
     {
         char ip_addr[kInetMaxAddrLen];
 
-        char interface[Inet::InterfaceId::kMaxIfNameLength + 1];
-        mInterface.GetInterfaceName(interface, sizeof(interface));
+        char interface[Inet::InterfaceId::kMaxIfNameLength + 2] = {'%', 0};
+        if (mInterface.IsPresent()) {
+            if (mInterface.GetInterfaceName(interface + 1, sizeof(interface) - 1) != CHIP_NO_ERROR)
+            {
+                ::strncpy(interface, "%(err)", sizeof(interface));
+            }
+        } else {
+            ::strncpy(interface, "%(nul)", sizeof(interface));
+        }
 
         switch (mTransportType)
         {
@@ -145,11 +153,11 @@ public:
             break;
         case Type::kUdp:
             mIPAddress.ToString(ip_addr);
-            snprintf(buf, bufSize, "UDP:%s:%d %s", ip_addr, mPort, interface);
+            snprintf(buf, bufSize, "UDP:[%s]:%d%s", ip_addr, mPort, interface);
             break;
         case Type::kTcp:
             mIPAddress.ToString(ip_addr);
-            snprintf(buf, bufSize, "TCP:%s:%d %s", ip_addr, mPort, interface);
+            snprintf(buf, bufSize, "TCP:[%s]:%d%s", ip_addr, mPort, interface);
             break;
         case Type::kBle:
             // Note that BLE does not currently use any specific address.
