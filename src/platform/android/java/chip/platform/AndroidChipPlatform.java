@@ -22,23 +22,34 @@ import android.content.Context;
 public final class AndroidChipPlatform {
   private BleManager mBleManager = null;
 
-  /**
-   * Constructs AndroidChipPlatform with default implementations for all
-   * dependencies.
-   */
+  /** Constructs AndroidChipPlatform with default implementations for all dependencies. */
   public static AndroidChipPlatform defaultInstance(Context context) {
-    return new AndroidChipPlatform(new AndroidBleManager(), new PreferencesKeyValueStoreManager(context),
-        new PreferencesConfigurationManager(context), new NsdManagerServiceResolver(context),
-        new NsdManagerServiceBrowser(context), new ChipMdnsCallbackImpl());
+    return new AndroidChipPlatform(
+        new AndroidBleManager(),
+        new PreferencesKeyValueStoreManager(context),
+        new PreferencesConfigurationManager(context),
+        new NsdManagerServiceResolver(context),
+        new NsdManagerServiceBrowser(context),
+        new ChipMdnsCallbackImpl());
   }
 
-  public static AndroidChipPlatform newInstance(BleManager ble, KeyValueStoreManager kvm, ConfigurationManager cfg,
-      ServiceResolver resolver, ServiceBrowser browser, ChipMdnsCallback chipMdnsCallback) {
+  public static AndroidChipPlatform newInstance(
+      BleManager ble,
+      KeyValueStoreManager kvm,
+      ConfigurationManager cfg,
+      ServiceResolver resolver,
+      ServiceBrowser browser,
+      ChipMdnsCallback chipMdnsCallback) {
     return new AndroidChipPlatform(ble, kvm, cfg, resolver, browser, chipMdnsCallback);
   }
 
-  private AndroidChipPlatform(BleManager ble, KeyValueStoreManager kvm, ConfigurationManager cfg,
-      ServiceResolver resolver, ServiceBrowser browser, ChipMdnsCallback chipMdnsCallback) {
+  private AndroidChipPlatform(
+      BleManager ble,
+      KeyValueStoreManager kvm,
+      ConfigurationManager cfg,
+      ServiceResolver resolver,
+      ServiceBrowser browser,
+      ChipMdnsCallback chipMdnsCallback) {
     setBLEManager(ble);
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
@@ -62,16 +73,19 @@ public final class AndroidChipPlatform {
 
   // apis in BleLayer.h called by Platform
   // write success
-  public native void handleWriteConfirmation(int connId, byte[] svcId, byte[] charId, boolean success);
+  public native void handleWriteConfirmation(
+      int connId, byte[] svcId, byte[] charId, boolean success);
 
   // onSubscribeCharacteristic get data
   public native void handleIndicationReceived(int connId, byte[] svcId, byte[] charId, byte[] data);
 
   // Subscribe success
-  public native void handleSubscribeComplete(int connId, byte[] svcId, byte[] charId, boolean success);
+  public native void handleSubscribeComplete(
+      int connId, byte[] svcId, byte[] charId, boolean success);
 
   // Unsubscribe success
-  public native void handleUnsubscribeComplete(int connId, byte[] svcId, byte[] charId, boolean success);
+  public native void handleUnsubscribeComplete(
+      int connId, byte[] svcId, byte[] charId, boolean success);
 
   // connection status changed
   public native void handleConnectionError(int connId);
@@ -83,12 +97,13 @@ public final class AndroidChipPlatform {
   private native void setConfigurationManager(ConfigurationManager manager);
 
   // for ServiceResolver
-  private void setServiceResolver(ServiceResolver resolver, ServiceBrowser browser, ChipMdnsCallback chipMdnsCallback) {
+  private void setServiceResolver(
+      ServiceResolver resolver, ServiceBrowser browser, ChipMdnsCallback chipMdnsCallback) {
     if (resolver != null) {
       nativeSetServiceResolver(resolver, browser, chipMdnsCallback);
     }
   }
 
-  private native void nativeSetServiceResolver(ServiceResolver resolver, ServiceBrowser browser,
-      ChipMdnsCallback chipMdnsCallback);
+  private native void nativeSetServiceResolver(
+      ServiceResolver resolver, ServiceBrowser browser, ChipMdnsCallback chipMdnsCallback);
 }

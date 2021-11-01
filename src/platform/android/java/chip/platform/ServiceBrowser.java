@@ -19,6 +19,9 @@ package chip.platform;
 
 /** Interface for browsing network services. */
 public interface ServiceBrowser {
-  public void browse(final String serviceType, final long callbackHandle, final long contextHandle,
+  public void browse(
+      final String serviceType,
+      final long callbackHandle,
+      final long contextHandle,
       final ChipMdnsCallback chipMdnsCallback);
 }
