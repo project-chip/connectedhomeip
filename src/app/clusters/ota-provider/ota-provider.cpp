@@ -185,7 +185,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     };
 
     ChipLogProgress(Zcl, "OTA Provider received QueryImage");
-    ChipLogDetail(Zcl, "  VendorID: %" PRIu16, vendorId);
+    ChipLogDetail(Zcl, "  VendorID: 0x%" PRIx16, vendorId);
     ChipLogDetail(Zcl, "  ProductID: %" PRIu16, productId);
     ChipLogDetail(Zcl, "  SoftwareVersion: %" PRIu32, softwareVersion);
     ChipLogDetail(Zcl, "  ProtocolsSupported: %" PRIu8, protocolsSupported);

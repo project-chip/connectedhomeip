@@ -93,8 +93,8 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
     ChipLogDetail(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
-    ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: %" PRIu64, mProviderNodeId);
-    ChipLogDetail(SoftwareUpdate, "  VendorID: %" PRIu16, commandData.vendorId);
+    ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(mProviderNodeId));
+    ChipLogDetail(SoftwareUpdate, "  VendorID: 0x%" PRIx16, commandData.vendorId);
     ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %" PRIu8, announcementReason);
     if (commandData.metadataForNode.HasValue())
     {
