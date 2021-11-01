@@ -118,7 +118,7 @@ jobs:
               working-directory: src/darwin/Framework
             - name: Uploading log files
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ failure() }} && ${{ !env.ACT }}
               with:
                   name: darwin-framework-test-logs
                   path: /tmp/darwin/framework-tests
