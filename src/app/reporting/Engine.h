@@ -92,8 +92,7 @@ private:
      */
     CHIP_ERROR BuildAndSendSingleReportDataMessage(ReadHandler * apReadHandler);
 
-    CHIP_ERROR BuildSingleReportDataAttributeDataList(ReportDataMessage::Builder & reportDataBuilder,
-                                                             ReadHandler * apReadHandler);
+    CHIP_ERROR BuildSingleReportDataAttributeDataList(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
     CHIP_ERROR BuildSingleReportDataEventList(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
     CHIP_ERROR RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeDataList::Builder & aAttributeDataList,
                                    ClusterInfo & aClusterInfo);

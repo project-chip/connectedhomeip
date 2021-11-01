@@ -131,8 +131,7 @@ CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayl
     return err;
 }
 
-CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext,
-                                                System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status statusCode;

@@ -97,7 +97,7 @@ exit:
 }
 
 CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Builder & aReportDataBuilder,
-                                                                 ReadHandler * apReadHandler)
+                                                          ReadHandler * apReadHandler)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     bool attributeClean = true;
@@ -151,8 +151,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & aReportDataBuilder,
-                                                         ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
