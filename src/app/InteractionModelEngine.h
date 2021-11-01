@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <app/MessageDef/ReportData.h>
+#include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -95,22 +95,22 @@ public:
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
     /**
-     *  Creates a new read client and send ReadRequest message to the node using the read client,
+     *  Creates a new read client and send ReadRequestMessage message to the node using the read client,
      *  shutdown if fail to send it out
      *
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
+    CHIP_ERROR SendReadRequestMessage(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
 
     /**
-     *  Creates a new read client and sends SubscribeRequest message to the node using the read client.
+     *  Creates a new read client and sends SubscribeRequestMessage message to the node using the read client.
      *  Shuts down on transmission failure.
      *
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
+    CHIP_ERROR SendSubscribeRequestMessage(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
 
     /**
      * Tears down an active subscription.
@@ -205,14 +205,14 @@ private:
      * Called when Interaction Model receives a Write Request message.  Errors processing
      * the Write Request are handled entirely within this function.
      */
-    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                              System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                     System::PacketBufferHandle && aPayload);
 
-    /**This function handles processing of un-solicited ReportData messages on the client, which can
+    /**This function handles processing of un-solicited ReportDataMessage messages on the client, which can
      * only occur post subscription establishment
      */
-    CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                       System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnUnsolicitedReportDataMessage(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                              System::PacketBufferHandle && aPayload);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;

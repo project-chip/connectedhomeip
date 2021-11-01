@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-#include "SubscribeRequest.h"
+#include "SubscribeRequestMessage.h"
 #include "MessageDefHelper.h"
 
 namespace chip {
 namespace app {
-CHIP_ERROR SubscribeRequest::Parser::Init(const chip::TLV::TLVReader & aReader)
+CHIP_ERROR SubscribeRequestMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     // make a copy of the reader here
     mReader.Init(aReader);
@@ -30,7 +30,7 @@ CHIP_ERROR SubscribeRequest::Parser::Init(const chip::TLV::TLVReader & aReader)
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
+CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
@@ -38,7 +38,7 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
     AttributePathList::Parser attributePathList;
     EventPaths::Parser eventPathList;
     AttributeDataVersionList::Parser attributeDataVersionList;
-    PRETTY_PRINT("SubscribeRequest =");
+    PRETTY_PRINT("SubscribeRequestMessage =");
     PRETTY_PRINT("{");
 
     // make a copy of the reader
@@ -165,7 +165,7 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR SubscribeRequest::Parser::GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const
 {
     TLV::TLVReader reader;
     ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributePathList), reader));
@@ -173,7 +173,7 @@ CHIP_ERROR SubscribeRequest::Parser::GetAttributePathList(AttributePathList::Par
     return apAttributePathList->Init(reader);
 }
 
-CHIP_ERROR SubscribeRequest::Parser::GetEventPaths(EventPaths::Parser * const apEventPaths) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetEventPaths(EventPaths::Parser * const apEventPaths) const
 {
     TLV::TLVReader reader;
     ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventPaths), reader));
@@ -182,7 +182,8 @@ CHIP_ERROR SubscribeRequest::Parser::GetEventPaths(EventPaths::Parser * const ap
 }
 
 CHIP_ERROR
-SubscribeRequest::Parser::GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
+SubscribeRequestMessage::Parser::GetAttributeDataVersionList(
+    AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
 {
     TLV::TLVReader reader;
     ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributeDataVersionList), reader));
@@ -190,37 +191,37 @@ SubscribeRequest::Parser::GetAttributeDataVersionList(AttributeDataVersionList::
     return apAttributeDataVersionList->Init(reader);
 }
 
-CHIP_ERROR SubscribeRequest::Parser::GetEventNumber(uint64_t * const apEventNumber) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetEventNumber(uint64_t * const apEventNumber) const
 {
     return GetUnsignedInteger(kCsTag_EventNumber, apEventNumber);
 }
 
-CHIP_ERROR SubscribeRequest::Parser::GetMinIntervalSeconds(uint16_t * const apMinIntervalSeconds) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetMinIntervalSeconds(uint16_t * const apMinIntervalSeconds) const
 {
     return GetUnsignedInteger(kCsTag_MinIntervalSeconds, apMinIntervalSeconds);
 }
 
-CHIP_ERROR SubscribeRequest::Parser::GetMaxIntervalSeconds(uint16_t * const apMaxIntervalSeconds) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetMaxIntervalSeconds(uint16_t * const apMaxIntervalSeconds) const
 {
     return GetUnsignedInteger(kCsTag_MaxIntervalSeconds, apMaxIntervalSeconds);
 }
 
-CHIP_ERROR SubscribeRequest::Parser::GetKeepSubscriptions(bool * const apKeepExistingSubscription) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetKeepSubscriptions(bool * const apKeepExistingSubscription) const
 {
     return GetSimpleValue(kCsTag_KeepSubscriptions, chip::TLV::kTLVType_Boolean, apKeepExistingSubscription);
 }
 
-CHIP_ERROR SubscribeRequest::Parser::GetIsProxy(bool * const apIsProxy) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetIsProxy(bool * const apIsProxy) const
 {
     return GetSimpleValue(kCsTag_IsProxy, chip::TLV::kTLVType_Boolean, apIsProxy);
 }
 
-CHIP_ERROR SubscribeRequest::Builder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR SubscribeRequestMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 {
     return InitAnonymousStructure(apWriter);
 }
 
-AttributePathList::Builder & SubscribeRequest::Builder::CreateAttributePathListBuilder()
+AttributePathList::Builder & SubscribeRequestMessage::Builder::CreateAttributePathListBuilder()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -230,7 +231,8 @@ AttributePathList::Builder & SubscribeRequest::Builder::CreateAttributePathListB
     return mAttributePathListBuilder;
 }
 
-EventPaths::Builder & SubscribeRequest::Builder::CreateEventPathsBuilder()
+
+EventPaths::Builder & SubscribeRequestMessage::Builder::CreateEventPathsBuilder()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -240,7 +242,7 @@ EventPaths::Builder & SubscribeRequest::Builder::CreateEventPathsBuilder()
     return mEventPathsBuilder;
 }
 
-AttributeDataVersionList::Builder & SubscribeRequest::Builder::CreateAttributeDataVersionListBuilder()
+AttributeDataVersionList::Builder & SubscribeRequestMessage::Builder::CreateAttributeDataVersionListBuilder()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -250,7 +252,7 @@ AttributeDataVersionList::Builder & SubscribeRequest::Builder::CreateAttributeDa
     return mAttributeDataVersionListBuilder;
 }
 
-SubscribeRequest::Builder & SubscribeRequest::Builder::EventNumber(const uint64_t aEventNumber)
+SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::EventNumber(const uint64_t aEventNumber)
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -259,7 +261,7 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::EventNumber(const uint64_
     return *this;
 }
 
-SubscribeRequest::Builder & SubscribeRequest::Builder::MinIntervalSeconds(const uint16_t aMinIntervalSeconds)
+SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::MinIntervalSeconds(const uint16_t aMinIntervalSeconds)
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -268,7 +270,7 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::MinIntervalSeconds(const 
     return *this;
 }
 
-SubscribeRequest::Builder & SubscribeRequest::Builder::MaxIntervalSeconds(const uint16_t aMaxIntervalSeconds)
+SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::MaxIntervalSeconds(const uint16_t aMaxIntervalSeconds)
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -277,7 +279,7 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::MaxIntervalSeconds(const 
     return *this;
 }
 
-SubscribeRequest::Builder & SubscribeRequest::Builder::KeepSubscriptions(const bool aKeepSubscriptions)
+SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::KeepSubscriptions(const bool aKeepSubscriptions)
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -286,7 +288,7 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::KeepSubscriptions(const b
     return *this;
 }
 
-SubscribeRequest::Builder & SubscribeRequest::Builder::IsProxy(const bool aIsProxy)
+SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::IsProxy(const bool aIsProxy)
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -295,7 +297,7 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::IsProxy(const bool aIsPro
     return *this;
 }
 
-SubscribeRequest::Builder & SubscribeRequest::Builder::EndOfSubscribeRequest()
+SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::EndOfSubscribeRequestMessage()
 {
     EndOfContainer();
     return *this;

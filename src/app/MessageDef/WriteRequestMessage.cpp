@@ -15,11 +15,11 @@
  */
 /**
  *    @file
- *      This file defines WriteRequest parser and builder in CHIP interaction model
+ *      This file defines WriteRequestMessage parser and builder in CHIP interaction model
  *
  */
 
-#include "WriteRequest.h"
+#include "WriteRequestMessage.h"
 #include "MessageDefHelper.h"
 
 #include <inttypes.h>
@@ -33,7 +33,7 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR WriteRequest::Parser::Init(const chip::TLV::TLVReader & aReader)
+CHIP_ERROR WriteRequestMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -49,14 +49,14 @@ exit:
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR WriteRequest::Parser::CheckSchemaValidity() const
+CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
     AttributeDataList::Parser attributeDataList;
     AttributeDataVersionList::Parser attributeDataVersionList;
-    PRETTY_PRINT("WriteRequest =");
+    PRETTY_PRINT("WriteRequestMessage =");
     PRETTY_PRINT("{");
 
     // make a copy of the reader
@@ -141,12 +141,12 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR WriteRequest::Parser::GetSuppressResponse(bool * const apSuppressResponse) const
+CHIP_ERROR WriteRequestMessage::Parser::GetSuppressResponse(bool * const apSuppressResponse) const
 {
     return GetSimpleValue(kCsTag_SuppressResponse, chip::TLV::kTLVType_Boolean, apSuppressResponse);
 }
 
-CHIP_ERROR WriteRequest::Parser::GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const
+CHIP_ERROR WriteRequestMessage::Parser::GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -166,7 +166,7 @@ exit:
 }
 
 CHIP_ERROR
-WriteRequest::Parser::GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
+WriteRequestMessage::Parser::GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -185,17 +185,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteRequest::Parser::GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const
+CHIP_ERROR WriteRequestMessage::Parser::GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const
 {
     return GetSimpleValue(kCsTag_MoreChunkedMessages, chip::TLV::kTLVType_Boolean, apMoreChunkedMessages);
 }
 
-CHIP_ERROR WriteRequest::Builder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR WriteRequestMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 {
     return InitAnonymousStructure(apWriter);
 }
 
-WriteRequest::Builder & WriteRequest::Builder::SuppressResponse(const bool aSuppressResponse)
+WriteRequestMessage::Builder & WriteRequestMessage::Builder::SuppressResponse(const bool aSuppressResponse)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -205,7 +205,7 @@ WriteRequest::Builder & WriteRequest::Builder::SuppressResponse(const bool aSupp
     return *this;
 }
 
-AttributeDataList::Builder & WriteRequest::Builder::CreateAttributeDataListBuilder()
+AttributeDataList::Builder & WriteRequestMessage::Builder::CreateAttributeDataListBuilder()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -220,7 +220,7 @@ AttributeDataList::Builder & WriteRequest::Builder::CreateAttributeDataListBuild
     return mAttributeDataListBuilder;
 }
 
-AttributeDataVersionList::Builder & WriteRequest::Builder::CreateAttributeDataVersionListBuilder()
+AttributeDataVersionList::Builder & WriteRequestMessage::Builder::CreateAttributeDataVersionListBuilder()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -234,7 +234,7 @@ AttributeDataVersionList::Builder & WriteRequest::Builder::CreateAttributeDataVe
     return mAttributeDataVersionListBuilder;
 }
 
-WriteRequest::Builder & WriteRequest::Builder::MoreChunkedMessages(const bool aMoreChunkedMessages)
+WriteRequestMessage::Builder & WriteRequestMessage::Builder::MoreChunkedMessages(const bool aMoreChunkedMessages)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -244,12 +244,12 @@ WriteRequest::Builder & WriteRequest::Builder::MoreChunkedMessages(const bool aM
     return *this;
 }
 
-AttributeDataList::Builder & WriteRequest::Builder::GetAttributeDataListBuilder()
+AttributeDataList::Builder & WriteRequestMessage::Builder::GetAttributeDataListBuilder()
 {
     return mAttributeDataListBuilder;
 }
 
-WriteRequest::Builder & WriteRequest::Builder::EndOfWriteRequest()
+WriteRequestMessage::Builder & WriteRequestMessage::Builder::EndOfWriteRequestMessage()
 {
     EndOfContainer();
     return *this;

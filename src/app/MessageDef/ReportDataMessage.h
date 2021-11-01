@@ -17,7 +17,7 @@
  */
 /**
  *    @file
- *      This file defines ReportData parser and builder in CHIP interaction model
+ *      This file defines ReportDataMessage parser and builder in CHIP interaction model
  *
  */
 
@@ -37,7 +37,7 @@
 
 namespace chip {
 namespace app {
-namespace ReportData {
+namespace ReportDataMessage {
 enum
 {
     kCsTag_SuppressResponse    = 0,
@@ -53,7 +53,7 @@ public:
     /**
      *  @brief Initialize the parser object with TLVReader
      *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this ReportData
+     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this ReportDataMessage
      *
      *  @return #CHIP_NO_ERROR on success
      */
@@ -77,7 +77,7 @@ public:
 #endif
 
     /**
-     *  @brief Check whether a response (a StatusReponse specifically) is to be sent back to the request.
+     *  @brief Check whether a response (a StatusResponseMessage specifically) is to be sent back to the request.
      *  Next() must be called before accessing them.
      *
      *  @param [in] apSuppressResponse    A pointer to apSuppressResponse
@@ -134,7 +134,7 @@ class Builder : public chip::app::Builder
 {
 public:
     /**
-     *  @brief Initialize a ReportData::Builder for writing into a TLV stream
+     *  @brief Initialize a ReportDataMessage::Builder for writing into a TLV stream
      *
      *  @param [in] apWriter    A pointer to TLVWriter
      *
@@ -143,19 +143,19 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     *  @brief Inject SuppressResponse into the TLV stream to indicate whether a response (a StatusResponse specifically)
+     *  @brief Inject SuppressResponse into the TLV stream to indicate whether a response (a StatusResponseMessage specifically)
      *  is to be sent back to the request.
      *
      *  @param [in] aSuppressResponse The boolean variable to indicate if request response is needed.
      *
      *  @return A reference to *this
      */
-    ReportData::Builder & SuppressResponse(const bool aSuppressResponse);
+    ReportDataMessage::Builder & SuppressResponse(const bool aSuppressResponse);
 
     /**
      *  @brief Inject subscription id into the TLV stream, This field contains the Subscription ID
-     *  to which the data is being sent against. This is not present when the ReportDataRequest is
-     *  sent in response to a ReadRequest, but is present when sent in response to a SubscribeRequest.
+     *  to which the data is being sent against. This is not present when the ReportDataMessageRequest is
+     *  sent in response to a ReadRequestMessage, but is present when sent in response to a SubscribeRequestMessage.
      *  Attempts should be made to ensure the SubscriptionId does not collide with IDs from previous
      *  subscriptions to ensure disambiguation.
      *
@@ -163,7 +163,7 @@ public:
      *
      *  @return A reference to *this
      */
-    ReportData::Builder & SubscriptionId(const uint64_t aSubscriptionId);
+    ReportDataMessage::Builder & SubscriptionId(const uint64_t aSubscriptionId);
 
     /**
      *  @brief Initialize a AttributeDataList::Builder for writing into the TLV stream
@@ -184,20 +184,20 @@ public:
      *  @param [in] aMoreChunkedMessages The boolean variable to indicate if there are more chunked messages in a transaction.
      *  @return A reference to *this
      */
-    ReportData::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
+    ReportDataMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
     /**
-     *  @brief Mark the end of this ReportData
+     *  @brief Mark the end of this ReportDataMessage
      *
      *  @return A reference to *this
      */
-    ReportData::Builder & EndOfReportData();
+    ReportDataMessage::Builder & EndOfReportDataMessage();
 
 private:
     AttributeDataList::Builder mAttributeDataListBuilder;
     EventList::Builder mEventDataListBuilder;
 };
-}; // namespace ReportData
+}; // namespace ReportDataMessage
 
 }; // namespace app
 }; // namespace chip

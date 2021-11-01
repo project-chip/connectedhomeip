@@ -31,7 +31,7 @@
 
 namespace chip {
 namespace app {
-namespace SubscribeRequest {
+namespace SubscribeRequestMessage {
 enum
 {
     kCsTag_AttributePathList        = 0,
@@ -149,35 +149,35 @@ public:
      *  @brief An initiator can optionally specify an EventNumber it has already to limit the
      *  set of retrieved events on the server for optimization purposes.
      */
-    SubscribeRequest::Builder & EventNumber(const uint64_t aEventNumber);
+    SubscribeRequestMessage::Builder & EventNumber(const uint64_t aEventNumber);
 
-    SubscribeRequest::Builder & MinIntervalSeconds(const uint16_t aMinIntervalSeconds);
+    SubscribeRequestMessage::Builder & MinIntervalSeconds(const uint16_t aMinIntervalSeconds);
 
-    SubscribeRequest::Builder & MaxIntervalSeconds(const uint16_t aMinIntervalSeconds);
+    SubscribeRequestMessage::Builder & MaxIntervalSeconds(const uint16_t aMinIntervalSeconds);
 
     /**
      *  @brief This is set to 'true' by the subscriber to indicate preservation of previous subscriptions. If omitted, it implies
      * 'false' as a value.
      */
-    SubscribeRequest::Builder & KeepSubscriptions(const bool aKeepSubscriptions);
+    SubscribeRequestMessage::Builder & KeepSubscriptions(const bool aKeepSubscriptions);
 
     /**
      *  @brief This is set to true by the subscriber if it is a proxy-type device proxying for another client. This
      *  confers it special privileges on the publisher that might result in evictions of other non-proxy subscriptions
      *  to make way for the proxy.
      */
-    SubscribeRequest::Builder & IsProxy(const bool aIsProxy);
+    SubscribeRequestMessage::Builder & IsProxy(const bool aIsProxy);
 
     /**
-     *  @brief Mark the end of this SubscribeRequest
+     *  @brief Mark the end of this SubscribeRequestMessage
      */
-    SubscribeRequest::Builder & EndOfSubscribeRequest();
+    SubscribeRequestMessage::Builder & EndOfSubscribeRequestMessage();
 
 private:
     AttributePathList::Builder mAttributePathListBuilder;
     EventPaths::Builder mEventPathsBuilder;
     AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
 };
-} // namespace SubscribeRequest
+} // namespace SubscribeRequestMessage
 } // namespace app
 } // namespace chip

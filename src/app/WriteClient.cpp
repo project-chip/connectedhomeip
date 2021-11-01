@@ -42,9 +42,9 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callbac
 
     mMessageWriter.Init(std::move(packet));
 
-    ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
+    ReturnErrorOnFailure(mWriteRequestMessageBuilder.Init(&mMessageWriter));
 
-    attributeDataListBuilder = mWriteRequestBuilder.CreateAttributeDataListBuilder();
+    attributeDataListBuilder = mWriteRequestMessageBuilder.CreateAttributeDataListBuilder();
     ReturnErrorOnFailure(attributeDataListBuilder.GetError());
 
     ClearExistingExchangeContext();
@@ -86,12 +86,12 @@ void WriteClient::ClearExistingExchangeContext()
     }
 }
 
-CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle && payload)
+CHIP_ERROR WriteClient::ProcessWriteResponseMessageMessage(System::PacketBufferHandle && payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
     TLV::TLVReader attributeStatusListReader;
-    WriteResponse::Parser writeResponse;
+    WriteResponseMessage::Parser writeResponse;
     AttributeStatusList::Parser attributeStatusListParser;
 
     reader.Init(std::move(payload));
@@ -138,7 +138,7 @@ CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePa
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     AttributeDataElement::Builder attributeDataElement =
-        mWriteRequestBuilder.GetAttributeDataListBuilder().CreateAttributeDataElementBuilder();
+        mWriteRequestMessageBuilder.GetAttributeDataListBuilder().CreateAttributeDataElementBuilder();
     SuccessOrExit(attributeDataElement.GetError());
     err = ConstructAttributePath(attributePathParams, attributeDataElement);
 
@@ -151,7 +151,7 @@ CHIP_ERROR WriteClient::FinishAttribute()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     AttributeDataElement::Builder attributeDataElement =
-        mWriteRequestBuilder.GetAttributeDataListBuilder().GetAttributeDataElementBuilder();
+        mWriteRequestMessageBuilder.GetAttributeDataListBuilder().GetAttributeDataElementBuilder();
 
     // TODO: Add attribute version support
     attributeDataElement.DataVersion(0);
@@ -165,7 +165,7 @@ exit:
 
 TLV::TLVWriter * WriteClient::GetAttributeDataElementTLVWriter()
 {
-    return mWriteRequestBuilder.GetAttributeDataListBuilder().GetAttributeDataElementBuilder().GetWriter();
+    return mWriteRequestMessageBuilder.GetAttributeDataListBuilder().GetAttributeDataElementBuilder().GetWriter();
 }
 
 CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
@@ -195,12 +195,12 @@ CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributeDataList::Builder attributeDataListBuilder;
     VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
-    attributeDataListBuilder = mWriteRequestBuilder.GetAttributeDataListBuilder().EndOfAttributeDataList();
+    attributeDataListBuilder = mWriteRequestMessageBuilder.GetAttributeDataListBuilder().EndOfAttributeDataList();
     err                      = attributeDataListBuilder.GetError();
     SuccessOrExit(err);
 
-    mWriteRequestBuilder.EndOfWriteRequest();
-    err = mWriteRequestBuilder.GetError();
+    mWriteRequestMessageBuilder.EndOfWriteRequestMessage();
+    err = mWriteRequestMessageBuilder.GetError();
     SuccessOrExit(err);
 
     err = mMessageWriter.Finalize(&aPacket);
@@ -242,7 +242,7 @@ void WriteClient::ClearState()
     MoveToState(State::Uninitialized);
 }
 
-CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout)
+CHIP_ERROR WriteClient::SendWriteRequestMessage(SessionHandle session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle packet;
@@ -261,7 +261,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::T
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(timeout);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequestMessage, std::move(packet),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
     MoveToState(State::AwaitingResponse);
@@ -280,7 +280,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Assert that the exchange context matches the client's current context.
-    // This should never fail because even if SendWriteRequest is called
+    // This should never fail because even if SendWriteRequestMessage is called
     // back-to-back, the second call will call Close() on the first exchange,
     // which clears the OnMessageReceived callback.
 
@@ -288,10 +288,10 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     // Verify that the message is an Write Response. If not, this is an unexpected message.
     // Signal the error through the error callback and shutdown the client.
-    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse),
+    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponseMessage),
                  err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    err = ProcessWriteResponseMessage(std::move(aPayload));
+    err = ProcessWriteResponseMessageMessage(std::move(aPayload));
 
 exit:
     if (mpCallback != nullptr)
@@ -371,9 +371,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClientHandle::SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout)
+CHIP_ERROR WriteClientHandle::SendWriteRequestMessage(SessionHandle session, System::Clock::Timeout timeout)
 {
-    CHIP_ERROR err = mpWriteClient->SendWriteRequest(session, timeout);
+    CHIP_ERROR err = mpWriteClient->SendWriteRequestMessage(session, timeout);
 
     if (err == CHIP_NO_ERROR)
     {

@@ -1,7 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,20 +16,16 @@
  */
 /**
  *    @file
- *      This file defines ReadRequest parser and builder in CHIP interaction model
+ *      This file defines WriteRequestMessage parser and builder in CHIP interaction model
  *
  */
 
 #pragma once
 
+#include "AttributeDataList.h"
 #include "AttributeDataVersionList.h"
-#include "AttributePathList.h"
 #include "Builder.h"
-#include "EventPaths.h"
-
 #include "Parser.h"
-
-#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -39,13 +34,13 @@
 
 namespace chip {
 namespace app {
-namespace ReadRequest {
+namespace WriteRequestMessage {
 enum
 {
-    kCsTag_AttributePathList        = 0,
-    kCsTag_EventPaths               = 1,
+    kCsTag_SuppressResponse         = 0,
+    kCsTag_AttributeDataList        = 1,
     kCsTag_AttributeDataVersionList = 2,
-    kCsTag_EventNumber              = 3,
+    kCsTag_MoreChunkedMessages      = 3,
 };
 
 class Parser : public chip::app::Parser
@@ -59,7 +54,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -68,36 +63,33 @@ public:
      *   4) At the top level of the structure, unknown tags are ignored for forward compatibility
      *  @note The main use of this function is to print out what we're
      *    receiving during protocol development and debugging.
-     *    The encoding rule has changed in IM encoding spec so this
-     *    check is only "roughly" conformant now.
      *
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR CheckSchemaValidity() const;
-#endif
+
+    /**
+     *  @brief Get GetSuppressResponse Next() must be called before accessing them.
+     *
+     *  @param [in] apSuppressResponse    A pointer to apSuppressResponse
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetSuppressResponse(bool * const apSuppressResponse) const;
 
     /**
      *  @brief Get a TLVReader for the AttributePathList. Next() must be called before accessing them.
      *
-     *  @param [in] apAttributePathList    A pointer to an attribute path list parser.
+     *  @param [in] apAttributeDataList    A pointer to apAttributeDataList
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const;
+    CHIP_ERROR GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const;
 
     /**
-     *  @brief Get a TLVReader for the EventPaths. Next() must be called before accessing them.
-     *
-     *  @param [in] apEventPaths    A pointer to apEventPaths
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetEventPaths(EventPaths::Parser * const apEventPaths) const;
-
-    /**
-     *  @brief Get a parser for the AttributeDataVersionList. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the AttributeDataVersionList. Next() must be called before accessing them.
      *
      *  @param [in] apAttributeDataVersionList    A pointer to apAttributeDataVersionList
      *
@@ -107,21 +99,21 @@ public:
     CHIP_ERROR GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const;
 
     /**
-     *  @brief Get Event Number. Next() must be called before accessing them.
+     *  @brief Get MoreChunkedMessages message. Next() must be called before accessing them.
      *
-     *  @param [in] apEventNumber    A pointer to apEventNumber
+     *  @param [in] apMoreChunkedMessages    A pointer to apMoreChunkedMessages
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventNumber(uint64_t * const apEventNumber) const;
+    CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
 };
 
 class Builder : public chip::app::Builder
 {
 public:
     /**
-     *  @brief Initialize a ReadRequest::Builder for writing into a TLV stream
+     *  @brief Initialize a WriteRequestMessage::Builder for writing into a TLV stream
      *
      *  @param [in] apWriter    A pointer to TLVWriter
      *
@@ -130,45 +122,46 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     *  @brief Initialize a AttributePathList::Builder for writing into the TLV stream
-     *
-     *  @return A reference to AttributePathList::Builder
+     *  @brief This can be used to optionally signal to the server that no responses are to be sent back.
+     *  @param [in] aSuppressResponse true if client need to signal suppress response
+     *  @return A reference to *this
      */
-    AttributePathList::Builder & CreateAttributePathListBuilder();
+    WriteRequestMessage::Builder & SuppressResponse(const bool aSuppressResponse);
 
     /**
-     *  @brief Initialize a EventPaths::Builder for writing into the TLV stream
+     *  @brief Initialize a AttributeDataList::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventPaths::Builder
+     *  @return A reference to AttributeDataList::Builder
      */
-    EventPaths::Builder & CreateEventPathsBuilder();
+    AttributeDataList::Builder & CreateAttributeDataListBuilder();
 
     /**
      *  @brief Initialize a AttributeDataVersionList::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataVersionList::Builder
+     *  @return A reference to EventPaths::Builder
      */
     AttributeDataVersionList::Builder & CreateAttributeDataVersionListBuilder();
 
     /**
-     *  @brief An initiator can optionally specify an EventNumber it has already to limit the
-     *  set of retrieved events on the server for optimization purposes.
-     *  @param [in] aEventNumber The event number
+     *  @brief Set True if the set of AttributeDataElements have to be sent across multiple packets in a single transaction
+     *  @param [in] aMoreChunkedMessages  true if more chunked messaged is needed
      *  @return A reference to *this
      */
-    ReadRequest::Builder & EventNumber(const uint64_t aEventNumber);
+    WriteRequestMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
+
+    AttributeDataList::Builder & GetAttributeDataListBuilder();
+
     /**
-     *  @brief Mark the end of this ReadRequest
+     *  @brief Mark the end of this WriteRequestMessage
      *
      *  @return A reference to *this
      */
-    ReadRequest::Builder & EndOfReadRequest();
+    WriteRequestMessage::Builder & EndOfWriteRequestMessage();
 
 private:
-    AttributePathList::Builder mAttributePathListBuilder;
-    EventPaths::Builder mEventPathsBuilder;
+    AttributeDataList::Builder mAttributeDataListBuilder;
     AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
 };
-}; // namespace ReadRequest
+}; // namespace WriteRequestMessage
 }; // namespace app
 }; // namespace chip

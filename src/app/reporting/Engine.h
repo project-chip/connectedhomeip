@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <app/MessageDef/ReportData.h>
+#include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -90,10 +90,11 @@ private:
      * Build Single Report Data including attribute changes and event data stream, and send out
      *
      */
-    CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler);
+    CHIP_ERROR BuildAndSendSingleReportDataMessage(ReadHandler * apReadHandler);
 
-    CHIP_ERROR BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
-    CHIP_ERROR BuildSingleReportDataEventList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
+    CHIP_ERROR BuildSingleReportDataMessageAttributeDataList(ReportDataMessage::Builder & reportDataBuilder,
+                                                             ReadHandler * apReadHandler);
+    CHIP_ERROR BuildSingleReportDataMessageEventList(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
     CHIP_ERROR RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeDataList::Builder & aAttributeDataList,
                                    ClusterInfo & aClusterInfo);
     EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);

@@ -34,9 +34,9 @@ CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
     VerifyOrReturnLogError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     mMessageWriter.Init(std::move(packet));
-    ReturnLogErrorOnFailure(mWriteResponseBuilder.Init(&mMessageWriter));
+    ReturnLogErrorOnFailure(mWriteResponseMessageBuilder.Init(&mMessageWriter));
 
-    AttributeStatusList::Builder attributeStatusListBuilder = mWriteResponseBuilder.CreateAttributeStatusListBuilder();
+    AttributeStatusList::Builder attributeStatusListBuilder = mWriteResponseMessageBuilder.CreateAttributeStatusListBuilder();
     ReturnLogErrorOnFailure(attributeStatusListBuilder.GetError());
 
     MoveToState(State::Initialized);
@@ -52,14 +52,15 @@ void WriteHandler::Shutdown()
     ClearState();
 }
 
-CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
+CHIP_ERROR WriteHandler::OnWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
+                                               System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     mpExchangeCtx  = apExchangeContext;
 
-    err = ProcessWriteRequest(std::move(aPayload));
+    err = ProcessWriteRequestMessage(std::move(aPayload));
     SuccessOrExit(err);
-    err = SendWriteResponse();
+    err = SendWriteResponseMessage();
 
 exit:
     Shutdown();
@@ -71,12 +72,12 @@ CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributeStatusList::Builder attributeStatusList;
     VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
-    attributeStatusList = mWriteResponseBuilder.GetAttributeStatusListBuilder().EndOfAttributeStatusList();
+    attributeStatusList = mWriteResponseMessageBuilder.GetAttributeStatusListBuilder().EndOfAttributeStatusList();
     err                 = attributeStatusList.GetError();
     SuccessOrExit(err);
 
-    mWriteResponseBuilder.EndOfWriteResponse();
-    err = mWriteResponseBuilder.GetError();
+    mWriteResponseMessageBuilder.EndOfWriteResponseMessage();
+    err = mWriteResponseMessageBuilder.GetError();
     SuccessOrExit(err);
 
     err = mMessageWriter.Finalize(&packet);
@@ -86,7 +87,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteHandler::SendWriteResponse()
+CHIP_ERROR WriteHandler::SendWriteResponseMessage()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle packet;
@@ -97,7 +98,7 @@ CHIP_ERROR WriteHandler::SendWriteResponse()
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponseMessage, std::move(packet));
     SuccessOrExit(err);
 
     MoveToState(State::Sending);
@@ -164,12 +165,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload)
+CHIP_ERROR WriteHandler::ProcessWriteRequestMessage(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
 
-    WriteRequest::Parser writeRequestParser;
+    WriteRequestMessage::Parser writeRequestParser;
     AttributeDataList::Parser attributeDataListParser;
     TLV::TLVReader attributeDataListReader;
     bool needSuppressResponse = false;
@@ -231,7 +232,7 @@ CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathPar
     StatusIB::Builder statusIBBuilder;
     StatusIB statusIB;
     AttributeStatusIB::Builder attributeStatusIB =
-        mWriteResponseBuilder.GetAttributeStatusListBuilder().CreateAttributeStatusBuilder();
+        mWriteResponseMessageBuilder.GetAttributeStatusListBuilder().CreateAttributeStatusBuilder();
     err = attributeStatusIB.GetError();
     SuccessOrExit(err);
 

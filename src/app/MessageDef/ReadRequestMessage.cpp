@@ -15,11 +15,11 @@
  */
 /**
  *    @file
- *      This file defines ReadRequest parser and builder in CHIP interaction model
+ *      This file defines ReadRequestMessage parser and builder in CHIP interaction model
  *
  */
 
-#include "ReadRequest.h"
+#include "ReadRequestMessage.h"
 #include "MessageDefHelper.h"
 
 #include <inttypes.h>
@@ -33,7 +33,7 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadRequest::Parser::Init(const chip::TLV::TLVReader & aReader)
+CHIP_ERROR ReadRequestMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -50,7 +50,7 @@ exit:
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR ReadRequest::Parser::CheckSchemaValidity() const
+CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
@@ -58,7 +58,7 @@ CHIP_ERROR ReadRequest::Parser::CheckSchemaValidity() const
     AttributePathList::Parser attributePathList;
     EventPaths::Parser eventPathList;
     AttributeDataVersionList::Parser attributeDataVersionList;
-    PRETTY_PRINT("ReadRequest =");
+    PRETTY_PRINT("ReadRequestMessage =");
     PRETTY_PRINT("{");
 
     // make a copy of the reader
@@ -161,7 +161,7 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR ReadRequest::Parser::GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const
+CHIP_ERROR ReadRequestMessage::Parser::GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -180,7 +180,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadRequest::Parser::GetEventPaths(EventPaths::Parser * const apEventPaths) const
+CHIP_ERROR ReadRequestMessage::Parser::GetEventPaths(EventPaths::Parser * const apEventPaths) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -200,7 +200,7 @@ exit:
 }
 
 CHIP_ERROR
-ReadRequest::Parser::GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
+ReadRequestMessage::Parser::GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -219,17 +219,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadRequest::Parser::GetEventNumber(uint64_t * const apEventNumber) const
+CHIP_ERROR ReadRequestMessage::Parser::GetEventNumber(uint64_t * const apEventNumber) const
 {
     return GetUnsignedInteger(kCsTag_EventNumber, apEventNumber);
 }
 
-CHIP_ERROR ReadRequest::Builder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR ReadRequestMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 {
     return InitAnonymousStructure(apWriter);
 }
 
-AttributePathList::Builder & ReadRequest::Builder::CreateAttributePathListBuilder()
+AttributePathList::Builder & ReadRequestMessage::Builder::CreateAttributePathListBuilder()
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributePathListBuilder.ResetError(mError));
@@ -241,7 +241,7 @@ exit:
     return mAttributePathListBuilder;
 }
 
-EventPaths::Builder & ReadRequest::Builder::CreateEventPathsBuilder()
+EventPaths::Builder & ReadRequestMessage::Builder::CreateEventPathsBuilder()
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mEventPathsBuilder.ResetError(mError));
@@ -253,7 +253,7 @@ exit:
     return mEventPathsBuilder;
 }
 
-AttributeDataVersionList::Builder & ReadRequest::Builder::CreateAttributeDataVersionListBuilder()
+AttributeDataVersionList::Builder & ReadRequestMessage::Builder::CreateAttributeDataVersionListBuilder()
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeDataVersionListBuilder.ResetError(mError));
@@ -265,7 +265,7 @@ exit:
     return mAttributeDataVersionListBuilder;
 }
 
-ReadRequest::Builder & ReadRequest::Builder::EventNumber(const uint64_t aEventNumber)
+ReadRequestMessage::Builder & ReadRequestMessage::Builder::EventNumber(const uint64_t aEventNumber)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -275,7 +275,7 @@ ReadRequest::Builder & ReadRequest::Builder::EventNumber(const uint64_t aEventNu
     return *this;
 }
 
-ReadRequest::Builder & ReadRequest::Builder::EndOfReadRequest()
+ReadRequestMessage::Builder & ReadRequestMessage::Builder::EndOfReadRequestMessage()
 {
     EndOfContainer();
     return *this;

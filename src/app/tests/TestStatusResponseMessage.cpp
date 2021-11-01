@@ -23,7 +23,7 @@
  */
 
 #include <app/AppBuildConfig.h>
-#include <app/MessageDef/StatusResponse.h>
+#include <app/MessageDef/StatusResponseMessage.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -37,10 +37,10 @@ using namespace chip::app;
 constexpr chip::Protocols::InteractionModel::Status statusValue        = chip::Protocols::InteractionModel::Status::Success;
 constexpr chip::Protocols::InteractionModel::Status invalidStatusValue = chip::Protocols::InteractionModel::Status::Failure;
 
-void BuildStatusResponse(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
+void BuildStatusResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusResponse::Builder statusResponse;
+    StatusResponseMessage::Builder statusResponse;
 
     err = statusResponse.Init(&aWriter);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -49,11 +49,11 @@ void BuildStatusResponse(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
     NL_TEST_ASSERT(apSuite, statusResponse.GetError() == CHIP_NO_ERROR);
 }
 
-void ParseStatusResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader, bool aTestPositiveCase)
+void ParseStatusResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader, bool aTestPositiveCase)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    StatusResponse::Parser statusResponse;
+    StatusResponseMessage::Parser statusResponse;
     chip::Protocols::InteractionModel::Status status;
 
     err = statusResponse.Init(aReader);
@@ -74,43 +74,43 @@ void ParseStatusResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader, 
     }
 }
 
-void StatusResponsePositiveTest(nlTestSuite * apSuite, void * apContext)
+void StatusResponseMessagePositiveTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    BuildStatusResponse(apSuite, writer);
+    BuildStatusResponseMessage(apSuite, writer);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     reader.Init(std::move(buf));
     err = reader.Next();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    ParseStatusResponse(apSuite, reader, true /*aTestPositiveCase*/);
+    ParseStatusResponseMessage(apSuite, reader, true /*aTestPositiveCase*/);
 }
 
-void StatusResponseNegativeTest(nlTestSuite * apSuite, void * apContext)
+void StatusResponseMessageNegativeTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    BuildStatusResponse(apSuite, writer);
+    BuildStatusResponseMessage(apSuite, writer);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     reader.Init(std::move(buf));
     err = reader.Next();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    ParseStatusResponse(apSuite, reader, false /*aTestPositiveCase*/);
+    ParseStatusResponseMessage(apSuite, reader, false /*aTestPositiveCase*/);
 }
 
 // clang-format off
 const nlTest sTests[] =
         {
-                NL_TEST_DEF("StatusResponsePositiveTest", StatusResponsePositiveTest),
-                NL_TEST_DEF("StatusResponseNegativeTest", StatusResponseNegativeTest),
+                NL_TEST_DEF("StatusResponseMessagePositiveTest", StatusResponseMessagePositiveTest),
+                NL_TEST_DEF("StatusResponseMessageNegativeTest", StatusResponseMessageNegativeTest),
                 NL_TEST_SENTINEL()
         };
 // clang-format on
@@ -136,12 +136,12 @@ static int TestTeardown(void * inContext)
     return SUCCESS;
 }
 
-int TestStatusResponse()
+int TestStatusResponseMessage()
 {
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "StatusResponse",
+        "StatusResponseMessage",
         &sTests[0],
         TestSetup,
         TestTeardown,
@@ -153,4 +153,4 @@ int TestStatusResponse()
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestStatusResponse)
+CHIP_REGISTER_TEST_SUITE(TestStatusResponseMessage)

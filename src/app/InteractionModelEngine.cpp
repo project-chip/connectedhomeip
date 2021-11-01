@@ -297,7 +297,7 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
             System::PacketBufferTLVReader reader;
             reader.Init(aPayload.Retain());
             SuccessOrExit(err = reader.Next());
-            SubscribeRequest::Parser subscribeRequestParser;
+            SubscribeRequestMessage::Parser subscribeRequestParser;
             SuccessOrExit(err = subscribeRequestParser.Init(reader));
             err = subscribeRequestParser.GetKeepSubscriptions(&keepSubscriptions);
             if (err == CHIP_NO_ERROR && !keepSubscriptions)
@@ -328,8 +328,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,
-                                                  const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR InteractionModelEngine::OnWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
+                                                         const PayloadHeader & aPayloadHeader,
+                                                         System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -341,7 +342,7 @@ CHIP_ERROR InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * a
         {
             err = writeHandler.Init(mpDelegate);
             SuccessOrExit(err);
-            err               = writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload));
+            err               = writeHandler.OnWriteRequestMessage(apExchangeContext, std::move(aPayload));
             apExchangeContext = nullptr;
             break;
         }
@@ -356,15 +357,15 @@ exit:
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext,
-                                                           const PayloadHeader & aPayloadHeader,
-                                                           System::PacketBufferHandle && aPayload)
+CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportDataMessage(Messaging::ExchangeContext * apExchangeContext,
+                                                                  const PayloadHeader & aPayloadHeader,
+                                                                  System::PacketBufferHandle && aPayload)
 {
     System::PacketBufferTLVReader reader;
     reader.Init(aPayload.Retain());
     ReturnLogErrorOnFailure(reader.Next());
 
-    ReportData::Parser report;
+    ReportDataMessage::Parser report;
     ReturnLogErrorOnFailure(report.Init(reader));
 
     uint64_t subscriptionId = 0;
@@ -381,7 +382,7 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
             continue;
         }
 
-        return readClient.OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
+        return readClient.OnUnsolicitedReportDataMessage(apExchangeContext, std::move(aPayload));
     }
     return CHIP_NO_ERROR;
 }
@@ -393,22 +394,22 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     {
         return OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
-    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequestMessage))
     {
         return OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), ReadHandler::InteractionType::Read);
     }
-    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequestMessage))
     {
-        return OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        return OnWriteRequestMessage(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
-    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeRequest))
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeRequestMessage))
     {
         return OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
                                     ReadHandler::InteractionType::Subscribe);
     }
-    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportDataMessage))
     {
-        return OnUnsolicitedReportData(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        return OnUnsolicitedReportDataMessage(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
     else
     {
@@ -422,12 +423,12 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
                     ChipLogValueExchange(ec));
 }
 
-CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
+CHIP_ERROR InteractionModelEngine::SendReadRequestMessage(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
 {
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aCallback));
-    err = client->SendReadRequest(aReadPrepareParams);
+    err = client->SendReadRequestMessage(aReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
         client->Shutdown();
@@ -435,11 +436,12 @@ CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrep
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
+CHIP_ERROR InteractionModelEngine::SendSubscribeRequestMessage(ReadPrepareParams & aReadPrepareParams,
+                                                               ReadClient::Callback * aCallback)
 {
     ReadClient * client = nullptr;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aCallback));
-    ReturnErrorOnFailure(client->SendSubscribeRequest(aReadPrepareParams));
+    ReturnErrorOnFailure(client->SendSubscribeRequestMessage(aReadPrepareParams));
     return CHIP_NO_ERROR;
 }
 

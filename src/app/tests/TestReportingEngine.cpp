@@ -51,7 +51,7 @@ namespace reporting {
 class TestReportingEngine
 {
 public:
-    static void TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * apContext);
+    static void TestBuildAndSendSingleReportDataMessage(nlTestSuite * apSuite, void * apContext);
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
@@ -65,14 +65,14 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
-void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * apContext)
+void TestReportingEngine::TestBuildAndSendSingleReportDataMessage(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
     app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    ReadRequest::Builder readRequestBuilder;
+    ReadRequestMessage::Builder readRequestBuilder;
     AttributePathList::Builder attributePathListBuilder;
     AttributePath::Builder attributePathBuilder;
 
@@ -107,13 +107,13 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     attributePathListBuilder.EndOfAttributePathList();
 
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    readRequestBuilder.EndOfReadRequest();
+    readRequestBuilder.EndOfReadRequestMessage();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
     readHandler.OnReadInitialRequest(std::move(readRequestbuf));
-    err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler);
+    err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportDataMessage(&readHandler);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 }
 
@@ -125,7 +125,7 @@ namespace {
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("CheckBuildAndSendSingleReportData", chip::app::reporting::TestReportingEngine::TestBuildAndSendSingleReportData),
+    NL_TEST_DEF("CheckBuildAndSendSingleReportDataMessage", chip::app::reporting::TestReportingEngine::TestBuildAndSendSingleReportDataMessage),
     NL_TEST_SENTINEL()
 };
 // clang-format on

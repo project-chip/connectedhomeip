@@ -14,18 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines WriteResponse parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
-
-#include "AttributeStatusList.h"
 #include "Builder.h"
-
+#include "EventPaths.h"
 #include "Parser.h"
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -34,24 +28,22 @@
 
 namespace chip {
 namespace app {
-namespace WriteResponse {
+namespace SubscribeResponseMessage {
 enum
 {
-    kCsTag_AttributeStatusList = 0,
+    kCsTag_SubscriptionId            = 0,
+    kCsTag_MinIntervalFloorSeconds   = 1,
+    kCsTag_MaxIntervalCeilingSeconds = 2,
 };
 
 class Parser : public chip::app::Parser
 {
 public:
     /**
-     *  @brief Initialize the parser object with TLVReader
-     *
      *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this response
-     *
-     *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -60,58 +52,62 @@ public:
      *   4) At the top level of the structure, unknown tags are ignored for forward compatibility
      *  @note The main use of this function is to print out what we're
      *    receiving during protocol development and debugging.
-     *
-     *  @return #CHIP_NO_ERROR on success
+     *    The encoding rule has changed in IM encoding spec so this
+     *    check is only "roughly" conformant now.
      */
     CHIP_ERROR CheckSchemaValidity() const;
+#endif
 
     /**
-     *  @brief Get a TLVReader for the AttributeStatusList. Next() must be called before accessing them.
-     *
-     *  @param [in] apAttributeStatusList    A pointer to apAttributeStatusList
+     *  @brief Get Subscription ID. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributeStatusList(AttributeStatusList::Parser * const apAttributeStatusList) const;
+    CHIP_ERROR GetSubscriptionId(uint64_t * const apSubscriptionId) const;
+
+    /**
+     *  @brief Get Final MinIntervalFloorSeconds. Next() must be called before accessing them.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetMinIntervalFloorSeconds(uint16_t * const apMinIntervalFloorSeconds) const;
+
+    /**
+     *  @brief Get Final MaxIntervalCeilingSeconds. Next() must be called before accessing them.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const;
 };
 
 class Builder : public chip::app::Builder
 {
 public:
-    /**
-     *  @brief Initialize a WriteResponse::Builder for writing into a TLV stream
-     *
-     *  @param [in] apWriter    A pointer to TLVWriter
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     *  @brief Initialize a AttributeStatusList::Builder for writing into the TLV stream
-     *
-     *  @return A reference to AttributeStatusList::Builder
+     *  @brief final subscription Id for the subscription back to the client.s.
      */
-    AttributeStatusList::Builder & CreateAttributeStatusListBuilder();
+    SubscribeResponseMessage::Builder & SubscriptionId(const uint64_t SubscriptionId);
 
     /**
-     *  @brief Get reference to AttributeStatusList::Builder
-     *
-     *  @return A reference to AttributeStatusList::Builder
+     *  @brief Final Min Interval for the subscription back to the clients.
      */
-    AttributeStatusList::Builder & GetAttributeStatusListBuilder();
+    SubscribeResponseMessage::Builder & MinIntervalFloorSeconds(const uint16_t aMinIntervalFloorSeconds);
 
     /**
-     *  @brief Mark the end of this WriteResponse
-     *
-     *  @return A reference to *this
+     *  @brief Final Max Interval for the subscription back to the clients.
      */
-    WriteResponse::Builder & EndOfWriteResponse();
+    SubscribeResponseMessage::Builder & MaxIntervalCeilingSeconds(const uint16_t aMaxIntervalCeilingSeconds);
 
-private:
-    AttributeStatusList::Builder mAttributeStatusListBuilder;
+    /**
+     *  @brief Mark the end of this SubscribeResponseMessage
+     */
+    SubscribeResponseMessage::Builder & EndOfSubscribeResponseMessage();
 };
-}; // namespace WriteResponse
-}; // namespace app
-}; // namespace chip
+} // namespace SubscribeResponseMessage
+} // namespace app
+} // namespace chip

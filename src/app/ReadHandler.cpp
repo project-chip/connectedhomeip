@@ -25,9 +25,10 @@
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
-#include <app/MessageDef/StatusResponse.h>
-#include <app/MessageDef/SubscribeRequest.h>
-#include <app/MessageDef/SubscribeResponse.h>
+#include <app/MessageDef/StatusResponseMessage.h>
+#include <app/MessageDef/SubscribeRequestMessage.h>
+#include <app/MessageDef/SubscribeResponseMessage.h>
+
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
 
@@ -115,11 +116,11 @@ CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayl
     System::PacketBufferHandle response;
     if (IsSubscriptionType())
     {
-        err = ProcessSubscribeRequest(std::move(aPayload));
+        err = ProcessSubscribeRequestMessage(std::move(aPayload));
     }
     else
     {
-        err = ProcessReadRequest(std::move(aPayload));
+        err = ProcessReadRequestMessage(std::move(aPayload));
     }
 
     if (err != CHIP_NO_ERROR)
@@ -130,11 +131,12 @@ CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayl
     return err;
 }
 
-CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnStatusResponseMessage(Messaging::ExchangeContext * apExchangeContext,
+                                                System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status statusCode;
-    StatusResponse::Parser response;
+    StatusResponseMessage::Parser response;
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
     reader.Next();
@@ -160,7 +162,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
             InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
             if (IsInitialReport())
             {
-                err           = SendSubscribeResponse();
+                err           = SendSubscribeResponseMessage();
                 mpExchangeCtx = nullptr;
                 SuccessOrExit(err);
                 mActiveSubscription = true;
@@ -191,7 +193,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::SendReportDataMessage(System::PacketBufferHandle && aPayload)
 {
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
     if (IsInitialReport())
@@ -206,7 +208,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     MoveToState(HandlerState::AwaitingReportResponse);
-    CHIP_ERROR err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
+    CHIP_ERROR err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportDataMessage, std::move(aPayload),
                                                 Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     if (err == CHIP_NO_ERROR)
     {
@@ -224,9 +226,9 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponseMessage))
     {
-        err = OnStatusResponse(apExchangeContext, std::move(aPayload));
+        err = OnStatusResponseMessage(apExchangeContext, std::move(aPayload));
     }
     else
     {
@@ -250,13 +252,14 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
     Shutdown();
 }
 
-CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::ProcessReadRequestMessage(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
 
-    ReadRequest::Parser readRequestParser;
+    ReadRequestMessage::Parser readRequestParser;
     EventPaths::Parser eventPathListParser;
+
     AttributePathList::Parser attributePathListParser;
 
     reader.Init(std::move(aPayload));
@@ -489,7 +492,7 @@ void ReadHandler::MoveToNextScheduledDirtyPriority()
     mCurrentPriority = PriorityLevel::Invalid;
 }
 
-CHIP_ERROR ReadHandler::SendSubscribeResponse()
+CHIP_ERROR ReadHandler::SendSubscribeResponseMessage()
 {
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnLogError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -497,12 +500,12 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(packet));
 
-    SubscribeResponse::Builder response;
+    SubscribeResponseMessage::Builder response;
     ReturnLogErrorOnFailure(response.Init(&writer));
     response.SubscriptionId(mSubscriptionId)
         .MinIntervalFloorSeconds(mMinIntervalFloorSeconds)
         .MaxIntervalCeilingSeconds(mMaxIntervalCeilingSeconds)
-        .EndOfSubscribeResponse();
+        .EndOfSubscribeResponseMessage();
     ReturnLogErrorOnFailure(response.GetError());
 
     ReturnLogErrorOnFailure(writer.Finalize(&packet));
@@ -515,16 +518,16 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     {
         mpDelegate->SubscriptionEstablished(this);
     }
-    return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
+    return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponseMessage, std::move(packet));
 }
 
-CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::ProcessSubscribeRequestMessage(System::PacketBufferHandle && aPayload)
 {
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
 
     ReturnLogErrorOnFailure(reader.Next());
-    SubscribeRequest::Parser subscribeRequestParser;
+    SubscribeRequestMessage::Parser subscribeRequestParser;
     ReturnLogErrorOnFailure(subscribeRequestParser.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnLogErrorOnFailure(subscribeRequestParser.CheckSchemaValidity());

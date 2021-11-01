@@ -51,8 +51,8 @@ public:
 private:
     static void AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient);
     static void AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler);
-    static void GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
-    static void GenerateWriteResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
+    static void GenerateWriteRequestMessage(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
+    static void GenerateWriteResponseMessage(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
@@ -120,13 +120,14 @@ void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apCo
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload)
+void TestWriteInteraction::GenerateWriteRequestMessage(nlTestSuite * apSuite, void * apContext,
+                                                       System::PacketBufferHandle & aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
-    WriteRequest::Builder writeRequestBuilder;
+    WriteRequestMessage::Builder writeRequestBuilder;
     err = writeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AttributeDataList::Builder attributeDataListBuilder = writeRequestBuilder.CreateAttributeDataListBuilder();
@@ -161,20 +162,21 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
 
     attributeDataListBuilder.EndOfAttributeDataList();
     NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
-    writeRequestBuilder.EndOfWriteRequest();
+    writeRequestBuilder.EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload)
+void TestWriteInteraction::GenerateWriteResponseMessage(nlTestSuite * apSuite, void * apContext,
+                                                        System::PacketBufferHandle & aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
-    WriteResponse::Builder writeResponseBuilder;
+    WriteResponseMessage::Builder writeResponseBuilder;
     err = writeResponseBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AttributeStatusList::Builder attributeStatusListBuilder = writeResponseBuilder.CreateAttributeStatusListBuilder();
@@ -201,7 +203,7 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
 
     attributeStatusListBuilder.EndOfAttributeStatusList();
     NL_TEST_ASSERT(apSuite, attributeStatusListBuilder.GetError() == CHIP_NO_ERROR);
-    writeResponseBuilder.EndOfWriteResponse();
+    writeResponseBuilder.EndOfWriteResponseMessage();
     NL_TEST_ASSERT(apSuite, writeResponseBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
@@ -224,14 +226,14 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AddAttributeDataElement(apSuite, apContext, writeClientHandle);
 
-    err = writeClientHandle.SendWriteRequest(ctx.GetSessionBobToAlice());
+    err = writeClientHandle.SendWriteRequestMessage(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    // The internal WriteClient should be nullptr once we SendWriteRequest.
+    // The internal WriteClient should be nullptr once we SendWriteRequestMessage.
     NL_TEST_ASSERT(apSuite, nullptr == writeClientHandle.mpWriteClient);
 
-    GenerateWriteResponse(apSuite, apContext, buf);
+    GenerateWriteResponseMessage(apSuite, apContext, buf);
 
-    err = writeClient.ProcessWriteResponseMessage(std::move(buf));
+    err = writeClient.ProcessWriteResponseMessageMessage(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     writeClient.Shutdown();
@@ -252,11 +254,11 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     err                            = writeHandler.Init(&IMdelegate);
 
-    GenerateWriteRequest(apSuite, apContext, buf);
+    GenerateWriteRequestMessage(apSuite, apContext, buf);
 
     TestExchangeDelegate delegate;
     Messaging::ExchangeContext * exchange = ctx.NewExchangeToBob(&delegate);
-    err                                   = writeHandler.OnWriteRequest(exchange, std::move(buf));
+    err                                   = writeHandler.OnWriteRequestMessage(exchange, std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -316,7 +318,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0);
 
-    err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    err = writeClient.SendWriteRequestMessage(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1);
@@ -367,7 +369,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
 
-    err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    err = writeClient.SendWriteRequestMessage(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1);

@@ -55,9 +55,9 @@ constexpr chip::FabricIndex gFabricIndex          = 0;
 constexpr size_t kMaxSubMessageCount              = 1;
 constexpr uint64_t gSubMaxReport                  = 5;
 
-constexpr chip::System::Clock::Timeout gSubscribeRequestTimeout = chip::System::Clock::Seconds16(1);
-constexpr chip::System::Clock::Timeout gMessageInterval         = chip::System::Clock::Milliseconds32(1200);
-constexpr chip::System::Clock::Timeout gMessageTimeout          = chip::System::Clock::Milliseconds32(1000);
+constexpr chip::System::Clock::Timeout gSubscribeRequestMessageTimeout = chip::System::Clock::Seconds16(1);
+constexpr chip::System::Clock::Timeout gMessageInterval                = chip::System::Clock::Milliseconds32(1200);
+constexpr chip::System::Clock::Timeout gMessageTimeout                 = chip::System::Clock::Milliseconds32(1000);
 
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::Inet::IPAddress gDestAddr;
@@ -71,22 +71,22 @@ uint64_t gCommandCount = 0;
 // Count of the number of CommandResponses received.
 uint64_t gCommandRespCount = 0;
 
-// Count of the number of ReadRequests sent.
+// Count of the number of ReadRequestMessages sent.
 uint64_t gReadCount = 0;
 
 // Count of the number of ReadResponses received.
 uint64_t gReadRespCount = 0;
 
-// Count of the number of WriteRequests sent.
+// Count of the number of WriteRequestMessages sent.
 uint64_t gWriteCount = 0;
 
-// Count of the number of WriteResponses received.
+// Count of the number of WriteResponseMessages received.
 uint64_t gWriteRespCount = 0;
 
-// Count of the number of SubscribeRequests sent.
+// Count of the number of SubscribeRequestMessages sent.
 uint64_t gSubCount = 0;
 
-// Count of the number of SubscribeResponses received.
+// Count of the number of SubscribeResponseMessages received.
 uint64_t gSubRespCount = 0;
 
 // Count of the number of reports for subscription.
@@ -205,9 +205,9 @@ MockInteractionModelApp gMockDelegate;
 
 void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appState);
 void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appState);
-void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState);
-void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState);
-void SubscribeRequestTimerHandler(chip::System::Layer * systemLayer, void * appState);
+void ReadRequestMessageTimerHandler(chip::System::Layer * systemLayer, void * appState);
+void WriteRequestMessageTimerHandler(chip::System::Layer * systemLayer, void * appState);
+void SubscribeRequestMessageTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
 CHIP_ERROR SendCommandRequest(std::unique_ptr<chip::app::CommandSender> && commandSender)
 {
@@ -292,7 +292,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SendReadRequest()
+CHIP_ERROR SendReadRequestMessage()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::EventPathParams eventPathParams[2];
@@ -316,7 +316,7 @@ CHIP_ERROR SendReadRequest()
     readPrepareParams.mAttributePathParamsListSize = 1;
     readPrepareParams.mpEventPathParamsList        = eventPathParams;
     readPrepareParams.mEventPathParamsListSize     = 2;
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &gMockDelegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequestMessage(readPrepareParams, &gMockDelegate);
     SuccessOrExit(err);
 
 exit:
@@ -331,7 +331,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
+CHIP_ERROR SendWriteRequestMessage(chip::app::WriteClientHandle & apWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVWriter * writer;
@@ -353,8 +353,8 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
 
     SuccessOrExit(err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true));
     SuccessOrExit(err = apWriteClient->FinishAttribute());
-    SuccessOrExit(
-        err = apWriteClient.SendWriteRequest(gSessionManager.FindSecureSessionForNode(chip::kTestDeviceNodeId), gMessageTimeout));
+    SuccessOrExit(err = apWriteClient.SendWriteRequestMessage(gSessionManager.FindSecureSessionForNode(chip::kTestDeviceNodeId),
+                                                              gMessageTimeout));
 
     gWriteCount++;
 
@@ -366,7 +366,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SendSubscribeRequest()
+CHIP_ERROR SendSubscribeRequestMessage()
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
@@ -401,7 +401,7 @@ CHIP_ERROR SendSubscribeRequest()
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(readPrepareParams, &gMockDelegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequestMessage(readPrepareParams, &gMockDelegate);
     SuccessOrExit(err);
 
     gSubCount++;
@@ -487,7 +487,7 @@ void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * app
     err = SendBadCommandRequest(std::move(commandSender));
     VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send bad command request with error: %s\n", chip::ErrorStr(err)));
 
-    err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, ReadRequestTimerHandler, NULL);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, ReadRequestMessageTimerHandler, NULL);
     VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
 
 exit:
@@ -497,7 +497,7 @@ exit:
     }
 }
 
-void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
+void ReadRequestMessageTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -511,15 +511,15 @@ void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
 
     if (gReadRespCount < kMaxReadMessageCount)
     {
-        err = SendReadRequest();
+        err = SendReadRequestMessage();
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send read request with error: %s\n", chip::ErrorStr(err)));
 
-        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, ReadRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, ReadRequestMessageTimerHandler, NULL);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
     else
     {
-        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, WriteRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, WriteRequestMessageTimerHandler, NULL);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
 
@@ -530,7 +530,7 @@ exit:
     }
 }
 
-void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
+void WriteRequestMessageTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -548,15 +548,16 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
         err = chip::app::InteractionModelEngine::GetInstance()->NewWriteClient(writeClient, &gMockDelegate);
         SuccessOrExit(err);
 
-        err = SendWriteRequest(writeClient);
+        err = SendWriteRequestMessage(writeClient);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send write request with error: %s\n", chip::ErrorStr(err)));
 
-        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, WriteRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer().StartTimer(gMessageInterval, WriteRequestMessageTimerHandler, NULL);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
     else
     {
-        err = chip::DeviceLayer::SystemLayer().StartTimer(gSubscribeRequestTimeout, SubscribeRequestTimerHandler, NULL);
+        err =
+            chip::DeviceLayer::SystemLayer().StartTimer(gSubscribeRequestMessageTimeout, SubscribeRequestMessageTimerHandler, NULL);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
 
@@ -567,7 +568,7 @@ exit:
     }
 }
 
-void SubscribeRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
+void SubscribeRequestMessageTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -581,10 +582,11 @@ void SubscribeRequestTimerHandler(chip::System::Layer * systemLayer, void * appS
 
     if (gSubRespCount < kMaxSubMessageCount)
     {
-        err = SendSubscribeRequest();
+        err = SendSubscribeRequestMessage();
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send write request with error: %s\n", chip::ErrorStr(err)));
 
-        err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(20), SubscribeRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(20), SubscribeRequestMessageTimerHandler,
+                                                          NULL);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
     else

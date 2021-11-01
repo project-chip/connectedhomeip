@@ -323,7 +323,7 @@ bool IMDefaultResponseCallback(const app::Command * commandObj, EmberAfStatus st
 
 bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, chip::Protocols::InteractionModel::Status status)
 {
-    ChipLogProgress(Zcl, "WriteResponse:");
+    ChipLogProgress(Zcl, "WriteResponseMessage:");
     LogIMStatus(status);
 
     Callback::Cancelable * onSuccessCallback = nullptr;
@@ -434,7 +434,7 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
 bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient, EmberAfStatus status)
 {
     auto subscriptionId = apSubscribeClient->GetSubscriptionId();
-    ChipLogProgress(Zcl, "SubscribeResponse:");
+    ChipLogProgress(Zcl, "SubscribeResponseMessage:");
     if (subscriptionId.HasValue())
     {
         ChipLogProgress(Zcl, "  SubscriptionId:        0x%" PRIx64, subscriptionId.Value());
