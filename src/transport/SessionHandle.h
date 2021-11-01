@@ -43,6 +43,11 @@ public:
         mPeerSessionId.SetValue(peerSessionId);
     }
 
+    SessionHandle(NodeId peerNodeId, GroupId groupId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric)
+    {
+        mGroupId.SetValue(groupId);
+    }
+
     bool IsSecure() const { return !mUnauthenticatedSessionHandle.HasValue(); }
 
     bool HasFabricIndex() const { return (mFabric != kUndefinedFabricIndex); }
@@ -70,6 +75,7 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     const Optional<uint16_t> & GetPeerSessionId() const { return mPeerSessionId; }
     const Optional<uint16_t> & GetLocalSessionId() const { return mLocalSessionId; }
+    const Optional<GroupId> & GetGroupId() const { return mGroupId; }
 
     // Return the peer address for this session.  May return null if the peer
     // address is not known.  This can happen for secure sessions that have been
@@ -85,6 +91,7 @@ private:
     NodeId mPeerNodeId;
     Optional<uint16_t> mLocalSessionId;
     Optional<uint16_t> mPeerSessionId;
+    Optional<GroupId> mGroupId;
     // TODO: Re-evaluate the storing of Fabric ID in SessionHandle
     //       The Fabric ID will not be available for PASE and group sessions. So need
     //       to identify an approach that'll allow looking up the corresponding information for
