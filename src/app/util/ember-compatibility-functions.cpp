@@ -427,7 +427,7 @@ CHIP_ERROR prepareWriteData(EmberAfAttributeType expectedType, TLV::TLVReader & 
     case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
         return numericTlvDataToAttributeBuffer<uint16_t>(aReader, dataLen);
     case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-        return numericTlvDataToAttributeBuffer<TLV::int24_t>(aReader, dataLen);
+        return numericTlvDataToAttributeBuffer<TLV::uint24_t>(aReader, dataLen);
     case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
         return numericTlvDataToAttributeBuffer<uint32_t>(aReader, dataLen);
     case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
