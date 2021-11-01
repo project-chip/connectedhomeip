@@ -23,6 +23,7 @@ import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
 
   public NsdManagerServiceBrowser(Context context) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
+    this.mainThreadHandler = new Handler(Looper.getMainLooper());
 
     this.multicastLock =
         ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))

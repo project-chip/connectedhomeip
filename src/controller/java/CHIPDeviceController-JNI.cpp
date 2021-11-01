@@ -378,7 +378,7 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
         return nullptr;
     }
 
-    jclass discoveredDeviceCls = env->FindClass("chip/devicecontroller/ChipDeviceController$DiscoveredDevice");
+    jclass discoveredDeviceCls = env->FindClass("chip/devicecontroller/DiscoveredDevice");
     jmethodID constructor      = env->GetMethodID(discoveredDeviceCls, "<init>", "()V");
 
     jfieldID discrminatorID = env->GetFieldID(discoveredDeviceCls, "discriminator", "J");

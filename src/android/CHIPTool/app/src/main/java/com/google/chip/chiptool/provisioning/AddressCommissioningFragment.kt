@@ -22,7 +22,9 @@ import kotlinx.android.synthetic.main.address_commissioning_fragment.pincodeEdit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 class AddressCommissioningFragment : Fragment() {
   private val ipAddressList = ArrayList<String>()
@@ -63,6 +65,7 @@ class AddressCommissioningFragment : Fragment() {
       val deviceController = ChipClient.getDeviceController(requireContext())
       deviceController.discoverCommissionableNodes()
       scope.launch {
+        delay(7000)
         updateSpinner()
         discoverBtn.isEnabled = true
       }
