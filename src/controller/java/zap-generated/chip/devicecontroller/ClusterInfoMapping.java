@@ -5513,31 +5513,6 @@ public class ClusterInfoMapping {
             networkCommissioningenableNetworkCommandParams);
     networkCommissioningClusterCommandInfoMap.put(
         "enableNetwork", networkCommissioningenableNetworkCommandInfo);
-    Map<String, CommandParameterInfo>
-        networkCommissioninggetLastNetworkCommissioningResultCommandParams =
-            new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo networkCommissioninggetLastNetworkCommissioningResultCommandParameterInfo =
-        new CommandParameterInfo("NetworkCommissioning", ChipClusters.DefaultClusterCallback.class);
-    CommandParameterInfo
-        networkCommissioninggetLastNetworkCommissioningResulttimeoutMsCommandParameterInfo =
-            new CommandParameterInfo("timeoutMs", long.class);
-    networkCommissioninggetLastNetworkCommissioningResultCommandParams.put(
-        "timeoutMs",
-        networkCommissioninggetLastNetworkCommissioningResulttimeoutMsCommandParameterInfo);
-
-    // Populate commands
-    CommandInfo networkCommissioninggetLastNetworkCommissioningResultCommandInfo =
-        new CommandInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.NetworkCommissioningCluster) cluster)
-                  .getLastNetworkCommissioningResult(
-                      (DefaultClusterCallback) callback, (Long) commandArguments.get("timeoutMs"));
-            },
-            () -> new DelegatedDefaultClusterCallback(),
-            networkCommissioninggetLastNetworkCommissioningResultCommandParams);
-    networkCommissioningClusterCommandInfoMap.put(
-        "getLastNetworkCommissioningResult",
-        networkCommissioninggetLastNetworkCommissioningResultCommandInfo);
     Map<String, CommandParameterInfo> networkCommissioningremoveNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo networkCommissioningremoveNetworkCommandParameterInfo =

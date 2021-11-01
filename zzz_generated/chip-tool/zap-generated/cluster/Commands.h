@@ -14589,7 +14589,6 @@ private:
 | * AddWiFiNetwork                                                    |   0x02 |
 | * DisableNetwork                                                    |   0x0E |
 | * EnableNetwork                                                     |   0x0C |
-| * GetLastNetworkCommissioningResult                                 |   0x10 |
 | * RemoveNetwork                                                     |   0x0A |
 | * ScanNetworks                                                      |   0x00 |
 | * UpdateThreadNetwork                                               |   0x08 |
@@ -14707,31 +14706,6 @@ public:
 
 private:
     chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type mRequest;
-};
-
-/*
- * Command GetLastNetworkCommissioningResult
- */
-class NetworkCommissioningGetLastNetworkCommissioningResult : public ModelCommand
-{
-public:
-    NetworkCommissioningGetLastNetworkCommissioningResult() : ModelCommand("get-last-network-commissioning-result")
-    {
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000010) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::NetworkCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
-    }
-
-private:
-    chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type mRequest;
 };
 
 /*
@@ -28029,17 +28003,16 @@ void registerClusterNetworkCommissioning(Commands & commands)
     const char * clusterName = "NetworkCommissioning";
 
     commands_list clusterCommands = {
-        make_unique<NetworkCommissioningAddThreadNetwork>(),                  //
-        make_unique<NetworkCommissioningAddWiFiNetwork>(),                    //
-        make_unique<NetworkCommissioningDisableNetwork>(),                    //
-        make_unique<NetworkCommissioningEnableNetwork>(),                     //
-        make_unique<NetworkCommissioningGetLastNetworkCommissioningResult>(), //
-        make_unique<NetworkCommissioningRemoveNetwork>(),                     //
-        make_unique<NetworkCommissioningScanNetworks>(),                      //
-        make_unique<NetworkCommissioningUpdateThreadNetwork>(),               //
-        make_unique<NetworkCommissioningUpdateWiFiNetwork>(),                 //
-        make_unique<ReadNetworkCommissioningFeatureMap>(),                    //
-        make_unique<ReadNetworkCommissioningClusterRevision>(),               //
+        make_unique<NetworkCommissioningAddThreadNetwork>(),    //
+        make_unique<NetworkCommissioningAddWiFiNetwork>(),      //
+        make_unique<NetworkCommissioningDisableNetwork>(),      //
+        make_unique<NetworkCommissioningEnableNetwork>(),       //
+        make_unique<NetworkCommissioningRemoveNetwork>(),       //
+        make_unique<NetworkCommissioningScanNetworks>(),        //
+        make_unique<NetworkCommissioningUpdateThreadNetwork>(), //
+        make_unique<NetworkCommissioningUpdateWiFiNetwork>(),   //
+        make_unique<ReadNetworkCommissioningFeatureMap>(),      //
+        make_unique<ReadNetworkCommissioningClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);

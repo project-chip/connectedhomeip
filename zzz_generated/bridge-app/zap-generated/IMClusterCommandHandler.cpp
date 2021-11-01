@@ -357,16 +357,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
-        case Commands::GetLastNetworkCommissioningResult::Id: {
-            Commands::GetLastNetworkCommissioningResult::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(apCommandObj, aCommandPath,
-                                                                                                         commandData);
-            }
-            break;
-        }
         case Commands::RemoveNetwork::Id: {
             Commands::RemoveNetwork::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);

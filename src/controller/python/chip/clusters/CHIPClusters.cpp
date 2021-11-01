@@ -5678,14 +5678,6 @@ chip::ChipError::StorageType chip_ime_AppendCommand_NetworkCommissioning_EnableN
     cluster.Associate(device, ZCLendpointId);
     return cluster.EnableNetwork(nullptr, nullptr, chip::ByteSpan(networkID, networkID_Len), breadcrumb, timeoutMs).AsInteger();
 }
-chip::ChipError::StorageType chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint32_t timeoutMs)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::NetworkCommissioningCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.GetLastNetworkCommissioningResult(nullptr, nullptr, timeoutMs).AsInteger();
-}
 chip::ChipError::StorageType chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork(chip::Controller::Device * device,
                                                                                        chip::EndpointId ZCLendpointId,
                                                                                        chip::GroupId, const uint8_t * networkID,

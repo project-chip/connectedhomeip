@@ -7445,34 +7445,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace DisableNetworkResponse
-namespace GetLastNetworkCommissioningResult {
-enum class Fields
-{
-    kTimeoutMs = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetLastNetworkCommissioningResult::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint32_t timeoutMs;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetLastNetworkCommissioningResult::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint32_t timeoutMs;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetLastNetworkCommissioningResult
 } // namespace Commands
 
 namespace Attributes {
