@@ -216,6 +216,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     mStartTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
 
+    ScheduleWork(HandleDeviceRebooted, 0);
+
 exit:
     return err;
 }
@@ -341,6 +343,16 @@ CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
     }
 
     return err;
+}
+
+void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
+{
+    PlatformManagerDelegate * delegate = PlatformMgr().GetDelegate();
+
+    if (delegate != nullptr)
+    {
+        delegate->OnDeviceRebooted();
+    }
 }
 
 #if CHIP_WITH_GIO

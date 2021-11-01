@@ -60,7 +60,24 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 
+class ConnectivityManager;
 class ConnectivityManagerImpl;
+
+/**
+ * Defines the delegate class of Connectivity Manager to notify connectivity updates.
+ */
+class ConnectivityManagerDelegate
+{
+public:
+    virtual ~ConnectivityManagerDelegate() {}
+
+    /**
+     * @brief
+     *   Called when any network interface on the Node is changed
+     *
+     */
+    virtual void OnNetworkInfoChanged() {}
+};
 
 /**
  * Provides control of network connectivity for a chip device.
@@ -139,6 +156,9 @@ public:
     };
 
     struct ThreadPollingConfig;
+
+    void SetDelegate(ConnectivityManagerDelegate * delegate) { mDelegate = delegate; }
+    ConnectivityManagerDelegate * GetDelegate() const { return mDelegate; }
 
     // WiFi station methods
     WiFiStationMode GetWiFiStationMode();
@@ -241,6 +261,8 @@ public:
     static const char * CHIPoBLEServiceModeToStr(CHIPoBLEServiceMode mode);
 
 private:
+    ConnectivityManagerDelegate * mDelegate = nullptr;
+
     // ===== Members for internal use by the following friends.
 
     friend class PlatformManagerImpl;
