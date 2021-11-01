@@ -55,8 +55,6 @@ namespace TLV {
 struct uint24_t
 {
     uint24_t() { memset(value, 0, 3); };
-    uint24_t(uint24_t & v) { memcpy(value, v.value, 3); };
-    uint24_t(const uint24_t & v) { memcpy(value, v.value, 3); };
     uint24_t(const uint64_t & v) { memcpy(value, &v, 3); };
     operator uint32_t() const { return (uint32_t) value[2] << 16 | (uint32_t) value[1] << 8 | (uint32_t) value[0]; };
 
@@ -66,8 +64,6 @@ struct uint24_t
 struct int24_t
 {
     int24_t() { memset(value, 0, 3); };
-    int24_t(int24_t & v) { memcpy(value, v.value, 3); };
-    int24_t(const int24_t & v) { memcpy(value, v.value, 3); };
     int24_t(const int64_t & v) { memcpy(value, &v, 3); };
     operator int32_t() const
     {
