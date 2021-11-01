@@ -204,7 +204,8 @@ private:
             return a1.GetIPAddress() == a2.GetIPAddress() && a1.GetPort() == a2.GetPort() &&
                 // Enforce interface equal-ness if the address is link-local, otherwise ignore interface
                 // Use MatchInterface for a temporary solution for #11120
-                (a1.GetIPAddress().IsIPv6LinkLocal() ? a1.GetInterface() == a2.GetInterface() : MatchInterface(a1.GetInterface(), a2.GetInterface()));
+                (a1.GetIPAddress().IsIPv6LinkLocal() ? a1.GetInterface() == a2.GetInterface()
+                                                     : MatchInterface(a1.GetInterface(), a2.GetInterface()));
         case Transport::Type::kBle:
             // TODO: complete BLE address comparation
             return true;
