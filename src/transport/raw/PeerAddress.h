@@ -136,13 +136,16 @@ public:
     {
         char ip_addr[kInetMaxAddrLen];
 
-        char interface[Inet::InterfaceId::kMaxIfNameLength + 2] = {'%', 0};
-        if (mInterface.IsPresent()) {
+        char interface[Inet::InterfaceId::kMaxIfNameLength + 2] = { '%', 0 };
+        if (mInterface.IsPresent())
+        {
             if (mInterface.GetInterfaceName(interface + 1, sizeof(interface) - 1) != CHIP_NO_ERROR)
             {
                 ::strncpy(interface, "%(err)", sizeof(interface));
             }
-        } else {
+        }
+        else
+        {
             ::strncpy(interface, "%(nul)", sizeof(interface));
         }
 
