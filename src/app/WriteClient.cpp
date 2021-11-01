@@ -242,7 +242,7 @@ void WriteClient::ClearState()
     MoveToState(State::Uninitialized);
 }
 
-CHIP_ERROR WriteClient::SendWriteRequestMessage(SessionHandle session, System::Clock::Timeout timeout)
+CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle packet;
@@ -280,7 +280,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Assert that the exchange context matches the client's current context.
-    // This should never fail because even if SendWriteRequestMessage is called
+    // This should never fail because even if SendWriteRequest is called
     // back-to-back, the second call will call Close() on the first exchange,
     // which clears the OnMessageReceived callback.
 
@@ -371,9 +371,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClientHandle::SendWriteRequestMessage(SessionHandle session, System::Clock::Timeout timeout)
+CHIP_ERROR WriteClientHandle::SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout)
 {
-    CHIP_ERROR err = mpWriteClient->SendWriteRequestMessage(session, timeout);
+    CHIP_ERROR err = mpWriteClient->SendWriteRequest(session, timeout);
 
     if (err == CHIP_NO_ERROR)
     {

@@ -162,7 +162,7 @@ CHIP_ERROR ReadHandler::OnStatusResponseMessage(Messaging::ExchangeContext * apE
             InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
             if (IsInitialReport())
             {
-                err           = SendSubscribeResponseMessage();
+                err           = SendSubscribeResponse();
                 mpExchangeCtx = nullptr;
                 SuccessOrExit(err);
                 mActiveSubscription = true;
@@ -193,7 +193,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::SendReportDataMessage(System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
 {
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
     if (IsInitialReport())
@@ -492,7 +492,7 @@ void ReadHandler::MoveToNextScheduledDirtyPriority()
     mCurrentPriority = PriorityLevel::Invalid;
 }
 
-CHIP_ERROR ReadHandler::SendSubscribeResponseMessage()
+CHIP_ERROR ReadHandler::SendSubscribeResponse()
 {
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnLogError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);

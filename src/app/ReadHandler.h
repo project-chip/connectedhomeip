@@ -102,7 +102,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR SendReportDataMessage(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload);
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
     bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport; }
@@ -149,7 +149,7 @@ private:
 
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
     CHIP_ERROR RefreshSubscribeSyncTimer();
-    CHIP_ERROR SendSubscribeResponseMessage();
+    CHIP_ERROR SendSubscribeResponse();
     CHIP_ERROR ProcessSubscribeRequestMessage(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequestMessage(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser);

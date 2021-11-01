@@ -93,8 +93,8 @@ const char * ReadClient::GetStateStr() const
         return "INIT";
     case ClientState::AwaitingInitialReport:
         return "AwaitingInitialReport";
-    case ClientState::AwaitingSubscribeResponseMessage:
-        return "AwaitingSubscribeResponseMessage";
+    case ClientState::AwaitingSubscribeResponse:
+        return "AwaitingSubscribeResponse";
     case ClientState::SubscriptionActive:
         return "SubscriptionActive";
     }
@@ -109,7 +109,7 @@ void ReadClient::MoveToState(const ClientState aTargetState)
                   GetStateStr());
 }
 
-CHIP_ERROR ReadClient::SendReadRequestMessage(ReadPrepareParams & aReadPrepareParams)
+CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 {
     // TODO: SendRequest parameter is too long, need to have the structure to represent it
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -213,7 +213,7 @@ CHIP_ERROR ReadClient::SendStatusResponseMessage(CHIP_ERROR aError)
     {
         if (IsAwaitingInitialReport())
         {
-            MoveToState(ClientState::AwaitingSubscribeResponseMessage);
+            MoveToState(ClientState::AwaitingSubscribeResponse);
         }
         else
         {
@@ -222,7 +222,7 @@ CHIP_ERROR ReadClient::SendStatusResponseMessage(CHIP_ERROR aError)
     }
     ReturnLogErrorOnFailure(mpExchangeCtx->SendMessage(
         Protocols::InteractionModel::MsgType::StatusResponseMessage, std::move(msgBuf),
-        Messaging::SendFlags(IsAwaitingSubscribeResponseMessage() ? Messaging::SendMessageFlags::kExpectResponse
+        Messaging::SendFlags(IsAwaitingSubscribeResponse() ? Messaging::SendMessageFlags::kExpectResponse
                                                                   : Messaging::SendMessageFlags::kNone)));
     return CHIP_NO_ERROR;
 }
@@ -594,7 +594,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponseMessage(System::PacketBufferHandl
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadClient::SendSubscribeRequestMessage(ReadPrepareParams & aReadPrepareParams)
+CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle msgBuf;

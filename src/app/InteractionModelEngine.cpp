@@ -423,12 +423,12 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
                     ChipLogValueExchange(ec));
 }
 
-CHIP_ERROR InteractionModelEngine::SendReadRequestMessage(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
+CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
 {
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aCallback));
-    err = client->SendReadRequestMessage(aReadPrepareParams);
+    err = client->SendReadRequest(aReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
         client->Shutdown();
@@ -436,12 +436,12 @@ CHIP_ERROR InteractionModelEngine::SendReadRequestMessage(ReadPrepareParams & aR
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::SendSubscribeRequestMessage(ReadPrepareParams & aReadPrepareParams,
+CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams,
                                                                ReadClient::Callback * aCallback)
 {
     ReadClient * client = nullptr;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aCallback));
-    ReturnErrorOnFailure(client->SendSubscribeRequestMessage(aReadPrepareParams));
+    ReturnErrorOnFailure(client->SendSubscribeRequest(aReadPrepareParams));
     return CHIP_NO_ERROR;
 }
 

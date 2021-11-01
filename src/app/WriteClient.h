@@ -47,7 +47,7 @@ class InteractionModelEngine;
  *  @brief The read client represents the initiator side of a Write Interaction, and is responsible
  *  for generating one Write Request for a particular set of attributes, and handling the Write response.
  *  Consumer can allocate one write client, then call PrepareAttribute, insert attribute value, followed by FinishAttribute for
- * every attribute it wants to insert in write request, then call SendWriteRequestMessage
+ * every attribute it wants to insert in write request, then call SendWriteRequest
  *
  */
 class WriteClient : public Messaging::ExchangeDelegate
@@ -73,7 +73,7 @@ public:
         virtual void OnResponse(const WriteClient * apWriteClient, const ConcreteAttributePath & aPath, StatusIB attributeStatus) {}
 
         /**
-         * OnError will be called when an error occurs *after* a successful call to SendWriteRequestMessage(). The following
+         * OnError will be called when an error occurs *after* a successful call to SendWriteRequest(). The following
          * errors will be delivered through this call in the aError field:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
@@ -95,7 +95,7 @@ public:
          * This function will:
          *      - Always be called exactly *once* for a given WriteClient instance.
          *      - Be called even in error circumstances.
-         *      - Only be called after a successful call to SendWriteRequestMessage as been made.
+         *      - Only be called after a successful call to SendWriteRequest as been made.
          *
          * @param[in] apWriteClient: The write client object of the terminated write transaction.
          */
@@ -126,7 +126,7 @@ private:
     {
         Uninitialized = 0, // The client has not been initialized
         Initialized,       // The client has been initialized
-        AddAttribute,      // The client has added attribute and ready for a SendWriteRequestMessage
+        AddAttribute,      // The client has added attribute and ready for a SendWriteRequest
         AwaitingResponse,  // The client has sent out the write request message
     };
 
@@ -136,15 +136,15 @@ private:
     CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & aPacket);
 
     /**
-     *  Once SendWriteRequestMessage returns successfully, the WriteClient will
+     *  Once SendWriteRequest returns successfully, the WriteClient will
      *  handle calling Shutdown on itself once it decides it's done with waiting
      *  for a response (i.e. times out or gets a response). Client can specify
      *  the maximum time to wait for response (in milliseconds) via timeout parameter.
      *  Default timeout value will be used otherwise.
-     *  If SendWriteRequestMessage is never called, or the call fails, the API
+     *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
-    CHIP_ERROR SendWriteRequestMessage(SessionHandle session, System::Clock::Timeout timeout);
+    CHIP_ERROR SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout);
 
     /**
      *  Initialize the client object. Within the lifetime
@@ -225,7 +225,7 @@ public:
      *  Finalize the message and send it to the desired node. The underlying write object will always be released, and the user
      * should not use this object after calling this function.
      */
-    CHIP_ERROR SendWriteRequestMessage(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
 
     /**
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put

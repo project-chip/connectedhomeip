@@ -445,7 +445,7 @@ CHIP_ERROR Engine::SendReport(ReadHandler * apReadHandler, System::PacketBufferH
 
     // We can only have 1 report in flight for any given read - increment and break out.
     mNumReportsInFlight++;
-    err = apReadHandler->SendReportDataMessage(std::move(aPayload));
+    err = apReadHandler->SendReportData(std::move(aPayload));
     return err;
 }
 
