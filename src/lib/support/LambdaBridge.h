@@ -41,9 +41,7 @@ public:
         memcpy(&mLambdaBody, &lambda, sizeof(Lambda));
     }
 
-    void operator()() const {
-        mLambdaProxy(mLambdaBody);
-    }
+    void operator()() const { mLambdaProxy(mLambdaBody); }
 
 private:
     void (*mLambdaProxy)(const std::aligned_storage<CHIP_CONFIG_LAMBDA_EVENT_SIZE, CHIP_CONFIG_LAMBDA_EVENT_ALIGN> & body);
