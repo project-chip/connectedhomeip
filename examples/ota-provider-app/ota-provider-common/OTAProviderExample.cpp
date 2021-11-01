@@ -95,9 +95,9 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
 
 EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
                                                    const chip::app::ConcreteCommandPath & commandPath, uint16_t vendorId,
-                                                   uint16_t productId, const Optional<uint16_t> & hardwareVersion,
-                                                   uint32_t softwareVersion, uint8_t protocolsSupported,
-                                                   const Optional<CharSpan> & location, const Optional<bool> & requestorCanConsent,
+                                                   uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
+                                                   const Optional<uint16_t> & hardwareVersion, const Optional<CharSpan> & location,
+                                                   const Optional<bool> & requestorCanConsent,
                                                    const Optional<ByteSpan> & metadataForProvider)
 {
     // TODO: add confiuration for returning BUSY status
@@ -158,8 +158,9 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     response.updateToken           = chip::ByteSpan(updateToken);
     response.userConsentNeeded     = userConsentNeeded;
     // TODO: Once our client is using APIs that handle optional arguments
-    // correctly, update QueryImageResponse to have the right things optional
-    // and just stop sending metadataForRequestor algether.
+    // correctly, update QueryImageResponse to have the right things optional.
+    // At that point we can decide whether to send metadataForRequestor as an
+    // empty ByteSpan or whether to not send it at all.
     response.metadataForRequestor = chip::ByteSpan();
 
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);

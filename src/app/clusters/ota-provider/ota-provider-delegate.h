@@ -37,8 +37,8 @@ class OTAProviderDelegate
 public:
     // TODO(#8605): protocolsSupported should be list of OTADownloadProtocol enums, not uint8_t
     virtual EmberAfStatus HandleQueryImage(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, uint16_t vendorId,
-                                           uint16_t productId, const Optional<uint16_t> & hardwareVersion, uint32_t softwareVersion,
-                                           uint8_t protocolsSupported, const Optional<CharSpan> & location,
+                                           uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
+                                           const Optional<uint16_t> & hardwareVersion, const Optional<CharSpan> & location,
                                            const Optional<bool> & requestorCanConsent,
                                            const Optional<ByteSpan> & metadataForProvider) = 0;
 

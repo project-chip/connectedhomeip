@@ -208,8 +208,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
         return true;
     }
 
-    status = delegate->HandleQueryImage(commandObj, commandPath, vendorId, productId, hardwareVersion, softwareVersion,
-                                        protocolsSupported, location, requestorCanConsent, metadataForProvider);
+    status = delegate->HandleQueryImage(commandObj, commandPath, vendorId, productId, softwareVersion, protocolsSupported,
+                                        hardwareVersion, location, requestorCanConsent, metadataForProvider);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);

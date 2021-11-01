@@ -33,8 +33,8 @@ public:
 
     // Inherited from OTAProviderDelegate
     EmberAfStatus HandleQueryImage(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                   uint16_t vendorId, uint16_t productId, const chip::Optional<uint16_t> & hardwareVersion,
-                                   uint32_t softwareVersion, uint8_t protocolsSupported,
+                                   uint16_t vendorId, uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
+                                   const chip::Optional<uint16_t> & hardwareVersion,
                                    const chip::Optional<chip::CharSpan> & location,
                                    const chip::Optional<bool> & requestorCanConsent,
                                    const chip::Optional<chip::ByteSpan> & metadataForServer) override;
