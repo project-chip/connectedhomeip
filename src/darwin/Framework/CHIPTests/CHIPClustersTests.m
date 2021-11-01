@@ -12693,6 +12693,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1U);
+            NSString * groupNameArgument = @"Group #1";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -12767,6 +12769,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4369U);
+            NSString * groupNameArgument = @"Group #2";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -12782,7 +12786,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t groupIdArgument = 65535U;
+    uint16_t groupIdArgument = 32767U;
     [cluster viewGroup:groupIdArgument
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"View Group 3 (not found) Error: %@", err);
@@ -12790,7 +12794,7 @@ CHIPDevice * GetConnectedDevice()
             XCTAssertEqual(err.code, 0);
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 139);
-            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535U);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 32767U);
 
             [expectation fulfill];
         }];
@@ -12806,7 +12810,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t groupIdArgument = 65535U;
+    uint16_t groupIdArgument = 32767U;
     NSString * groupNameArgument = @"Group #3";
     [cluster addGroup:groupIdArgument
               groupName:groupNameArgument
@@ -12816,7 +12820,7 @@ CHIPDevice * GetConnectedDevice()
             XCTAssertEqual(err.code, 0);
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
-            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535U);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 32767U);
 
             [expectation fulfill];
         }];
@@ -12841,6 +12845,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1U);
+            NSString * groupNameArgument = @"Group #1";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -12865,6 +12871,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4369U);
+            NSString * groupNameArgument = @"Group #2";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -12880,7 +12888,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t groupIdArgument = 65535U;
+    uint16_t groupIdArgument = 32767U;
     [cluster viewGroup:groupIdArgument
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"View Group 3 (new) Error: %@", err);
@@ -12888,7 +12896,9 @@ CHIPDevice * GetConnectedDevice()
             XCTAssertEqual(err.code, 0);
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
-            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535U);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 32767U);
+            NSString * groupNameArgument = @"Group #3";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -12985,6 +12995,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1U);
+            NSString * groupNameArgument = @"Group #1";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -12993,7 +13005,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTestGroupsCluster_000016_ViewGroup
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 1 (removed)"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 2 (removed)"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -13003,7 +13015,7 @@ CHIPDevice * GetConnectedDevice()
     uint16_t groupIdArgument = 4369U;
     [cluster viewGroup:groupIdArgument
         responseHandler:^(NSError * err, NSDictionary * values) {
-            NSLog(@"View Group 1 (removed) Error: %@", err);
+            NSLog(@"View Group 2 (removed) Error: %@", err);
 
             XCTAssertEqual(err.code, 0);
 
@@ -13024,7 +13036,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t groupIdArgument = 65535U;
+    uint16_t groupIdArgument = 32767U;
     [cluster viewGroup:groupIdArgument
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"View Group 3 (not removed) Error: %@", err);
@@ -13032,7 +13044,9 @@ CHIPDevice * GetConnectedDevice()
             XCTAssertEqual(err.code, 0);
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
-            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535U);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 32767U);
+            NSString * groupNameArgument = @"Group #3";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -13115,7 +13129,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t groupIdArgument = 65535U;
+    uint16_t groupIdArgument = 32767U;
     [cluster viewGroup:groupIdArgument
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"View Group 3 (removed) Error: %@", err);
@@ -13123,7 +13137,7 @@ CHIPDevice * GetConnectedDevice()
             XCTAssertEqual(err.code, 0);
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 139);
-            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535U);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 32767U);
 
             [expectation fulfill];
         }];

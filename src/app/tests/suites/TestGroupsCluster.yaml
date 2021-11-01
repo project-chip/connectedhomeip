@@ -70,6 +70,8 @@ tests:
           values:
               - name: "groupId"
                 value: 0x0001
+              - name: "groupName"
+                value: "Group #1"
               - name: "status"
                 value: 0
 
@@ -111,6 +113,8 @@ tests:
           values:
               - name: "groupId"
                 value: 0x1111
+              - name: "groupName"
+                value: "Group #2"
               - name: "status"
                 value: 0
 
@@ -119,11 +123,11 @@ tests:
       arguments:
           values:
               - name: "groupId"
-                value: 0xffff
+                value: 0x7fff
       response:
           values:
               - name: "groupId"
-                value: 0xffff
+                value: 0x7fff
               - name: "status"
                 value: 0x8B
 
@@ -132,13 +136,13 @@ tests:
       arguments:
           values:
               - name: "groupId"
-                value: 0xffff
+                value: 0x7fff
               - name: "groupName"
                 value: "Group #3"
       response:
           values:
               - name: "groupId"
-                value: 0xffff
+                value: 0x7fff
               - name: "status"
                 value: 0
 
@@ -152,6 +156,8 @@ tests:
           values:
               - name: "groupId"
                 value: 0x01
+              - name: "groupName"
+                value: "Group #1"
               - name: "status"
                 value: 0
 
@@ -165,6 +171,8 @@ tests:
           values:
               - name: "groupId"
                 value: 0x1111
+              - name: "groupName"
+                value: "Group #2"
               - name: "status"
                 value: 0
 
@@ -173,11 +181,13 @@ tests:
       arguments:
           values:
               - name: "groupId"
-                value: 0xffff
+                value: 0x7fff
       response:
           values:
               - name: "groupId"
-                value: 0xffff
+                value: 0x7fff
+              - name: "groupName"
+                value: "Group #3"
               - name: "status"
                 value: 0
 
@@ -230,10 +240,12 @@ tests:
           values:
               - name: "groupId"
                 value: 0x0001
+              - name: "groupName"
+                value: "Group #1"
               - name: "status"
                 value: 0
 
-    - label: "View Group 1 (removed)"
+    - label: "View Group 2 (removed)"
       command: "ViewGroup"
       arguments:
           values:
@@ -251,11 +263,13 @@ tests:
       arguments:
           values:
               - name: "groupId"
-                value: 0xffff
+                value: 0x7fff
       response:
           values:
               - name: "groupId"
-                value: 0xffff
+                value: 0x7fff
+              - name: "groupName"
+                value: "Group #3"
               - name: "status"
                 value: 0
 
@@ -295,10 +309,10 @@ tests:
       arguments:
           values:
               - name: "groupId"
-                value: 0xffff
+                value: 0x7fff
       response:
           values:
               - name: "groupId"
-                value: 0xffff
+                value: 0x7fff
               - name: "status"
                 value: 0x8B
