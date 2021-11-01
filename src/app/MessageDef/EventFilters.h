@@ -29,14 +29,14 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "ArrayBuilder.h"
+#include "ArrayParser.h"
 #include "EventFilterIB.h"
-#include "ListBuilder.h"
-#include "ListParser.h"
 
 namespace chip {
 namespace app {
 namespace EventFilters {
-class Parser : public ListParser
+class Parser : public ArrayParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -57,7 +57,7 @@ public:
 #endif
 };
 
-class Builder : public ListBuilder
+class Builder : public ArrayBuilder
 {
 public:
     /**

@@ -1,8 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Google LLC.
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -16,16 +14,28 @@
  *    limitations under the License.
  */
 
-#include "ListParser.h"
+#include "ArrayBuilder.h"
+
+#include <inttypes.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 namespace chip {
 namespace app {
-CHIP_ERROR ListParser::Init(const TLV::TLVReader & aReader)
+CHIP_ERROR ArrayBuilder::Init(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
 {
-    mReader.Init(aReader);
-    VerifyOrReturnError(TLV::kTLVType_List == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnLogErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    mpWriter = apWriter;
+    mError   = mpWriter->StartContainer(TLV::ContextTag(aContextTagToUse), chip::TLV::kTLVType_Array, mOuterContainerType);
+
+    return mError;
+}
+
+CHIP_ERROR ArrayBuilder::Init(TLV::TLVWriter * const apWriter)
+{
+    mpWriter = apWriter;
+    mError   = mpWriter->StartContainer(TLV::AnonymousTag, chip::TLV::kTLVType_Array, mOuterContainerType);
+
+    return mError;
 }
 } // namespace app
 } // namespace chip
