@@ -50,7 +50,7 @@ public:
     {
         mMaxEchoCount       = 3;
         mEchoInterval       = 1000;
-        mLastEchoTime       = System::Clock::Zero;
+        mLastEchoTime       = System::Clock::kZero;
         mEchoCount          = 0;
         mEchoRespCount      = 0;
         mPayloadSize        = 32;

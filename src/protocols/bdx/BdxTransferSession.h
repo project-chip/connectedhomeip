@@ -352,8 +352,8 @@ private:
     uint32_t mLastQueryNum = 0;
     uint32_t mNextQueryNum = 0;
 
-    System::Clock::Timeout mTimeout            = System::Clock::Zero;
-    System::Clock::Timestamp mTimeoutStartTime = System::Clock::Zero;
+    System::Clock::Timeout mTimeout            = System::Clock::kZero;
+    System::Clock::Timestamp mTimeoutStartTime = System::Clock::kZero;
     bool mShouldInitTimeoutStart               = true;
     bool mAwaitingResponse                     = false;
 };

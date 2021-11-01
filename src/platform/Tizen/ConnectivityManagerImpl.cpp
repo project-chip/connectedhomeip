@@ -55,7 +55,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init(void)
     mWiFiStationMode              = kWiFiStationMode_Disabled;
     mWiFiAPMode                   = kWiFiAPMode_Disabled;
     mWiFiAPState                  = kWiFiAPState_NotActive;
-    mLastAPDemandTime             = System::Clock::Zero;
+    mLastAPDemandTime             = System::Clock::kZero;
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
     mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
 

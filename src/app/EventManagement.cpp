@@ -87,7 +87,7 @@ struct EventEnvelopeContext
 
     uint16_t mFieldsToRead = 0;
     /* PriorityLevel and DeltaSystemTimestamp are there if that is not first event when putting events in report*/
-    Timestamp mDeltaSystemTime = Timestamp::System(System::Clock::Zero);
+    Timestamp mDeltaSystemTime = Timestamp::System(System::Clock::kZero);
     Timestamp mDeltaUtc        = Timestamp::UTC(0);
     PriorityLevel mPriority    = PriorityLevel::First;
     NodeId mNodeId             = 0;
@@ -854,8 +854,8 @@ void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, Circu
     mPriority                  = aPriorityLevel;
     mFirstEventNumber          = 1;
     mLastEventNumber           = 0;
-    mFirstEventSystemTimestamp = Timestamp::System(System::Clock::Zero);
-    mLastEventSystemTimestamp  = Timestamp::System(System::Clock::Zero);
+    mFirstEventSystemTimestamp = Timestamp::System(System::Clock::kZero);
+    mLastEventSystemTimestamp  = Timestamp::System(System::Clock::kZero);
     mpEventNumberCounter       = nullptr;
 }
 

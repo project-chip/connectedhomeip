@@ -62,7 +62,7 @@ chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPen
 chip::Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Echo was attempted to be sent.
-chip::System::Clock::Timestamp gLastEchoTime = chip::System::Clock::Zero;
+chip::System::Clock::Timestamp gLastEchoTime = chip::System::Clock::kZero;
 
 // Count of the number of EchoRequests sent.
 uint64_t gEchoCount = 0;
@@ -263,7 +263,7 @@ int main(int argc, char * argv[])
     // Arrange to get a callback whenever an Echo Response is received.
     gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
-    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Zero, EchoTimerHandler, NULL);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::kZero, EchoTimerHandler, NULL);
     SuccessOrExit(err);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
