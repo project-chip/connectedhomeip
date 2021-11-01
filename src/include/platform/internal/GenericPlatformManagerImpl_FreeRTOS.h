@@ -100,7 +100,6 @@ private:
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
     StaticSemaphore_t mChipStackLockMutex;
 #endif
-
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.

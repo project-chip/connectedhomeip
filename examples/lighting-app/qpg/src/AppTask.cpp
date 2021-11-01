@@ -54,15 +54,14 @@ using namespace chip::DeviceLayer;
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
-
 namespace {
- TaskHandle_t sAppTaskHandle;
- QueueHandle_t sAppEventQueue;
+TaskHandle_t sAppTaskHandle;
+QueueHandle_t sAppEventQueue;
 
- bool sIsThreadProvisioned     = false;
- bool sIsThreadEnabled         = false;
- bool sHaveBLEConnections      = false;
- bool sHaveServiceConnectivity = false;
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+bool sHaveBLEConnections      = false;
+bool sHaveServiceConnectivity = false;
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 
