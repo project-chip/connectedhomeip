@@ -23984,8 +23984,8 @@ public:
             err = TestViewGroup1NotRemoved_15();
             break;
         case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : View Group 1 (removed)\n");
-            err = TestViewGroup1Removed_16();
+            ChipLogProgress(chipTool, " ***** Test Step 16 : View Group 2 (removed)\n");
+            err = TestViewGroup2Removed_16();
             break;
         case 17:
             ChipLogProgress(chipTool, " ***** Test Step 17 : View Group 3 (not removed)\n");
@@ -24149,6 +24149,7 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #1"));
         NextTest();
     }
 
@@ -24245,6 +24246,7 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #2"));
         NextTest();
     }
 
@@ -24257,7 +24259,7 @@ private:
         using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
 
         chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
-        request.groupId = 65535U;
+        request.groupId = 32767U;
 
         auto success = [](void * context, const responseType & data) {
             (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_7(data.status, data.groupId, data.groupName);
@@ -24275,7 +24277,7 @@ private:
     {
         VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
 
-        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 65535U));
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
 
         NextTest();
     }
@@ -24289,7 +24291,7 @@ private:
         using responseType = chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType;
 
         chip::app::Clusters::Groups::Commands::AddGroup::Type request;
-        request.groupId   = 65535U;
+        request.groupId   = 32767U;
         request.groupName = chip::Span<const char>("Group #3", strlen("Group #3"));
 
         auto success = [](void * context, const responseType & data) {
@@ -24308,7 +24310,7 @@ private:
     {
         VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
 
-        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 65535U));
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
         NextTest();
     }
 
@@ -24341,6 +24343,7 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #1"));
         NextTest();
     }
 
@@ -24373,6 +24376,7 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #2"));
         NextTest();
     }
 
@@ -24385,7 +24389,7 @@ private:
         using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
 
         chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
-        request.groupId = 65535U;
+        request.groupId = 32767U;
 
         auto success = [](void * context, const responseType & data) {
             (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_11(data.status, data.groupId, data.groupName);
@@ -24403,8 +24407,9 @@ private:
     {
         VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
 
-        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 65535U));
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #3"));
         NextTest();
     }
 
@@ -24530,10 +24535,11 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #1"));
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup1Removed_16()
+    CHIP_ERROR TestViewGroup2Removed_16()
     {
         chip::Controller::GroupsClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -24574,7 +24580,7 @@ private:
         using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
 
         chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
-        request.groupId = 65535U;
+        request.groupId = 32767U;
 
         auto success = [](void * context, const responseType & data) {
             (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_17(data.status, data.groupId, data.groupName);
@@ -24592,8 +24598,9 @@ private:
     {
         VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
 
-        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 65535U));
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #3"));
         NextTest();
     }
 
@@ -24694,7 +24701,7 @@ private:
         using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
 
         chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
-        request.groupId = 65535U;
+        request.groupId = 32767U;
 
         auto success = [](void * context, const responseType & data) {
             (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_21(data.status, data.groupId, data.groupName);
@@ -24712,7 +24719,7 @@ private:
     {
         VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
 
-        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 65535U));
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
 
         NextTest();
     }

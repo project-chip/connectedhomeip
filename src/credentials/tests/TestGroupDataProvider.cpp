@@ -38,11 +38,11 @@ void TestEndpoints(nlTestSuite * apSuite, void * apContext)
     chip::FabricIndex kFabricIndex1 = 1;
     chip::FabricIndex kFabricIndex2 = 7;
 
-    GroupDataProvider::GroupMapping group1a = { .endpoint = 1, .group = 1 };
-    GroupDataProvider::GroupMapping group1b = { .endpoint = 1, .group = 2 };
-    GroupDataProvider::GroupMapping group1c = { .endpoint = 1, .group = 3 };
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    bool exists                             = false;
+    GroupDataProvider::GroupMapping group1a(1, 1, "Group 1.1");
+    GroupDataProvider::GroupMapping group1b(1, 2, "Group 1.2");
+    GroupDataProvider::GroupMapping group1c(1, 3, "Group 1.3");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    bool exists    = false;
 
     NL_TEST_ASSERT(apSuite, groups);
 
@@ -52,10 +52,10 @@ void TestEndpoints(nlTestSuite * apSuite, void * apContext)
     exists = groups->GroupMappingExists(kFabricIndex1, group1a);
     NL_TEST_ASSERT(apSuite, !exists);
 
-    err = groups->AddGroupMapping(kFabricIndex1, group1a, "Group 1.1");
+    err = groups->AddGroupMapping(kFabricIndex1, group1a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex1, group1c, "Group 1.3");
+    err = groups->AddGroupMapping(kFabricIndex1, group1c);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     exists = groups->GroupMappingExists(kFabricIndex1, group1a);
@@ -79,10 +79,10 @@ void TestEndpoints(nlTestSuite * apSuite, void * apContext)
     exists = groups->GroupMappingExists(kFabricIndex1, group1c);
     NL_TEST_ASSERT(apSuite, exists);
 
-    err = groups->AddGroupMapping(kFabricIndex1, group1a, "Group 1.1b");
+    err = groups->AddGroupMapping(kFabricIndex1, group1a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex1, group1b, "Group 1.2");
+    err = groups->AddGroupMapping(kFabricIndex1, group1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     exists = groups->GroupMappingExists(kFabricIndex1, group1a);
@@ -116,16 +116,16 @@ void TestEndpoints(nlTestSuite * apSuite, void * apContext)
     exists = groups->GroupMappingExists(kFabricIndex2, group1a);
     NL_TEST_ASSERT(apSuite, !exists);
 
-    err = groups->AddGroupMapping(kFabricIndex1, group1a, "Group 1.1");
+    err = groups->AddGroupMapping(kFabricIndex1, group1a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex1, group1c, "Group 1.3");
+    err = groups->AddGroupMapping(kFabricIndex1, group1c);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex2, group1a, "Group 1.1");
+    err = groups->AddGroupMapping(kFabricIndex2, group1a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex2, group1c, "Group 1.3");
+    err = groups->AddGroupMapping(kFabricIndex2, group1c);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     exists = groups->GroupMappingExists(kFabricIndex2, group1a);
@@ -149,10 +149,10 @@ void TestEndpoints(nlTestSuite * apSuite, void * apContext)
     exists = groups->GroupMappingExists(kFabricIndex2, group1c);
     NL_TEST_ASSERT(apSuite, exists);
 
-    err = groups->AddGroupMapping(kFabricIndex2, group1a, "Group 1.1b");
+    err = groups->AddGroupMapping(kFabricIndex2, group1a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex2, group1b, "Group 1.2");
+    err = groups->AddGroupMapping(kFabricIndex2, group1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     exists = groups->GroupMappingExists(kFabricIndex2, group1a);
@@ -184,52 +184,51 @@ void TestEndpointIterator(nlTestSuite * apSuite, void * apContext)
     GroupDataProvider * groups = GetGroupDataProvider();
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == groups->Init());
 
-    chip::FabricIndex kFabricIndex          = 1;
-    GroupDataProvider::GroupMapping group1a = { .endpoint = 1, .group = 1 };
-    GroupDataProvider::GroupMapping group1b = { .endpoint = 1, .group = 3 };
-    GroupDataProvider::GroupMapping group2a = { .endpoint = 2, .group = 2 };
-    GroupDataProvider::GroupMapping group3a = { .endpoint = 3, .group = 1 };
-    GroupDataProvider::GroupMapping group3b = { .endpoint = 3, .group = 2 };
-    GroupDataProvider::GroupMapping group3c = { .endpoint = 3, .group = 3 };
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    chip::FabricIndex kFabricIndex = 1;
+    GroupDataProvider::GroupMapping group1a(1, 1, "Group 1.1");
+    GroupDataProvider::GroupMapping group1b(1, 3, "Group 1.3");
+    GroupDataProvider::GroupMapping group2a(2, 2, "Group 2.2");
+    GroupDataProvider::GroupMapping group3a(3, 1, "Group 3.1");
+    GroupDataProvider::GroupMapping group3b(3, 2, "Group 3.2");
+    GroupDataProvider::GroupMapping group3c(3, 3, "Group 3.3");
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     NL_TEST_ASSERT(apSuite, groups);
 
-    err = groups->AddGroupMapping(kFabricIndex, group3b, "Group 3.2");
+    err = groups->AddGroupMapping(kFabricIndex, group3b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex, group2a, "Group 2.2");
+    err = groups->AddGroupMapping(kFabricIndex, group2a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex, group1b, "Group 1.3");
+    err = groups->AddGroupMapping(kFabricIndex, group1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex, group3a, "Group 3.1");
+    err = groups->AddGroupMapping(kFabricIndex, group3a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex, group1a, "Group 1.1");
+    err = groups->AddGroupMapping(kFabricIndex, group1a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex, group3c, "Group 3.3");
+    err = groups->AddGroupMapping(kFabricIndex, group3c);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex, group3a, "Group 3.1");
+    err = groups->AddGroupMapping(kFabricIndex, group3a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
-
-    GroupId gid = 0;
 
     // Endpoint 1
     EndpointId endpoint                          = 1;
     GroupDataProvider::GroupMappingIterator * it = groups->IterateGroupMappings(kFabricIndex, endpoint);
     NL_TEST_ASSERT(apSuite, it);
 
+    GroupDataProvider::GroupMapping mapping;
     size_t count1 = it->Count();
     size_t count2 = 0;
     NL_TEST_ASSERT(apSuite, 2 == count1);
-    while (it->Next(gid))
+    while (it->Next(mapping))
     {
         count2++;
-        NL_TEST_ASSERT(apSuite, 1 == gid || 3 == gid);
+        NL_TEST_ASSERT(apSuite, 1 == mapping.group || 3 == mapping.group);
     }
     NL_TEST_ASSERT(apSuite, count2 == count1);
     it->Release();
@@ -243,10 +242,10 @@ void TestEndpointIterator(nlTestSuite * apSuite, void * apContext)
     count1 = it->Count();
     count2 = 0;
     NL_TEST_ASSERT(apSuite, 3 == count1);
-    while (it->Next(gid))
+    while (it->Next(mapping))
     {
         count2++;
-        NL_TEST_ASSERT(apSuite, gid > 0 && gid < 4);
+        NL_TEST_ASSERT(apSuite, mapping.group > 0 && mapping.group < 4);
     }
     NL_TEST_ASSERT(apSuite, count2 == count1);
     it->Release();
@@ -587,29 +586,29 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
     const chip::GroupId kGroupId2         = 222;
     const chip::GroupId kGroupId3         = 333;
 
-    const GroupDataProvider::GroupMapping group1a = { .endpoint = 101, .group = kGroupId1 };
-    const GroupDataProvider::GroupMapping group1b = { .endpoint = 101, .group = kGroupId2 };
-    const GroupDataProvider::GroupMapping group1c = { .endpoint = 101, .group = kGroupId3 };
-    CHIP_ERROR err                                = CHIP_NO_ERROR;
-    bool exists                                   = false;
+    const GroupDataProvider::GroupMapping group1a(101, kGroupId1, "Group 1.1");
+    const GroupDataProvider::GroupMapping group1b(101, kGroupId2, "Group 1.2");
+    const GroupDataProvider::GroupMapping group1c(101, kGroupId3, "Group 1.3");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    bool exists    = false;
 
     NL_TEST_ASSERT(apSuite, groups);
 
     // Mappings
 
-    err = groups->AddGroupMapping(kFabricIndex1, group1a, "Group 1.1");
+    err = groups->AddGroupMapping(kFabricIndex1, group1a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex1, group1b, "Group 1.2");
+    err = groups->AddGroupMapping(kFabricIndex1, group1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex1, group1c, "Group 1.3");
+    err = groups->AddGroupMapping(kFabricIndex1, group1c);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex2, group1a, "Group 1.1");
+    err = groups->AddGroupMapping(kFabricIndex2, group1a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->AddGroupMapping(kFabricIndex2, group1c, "Group 1.3");
+    err = groups->AddGroupMapping(kFabricIndex2, group1c);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     exists = groups->GroupMappingExists(kFabricIndex1, group1a);
