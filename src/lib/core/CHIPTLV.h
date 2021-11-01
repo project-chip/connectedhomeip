@@ -52,6 +52,26 @@
 namespace chip {
 namespace TLV {
 
+struct uint24_t {
+    uint24_t() { memset(value, 0, 3); };
+    uint24_t(uint24_t &v) { memcpy(value, v.value, 3); };
+    uint24_t(const uint24_t &v) { memcpy(value, v.value, 3); };
+    uint24_t(const uint64_t &v) { memcpy(value, &v, 3); };
+    operator uint32_t() const { return (uint32_t)value[2] << 16 | (uint32_t)value[1] << 8 | (uint32_t)value[0]; };
+
+    uint8_t value[3];
+};
+
+struct int24_t {
+    int24_t() { memset(value, 0, 3); };
+    int24_t(int24_t &v) { memcpy(value, v.value, 3); };
+    int24_t(const int24_t &v) { memcpy(value, v.value, 3); };
+    int24_t(const int64_t &v) { memcpy(value, &v, 3); };
+    operator int32_t() const { return (int32_t)value[2] << 16 | (int32_t)value[1] << 8 | (int32_t)value[0]; };
+
+    uint8_t value[3];
+};
+
 inline uint8_t operator|(TLVElementType lhs, TLVTagControl rhs)
 {
     return static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs);
@@ -339,6 +359,21 @@ public:
     CHIP_ERROR Get(int16_t & v);
 
     /**
+     * Get the value of the current element as a 24-bit signed integer.
+     *
+     * If the encoded integer value is larger than the output data type the resultant value will be
+     * truncated.
+     *
+     * @param[out]  v                       Receives the value associated with current TLV element.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
+     *                                      unsigned), or the reader is not positioned on an element.
+     *
+     */
+    CHIP_ERROR Get(int24_t & v);
+
+    /**
      * Get the value of the current element as a 32-bit signed integer.
      *
      * If the encoded integer value is larger than the output data type the resultant value will be
@@ -399,6 +434,23 @@ public:
      *
      */
     CHIP_ERROR Get(uint16_t & v);
+
+
+    /**
+     * Get the value of the current element as a 24-bit unsigned integer.
+     *
+     * If the encoded integer value is larger than the output data type the resultant value will be
+     * truncated.  Similarly, if the encoded integer value is negative, the value will be converted
+     * to unsigned.
+     *
+     * @param[out]  v                       Receives the value associated with current TLV element.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
+     unsigned), or the reader is not positioned on an element.
+     *
+     */
+    CHIP_ERROR Get(uint24_t & v);
 
     /**
      * Get the value of the current element as a 32-bit unsigned integer.
@@ -1163,6 +1215,16 @@ public:
     /**
      * @overload CHIP_ERROR TLVWriter::Put(Tag tag, int8_t v)
      */
+    CHIP_ERROR Put(Tag tag, int24_t v);
+
+    /**
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, int8_t v, bool preserveSize)
+     */
+    CHIP_ERROR Put(Tag tag, int24_t v, bool preserveSize);
+
+    /**
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, int8_t v)
+     */
     CHIP_ERROR Put(Tag tag, int32_t v);
 
     /**
@@ -1249,6 +1311,16 @@ public:
      * @overload CHIP_ERROR TLVWriter::Put(Tag tag, uint8_t v, bool preserveSize)
      */
     CHIP_ERROR Put(Tag tag, uint16_t v, bool preserveSize);
+
+    /**
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, uint8_t v)
+     */
+    CHIP_ERROR Put(Tag tag, uint24_t v);
+
+    /**
+     * @overload CHIP_ERROR TLVWriter::Put(Tag tag, uint8_t v, bool preserveSize)
+     */
+    CHIP_ERROR Put(Tag tag, uint24_t v, bool preserveSize);
 
     /**
      * @overload CHIP_ERROR TLVWriter::Put(Tag tag, uint8_t v)

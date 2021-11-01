@@ -123,6 +123,18 @@ CHIP_ERROR TLVWriter::Put(Tag tag, uint16_t v, bool preserveSize)
     return Put(tag, v);
 }
 
+CHIP_ERROR TLVWriter::Put(Tag tag, uint24_t v)
+{
+    return Put(tag, static_cast<uint64_t>(v));
+}
+
+CHIP_ERROR TLVWriter::Put(Tag tag, uint24_t v, bool preserveSize)
+{
+    if (preserveSize)
+        return WriteElementHead(TLVElementType::UInt32, tag, v);
+    return Put(tag, v);
+}
+
 CHIP_ERROR TLVWriter::Put(Tag tag, uint32_t v)
 {
     return Put(tag, static_cast<uint64_t>(v));
@@ -177,6 +189,18 @@ CHIP_ERROR TLVWriter::Put(Tag tag, int16_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(TLVElementType::Int16, tag, static_cast<uint16_t>(v));
+    return Put(tag, v);
+}
+
+CHIP_ERROR TLVWriter::Put(Tag tag, int24_t v)
+{
+    return Put(tag, static_cast<int64_t>(v));
+}
+
+CHIP_ERROR TLVWriter::Put(Tag tag, int24_t v, bool preserveSize)
+{
+    if (preserveSize)
+        return WriteElementHead(TLVElementType::Int32, tag, static_cast<uint32_t>(v));
     return Put(tag, v);
 }
 

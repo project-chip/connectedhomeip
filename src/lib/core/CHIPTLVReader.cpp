@@ -152,6 +152,18 @@ CHIP_ERROR TLVReader::Get(int16_t & v)
     return err;
 }
 
+CHIP_ERROR TLVReader::Get(int24_t & v)
+{
+    int64_t v64    = 0;
+    CHIP_ERROR err = Get(v64);
+    if ((v64 > static_cast<int64_t>((1UL<<23) - 1)) || (v64 < static_cast<int64_t>(-(1UL<<23))))
+    {
+        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+    }
+    v = static_cast<int24_t>(v64);
+    return err;
+}
+
 CHIP_ERROR TLVReader::Get(int32_t & v)
 {
     int64_t v64    = 0;
@@ -209,6 +221,18 @@ CHIP_ERROR TLVReader::Get(uint16_t & v)
         return CHIP_ERROR_INVALID_INTEGER_VALUE;
     }
     v = static_cast<uint16_t>(v64);
+    return err;
+}
+
+CHIP_ERROR TLVReader::Get(uint24_t & v)
+{
+    uint64_t v64   = 0;
+    CHIP_ERROR err = Get(v64);
+    if (v64 > static_cast<uint64_t>((1UL<<24) - 1))
+    {
+        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+    }
+    v = static_cast<uint24_t>(v64);
     return err;
 }
 
