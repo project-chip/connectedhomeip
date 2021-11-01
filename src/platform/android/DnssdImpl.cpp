@@ -339,9 +339,6 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, 
         size_t size = service.mTextEntrySize;
         for (size_t i = 0; i < size; i++)
         {
-            // if (service.mTextEntries[i].mKey != nullptr) {
-            //    delete[] service.mTextEntries[i].mKey;
-            //}
             if (service.mTextEntries[i].mData != nullptr)
             {
                 delete[] service.mTextEntries[i].mData;
