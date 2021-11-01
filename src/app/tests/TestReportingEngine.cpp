@@ -51,7 +51,7 @@ namespace reporting {
 class TestReportingEngine
 {
 public:
-    static void TestBuildAndSendSingleReportDataMessage(nlTestSuite * apSuite, void * apContext);
+    static void TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * apContext);
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
@@ -65,7 +65,7 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
-void TestReportingEngine::TestBuildAndSendSingleReportDataMessage(nlTestSuite * apSuite, void * apContext)
+void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -113,7 +113,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportDataMessage(nlTestSuite * 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
     readHandler.OnReadInitialRequest(std::move(readRequestbuf));
-    err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportDataMessage(&readHandler);
+    err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 }
 
@@ -125,7 +125,7 @@ namespace {
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("CheckBuildAndSendSingleReportDataMessage", chip::app::reporting::TestReportingEngine::TestBuildAndSendSingleReportDataMessage),
+    NL_TEST_DEF("CheckBuildAndSendSingleReportData", chip::app::reporting::TestReportingEngine::TestBuildAndSendSingleReportData),
     NL_TEST_SENTINEL()
 };
 // clang-format on

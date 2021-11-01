@@ -59,7 +59,7 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const Sessio
 
     ReturnErrorOnFailure(engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, callback.get()));
 
-    err = readClient->SendReadRequestMessage(readParams);
+    err = readClient->SendReadRequest(readParams);
     if (err != CHIP_NO_ERROR)
     {
         readClient->Shutdown();

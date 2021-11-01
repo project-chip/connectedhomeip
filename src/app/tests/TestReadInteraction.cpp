@@ -126,7 +126,7 @@ void GenerateEvents(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void GenerateSubscribeResponseMessage(nlTestSuite * apSuite, void * apContext, chip::System::PacketBufferHandle && aPayload)
+void GenerateSubscribeResponse(nlTestSuite * apSuite, void * apContext, chip::System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
@@ -262,20 +262,20 @@ public:
     static void TestReadClientGenerateTwoEventPaths(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientInvalidReport(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext);
-    static void TestProcessSubscribeResponseMessage(nlTestSuite * apSuite, void * apContext);
-    static void TestProcessSubscribeRequestMessage(nlTestSuite * apSuite, void * apContext);
+    static void TestProcessSubscribeResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestProcessSubscribeRequest(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestReadInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext);
 
 private:
-    static void GenerateReportDataMessage(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                          bool aNeedInvalidReport = false);
+    static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
+                                   bool aNeedInvalidReport = false);
 };
 
-void TestReadInteraction::GenerateReportDataMessage(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                                    bool aNeedInvalidReport)
+void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
+                                             bool aNeedInvalidReport)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
@@ -359,12 +359,12 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     err = readClient.Init(&ctx.GetExchangeManager(), &delegate, chip::app::ReadClient::InteractionType::Read);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    err = readClient.SendReadRequestMessage(readPrepareParams);
+    err = readClient.SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    GenerateReportDataMessage(apSuite, apContext, buf);
+    GenerateReportData(apSuite, apContext, buf);
 
-    err = readClient.ProcessReportDataMessage(std::move(buf));
+    err = readClient.ProcessReportData(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     readClient.Shutdown();
@@ -387,8 +387,8 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr);
     readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
 
-    GenerateReportDataMessage(apSuite, apContext, reportDatabuf);
-    err = readHandler.SendReportDataMessage(std::move(reportDatabuf));
+    GenerateReportData(apSuite, apContext, reportDatabuf);
+    err = readHandler.SendReportData(std::move(reportDatabuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     writer.Init(std::move(readRequestbuf));
@@ -487,12 +487,12 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    err = readClient.SendReadRequestMessage(readPrepareParams);
+    err = readClient.SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    GenerateReportDataMessage(apSuite, apContext, buf, true /*aNeedInvalidReport*/);
+    GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/);
 
-    err = readClient.ProcessReportDataMessage(std::move(buf));
+    err = readClient.ProcessReportData(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
     readClient.Shutdown();
@@ -516,8 +516,8 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr);
     readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
 
-    GenerateReportDataMessage(apSuite, apContext, reportDatabuf);
-    err = readHandler.SendReportDataMessage(std::move(reportDatabuf));
+    GenerateReportData(apSuite, apContext, reportDatabuf);
+    err = readHandler.SendReportData(std::move(reportDatabuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     writer.Init(std::move(readRequestbuf));
@@ -699,7 +699,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     readPrepareParams.mEventPathParamsListSize     = 2;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 2;
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequestMessage(readPrepareParams, &delegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
@@ -742,7 +742,7 @@ void TestReadInteraction::TestReadInvalidAttributePathRoundtrip(nlTestSuite * ap
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequestMessage(readPrepareParams, &delegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
@@ -755,7 +755,7 @@ void TestReadInteraction::TestReadInvalidAttributePathRoundtrip(nlTestSuite * ap
     engine->Shutdown();
 }
 
-void TestReadInteraction::TestProcessSubscribeResponseMessage(nlTestSuite * apSuite, void * apContext)
+void TestReadInteraction::TestProcessSubscribeResponse(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -765,16 +765,16 @@ void TestReadInteraction::TestProcessSubscribeResponseMessage(nlTestSuite * apSu
     err = readClient.Init(&ctx.GetExchangeManager(), &delegate, chip::app::ReadClient::InteractionType::Subscribe);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    readClient.MoveToState(chip::app::ReadClient::ClientState::AwaitingSubscribeResponseMessage);
+    readClient.MoveToState(chip::app::ReadClient::ClientState::AwaitingSubscribeResponse);
 
-    GenerateSubscribeResponseMessage(apSuite, apContext, buf.Retain());
+    GenerateSubscribeResponse(apSuite, apContext, buf.Retain());
 
-    err = readClient.ProcessSubscribeResponseMessage(std::move(buf));
+    err = readClient.ProcessSubscribeResponse(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     readClient.ShutdownInternal(CHIP_NO_ERROR);
 }
 
-void TestReadInteraction::TestProcessSubscribeRequestMessage(nlTestSuite * apSuite, void * apContext)
+void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -827,7 +827,7 @@ void TestReadInteraction::TestProcessSubscribeRequestMessage(nlTestSuite * apSui
     err = writer.Finalize(&subscribeRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readHandler.ProcessSubscribeRequestMessage(std::move(subscribeRequestbuf));
+    err = readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     exchangeCtx->Close();
     engine->Shutdown();
@@ -887,12 +887,12 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = engine->SendSubscribeRequestMessage(readPrepareParams, &delegate);
+    err = engine->SendSubscribeRequest(readPrepareParams, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     delegate.mNumAttributeResponse       = 0;
     readPrepareParams.mKeepSubscriptions = false;
-    err                                  = engine->SendSubscribeRequestMessage(readPrepareParams, &delegate);
+    err                                  = engine->SendSubscribeRequest(readPrepareParams, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     delegate.mGotReport = false;
     engine->GetReportingEngine().Run();
@@ -1010,7 +1010,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     readPrepareParams1.mMaxIntervalCeilingSeconds   = 5;
     printf("\nSend another subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = engine->SendSubscribeRequestMessage(readPrepareParams1, &delegate);
+    err = engine->SendSubscribeRequest(readPrepareParams1, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     engine->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
@@ -1071,7 +1071,7 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequestMessage(readPrepareParams, &delegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(readPrepareParams, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     delegate.mNumAttributeResponse = 0;
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
@@ -1103,8 +1103,8 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadClientGenerateTwoEventPaths", chip::app::TestReadInteraction::TestReadClientGenerateTwoEventPaths),
     NL_TEST_DEF("TestReadClientInvalidReport", chip::app::TestReadInteraction::TestReadClientInvalidReport),
     NL_TEST_DEF("TestReadHandlerInvalidAttributePath", chip::app::TestReadInteraction::TestReadHandlerInvalidAttributePath),
-    NL_TEST_DEF("TestProcessSubscribeResponseMessage", chip::app::TestReadInteraction::TestProcessSubscribeResponseMessage),
-    NL_TEST_DEF("TestProcessSubscribeRequestMessage", chip::app::TestReadInteraction::TestProcessSubscribeRequestMessage),
+    NL_TEST_DEF("TestProcessSubscribeResponse", chip::app::TestReadInteraction::TestProcessSubscribeResponse),
+    NL_TEST_DEF("TestProcessSubscribeRequest", chip::app::TestReadInteraction::TestProcessSubscribeRequest),
     NL_TEST_DEF("TestSubscribeRoundtrip", chip::app::TestReadInteraction::TestSubscribeRoundtrip),
     NL_TEST_DEF("TestSubscribeInvalidAttributePathRoundtrip", chip::app::TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip),
     NL_TEST_DEF("TestReadInvalidAttributePathRoundtrip", chip::app::TestReadInteraction::TestReadInvalidAttributePathRoundtrip),

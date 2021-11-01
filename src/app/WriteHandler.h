@@ -55,7 +55,7 @@ public:
 
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
-     *  guarantees that it will call Shutdown on itself when processing is done (including if OnWriteRequestMessage
+     *  guarantees that it will call Shutdown on itself when processing is done (including if OnWriteRequest
      *  returns an error).
      *
      *  @param[in]    apExchangeContext    A pointer to the ExchangeContext.
@@ -64,7 +64,7 @@ public:
      *  @retval #Others If fails to process read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR OnWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
     bool IsFree() const { return mState == State::Uninitialized; }
 
@@ -92,9 +92,9 @@ private:
         AddStatus,         // The handler has added status code
         Sending,           // The handler has sent out the write response
     };
-    CHIP_ERROR ProcessWriteRequestMessage(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR ProcessWriteRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & packet);
-    CHIP_ERROR SendWriteResponseMessage();
+    CHIP_ERROR SendWriteResponse();
     CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams,
                                       AttributeStatusIB::Builder aAttributeStatusIB);
 
@@ -107,7 +107,7 @@ private:
     void Shutdown();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    WriteResponseMessage::Builder mWriteResponseMessageBuilder;
+    WriteResponseMessage::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;
     State mState = State::Uninitialized;
 };
