@@ -200,7 +200,7 @@ JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject man
     chip::DeviceLayer::ConfigurationMgrImpl().InitializeWithObject(manager);
 }
 
-// for ServiceResolver
+// for ServiceResolver and  ServiceBrowser
 JNI_METHOD(void, nativeSetDnssdDelegates)(JNIEnv * env, jclass self, jobject resolver, jobject browser, jobject chipMdnsCallback)
 {
     chip::DeviceLayer::StackLock lock;

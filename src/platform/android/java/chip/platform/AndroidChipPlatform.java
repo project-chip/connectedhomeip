@@ -53,7 +53,7 @@ public final class AndroidChipPlatform {
     setBLEManager(ble);
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
-    setServiceResolver(resolver, browser, chipMdnsCallback);
+    setDnssdDelegates(resolver, browser, chipMdnsCallback);
   }
 
   // for BLEManager
@@ -97,13 +97,13 @@ public final class AndroidChipPlatform {
   private native void setConfigurationManager(ConfigurationManager manager);
 
   // for ServiceResolver
-  private void setServiceResolver(
+  private void setDnssdDelegates(
       ServiceResolver resolver, ServiceBrowser browser, ChipMdnsCallback chipMdnsCallback) {
     if (resolver != null) {
-      nativeSetServiceResolver(resolver, browser, chipMdnsCallback);
+      nativeSetDnssdDelegates(resolver, browser, chipMdnsCallback);
     }
   }
 
-  private native void nativeSetServiceResolver(
+  private native void nativeSetDnssdDelegates(
       ServiceResolver resolver, ServiceBrowser browser, ChipMdnsCallback chipMdnsCallback);
 }
