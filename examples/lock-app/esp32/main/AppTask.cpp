@@ -114,7 +114,7 @@ CHIP_ERROR AppTask::Init()
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
-    Clock::Timestamp lastChangeTime{ 0 };
+    Clock::Timestamp lastChangeTime = Clock::Zero;
 
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)

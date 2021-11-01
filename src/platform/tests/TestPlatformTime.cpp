@@ -41,8 +41,8 @@ using namespace chip::Logging;
 using namespace chip::System;
 using namespace chip::System::Clock::Literals;
 
-constexpr Clock::Milliseconds64 kTestTimeMarginMs{ 2 };
-constexpr Clock::Microseconds64 kTestTimeMarginUs{ 500 };
+constexpr Clock::Milliseconds64 kTestTimeMarginMs = 2_ms64;
+constexpr Clock::Microseconds64 kTestTimeMarginUs = 500_us64;
 
 // =================================
 //      Unit tests

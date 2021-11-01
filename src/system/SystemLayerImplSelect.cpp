@@ -38,7 +38,7 @@
 namespace chip {
 namespace System {
 
-constexpr Clock::Seconds64 kDefaultMinSleepPeriod{ 60 * 60 * 24 * 30 }; // Month [sec]
+constexpr Clock::Seconds64 kDefaultMinSleepPeriod = Clock::Seconds64( 60 * 60 * 24 * 30 ); // Month [sec]
 
 CHIP_ERROR LayerImplSelect::Init()
 {
