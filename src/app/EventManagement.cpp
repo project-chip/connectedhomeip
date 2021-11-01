@@ -303,7 +303,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     TLVWriter checkpoint = apContext->mWriter;
     TLV::TLVType dataContainerType;
     EventDataElement::Builder eventDataElementBuilder;
-    EventPath::Builder eventPathBuilder;
+    EventPathIB::Builder eventPathBuilder;
     uint64_t deltatime = 0;
 
     VerifyOrExit(apContext->mCurrentEventNumber >= apContext->mStartingEventNumber,
@@ -313,7 +313,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     VerifyOrExit(apOptions->mTimestamp.mType != Timestamp::Type::kInvalid, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     eventDataElementBuilder.Init(&(apContext->mWriter));
-    eventPathBuilder = eventDataElementBuilder.CreateEventPathBuilder();
+    eventPathBuilder = eventDataElementBuilder.CreateEventPath();
     err              = eventPathBuilder.GetError();
     SuccessOrExit(err);
 
@@ -322,7 +322,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
         .EndpointId(apOptions->mpEventSchema->mEndpointId)
         .ClusterId(apOptions->mpEventSchema->mClusterId)
         .EventId(apOptions->mpEventSchema->mEventId)
-        .EndOfEventPath();
+        .EndOfEventPathIB();
     err = eventPathBuilder.GetError();
     SuccessOrExit(err);
 
@@ -751,7 +751,7 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
 
     if (reader.GetTag() == TLV::ContextTag(EventDataElement::kCsTag_EventPath))
     {
-        EventPath::Parser path;
+        EventPathIB::Parser path;
         ReturnErrorOnFailure(path.Init(aReader));
         ReturnErrorOnFailure(path.GetNodeId(&(envelope->mNodeId)));
         ReturnErrorOnFailure(path.GetEndpointId(&(envelope->mEndpointId)));

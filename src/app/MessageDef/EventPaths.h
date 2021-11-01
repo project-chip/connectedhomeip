@@ -17,7 +17,7 @@
  */
 /**
  *    @file
- *      This file defines EventPathList parser and builder in CHIP interaction model
+ *      This file defines EventPaths parser and builder in CHIP interaction model
  *
  */
 
@@ -25,8 +25,8 @@
 
 #include "ArrayBuilder.h"
 #include "ArrayParser.h"
-#include "EventPath.h"
-#include "EventPathList.h"
+#include "EventPathIB.h"
+#include "EventPaths.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -37,7 +37,7 @@
 
 namespace chip {
 namespace app {
-namespace EventPathList {
+namespace EventPaths {
 class Parser : public ArrayParser
 {
 public:
@@ -63,22 +63,22 @@ class Builder : public ArrayBuilder
 {
 public:
     /**
-     *  @brief Initialize a EventPath::Builder for writing into the TLV stream
+     *  @brief Initialize a EventPathIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventPath::Builder
+     *  @return A reference to EventPathIB::Builder
      */
-    EventPath::Builder & CreateEventPathBuilder();
+    EventPathIB::Builder & CreateEventPath();
 
     /**
-     *  @brief Mark the end of this EventPathList
+     *  @brief Mark the end of this EventPaths
      *
      *  @return A reference to *this
      */
-    EventPathList::Builder & EndOfEventPathList();
+    EventPaths::Builder & EndOfEventPaths();
 
 private:
-    EventPath::Builder mEventPathBuilder;
+    EventPathIB::Builder mEventPath;
 };
-}; // namespace EventPathList
-}; // namespace app
-}; // namespace chip
+} // namespace EventPaths
+} // namespace app
+} // namespace chip

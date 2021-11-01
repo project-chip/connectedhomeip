@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "Builder.h"
-#include "Parser.h"
+#include "ListBuilder.h"
+#include "ListParser.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -35,7 +35,7 @@
 
 namespace chip {
 namespace app {
-namespace EventPath {
+namespace EventPathIB {
 enum
 {
     kCsTag_NodeId     = 0,
@@ -44,18 +44,9 @@ enum
     kCsTag_EventId    = 3,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public ListParser
 {
 public:
-    /**
-     *  @brief Initialize the parser object with TLVReader
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this EventPath
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
@@ -82,7 +73,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetNodeId(chip::NodeId * const apNodeId) const;
+    CHIP_ERROR GetNodeId(NodeId * const apNodeId) const;
 
     /**
      *  @brief Get a TLVReader for the EndpointId. Next() must be called before accessing them.
@@ -93,7 +84,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEndpointId(chip::EndpointId * const apEndpointId) const;
+    CHIP_ERROR GetEndpointId(EndpointId * const apEndpointId) const;
 
     /**
      *  @brief Get a TLVReader for the ClusterId. Next() must be called before accessing them.
@@ -104,7 +95,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetClusterId(chip::ClusterId * const apClusterId) const;
+    CHIP_ERROR GetClusterId(ClusterId * const apClusterId) const;
 
     /**
      *  @brief Get a TLVReader for the EventId. Next() must be called before accessing them.
@@ -115,32 +106,12 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventId(chip::EventId * const apEventId) const;
+    CHIP_ERROR GetEventId(EventId * const apEventId) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public ListBuilder
 {
 public:
-    /**
-     *  @brief Initialize a EventPath::Builder for writing into a TLV stream
-     *
-     *  @param [in] apWriter    A pointer to TLVWriter
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
-
-    /**
-     * Init the EventPath container with an particular context tag.
-     * Required to implement arrays of arrays, and to test ListBuilder.
-     *
-     * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
-     * @param[in]   aContextTagToUse    A contextTag to use.
-     *
-     * @return                  CHIP_ERROR codes returned by chip::TLV objects.
-     */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
-
     /**
      *  @brief Inject NodeId into the TLV stream.
      *
@@ -148,7 +119,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventPath::Builder & NodeId(const chip::NodeId aNodeId);
+    EventPathIB::Builder & NodeId(const chip::NodeId aNodeId);
 
     /**
      *  @brief Inject EndpointId into the TLV stream.
@@ -157,7 +128,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventPath::Builder & EndpointId(const chip::EndpointId aEndpointId);
+    EventPathIB::Builder & EndpointId(const chip::EndpointId aEndpointId);
 
     /**
      *  @brief Inject ClusterId into the TLV stream.
@@ -166,7 +137,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventPath::Builder & ClusterId(const chip::ClusterId aClusterId);
+    EventPathIB::Builder & ClusterId(const chip::ClusterId aClusterId);
 
     /**
      *  @brief Inject EventId into the TLV stream.
@@ -175,18 +146,15 @@ public:
      *
      *  @return A reference to *this
      */
-    EventPath::Builder & EventId(const chip::EventId aEventId);
+    EventPathIB::Builder & EventId(const chip::EventId aEventId);
 
     /**
      *  @brief Mark the end of this EventPath
      *
      *  @return A reference to *this
      */
-    EventPath::Builder & EndOfEventPath();
-
-private:
-    CHIP_ERROR _Init(TLV::TLVWriter * const apWriter, const TLV::Tag aTag);
+    EventPathIB::Builder & EndOfEventPathIB();
 };
-}; // namespace EventPath
+}; // namespace EventPathIB
 }; // namespace app
 }; // namespace chip

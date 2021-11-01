@@ -26,7 +26,7 @@
 #include "AttributeDataVersionList.h"
 #include "AttributePathList.h"
 #include "Builder.h"
-#include "EventPathList.h"
+#include "EventPaths.h"
 
 #include "Parser.h"
 
@@ -43,7 +43,7 @@ namespace ReadRequest {
 enum
 {
     kCsTag_AttributePathList        = 0,
-    kCsTag_EventPathList            = 1,
+    kCsTag_EventPaths               = 1,
     kCsTag_AttributeDataVersionList = 2,
     kCsTag_EventNumber              = 3,
 };
@@ -87,14 +87,14 @@ public:
     CHIP_ERROR GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const;
 
     /**
-     *  @brief Get a TLVReader for the EventPathList. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the EventPaths. Next() must be called before accessing them.
      *
-     *  @param [in] apEventPathList    A pointer to apEventPathList
+     *  @param [in] apEventPaths    A pointer to apEventPaths
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventPathList(EventPathList::Parser * const apEventPathList) const;
+    CHIP_ERROR GetEventPaths(EventPaths::Parser * const apEventPaths) const;
 
     /**
      *  @brief Get a parser for the AttributeDataVersionList. Next() must be called before accessing them.
@@ -137,11 +137,11 @@ public:
     AttributePathList::Builder & CreateAttributePathListBuilder();
 
     /**
-     *  @brief Initialize a EventPathList::Builder for writing into the TLV stream
+     *  @brief Initialize a EventPaths::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventPathList::Builder
+     *  @return A reference to EventPaths::Builder
      */
-    EventPathList::Builder & CreateEventPathListBuilder();
+    EventPaths::Builder & CreateEventPathsBuilder();
 
     /**
      *  @brief Initialize a AttributeDataVersionList::Builder for writing into the TLV stream
@@ -166,7 +166,7 @@ public:
 
 private:
     AttributePathList::Builder mAttributePathListBuilder;
-    EventPathList::Builder mEventPathListBuilder;
+    EventPaths::Builder mEventPathsBuilder;
     AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
 };
 }; // namespace ReadRequest

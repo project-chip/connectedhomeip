@@ -188,15 +188,15 @@ void ParseAttributePathList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
 #endif
 }
 
-void BuildEventPath(nlTestSuite * apSuite, EventPath::Builder & aEventPathBuilder)
+void BuildEventPath(nlTestSuite * apSuite, EventPathIB::Builder & aEventPathBuilder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    aEventPathBuilder.NodeId(1).EndpointId(2).ClusterId(3).EventId(4).EndOfEventPath();
+    aEventPathBuilder.NodeId(1).EndpointId(2).ClusterId(3).EventId(4).EndOfEventPathIB();
     err = aEventPathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void ParseEventPath(nlTestSuite * apSuite, EventPath::Parser & aEventPathParser)
+void ParseEventPath(nlTestSuite * apSuite, EventPathIB::Parser & aEventPathParser)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     chip::NodeId nodeId         = 1;
@@ -221,20 +221,20 @@ void ParseEventPath(nlTestSuite * apSuite, EventPath::Parser & aEventPathParser)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && eventId == 4);
 }
 
-void BuildEventPathList(nlTestSuite * apSuite, EventPathList::Builder & aEventPathListBuilder)
+void BuildEventPaths(nlTestSuite * apSuite, EventPaths::Builder & aEventPathsBuilder)
 {
-    EventPath::Builder eventPathBuilder = aEventPathListBuilder.CreateEventPathBuilder();
+    EventPathIB::Builder eventPathBuilder = aEventPathsBuilder.CreateEventPath();
     NL_TEST_ASSERT(apSuite, eventPathBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventPath(apSuite, eventPathBuilder);
 
-    aEventPathListBuilder.EndOfEventPathList();
-    NL_TEST_ASSERT(apSuite, aEventPathListBuilder.GetError() == CHIP_NO_ERROR);
+    aEventPathsBuilder.EndOfEventPaths();
+    NL_TEST_ASSERT(apSuite, aEventPathsBuilder.GetError() == CHIP_NO_ERROR);
 }
 
-void ParseEventPathList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+void ParseEventPaths(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    EventPathList::Parser eventPathListParser;
+    EventPaths::Parser eventPathListParser;
 
     err = eventPathListParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -279,7 +279,7 @@ void BuildEventDataElement(nlTestSuite * apSuite, EventDataElement::Builder & aE
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    EventPath::Builder eventPathBuilder = aEventDataElementBuilder.CreateEventPathBuilder();
+    EventPathIB::Builder eventPathBuilder = aEventDataElementBuilder.CreateEventPath();
     NL_TEST_ASSERT(apSuite, eventPathBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventPath(apSuite, eventPathBuilder);
 
@@ -325,7 +325,7 @@ void ParseEventDataElement(nlTestSuite * apSuite, EventDataElement::Parser & aEv
 #endif
     {
         {
-            EventPath::Parser eventPath;
+            EventPathIB::Parser eventPath;
             err = aEventDataElementParser.GetEventPath(&eventPath);
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         }
@@ -801,9 +801,9 @@ void BuildReadRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributePathList(apSuite, attributePathList);
 
-    EventPathList::Builder eventPathList = readRequestBuilder.CreateEventPathListBuilder();
+    EventPaths::Builder eventPathList = readRequestBuilder.CreateEventPathsBuilder();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    BuildEventPathList(apSuite, eventPathList);
+    BuildEventPaths(apSuite, eventPathList);
 
     AttributeDataVersionList::Builder attributeDataVersionList = readRequestBuilder.CreateAttributeDataVersionListBuilder();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
@@ -822,7 +822,7 @@ void ParseReadRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 
     ReadRequest::Parser readRequestParser;
     AttributePathList::Parser attributePathListParser;
-    EventPathList::Parser eventPathListParser;
+    EventPaths::Parser eventPathListParser;
     AttributeDataVersionList::Parser attributeDataVersionListParser;
     uint64_t eventNumber;
 
@@ -835,7 +835,7 @@ void ParseReadRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     err = readRequestParser.GetAttributePathList(&attributePathListParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readRequestParser.GetEventPathList(&eventPathListParser);
+    err = readRequestParser.GetEventPaths(&eventPathListParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = readRequestParser.GetAttributeDataVersionList(&attributeDataVersionListParser);
@@ -944,9 +944,9 @@ void BuildSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributePathList(apSuite, attributePathList);
 
-    EventPathList::Builder eventPathList = subscribeRequestBuilder.CreateEventPathListBuilder();
+    EventPaths::Builder eventPathList = subscribeRequestBuilder.CreateEventPathsBuilder();
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
-    BuildEventPathList(apSuite, eventPathList);
+    BuildEventPaths(apSuite, eventPathList);
 
     AttributeDataVersionList::Builder attributeDataVersionList = subscribeRequestBuilder.CreateAttributeDataVersionListBuilder();
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
@@ -977,7 +977,7 @@ void ParseSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader
 
     SubscribeRequest::Parser subscribeRequestParser;
     AttributePathList::Parser attributePathListParser;
-    EventPathList::Parser eventPathListParser;
+    EventPaths::Parser eventPathListParser;
     AttributeDataVersionList::Parser attributeDataVersionListParser;
     uint64_t eventNumber          = 0;
     uint16_t minIntervalSeconds   = 0;
@@ -994,7 +994,7 @@ void ParseSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader
     err = subscribeRequestParser.GetAttributePathList(&attributePathListParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = subscribeRequestParser.GetEventPathList(&eventPathListParser);
+    err = subscribeRequestParser.GetEventPaths(&eventPathListParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = subscribeRequestParser.GetAttributeDataVersionList(&attributeDataVersionListParser);
@@ -1187,8 +1187,8 @@ void AttributePathListTest(nlTestSuite * apSuite, void * apContext)
 void EventPathTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    EventPath::Parser eventPathParser;
-    EventPath::Builder eventPathBuilder;
+    EventPathIB::Parser eventPathParser;
+    EventPathIB::Builder eventPathBuilder;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
@@ -1208,19 +1208,19 @@ void EventPathTest(nlTestSuite * apSuite, void * apContext)
     ParseEventPath(apSuite, eventPathParser);
 }
 
-void EventPathListTest(nlTestSuite * apSuite, void * apContext)
+void EventPathsTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
-    EventPathList::Builder eventPathListBuilder;
+    EventPaths::Builder eventPathListBuilder;
 
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
 
     err = eventPathListBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    BuildEventPathList(apSuite, eventPathListBuilder);
+    BuildEventPaths(apSuite, eventPathListBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1230,7 +1230,7 @@ void EventPathListTest(nlTestSuite * apSuite, void * apContext)
     reader.Init(std::move(buf));
     err = reader.Next();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    ParseEventPathList(apSuite, reader);
+    ParseEventPaths(apSuite, reader);
 }
 
 void CommandPathTest(nlTestSuite * apSuite, void * apContext)
@@ -1725,7 +1725,7 @@ const nlTest sTests[] =
                 NL_TEST_DEF("AttributePathTest", AttributePathTest),
                 NL_TEST_DEF("AttributePathListTest", AttributePathListTest),
                 NL_TEST_DEF("EventPathTest", EventPathTest),
-                NL_TEST_DEF("EventPathListTest", EventPathListTest),
+                NL_TEST_DEF("EventPathsTest", EventPathsTest),
                 NL_TEST_DEF("CommandPathTest", CommandPathTest),
                 NL_TEST_DEF("EventDataElementTest", EventDataElementTest),
                 NL_TEST_DEF("EventListTest", EventListTest),

@@ -18,7 +18,7 @@
 
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/EventPath.h>
+#include <app/MessageDef/EventPathIB.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
 #include <lib/support/TypeTraits.h>

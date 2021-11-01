@@ -237,8 +237,8 @@ private:
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
-    CHIP_ERROR GenerateEventPathList(EventPathList::Builder & aEventPathListBuilder, EventPathParams * apEventPathParamsList,
-                                     size_t aEventPathParamsListSize);
+    CHIP_ERROR GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
+                                  size_t aEventPathParamsListSize);
     CHIP_ERROR GenerateAttributePathList(AttributePathList::Builder & aAttributeathListBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);

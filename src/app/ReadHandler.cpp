@@ -24,7 +24,7 @@
 
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/EventPath.h>
+#include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusResponse.h>
 #include <app/MessageDef/SubscribeRequest.h>
 #include <app/MessageDef/SubscribeResponse.h>
@@ -256,7 +256,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     System::PacketBufferTLVReader reader;
 
     ReadRequest::Parser readRequestParser;
-    EventPathList::Parser eventPathListParser;
+    EventPaths::Parser eventPathListParser;
     AttributePathList::Parser attributePathListParser;
 
     reader.Init(std::move(aPayload));
@@ -282,7 +282,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
         err = ProcessAttributePathList(attributePathListParser);
     }
     SuccessOrExit(err);
-    err = readRequestParser.GetEventPathList(&eventPathListParser);
+    err = readRequestParser.GetEventPaths(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
@@ -290,7 +290,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     else
     {
         SuccessOrExit(err);
-        err = ProcessEventPathList(eventPathListParser);
+        err = ProcessEventPaths(eventPathListParser);
     }
     SuccessOrExit(err);
 
@@ -375,18 +375,18 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathListParser)
+CHIP_ERROR ReadHandler::ProcessEventPaths(EventPaths::Parser & aEventPathsParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
-    aEventPathListParser.GetReader(&reader);
+    aEventPathsParser.GetReader(&reader);
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
         VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
         ClusterInfo clusterInfo;
-        EventPath::Parser path;
+        EventPathIB::Parser path;
         err = path.Init(reader);
         SuccessOrExit(err);
         err = path.GetNodeId(&(clusterInfo.mNodeId));
@@ -542,15 +542,15 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
     ReturnLogErrorOnFailure(err);
 
-    EventPathList::Parser eventPathListParser;
-    err = subscribeRequestParser.GetEventPathList(&eventPathListParser);
+    EventPaths::Parser eventPathListParser;
+    err = subscribeRequestParser.GetEventPaths(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     else if (err == CHIP_NO_ERROR)
     {
-        ReturnLogErrorOnFailure(ProcessEventPathList(eventPathListParser));
+        ReturnLogErrorOnFailure(ProcessEventPaths(eventPathListParser));
     }
     ReturnLogErrorOnFailure(err);
 

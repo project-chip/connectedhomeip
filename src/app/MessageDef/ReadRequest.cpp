@@ -56,7 +56,7 @@ CHIP_ERROR ReadRequest::Parser::CheckSchemaValidity() const
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
     AttributePathList::Parser attributePathList;
-    EventPathList::Parser eventPathList;
+    EventPaths::Parser eventPathList;
     AttributeDataVersionList::Parser attributeDataVersionList;
     PRETTY_PRINT("ReadRequest =");
     PRETTY_PRINT("{");
@@ -83,10 +83,10 @@ CHIP_ERROR ReadRequest::Parser::CheckSchemaValidity() const
 
             PRETTY_PRINT_DECDEPTH();
         }
-        else if (chip::TLV::ContextTag(kCsTag_EventPathList) == tag)
+        else if (chip::TLV::ContextTag(kCsTag_EventPaths) == tag)
         {
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventPathList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_EventPathList);
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventPaths)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_EventPaths);
             VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
             eventPathList.Init(reader);
@@ -180,17 +180,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadRequest::Parser::GetEventPathList(EventPathList::Parser * const apEventPathList) const
+CHIP_ERROR ReadRequest::Parser::GetEventPaths(EventPaths::Parser * const apEventPaths) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
 
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventPathList), reader);
+    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventPaths), reader);
     SuccessOrExit(err);
 
     VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    err = apEventPathList->Init(reader);
+    err = apEventPaths->Init(reader);
     SuccessOrExit(err);
 
 exit:
@@ -241,16 +241,16 @@ exit:
     return mAttributePathListBuilder;
 }
 
-EventPathList::Builder & ReadRequest::Builder::CreateEventPathListBuilder()
+EventPaths::Builder & ReadRequest::Builder::CreateEventPathsBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mEventPathListBuilder.ResetError(mError));
+    VerifyOrExit(CHIP_NO_ERROR == mError, mEventPathsBuilder.ResetError(mError));
 
-    mError = mEventPathListBuilder.Init(mpWriter, kCsTag_EventPathList);
+    mError = mEventPathsBuilder.Init(mpWriter, kCsTag_EventPaths);
 
 exit:
-    // on error, mEventPathListBuilder would be un-/partial initialized and cannot be used to write anything
-    return mEventPathListBuilder;
+    // on error, mEventPathsBuilder would be un-/partial initialized and cannot be used to write anything
+    return mEventPathsBuilder;
 }
 
 AttributeDataVersionList::Builder & ReadRequest::Builder::CreateAttributeDataVersionListBuilder()

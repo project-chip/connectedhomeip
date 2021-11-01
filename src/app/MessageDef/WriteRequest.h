@@ -138,7 +138,7 @@ public:
     /**
      *  @brief Initialize a AttributeDataVersionList::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventPathList::Builder
+     *  @return A reference to EventPaths::Builder
      */
     AttributeDataVersionList::Builder & CreateAttributeDataVersionListBuilder();
 
