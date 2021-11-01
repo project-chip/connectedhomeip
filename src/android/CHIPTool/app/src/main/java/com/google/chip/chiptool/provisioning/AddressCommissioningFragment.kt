@@ -1,8 +1,6 @@
 package com.google.chip.chiptool.provisioning
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,8 +19,15 @@ import kotlinx.android.synthetic.main.address_commissioning_fragment.discoverBtn
 import kotlinx.android.synthetic.main.address_commissioning_fragment.discoverListSpinner
 import kotlinx.android.synthetic.main.address_commissioning_fragment.discriminatorEditText
 import kotlinx.android.synthetic.main.address_commissioning_fragment.pincodeEditText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class AddressCommissioningFragment : Fragment() {
+  private val ipAddressList = ArrayList<String>()
+  private val scope = CoroutineScope(Dispatchers.Main + Job())
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -33,12 +38,6 @@ class AddressCommissioningFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
-    updateSpinnerHandler = Handler(Looper.getMainLooper()) {
-      updateSpinner()
-      discoverBtn.isEnabled = true;
-      true
-    }
 
     commissionBtn.setOnClickListener {
       val address = addressEditText.text.toString()
@@ -60,40 +59,40 @@ class AddressCommissioningFragment : Fragment() {
     }
 
     discoverBtn.setOnClickListener { _ ->
+      discoverBtn.isEnabled = false
       val deviceController = ChipClient.getDeviceController(requireContext())
       deviceController.discoverCommissionableNodes()
-      updateSpinnerHandler.sendEmptyMessageDelayed(0, 5000)
-      discoverBtn.isEnabled = false;
+      scope.launch {
+        updateSpinner()
+        discoverBtn.isEnabled = true
+      }
     }
   }
 
   private fun updateSpinner() {
     val deviceController = ChipClient.getDeviceController(requireContext())
-    for(i: Int in 0..10) {
+    for(i in 0..10) {
       val device = deviceController.getDiscoveredDevice(i) ?: break
-      ipAddressList.add("${device.ipAddress},${device.discriminator}")
+      ipAddressList.add("${device.ipAddress}, ${device.discriminator}")
     }
     requireActivity().runOnUiThread {
       discoverListSpinner.adapter =
         ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, ipAddressList)
       discoverListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
           val address = ipAddressList[position].split(",")[0].trim()
           val discriminator = ipAddressList[position].split(",")[1].trim()
           addressEditText.setText(address)
           discriminatorEditText.setText(discriminator)
         }
 
-        override fun onNothingSelected(parent: AdapterView<*>?) {}
+        override fun onNothingSelected(parent: AdapterView<*>) {}
       }
     }
   }
 
   companion object {
     private const val TAG = "AddressCommissioningFragment"
-    private const val SERVICE_TYPE = "_matterc._udp"
-    private val ipAddressList = ArrayList<String>()
-    private lateinit var updateSpinnerHandler: Handler
 
     fun newInstance(): AddressCommissioningFragment = AddressCommissioningFragment()
   }

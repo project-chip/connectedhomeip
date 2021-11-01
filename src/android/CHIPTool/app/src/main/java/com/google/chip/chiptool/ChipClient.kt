@@ -50,7 +50,7 @@ object ChipClient {
     if (!this::androidPlatform.isInitialized && context != null) {
       //force ChipDeviceController load jni
       ChipDeviceController.loadJni()
-      androidPlatform = AndroidChipPlatform(context)
+      androidPlatform = AndroidChipPlatform.defaultInstance(context)
     }
     return androidPlatform
   }

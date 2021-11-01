@@ -201,10 +201,10 @@ JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject man
 }
 
 // for ServiceResolver
-JNI_METHOD(void, nativeSetServiceResolver)(JNIEnv * env, jclass self, jobject resolver, jobject browse, jobject chipMdnsCallback)
+JNI_METHOD(void, nativeSetDnssdDelegates)(JNIEnv * env, jclass self, jobject resolver, jobject browser, jobject chipMdnsCallback)
 {
     chip::DeviceLayer::StackLock lock;
-    chip::Dnssd::InitializeWithObjects(resolver, browse, chipMdnsCallback);
+    chip::Dnssd::InitializeWithObjects(resolver, browser, chipMdnsCallback);
 }
 
 JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)

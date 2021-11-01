@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2020-2021 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,9 @@
  *   limitations under the License.
  *
  */
-package chip.platform;
+package chip.devicecontroller;
 
-/** Interface for resolving network services. */
-public interface ServiceBrowse {
-  /** TO-DO */
-  public void browse(
-      final String serviceType,
-      final long callbackHandle,
-      final long contextHandle,
-      final ChipMdnsCallback chipMdnsCallback);
+public class DiscoveredDevice {
+  public long discriminator;
+  public String ipAddress;
 }

@@ -40,19 +40,14 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
     this.mainThreadHandler = new Handler(Looper.getMainLooper());
 
-    this.multicastLock =
-        ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
-            .createMulticastLock("chipMulticastLock");
+    this.multicastLock = ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
+        .createMulticastLock("chipMulticastLock");
     this.multicastLock.setReferenceCounted(true);
   }
 
   @Override
-  public void resolve(
-      final String instanceName,
-      final String serviceType,
-      final long callbackHandle,
-      final long contextHandle,
-      final ChipMdnsCallback chipMdnsCallback) {
+  public void resolve(final String instanceName, final String serviceType, final long callbackHandle,
+      final long contextHandle, final ChipMdnsCallback chipMdnsCallback) {
     multicastLock.acquire();
 
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
@@ -60,103 +55,79 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     serviceInfo.setServiceType(serviceType);
     Log.d(TAG, "Starting service resolution for '" + instanceName + "'");
 
-    Runnable timeoutRunnable =
-        new Runnable() {
-          @Override
-          public void run() {
-            // Ensure we always release the multicast lock. It's possible that we release the
-            // multicast lock here before ResolveListener returns, but since NsdManager has no API
-            // to cancel service resolution, there's not much we can do here.
-            if (multicastLock.isHeld()) {
-              multicastLock.release();
-            }
-          }
-        };
+    Runnable timeoutRunnable = new Runnable() {
+      @Override
+      public void run() {
+        // Ensure we always release the multicast lock. It's possible that we release
+        // the
+        // multicast lock here before ResolveListener returns, but since NsdManager has
+        // no API
+        // to cancel service resolution, there's not much we can do here.
+        if (multicastLock.isHeld()) {
+          multicastLock.release();
+        }
+      }
+    };
 
-    this.nsdManager.resolveService(
-        serviceInfo,
-        new NsdManager.ResolveListener() {
-          @Override
-          public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-            Log.w(
-                TAG,
-                "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
+    this.nsdManager.resolveService(serviceInfo, new NsdManager.ResolveListener() {
+      @Override
+      public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+        Log.w(TAG, "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
+        chipMdnsCallback.handleServiceResolve(instanceName, serviceType, null, null, 0, null, callbackHandle,
+            contextHandle);
+        if (multicastLock.isHeld()) {
+          multicastLock.release();
+        }
+        mainThreadHandler.removeCallbacks(timeoutRunnable);
+      }
 
-            if (multicastLock.isHeld()) {
-              multicastLock.release();
-            }
-            mainThreadHandler.removeCallbacks(timeoutRunnable);
-          }
+      @Override
+      public void onServiceResolved(NsdServiceInfo serviceInfo) {
+        Log.i(TAG, "Resolved service '" + serviceInfo.getServiceName() + "' to " + serviceInfo.getHost());
+        // TODO: Find out if DNS-SD results for Android should contain interface ID
+        chipMdnsCallback.handleServiceResolve(instanceName, serviceType, serviceInfo.getHost().getHostName(),
+            serviceInfo.getHost().getHostAddress(), serviceInfo.getPort(), serviceInfo.getAttributes(), callbackHandle,
+            contextHandle);
 
-          @Override
-          public void onServiceResolved(NsdServiceInfo serviceInfo) {
-            Log.i(
-                TAG,
-                "Resolved service '"
-                    + serviceInfo.getServiceName()
-                    + "' to "
-                    + serviceInfo.getHost());
-            // TODO: Find out if DNS-SD results for Android should contain interface ID
-            chipMdnsCallback.handleServiceResolve(
-                instanceName,
-                serviceType,
-                serviceInfo.getHost().getHostName(),
-                serviceInfo.getHost().getHostAddress(),
-                serviceInfo.getPort(),
-                serviceInfo.getAttributes(),
-                callbackHandle,
-                contextHandle);
-
-            if (multicastLock.isHeld()) {
-              multicastLock.release();
-            }
-            mainThreadHandler.removeCallbacks(timeoutRunnable);
-          }
-        });
+        if (multicastLock.isHeld()) {
+          multicastLock.release();
+        }
+        mainThreadHandler.removeCallbacks(timeoutRunnable);
+      }
+    });
     mainThreadHandler.postDelayed(timeoutRunnable, RESOLVE_SERVICE_TIMEOUT);
   }
 
   @Override
-  public void publish(
-      String serviceName,
-      String hostName,
-      String type,
-      int port,
-      String[] textEntriesKeys,
-      byte[][] textEntriesDatas,
-      String[] subTypes) {
+  public void publish(String serviceName, String hostName, String type, int port, String[] textEntriesKeys,
+      byte[][] textEntriesDatas, String[] subTypes) {
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
     serviceInfo.setServiceName(serviceName);
     serviceInfo.setServiceType(type);
     serviceInfo.setPort(port);
     Log.i(TAG, "publish serviceName=" + serviceName + " type=" + type + " port=" + port);
 
-    NsdManager.RegistrationListener registrationListener =
-        new NsdManager.RegistrationListener() {
-          @Override
-          public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
-            Log.w(
-                TAG,
-                "service " + serviceInfo.getServiceName() + " onRegistrationFailed:" + errorCode);
-          }
+    NsdManager.RegistrationListener registrationListener = new NsdManager.RegistrationListener() {
+      @Override
+      public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+        Log.w(TAG, "service " + serviceInfo.getServiceName() + " onRegistrationFailed:" + errorCode);
+      }
 
-          @Override
-          public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
-            Log.w(
-                TAG,
-                "service " + serviceInfo.getServiceName() + " onUnregistrationFailed:" + errorCode);
-          }
+      @Override
+      public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+        Log.w(TAG, "service " + serviceInfo.getServiceName() + " onUnregistrationFailed:" + errorCode);
+      }
 
-          @Override
-          public void onServiceRegistered(NsdServiceInfo serviceInfo) {
-            Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered:");
-          }
+      @Override
+      public void onServiceRegistered(NsdServiceInfo serviceInfo) {
+        Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered:");
+      }
 
-          @Override
-          public void onServiceUnregistered(NsdServiceInfo serviceInfo) {
-            Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered:");
-          }
-        };
+      @Override
+      public void onServiceUnregistered(NsdServiceInfo serviceInfo) {
+        Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered:");
+      }
+    };
     registrationListeners.add(registrationListener);
 
     nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);

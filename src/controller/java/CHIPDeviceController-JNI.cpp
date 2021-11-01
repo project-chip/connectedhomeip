@@ -378,13 +378,13 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
         return nullptr;
     }
 
-    jclass discoveredDevicecls = env->FindClass("chip/devicecontroller/ChipDeviceController$DiscoveredDevice");
-    jmethodID constructor      = env->GetMethodID(discoveredDevicecls, "<init>", "()V");
+    jclass discoveredDeviceCls = env->FindClass("chip/devicecontroller/ChipDeviceController$DiscoveredDevice");
+    jmethodID constructor      = env->GetMethodID(discoveredDeviceCls, "<init>", "()V");
 
-    jfieldID discrminatorID = env->GetFieldID(discoveredDevicecls, "discriminator", "J");
-    jfieldID ipAddressID    = env->GetFieldID(discoveredDevicecls, "ipAddress", "Ljava/lang/String;");
+    jfieldID discrminatorID = env->GetFieldID(discoveredDeviceCls, "discriminator", "J");
+    jfieldID ipAddressID    = env->GetFieldID(discoveredDeviceCls, "ipAddress", "Ljava/lang/String;");
 
-    jobject discoveredObj = env->NewObject(discoveredDevicecls, constructor);
+    jobject discoveredObj = env->NewObject(discoveredDeviceCls, constructor);
 
     env->SetLongField(discoveredObj, discrminatorID, data->longDiscriminator);
 

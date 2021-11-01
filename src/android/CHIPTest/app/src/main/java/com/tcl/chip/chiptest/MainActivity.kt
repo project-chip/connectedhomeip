@@ -53,6 +53,6 @@ class MainActivity : AppCompatActivity() {
             }.start()
         }
 
-        AndroidChipPlatform(AndroidBleManager(), PreferencesKeyValueStoreManager(this), PreferencesConfigurationManager(this), NsdManagerServiceResolver(this), NsdManagerServiceBrowse(this), ChipMdnsCallbackImpl())
+        AndroidChipPlatform.defaultInstance(this)
     }
 }
