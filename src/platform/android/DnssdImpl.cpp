@@ -27,9 +27,9 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <memory>
 #include <cstddef>
 #include <jni.h>
+#include <memory>
 #include <string>
 
 namespace chip {
