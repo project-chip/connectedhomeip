@@ -38,4 +38,3 @@ CHIP_ERROR Layer::ScheduleLambdaBridge(LambdaBridge && bridge)
 
 } // namespace System
 } // namespace chip
-
