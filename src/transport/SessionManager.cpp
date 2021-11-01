@@ -401,7 +401,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decrypt(session, payloadHeader, packetHeader, msg),
                  ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding"));
 
-    err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
+    err = session->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
     if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
         isDuplicate = SessionManagerDelegate::DuplicateMessage::Yes;
@@ -409,17 +409,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     }
     if (err != CHIP_NO_ERROR)
     {
-        err = session->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
-        if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
-        {
-            isDuplicate = SessionManagerDelegate::DuplicateMessage::Yes;
-            err         = CHIP_NO_ERROR;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        SuccessOrExit(err);
+        ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
 
