@@ -85,9 +85,9 @@ bool emberAfScenesClusterCopySceneCallback(app::CommandHandler * commandObj, uin
 
     // If a group id is specified but this endpoint isn't in it, take no action.
     if ((groupIdFrom != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID &&
-         !emberAfGroupsClusterEndpointInGroupCallback(emberAfCurrentEndpoint(), groupIdFrom)) ||
+         !emberAfGroupsClusterEndpointInGroupCallback(commandObj, emberAfCurrentEndpoint(), groupIdFrom)) ||
         (groupIdTo != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID &&
-         !emberAfGroupsClusterEndpointInGroupCallback(emberAfCurrentEndpoint(), groupIdTo)))
+         !emberAfGroupsClusterEndpointInGroupCallback(commandObj, emberAfCurrentEndpoint(), groupIdTo)))
     {
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
         goto kickout;

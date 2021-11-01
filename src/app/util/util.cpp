@@ -418,7 +418,8 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
     }
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
     else if ((cmd->type == EMBER_INCOMING_MULTICAST || cmd->type == EMBER_INCOMING_MULTICAST_LOOPBACK) &&
-             !emberAfGroupsClusterEndpointInGroupCallback(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
+             !emberAfGroupsClusterEndpointInGroupCallback(cmd->source->GetSessionHandle().GetFabricIndex(),
+                                                          cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
     {
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
         emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "group");

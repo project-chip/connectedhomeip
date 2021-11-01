@@ -23784,6 +23784,7 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #1"));
         NextTest();
     }
 
@@ -23880,6 +23881,7 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #2"));
         NextTest();
     }
 
@@ -23976,6 +23978,7 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #1"));
         NextTest();
     }
 
@@ -24008,6 +24011,7 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #2"));
         NextTest();
     }
 
@@ -24040,6 +24044,7 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 65535U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #3"));
         NextTest();
     }
 
@@ -24165,6 +24170,7 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #1"));
         NextTest();
     }
 
@@ -24229,6 +24235,7 @@ private:
 
         VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 65535U));
 
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #3"));
         NextTest();
     }
 

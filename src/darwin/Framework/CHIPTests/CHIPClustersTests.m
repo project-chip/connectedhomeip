@@ -12673,6 +12673,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1U);
+            NSString * groupNameArgument = @"Group #1";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -12747,6 +12749,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4369U);
+            NSString * groupNameArgument = @"Group #2";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -12821,6 +12825,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1U);
+            NSString * groupNameArgument = @"Group #1";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -12845,6 +12851,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4369U);
+            NSString * groupNameArgument = @"Group #2";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -12869,6 +12877,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535U);
+            NSString * groupNameArgument = @"Group #3";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -12965,6 +12975,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1U);
+            NSString * groupNameArgument = @"Group #1";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];
@@ -13013,6 +13025,8 @@ CHIPDevice * GetConnectedDevice()
 
             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535U);
+            NSString * groupNameArgument = @"Group #3";
+            XCTAssertTrue([values[@"groupName"] isEqualToString:groupNameArgument]);
 
             [expectation fulfill];
         }];

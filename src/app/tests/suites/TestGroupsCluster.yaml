@@ -70,6 +70,8 @@ tests:
           values:
               - name: "groupId"
                 value: 0x0001
+              - name: "groupName"
+                value: "Group #1"
               - name: "status"
                 value: 0
 
@@ -111,6 +113,8 @@ tests:
           values:
               - name: "groupId"
                 value: 0x1111
+              - name: "groupName"
+                value: "Group #2"
               - name: "status"
                 value: 0
 
@@ -152,6 +156,8 @@ tests:
           values:
               - name: "groupId"
                 value: 0x01
+              - name: "groupName"
+                value: "Group #1"
               - name: "status"
                 value: 0
 
@@ -165,6 +171,8 @@ tests:
           values:
               - name: "groupId"
                 value: 0x1111
+              - name: "groupName"
+                value: "Group #2"
               - name: "status"
                 value: 0
 
@@ -178,6 +186,8 @@ tests:
           values:
               - name: "groupId"
                 value: 0xffff
+              - name: "groupName"
+                value: "Group #3"
               - name: "status"
                 value: 0
 
@@ -230,6 +240,8 @@ tests:
           values:
               - name: "groupId"
                 value: 0x0001
+              - name: "groupName"
+                value: "Group #1"
               - name: "status"
                 value: 0
 
@@ -256,6 +268,8 @@ tests:
           values:
               - name: "groupId"
                 value: 0xffff
+              - name: "groupName"
+                value: "Group #3"
               - name: "status"
                 value: 0
 
