@@ -29,8 +29,7 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                            InteractionType aInteractionType, uint64_t aAppIdentifier)
+CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, InteractionType aInteractionType)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
@@ -38,9 +37,8 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interact
     VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     mpExchangeMgr              = apExchangeMgr;
-    mpDelegate                 = apDelegate;
+    mpCallback                 = apCallback;
     mState                     = ClientState::Initialized;
-    mAppIdentifier             = aAppIdentifier;
     mMinIntervalFloorSeconds   = 0;
     mMaxIntervalCeilingSeconds = 0;
     mSubscriptionId            = 0;
@@ -60,17 +58,14 @@ void ReadClient::Shutdown()
 
 void ReadClient::ShutdownInternal(CHIP_ERROR aError)
 {
-    if (mpDelegate != nullptr)
+    if (mpCallback != nullptr)
     {
         if (aError != CHIP_NO_ERROR)
         {
-            mpDelegate->ReadError(this, aError);
+            mpCallback->OnError(this, aError);
         }
-        else
-        {
-            mpDelegate->ReadDone(this);
-        }
-        mpDelegate = nullptr;
+        mpCallback->OnDone(this);
+        mpCallback = nullptr;
     }
     if (IsSubscriptionType())
     {
@@ -122,7 +117,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     ChipLogDetail(DataManagement, "%s: Client[%u] [%5.5s]", __func__,
                   InteractionModelEngine::GetInstance()->GetReadClientArrayIndex(this), GetStateStr());
     VerifyOrExit(ClientState::Initialized == mState, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Discard any existing exchange context. Effectively we can only have one exchange per ReadClient
     // at any one time.
@@ -290,7 +285,7 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(!IsFree(), err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
         err = ProcessReportData(std::move(aPayload));
@@ -411,12 +406,11 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
-    if (isEventListPresent && nullptr != mpDelegate)
+    if (isEventListPresent && nullptr != mpCallback)
     {
         chip::TLV::TLVReader eventListReader;
         eventList.GetReader(&eventListReader);
-        err = mpDelegate->EventStreamReceived(mpExchangeCtx, &eventListReader);
-        SuccessOrExit(err);
+        mpCallback->OnEventData(this, eventListReader);
     }
 
     err                        = report.GetAttributeDataList(&attributeDataList);
@@ -426,7 +420,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
-    if (isAttributeDataListPresent && nullptr != mpDelegate && !moreChunkedMessages)
+    if (isAttributeDataListPresent && nullptr != mpCallback && !moreChunkedMessages)
     {
         chip::TLV::TLVReader attributeDataListReader;
         attributeDataList.GetReader(&attributeDataListReader);
@@ -440,10 +434,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         // are multiple reports
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        mpDelegate->ReportProcessed(this);
-    }
 exit:
     SendStatusResponse(err);
     if (!mInitialReport)
@@ -524,7 +514,9 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         {
             ExitNow();
         }
-        mpDelegate->OnReportData(this, clusterInfo, &dataReader, status);
+        mpCallback->OnAttributeData(
+            this, ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mFieldId),
+            status == Protocols::InteractionModel::Status::Success ? &dataReader : nullptr, StatusIB(status));
     }
 
     if (CHIP_END_OF_TLV == err)
@@ -591,7 +583,11 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     VerifyOrReturnLogError(IsMatchingClient(subscriptionId), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnLogErrorOnFailure(subscribeResponse.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnLogErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
-    mpDelegate->SubscribeResponseProcessed(this);
+
+    if (mpCallback != nullptr)
+    {
+        mpCallback->OnSubscriptionEstablished(this);
+    }
 
     MoveToState(ClientState::SubscriptionActive);
 
@@ -606,7 +602,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     SubscribeRequest::Builder request;
     VerifyOrExit(ClientState::Initialized == mState, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
