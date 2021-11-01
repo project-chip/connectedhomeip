@@ -189,10 +189,22 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     ChipLogDetail(Zcl, "  ProductID: %" PRIu16, productId);
     ChipLogDetail(Zcl, "  SoftwareVersion: %" PRIu32, softwareVersion);
     ChipLogDetail(Zcl, "  ProtocolsSupported: %" PRIu8, protocolsSupported);
-    ChipLogDetail(Zcl, "  HardwareVersion: %" PRIu16, hardwareVersion);
-    ChipLogDetail(Zcl, "  Location: %.*s", static_cast<int>(location.size()), location.data());
-    ChipLogDetail(Zcl, "  RequestorCanConsent: %" PRIu8, requestorCanConsent);
-    ChipLogDetail(Zcl, "  MetadataForProvider: %zu", metadataForProvider.size());
+    if (hardwareVersion.HasValue())
+    {
+        ChipLogDetail(Zcl, "  HardwareVersion: %" PRIu16, hardwareVersion.Value());
+    }
+    if (location.HasValue())
+    {
+        ChipLogDetail(Zcl, "  Location: %.*s", static_cast<int>(location.Value().size()), location.Value().data());
+    }
+    if (requestorCanConsent.HasValue())
+    {
+        ChipLogDetail(Zcl, "  RequestorCanConsent: %" PRIu8, requestorCanConsent.Value());
+    }
+    if (metadataForProvider.HasValue())
+    {
+        ChipLogDetail(Zcl, "  MetadataForProvider: %zu", metadataForProvider.Value().size());
+    }
 
     if (location.HasValue() && location.Value().size() != kLocationLen)
     {
