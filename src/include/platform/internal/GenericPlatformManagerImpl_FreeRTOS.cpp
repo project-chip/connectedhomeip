@@ -56,7 +56,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
     mChipStackLock = xSemaphoreCreateMutexStatic(&mChipStackLockMutex);
 #else
     mChipStackLock = xSemaphoreCreateMutex();
-    
+
     if (mChipStackLock == NULL)
     {
         ChipLogError(DeviceLayer, "Failed to create CHIP stack lock");
