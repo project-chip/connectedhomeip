@@ -100,8 +100,8 @@ void TestMockClock(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMilliseconds64() == Clock::Zero);
     NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMicroseconds64() == Clock::Zero);
 
-    constexpr Clock::Milliseconds64 k1234 = Clock::Milliseconds64( 1234 );
-    clock.mTime = k1234;
+    constexpr Clock::Milliseconds64 k1234 = Clock::Milliseconds64(1234);
+    clock.mTime                           = k1234;
     NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMilliseconds64() == k1234);
     NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMicroseconds64() == k1234);
 
