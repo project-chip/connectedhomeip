@@ -220,10 +220,10 @@ CHIP_ERROR ReadClient::SendStatusResponseMessage(CHIP_ERROR aError)
             RefreshLivenessCheckTimer();
         }
     }
-    ReturnLogErrorOnFailure(mpExchangeCtx->SendMessage(
-        Protocols::InteractionModel::MsgType::StatusResponseMessage, std::move(msgBuf),
-        Messaging::SendFlags(IsAwaitingSubscribeResponse() ? Messaging::SendMessageFlags::kExpectResponse
-                                                                  : Messaging::SendMessageFlags::kNone)));
+    ReturnLogErrorOnFailure(
+        mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::StatusResponseMessage, std::move(msgBuf),
+                                   Messaging::SendFlags(IsAwaitingSubscribeResponse() ? Messaging::SendMessageFlags::kExpectResponse
+                                                                                      : Messaging::SendMessageFlags::kNone)));
     return CHIP_NO_ERROR;
 }
 

@@ -187,11 +187,11 @@ private:
 
     enum class ClientState
     {
-        Uninitialized = 0,                ///< The client has not been initialized
-        Initialized,                      ///< The client has been initialized and is ready for a SendReadRequest
-        AwaitingInitialReport,            ///< The client is waiting for initial report
+        Uninitialized = 0,         ///< The client has not been initialized
+        Initialized,               ///< The client has been initialized and is ready for a SendReadRequest
+        AwaitingInitialReport,     ///< The client is waiting for initial report
         AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
-        SubscriptionActive,               ///< The client is maintaining subscription
+        SubscriptionActive,        ///< The client is maintaining subscription
     };
 
     bool IsMatchingClient(uint64_t aSubscriptionId)
