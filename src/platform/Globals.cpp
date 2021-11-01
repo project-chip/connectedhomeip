@@ -31,8 +31,22 @@ chip::Inet::InetLayer & InetLayer()
     return gInetLayer;
 }
 
+#ifndef NDEBUG
+chip::System::LayerImpl * gMockedSystemLayer = nullptr;
+
+void SetSystemLayerForTesting(System::LayerImpl * layer)
+{
+    gMockedSystemLayer = layer;
+}
+#endif
+
 chip::System::LayerImpl & SystemLayerImpl()
 {
+#ifndef NDEBUG
+    if (gMockedSystemLayer != nullptr)
+        return *gMockedSystemLayer;
+#endif
+
     static chip::System::LayerImpl gSystemLayerImpl;
     return gSystemLayerImpl;
 }
