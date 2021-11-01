@@ -255,7 +255,7 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
     case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
     {
         TLV::uint24_t uint24_data;
-        memcpy(&uint24_data, attributeData, sizeof(uint24_data));
+        memcpy(static_cast<void *>(&uint24_data), attributeData, sizeof(uint24_data));
         ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint24_data));
         break;
     }
@@ -290,7 +290,7 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
     case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
     {
         TLV::int24_t int24_data;
-        memcpy(&int24_data, attributeData, sizeof(int24_data));
+        memcpy(static_cast<void *>(&int24_data), attributeData, sizeof(int24_data));
         ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int24_data));
         break;
     }
