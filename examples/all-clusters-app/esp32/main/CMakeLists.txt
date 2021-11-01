@@ -179,6 +179,17 @@ pw_proto_library(lighting_service
     pw_protobuf.common_protos
 )
 
+pw_proto_library(locking_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/locking_service.proto
+  PREFIX
+    locking_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
 pw_proto_library(wifi_service
   SOURCES
     ${CHIP_ROOT}/examples/ipv6only-app/common/wifi_service/wifi_service.proto
@@ -197,6 +208,7 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
   button_service.nanopb_rpc
   device_service.nanopb_rpc
   lighting_service.nanopb_rpc
+  locking_service.nanopb_rpc
   wifi_service.nanopb_rpc
   pw_checksum
   pw_hdlc

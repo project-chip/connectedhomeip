@@ -84,7 +84,7 @@ public:
             response.product_id = static_cast<uint32_t>(product_id);
         }
 
-        uint32_t software_version;
+        uint16_t software_version;
         if (DeviceLayer::ConfigurationMgr().GetFirmwareRevision(software_version) == CHIP_NO_ERROR)
         {
             response.software_version = software_version;
