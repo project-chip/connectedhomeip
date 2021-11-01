@@ -52,22 +52,27 @@
 namespace chip {
 namespace TLV {
 
-struct uint24_t {
+struct uint24_t
+{
     uint24_t() { memset(value, 0, 3); };
-    uint24_t(uint24_t &v) { memcpy(value, v.value, 3); };
-    uint24_t(const uint24_t &v) { memcpy(value, v.value, 3); };
-    uint24_t(const uint64_t &v) { memcpy(value, &v, 3); };
-    operator uint32_t() const { return (uint32_t)value[2] << 16 | (uint32_t)value[1] << 8 | (uint32_t)value[0]; };
+    uint24_t(uint24_t & v) { memcpy(value, v.value, 3); };
+    uint24_t(const uint24_t & v) { memcpy(value, v.value, 3); };
+    uint24_t(const uint64_t & v) { memcpy(value, &v, 3); };
+    operator uint32_t() const { return (uint32_t) value[2] << 16 | (uint32_t) value[1] << 8 | (uint32_t) value[0]; };
 
     uint8_t value[3];
 };
 
-struct int24_t {
+struct int24_t
+{
     int24_t() { memset(value, 0, 3); };
-    int24_t(int24_t &v) { memcpy(value, v.value, 3); };
-    int24_t(const int24_t &v) { memcpy(value, v.value, 3); };
-    int24_t(const int64_t &v) { memcpy(value, &v, 3); };
-    operator int32_t() const { return (int32_t)value[2] << 16 | (int32_t)value[1] << 8 | (int32_t)value[0]; };
+    int24_t(int24_t & v) { memcpy(value, v.value, 3); };
+    int24_t(const int24_t & v) { memcpy(value, v.value, 3); };
+    int24_t(const int64_t & v) { memcpy(value, &v, 3); };
+    operator int32_t() const
+    {
+        return (int32_t) ((uint32_t) value[2] << 24 | (uint32_t) value[1] << 16 | (uint32_t) value[0] << 8) >> 8;
+    };
 
     uint8_t value[3];
 };
@@ -434,7 +439,6 @@ public:
      *
      */
     CHIP_ERROR Get(uint16_t & v);
-
 
     /**
      * Get the value of the current element as a 24-bit unsigned integer.
