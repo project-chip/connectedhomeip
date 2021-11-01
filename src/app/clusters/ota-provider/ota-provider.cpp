@@ -184,7 +184,15 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
         return true;
     };
 
-    ChipLogDetail(Zcl, "OTA Provider received QueryImage");
+    ChipLogProgress(Zcl, "OTA Provider received QueryImage");
+    ChipLogDetail(Zcl, "  VendorID: 0x%" PRIx16, vendorId);
+    ChipLogDetail(Zcl, "  ProductID: %" PRIu16, productId);
+    ChipLogDetail(Zcl, "  SoftwareVersion: %" PRIu32, softwareVersion);
+    ChipLogDetail(Zcl, "  ProtocolsSupported: %" PRIu8, protocolsSupported);
+    ChipLogDetail(Zcl, "  HardwareVersion: %" PRIu16, hardwareVersion);
+    ChipLogDetail(Zcl, "  Location: %.*s", static_cast<int>(location.size()), location.data());
+    ChipLogDetail(Zcl, "  RequestorCanConsent: %" PRIu8, requestorCanConsent);
+    ChipLogDetail(Zcl, "  MetadataForProvider: %zu", metadataForProvider.size());
 
     if (location.size() != kLocationLen)
     {

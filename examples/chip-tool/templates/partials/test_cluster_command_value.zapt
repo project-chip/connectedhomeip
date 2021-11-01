@@ -2,13 +2,17 @@
   {{#if ignore}}
     {{>commandValue ns=ns container=(concat container ".Emplace()") definedValue=definedValue type=type isOptional=false ignore=true}}
   {{else}}
-    {{>commandValue ns=ns container=(concat container "." label ".Emplace()") definedValue=definedValue type=type isOptional=false ignore=true}}
+    {{>commandValue ns=ns container=(concat container "." (asLowerCamelCase label) ".Emplace()") definedValue=definedValue type=type isOptional=false ignore=true}}
   {{/if}}
 {{else if isNullable}}
-  {{#if ignore}}
-    {{>commandValue ns=ns container=(concat container ".SetNonNull()") definedValue=definedValue type=type isNullable=false ignore=true}}
+  {{#if (isLiteralNull definedValue)}}
+    {{container}}{{#unless ignore}}.{{asLowerCamelCase label}}{{/unless}}.SetNull();
   {{else}}
-    {{>commandValue ns=ns container=(concat container "." label ".SetNonNull()") definedValue=definedValue type=type isNullable=false ignore=true}}
+    {{#if ignore}}
+      {{>commandValue ns=ns container=(concat container ".SetNonNull()") definedValue=definedValue type=type isNullable=false ignore=true}}
+    {{else}}
+      {{>commandValue ns=ns container=(concat container "." (asLowerCamelCase label) ".SetNonNull()") definedValue=definedValue type=type isNullable=false ignore=true}}
+    {{/if}}
   {{/if}}
 {{else if isArray}}
 
@@ -26,9 +30,9 @@
 
     {{#zcl_struct_items_by_struct_name type}}
       {{#if ../ignore}}
-      {{>commandValue ns=parent.ns container=(concat parent.container "." label) definedValue=(lookup parent.definedValue name) ignore=../ignore}}
+      {{>commandValue ns=parent.ns container=(concat parent.container "." (asLowerCamelCase label)) definedValue=(lookup parent.definedValue name) ignore=../ignore}}
       {{else}}
-      {{>commandValue ns=parent.ns container=(concat parent.container "." parent.label) definedValue=(lookup parent.definedValue name) ignore=../ignore}}
+      {{>commandValue ns=parent.ns container=(concat parent.container "." (asLowerCamelCase parent.label)) definedValue=(lookup parent.definedValue name) ignore=../ignore}}
       {{/if}}
     {{/zcl_struct_items_by_struct_name}}
 

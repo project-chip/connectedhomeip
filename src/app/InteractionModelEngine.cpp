@@ -121,14 +121,8 @@ void InteractionModelEngine::Shutdown()
 }
 
 CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
-                                                 uint64_t aAppIdentifier, InteractionModelDelegate * apDelegateOverride)
+                                                 ReadClient::Callback * aCallback)
 {
-
-    if (apDelegateOverride == nullptr)
-    {
-        apDelegateOverride = mpDelegate;
-    }
-
     *apReadClient = nullptr;
 
     for (auto & readClient : mReadClients)
@@ -138,7 +132,7 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
             CHIP_ERROR err;
 
             *apReadClient = &readClient;
-            err           = readClient.Init(mpExchangeMgr, apDelegateOverride, aInteractionType, aAppIdentifier);
+            err           = readClient.Init(mpExchangeMgr, aCallback, aInteractionType);
             if (CHIP_NO_ERROR != err)
             {
                 *apReadClient = nullptr;
@@ -428,11 +422,11 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
                     ChipLogValueExchange(ec));
 }
 
-CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier)
+CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
 {
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aAppIdentifier));
+    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aCallback));
     err = client->SendReadRequest(aReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
@@ -441,10 +435,10 @@ CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrep
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier)
+CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
 {
     ReadClient * client = nullptr;
-    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aAppIdentifier));
+    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aCallback));
     ReturnErrorOnFailure(client->SendSubscribeRequest(aReadPrepareParams));
     return CHIP_NO_ERROR;
 }

@@ -386,18 +386,11 @@ public:
     PASESessionSerializable & GetPairing() { return mPairing; }
 
     uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
-    void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            app::TLVDataFilter tlvDataFilter = nullptr);
-    void CancelResponseHandler(uint8_t seqNum);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback,
                           app::TLVDataFilter tlvDataFilter);
-
-    // This two functions are pretty tricky, it is used to bridge the response, we need to implement interaction model delegate
-    // on the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
-    // type-safe.
-    // TODO: Implement interaction model delegate in the application.
-    void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
-                              Callback::Cancelable * onFailureCallback);
+    // Interaction model uses the object and callback interface instead of sequence number to mark different transactions.
+    void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              app::TLVDataFilter tlvDataFilter = nullptr);
     void CancelIMResponseHandler(void * commandObj);
 
     void OperationalCertProvisioned();

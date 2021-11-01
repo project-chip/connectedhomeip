@@ -101,7 +101,7 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
+    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
 
     /**
      *  Creates a new read client and sends SubscribeRequest message to the node using the read client.
@@ -110,7 +110,7 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
+    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
 
     /**
      * Tears down an active subscription.
@@ -151,7 +151,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
-                             uint64_t aAppIdentifier, InteractionModelDelegate * apDelegateOverride = nullptr);
+                             ReadClient::Callback * aCallback);
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadClients() const;
@@ -256,6 +256,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *  This function is implemented by CHIP as a part of cluster data storage & management.
  * The apWriter and apDataExists can be nullptr.
  *
+ *  @param[in]    aAccessingFabricIndex The accessing fabric index for the read.
  *  @param[in]    aPath             The concrete path of the data being read.
  *  @param[in]    apWriter          The TLVWriter for holding cluster data. Can be a nullptr if the caller does not care
  *                                  the exact value of the attribute.
@@ -264,7 +265,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists);
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
+                                 bool * apDataExists);
 
 /**
  * TODO: Document.

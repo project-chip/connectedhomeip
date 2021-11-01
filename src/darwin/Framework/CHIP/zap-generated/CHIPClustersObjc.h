@@ -1088,6 +1088,33 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Mode Select
+ *
+ */
+@interface CHIPModeSelect : CHIPCluster
+
+- (void)changeToMode:(uint8_t)newMode responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCurrentModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)subscribeAttributeCurrentModeWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentModeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeSupportedModesWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeOnModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOnModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeStartUpModeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Network Commissioning
  *
  */
@@ -1282,6 +1309,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeTrustedRootCertificatesWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCurrentFabricIndexWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -1666,6 +1695,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeVendorIdWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeListNullablesAndOptionalsStructWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;

@@ -46,18 +46,9 @@ enum
     kCsTag_StatusIB    = 2,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @brief Initialize the parser object with TLVReader
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this CommandDataIB
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
@@ -112,18 +103,9 @@ protected:
     CHIP_ERROR ParseData(chip::TLV::TLVReader & aReader, int aDepth) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public StructBuilder
 {
 public:
-    /**
-     *  @brief Initialize a AttributeDataList::Builder for writing into a TLV stream
-     *
-     *  @param [in] apWriter    A pointer to TLVWriter
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
-
     /**
      *  @brief Initialize a CommandPathIB::Builder for writing into the TLV stream
      *

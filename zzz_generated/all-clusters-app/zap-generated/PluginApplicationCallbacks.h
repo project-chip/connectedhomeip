@@ -55,6 +55,7 @@
     MatterLowPowerPluginServerInitCallback();                                                                                      \
     MatterMediaInputPluginServerInitCallback();                                                                                    \
     MatterMediaPlaybackPluginServerInitCallback();                                                                                 \
+    MatterModeSelectPluginServerInitCallback();                                                                                    \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOtaSoftwareUpdateProviderPluginServerInitCallback();                                                                     \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \

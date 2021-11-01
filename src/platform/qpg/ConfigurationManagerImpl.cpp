@@ -115,6 +115,7 @@ exit:
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
+    qvStatus_t qvErr;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
@@ -122,6 +123,12 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
+    }
+
+    qvErr = qvCHIP_KvsErasePartition();
+    if (qvErr != QV_STATUS_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "qvCHIP_KvsErasePartition() failed: %d", qvErr);
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

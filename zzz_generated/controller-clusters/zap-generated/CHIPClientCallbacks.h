@@ -146,8 +146,8 @@ typedef void (*TestClusterClusterTestAddArgumentsResponseCallback)(void * contex
 typedef void (*TestClusterClusterTestEnumsResponseCallback)(void * context, chip::VendorId arg1, uint8_t arg2);
 typedef void (*TestClusterClusterTestListInt8UReverseResponseCallback)(void * context,
                                                                        /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
-typedef void (*TestClusterClusterTestNullableOptionalResponseCallback)(void * context, bool wasPresent, bool wasNull,
-                                                                       uint8_t value);
+typedef void (*TestClusterClusterTestNullableOptionalResponseCallback)(void * context, bool wasPresent, bool wasNull, uint8_t value,
+                                                                       uint8_t originalValue);
 typedef void (*TestClusterClusterTestSpecificResponseCallback)(void * context, uint8_t returnValue);
 
 // List specific responses
@@ -237,6 +237,11 @@ void MediaInputClusterMediaInputListListAttributeFilter(chip::TLV::TLVReader * d
 typedef void (*MediaInputMediaInputListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & data);
+void ModeSelectClusterSupportedModesListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
+                                                        chip::Callback::Cancelable * onFailureCallback);
+typedef void (*ModeSelectSupportedModesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & data);
 void OperationalCredentialsClusterFabricsListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                  chip::Callback::Cancelable * onSuccessCallback,
                                                                  chip::Callback::Cancelable * onFailureCallback);
@@ -282,6 +287,13 @@ typedef void (*TestClusterListStructOctetStringListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
         data);
+void TestClusterClusterListNullablesAndOptionalsStructListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                          chip::Callback::Cancelable * onSuccessCallback,
+                                                                          chip::Callback::Cancelable * onFailureCallback);
+typedef void (*TestClusterListNullablesAndOptionalsStructListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & data);
 void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                          chip::Callback::Cancelable * onSuccessCallback,
                                                                          chip::Callback::Cancelable * onFailureCallback);

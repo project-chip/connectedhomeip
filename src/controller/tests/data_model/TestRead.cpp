@@ -58,7 +58,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
+                                 bool * apDataExists)
 {
     if (responseDirective == kSendDataResponse)
     {
@@ -137,8 +138,7 @@ void TestReadInteraction::TestDataResponse(nlTestSuite * apSuite, void * apConte
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath,
-                                             Protocols::InteractionModel::Status aIMStatus,
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB aIMStatus,
                                              CHIP_ERROR aError) { onFailureCbInvoked = true; };
 
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(

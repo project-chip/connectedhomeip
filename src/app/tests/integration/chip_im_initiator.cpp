@@ -126,15 +126,12 @@ void HandleSubscribeReportComplete()
 
 class MockInteractionModelApp : public chip::app::InteractionModelDelegate,
                                 public ::chip::app::CommandSender::Callback,
-                                public ::chip::app::WriteClient::Callback
+                                public ::chip::app::WriteClient::Callback,
+                                public ::chip::app::ReadClient::Callback
 {
 public:
-    CHIP_ERROR EventStreamReceived(const chip::Messaging::ExchangeContext * apExchangeContext,
-                                   chip::TLV::TLVReader * apEventListReader) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR ReportProcessed(const chip::app::ReadClient * apReadClient) override
+    void OnEventData(const chip::app::ReadClient * apReadClient, chip::TLV::TLVReader & apEventListReader) override {}
+    void OnSubscriptionEstablished(const chip::app::ReadClient * apReadClient) override
     {
         if (apReadClient->IsSubscriptionType())
         {
@@ -144,22 +141,21 @@ public:
                 HandleSubscribeReportComplete();
             }
         }
-
-        return CHIP_NO_ERROR;
     }
+    void OnAttributeData(const chip::app::ReadClient * apReadClient, const chip::app::ConcreteAttributePath & aPath,
+                         chip::TLV::TLVReader * aData, const chip::app::StatusIB & status) override
+    {}
 
-    CHIP_ERROR ReadError(chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    void OnError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
         printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format());
-        return CHIP_NO_ERROR;
     }
-    CHIP_ERROR ReadDone(chip::app::ReadClient * apReadClient) override
+    void OnDone(chip::app::ReadClient * apReadClient) override
     {
         if (!apReadClient->IsSubscriptionType())
         {
             HandleReadComplete();
         }
-        return CHIP_NO_ERROR;
     }
 
     void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
@@ -247,8 +243,7 @@ CHIP_ERROR SendCommandRequest(std::unique_ptr<chip::app::CommandSender> && comma
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, chip::Optional<chip::SessionHandle>::Missing(),
-                                            gMessageTimeout);
+    err = commandSender->SendCommandRequest(gSessionManager.FindSecureSessionForNode(chip::kTestDeviceNodeId), gMessageTimeout);
     SuccessOrExit(err);
 
     gCommandCount++;
@@ -284,8 +279,7 @@ CHIP_ERROR SendBadCommandRequest(std::unique_ptr<chip::app::CommandSender> && co
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, chip::Optional<chip::SessionHandle>::Missing(),
-                                            gMessageTimeout);
+    err = commandSender->SendCommandRequest(gSessionManager.FindSecureSessionForNode(chip::kTestDeviceNodeId), gMessageTimeout);
     SuccessOrExit(err);
     gCommandCount++;
     commandSender.release();
@@ -322,7 +316,7 @@ CHIP_ERROR SendReadRequest()
     readPrepareParams.mAttributePathParamsListSize = 1;
     readPrepareParams.mpEventPathParamsList        = eventPathParams;
     readPrepareParams.mEventPathParamsListSize     = 2;
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &gMockDelegate);
     SuccessOrExit(err);
 
 exit:
@@ -359,8 +353,8 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
 
     SuccessOrExit(err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true));
     SuccessOrExit(err = apWriteClient->FinishAttribute());
-    SuccessOrExit(err = apWriteClient.SendWriteRequest(chip::kTestDeviceNodeId, gFabricIndex,
-                                                       chip::Optional<chip::SessionHandle>::Missing(), gMessageTimeout));
+    SuccessOrExit(
+        err = apWriteClient.SendWriteRequest(gSessionManager.FindSecureSessionForNode(chip::kTestDeviceNodeId), gMessageTimeout));
 
     gWriteCount++;
 
@@ -407,7 +401,7 @@ CHIP_ERROR SendSubscribeRequest()
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(readPrepareParams);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(readPrepareParams, &gMockDelegate);
     SuccessOrExit(err);
 
     gSubCount++;
@@ -639,7 +633,8 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     gLastCommandResult = TestCommandResult::kSuccess;
 }
 
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
+                                 bool * apDataExists)
 {
     // We do not really care about the value, just return a not found status code.
     VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);

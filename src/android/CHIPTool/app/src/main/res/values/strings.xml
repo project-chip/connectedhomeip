@@ -99,15 +99,50 @@
     <string name="op_cred_client_btn_text">Operational Credentials cluster</string>
     <string name="op_cred_client_read_supported_fabric_btn_text">Read Supported Fabric count</string>
     <string name="op_cred_client_read_commissioned_fabric_btn_text">Read Commissioned Fabric count</string>
-    
+
     <string name="basic_cluster_btn_text">Basic cluster</string>
-    <string name="basic_cluster_read_user_label_btn_text">Read User Label</string>
-    <string name="basic_cluster_write_user_label_btn_text">Write User Label</string>
+    <string name="basic_cluster_write_btn_text">Write</string>
     <string name="basic_cluster_write_user_label_hint_text">Enter User Label</string>
-    <string name="basic_cluster_read_product_name_btn_text">Read Product Name</string>
+    <string name="basic_cluster_write_location_hint_text">Enter Location</string>
+    <string name="basic_cluster_local_config_disabled_btn_text">Set LocalConfigDisabled</string>
+    <string name="basic_cluster_read_attribute_btn_text">Read Attribute</string>
+    <string name="basic_cluster_interaction_mode_version_text">InteractionModelVersion</string>
+    <string name="basic_cluster_vendor_name_text">VendorName</string>
+    <string name="basic_cluster_vendor_id_text">VendorID</string>
+    <string name="basic_cluster_product_name_text">ProductName</string>
+    <string name="basic_cluster_product_id_text">ProductID</string>
+    <string name="basic_cluster_user_label_text">UserLabel</string>
+    <string name="basic_cluster_location_text">Location</string>
+    <string name="basic_cluster_hardware_version_text">HardwareVersion</string>
+    <string name="basic_cluster_hardware_version_string_text">HardwareVersionString</string>
+    <string name="basic_cluster_software_version_text">SoftwareVersion</string>
+    <string name="basic_cluster_software_version_string_text">SoftwareVersionString</string>
+    <string name="basic_cluster_manufacturing_date_text">ManufacturingDate</string>
+    <string name="basic_cluster_part_number_text">PartNumber</string>
+    <string name="basic_cluster_product_url_text">ProductURL</string>
+    <string name="basic_cluster_product_label_text">ProductLabel</string>
+    <string name="basic_cluster_serial_number_text">SerialNumber</string>
+    <string name="basic_cluster_local_config_disabled_text">LocalConfigDisabled</string>
+    <string name="basic_cluster_reachable_text">Reachable</string>
+    <string name="basic_cluster_cluster_revision_text">ClusterRevision</string>
 
     <string name="subscribe_dialog_title_text">Subscribe on/off</string>
     <string name="subscribe_dialog_subscribe_btn_text">Subscribe</string>
     <string name="subscribe_dialog_min_interval_hint">Minimum interval (seconds)</string>
     <string name="subscribe_dialog_max_interval_hint">Maximum interval (seconds)</string>
+
+    <string name="provision_custom_flow_btn_text">Provision CHIP device with Custom Flow</string>
+    <string name="chip_device_info_commissioning_flow_label">Commissioning Flow:</string>
+    <string name="chip_device_info_custom_flow_btn_text">Read from Ledger</string>
+    <string name="chip_ledger_info_title">Device Model Info</string>
+    <string name="chip_ledger_info_commissioning_flow_url_label">Commissioning Url:</string>
+    <string name="chip_ledger_info_commissioning_flow_url_text">Loading...</string>
+    <string name="chip_ledge_info_redirect_btn_text">Redirect</string>
+    <string name="chip_ledger_info_commissioning_flow_url_not_available">Not available</string>
+
+    <string name="dcl_api_root_url">https://dcl.dev.dsr-corporation.com/api/modelinfo/models</string>
+    <string name="dcl_response_key">result</string>
+    <string name="dcl_custom_flow_url_key">custom</string>
+    <string name="custom_flow_return_url"></string>
+    <string name="retrieve_endpoint_list">Retrieve Endpoint List</string>
 </resources>

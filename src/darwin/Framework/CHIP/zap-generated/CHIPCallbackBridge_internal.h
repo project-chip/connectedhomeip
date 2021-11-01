@@ -346,6 +346,20 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list);
 };
 
+class CHIPModeSelectSupportedModesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ModeSelectSupportedModesListAttributeCallback>
+{
+public:
+    CHIPModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<ModeSelectSupportedModesListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
+            list);
+};
+
 class CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge
     : public CHIPCallbackBridge<OperationalCredentialsFabricsListListAttributeCallback>
 {
@@ -442,6 +456,20 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
             list);
+};
+
+class CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TestClusterListNullablesAndOptionalsStructListAttributeCallback>
+{
+public:
+    CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterListNullablesAndOptionalsStructListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list);
 };
 
 class CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
@@ -1335,7 +1363,7 @@ public:
         CHIPCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, bool wasPresent, bool wasNull, uint8_t value);
+    static void OnSuccessFn(void * context, bool wasPresent, bool wasNull, uint8_t value, uint8_t originalValue);
 };
 
 class CHIPTestClusterClusterTestSpecificResponseCallbackBridge

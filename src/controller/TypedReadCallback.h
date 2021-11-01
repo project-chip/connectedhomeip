@@ -36,7 +36,7 @@ namespace Controller {
  *     cluster object.
  */
 template <typename AttributeTypeInfo>
-class TypedReadCallback final : public app::InteractionModelDelegate
+class TypedReadCallback final : public app::ReadClient::Callback
 {
 public:
     using OnSuccessCallbackType =
@@ -50,22 +50,22 @@ public:
     {}
 
 private:
-    void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
-                      Protocols::InteractionModel::Status status) override
+    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & status) override
     {
-        CHIP_ERROR err                           = CHIP_NO_ERROR;
-        app::ConcreteAttributePath attributePath = { aPath.mEndpointId, aPath.mClusterId, aPath.mFieldId };
+        CHIP_ERROR err = CHIP_NO_ERROR;
         typename AttributeTypeInfo::DecodableType value;
 
-        VerifyOrExit(status == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
-        VerifyOrExit(aPath.mClusterId == AttributeTypeInfo::GetClusterId() && aPath.mFieldId == AttributeTypeInfo::GetAttributeId(),
+        VerifyOrExit(status.mStatus == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+        VerifyOrExit(aPath.mClusterId == AttributeTypeInfo::GetClusterId() &&
+                         aPath.mAttributeId == AttributeTypeInfo::GetAttributeId(),
                      CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         err = app::DataModel::Decode(*apData, value);
         SuccessOrExit(err);
 
-        mOnSuccess(attributePath, value);
+        mOnSuccess(aPath, value);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -73,27 +73,22 @@ private:
             //
             // Override status to indicate an error if something bad happened above.
             //
-            if (status == Protocols::InteractionModel::Status::Success)
+            Protocols::InteractionModel::Status imStatus = status.mStatus;
+            if (status.mStatus == Protocols::InteractionModel::Status::Success)
             {
-                status = Protocols::InteractionModel::Status::Failure;
+                imStatus = Protocols::InteractionModel::Status::Failure;
             }
 
-            mOnError(&attributePath, status, err);
+            mOnError(&aPath, imStatus, err);
         }
     }
 
-    CHIP_ERROR ReadError(app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
         mOnError(nullptr, Protocols::InteractionModel::Status::Failure, aError);
-        mOnDone(apReadClient, this);
-        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadDone(app::ReadClient * apReadClient) override
-    {
-        mOnDone(apReadClient, this);
-        return CHIP_NO_ERROR;
-    }
+    void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
 
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;

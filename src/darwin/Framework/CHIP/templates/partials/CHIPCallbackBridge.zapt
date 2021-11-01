@@ -50,13 +50,24 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
     while (iter.Next())
     {
         auto & entry = iter.GetValue();
+        (void)entry; // All our types below might be unsupported
         {{#if isStruct}}
         [array addObject:@{
           {{#chip_attribute_list_entryTypes}}
-          {{#if (isOctetString type)}}
+          {{#if isOptional}}
+          {{! TODO: Add support for optional types, probably by having a templated ToObjectiveCType function }}
+          {{else if isNullable}}
+          {{! TODO: Add support for nullable types, probably by having a templated ToObjectiveCType function }}
+          {{else if isArray}}
+          {{! TODO: Add support for list members of structs in list attributes }}
+          @"{{name}}": [[NSMutableArray alloc] init],
+          {{else if (isOctetString type)}}
           @"{{name}}" : [NSData dataWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size()],
           {{else if (isCharString type)}}
           @"{{name}}" : [[NSString alloc] initWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size() encoding:NSUTF8StringEncoding],
+          {{else if isStruct}}
+          {{! TODO: Add support for struct members of structs in list attributes }}
+          @"{{name}}": @{}
           {{else}}
           @"{{name}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entry.{{asLowerCamelCase name}}],
           {{/if}}

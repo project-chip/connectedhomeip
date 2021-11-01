@@ -90,7 +90,7 @@ public class ClusterInfoMapping {
      Map<String, CommandInfo> {{asLowerCamelCase name}}ClusterCommandInfoMap = new LinkedHashMap<>();
      {{#chip_cluster_commands}}
      Map<String, CommandParameterInfo> {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-     // PLEASE UPDATE LATER: fill out parameter types
+     {{! TODO: fill out parameter types }}
      {{#if (zcl_command_arguments_count this.id)}}
      {{#if hasSpecificResponse}}
        CommandParameterInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameterInfo = new CommandParameterInfo("{{asUpperCamelCase ../name}}", ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback.class);

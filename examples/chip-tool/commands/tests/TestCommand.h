@@ -206,6 +206,30 @@ protected:
         return false;
     }
 
+    template <typename T>
+    bool CheckValueNull(const char * itemName, const chip::app::DataModel::Nullable<T> & value)
+    {
+        if (value.IsNull())
+        {
+            return true;
+        }
+
+        Exit(std::string(itemName) + " expected to be null but isn't");
+        return false;
+    }
+
+    template <typename T>
+    bool CheckValueNonNull(const char * itemName, const chip::app::DataModel::Nullable<T> & value)
+    {
+        if (!value.IsNull())
+        {
+            return true;
+        }
+
+        Exit(std::string(itemName) + " expected to not be null but is");
+        return false;
+    }
+
     chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 

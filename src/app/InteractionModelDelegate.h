@@ -51,62 +51,6 @@ class InteractionModelDelegate
 {
 public:
     /**
-     * Notification that the interaction model has received a list of events in response to a Read request and that list
-     * of events needs to be processed.
-     * @param[in]  apExchangeContext   An exchange context that represents the exchange the Report Data came in on.
-     *                                 This can be used to recover the NodeId of the node that sent the Report Data.
-     *                                 It is managed externally and should not be closed by the SDK consumer.
-     * @param[in]  apEventListReader  TLV reader positioned at the list that contains the events.  The
-     *                                implementation of EventStreamReceived is expected to call Next() on the reader to
-     *                                advance it to the first element of the list, then process the elements from beginning to the
-     *                                end. The callee is expected to consume all events.
-     *
-     * @retval  # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
-     */
-    virtual CHIP_ERROR EventStreamReceived(const Messaging::ExchangeContext * apExchangeContext, TLV::TLVReader * apEventListReader)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
-     * Notification that the interaction model has received a list of attribute data in response to a Read request. apData might be
-     * nullptr if status is not Status::Success.
-     *
-     * @param[in]  apReadClient   The read client object, the application can use GetAppIdentifier() for the read client to
-     *                            distinguish different read requests.
-     * @param[in]  aPath          The path of the attribute, contains node id, endpoint id, cluster id, field id etc.
-     * @param[in]  apData         The attribute data TLV
-     * @param[in]  status         Interaction model status code
-     *
-     */
-    virtual void OnReportData(const ReadClient * apReadClient, const ClusterInfo & aPath, TLV::TLVReader * apData,
-                              Protocols::InteractionModel::Status status)
-    {}
-
-    /**
-     * Notification that the last message for a Report Data action for the given ReadClient has been received and processed.
-     * @param[in]  apReadClient   A current readClient which can identify the read to the consumer, particularly during
-     *                            multiple read interactions
-     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
-     */
-    virtual CHIP_ERROR ReportProcessed(const ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /**
-     * Notification that a read attempt encountered an asynchronous failure.
-     * @param[in]  apReadClient   A current readClient which can identify the read to the consumer, particularly during
-     *                            multiple read interactions
-     * @param[in]  aError         A error that could be CHIP_ERROR_TIMEOUT when read client fails to receive, or other error when
-     *                            fail to process report data.
-     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
-     */
-    virtual CHIP_ERROR ReadError(ReadClient * apReadClient, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /**
-     * Notification that a Subscribe Response has been processed and application can do further work .
-     */
-    virtual CHIP_ERROR SubscribeResponseProcessed(const ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /**
      * Notification that Subscription has been established successfully and application can do further work in handler.
      */
     virtual CHIP_ERROR SubscriptionEstablished(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -115,14 +59,6 @@ public:
      * Notification that Subscription has been terminated in handler side.
      */
     virtual CHIP_ERROR SubscriptionTerminated(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /**
-     * Notification that a read interaction was completed on the client successfully.
-     * @param[in]  apReadClient  A current read client which can identify the read client to the consumer, particularly
-     * during multiple read interactions
-     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
-     */
-    virtual CHIP_ERROR ReadDone(ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     virtual ~InteractionModelDelegate() = default;
 };

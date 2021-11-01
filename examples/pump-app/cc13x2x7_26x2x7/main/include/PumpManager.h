@@ -68,7 +68,7 @@ public:
     int16_t GetMaxConstTemp();
 
     typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
-    typedef void (*Callback_fn_completed)(Action_t);
+    typedef void (*Callback_fn_completed)(Action_t, int32_t aActor);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
 
 private:
@@ -82,6 +82,7 @@ private:
     uint32_t mAutoStartDuration;
     bool mAutoStartTimerArmed;
     TimerHandle_t mTimerHandle;
+    int32_t mCurrentActor;
 
     void CancelTimer(void);
     void PumpTimer(uint32_t aTimeoutMs);

@@ -1870,11 +1870,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(boolean wasPresent, boolean wasNull, int value) {
+    public void onSuccess(boolean wasPresent, boolean wasNull, int value, int originalValue) {
       List<Object> responseValues = new ArrayList<>();
       responseValues.add(wasPresent);
       responseValues.add(wasNull);
       responseValues.add(value);
+      responseValues.add(originalValue);
       callback.onSuccess(responseValues);
     }
 
@@ -1912,7 +1913,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> accountLoginClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> accountLogingetSetupPINCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo accountLogingetSetupPINCommandParameterInfo =
         new CommandParameterInfo(
             "AccountLogin", ChipClusters.AccountLoginCluster.GetSetupPINResponseCallback.class);
@@ -1935,7 +1935,6 @@ public class ClusterInfoMapping {
     accountLoginClusterCommandInfoMap.put("getSetupPIN", accountLogingetSetupPINCommandInfo);
     Map<String, CommandParameterInfo> accountLoginloginCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo accountLoginloginCommandParameterInfo =
         new CommandParameterInfo("AccountLogin", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo accountLoginlogintempAccountIdentifierCommandParameterInfo =
@@ -1971,7 +1970,6 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo>
         administratorCommissioningopenBasicCommissioningWindowCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo
         administratorCommissioningopenBasicCommissioningWindowCommandParameterInfo =
             new CommandParameterInfo(
@@ -2000,7 +1998,6 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo>
         administratorCommissioningopenCommissioningWindowCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo administratorCommissioningopenCommissioningWindowCommandParameterInfo =
         new CommandParameterInfo(
             "AdministratorCommissioning", ChipClusters.DefaultClusterCallback.class);
@@ -2064,7 +2061,6 @@ public class ClusterInfoMapping {
         "openCommissioningWindow", administratorCommissioningopenCommissioningWindowCommandInfo);
     Map<String, CommandParameterInfo> administratorCommissioningrevokeCommissioningCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo administratorCommissioningrevokeCommissioningCommandParameterInfo =
         new CommandParameterInfo(
             "AdministratorCommissioning", ChipClusters.DefaultClusterCallback.class);
@@ -2089,7 +2085,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> applicationBasicClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> applicationBasicchangeStatusCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo applicationBasicchangeStatusCommandParameterInfo =
         new CommandParameterInfo("ApplicationBasic", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo applicationBasicchangeStatusstatusCommandParameterInfo =
@@ -2118,7 +2113,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> applicationLauncherClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> applicationLauncherlaunchAppCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo applicationLauncherlaunchAppCommandParameterInfo =
         new CommandParameterInfo(
             "ApplicationLauncher",
@@ -2162,7 +2156,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> audioOutputClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> audioOutputrenameOutputCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo audioOutputrenameOutputCommandParameterInfo =
         new CommandParameterInfo("AudioOutput", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo audioOutputrenameOutputindexCommandParameterInfo =
@@ -2190,7 +2183,6 @@ public class ClusterInfoMapping {
     audioOutputClusterCommandInfoMap.put("renameOutput", audioOutputrenameOutputCommandInfo);
     Map<String, CommandParameterInfo> audioOutputselectOutputCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo audioOutputselectOutputCommandParameterInfo =
         new CommandParameterInfo("AudioOutput", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo audioOutputselectOutputindexCommandParameterInfo =
@@ -2218,7 +2210,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> barrierControlClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> barrierControlbarrierControlGoToPercentCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo barrierControlbarrierControlGoToPercentCommandParameterInfo =
         new CommandParameterInfo("BarrierControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo barrierControlbarrierControlGoToPercentpercentOpenCommandParameterInfo =
@@ -2241,7 +2232,6 @@ public class ClusterInfoMapping {
         "barrierControlGoToPercent", barrierControlbarrierControlGoToPercentCommandInfo);
     Map<String, CommandParameterInfo> barrierControlbarrierControlStopCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo barrierControlbarrierControlStopCommandParameterInfo =
         new CommandParameterInfo("BarrierControl", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -2264,7 +2254,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> basicClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> basicmfgSpecificPingCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo basicmfgSpecificPingCommandParameterInfo =
         new CommandParameterInfo("Basic", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -2293,7 +2282,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> bindingClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> bindingbindCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bindingbindCommandParameterInfo =
         new CommandParameterInfo("Binding", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bindingbindnodeIdCommandParameterInfo =
@@ -2329,7 +2317,6 @@ public class ClusterInfoMapping {
     bindingClusterCommandInfoMap.put("bind", bindingbindCommandInfo);
     Map<String, CommandParameterInfo> bindingunbindCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bindingunbindCommandParameterInfo =
         new CommandParameterInfo("Binding", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bindingunbindnodeIdCommandParameterInfo =
@@ -2379,7 +2366,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> bridgedActionsClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> bridgedActionsdisableActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionsdisableActionCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionsdisableActionactionIDCommandParameterInfo =
@@ -2408,7 +2394,6 @@ public class ClusterInfoMapping {
         "disableAction", bridgedActionsdisableActionCommandInfo);
     Map<String, CommandParameterInfo> bridgedActionsdisableActionWithDurationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionsdisableActionWithDurationCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionsdisableActionWithDurationactionIDCommandParameterInfo =
@@ -2443,7 +2428,6 @@ public class ClusterInfoMapping {
         "disableActionWithDuration", bridgedActionsdisableActionWithDurationCommandInfo);
     Map<String, CommandParameterInfo> bridgedActionsenableActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionsenableActionCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionsenableActionactionIDCommandParameterInfo =
@@ -2471,7 +2455,6 @@ public class ClusterInfoMapping {
     bridgedActionsClusterCommandInfoMap.put("enableAction", bridgedActionsenableActionCommandInfo);
     Map<String, CommandParameterInfo> bridgedActionsenableActionWithDurationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionsenableActionWithDurationCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionsenableActionWithDurationactionIDCommandParameterInfo =
@@ -2506,7 +2489,6 @@ public class ClusterInfoMapping {
         "enableActionWithDuration", bridgedActionsenableActionWithDurationCommandInfo);
     Map<String, CommandParameterInfo> bridgedActionsinstantActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionsinstantActionCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionsinstantActionactionIDCommandParameterInfo =
@@ -2535,7 +2517,6 @@ public class ClusterInfoMapping {
         "instantAction", bridgedActionsinstantActionCommandInfo);
     Map<String, CommandParameterInfo> bridgedActionsinstantActionWithTransitionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionsinstantActionWithTransitionCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionsinstantActionWithTransitionactionIDCommandParameterInfo =
@@ -2572,7 +2553,6 @@ public class ClusterInfoMapping {
         "instantActionWithTransition", bridgedActionsinstantActionWithTransitionCommandInfo);
     Map<String, CommandParameterInfo> bridgedActionspauseActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionspauseActionCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionspauseActionactionIDCommandParameterInfo =
@@ -2600,7 +2580,6 @@ public class ClusterInfoMapping {
     bridgedActionsClusterCommandInfoMap.put("pauseAction", bridgedActionspauseActionCommandInfo);
     Map<String, CommandParameterInfo> bridgedActionspauseActionWithDurationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionspauseActionWithDurationCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionspauseActionWithDurationactionIDCommandParameterInfo =
@@ -2635,7 +2614,6 @@ public class ClusterInfoMapping {
         "pauseActionWithDuration", bridgedActionspauseActionWithDurationCommandInfo);
     Map<String, CommandParameterInfo> bridgedActionsresumeActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionsresumeActionCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionsresumeActionactionIDCommandParameterInfo =
@@ -2663,7 +2641,6 @@ public class ClusterInfoMapping {
     bridgedActionsClusterCommandInfoMap.put("resumeAction", bridgedActionsresumeActionCommandInfo);
     Map<String, CommandParameterInfo> bridgedActionsstartActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionsstartActionCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionsstartActionactionIDCommandParameterInfo =
@@ -2691,7 +2668,6 @@ public class ClusterInfoMapping {
     bridgedActionsClusterCommandInfoMap.put("startAction", bridgedActionsstartActionCommandInfo);
     Map<String, CommandParameterInfo> bridgedActionsstartActionWithDurationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionsstartActionWithDurationCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionsstartActionWithDurationactionIDCommandParameterInfo =
@@ -2726,7 +2702,6 @@ public class ClusterInfoMapping {
         "startActionWithDuration", bridgedActionsstartActionWithDurationCommandInfo);
     Map<String, CommandParameterInfo> bridgedActionsstopActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo bridgedActionsstopActionCommandParameterInfo =
         new CommandParameterInfo("BridgedActions", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo bridgedActionsstopActionactionIDCommandParameterInfo =
@@ -2768,7 +2743,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> colorControlClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> colorControlcolorLoopSetCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlcolorLoopSetCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlcolorLoopSetupdateFlagsCommandParameterInfo =
@@ -2826,7 +2800,6 @@ public class ClusterInfoMapping {
     colorControlClusterCommandInfoMap.put("colorLoopSet", colorControlcolorLoopSetCommandInfo);
     Map<String, CommandParameterInfo> colorControlenhancedMoveHueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlenhancedMoveHueCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlenhancedMoveHuemoveModeCommandParameterInfo =
@@ -2867,7 +2840,6 @@ public class ClusterInfoMapping {
         "enhancedMoveHue", colorControlenhancedMoveHueCommandInfo);
     Map<String, CommandParameterInfo> colorControlenhancedMoveToHueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlenhancedMoveToHueCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlenhancedMoveToHueenhancedHueCommandParameterInfo =
@@ -2914,7 +2886,6 @@ public class ClusterInfoMapping {
         "enhancedMoveToHue", colorControlenhancedMoveToHueCommandInfo);
     Map<String, CommandParameterInfo> colorControlenhancedMoveToHueAndSaturationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlenhancedMoveToHueAndSaturationCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlenhancedMoveToHueAndSaturationenhancedHueCommandParameterInfo =
@@ -2965,7 +2936,6 @@ public class ClusterInfoMapping {
         "enhancedMoveToHueAndSaturation", colorControlenhancedMoveToHueAndSaturationCommandInfo);
     Map<String, CommandParameterInfo> colorControlenhancedStepHueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlenhancedStepHueCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlenhancedStepHuestepModeCommandParameterInfo =
@@ -3012,7 +2982,6 @@ public class ClusterInfoMapping {
         "enhancedStepHue", colorControlenhancedStepHueCommandInfo);
     Map<String, CommandParameterInfo> colorControlmoveColorCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlmoveColorCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlmoveColorrateXCommandParameterInfo =
@@ -3050,7 +3019,6 @@ public class ClusterInfoMapping {
     colorControlClusterCommandInfoMap.put("moveColor", colorControlmoveColorCommandInfo);
     Map<String, CommandParameterInfo> colorControlmoveColorTemperatureCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlmoveColorTemperatureCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlmoveColorTemperaturemoveModeCommandParameterInfo =
@@ -3107,7 +3075,6 @@ public class ClusterInfoMapping {
         "moveColorTemperature", colorControlmoveColorTemperatureCommandInfo);
     Map<String, CommandParameterInfo> colorControlmoveHueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlmoveHueCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlmoveHuemoveModeCommandParameterInfo =
@@ -3146,7 +3113,6 @@ public class ClusterInfoMapping {
     colorControlClusterCommandInfoMap.put("moveHue", colorControlmoveHueCommandInfo);
     Map<String, CommandParameterInfo> colorControlmoveSaturationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlmoveSaturationCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlmoveSaturationmoveModeCommandParameterInfo =
@@ -3186,7 +3152,6 @@ public class ClusterInfoMapping {
     colorControlClusterCommandInfoMap.put("moveSaturation", colorControlmoveSaturationCommandInfo);
     Map<String, CommandParameterInfo> colorControlmoveToColorCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlmoveToColorCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlmoveToColorcolorXCommandParameterInfo =
@@ -3232,7 +3197,6 @@ public class ClusterInfoMapping {
     colorControlClusterCommandInfoMap.put("moveToColor", colorControlmoveToColorCommandInfo);
     Map<String, CommandParameterInfo> colorControlmoveToColorTemperatureCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlmoveToColorTemperatureCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlmoveToColorTemperaturecolorTemperatureCommandParameterInfo =
@@ -3273,7 +3237,6 @@ public class ClusterInfoMapping {
         "moveToColorTemperature", colorControlmoveToColorTemperatureCommandInfo);
     Map<String, CommandParameterInfo> colorControlmoveToHueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlmoveToHueCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlmoveToHuehueCommandParameterInfo =
@@ -3318,7 +3281,6 @@ public class ClusterInfoMapping {
     colorControlClusterCommandInfoMap.put("moveToHue", colorControlmoveToHueCommandInfo);
     Map<String, CommandParameterInfo> colorControlmoveToHueAndSaturationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlmoveToHueAndSaturationCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlmoveToHueAndSaturationhueCommandParameterInfo =
@@ -3365,7 +3327,6 @@ public class ClusterInfoMapping {
         "moveToHueAndSaturation", colorControlmoveToHueAndSaturationCommandInfo);
     Map<String, CommandParameterInfo> colorControlmoveToSaturationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlmoveToSaturationCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlmoveToSaturationsaturationCommandParameterInfo =
@@ -3406,7 +3367,6 @@ public class ClusterInfoMapping {
         "moveToSaturation", colorControlmoveToSaturationCommandInfo);
     Map<String, CommandParameterInfo> colorControlstepColorCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlstepColorCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlstepColorstepXCommandParameterInfo =
@@ -3450,7 +3410,6 @@ public class ClusterInfoMapping {
     colorControlClusterCommandInfoMap.put("stepColor", colorControlstepColorCommandInfo);
     Map<String, CommandParameterInfo> colorControlstepColorTemperatureCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlstepColorTemperatureCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlstepColorTemperaturestepModeCommandParameterInfo =
@@ -3513,7 +3472,6 @@ public class ClusterInfoMapping {
         "stepColorTemperature", colorControlstepColorTemperatureCommandInfo);
     Map<String, CommandParameterInfo> colorControlstepHueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlstepHueCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlstepHuestepModeCommandParameterInfo =
@@ -3559,7 +3517,6 @@ public class ClusterInfoMapping {
     colorControlClusterCommandInfoMap.put("stepHue", colorControlstepHueCommandInfo);
     Map<String, CommandParameterInfo> colorControlstepSaturationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlstepSaturationCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlstepSaturationstepModeCommandParameterInfo =
@@ -3605,7 +3562,6 @@ public class ClusterInfoMapping {
     colorControlClusterCommandInfoMap.put("stepSaturation", colorControlstepSaturationCommandInfo);
     Map<String, CommandParameterInfo> colorControlstopMoveStepCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo colorControlstopMoveStepCommandParameterInfo =
         new CommandParameterInfo("ColorControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo colorControlstopMoveStepoptionsMaskCommandParameterInfo =
@@ -3640,7 +3596,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> contentLauncherClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> contentLauncherlaunchContentCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo contentLauncherlaunchContentCommandParameterInfo =
         new CommandParameterInfo(
             "ContentLauncher",
@@ -3671,7 +3626,6 @@ public class ClusterInfoMapping {
         "launchContent", contentLauncherlaunchContentCommandInfo);
     Map<String, CommandParameterInfo> contentLauncherlaunchURLCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo contentLauncherlaunchURLCommandParameterInfo =
         new CommandParameterInfo(
             "ContentLauncher", ChipClusters.ContentLauncherCluster.LaunchURLResponseCallback.class);
@@ -3714,7 +3668,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> diagnosticLogsClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> diagnosticLogsretrieveLogsRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo diagnosticLogsretrieveLogsRequestCommandParameterInfo =
         new CommandParameterInfo(
             "DiagnosticLogs",
@@ -3761,7 +3714,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> doorLockClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> doorLockclearAllPinsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockclearAllPinsCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.ClearAllPinsResponseCallback.class);
@@ -3778,7 +3730,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("clearAllPins", doorLockclearAllPinsCommandInfo);
     Map<String, CommandParameterInfo> doorLockclearAllRfidsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockclearAllRfidsCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.ClearAllRfidsResponseCallback.class);
@@ -3795,7 +3746,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("clearAllRfids", doorLockclearAllRfidsCommandInfo);
     Map<String, CommandParameterInfo> doorLockclearHolidayScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockclearHolidayScheduleCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.ClearHolidayScheduleResponseCallback.class);
@@ -3819,7 +3769,6 @@ public class ClusterInfoMapping {
         "clearHolidaySchedule", doorLockclearHolidayScheduleCommandInfo);
     Map<String, CommandParameterInfo> doorLockclearPinCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockclearPinCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.ClearPinResponseCallback.class);
@@ -3841,7 +3790,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("clearPin", doorLockclearPinCommandInfo);
     Map<String, CommandParameterInfo> doorLockclearRfidCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockclearRfidCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.ClearRfidResponseCallback.class);
@@ -3863,7 +3811,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("clearRfid", doorLockclearRfidCommandInfo);
     Map<String, CommandParameterInfo> doorLockclearWeekdayScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockclearWeekdayScheduleCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.ClearWeekdayScheduleResponseCallback.class);
@@ -3893,7 +3840,6 @@ public class ClusterInfoMapping {
         "clearWeekdaySchedule", doorLockclearWeekdayScheduleCommandInfo);
     Map<String, CommandParameterInfo> doorLockclearYeardayScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockclearYeardayScheduleCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.ClearYeardayScheduleResponseCallback.class);
@@ -3923,7 +3869,6 @@ public class ClusterInfoMapping {
         "clearYeardaySchedule", doorLockclearYeardayScheduleCommandInfo);
     Map<String, CommandParameterInfo> doorLockgetHolidayScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockgetHolidayScheduleCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.GetHolidayScheduleResponseCallback.class);
@@ -3946,7 +3891,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("getHolidaySchedule", doorLockgetHolidayScheduleCommandInfo);
     Map<String, CommandParameterInfo> doorLockgetLogRecordCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockgetLogRecordCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.GetLogRecordResponseCallback.class);
@@ -3969,7 +3913,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("getLogRecord", doorLockgetLogRecordCommandInfo);
     Map<String, CommandParameterInfo> doorLockgetPinCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockgetPinCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.GetPinResponseCallback.class);
@@ -3991,7 +3934,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("getPin", doorLockgetPinCommandInfo);
     Map<String, CommandParameterInfo> doorLockgetRfidCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockgetRfidCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.GetRfidResponseCallback.class);
@@ -4013,7 +3955,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("getRfid", doorLockgetRfidCommandInfo);
     Map<String, CommandParameterInfo> doorLockgetUserTypeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockgetUserTypeCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.GetUserTypeResponseCallback.class);
@@ -4035,7 +3976,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("getUserType", doorLockgetUserTypeCommandInfo);
     Map<String, CommandParameterInfo> doorLockgetWeekdayScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockgetWeekdayScheduleCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.GetWeekdayScheduleResponseCallback.class);
@@ -4064,7 +4004,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("getWeekdaySchedule", doorLockgetWeekdayScheduleCommandInfo);
     Map<String, CommandParameterInfo> doorLockgetYeardayScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockgetYeardayScheduleCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.GetYeardayScheduleResponseCallback.class);
@@ -4093,7 +4032,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("getYeardaySchedule", doorLockgetYeardayScheduleCommandInfo);
     Map<String, CommandParameterInfo> doorLocklockDoorCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLocklockDoorCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.LockDoorResponseCallback.class);
@@ -4115,7 +4053,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("lockDoor", doorLocklockDoorCommandInfo);
     Map<String, CommandParameterInfo> doorLocksetHolidayScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLocksetHolidayScheduleCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.SetHolidayScheduleResponseCallback.class);
@@ -4157,7 +4094,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("setHolidaySchedule", doorLocksetHolidayScheduleCommandInfo);
     Map<String, CommandParameterInfo> doorLocksetPinCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLocksetPinCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.SetPinResponseCallback.class);
@@ -4194,7 +4130,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("setPin", doorLocksetPinCommandInfo);
     Map<String, CommandParameterInfo> doorLocksetRfidCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLocksetRfidCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.SetRfidResponseCallback.class);
@@ -4231,7 +4166,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("setRfid", doorLocksetRfidCommandInfo);
     Map<String, CommandParameterInfo> doorLocksetUserTypeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLocksetUserTypeCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.SetUserTypeResponseCallback.class);
@@ -4259,7 +4193,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("setUserType", doorLocksetUserTypeCommandInfo);
     Map<String, CommandParameterInfo> doorLocksetWeekdayScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLocksetWeekdayScheduleCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.SetWeekdayScheduleResponseCallback.class);
@@ -4318,7 +4251,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("setWeekdaySchedule", doorLocksetWeekdayScheduleCommandInfo);
     Map<String, CommandParameterInfo> doorLocksetYeardayScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLocksetYeardayScheduleCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.SetYeardayScheduleResponseCallback.class);
@@ -4359,7 +4291,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("setYeardaySchedule", doorLocksetYeardayScheduleCommandInfo);
     Map<String, CommandParameterInfo> doorLockunlockDoorCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockunlockDoorCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.UnlockDoorResponseCallback.class);
@@ -4381,7 +4312,6 @@ public class ClusterInfoMapping {
     doorLockClusterCommandInfoMap.put("unlockDoor", doorLockunlockDoorCommandInfo);
     Map<String, CommandParameterInfo> doorLockunlockWithTimeoutCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo doorLockunlockWithTimeoutCommandParameterInfo =
         new CommandParameterInfo(
             "DoorLock", ChipClusters.DoorLockCluster.UnlockWithTimeoutResponseCallback.class);
@@ -4425,7 +4355,6 @@ public class ClusterInfoMapping {
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> ethernetNetworkDiagnosticsresetCountsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo ethernetNetworkDiagnosticsresetCountsCommandParameterInfo =
         new CommandParameterInfo(
             "EthernetNetworkDiagnostics", ChipClusters.DefaultClusterCallback.class);
@@ -4464,7 +4393,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> generalCommissioningClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> generalCommissioningarmFailSafeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo generalCommissioningarmFailSafeCommandParameterInfo =
         new CommandParameterInfo(
             "GeneralCommissioning",
@@ -4503,7 +4431,6 @@ public class ClusterInfoMapping {
         "armFailSafe", generalCommissioningarmFailSafeCommandInfo);
     Map<String, CommandParameterInfo> generalCommissioningcommissioningCompleteCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo generalCommissioningcommissioningCompleteCommandParameterInfo =
         new CommandParameterInfo(
             "GeneralCommissioning",
@@ -4524,7 +4451,6 @@ public class ClusterInfoMapping {
         "commissioningComplete", generalCommissioningcommissioningCompleteCommandInfo);
     Map<String, CommandParameterInfo> generalCommissioningsetRegulatoryConfigCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo generalCommissioningsetRegulatoryConfigCommandParameterInfo =
         new CommandParameterInfo(
             "GeneralCommissioning",
@@ -4589,7 +4515,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> groupsClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> groupsaddGroupCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo groupsaddGroupCommandParameterInfo =
         new CommandParameterInfo(
             "Groups", ChipClusters.GroupsCluster.AddGroupResponseCallback.class);
@@ -4616,7 +4541,6 @@ public class ClusterInfoMapping {
     groupsClusterCommandInfoMap.put("addGroup", groupsaddGroupCommandInfo);
     Map<String, CommandParameterInfo> groupsaddGroupIfIdentifyingCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo groupsaddGroupIfIdentifyingCommandParameterInfo =
         new CommandParameterInfo("Groups", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo groupsaddGroupIfIdentifyinggroupIdCommandParameterInfo =
@@ -4645,7 +4569,6 @@ public class ClusterInfoMapping {
         "addGroupIfIdentifying", groupsaddGroupIfIdentifyingCommandInfo);
     Map<String, CommandParameterInfo> groupsgetGroupMembershipCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo groupsgetGroupMembershipCommandParameterInfo =
         new CommandParameterInfo(
             "Groups", ChipClusters.GroupsCluster.GetGroupMembershipResponseCallback.class);
@@ -4674,7 +4597,6 @@ public class ClusterInfoMapping {
     groupsClusterCommandInfoMap.put("getGroupMembership", groupsgetGroupMembershipCommandInfo);
     Map<String, CommandParameterInfo> groupsremoveAllGroupsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo groupsremoveAllGroupsCommandParameterInfo =
         new CommandParameterInfo("Groups", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -4689,7 +4611,6 @@ public class ClusterInfoMapping {
     groupsClusterCommandInfoMap.put("removeAllGroups", groupsremoveAllGroupsCommandInfo);
     Map<String, CommandParameterInfo> groupsremoveGroupCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo groupsremoveGroupCommandParameterInfo =
         new CommandParameterInfo(
             "Groups", ChipClusters.GroupsCluster.RemoveGroupResponseCallback.class);
@@ -4711,7 +4632,6 @@ public class ClusterInfoMapping {
     groupsClusterCommandInfoMap.put("removeGroup", groupsremoveGroupCommandInfo);
     Map<String, CommandParameterInfo> groupsviewGroupCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo groupsviewGroupCommandParameterInfo =
         new CommandParameterInfo(
             "Groups", ChipClusters.GroupsCluster.ViewGroupResponseCallback.class);
@@ -4740,7 +4660,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> identifyClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> identifyidentifyCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo identifyidentifyCommandParameterInfo =
         new CommandParameterInfo("Identify", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo identifyidentifyidentifyTimeCommandParameterInfo =
@@ -4762,7 +4681,6 @@ public class ClusterInfoMapping {
     identifyClusterCommandInfoMap.put("identify", identifyidentifyCommandInfo);
     Map<String, CommandParameterInfo> identifyidentifyQueryCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo identifyidentifyQueryCommandParameterInfo =
         new CommandParameterInfo(
             "Identify", ChipClusters.IdentifyCluster.IdentifyQueryResponseCallback.class);
@@ -4779,7 +4697,6 @@ public class ClusterInfoMapping {
     identifyClusterCommandInfoMap.put("identifyQuery", identifyidentifyQueryCommandInfo);
     Map<String, CommandParameterInfo> identifytriggerEffectCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo identifytriggerEffectCommandParameterInfo =
         new CommandParameterInfo("Identify", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo identifytriggerEffecteffectIdentifierCommandParameterInfo =
@@ -4821,7 +4738,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> keypadInputClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> keypadInputsendKeyCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo keypadInputsendKeyCommandParameterInfo =
         new CommandParameterInfo(
             "KeypadInput", ChipClusters.KeypadInputCluster.SendKeyResponseCallback.class);
@@ -4850,7 +4766,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> levelControlClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> levelControlmoveCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo levelControlmoveCommandParameterInfo =
         new CommandParameterInfo("LevelControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo levelControlmovemoveModeCommandParameterInfo =
@@ -4887,7 +4802,6 @@ public class ClusterInfoMapping {
     levelControlClusterCommandInfoMap.put("move", levelControlmoveCommandInfo);
     Map<String, CommandParameterInfo> levelControlmoveToLevelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo levelControlmoveToLevelCommandParameterInfo =
         new CommandParameterInfo("LevelControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo levelControlmoveToLevellevelCommandParameterInfo =
@@ -4927,7 +4841,6 @@ public class ClusterInfoMapping {
     levelControlClusterCommandInfoMap.put("moveToLevel", levelControlmoveToLevelCommandInfo);
     Map<String, CommandParameterInfo> levelControlmoveToLevelWithOnOffCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo levelControlmoveToLevelWithOnOffCommandParameterInfo =
         new CommandParameterInfo("LevelControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo levelControlmoveToLevelWithOnOfflevelCommandParameterInfo =
@@ -4956,7 +4869,6 @@ public class ClusterInfoMapping {
         "moveToLevelWithOnOff", levelControlmoveToLevelWithOnOffCommandInfo);
     Map<String, CommandParameterInfo> levelControlmoveWithOnOffCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo levelControlmoveWithOnOffCommandParameterInfo =
         new CommandParameterInfo("LevelControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo levelControlmoveWithOnOffmoveModeCommandParameterInfo =
@@ -4984,7 +4896,6 @@ public class ClusterInfoMapping {
     levelControlClusterCommandInfoMap.put("moveWithOnOff", levelControlmoveWithOnOffCommandInfo);
     Map<String, CommandParameterInfo> levelControlstepCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo levelControlstepCommandParameterInfo =
         new CommandParameterInfo("LevelControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo levelControlstepstepModeCommandParameterInfo =
@@ -5027,7 +4938,6 @@ public class ClusterInfoMapping {
     levelControlClusterCommandInfoMap.put("step", levelControlstepCommandInfo);
     Map<String, CommandParameterInfo> levelControlstepWithOnOffCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo levelControlstepWithOnOffCommandParameterInfo =
         new CommandParameterInfo("LevelControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo levelControlstepWithOnOffstepModeCommandParameterInfo =
@@ -5061,7 +4971,6 @@ public class ClusterInfoMapping {
     levelControlClusterCommandInfoMap.put("stepWithOnOff", levelControlstepWithOnOffCommandInfo);
     Map<String, CommandParameterInfo> levelControlstopCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo levelControlstopCommandParameterInfo =
         new CommandParameterInfo("LevelControl", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo levelControlstopoptionMaskCommandParameterInfo =
@@ -5088,7 +4997,6 @@ public class ClusterInfoMapping {
     levelControlClusterCommandInfoMap.put("stop", levelControlstopCommandInfo);
     Map<String, CommandParameterInfo> levelControlstopWithOnOffCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo levelControlstopWithOnOffCommandParameterInfo =
         new CommandParameterInfo("LevelControl", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -5110,7 +5018,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> lowPowerClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> lowPowersleepCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo lowPowersleepCommandParameterInfo =
         new CommandParameterInfo("LowPower", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -5131,7 +5038,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> mediaInputClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> mediaInputhideInputStatusCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaInputhideInputStatusCommandParameterInfo =
         new CommandParameterInfo("MediaInput", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -5146,7 +5052,6 @@ public class ClusterInfoMapping {
     mediaInputClusterCommandInfoMap.put("hideInputStatus", mediaInputhideInputStatusCommandInfo);
     Map<String, CommandParameterInfo> mediaInputrenameInputCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaInputrenameInputCommandParameterInfo =
         new CommandParameterInfo("MediaInput", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo mediaInputrenameInputindexCommandParameterInfo =
@@ -5172,7 +5077,6 @@ public class ClusterInfoMapping {
     mediaInputClusterCommandInfoMap.put("renameInput", mediaInputrenameInputCommandInfo);
     Map<String, CommandParameterInfo> mediaInputselectInputCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaInputselectInputCommandParameterInfo =
         new CommandParameterInfo("MediaInput", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo mediaInputselectInputindexCommandParameterInfo =
@@ -5192,7 +5096,6 @@ public class ClusterInfoMapping {
     mediaInputClusterCommandInfoMap.put("selectInput", mediaInputselectInputCommandInfo);
     Map<String, CommandParameterInfo> mediaInputshowInputStatusCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaInputshowInputStatusCommandParameterInfo =
         new CommandParameterInfo("MediaInput", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -5214,7 +5117,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> mediaPlaybackClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> mediaPlaybackmediaFastForwardCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaPlaybackmediaFastForwardCommandParameterInfo =
         new CommandParameterInfo(
             "MediaPlayback",
@@ -5234,7 +5136,6 @@ public class ClusterInfoMapping {
         "mediaFastForward", mediaPlaybackmediaFastForwardCommandInfo);
     Map<String, CommandParameterInfo> mediaPlaybackmediaNextCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaPlaybackmediaNextCommandParameterInfo =
         new CommandParameterInfo(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaNextResponseCallback.class);
@@ -5251,7 +5152,6 @@ public class ClusterInfoMapping {
     mediaPlaybackClusterCommandInfoMap.put("mediaNext", mediaPlaybackmediaNextCommandInfo);
     Map<String, CommandParameterInfo> mediaPlaybackmediaPauseCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaPlaybackmediaPauseCommandParameterInfo =
         new CommandParameterInfo(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaPauseResponseCallback.class);
@@ -5268,7 +5168,6 @@ public class ClusterInfoMapping {
     mediaPlaybackClusterCommandInfoMap.put("mediaPause", mediaPlaybackmediaPauseCommandInfo);
     Map<String, CommandParameterInfo> mediaPlaybackmediaPlayCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaPlaybackmediaPlayCommandParameterInfo =
         new CommandParameterInfo(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaPlayResponseCallback.class);
@@ -5285,7 +5184,6 @@ public class ClusterInfoMapping {
     mediaPlaybackClusterCommandInfoMap.put("mediaPlay", mediaPlaybackmediaPlayCommandInfo);
     Map<String, CommandParameterInfo> mediaPlaybackmediaPreviousCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaPlaybackmediaPreviousCommandParameterInfo =
         new CommandParameterInfo(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaPreviousResponseCallback.class);
@@ -5302,7 +5200,6 @@ public class ClusterInfoMapping {
     mediaPlaybackClusterCommandInfoMap.put("mediaPrevious", mediaPlaybackmediaPreviousCommandInfo);
     Map<String, CommandParameterInfo> mediaPlaybackmediaRewindCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaPlaybackmediaRewindCommandParameterInfo =
         new CommandParameterInfo(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaRewindResponseCallback.class);
@@ -5319,7 +5216,6 @@ public class ClusterInfoMapping {
     mediaPlaybackClusterCommandInfoMap.put("mediaRewind", mediaPlaybackmediaRewindCommandInfo);
     Map<String, CommandParameterInfo> mediaPlaybackmediaSeekCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaPlaybackmediaSeekCommandParameterInfo =
         new CommandParameterInfo(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaSeekResponseCallback.class);
@@ -5342,7 +5238,6 @@ public class ClusterInfoMapping {
     mediaPlaybackClusterCommandInfoMap.put("mediaSeek", mediaPlaybackmediaSeekCommandInfo);
     Map<String, CommandParameterInfo> mediaPlaybackmediaSkipBackwardCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaPlaybackmediaSkipBackwardCommandParameterInfo =
         new CommandParameterInfo(
             "MediaPlayback",
@@ -5370,7 +5265,6 @@ public class ClusterInfoMapping {
         "mediaSkipBackward", mediaPlaybackmediaSkipBackwardCommandInfo);
     Map<String, CommandParameterInfo> mediaPlaybackmediaSkipForwardCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaPlaybackmediaSkipForwardCommandParameterInfo =
         new CommandParameterInfo(
             "MediaPlayback",
@@ -5397,7 +5291,6 @@ public class ClusterInfoMapping {
         "mediaSkipForward", mediaPlaybackmediaSkipForwardCommandInfo);
     Map<String, CommandParameterInfo> mediaPlaybackmediaStartOverCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaPlaybackmediaStartOverCommandParameterInfo =
         new CommandParameterInfo(
             "MediaPlayback",
@@ -5416,7 +5309,6 @@ public class ClusterInfoMapping {
         "mediaStartOver", mediaPlaybackmediaStartOverCommandInfo);
     Map<String, CommandParameterInfo> mediaPlaybackmediaStopCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo mediaPlaybackmediaStopCommandParameterInfo =
         new CommandParameterInfo(
             "MediaPlayback", ChipClusters.MediaPlaybackCluster.MediaStopResponseCallback.class);
@@ -5437,10 +5329,36 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.MediaPlaybackCluster(ptr, endpointId),
             mediaPlaybackClusterCommandInfoMap);
     clusterMap.put("mediaPlayback", mediaPlaybackClusterInfo);
+    Map<String, CommandInfo> modeSelectClusterCommandInfoMap = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> modeSelectchangeToModeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo modeSelectchangeToModeCommandParameterInfo =
+        new CommandParameterInfo("ModeSelect", ChipClusters.DefaultClusterCallback.class);
+    CommandParameterInfo modeSelectchangeToModenewModeCommandParameterInfo =
+        new CommandParameterInfo("newMode", int.class);
+    modeSelectchangeToModeCommandParams.put(
+        "newMode", modeSelectchangeToModenewModeCommandParameterInfo);
+
+    // Populate commands
+    CommandInfo modeSelectchangeToModeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ModeSelectCluster) cluster)
+                  .changeToMode(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("newMode"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            modeSelectchangeToModeCommandParams);
+    modeSelectClusterCommandInfoMap.put("changeToMode", modeSelectchangeToModeCommandInfo);
+    // Populate cluster
+    ClusterInfo modeSelectClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ModeSelectCluster(ptr, endpointId),
+            modeSelectClusterCommandInfoMap);
+    clusterMap.put("modeSelect", modeSelectClusterInfo);
     Map<String, CommandInfo> networkCommissioningClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> networkCommissioningaddThreadNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo networkCommissioningaddThreadNetworkCommandParameterInfo =
         new CommandParameterInfo(
             "NetworkCommissioning",
@@ -5480,7 +5398,6 @@ public class ClusterInfoMapping {
         "addThreadNetwork", networkCommissioningaddThreadNetworkCommandInfo);
     Map<String, CommandParameterInfo> networkCommissioningaddWiFiNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo networkCommissioningaddWiFiNetworkCommandParameterInfo =
         new CommandParameterInfo(
             "NetworkCommissioning",
@@ -5524,7 +5441,6 @@ public class ClusterInfoMapping {
         "addWiFiNetwork", networkCommissioningaddWiFiNetworkCommandInfo);
     Map<String, CommandParameterInfo> networkCommissioningdisableNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo networkCommissioningdisableNetworkCommandParameterInfo =
         new CommandParameterInfo(
             "NetworkCommissioning",
@@ -5562,7 +5478,6 @@ public class ClusterInfoMapping {
         "disableNetwork", networkCommissioningdisableNetworkCommandInfo);
     Map<String, CommandParameterInfo> networkCommissioningenableNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo networkCommissioningenableNetworkCommandParameterInfo =
         new CommandParameterInfo(
             "NetworkCommissioning",
@@ -5601,7 +5516,6 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo>
         networkCommissioninggetLastNetworkCommissioningResultCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo networkCommissioninggetLastNetworkCommissioningResultCommandParameterInfo =
         new CommandParameterInfo("NetworkCommissioning", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo
@@ -5626,7 +5540,6 @@ public class ClusterInfoMapping {
         networkCommissioninggetLastNetworkCommissioningResultCommandInfo);
     Map<String, CommandParameterInfo> networkCommissioningremoveNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo networkCommissioningremoveNetworkCommandParameterInfo =
         new CommandParameterInfo(
             "NetworkCommissioning",
@@ -5664,7 +5577,6 @@ public class ClusterInfoMapping {
         "removeNetwork", networkCommissioningremoveNetworkCommandInfo);
     Map<String, CommandParameterInfo> networkCommissioningscanNetworksCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo networkCommissioningscanNetworksCommandParameterInfo =
         new CommandParameterInfo(
             "NetworkCommissioning",
@@ -5702,7 +5614,6 @@ public class ClusterInfoMapping {
         "scanNetworks", networkCommissioningscanNetworksCommandInfo);
     Map<String, CommandParameterInfo> networkCommissioningupdateThreadNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo networkCommissioningupdateThreadNetworkCommandParameterInfo =
         new CommandParameterInfo(
             "NetworkCommissioning",
@@ -5742,7 +5653,6 @@ public class ClusterInfoMapping {
         "updateThreadNetwork", networkCommissioningupdateThreadNetworkCommandInfo);
     Map<String, CommandParameterInfo> networkCommissioningupdateWiFiNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo networkCommissioningupdateWiFiNetworkCommandParameterInfo =
         new CommandParameterInfo(
             "NetworkCommissioning",
@@ -5793,7 +5703,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> otaSoftwareUpdateProviderClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> otaSoftwareUpdateProviderapplyUpdateRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo otaSoftwareUpdateProviderapplyUpdateRequestCommandParameterInfo =
         new CommandParameterInfo(
             "OtaSoftwareUpdateProvider",
@@ -5827,7 +5736,6 @@ public class ClusterInfoMapping {
         "applyUpdateRequest", otaSoftwareUpdateProviderapplyUpdateRequestCommandInfo);
     Map<String, CommandParameterInfo> otaSoftwareUpdateProvidernotifyUpdateAppliedCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo otaSoftwareUpdateProvidernotifyUpdateAppliedCommandParameterInfo =
         new CommandParameterInfo(
             "OtaSoftwareUpdateProvider", ChipClusters.DefaultClusterCallback.class);
@@ -5860,7 +5768,6 @@ public class ClusterInfoMapping {
         "notifyUpdateApplied", otaSoftwareUpdateProvidernotifyUpdateAppliedCommandInfo);
     Map<String, CommandParameterInfo> otaSoftwareUpdateProviderqueryImageCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo otaSoftwareUpdateProviderqueryImageCommandParameterInfo =
         new CommandParameterInfo(
             "OtaSoftwareUpdateProvider",
@@ -5941,7 +5848,6 @@ public class ClusterInfoMapping {
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> otaSoftwareUpdateRequestorannounceOtaProviderCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProviderCommandParameterInfo =
         new CommandParameterInfo(
             "OtaSoftwareUpdateRequestor", ChipClusters.DefaultClusterCallback.class);
@@ -6004,7 +5910,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> onOffClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> onOffoffCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo onOffoffCommandParameterInfo =
         new CommandParameterInfo("OnOff", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -6018,7 +5923,6 @@ public class ClusterInfoMapping {
     onOffClusterCommandInfoMap.put("off", onOffoffCommandInfo);
     Map<String, CommandParameterInfo> onOffoffWithEffectCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo onOffoffWithEffectCommandParameterInfo =
         new CommandParameterInfo("OnOff", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo onOffoffWithEffecteffectIdCommandParameterInfo =
@@ -6045,7 +5949,6 @@ public class ClusterInfoMapping {
     onOffClusterCommandInfoMap.put("offWithEffect", onOffoffWithEffectCommandInfo);
     Map<String, CommandParameterInfo> onOffonCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo onOffonCommandParameterInfo =
         new CommandParameterInfo("OnOff", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -6059,7 +5962,6 @@ public class ClusterInfoMapping {
     onOffClusterCommandInfoMap.put("on", onOffonCommandInfo);
     Map<String, CommandParameterInfo> onOffonWithRecallGlobalSceneCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo onOffonWithRecallGlobalSceneCommandParameterInfo =
         new CommandParameterInfo("OnOff", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -6075,7 +5977,6 @@ public class ClusterInfoMapping {
         "onWithRecallGlobalScene", onOffonWithRecallGlobalSceneCommandInfo);
     Map<String, CommandParameterInfo> onOffonWithTimedOffCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo onOffonWithTimedOffCommandParameterInfo =
         new CommandParameterInfo("OnOff", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo onOffonWithTimedOffonOffControlCommandParameterInfo =
@@ -6108,7 +6009,6 @@ public class ClusterInfoMapping {
     onOffClusterCommandInfoMap.put("onWithTimedOff", onOffonWithTimedOffCommandInfo);
     Map<String, CommandParameterInfo> onOfftoggleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo onOfftoggleCommandParameterInfo =
         new CommandParameterInfo("OnOff", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -6136,7 +6036,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> operationalCredentialsClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> operationalCredentialsaddNOCCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo operationalCredentialsaddNOCCommandParameterInfo =
         new CommandParameterInfo(
             "OperationalCredentials",
@@ -6185,7 +6084,6 @@ public class ClusterInfoMapping {
         "addNOC", operationalCredentialsaddNOCCommandInfo);
     Map<String, CommandParameterInfo> operationalCredentialsaddTrustedRootCertificateCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo operationalCredentialsaddTrustedRootCertificateCommandParameterInfo =
         new CommandParameterInfo(
             "OperationalCredentials", ChipClusters.DefaultClusterCallback.class);
@@ -6211,7 +6109,6 @@ public class ClusterInfoMapping {
         "addTrustedRootCertificate", operationalCredentialsaddTrustedRootCertificateCommandInfo);
     Map<String, CommandParameterInfo> operationalCredentialsattestationRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo operationalCredentialsattestationRequestCommandParameterInfo =
         new CommandParameterInfo(
             "OperationalCredentials",
@@ -6239,7 +6136,6 @@ public class ClusterInfoMapping {
         "attestationRequest", operationalCredentialsattestationRequestCommandInfo);
     Map<String, CommandParameterInfo> operationalCredentialscertificateChainRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo operationalCredentialscertificateChainRequestCommandParameterInfo =
         new CommandParameterInfo(
             "OperationalCredentials",
@@ -6267,7 +6163,6 @@ public class ClusterInfoMapping {
         "certificateChainRequest", operationalCredentialscertificateChainRequestCommandInfo);
     Map<String, CommandParameterInfo> operationalCredentialsopCSRRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo operationalCredentialsopCSRRequestCommandParameterInfo =
         new CommandParameterInfo(
             "OperationalCredentials",
@@ -6292,7 +6187,6 @@ public class ClusterInfoMapping {
         "opCSRRequest", operationalCredentialsopCSRRequestCommandInfo);
     Map<String, CommandParameterInfo> operationalCredentialsremoveFabricCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo operationalCredentialsremoveFabricCommandParameterInfo =
         new CommandParameterInfo(
             "OperationalCredentials",
@@ -6318,7 +6212,6 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo>
         operationalCredentialsremoveTrustedRootCertificateCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo operationalCredentialsremoveTrustedRootCertificateCommandParameterInfo =
         new CommandParameterInfo(
             "OperationalCredentials", ChipClusters.DefaultClusterCallback.class);
@@ -6345,7 +6238,6 @@ public class ClusterInfoMapping {
         operationalCredentialsremoveTrustedRootCertificateCommandInfo);
     Map<String, CommandParameterInfo> operationalCredentialsupdateFabricLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo operationalCredentialsupdateFabricLabelCommandParameterInfo =
         new CommandParameterInfo(
             "OperationalCredentials",
@@ -6370,7 +6262,6 @@ public class ClusterInfoMapping {
         "updateFabricLabel", operationalCredentialsupdateFabricLabelCommandInfo);
     Map<String, CommandParameterInfo> operationalCredentialsupdateNOCCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo operationalCredentialsupdateNOCCommandParameterInfo =
         new CommandParameterInfo(
             "OperationalCredentials",
@@ -6440,7 +6331,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> scenesClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> scenesaddSceneCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo scenesaddSceneCommandParameterInfo =
         new CommandParameterInfo(
             "Scenes", ChipClusters.ScenesCluster.AddSceneResponseCallback.class);
@@ -6493,7 +6383,6 @@ public class ClusterInfoMapping {
     scenesClusterCommandInfoMap.put("addScene", scenesaddSceneCommandInfo);
     Map<String, CommandParameterInfo> scenesgetSceneMembershipCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo scenesgetSceneMembershipCommandParameterInfo =
         new CommandParameterInfo(
             "Scenes", ChipClusters.ScenesCluster.GetSceneMembershipResponseCallback.class);
@@ -6516,7 +6405,6 @@ public class ClusterInfoMapping {
     scenesClusterCommandInfoMap.put("getSceneMembership", scenesgetSceneMembershipCommandInfo);
     Map<String, CommandParameterInfo> scenesrecallSceneCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo scenesrecallSceneCommandParameterInfo =
         new CommandParameterInfo("Scenes", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo scenesrecallScenegroupIdCommandParameterInfo =
@@ -6548,7 +6436,6 @@ public class ClusterInfoMapping {
     scenesClusterCommandInfoMap.put("recallScene", scenesrecallSceneCommandInfo);
     Map<String, CommandParameterInfo> scenesremoveAllScenesCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo scenesremoveAllScenesCommandParameterInfo =
         new CommandParameterInfo(
             "Scenes", ChipClusters.ScenesCluster.RemoveAllScenesResponseCallback.class);
@@ -6571,7 +6458,6 @@ public class ClusterInfoMapping {
     scenesClusterCommandInfoMap.put("removeAllScenes", scenesremoveAllScenesCommandInfo);
     Map<String, CommandParameterInfo> scenesremoveSceneCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo scenesremoveSceneCommandParameterInfo =
         new CommandParameterInfo(
             "Scenes", ChipClusters.ScenesCluster.RemoveSceneResponseCallback.class);
@@ -6598,7 +6484,6 @@ public class ClusterInfoMapping {
     scenesClusterCommandInfoMap.put("removeScene", scenesremoveSceneCommandInfo);
     Map<String, CommandParameterInfo> scenesstoreSceneCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo scenesstoreSceneCommandParameterInfo =
         new CommandParameterInfo(
             "Scenes", ChipClusters.ScenesCluster.StoreSceneResponseCallback.class);
@@ -6625,7 +6510,6 @@ public class ClusterInfoMapping {
     scenesClusterCommandInfoMap.put("storeScene", scenesstoreSceneCommandInfo);
     Map<String, CommandParameterInfo> scenesviewSceneCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo scenesviewSceneCommandParameterInfo =
         new CommandParameterInfo(
             "Scenes", ChipClusters.ScenesCluster.ViewSceneResponseCallback.class);
@@ -6659,7 +6543,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> softwareDiagnosticsClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> softwareDiagnosticsresetWatermarksCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo softwareDiagnosticsresetWatermarksCommandParameterInfo =
         new CommandParameterInfo("SoftwareDiagnostics", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -6689,7 +6572,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> tvChannelClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> tvChannelchangeChannelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo tvChannelchangeChannelCommandParameterInfo =
         new CommandParameterInfo(
             "TvChannel", ChipClusters.TvChannelCluster.ChangeChannelResponseCallback.class);
@@ -6712,7 +6594,6 @@ public class ClusterInfoMapping {
     tvChannelClusterCommandInfoMap.put("changeChannel", tvChannelchangeChannelCommandInfo);
     Map<String, CommandParameterInfo> tvChannelchangeChannelByNumberCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo tvChannelchangeChannelByNumberCommandParameterInfo =
         new CommandParameterInfo("TvChannel", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo tvChannelchangeChannelByNumbermajorNumberCommandParameterInfo =
@@ -6741,7 +6622,6 @@ public class ClusterInfoMapping {
         "changeChannelByNumber", tvChannelchangeChannelByNumberCommandInfo);
     Map<String, CommandParameterInfo> tvChannelskipChannelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo tvChannelskipChannelCommandParameterInfo =
         new CommandParameterInfo("TvChannel", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo tvChannelskipChannelcountCommandParameterInfo =
@@ -6768,7 +6648,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> targetNavigatorClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> targetNavigatornavigateTargetCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo targetNavigatornavigateTargetCommandParameterInfo =
         new CommandParameterInfo(
             "TargetNavigator",
@@ -6813,7 +6692,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> testClusterClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> testClustertestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo testClustertestCommandParameterInfo =
         new CommandParameterInfo("TestCluster", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -6827,7 +6705,6 @@ public class ClusterInfoMapping {
     testClusterClusterCommandInfoMap.put("test", testClustertestCommandInfo);
     Map<String, CommandParameterInfo> testClustertestAddArgumentsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo testClustertestAddArgumentsCommandParameterInfo =
         new CommandParameterInfo(
             "TestCluster", ChipClusters.TestClusterCluster.TestAddArgumentsResponseCallback.class);
@@ -6857,7 +6734,6 @@ public class ClusterInfoMapping {
         "testAddArguments", testClustertestAddArgumentsCommandInfo);
     Map<String, CommandParameterInfo> testClustertestEnumsRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo testClustertestEnumsRequestCommandParameterInfo =
         new CommandParameterInfo(
             "TestCluster", ChipClusters.TestClusterCluster.TestEnumsResponseCallback.class);
@@ -6887,7 +6763,6 @@ public class ClusterInfoMapping {
         "testEnumsRequest", testClustertestEnumsRequestCommandInfo);
     Map<String, CommandParameterInfo> testClustertestListInt8UArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo testClustertestListInt8UArgumentRequestCommandParameterInfo =
         new CommandParameterInfo("TestCluster", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo testClustertestListInt8UArgumentRequestarg1CommandParameterInfo =
@@ -6909,7 +6784,6 @@ public class ClusterInfoMapping {
         "testListInt8UArgumentRequest", testClustertestListInt8UArgumentRequestCommandInfo);
     Map<String, CommandParameterInfo> testClustertestListInt8UReverseRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo testClustertestListInt8UReverseRequestCommandParameterInfo =
         new CommandParameterInfo(
             "TestCluster",
@@ -6935,7 +6809,6 @@ public class ClusterInfoMapping {
         "testListInt8UReverseRequest", testClustertestListInt8UReverseRequestCommandInfo);
     Map<String, CommandParameterInfo> testClustertestListStructArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo testClustertestListStructArgumentRequestCommandParameterInfo =
         new CommandParameterInfo("TestCluster", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo testClustertestListStructArgumentRequestaCommandParameterInfo =
@@ -6988,7 +6861,6 @@ public class ClusterInfoMapping {
         "testListStructArgumentRequest", testClustertestListStructArgumentRequestCommandInfo);
     Map<String, CommandParameterInfo> testClustertestNotHandledCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo testClustertestNotHandledCommandParameterInfo =
         new CommandParameterInfo("TestCluster", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -7003,7 +6875,6 @@ public class ClusterInfoMapping {
     testClusterClusterCommandInfoMap.put("testNotHandled", testClustertestNotHandledCommandInfo);
     Map<String, CommandParameterInfo> testClustertestNullableOptionalRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo testClustertestNullableOptionalRequestCommandParameterInfo =
         new CommandParameterInfo(
             "TestCluster",
@@ -7029,7 +6900,6 @@ public class ClusterInfoMapping {
         "testNullableOptionalRequest", testClustertestNullableOptionalRequestCommandInfo);
     Map<String, CommandParameterInfo> testClustertestSpecificCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo testClustertestSpecificCommandParameterInfo =
         new CommandParameterInfo(
             "TestCluster", ChipClusters.TestClusterCluster.TestSpecificResponseCallback.class);
@@ -7046,7 +6916,6 @@ public class ClusterInfoMapping {
     testClusterClusterCommandInfoMap.put("testSpecific", testClustertestSpecificCommandInfo);
     Map<String, CommandParameterInfo> testClustertestStructArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo testClustertestStructArgumentRequestCommandParameterInfo =
         new CommandParameterInfo("TestCluster", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo testClustertestStructArgumentRequestaCommandParameterInfo =
@@ -7099,7 +6968,6 @@ public class ClusterInfoMapping {
         "testStructArgumentRequest", testClustertestStructArgumentRequestCommandInfo);
     Map<String, CommandParameterInfo> testClustertestUnknownCommandCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo testClustertestUnknownCommandCommandParameterInfo =
         new CommandParameterInfo("TestCluster", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -7122,7 +6990,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> thermostatClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> thermostatclearWeeklyScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo thermostatclearWeeklyScheduleCommandParameterInfo =
         new CommandParameterInfo("Thermostat", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -7138,7 +7005,6 @@ public class ClusterInfoMapping {
         "clearWeeklySchedule", thermostatclearWeeklyScheduleCommandInfo);
     Map<String, CommandParameterInfo> thermostatgetRelayStatusLogCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo thermostatgetRelayStatusLogCommandParameterInfo =
         new CommandParameterInfo("Thermostat", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -7154,7 +7020,6 @@ public class ClusterInfoMapping {
         "getRelayStatusLog", thermostatgetRelayStatusLogCommandInfo);
     Map<String, CommandParameterInfo> thermostatgetWeeklyScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo thermostatgetWeeklyScheduleCommandParameterInfo =
         new CommandParameterInfo("Thermostat", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo thermostatgetWeeklyScheduledaysToReturnCommandParameterInfo =
@@ -7183,7 +7048,6 @@ public class ClusterInfoMapping {
         "getWeeklySchedule", thermostatgetWeeklyScheduleCommandInfo);
     Map<String, CommandParameterInfo> thermostatsetWeeklyScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo thermostatsetWeeklyScheduleCommandParameterInfo =
         new CommandParameterInfo("Thermostat", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo
@@ -7227,7 +7091,6 @@ public class ClusterInfoMapping {
         "setWeeklySchedule", thermostatsetWeeklyScheduleCommandInfo);
     Map<String, CommandParameterInfo> thermostatsetpointRaiseLowerCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo thermostatsetpointRaiseLowerCommandParameterInfo =
         new CommandParameterInfo("Thermostat", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo thermostatsetpointRaiseLowermodeCommandParameterInfo =
@@ -7273,7 +7136,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> threadNetworkDiagnosticsClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> threadNetworkDiagnosticsresetCountsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo threadNetworkDiagnosticsresetCountsCommandParameterInfo =
         new CommandParameterInfo(
             "ThreadNetworkDiagnostics", ChipClusters.DefaultClusterCallback.class);
@@ -7304,7 +7166,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> wiFiNetworkDiagnosticsClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> wiFiNetworkDiagnosticsresetCountsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo wiFiNetworkDiagnosticsresetCountsCommandParameterInfo =
         new CommandParameterInfo(
             "WiFiNetworkDiagnostics", ChipClusters.DefaultClusterCallback.class);
@@ -7328,7 +7189,6 @@ public class ClusterInfoMapping {
     Map<String, CommandInfo> windowCoveringClusterCommandInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> windowCoveringdownOrCloseCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo windowCoveringdownOrCloseCommandParameterInfo =
         new CommandParameterInfo("WindowCovering", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -7343,7 +7203,6 @@ public class ClusterInfoMapping {
     windowCoveringClusterCommandInfoMap.put("downOrClose", windowCoveringdownOrCloseCommandInfo);
     Map<String, CommandParameterInfo> windowCoveringgoToLiftPercentageCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo windowCoveringgoToLiftPercentageCommandParameterInfo =
         new CommandParameterInfo("WindowCovering", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo windowCoveringgoToLiftPercentageliftPercentageValueCommandParameterInfo =
@@ -7375,7 +7234,6 @@ public class ClusterInfoMapping {
         "goToLiftPercentage", windowCoveringgoToLiftPercentageCommandInfo);
     Map<String, CommandParameterInfo> windowCoveringgoToLiftValueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo windowCoveringgoToLiftValueCommandParameterInfo =
         new CommandParameterInfo("WindowCovering", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo windowCoveringgoToLiftValueliftValueCommandParameterInfo =
@@ -7398,7 +7256,6 @@ public class ClusterInfoMapping {
         "goToLiftValue", windowCoveringgoToLiftValueCommandInfo);
     Map<String, CommandParameterInfo> windowCoveringgoToTiltPercentageCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo windowCoveringgoToTiltPercentageCommandParameterInfo =
         new CommandParameterInfo("WindowCovering", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo windowCoveringgoToTiltPercentagetiltPercentageValueCommandParameterInfo =
@@ -7430,7 +7287,6 @@ public class ClusterInfoMapping {
         "goToTiltPercentage", windowCoveringgoToTiltPercentageCommandInfo);
     Map<String, CommandParameterInfo> windowCoveringgoToTiltValueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo windowCoveringgoToTiltValueCommandParameterInfo =
         new CommandParameterInfo("WindowCovering", ChipClusters.DefaultClusterCallback.class);
     CommandParameterInfo windowCoveringgoToTiltValuetiltValueCommandParameterInfo =
@@ -7453,7 +7309,6 @@ public class ClusterInfoMapping {
         "goToTiltValue", windowCoveringgoToTiltValueCommandInfo);
     Map<String, CommandParameterInfo> windowCoveringstopMotionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo windowCoveringstopMotionCommandParameterInfo =
         new CommandParameterInfo("WindowCovering", ChipClusters.DefaultClusterCallback.class);
     // Populate commands
@@ -7468,7 +7323,6 @@ public class ClusterInfoMapping {
     windowCoveringClusterCommandInfoMap.put("stopMotion", windowCoveringstopMotionCommandInfo);
     Map<String, CommandParameterInfo> windowCoveringupOrOpenCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    // PLEASE UPDATE LATER: fill out parameter types
     CommandParameterInfo windowCoveringupOrOpenCommandParameterInfo =
         new CommandParameterInfo("WindowCovering", ChipClusters.DefaultClusterCallback.class);
     // Populate commands

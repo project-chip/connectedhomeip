@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "ListBuilder.h"
-#include "ListParser.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -52,7 +52,7 @@ struct StatusIB
         kClusterStatus = 1,
     };
 
-    class Parser : public chip::app::Parser
+    class Parser : public StructParser
     {
     public:
         /**
@@ -91,29 +91,9 @@ struct StatusIB
         CHIP_ERROR DecodeStatusIB(StatusIB & aStatusIB) const;
     };
 
-    class Builder : public chip::app::Builder
+    class Builder : public StructBuilder
     {
     public:
-        /**
-         *  @brief Initialize a StatusIB::Builder for writing into a TLV stream
-         *
-         *  @param [in] apWriter    A pointer to TLVWriter
-         *
-         *  @return #CHIP_NO_ERROR on success
-         */
-        CHIP_ERROR Init(TLV::TLVWriter * const apWriter);
-
-        /**
-         * Init the StatusIB container with an particular context tag.
-         * Required to implement arrays of arrays, and to test ListBuilder.
-         *
-         * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
-         * @param[in]   aContextTagToUse    A contextTag to use.
-         *
-         * @return                  CHIP_ERROR codes returned by chip::TLV objects.
-         */
-        CHIP_ERROR Init(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
-
         /**
          * Write the StatusIB into TLV and close the container
          *
