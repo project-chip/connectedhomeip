@@ -370,10 +370,21 @@ class BaseTestHelper:
             changeThread.start()
             with handler.cv:
                 while handler.subscriptionReceived < 5:
-                    # We should observe 10 attribute changes
-                    handler.cv.wait()
-            changeThread.join()
-            return True
+                    # We should observe 5 attribute changes
+                    # The changing thread will change the value after 3 seconds. If we're waiting more than 10, assume something
+                    # is really wrong and bail out here with some information.
+                    if not handler.cv.wait(10.0):
+                        self.logger.error(f"Failed to receive subscription update")
+                        break
+
+            # thread changes 5 times, and sleeps for 3 seconds in between. Add an additional 3 seconds of slack. Timeout is in seconds.
+            changeThread.join(18.0)
+            if changeThread.is_alive():
+                # Thread join timed out
+                self.logger.error(f"Failed to join change thread")
+                return False
+            return True if handler.subscriptionReceived == 5 else False
+
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")
             return False
