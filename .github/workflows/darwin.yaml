@@ -112,6 +112,14 @@ jobs:
             - name: Run Framework Tests
               timeout-minutes: 10
               run: |
-                ../../../out/debug/chip-all-clusters-app &
-                xcodebuild test -target "CHIP" -scheme "CHIP Framework Tests" -sdk macosx
+                mkdir -p /tmp/darwin/framework-tests
+                ../../../out/debug/chip-all-clusters-app > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
+                xcodebuild test -target "CHIP" -scheme "CHIP Framework Tests" -sdk macosx > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
               working-directory: src/darwin/Framework
+            - name: Uploading log files
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }} && ${{ !env.ACT }}
+              with:
+                  name: darwin-framework-test-logs
+                  path: /tmp/darwin/framework-tests
+                  retention-days: 5
