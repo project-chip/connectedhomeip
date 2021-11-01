@@ -226,14 +226,14 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AddAttributeDataElement(apSuite, apContext, writeClientHandle);
 
-    err = writeClientHandle.SendWriteRequestMessage(ctx.GetSessionBobToAlice());
+    err = writeClientHandle.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    // The internal WriteClient should be nullptr once we SendWriteRequestMessage.
+    // The internal WriteClient should be nullptr once we SendWriteRequest.
     NL_TEST_ASSERT(apSuite, nullptr == writeClientHandle.mpWriteClient);
 
     GenerateWriteResponseMessage(apSuite, apContext, buf);
 
-    err = writeClient.ProcessWriteResponseMessageMessage(std::move(buf));
+    err = writeClient.ProcessWriteResponseMessage(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     writeClient.Shutdown();
@@ -258,7 +258,7 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
     TestExchangeDelegate delegate;
     Messaging::ExchangeContext * exchange = ctx.NewExchangeToBob(&delegate);
-    err                                   = writeHandler.OnWriteRequestMessage(exchange, std::move(buf));
+    err                                   = writeHandler.OnWriteRequest(exchange, std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -318,7 +318,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0);
 
-    err = writeClient.SendWriteRequestMessage(ctx.GetSessionBobToAlice());
+    err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1);
@@ -369,7 +369,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
 
-    err = writeClient.SendWriteRequestMessage(ctx.GetSessionBobToAlice());
+    err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1);

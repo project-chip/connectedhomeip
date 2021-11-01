@@ -231,7 +231,6 @@ AttributePathList::Builder & SubscribeRequestMessage::Builder::CreateAttributePa
     return mAttributePathListBuilder;
 }
 
-
 EventPaths::Builder & SubscribeRequestMessage::Builder::CreateEventPathsBuilder()
 {
     if (mError == CHIP_NO_ERROR)

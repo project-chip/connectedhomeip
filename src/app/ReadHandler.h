@@ -94,7 +94,7 @@ public:
     CHIP_ERROR OnReadInitialRequest(System::PacketBufferHandle && aPayload);
 
     /**
-     *  Send ReportDataMessage to initiator
+     *  Send ReportData to initiator
      *
      *  @param[in]    aPayload             A payload that has read request data
      *
@@ -102,7 +102,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR SendReportDataMessage(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload);
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
     bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport; }
@@ -128,7 +128,7 @@ public:
     bool IsSubscriptionType() { return mInteractionType == InteractionType::Subscribe; }
     bool IsInitialReport() { return mInitialReport; }
     bool IsActiveSubscription() const { return mActiveSubscription; }
-    CHIP_ERROR OnSubscribeRequestMessage(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     void GetSubscriptionId(uint64_t & aSubscriptionId) { aSubscriptionId = mSubscriptionId; }
     void SetDirty() { mDirty = true; }
     void ClearDirty() { mDirty = false; }
@@ -149,12 +149,12 @@ private:
 
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
     CHIP_ERROR RefreshSubscribeSyncTimer();
-    CHIP_ERROR SendSubscribeResponseMessage();
-    CHIP_ERROR ProcessSubscribeRequestMessage(System::PacketBufferHandle && aPayload);
-    CHIP_ERROR ProcessReadRequestMessage(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR SendSubscribeResponse();
+    CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser);
     CHIP_ERROR ProcessEventPaths(EventPaths::Parser & aEventPathsParser);
-    CHIP_ERROR OnStatusResponseMessage(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;

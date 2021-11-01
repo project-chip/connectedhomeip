@@ -102,7 +102,7 @@ public:
         virtual void OnSubscriptionEstablished(const ReadClient * apReadClient) {}
 
         /**
-         * OnError will be called when an error occurs *after* a successful call to SendReadRequestMessage(). The following
+         * OnError will be called when an error occurs *after* a successful call to SendReadRequest(). The following
          * errors will be delivered through this call in the aError field:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
@@ -124,7 +124,7 @@ public:
          * This function will:
          *      - Always be called exactly *once* for a given WriteClient instance.
          *      - Be called even in error circumstances.
-         *      - Only be called after a successful call to SendWriteRequestMessage as been made.
+         *      - Only be called after a successful call to SendWriteRequest as been made.
          *
          * @param[in] apReadClient: The read client object of the terminated read transaction.
          */
@@ -144,31 +144,30 @@ public:
      *  The ReadClient will automatically shut itself down when it receives a
      *  response or the response times out.  So manual shutdown is only needed
      *  to shut down a ReadClient before one of those two things has happened,
-     *  (e.g. if SendReadRequestMessage returned failure).
+     *  (e.g. if SendReadRequest returned failure).
      */
     void Shutdown();
 
     /**
      *  Send a Read Request.  There can be one Read Request outstanding on a given ReadClient.
-     *  If SendReadRequestMessage returns success, no more Read Requests can be sent on this ReadClient
+     *  If SendReadRequest returns success, no more Read Requests can be sent on this ReadClient
      *  until the corresponding InteractionModelDelegate::ReadDone call happens with guarantee.
      *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequestMessage(ReadPrepareParams & aReadPrepareParams);
+    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
 
     /**
      *  Send a subscribe Request.  There can be one Subscribe Request outstanding on a given ReadClient.
-     *  If SendSubscribeRequestMessage returns success, no more subscribe Requests can be sent on this ReadClient
+     *  If SendSubscribeRequest returns success, no more subscribe Requests can be sent on this ReadClient
      *  until the corresponding InteractionModelDelegate::ReadDone call happens with guarantee.
      *
      *  @retval #others fail to send subscribe request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendSubscribeRequestMessage(ReadPrepareParams & aSubscribePrepareParams);
-    CHIP_ERROR OnUnsolicitedReportDataMessage(Messaging::ExchangeContext * apExchangeContext,
-                                              System::PacketBufferHandle && aPayload);
+    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
+    CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
     auto GetSubscriptionId() const
     {
@@ -179,7 +178,7 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
-    CHIP_ERROR SendStatusResponseMessage(CHIP_ERROR aError);
+    CHIP_ERROR SendStatusResponse(CHIP_ERROR aError);
 
 private:
     friend class TestReadInteraction;
@@ -187,11 +186,11 @@ private:
 
     enum class ClientState
     {
-        Uninitialized = 0,                ///< The client has not been initialized
-        Initialized,                      ///< The client has been initialized and is ready for a SendReadRequestMessage
-        AwaitingInitialReport,            ///< The client is waiting for initial report
-        AwaitingSubscribeResponseMessage, ///< The client is waiting for subscribe response
-        SubscriptionActive,               ///< The client is maintaining subscription
+        Uninitialized = 0,         ///< The client has not been initialized
+        Initialized,               ///< The client has been initialized and is ready for a SendReadRequest
+        AwaitingInitialReport,     ///< The client is waiting for initial report
+        AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
+        SubscriptionActive,        ///< The client is maintaining subscription
     };
 
     bool IsMatchingClient(uint64_t aSubscriptionId)
@@ -206,13 +205,13 @@ private:
      *
      *  The following callbacks are expected to be invoked on the InteractionModelDelegate:
      *      - EventStreamReceived
-     *      - OnReportDataMessage
+     *      - OnReportData
      *      - ReportProcessed
      *      - ReadError
      *      - ReadDone
      *
      *  When processing subscriptions, these callbacks are invoked as well:
-     *      - SubscribeResponseMessageProcessed
+     *      - SubscribeResponseProcessed
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.
@@ -236,7 +235,7 @@ private:
     bool IsFree() const { return mState == ClientState::Uninitialized; }
     bool IsSubscriptionTypeIdle() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
-    bool IsAwaitingSubscribeResponseMessage() const { return mState == ClientState::AwaitingSubscribeResponseMessage; }
+    bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
     CHIP_ERROR GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
                                   size_t aEventPathParamsListSize);
@@ -246,11 +245,11 @@ private:
 
     void ClearExchangeContext() { mpExchangeCtx = nullptr; }
     static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
-    CHIP_ERROR ProcessSubscribeResponseMessage(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR ProcessSubscribeResponse(System::PacketBufferHandle && aPayload);
     CHIP_ERROR RefreshLivenessCheckTimer();
     void CancelLivenessCheckTimer();
     void MoveToState(const ClientState aTargetState);
-    CHIP_ERROR ProcessReportDataMessage(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;
 

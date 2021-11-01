@@ -768,7 +768,7 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
     readPrepareParams.mpAttributePathParamsList    = &aPath;
     readPrepareParams.mAttributePathParamsListSize = 1;
 
-    CHIP_ERROR err = readClient->SendReadRequestMessage(readPrepareParams);
+    CHIP_ERROR err = readClient->SendReadRequest(readPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
         CancelIMResponseHandler(readClient);
@@ -805,7 +805,7 @@ CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath,
     params.mMaxIntervalCeilingSeconds   = mMaxIntervalCeilingSeconds;
     params.mKeepSubscriptions           = false;
 
-    CHIP_ERROR err = readClient->SendSubscribeRequestMessage(params);
+    CHIP_ERROR err = readClient->SendSubscribeRequest(params);
     if (err != CHIP_NO_ERROR)
     {
         mpIMDelegate->FreeAttributePathParam(reinterpret_cast<uint64_t>(readClient));
@@ -836,7 +836,7 @@ CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Cal
     {
         AddIMResponseHandler(writeClient, onSuccessCallback, onFailureCallback);
     }
-    if ((err = aHandle.SendWriteRequestMessage(mSecureSession.Value())) != CHIP_NO_ERROR)
+    if ((err = aHandle.SendWriteRequest(mSecureSession.Value())) != CHIP_NO_ERROR)
     {
         CancelIMResponseHandler(writeClient);
     }
