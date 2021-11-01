@@ -47,7 +47,7 @@ private:
     int Init();
 
     static void ActionInitiated(PumpManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(PumpManager::Action_t aAction);
+    static void ActionCompleted(PumpManager::Action_t aAction, int32_t aActor);
 
     void DispatchEvent(AppEvent * event);
 
