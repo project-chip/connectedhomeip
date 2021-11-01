@@ -95,5 +95,5 @@ protected:
     Builder();
     CHIP_ERROR InitAnonymousStructure(chip::TLV::TLVWriter * const apWriter);
 };
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

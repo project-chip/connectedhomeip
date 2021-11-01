@@ -39,5 +39,5 @@ CHIP_ERROR ListBuilder::Init(TLV::TLVWriter * const apWriter)
 
     return mError;
 }
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

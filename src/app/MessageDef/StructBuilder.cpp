@@ -35,5 +35,5 @@ CHIP_ERROR StructBuilder::Init(TLV::TLVWriter * const apWriter)
     mError   = mpWriter->StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, mOuterContainerType);
     return mError;
 }
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

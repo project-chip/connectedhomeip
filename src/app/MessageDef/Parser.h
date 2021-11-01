@@ -102,5 +102,5 @@ protected:
         return err;
     };
 };
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

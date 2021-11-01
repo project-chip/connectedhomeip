@@ -54,5 +54,5 @@ CHIP_ERROR Parser::Next()
     ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
     return err;
 }
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip
