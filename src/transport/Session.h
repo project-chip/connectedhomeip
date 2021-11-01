@@ -28,16 +28,16 @@ public:
 
     enum class SessionType : uint8_t
     {
-        kUndefined = 0,
+        kUndefined       = 0,
         kUnauthenticated = 1,
-        kSecure = 2,
+        kSecure          = 2,
     };
 
     virtual SessionType GetSessionType() const = 0;
 #if CHIP_PROGRESS_LOGGING
     virtual const char * GetSessionTypeString() const = 0;
 #endif
-    virtual NodeId GetPeerNodeId() const = 0;
+    virtual NodeId GetPeerNodeId() const                          = 0;
     virtual const Transport::PeerAddress & GetPeerAddress() const = 0;
 };
 

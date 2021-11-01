@@ -270,7 +270,8 @@ public:
     SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
 
     /// Get the raw pointer to the SecureSession.
-    // Almost all usages are private, but there is one usage by DeviceCommissioner::ValidateAttestationInfo, we should consider remove that usage
+    // Almost all usages are private, but there is one usage by DeviceCommissioner::ValidateAttestationInfo, we should consider
+    // remove that usage
     Transport::SecureSession * GetSecureSession(uint16_t localSessionId);
 
 private:

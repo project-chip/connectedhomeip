@@ -249,7 +249,7 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeCont
     msgBuf->SetDataLength(kSyncRespMsgSize);
 
     return exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp, std::move(msgBuf),
-                                       Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+                                        Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
 }
 
 CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext,
@@ -282,7 +282,7 @@ CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeCo
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    uint32_t syncCounter             = 0;
+    uint32_t syncCounter = 0;
 
     const uint8_t * resp = msgBuf->Start();
     size_t resplen       = msgBuf->DataLength();
@@ -301,8 +301,8 @@ CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeCo
     VerifyOrExit(syncCounter != 0, err = CHIP_ERROR_READ_FAILED);
 
     // Verify that the response field matches the expected Challenge field for the exchange.
-    err =
-        session->GetSessionMessageCounter().GetPeerMessageCounter().VerifyChallenge(syncCounter, FixedByteSpan<kChallengeSize>(resp));
+    err = session->GetSessionMessageCounter().GetPeerMessageCounter().VerifyChallenge(syncCounter,
+                                                                                      FixedByteSpan<kChallengeSize>(resp));
     SuccessOrExit(err);
 
     // Process all queued incoming messages after message counter synchronization is completed.

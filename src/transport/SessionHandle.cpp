@@ -23,7 +23,8 @@ namespace chip {
 
 using namespace Transport;
 
-Session * SessionHandle::operator->() const {
+Session * SessionHandle::operator->() const
+{
     if (mSession.Is<VariantSecureSession>())
     {
         return AsSecureSession();

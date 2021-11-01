@@ -697,7 +697,8 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
         // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
         // Retrieve attestation challenge
-        ByteSpan attestationChallenge = commandObj->GetExchangeContext()->GetSessionHandle().AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+        ByteSpan attestationChallenge =
+            commandObj->GetExchangeContext()->GetSessionHandle().AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
         Hash_SHA256_stream hashStream;
         SuccessOrExit(err = hashStream.Begin());

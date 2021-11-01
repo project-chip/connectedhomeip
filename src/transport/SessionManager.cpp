@@ -114,31 +114,29 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
 
     switch (sessionHandle->GetSessionType())
     {
-        case Session::SessionType::kSecure:
-            {
-                SecureSession * session = sessionHandle.AsSecureSession();
-                if (session == nullptr)
-                {
-                    return CHIP_ERROR_NOT_CONNECTED;
-                }
+    case Session::SessionType::kSecure: {
+        SecureSession * session = sessionHandle.AsSecureSession();
+        if (session == nullptr)
+        {
+            return CHIP_ERROR_NOT_CONNECTED;
+        }
 
-                MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *session);
-                ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session, payloadHeader, packetHeader, message, counter));
-            }
-            break;
-        case Session::SessionType::kUnauthenticated:
-            {
-                ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
+        MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *session);
+        ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session, payloadHeader, packetHeader, message, counter));
+    }
+    break;
+    case Session::SessionType::kUnauthenticated: {
+        ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
 
-                MessageCounter & counter = sessionHandle.AsUnauthenticatedSession()->GetLocalMessageCounter();
-                uint32_t messageCounter  = counter.Value();
-                ReturnErrorOnFailure(counter.Advance());
+        MessageCounter & counter = sessionHandle.AsUnauthenticatedSession()->GetLocalMessageCounter();
+        uint32_t messageCounter  = counter.Value();
+        ReturnErrorOnFailure(counter.Advance());
 
-                packetHeader.SetMessageCounter(messageCounter);
-            }
-            break;
-        default:
-            return CHIP_ERROR_INTERNAL;
+        packetHeader.SetMessageCounter(messageCounter);
+    }
+    break;
+    default:
+        return CHIP_ERROR_INTERNAL;
     }
 
     ChipLogProgress(Inet,
@@ -162,35 +160,33 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, cons
 
     switch (sessionHandle->GetSessionType())
     {
-        case Session::SessionType::kSecure:
-            {
-                // Find an active connection to the specified peer node
-                SecureSession * session = sessionHandle.AsSecureSession();
-                if (session == nullptr)
-                {
-                    ChipLogError(Inet, "Secure transport could not find a valid PeerConnection");
-                    return CHIP_ERROR_NOT_CONNECTED;
-                }
+    case Session::SessionType::kSecure: {
+        // Find an active connection to the specified peer node
+        SecureSession * session = sessionHandle.AsSecureSession();
+        if (session == nullptr)
+        {
+            ChipLogError(Inet, "Secure transport could not find a valid PeerConnection");
+            return CHIP_ERROR_NOT_CONNECTED;
+        }
 
-                // This marks any session where we send data to as 'active'
-                mSecureSessions.MarkSessionActive(session);
-            }
-            break;
-        case Session::SessionType::kUnauthenticated:
-            {
-                auto unauthenticated = sessionHandle.AsUnauthenticatedSession();
-                mUnauthenticatedSessions.MarkSessionActive(unauthenticated);
-            }
-            break;
-        default:
-            return CHIP_ERROR_INTERNAL;
+        // This marks any session where we send data to as 'active'
+        mSecureSessions.MarkSessionActive(session);
+    }
+    break;
+    case Session::SessionType::kUnauthenticated: {
+        auto unauthenticated = sessionHandle.AsUnauthenticatedSession();
+        mUnauthenticatedSessions.MarkSessionActive(unauthenticated);
+    }
+    break;
+    default:
+        return CHIP_ERROR_INTERNAL;
     }
 
     ChipLogProgress(Inet,
-        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-        " at monotonic time: %" PRId64 " msec",
-        sessionHandle->GetSessionTypeString(), &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(kUndefinedNodeId),
-        System::SystemClock().GetMonotonicMilliseconds64().count());
+                    "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
+                    " at monotonic time: %" PRId64 " msec",
+                    sessionHandle->GetSessionTypeString(), &preparedMessage, preparedMessage.GetMessageCounter(),
+                    ChipLogValueX64(kUndefinedNodeId), System::SystemClock().GetMonotonicMilliseconds64().count());
 
     PacketBufferHandle msgBuf = preparedMessage.CastToWritable();
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -402,7 +398,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         if (!session->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized())
         {
             // Queue and start message sync procedure
-            err = mMessageCounterManager->QueueReceivedMessageAndStartSync(packetHeader, SessionHandle(*this, session->GetLocalSessionId()), session, peerAddress, std::move(msg));
+            err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
+                packetHeader, SessionHandle(*this, session->GetLocalSessionId()), session, peerAddress, std::move(msg));
 
             if (err != CHIP_NO_ERROR)
             {
@@ -566,7 +563,7 @@ SecureSession * SessionManager::GetSecureSession(uint16_t localSessionId)
 SessionHandle SessionManager::FindSecureSessionForNode(NodeId peerNodeId)
 {
     SecureSession * found = nullptr;
-    mSecureSessions.ForEachSession([&] (auto session) {
+    mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetPeerNodeId() == peerNodeId)
         {
             found = session;

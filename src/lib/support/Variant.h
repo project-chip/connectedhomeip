@@ -149,8 +149,9 @@ private:
 public:
     Variant() : mTypeId(kInvalidType) {}
 
-    template<typename T, class... Args >
-    constexpr explicit Variant(InPlaceTemplateType<T>, Args&&... args) : mTypeId(VariantInternal::TupleIndexOfType<T, std::tuple<Ts...>>::value)
+    template <typename T, class... Args>
+    constexpr explicit Variant(InPlaceTemplateType<T>, Args &&... args) :
+        mTypeId(VariantInternal::TupleIndexOfType<T, std::tuple<Ts...>>::value)
     {
         new (&mData) T(std::forward<Args>(args)...);
     }
