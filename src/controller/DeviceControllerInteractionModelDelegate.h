@@ -15,9 +15,10 @@ namespace Controller {
  *
  * TODO:(#8967) Implementation of CommandSender::Callback should be removed after switching to ClusterObjects.
  */
-class DeviceControllerInteractionModelDelegate : public chip::app::InteractionModelDelegate,
+class DeviceControllerInteractionModelDelegate : public chip::app::ReadClient::Callback,
                                                  public chip::app::CommandSender::Callback,
-                                                 public chip::app::WriteClient::Callback
+                                                 public chip::app::WriteClient::Callback,
+                                                 public chip::app::InteractionModelDelegate
 {
 public:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
@@ -31,13 +32,12 @@ public:
     void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override;
     void OnDone(app::WriteClient * apWriteClient) override;
 
-    void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
-                      Protocols::InteractionModel::Status status) override;
-    CHIP_ERROR ReadError(app::ReadClient * apReadClient, CHIP_ERROR aError) override;
-
-    CHIP_ERROR SubscribeResponseProcessed(const app::ReadClient * apSubscribeClient) override;
-
-    CHIP_ERROR ReadDone(app::ReadClient * apReadClient) override;
+    void OnEventData(const app::ReadClient * apReadClient, TLV::TLVReader & aEventList) override {}
+    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override;
+    void OnSubscriptionEstablished(const app::ReadClient * apReadClient) override;
+    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
+    void OnDone(app::ReadClient * apReadClient) override;
 
     // TODO: FreeAttributePathParam and AllocateAttributePathParam are used by CHIPDevice.cpp for getting a long-live attribute path
     // object.

@@ -24,7 +24,7 @@
 #pragma once
 
 #include "Builder.h"
-#include "EventPath.h"
+#include "EventPathIB.h"
 
 #include "Parser.h"
 
@@ -88,7 +88,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventPath(EventPath::Parser * const apEventPath);
+    CHIP_ERROR GetEventPath(EventPathIB::Parser * const apEventPath);
 
     /**
      *  @brief Get a TLVReader for the Number. Next() must be called before accessing them.
@@ -184,11 +184,11 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     *  @brief Initialize a EventPath::Builder for writing into the TLV stream
+     *  @brief Initialize a EventPathIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventPath::Builder
+     *  @return A reference to EventPathIB::Builder
      */
-    EventPath::Builder & CreateEventPathBuilder();
+    EventPathIB::Builder & CreateEventPath();
 
     /**
      *  @brief Inject PriorityLevel into the TLV stream to indicate the priority level associated with
@@ -261,7 +261,7 @@ public:
     EventDataElement::Builder & EndOfEventDataElement();
 
 private:
-    EventPath::Builder mEventPathBuilder;
+    EventPathIB::Builder mEventPathBuilder;
 };
 }; // namespace EventDataElement
 }; // namespace app

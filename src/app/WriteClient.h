@@ -23,7 +23,7 @@
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/AttributeDataList.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/MessageDef/WriteRequest.h>
+#include <app/MessageDef/WriteRequestMessage.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -35,6 +35,7 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
 namespace app {
@@ -143,8 +144,7 @@ private:
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
-    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
-                                System::Clock::Timeout timeout);
+    CHIP_ERROR SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout);
 
     /**
      *  Initialize the client object. Within the lifetime
@@ -190,7 +190,7 @@ private:
     Callback * mpCallback                      = nullptr;
     State mState                               = State::Uninitialized;
     System::PacketBufferTLVWriter mMessageWriter;
-    WriteRequest::Builder mWriteRequestBuilder;
+    WriteRequestMessage::Builder mWriteRequestBuilder;
     uint8_t mAttributeStatusIndex = 0;
 };
 
@@ -225,8 +225,7 @@ public:
      *  Finalize the message and send it to the desired node. The underlying write object will always be released, and the user
      * should not use this object after calling this function.
      */
-    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
-                                System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
 
     /**
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put

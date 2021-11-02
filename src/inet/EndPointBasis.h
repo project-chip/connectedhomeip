@@ -27,9 +27,8 @@
 #include <inet/InetConfig.h>
 
 #include <inet/IPAddress.h>
-#include <inet/InetLayerBasis.h>
-
 #include <lib/support/DLLUtil.h>
+#include <system/SystemObject.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <system/SocketEvents.h>
@@ -47,11 +46,31 @@ struct tcp_pcb;
 namespace chip {
 namespace Inet {
 
+class InetLayer;
+
 /**
  * Basis of internet transport endpoint classes.
  */
-class DLL_EXPORT EndPointBasis : public InetLayerBasis
+class DLL_EXPORT EndPointBasis : public System::Object
 {
+public:
+    /**
+     *  Returns a reference to the Inet layer object that owns this basis object.
+     */
+    InetLayer & Layer() const { return *mInetLayer; }
+
+    /**
+     *  Returns \c true if the basis object was obtained by the specified Inet layer instance.
+     *
+     *  @note
+     *      Does not check whether the object is actually obtained by the system layer instance associated with the Inet layer
+     *      instance. It merely tests whether \c aInetLayer is the Inet layer instance that was provided to \c InitInetLayerBasis.
+     */
+    bool IsCreatedByInetLayer(const InetLayer & aInetLayer) const { return mInetLayer == &aInetLayer; }
+
+private:
+    InetLayer * mInetLayer; /**< Pointer to the InetLayer object that owns this object. */
+
 protected:
     void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = nullptr);
     void DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic);

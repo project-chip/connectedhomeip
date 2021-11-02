@@ -39,8 +39,8 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/Command.h>
-#include <app/MessageDef/CommandPathIB.h>
-#include <app/MessageDef/StatusIB.h>
+#include <app/MessageDef/InvokeRequestMessage.h>
+#include <app/MessageDef/InvokeResponseMessage.h>
 
 #define COMMON_STATUS_SUCCESS 0
 
@@ -117,7 +117,9 @@ public:
      * The callback passed in has to outlive this CommandSender object.
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr);
-
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
+    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
+    TLV::TLVWriter * GetCommandDataIBTLVWriter();
     /**
      * API for adding a data request.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
@@ -133,12 +135,10 @@ public:
         ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::kCsTag_Data), aData));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
-    // TODO: issue #6792 - the secure session parameter should be made non-optional and passed by reference.
-    //
     // Sends a queued up command request to the target encapsulated by the secureSession handle.
     //
     // Upon successful return from this call, all subsequent errors that occur during this interaction
@@ -155,10 +155,19 @@ public:
     // Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
     // Default timeout value will be used otherwise.
     //
-    CHIP_ERROR SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
-                                  System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
+    friend class TestCommandInteraction;
+
+    /*
+     * Allocates a packet buffer used for encoding an invoke request payload.
+     *
+     * This can be called multiple times safely, as it will only allocate the buffer once for the lifetime
+     * of this object.
+     */
+    CHIP_ERROR AllocateBuffer();
+
     // ExchangeDelegate interface implementation.  Private so people won't
     // accidentally call it on us when we're not being treated as an actual
     // ExchangeDelegate.
@@ -173,10 +182,15 @@ private:
     //
     void Close();
 
-    CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement) override;
+    CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload);
+    CHIP_ERROR ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse);
 
     Callback * mpCallback                      = nullptr;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
+    InvokeRequestMessage::Builder mInvokeRequestBuilder;
+    TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
+    bool mSuppressResponse                 = false;
+    bool mTimedRequest                     = false;
 };
 
 } // namespace app

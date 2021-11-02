@@ -26,8 +26,6 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lock-app/"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
                      "${CMAKE_CURRENT_LIST_DIR}/include"
                      "${IDF_PATH}/components/freertos/include/freertos"
                       SRC_DIRS
@@ -122,10 +120,7 @@ target_include_directories(${chip_lib} PUBLIC
 
 else (CONFIG_ENABLE_PW_RPC)
 idf_component_register(PRIV_INCLUDE_DIRS
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lock-app/"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       SRC_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"

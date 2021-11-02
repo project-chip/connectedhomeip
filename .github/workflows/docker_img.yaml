@@ -43,6 +43,6 @@ jobs:
             - name: Scan for vulnerabilities
               uses: crazy-max/docker-scan-action@master
               with:
-                  image: connectedhomeip/chip-build${{ matrix.img }}:latest
+                  image: connectedhomeip/chip-build${{ matrix.img }}:0.5.23
                   annotations: true
 

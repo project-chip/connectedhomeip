@@ -27,6 +27,7 @@ import sys
 import logging
 import time
 import ctypes
+import chip.clusters as Clusters
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -186,6 +187,23 @@ class BaseTestHelper:
             return False
         return True
 
+    def TestOnOffCluster(self, nodeid: int, endpoint: int, group: int):
+        self.logger.info(
+            "Sending On/Off commands to device {} endpoint {}".format(nodeid, endpoint))
+        err, resp = self.devCtrl.ZCLSend("OnOff", "On", nodeid,
+                                         endpoint, group, {}, blocking=True)
+        if err != 0 or resp is None or resp.Status != 0:
+            self.logger.error(
+                "failed to send OnOff.On: error is {} with im response{}".format(err, resp))
+            return False
+        err, resp = self.devCtrl.ZCLSend("OnOff", "Off", nodeid,
+                                         endpoint, group, {}, blocking=True)
+        if err != 0 or resp is None or resp.Status != 0:
+            self.logger.error(
+                "failed to send OnOff.Off: error is {} with im response {}".format(err, resp))
+            return False
+        return True
+
     def TestLevelControlCluster(self, nodeid: int, endpoint: int, group: int):
         self.logger.info(
             f"Sending MoveToLevel command to device {nodeid} endpoint {endpoint}")
@@ -239,7 +257,7 @@ class BaseTestHelper:
             "VendorID": 9050,
             "ProductName": "TEST_PRODUCT",
             "ProductID": 65279,
-            "UserLabel": "",
+            "UserLabel": "Test",
             "Location": "",
             "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",

@@ -25,3 +25,4 @@ chip_project_config_include_dirs =
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 chip_build_libshell = true
+chip_use_clusters_for_ip_commissioning = true

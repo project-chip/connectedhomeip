@@ -361,8 +361,8 @@ void TransferSession::Reset()
     mLastQueryNum      = 0;
     mNextQueryNum      = 0;
 
-    mTimeout                = System::Clock::Zero;
-    mTimeoutStartTime       = System::Clock::Zero;
+    mTimeout                = System::Clock::kZero;
+    mTimeoutStartTime       = System::Clock::kZero;
     mShouldInitTimeoutStart = true;
     mAwaitingResponse       = false;
 }
@@ -772,6 +772,37 @@ exit:
 bool TransferSession::IsTransferLengthDefinite()
 {
     return (mTransferLength > 0);
+}
+
+const char * TransferSession::OutputEvent::ToString(OutputEventType outputEventType)
+{
+    switch (outputEventType)
+    {
+    case OutputEventType::kNone:
+        return "None";
+    case OutputEventType::kMsgToSend:
+        return "MsgToSend";
+    case OutputEventType::kInitReceived:
+        return "InitReceived";
+    case OutputEventType::kAcceptReceived:
+        return "AcceptReceived";
+    case OutputEventType::kBlockReceived:
+        return "BlockReceived";
+    case OutputEventType::kQueryReceived:
+        return "QueryReceived";
+    case OutputEventType::kAckReceived:
+        return "AckReceived";
+    case OutputEventType::kAckEOFReceived:
+        return "AckEOFReceived";
+    case OutputEventType::kStatusReceived:
+        return "StatusReceived";
+    case OutputEventType::kInternalError:
+        return "InternalError";
+    case OutputEventType::kTransferTimeout:
+        return "TransferTimeout";
+    default:
+        return "Unknown";
+    }
 }
 
 TransferSession::OutputEvent TransferSession::OutputEvent::TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg)

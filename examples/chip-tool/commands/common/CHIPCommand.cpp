@@ -23,6 +23,7 @@
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 
@@ -37,6 +38,7 @@ CHIP_ERROR CHIPCommand::Run()
 
     ReturnLogErrorOnFailure(mStorage.Init());
     ReturnLogErrorOnFailure(mOpCredsIssuer.Initialize(mStorage));
+    ReturnLogErrorOnFailure(mFabricStorage.Initialize(&mStorage));
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
@@ -63,15 +65,17 @@ CHIP_ERROR CHIPCommand::Run()
                                                                            rcacSpan, icacSpan, nocSpan));
 
     chip::Controller::FactoryInitParams factoryInitParams;
-    factoryInitParams.storageDelegate = &mStorage;
-    factoryInitParams.listenPort      = mStorage.GetListenPort();
+    factoryInitParams.fabricStorage = &mFabricStorage;
+    factoryInitParams.listenPort    = mStorage.GetListenPort();
 
     chip::Controller::SetupParams commissionerParams;
+    commissionerParams.storageDelegate                = &mStorage;
     commissionerParams.operationalCredentialsDelegate = &mOpCredsIssuer;
     commissionerParams.ephemeralKeypair               = &ephemeralKey;
     commissionerParams.controllerRCAC                 = rcacSpan;
     commissionerParams.controllerICAC                 = icacSpan;
     commissionerParams.controllerNOC                  = nocSpan;
+    commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
 
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, mController));

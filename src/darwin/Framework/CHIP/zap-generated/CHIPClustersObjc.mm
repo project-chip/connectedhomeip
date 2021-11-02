@@ -3232,6 +3232,91 @@ using chip::Callback::Cancelable;
 
 @end
 
+@implementation CHIPModeSelect
+
+- (chip::Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)changeToMode:(uint8_t)newMode responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ChangeToMode(success, failure, newMode);
+    });
+}
+
+- (void)readAttributeCurrentModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeCurrentMode(success, failure);
+    });
+}
+
+- (void)subscribeAttributeCurrentModeWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentMode(success);
+        },
+        true);
+}
+
+- (void)readAttributeSupportedModesWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPModeSelectSupportedModesListAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReadAttributeSupportedModes(success, failure);
+        });
+}
+
+- (void)readAttributeOnModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeOnMode(success, failure);
+    });
+}
+
+- (void)writeAttributeOnModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeOnMode(success, failure, value);
+    });
+}
+
+- (void)readAttributeStartUpModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeStartUpMode(success, failure);
+    });
+}
+
+- (void)readAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeDescription(success, failure);
+    });
+}
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+    });
+}
+
+@end
+
 @implementation CHIPNetworkCommissioning
 
 - (chip::Controller::ClusterBase *)getCluster
@@ -3283,13 +3368,6 @@ using chip::Callback::Cancelable;
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
             return self.cppCluster.EnableNetwork(success, failure, [self asByteSpan:networkID], breadcrumb, timeoutMs);
         });
-}
-
-- (void)getLastNetworkCommissioningResult:(uint32_t)timeoutMs responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.GetLastNetworkCommissioningResult(success, failure, timeoutMs);
-    });
 }
 
 - (void)removeNetwork:(NSData *)networkID
@@ -3364,7 +3442,7 @@ using chip::Callback::Cancelable;
 
 - (void)applyUpdateRequest:(NSData *)updateToken newVersion:(uint32_t)newVersion responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge(
+    new CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
             return self.cppCluster.ApplyUpdateRequest(success, failure, [self asByteSpan:updateToken], newVersion);
         });
@@ -3381,9 +3459,9 @@ using chip::Callback::Cancelable;
 
 - (void)queryImage:(uint16_t)vendorId
               productId:(uint16_t)productId
-        hardwareVersion:(uint16_t)hardwareVersion
         softwareVersion:(uint32_t)softwareVersion
      protocolsSupported:(uint8_t)protocolsSupported
+        hardwareVersion:(uint16_t)hardwareVersion
                location:(NSString *)location
     requestorCanConsent:(bool)requestorCanConsent
     metadataForProvider:(NSData *)metadataForProvider
@@ -3391,8 +3469,8 @@ using chip::Callback::Cancelable;
 {
     new CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.QueryImage(success, failure, vendorId, productId, hardwareVersion, softwareVersion,
-                static_cast<uint8_t>(protocolsSupported), [self asCharSpan:location], requestorCanConsent,
+            return self.cppCluster.QueryImage(success, failure, static_cast<chip::VendorId>(vendorId), productId, softwareVersion,
+                static_cast<uint8_t>(protocolsSupported), hardwareVersion, [self asCharSpan:location], requestorCanConsent,
                 [self asByteSpan:metadataForProvider]);
         });
 }
@@ -3802,6 +3880,13 @@ using chip::Callback::Cancelable;
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
             return self.cppCluster.ReadAttributeTrustedRootCertificates(success, failure);
         });
+}
+
+- (void)readAttributeCurrentFabricIndexWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeCurrentFabricIndex(success, failure);
+    });
 }
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
@@ -5087,6 +5172,14 @@ using chip::Callback::Cancelable;
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.WriteAttributeVendorId(success, failure, static_cast<chip::VendorId>(value));
     });
+}
+
+- (void)readAttributeListNullablesAndOptionalsStructWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReadAttributeListNullablesAndOptionalsStruct(success, failure);
+        });
 }
 
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler

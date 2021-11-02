@@ -122,8 +122,8 @@ void HandleTimer10Success(Layer * inetLayer, void * aState)
 
 static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
 {
-    chip::System::Clock::Milliseconds32 timeout_overflow_0ms{ 652835029 };
-    chip::System::Clock::Milliseconds32 timeout_10ms{ 10 };
+    chip::System::Clock::Milliseconds32 timeout_overflow_0ms = chip::System::Clock::Milliseconds32(652835029);
+    chip::System::Clock::Milliseconds32 timeout_10ms         = chip::System::Clock::Milliseconds32(10);
 
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     Layer & lSys           = *lContext.mLayer;
@@ -154,7 +154,7 @@ void HandleGreedyTimer(Layer * aLayer, void * aState)
         return;
     }
 
-    aLayer->StartTimer(chip::System::Clock::Zero, HandleGreedyTimer, aState);
+    aLayer->StartTimer(chip::System::Clock::kZero, HandleGreedyTimer, aState);
     sNumTimersHandled++;
 }
 
@@ -163,7 +163,7 @@ static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     Layer & lSys           = *lContext.mLayer;
 
-    lSys.StartTimer(chip::System::Clock::Zero, HandleGreedyTimer, aContext);
+    lSys.StartTimer(chip::System::Clock::kZero, HandleGreedyTimer, aContext);
 
     ServiceEvents(lSys);
 }

@@ -214,7 +214,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
-    mStartTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+    ScheduleWork(HandleDeviceRebooted, 0);
 
 exit:
     return err;
@@ -300,11 +302,11 @@ CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
 
 CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
 {
-    uint64_t currentTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+    System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
-    if (currentTimeMilliseconds >= mStartTimeMilliseconds)
+    if (currentTime >= mStartTime)
     {
-        upTime = (currentTimeMilliseconds - mStartTimeMilliseconds) / 1000;
+        upTime = std::chrono::duration_cast<System::Clock::Seconds64>(currentTime - mStartTime).count();
         return CHIP_NO_ERROR;
     }
 
@@ -341,6 +343,16 @@ CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
     }
 
     return err;
+}
+
+void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
+{
+    PlatformManagerDelegate * delegate = PlatformMgr().GetDelegate();
+
+    if (delegate != nullptr)
+    {
+        delegate->OnDeviceRebooted();
+    }
 }
 
 #if CHIP_WITH_GIO

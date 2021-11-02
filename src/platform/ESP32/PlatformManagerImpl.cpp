@@ -86,7 +86,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
     esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    mStartTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     // Initialize the ESP WiFi layer.
     cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -180,11 +180,11 @@ CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
 
 CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
 {
-    uint64_t currentTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+    System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
-    if (currentTimeMilliseconds >= mStartTimeMilliseconds)
+    if (currentTime >= mStartTime)
     {
-        upTime = (currentTimeMilliseconds - mStartTimeMilliseconds) / 1000;
+        upTime = std::chrono::duration_cast<System::Clock::Seconds64>(currentTime - mStartTime).count();
         return CHIP_NO_ERROR;
     }
 

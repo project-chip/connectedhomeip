@@ -59,7 +59,7 @@ void ReliableMessageMgr::Init(chip::System::Layer * systemLayer, SessionManager 
 {
     mSystemLayer        = systemLayer;
     mTimeStampBase      = System::SystemClock().GetMonotonicTimestamp();
-    mCurrentTimerExpiry = System::Clock::Zero;
+    mCurrentTimerExpiry = System::Clock::kZero;
 }
 
 void ReliableMessageMgr::Shutdown()
@@ -448,7 +448,7 @@ void ReliableMessageMgr::StartTimer()
             // If the tick boundary has expired in the past (delayed processing of event due to other system activity),
             // expire the timer immediately
             System::Clock::Timestamp now         = System::SystemClock().GetMonotonicTimestamp();
-            System::Clock::Timeout timerArmValue = (timerExpiry > now) ? timerExpiry - now : System::Clock::Zero;
+            System::Clock::Timeout timerArmValue = (timerExpiry > now) ? timerExpiry - now : System::Clock::kZero;
 
 #if defined(RMP_TICKLESS_DEBUG)
             ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer set timer for %" PRIu32 " ms",

@@ -106,7 +106,11 @@ static inline void unreg(Identify * inst)
 
 void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
 {
-    (void) Clusters::Identify::Attributes::IdentifyType::Set(endpoint, inst(endpoint)->mIdentifyType);
+    Identify * identify = inst(endpoint);
+    if (identify != nullptr)
+    {
+        (void) Clusters::Identify::Attributes::IdentifyType::Set(endpoint, identify->mIdentifyType);
+    }
 }
 
 static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appState)

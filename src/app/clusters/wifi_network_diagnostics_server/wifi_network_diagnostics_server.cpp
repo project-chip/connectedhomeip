@@ -160,12 +160,7 @@ exit:
     return true;
 }
 
-void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpoint)
+void MatterWiFiNetworkDiagnosticsPluginServerInitCallback()
 {
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gAttrAccess);
-        attrAccessRegistered = true;
-    }
+    registerAttributeAccessOverride(&gAttrAccess);
 }

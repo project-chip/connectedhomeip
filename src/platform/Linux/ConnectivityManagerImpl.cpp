@@ -452,7 +452,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP");
-        mLastAPDemandTime = System::Clock::Zero;
+        mLastAPDemandTime = System::Clock::kZero;
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
@@ -510,6 +510,35 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
         g_error_free(err);
 }
 
+void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
+{
+    GError * err = nullptr;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    WpaFiW1Wpa_supplicant1BSS * bss = wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus_finish(res, &err);
+
+    if (mWpaSupplicant.bss)
+    {
+        g_object_unref(mWpaSupplicant.bss);
+        mWpaSupplicant.bss = nullptr;
+    }
+
+    if (bss != nullptr && err == nullptr)
+    {
+        mWpaSupplicant.bss = bss;
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant bss proxy");
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant bss proxy %s: %s",
+                        mWpaSupplicant.interfacePath, err ? err->message : "unknown error");
+    }
+
+    if (err != nullptr)
+        g_error_free(err);
+}
+
 void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     GError * err = nullptr;
@@ -526,6 +555,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
         wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
                                                               mWpaSupplicant.interfacePath, nullptr, _OnWpaInterfaceProxyReady,
                                                               nullptr);
+
+        wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
+                                                        mWpaSupplicant.interfacePath, nullptr, _OnWpaBssProxyReady, nullptr);
     }
     else
     {
@@ -556,6 +588,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
             wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
                                                                   kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,
                                                                   _OnWpaInterfaceProxyReady, nullptr);
+
+            wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
+                                                            mWpaSupplicant.interfacePath, nullptr, _OnWpaBssProxyReady, nullptr);
         }
         else
         {
@@ -598,6 +633,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * prox
         wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
                                                               mWpaSupplicant.interfacePath, nullptr, _OnWpaInterfaceProxyReady,
                                                               nullptr);
+
+        wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
+                                                        mWpaSupplicant.interfacePath, nullptr, _OnWpaBssProxyReady, nullptr);
     }
 }
 
@@ -627,6 +665,12 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * pr
         {
             g_object_unref(mWpaSupplicant.iface);
             mWpaSupplicant.iface = nullptr;
+        }
+
+        if (mWpaSupplicant.bss)
+        {
+            g_object_unref(mWpaSupplicant.bss);
+            mWpaSupplicant.bss = nullptr;
         }
 
         mWpaSupplicant.scanState = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
@@ -669,6 +713,7 @@ void ConnectivityManagerImpl::StartWiFiManagement()
     mWpaSupplicant.scanState     = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
     mWpaSupplicant.proxy         = nullptr;
     mWpaSupplicant.iface         = nullptr;
+    mWpaSupplicant.bss           = nullptr;
     mWpaSupplicant.interfacePath = nullptr;
     mWpaSupplicant.networkPath   = nullptr;
 
@@ -724,7 +769,7 @@ void ConnectivityManagerImpl::DriveAPState()
         {
             System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
-            if (mLastAPDemandTime != System::Clock::Zero && now < (mLastAPDemandTime + mWiFiAPIdleTimeout))
+            if (mLastAPDemandTime != System::Clock::kZero && now < (mLastAPDemandTime + mWiFiAPIdleTimeout))
             {
                 targetState = kWiFiAPState_Active;
 

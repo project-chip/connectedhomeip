@@ -94,16 +94,32 @@ jobs:
             - name: Clean Build
               run: xcodebuild clean
               working-directory: src/darwin/Framework
-            - name: Run Build Test Server
+            - name: Build example All Clusters Server
               timeout-minutes: 10
               run: |
                 scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+            - name: Build example OTA Provider
+              timeout-minutes: 5
+              run: |
+                scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
+            - name: Build example OTA Requestor
+              timeout-minutes: 5
+              run: |
+                scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
             - name: Run Framework Tests
               timeout-minutes: 10
               run: |
-                ../../../out/debug/chip-all-clusters-app &
-                xcodebuild test -target "CHIP" -scheme "CHIP Framework Tests" -sdk macosx
+                mkdir -p /tmp/darwin/framework-tests
+                ../../../out/debug/chip-all-clusters-app > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
+                xcodebuild test -target "CHIP" -scheme "CHIP Framework Tests" -sdk macosx > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
               working-directory: src/darwin/Framework
+            - name: Uploading log files
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }} && ${{ !env.ACT }}
+              with:
+                  name: darwin-framework-test-logs
+                  path: /tmp/darwin/framework-tests
+                  retention-days: 5

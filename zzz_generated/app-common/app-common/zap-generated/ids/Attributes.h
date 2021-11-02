@@ -1736,6 +1736,10 @@ namespace TrustedRootCertificates {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace TrustedRootCertificates
 
+namespace CurrentFabricIndex {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace CurrentFabricIndex
+
 namespace FeatureMap {
 static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 } // namespace FeatureMap
@@ -1782,6 +1786,40 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace BooleanState
+
+namespace ModeSelect {
+namespace Attributes {
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace CurrentMode
+
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedModes
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace OnMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace StartUpMode
+
+namespace Description {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace Description
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ModeSelect
 
 namespace ShadeConfiguration {
 namespace Attributes {
@@ -4469,6 +4507,10 @@ static constexpr AttributeId Id = 0x00000021;
 namespace VendorId {
 static constexpr AttributeId Id = 0x00000022;
 } // namespace VendorId
+
+namespace ListNullablesAndOptionalsStruct {
+static constexpr AttributeId Id = 0x00000023;
+} // namespace ListNullablesAndOptionalsStruct
 
 namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;

@@ -202,7 +202,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
 
         BLEManagerImpl & ble_manager = BLEMgrImpl();
-        ble_manager.mFlags.Set(ble_manager.kFlag_Advertising);
+        ble_manager.mFlags.Clear(ble_manager.kFlag_Advertising);
 
         // Post a CHIPoBLEAdvertisingChange(Stopped) event.
         ChipDeviceEvent chip_event;

@@ -544,9 +544,9 @@ namespace QueryImageResponse {
 static constexpr CommandId Id = 0x00000003;
 } // namespace QueryImageResponse
 
-namespace ApplyUpdateRequestResponse {
+namespace ApplyUpdateResponse {
 static constexpr CommandId Id = 0x00000004;
-} // namespace ApplyUpdateRequestResponse
+} // namespace ApplyUpdateResponse
 
 } // namespace Commands
 } // namespace OtaSoftwareUpdateProvider
@@ -657,10 +657,6 @@ static constexpr CommandId Id = 0x0000000E;
 namespace DisableNetworkResponse {
 static constexpr CommandId Id = 0x0000000F;
 } // namespace DisableNetworkResponse
-
-namespace GetLastNetworkCommissioningResult {
-static constexpr CommandId Id = 0x00000010;
-} // namespace GetLastNetworkCommissioningResult
 
 } // namespace Commands
 } // namespace NetworkCommissioning
@@ -816,6 +812,16 @@ static constexpr CommandId Id = 0x0000000C;
 
 } // namespace Commands
 } // namespace OperationalCredentials
+
+namespace ModeSelect {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+} // namespace Commands
+} // namespace ModeSelect
 
 namespace DoorLock {
 namespace Commands {

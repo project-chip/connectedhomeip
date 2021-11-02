@@ -18,7 +18,7 @@
 
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/EventPath.h>
+#include <app/MessageDef/EventPathIB.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
 #include <lib/support/TypeTraits.h>
@@ -75,7 +75,7 @@ CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
     err                 = attributeStatusList.GetError();
     SuccessOrExit(err);
 
-    mWriteResponseBuilder.EndOfWriteResponse();
+    mWriteResponseBuilder.EndOfWriteResponseMessage();
     err = mWriteResponseBuilder.GetError();
     SuccessOrExit(err);
 
@@ -169,7 +169,7 @@ CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayl
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
 
-    WriteRequest::Parser writeRequestParser;
+    WriteRequestMessage::Parser writeRequestParser;
     AttributeDataList::Parser attributeDataListParser;
     TLV::TLVReader attributeDataListReader;
     bool needSuppressResponse = false;

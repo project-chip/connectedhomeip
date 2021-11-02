@@ -51,6 +51,20 @@ public:
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
 
+    int16_t GetMaxPressure();
+    uint16_t GetMaxSpeed();
+    uint16_t GetMaxFlow();
+    int16_t GetMinConstPressure();
+    int16_t GetMaxConstPressure();
+    int16_t GetMinCompPressure();
+    int16_t GetMaxCompPressure();
+    uint16_t GetMinConstSpeed();
+    uint16_t GetMaxConstSpeed();
+    uint16_t GetMinConstFlow();
+    uint16_t GetMaxConstFlow();
+    int16_t GetMinConstTemp();
+    int16_t GetMaxConstTemp();
+
     typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
     typedef void (*Callback_fn_completed)(Action_t, int32_t aActor);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);

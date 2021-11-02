@@ -72,7 +72,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    ReadRequest::Builder readRequestBuilder;
+    ReadRequestMessage::Builder readRequestBuilder;
     AttributePathList::Builder attributePathListBuilder;
     AttributePath::Builder attributePathBuilder;
 
@@ -107,7 +107,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     attributePathListBuilder.EndOfAttributePathList();
 
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    readRequestBuilder.EndOfReadRequest();
+    readRequestBuilder.EndOfReadRequestMessage();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

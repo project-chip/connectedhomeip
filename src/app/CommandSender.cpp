@@ -33,11 +33,35 @@ namespace chip {
 namespace app {
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr) :
-    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr)
+    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(false), mTimedRequest(false)
 {}
 
-CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
-                                             System::Clock::Timeout timeout)
+CHIP_ERROR CommandSender::AllocateBuffer()
+{
+    if (!mBufferAllocated)
+    {
+        mCommandMessageWriter.Reset();
+
+        System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+        VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+        mCommandMessageWriter.Init(std::move(commandPacket));
+        ReturnErrorOnFailure(mInvokeRequestBuilder.Init(&mCommandMessageWriter));
+
+        mInvokeRequestBuilder.SuppressResponse(mSuppressResponse).TimedRequest(mTimedRequest);
+        ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
+
+        mInvokeRequestBuilder.CreateInvokeRequests();
+        ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
+
+        mCommandIndex    = 0;
+        mBufferAllocated = true;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommandSender::SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle commandPacket;
@@ -48,7 +72,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabric
     SuccessOrExit(err);
 
     // Create a new exchange context.
-    mpExchangeCtx = mpExchangeMgr->NewContext(secureSession.ValueOr(SessionHandle(aNodeId, 1, 1, aFabricIndex)), this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mpExchangeCtx->SetResponseTimeout(timeout);
@@ -72,7 +96,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse),
                  err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    SuccessOrExit(err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId));
+    err = ProcessInvokeResponse(std::move(aPayload));
 
 exit:
     if (mpCallback != nullptr)
@@ -87,6 +111,43 @@ exit:
 
     Close();
 
+    return err;
+}
+
+CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && payload)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    System::PacketBufferTLVReader reader;
+    TLV::TLVReader invokeResponsesReader;
+    InvokeResponseMessage::Parser invokeResponseMessage;
+    InvokeResponses::Parser invokeResponses;
+    bool suppressResponse = false;
+
+    reader.Init(std::move(payload));
+    ReturnErrorOnFailure(reader.Next());
+    ReturnErrorOnFailure(invokeResponseMessage.Init(reader));
+
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    ReturnErrorOnFailure(invokeResponseMessage.CheckSchemaValidity());
+#endif
+
+    ReturnErrorOnFailure(invokeResponseMessage.GetSuppressResponse(&suppressResponse));
+    ReturnErrorOnFailure(invokeResponseMessage.GetInvokeResponses(&invokeResponses));
+    invokeResponses.GetReader(&invokeResponsesReader);
+
+    while (CHIP_NO_ERROR == (err = invokeResponsesReader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag == invokeResponsesReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        InvokeResponseIB::Parser invokeResponse;
+        ReturnErrorOnFailure(invokeResponse.Init(invokeResponsesReader));
+        ReturnErrorOnFailure(ProcessInvokeResponseIB(invokeResponse));
+    }
+
+    // if we have exhausted this container
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
     return err;
 }
 
@@ -107,6 +168,8 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
 
 void CommandSender::Close()
 {
+    mSuppressResponse = false;
+    mTimedRequest     = false;
     MoveToState(CommandState::AwaitingDestruction);
 
     Command::Close();
@@ -117,45 +180,45 @@ void CommandSender::Close()
     }
 }
 
-CHIP_ERROR CommandSender::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
+CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::ClusterId clusterId;
-    chip::CommandId commandId;
-    chip::EndpointId endpointId;
+    ClusterId clusterId;
+    CommandId commandId;
+    EndpointId endpointId;
     // Default to success when an invoke response is received.
     StatusIB statusIB;
 
     {
-        CommandPathIB::Parser commandPath;
-
-        err = aCommandElement.GetCommandPath(&commandPath);
-        SuccessOrExit(err);
-
-        err = commandPath.GetClusterId(&clusterId);
-        SuccessOrExit(err);
-
-        err = commandPath.GetCommandId(&commandId);
-        SuccessOrExit(err);
-
-        err = commandPath.GetEndpointId(&endpointId);
-        SuccessOrExit(err);
-    }
-
-    {
         bool hasDataResponse = false;
-        chip::TLV::TLVReader commandDataReader;
+        TLV::TLVReader commandDataReader;
 
-        StatusIB::Parser statusIBParser;
-        err = aCommandElement.GetStatusIB(&statusIBParser);
+        CommandStatusIB::Parser commandStatus;
+        err = aInvokeResponse.GetStatus(&commandStatus);
         if (CHIP_NO_ERROR == err)
         {
-            err = statusIBParser.DecodeStatusIB(statusIB);
+            CommandPathIB::Parser commandPath;
+            commandStatus.GetPath(&commandPath);
+            ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
+            ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
+            ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));
+
+            StatusIB::Parser status;
+            commandStatus.GetErrorStatus(&status);
+            ReturnErrorOnFailure(status.DecodeStatusIB(statusIB));
         }
         else if (CHIP_END_OF_TLV == err)
         {
+            CommandDataIB::Parser commandData;
+            CommandPathIB::Parser commandPath;
+            ReturnErrorOnFailure(aInvokeResponse.GetCommand(&commandData));
+            ReturnErrorOnFailure(commandData.GetPath(&commandPath));
+            ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));
+            ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
+            ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
+            commandData.GetData(&commandDataReader);
+            err             = CHIP_NO_ERROR;
             hasDataResponse = true;
-            err             = aCommandElement.GetData(&commandDataReader);
         }
 
         if (err != CHIP_NO_ERROR)
@@ -180,7 +243,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataIB(CommandDataIB::Parser & aCommandE
                                 to_underlying(statusIB.mStatus));
             }
         }
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(err);
 
         if (mpCallback != nullptr)
         {
@@ -195,9 +258,66 @@ CHIP_ERROR CommandSender::ProcessCommandDataIB(CommandDataIB::Parser & aCommandE
             }
         }
     }
+    return CHIP_NO_ERROR;
+}
 
-exit:
-    return err;
+CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct)
+{
+    CommandDataIB::Builder commandData;
+    ReturnLogErrorOnFailure(AllocateBuffer());
+
+    //
+    // We must not be in the middle of preparing a command, or having prepared or sent one.
+    //
+    VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
+
+    commandData = mInvokeRequestBuilder.GetInvokeRequests().CreateCommandData();
+    ReturnLogErrorOnFailure(commandData.GetError());
+
+    ReturnLogErrorOnFailure(ConstructCommandPath(aCommandPathParams, commandData.CreatePath()));
+
+    if (aStartDataStruct)
+    {
+        ReturnLogErrorOnFailure(commandData.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
+                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
+    }
+
+    MoveToState(CommandState::AddingCommand);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(mState == CommandState::AddingCommand, err = CHIP_ERROR_INCORRECT_STATE);
+
+    CommandDataIB::Builder commandData = mInvokeRequestBuilder.GetInvokeRequests().GetCommandData();
+
+    if (aEndDataStruct)
+    {
+        ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
+    }
+
+    ReturnErrorOnFailure(commandData.EndOfCommandDataIB().GetError());
+    ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests().GetError());
+    ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage().GetError());
+
+    MoveToState(CommandState::AddedCommand);
+
+    return CHIP_NO_ERROR;
+}
+
+TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
+{
+    if (mState != CommandState::AddingCommand)
+    {
+        return nullptr;
+    }
+    else
+    {
+        return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
+    }
 }
 
 } // namespace app

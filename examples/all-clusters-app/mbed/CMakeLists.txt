@@ -16,7 +16,7 @@ configure_file(
     @ONLY
 )
 
-set(MBED_PATH $ENV{MBED_OS_PATH} CACHE INTERNAL "")
+set(MBED_PATH ${MBED_OS_PATH} CACHE INTERNAL "")
 set(MBED_CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "")
 set(APP_TARGET chip-mbed-all-clusters-app-example)
 
@@ -25,7 +25,7 @@ include(${MBED_PATH}/tools/cmake/app.cmake)
 project(${APP_TARGET})
 
 add_subdirectory(${MBED_PATH} ./mbed_build)
-add_subdirectory($ENV{MBED_OS_POSIX_SOCKET_PATH} ./mbed_os_posix_socket_build)
+add_subdirectory(${MBED_OS_POSIX_SOCKET_PATH} ./mbed_os_posix_socket_build)
 
 add_executable(${APP_TARGET})
 
@@ -108,6 +108,8 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/low-power-server/low-power-server.cpp
                ${APP_CLUSTERS}/media-input-server/media-input-server.cpp
                ${APP_CLUSTERS}/media-playback-server/media-playback-server.cpp
+               ${APP_CLUSTERS}/mode-select-server/mode-select-server.cpp
+               ${APP_CLUSTERS}/mode-select-server/static-supported-modes-manager.cpp
                ${APP_CLUSTERS}/network-commissioning/network-commissioning-ember.cpp
                ${APP_CLUSTERS}/network-commissioning/network-commissioning.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp

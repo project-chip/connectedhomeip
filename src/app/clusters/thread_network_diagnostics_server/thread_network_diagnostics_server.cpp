@@ -94,12 +94,7 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandl
     return true;
 }
 
-void emberAfThreadNetworkDiagnosticsClusterServerInitCallback(EndpointId endpoint)
+void MatterThreadNetworkDiagnosticsPluginServerInitCallback()
 {
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gAttrAccess);
-        attrAccessRegistered = true;
-    }
+    registerAttributeAccessOverride(&gAttrAccess);
 }

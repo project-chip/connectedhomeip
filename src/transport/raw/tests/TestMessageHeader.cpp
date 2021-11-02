@@ -157,6 +157,17 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 234);
     NL_TEST_ASSERT(inSuite, header.GetDestinationGroupId() == Optional<uint16_t>::Value((uint16_t) 45));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
+
+    // Verify MCSP state
+    header.ClearDestinationGroupId().SetDestinationNodeId(42).SetFlags(Header::SecFlagValues::kPrivacyFlag);
+    NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
+
+    // change it to verify decoding
+    header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationGroupId(2);
+    NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(42ull));
+    NL_TEST_ASSERT(inSuite, !header.GetDestinationGroupId().HasValue());
+    NL_TEST_ASSERT(inSuite, header.HasPrivacyFlag());
 }
 
 void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)

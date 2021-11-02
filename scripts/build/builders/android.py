@@ -25,36 +25,38 @@ class AndroidBoard(Enum):
     ARM64 = auto()
     X64 = auto()
     X86 = auto()
-    AndroidStudio = auto()
+    AndroidStudio_ARM = auto()
+    AndroidStudio_ARM64 = auto()
+    AndroidStudio_X64 = auto()
+    AndroidStudio_X86 = auto()
 
     def TargetCpuName(self):
-        if self == AndroidBoard.ARM:
+        if self == AndroidBoard.ARM or self == AndroidBoard.AndroidStudio_ARM:
             return 'arm'
-        elif self == AndroidBoard.ARM64:
+        elif self == AndroidBoard.ARM64 or self == AndroidBoard.AndroidStudio_ARM64:
             return 'arm64'
-        elif self == AndroidBoard.X64:
+        elif self == AndroidBoard.X64 or self == AndroidBoard.AndroidStudio_X64:
             return 'x64'
-        elif self == AndroidBoard.X86:
+        elif self == AndroidBoard.X86 or self == AndroidBoard.AndroidStudio_X86:
             return 'x86'
-        elif self == AndroidBoard.AndroidStudio:
-            return "arm64"
         else:
             raise Exception('Unknown board type: %r' % self)
 
     def AbiName(self):
-        if self == AndroidBoard.ARM:
+        if self.TargetCpuName() == 'arm':
             return 'armeabi-v7a'
-        elif self == AndroidBoard.ARM64:
+        elif self.TargetCpuName() == 'arm64':
             return 'arm64-v8a'
-        elif self == AndroidBoard.X64:
+        elif self.TargetCpuName() == 'x64':
             return 'x86_64'
-        elif self == AndroidBoard.X86:
+        elif self.TargetCpuName() == 'x86':
             return 'x86'
         else:
             raise Exception('Unknown board type: %r' % self)
 
     def IsIde(self):
-        if self == AndroidBoard.AndroidStudio:
+        if (self == AndroidBoard.AndroidStudio_ARM or self == AndroidBoard.AndroidStudio_ARM64
+                or self == AndroidBoard.AndroidStudio_X64 or self == AndroidBoard.AndroidStudio_X86):
             return True
         else:
             return False
@@ -63,14 +65,23 @@ class AndroidBoard(Enum):
 class AndroidApp(Enum):
     CHIP_TOOL = auto()
     CHIP_TEST = auto()
+    CHIP_TVServer = auto()
 
     def AppName(self):
         if self == AndroidApp.CHIP_TOOL:
             return "CHIPTool"
         elif self == AndroidApp.CHIP_TEST:
             return "CHIPTest"
+        elif self == AndroidApp.CHIP_TVServer:
+            return "CHIPTVServer"
         else:
             raise Exception('Unknown app type: %r' % self)
+
+    def AppGnArgs(self):
+        gn_args = {}
+        if self == AndroidApp.CHIP_TVServer:
+            gn_args['chip_config_network_layer_ble'] = False
+        return gn_args
 
 
 class AndroidBuilder(Builder):
@@ -128,12 +139,19 @@ class AndroidBuilder(Builder):
             gn_args['target_cpu'] = self.board.TargetCpuName()
             gn_args['android_ndk_root'] = os.environ['ANDROID_NDK_HOME']
             gn_args['android_sdk_root'] = os.environ['ANDROID_HOME']
-            gn_args['chip_use_clusters_for_ip_commissioning'] = 'true'
+            gn_args['chip_use_clusters_for_ip_commissioning'] = True
+            gn_args.update(self.app.AppGnArgs())
 
-            args = '--args=%s' % (' '.join([
-                '%s="%s"' % (key, shlex.quote(value))
-                for key, value in gn_args.items()
-            ]))
+            args_str = ""
+            for key, value in gn_args.items():
+                if type(value) == bool:
+                    if value:
+                        args_str += '%s=true ' % (key)
+                    else:
+                        args_str += '%s=false ' % (key)
+                else:
+                    args_str += '%s="%s" ' % (key, shlex.quote(value))
+            args = '--args=%s' % (args_str)
 
             gn_gen = [
                 'gn', 'gen', '--check', '--fail-on-unused-args', self.output_dir, args,
@@ -161,6 +179,7 @@ class AndroidBuilder(Builder):
                 '%s/src/android/%s' % (self.root, self.app.AppName()),
                 '-PmatterBuildSrcDir=%s' % self.output_dir,
                 '-PmatterSdkSourceBuild=true',
+                '-PmatterSourceBuildAbiFilters=%s' % self.board.AbiName(),
                 'assembleDebug'
             ],
                 title='Building APP ' + self.identifier)
@@ -190,16 +209,17 @@ class AndroidBuilder(Builder):
             #
             #   If we unify the JNI libraries, libc++_shared.so may not be needed anymore, which could
             # be another path of resolving this inconsistency.
-            for libName in ['libSetupPayloadParser.so', 'libCHIPController.so', 'libc++_shared.so']:
+            for libName in ['libSetupPayloadParser.so', 'libCHIPController.so', 'libc++_shared.so', 'libCHIPAppServer.so']:
                 self._Execute(['cp', os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(
                 ), libName), os.path.join(jnilibs_dir, libName)])
 
             jars = {
                 'CHIPController.jar': 'src/controller/java/CHIPController.jar',
                 'SetupPayloadParser.jar': 'src/setup_payload/java/SetupPayloadParser.jar',
-                'AndroidPlatform.jar': 'src/platform/android/AndroidPlatform.jar'
-
+                'AndroidPlatform.jar': 'src/platform/android/AndroidPlatform.jar',
+                'CHIPAppServer.jar': 'src/app/server/java/CHIPAppServer.jar',
             }
+
             for jarName in jars.keys():
                 self._Execute(['cp', os.path.join(
                     self.output_dir, 'lib', jars[jarName]), os.path.join(libs_dir, jarName)])

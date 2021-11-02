@@ -49,6 +49,10 @@ function getTests()
     'Test_TC_DM_3_1',
   ];
 
+  const ElectricalMeasurement = [
+    'Test_TC_EMR_1_1',
+  ];
+
   const FlowMeasurement = [
     'Test_TC_FLW_1_1',
     'Test_TC_FLW_2_1',
@@ -68,6 +72,12 @@ function getTests()
 
   const MediaControl = [
     'Test_TC_MC_1_1',
+    'Test_TC_MC_2_1',
+    'Test_TC_MC_3_1',
+    'Test_TC_MC_3_2',
+    'Test_TC_MC_3_3',
+    'Test_TC_MC_3_4',
+    'Test_TC_MC_3_5',
     'Test_TC_MC_3_6',
     'Test_TC_MC_3_7',
     'Test_TC_MC_3_8',
@@ -144,6 +154,7 @@ function getTests()
     'TestBasicInformation',
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
+    'TestModeSelectCluster',
   ];
 
   const Subscriptions = [
@@ -154,6 +165,7 @@ function getTests()
     BinaryInput, //
     ColorControl, //
     DeviceManagement, //
+    ElectricalMeasurement, //
     FlowMeasurement, //
     LevelControl, //
     MediaControl, //

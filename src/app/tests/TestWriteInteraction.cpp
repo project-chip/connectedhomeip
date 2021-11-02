@@ -126,7 +126,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
-    WriteRequest::Builder writeRequestBuilder;
+    WriteRequestMessage::Builder writeRequestBuilder;
     err = writeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AttributeDataList::Builder attributeDataListBuilder = writeRequestBuilder.CreateAttributeDataListBuilder();
@@ -161,7 +161,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
 
     attributeDataListBuilder.EndOfAttributeDataList();
     NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
-    writeRequestBuilder.EndOfWriteRequest();
+    writeRequestBuilder.EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
@@ -174,7 +174,7 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
-    WriteResponse::Builder writeResponseBuilder;
+    WriteResponseMessage::Builder writeResponseBuilder;
     err = writeResponseBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AttributeStatusList::Builder attributeStatusListBuilder = writeResponseBuilder.CreateAttributeStatusListBuilder();
@@ -201,7 +201,7 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
 
     attributeStatusListBuilder.EndOfAttributeStatusList();
     NL_TEST_ASSERT(apSuite, attributeStatusListBuilder.GetError() == CHIP_NO_ERROR);
-    writeResponseBuilder.EndOfWriteResponse();
+    writeResponseBuilder.EndOfWriteResponseMessage();
     NL_TEST_ASSERT(apSuite, writeResponseBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
@@ -224,8 +224,7 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AddAttributeDataElement(apSuite, apContext, writeClientHandle);
 
-    SessionHandle session = ctx.GetSessionBobToAlice();
-    err = writeClientHandle.SendWriteRequest(ctx.GetAliceNodeId(), ctx.GetFabricIndex(), Optional<SessionHandle>::Value(session));
+    err = writeClientHandle.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // The internal WriteClient should be nullptr once we SendWriteRequest.
     NL_TEST_ASSERT(apSuite, nullptr == writeClientHandle.mpWriteClient);
@@ -317,9 +316,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0);
 
-    SessionHandle session = ctx.GetSessionBobToAlice();
-
-    err = writeClient.SendWriteRequest(ctx.GetAliceNodeId(), ctx.GetFabricIndex(), Optional<SessionHandle>::Value(session));
+    err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1);
@@ -370,9 +367,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
 
-    SessionHandle session = ctx.GetSessionBobToAlice();
-
-    err = writeClient.SendWriteRequest(ctx.GetAliceNodeId(), ctx.GetFabricIndex(), Optional<SessionHandle>::Value(session));
+    err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1);
