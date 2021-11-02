@@ -27,6 +27,8 @@
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_matter._tcp</string>
+		<string>_matterc._udp</string>
+		<string>_matterd._udp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Used to scan QR code</string>
