@@ -13,7 +13,7 @@ configure_file(
     @ONLY
 )
 
-set(MBED_PATH $ENV{MBED_OS_PATH} CACHE INTERNAL "")
+set(MBED_PATH ${MBED_OS_PATH} CACHE INTERNAL "")
 set(MBED_CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "")
 set(APP_TARGET chip-mbed-pigweed-app-example)
 
@@ -22,7 +22,7 @@ include(${MBED_PATH}/tools/cmake/app.cmake)
 project(${APP_TARGET})
 
 add_subdirectory(${MBED_PATH} ./mbed_build)
-add_subdirectory($ENV{MBED_OS_POSIX_SOCKET_PATH} ./mbed_os_posix_socket_build)
+add_subdirectory(${MBED_OS_POSIX_SOCKET_PATH} ./mbed_os_posix_socket_build)
 
 add_executable(${APP_TARGET})
 

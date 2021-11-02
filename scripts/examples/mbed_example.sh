@@ -96,27 +96,20 @@ BUILD_DIRECTORY="$APP"/mbed/build-"$TARGET_BOARD"/"$PROFILE"/
 if [[ "$COMMAND" == *"build"* ]]; then
     echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
 
-    # Config directory setup
-    MBED_CONFIG_PATH="$APP"/mbed/config/"$TARGET_BOARD"/"$PROFILE"/"$TOOLCHAIN"/
-
     # Set Mbed OS path
-    export MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
+    MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
 
     # Set Mbed OS posix socket submodule path
-    export MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
+    MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
 
     # Generate config file for selected target, toolchain and hardware
-    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/ -o "$MBED_CONFIG_PATH" --mbed-os-path "$MBED_OS_PATH"
+    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/ -o "$BUILD_DIRECTORY" --mbed-os-path "$MBED_OS_PATH"
 
     # Remove old artifacts to force linking
     rm -rf "$BUILD_DIRECTORY/chip-"*
 
-    # Create output directory and copy config file there.
-    mkdir -p "$BUILD_DIRECTORY"
-    cp -f "$MBED_CONFIG_PATH"/mbed_config.cmake "$BUILD_DIRECTORY"/mbed_config.cmake
-
     # Build application
-    cmake -S "$APP/mbed" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE"
+    cmake -S "$APP/mbed" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE" -DMBED_OS_PATH="$MBED_OS_PATH" -DMBED_OS_POSIX_SOCKET_PATH="$MBED_OS_POSIX_SOCKET_PATH"
     cmake --build "$BUILD_DIRECTORY"
 fi
 
