@@ -22,10 +22,6 @@ import pathlib
 from enum import Enum, auto
 from .builder import Builder
 
-if platform.system() != 'Darwin':
-    from mbed_tools.project import MbedProgram
-    from mbed_tools.build import generate_config
-
 
 class MbedApp(Enum):
     LOCK = auto()
@@ -112,20 +108,17 @@ class MbedBuilder(Builder):
 
     @property
     def ExamplePath(self):
-        return os.path.join('examples', self.app.ExampleName, 'mbed')
+        return os.path.join(self.root, 'examples', self.app.ExampleName, 'mbed')
 
     def generate(self):
         if not os.path.exists(self.output_dir):
-            if not self._runner.dry_run:
-                cmake_build_subdir = pathlib.Path(self.board.BoardName.upper(
-                ), self.profile.ProfileName.lower(), self.toolchain.upper())
-                program = MbedProgram.from_existing(pathlib.Path(
-                    self.ExamplePath), cmake_build_subdir, pathlib.Path(self.mbed_os_path))
-                program.files.cmake_build_dir = pathlib.Path(self.output_dir)
-                _, output_path = generate_config(
-                    self.board.BoardName.upper(), self.toolchain, program)
-                logging.info(
-                    f"mbed_config.cmake has been generated and written to '{str(output_path.resolve())}'")
+            self._Execute(['mbed-tools', 'configure',
+                            '-t', self.toolchain,
+                            '-m', self.board.BoardName,
+                            '-p', self.ExamplePath,
+                            '-o', self.output_dir,    
+                            '--mbed-os-path', self.mbed_os_path,
+                           ], title='Generating config ' + self.identifier)
 
             self._Execute(['cmake', '-S', shlex.quote(self.ExamplePath), '-B', shlex.quote(self.output_dir), '-GNinja',
                            '-DCMAKE_BUILD_TYPE={}'.format(
@@ -137,11 +130,11 @@ class MbedBuilder(Builder):
                            ], title='Generating ' + self.identifier)
 
     def _build(self):
-        logging.info('Building ' + self.identifier)
         # Remove old artifacts to force linking
-        if pathlib.Path(self.output_dir, self.app.AppNamePrefix + '.elf').is_file():
-            for filename in glob.glob(os.path.join(self.output_dir, self.app.AppNamePrefix + '*')):
-                os.remove(filename)
+        cmd = 'rm -rf {}/chip-*'.format(self.output_dir)
+        self._Execute(['bash', '-c', cmd],
+                          title='Remove old artifacts ' + self.identifier)
+                      
         self._Execute(['cmake', '--build', shlex.quote(self.output_dir)],
                       title='Building ' + self.identifier)
 

@@ -211,8 +211,8 @@ def MbedTargets():
 
     for target in app_targets:
         yield target.Extend('release', profile=MbedProfile.RELEASE)
-        yield target.Extend('develop', profile=MbedProfile.DEVELOP)
-        yield target.Extend('debug', profile=MbedProfile.DEBUG)
+        yield target.Extend('develop', profile=MbedProfile.DEVELOP).GlobBlacklist('Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
+        yield target.Extend('debug', profile=MbedProfile.DEBUG).GlobBlacklist('Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
 
 
 ALL = []

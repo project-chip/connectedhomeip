@@ -254,50 +254,95 @@ idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rp
 # Generating infineon-p6-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
 
+# Generating config mbed-CY8CPROTO_062_4343W-all-clusters-debug
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug --mbed-os-path {root}/third_party/mbed-os/repo
+
 # Generating mbed-CY8CPROTO_062_4343W-all-clusters-debug
-cmake -S examples/all-clusters-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug -GNinja -DCMAKE_BUILD_TYPE=debug -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/all-clusters-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug -GNinja -DCMAKE_BUILD_TYPE=debug -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-all-clusters-develop
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-develop --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-all-clusters-develop
-cmake -S examples/all-clusters-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-all-clusters-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/all-clusters-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-all-clusters-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-all-clusters-release
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-release --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-all-clusters-release
-cmake -S examples/all-clusters-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-all-clusters-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/all-clusters-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-all-clusters-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-light-debug
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/lighting-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-light-debug --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-light-debug
-cmake -S examples/lighting-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-light-debug -GNinja -DCMAKE_BUILD_TYPE=debug -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/lighting-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-light-debug -GNinja -DCMAKE_BUILD_TYPE=debug -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-light-develop
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/lighting-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-light-develop --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-light-develop
-cmake -S examples/lighting-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-light-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/lighting-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-light-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-light-release
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/lighting-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-light-release --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-light-release
-cmake -S examples/lighting-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-light-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/lighting-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-light-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-lock-debug
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/lock-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-lock-debug --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-lock-debug
-cmake -S examples/lock-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-lock-debug -GNinja -DCMAKE_BUILD_TYPE=debug -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/lock-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-lock-debug -GNinja -DCMAKE_BUILD_TYPE=debug -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-lock-develop
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/lock-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-lock-develop --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-lock-develop
-cmake -S examples/lock-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-lock-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/lock-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-lock-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-lock-release
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/lock-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-lock-release --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-lock-release
-cmake -S examples/lock-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-lock-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/lock-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-lock-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-pigweed-debug
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/pigweed-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-pigweed-debug --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-pigweed-debug
-cmake -S examples/pigweed-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-pigweed-debug -GNinja -DCMAKE_BUILD_TYPE=debug -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/pigweed-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-pigweed-debug -GNinja -DCMAKE_BUILD_TYPE=debug -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-pigweed-develop
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/pigweed-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-pigweed-develop --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-pigweed-develop
-cmake -S examples/pigweed-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-pigweed-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/pigweed-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-pigweed-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-pigweed-release
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/pigweed-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-pigweed-release --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-pigweed-release
-cmake -S examples/pigweed-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-pigweed-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/pigweed-app/mbed -B {out}/mbed-CY8CPROTO_062_4343W-pigweed-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-shell-debug
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/shell/mbed -o {out}/mbed-CY8CPROTO_062_4343W-shell-debug --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-shell-debug
-cmake -S examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-debug -GNinja -DCMAKE_BUILD_TYPE=debug -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-debug -GNinja -DCMAKE_BUILD_TYPE=debug -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-shell-develop
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/shell/mbed -o {out}/mbed-CY8CPROTO_062_4343W-shell-develop --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-shell-develop
-cmake -S examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-develop -GNinja -DCMAKE_BUILD_TYPE=develop -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+
+# Generating config mbed-CY8CPROTO_062_4343W-shell-release
+mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/shell/mbed -o {out}/mbed-CY8CPROTO_062_4343W-shell-release --mbed-os-path {root}/third_party/mbed-os/repo
 
 # Generating mbed-CY8CPROTO_062_4343W-shell-release
-cmake -S examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
+cmake -S {root}/examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
 
 # Generating nrf-nrf52840-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
@@ -584,47 +629,92 @@ idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rp
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock
 
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-all-clusters-debug
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug/chip-*'
+
 # Building mbed-CY8CPROTO_062_4343W-all-clusters-debug
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug
+
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-all-clusters-develop
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-develop/chip-*'
 
 # Building mbed-CY8CPROTO_062_4343W-all-clusters-develop
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-all-clusters-develop
 
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-all-clusters-release
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-release/chip-*'
+
 # Building mbed-CY8CPROTO_062_4343W-all-clusters-release
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-all-clusters-release
+
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-light-debug
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-light-debug/chip-*'
 
 # Building mbed-CY8CPROTO_062_4343W-light-debug
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-light-debug
 
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-light-develop
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-light-develop/chip-*'
+
 # Building mbed-CY8CPROTO_062_4343W-light-develop
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-light-develop
+
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-light-release
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-light-release/chip-*'
 
 # Building mbed-CY8CPROTO_062_4343W-light-release
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-light-release
 
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-lock-debug
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-lock-debug/chip-*'
+
 # Building mbed-CY8CPROTO_062_4343W-lock-debug
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-lock-debug
+
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-lock-develop
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-lock-develop/chip-*'
 
 # Building mbed-CY8CPROTO_062_4343W-lock-develop
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-lock-develop
 
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-lock-release
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-lock-release/chip-*'
+
 # Building mbed-CY8CPROTO_062_4343W-lock-release
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-lock-release
+
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-pigweed-debug
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-pigweed-debug/chip-*'
 
 # Building mbed-CY8CPROTO_062_4343W-pigweed-debug
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-pigweed-debug
 
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-pigweed-develop
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-pigweed-develop/chip-*'
+
 # Building mbed-CY8CPROTO_062_4343W-pigweed-develop
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-pigweed-develop
+
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-pigweed-release
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-pigweed-release/chip-*'
 
 # Building mbed-CY8CPROTO_062_4343W-pigweed-release
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-pigweed-release
 
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-shell-debug
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-shell-debug/chip-*'
+
 # Building mbed-CY8CPROTO_062_4343W-shell-debug
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-shell-debug
 
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-shell-develop
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-shell-develop/chip-*'
+
 # Building mbed-CY8CPROTO_062_4343W-shell-develop
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-shell-develop
+
+# Remove old artifacts mbed-CY8CPROTO_062_4343W-shell-release
+bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-shell-release/chip-*'
 
 # Building mbed-CY8CPROTO_062_4343W-shell-release
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-shell-release

@@ -24,6 +24,11 @@ esp32-m5stack-all-clusters-ipv6only
 esp32-m5stack-all-clusters-rpc
 esp32-m5stack-all-clusters-rpc-ipv6only
 infineon-p6-lock
+mbed-CY8CPROTO_062_4343W-all-clusters-release
+mbed-CY8CPROTO_062_4343W-light-release
+mbed-CY8CPROTO_062_4343W-lock-release
+mbed-CY8CPROTO_062_4343W-pigweed-release
+mbed-CY8CPROTO_062_4343W-shell-release
 nrf-nrf52840-light
 nrf-nrf52840-light-rpc
 nrf-nrf52840-lock
