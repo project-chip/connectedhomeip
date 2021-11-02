@@ -38,19 +38,6 @@ class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImp
                                  private Internal::AmebaConfig
 {
 public:
-    CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
-    CHIP_ERROR StoreRebootCount(uint32_t rebootCount);
-    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
-    CHIP_ERROR GetBootReasons(uint32_t & bootReasons);
-    CHIP_ERROR StoreBootReasons(uint32_t bootReasons);
-
-private:
-    // Allow the ConfigurationManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend class ConfigurationManager;
-
-public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
 
@@ -69,6 +56,12 @@ private:
     void InitiateFactoryReset(void) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetBootReasons(uint32_t & bootReasons) override;
+    CHIP_ERROR StoreBootReasons(uint32_t bootReasons) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
