@@ -1172,7 +1172,6 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
 
     ChipLogProgress(Controller, "Successfully validated 'Attestation Information' command received from the device.");
 
-    // TODO: Validate Certification Declaration
     // TODO: Validate Firmware Information
 
     return CHIP_NO_ERROR;
