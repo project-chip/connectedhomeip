@@ -38,7 +38,7 @@ CHIP_ERROR EventPaths::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     size_t NumPath = 0;
-    chip::TLV::TLVReader reader;
+    TLV::TLVReader reader;
 
     PRETTY_PRINT("EventPaths =");
     PRETTY_PRINT("[");
@@ -48,17 +48,15 @@ CHIP_ERROR EventPaths::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(chip::TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+        VerifyOrReturnError(TLV::AnonymousTag == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(TLV::kTLVType_List == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
         {
             EventPathIB::Parser path;
-            err = path.Init(reader);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(path.Init(reader));
 
             PRETTY_PRINT_INCDEPTH();
-            err = path.CheckSchemaValidity();
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(path.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
         }
 
@@ -73,12 +71,9 @@ CHIP_ERROR EventPaths::Parser::CheckSchemaValidity() const
     {
         err = CHIP_NO_ERROR;
     }
-    SuccessOrExit(err);
-    err = reader.ExitContainer(mOuterContainerType);
-
-exit:
-
-    return err;
+    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
+    return CHIP_NO_ERROR;
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 

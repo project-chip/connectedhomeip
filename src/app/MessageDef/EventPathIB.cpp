@@ -31,17 +31,14 @@
 
 #include <app/AppBuildConfig.h>
 
-using namespace chip;
-using namespace chip::TLV;
-
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR EventPathIB::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint16_t TagPresenceMask = 0;
-    chip::TLV::TLVReader reader;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    int TagPresenceMask = 0;
+    TLV::TLVReader reader;
 
     PRETTY_PRINT("EventPath =");
     PRETTY_PRINT("{");
@@ -51,65 +48,81 @@ CHIP_ERROR EventPathIB::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(chip::TLV::IsContextTag(reader.GetTag()), err = CHIP_ERROR_INVALID_TLV_TAG);
-        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
+        switch (tagNum)
         {
-        case kCsTag_NodeId:
+        case to_underlying(Tag::kNode):
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_NodeId)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_NodeId);
-            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kNode))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kNode));
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                uint64_t nodeId;
-                reader.Get(nodeId);
-                PRETTY_PRINT("\tNodeId = 0x%" PRIx64 ",", nodeId);
+                NodeId node;
+                reader.Get(node);
+                PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_EndpointId:
+        case to_underlying(Tag::kEndpoint):
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EndpointId)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_EndpointId);
-            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEndpoint))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kEndpoint));
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                uint16_t endpointId;
-                reader.Get(endpointId);
-                PRETTY_PRINT("\tEndpointId = 0x%" PRIx16 ",", endpointId);
+                EndpointId endpoint;
+                reader.Get(endpoint);
+                PRETTY_PRINT("\tEndpoint = 0x%" PRIx16 ",", endpoint);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_ClusterId:
+        case to_underlying(Tag::kCluster):
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_ClusterId)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_ClusterId);
-            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kCluster))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kCluster));
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
             {
-                chip::ClusterId clusterId;
-                reader.Get(clusterId);
-                PRETTY_PRINT("\tClusterId = 0x%" PRIx32 ",", clusterId);
+                ClusterId cluster;
+                reader.Get(cluster);
+                PRETTY_PRINT("\tCluster = 0x%" PRIx32 ",", cluster);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case chip::app::EventPathIB::kCsTag_EventId:
+        case to_underlying(Tag::kEvent):
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << chip::app::EventPathIB::kCsTag_EventId)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << chip::app::EventPathIB::kCsTag_EventId);
-            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEvent))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kEvent));
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
             {
-                chip::EventId eventId;
-                reader.Get(eventId);
-                PRETTY_PRINT("\tEventId = 0x%" PRIx16 ",", eventId);
+                EventId event;
+                reader.Get(event);
+                PRETTY_PRINT("\tEvent = 0x%" PRIx16 ",", event);
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
+        case to_underlying(Tag::kIsUrgent):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kIsUrgent))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kIsUrgent));
+            VerifyOrReturnError(TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+
+#if CHIP_DETAIL_LOGGING
+            {
+                bool isUrgent;
+                ReturnErrorOnFailure(reader.Get(isUrgent));
+                PRETTY_PRINT("\tisUrgent = %s, ", isUrgent ? "true" : "false");
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         default:
-            ExitNow(err = CHIP_ERROR_INVALID_TLV_TAG);
+            PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
+            break;
         }
     }
 
@@ -119,83 +132,86 @@ CHIP_ERROR EventPathIB::Parser::CheckSchemaValidity() const
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // check for required fields:
-        const uint16_t RequiredFields = (1 << kCsTag_EndpointId) | (1 << kCsTag_ClusterId);
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
-        }
+        err = CHIP_NO_ERROR;
     }
-    SuccessOrExit(err);
-    err = reader.ExitContainer(mOuterContainerType);
 
-exit:
-
+    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
     return err;
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR EventPathIB::Parser::GetNodeId(chip::NodeId * const apNodeId) const
+CHIP_ERROR EventPathIB::Parser::GetNode(NodeId * const apNode) const
 {
-    return GetUnsignedInteger(kCsTag_NodeId, apNodeId);
+    return GetUnsignedInteger(to_underlying(Tag::kNode), apNode);
 }
 
-CHIP_ERROR EventPathIB::Parser::GetEndpointId(chip::EndpointId * const apEndpointID) const
+CHIP_ERROR EventPathIB::Parser::GetEndpoint(EndpointId * const apEndpoint) const
 {
-    return GetUnsignedInteger(kCsTag_EndpointId, apEndpointID);
+    return GetUnsignedInteger(to_underlying(Tag::kEndpoint), apEndpoint);
 }
 
-CHIP_ERROR EventPathIB::Parser::GetClusterId(chip::ClusterId * const apClusterId) const
+CHIP_ERROR EventPathIB::Parser::GetCluster(ClusterId * const apCluster) const
 {
-    return GetUnsignedInteger(kCsTag_ClusterId, apClusterId);
+    return GetUnsignedInteger(to_underlying(Tag::kCluster), apCluster);
 }
 
-CHIP_ERROR EventPathIB::Parser::GetEventId(chip::EventId * const apEventId) const
+CHIP_ERROR EventPathIB::Parser::GetEvent(EventId * const apEvent) const
 {
-    return GetUnsignedInteger(kCsTag_EventId, apEventId);
+    return GetUnsignedInteger(to_underlying(Tag::kEvent), apEvent);
 }
 
-EventPathIB::Builder & EventPathIB::Builder::NodeId(const uint64_t aNodeId)
+CHIP_ERROR EventPathIB::Parser::GetIsUrgent(bool * const apIsUrgent) const
+{
+    return GetSimpleValue(to_underlying(Tag::kIsUrgent), TLV::kTLVType_Boolean, apIsUrgent);
+}
+
+EventPathIB::Builder & EventPathIB::Builder::Node(const NodeId aNode)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_NodeId), aNodeId);
+        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kNode)), aNode);
     }
     return *this;
 }
 
-EventPathIB::Builder & EventPathIB::Builder::EndpointId(const chip::EndpointId aEndpointId)
+EventPathIB::Builder & EventPathIB::Builder::Endpoint(const EndpointId aEndpoint)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
+        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEndpoint)), aEndpoint);
     }
     return *this;
 }
 
-EventPathIB::Builder & EventPathIB::Builder::ClusterId(const chip::ClusterId aClusterId)
+EventPathIB::Builder & EventPathIB::Builder::Cluster(const ClusterId aCluster)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
+        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kCluster)), aCluster);
     }
     return *this;
 }
 
-EventPathIB::Builder & EventPathIB::Builder::EventId(const chip::EventId aEventId)
+EventPathIB::Builder & EventPathIB::Builder::Event(const EventId aEvent)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventId), aEventId);
+        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEvent)), aEvent);
+    }
+    return *this;
+}
+
+EventPathIB::Builder & EventPathIB::Builder::IsUrgent(const bool aIsUrgent)
+{
+    // skip if error has already been set
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kIsUrgent)), aIsUrgent);
     }
     return *this;
 }

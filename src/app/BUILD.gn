@@ -72,6 +72,8 @@ static_library("app") {
     "MessageDef/EventPathIB.h",
     "MessageDef/EventPaths.cpp",
     "MessageDef/EventPaths.h",
+    "MessageDef/EventStatusIB.cpp",
+    "MessageDef/EventStatusIB.h",
     "MessageDef/InvokeRequestMessage.cpp",
     "MessageDef/InvokeRequests.cpp",
     "MessageDef/InvokeResponseIB.cpp",

@@ -318,10 +318,11 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     SuccessOrExit(err);
 
     // TODO: Revisit NodeId since the the encoding spec and the IM seem to disagree on how this stuff works
-    eventPathBuilder.NodeId(apOptions->mpEventSchema->mNodeId)
-        .EndpointId(apOptions->mpEventSchema->mEndpointId)
-        .ClusterId(apOptions->mpEventSchema->mClusterId)
-        .EventId(apOptions->mpEventSchema->mEventId)
+    eventPathBuilder.Node(apOptions->mpEventSchema->mNodeId)
+        .Endpoint(apOptions->mpEventSchema->mEndpointId)
+        .Cluster(apOptions->mpEventSchema->mClusterId)
+        .Event(apOptions->mpEventSchema->mEventId)
+        .IsUrgent(false)
         .EndOfEventPathIB();
     err = eventPathBuilder.GetError();
     SuccessOrExit(err);
@@ -753,10 +754,10 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
     {
         EventPathIB::Parser path;
         ReturnErrorOnFailure(path.Init(aReader));
-        ReturnErrorOnFailure(path.GetNodeId(&(envelope->mNodeId)));
-        ReturnErrorOnFailure(path.GetEndpointId(&(envelope->mEndpointId)));
-        ReturnErrorOnFailure(path.GetClusterId(&(envelope->mClusterId)));
-        ReturnErrorOnFailure(path.GetEventId(&(envelope->mEventId)));
+        ReturnErrorOnFailure(path.GetNode(&(envelope->mNodeId)));
+        ReturnErrorOnFailure(path.GetEndpoint(&(envelope->mEndpointId)));
+        ReturnErrorOnFailure(path.GetCluster(&(envelope->mClusterId)));
+        ReturnErrorOnFailure(path.GetEvent(&(envelope->mEventId)));
         envelope->mFieldsToRead |= 1 << EventDataElement::kCsTag_EventPath;
     }
 

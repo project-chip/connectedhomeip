@@ -236,10 +236,10 @@ CHIP_ERROR ReadClient::GenerateEventPaths(EventPaths::Builder & aEventPathsBuild
     {
         EventPathIB::Builder eventPathBuilder = aEventPathsBuilder.CreateEventPath();
         EventPathParams eventPath             = apEventPathParamsList[eventIndex];
-        eventPathBuilder.NodeId(eventPath.mNodeId)
-            .EventId(eventPath.mEventId)
-            .EndpointId(eventPath.mEndpointId)
-            .ClusterId(eventPath.mClusterId)
+        eventPathBuilder.Node(eventPath.mNodeId)
+            .Event(eventPath.mEventId)
+            .Endpoint(eventPath.mEndpointId)
+            .Cluster(eventPath.mClusterId)
             .EndOfEventPathIB();
         SuccessOrExit(err = eventPathBuilder.GetError());
     }
