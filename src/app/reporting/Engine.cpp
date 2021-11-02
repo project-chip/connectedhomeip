@@ -96,7 +96,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Builder & aReportDataBuilder,
+                                                          ReadHandler * apReadHandler)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     bool attributeClean = true;
@@ -150,7 +151,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportData::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
@@ -257,7 +258,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter reportDataWriter;
-    ReportData::Builder reportDataBuilder;
+    ReportDataMessage::Builder reportDataBuilder;
     chip::System::PacketBufferHandle bufHandle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
 
     VerifyOrExit(!bufHandle.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -288,7 +289,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         reportDataBuilder.MoreChunkedMessages(mMoreChunkedMessages);
     }
 
-    reportDataBuilder.EndOfReportData();
+    reportDataBuilder.EndOfReportDataMessage();
     SuccessOrExit(err = reportDataBuilder.GetError());
 
     err = reportDataWriter.Finalize(&bufHandle);
@@ -298,7 +299,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     {
         ChipLogDetail(DataManagement, "<RE> Dumping report data...");
         chip::System::PacketBufferTLVReader reader;
-        ReportData::Parser report;
+        ReportDataMessage::Parser report;
 
         reader.Init(bufHandle.Retain());
         reader.Next();

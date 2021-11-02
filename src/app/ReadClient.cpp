@@ -125,7 +125,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
     {
         System::PacketBufferTLVWriter writer;
-        ReadRequest::Builder request;
+        ReadRequestMessage::Builder request;
 
         msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
         VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -158,7 +158,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
             SuccessOrExit(err);
         }
 
-        request.EndOfReadRequest();
+        request.EndOfReadRequestMessage();
         SuccessOrExit(err = request.GetError());
 
         err = writer.Finalize(&msgBuf);
@@ -197,7 +197,7 @@ CHIP_ERROR ReadClient::SendStatusResponse(CHIP_ERROR aError)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
 
-    StatusResponse::Builder response;
+    StatusResponseMessage::Builder response;
     ReturnLogErrorOnFailure(response.Init(&writer));
     Status statusCode = Status::Success;
     if (aError != CHIP_NO_ERROR)
@@ -337,7 +337,7 @@ CHIP_ERROR ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apEx
 CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ReportData::Parser report;
+    ReportDataMessage::Parser report;
 
     bool isEventListPresent         = false;
     bool isAttributeDataListPresent = false;
@@ -571,7 +571,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     reader.Init(std::move(aPayload));
     ReturnLogErrorOnFailure(reader.Next());
 
-    SubscribeResponse::Parser subscribeResponse;
+    SubscribeResponseMessage::Parser subscribeResponse;
     ReturnLogErrorOnFailure(subscribeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -599,7 +599,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
-    SubscribeRequest::Builder request;
+    SubscribeRequestMessage::Builder request;
     VerifyOrExit(ClientState::Initialized == mState, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -638,7 +638,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     request.MinIntervalSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
         .MaxIntervalSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds)
         .KeepSubscriptions(aReadPrepareParams.mKeepSubscriptions)
-        .EndOfSubscribeRequest();
+        .EndOfSubscribeRequestMessage();
     SuccessOrExit(err = request.GetError());
 
     err = writer.Finalize(&msgBuf);

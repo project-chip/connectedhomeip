@@ -126,7 +126,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
-    WriteRequest::Builder writeRequestBuilder;
+    WriteRequestMessage::Builder writeRequestBuilder;
     err = writeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AttributeDataList::Builder attributeDataListBuilder = writeRequestBuilder.CreateAttributeDataListBuilder();
@@ -161,7 +161,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
 
     attributeDataListBuilder.EndOfAttributeDataList();
     NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
-    writeRequestBuilder.EndOfWriteRequest();
+    writeRequestBuilder.EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
@@ -174,7 +174,7 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
-    WriteResponse::Builder writeResponseBuilder;
+    WriteResponseMessage::Builder writeResponseBuilder;
     err = writeResponseBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AttributeStatusList::Builder attributeStatusListBuilder = writeResponseBuilder.CreateAttributeStatusListBuilder();
@@ -201,7 +201,7 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
 
     attributeStatusListBuilder.EndOfAttributeStatusList();
     NL_TEST_ASSERT(apSuite, attributeStatusListBuilder.GetError() == CHIP_NO_ERROR);
-    writeResponseBuilder.EndOfWriteResponse();
+    writeResponseBuilder.EndOfWriteResponseMessage();
     NL_TEST_ASSERT(apSuite, writeResponseBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);

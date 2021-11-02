@@ -132,7 +132,7 @@ void GenerateSubscribeResponse(nlTestSuite * apSuite, void * apContext, chip::Sy
     chip::System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
-    chip::app::SubscribeResponse::Builder subscribeResponseBuilder;
+    chip::app::SubscribeResponseMessage::Builder subscribeResponseBuilder;
 
     err = subscribeResponseBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -146,7 +146,7 @@ void GenerateSubscribeResponse(nlTestSuite * apSuite, void * apContext, chip::Sy
     subscribeResponseBuilder.MaxIntervalCeilingSeconds(2);
     NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeResponseBuilder.EndOfSubscribeResponse();
+    subscribeResponseBuilder.EndOfSubscribeResponseMessage();
     NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
@@ -281,7 +281,7 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
-    ReportData::Builder reportDataBuilder;
+    ReportDataMessage::Builder reportDataBuilder;
 
     err = reportDataBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -342,7 +342,7 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     reportDataBuilder.MoreChunkedMessages(false);
     NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
 
-    reportDataBuilder.EndOfReportData();
+    reportDataBuilder.EndOfReportDataMessage();
     NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
@@ -378,7 +378,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    ReadRequest::Builder readRequestBuilder;
+    ReadRequestMessage::Builder readRequestBuilder;
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
@@ -410,7 +410,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    readRequestBuilder.EndOfReadRequest();
+    readRequestBuilder.EndOfReadRequestMessage();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -430,7 +430,7 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
     MockInteractionModelApp delegate;
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
-    ReadRequest::Builder request;
+    ReadRequestMessage::Builder request;
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
     writer.Init(std::move(msgBuf));
@@ -457,7 +457,7 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
     MockInteractionModelApp delegate;
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
-    ReadRequest::Builder request;
+    ReadRequestMessage::Builder request;
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
     writer.Init(std::move(msgBuf));
@@ -506,7 +506,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    ReadRequest::Builder readRequestBuilder;
+    ReadRequestMessage::Builder readRequestBuilder;
     MockInteractionModelApp delegate;
 
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
@@ -535,7 +535,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    readRequestBuilder.EndOfReadRequest();
+    readRequestBuilder.EndOfReadRequestMessage();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -555,7 +555,7 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSu
     MockInteractionModelApp delegate;
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
-    ReadRequest::Builder request;
+    ReadRequestMessage::Builder request;
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
     writer.Init(std::move(msgBuf));
@@ -575,14 +575,14 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSu
     err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 1 /*aEventPathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    request.EndOfReadRequest();
+    request.EndOfReadRequestMessage();
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == request.GetError());
 
     err = writer.Finalize(&msgBuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::System::PacketBufferTLVReader reader;
-    ReadRequest::Parser readRequestParser;
+    ReadRequestMessage::Parser readRequestParser;
 
     reader.Init(msgBuf.Retain());
     reader.Next();
@@ -604,7 +604,7 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSu
     MockInteractionModelApp delegate;
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
-    ReadRequest::Builder request;
+    ReadRequestMessage::Builder request;
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
     writer.Init(std::move(msgBuf));
@@ -629,14 +629,14 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSu
     err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 2 /*aEventPathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    request.EndOfReadRequest();
+    request.EndOfReadRequestMessage();
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == request.GetError());
 
     err = writer.Finalize(&msgBuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::System::PacketBufferTLVReader reader;
-    ReadRequest::Parser readRequestParser;
+    ReadRequestMessage::Parser readRequestParser;
 
     reader.Init(msgBuf.Retain());
     reader.Next();
@@ -781,7 +781,7 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    SubscribeRequest::Builder subscribeRequestBuilder;
+    SubscribeRequestMessage::Builder subscribeRequestBuilder;
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
@@ -820,7 +820,7 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     subscribeRequestBuilder.IsProxy(true);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.EndOfSubscribeRequest();
+    subscribeRequestBuilder.EndOfSubscribeRequestMessage();
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);

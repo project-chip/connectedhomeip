@@ -91,7 +91,7 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
     TLV::TLVReader attributeStatusListReader;
-    WriteResponse::Parser writeResponse;
+    WriteResponseMessage::Parser writeResponse;
     AttributeStatusList::Parser attributeStatusListParser;
 
     reader.Init(std::move(payload));
@@ -199,7 +199,7 @@ CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
     err                      = attributeDataListBuilder.GetError();
     SuccessOrExit(err);
 
-    mWriteRequestBuilder.EndOfWriteRequest();
+    mWriteRequestBuilder.EndOfWriteRequestMessage();
     err = mWriteRequestBuilder.GetError();
     SuccessOrExit(err);
 

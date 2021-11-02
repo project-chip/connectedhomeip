@@ -17,11 +17,11 @@
  */
 /**
  *    @file
- *      This file defines ReportData parser and builder in CHIP interaction model
+ *      This file defines ReportDataMessage parser and builder in CHIP interaction model
  *
  */
 
-#include "ReportData.h"
+#include "ReportDataMessage.h"
 
 #include "MessageDefHelper.h"
 
@@ -36,7 +36,7 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReportData::Parser::Init(const chip::TLV::TLVReader & aReader)
+CHIP_ERROR ReportDataMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -53,7 +53,7 @@ exit:
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR ReportData::Parser::CheckSchemaValidity() const
+CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
@@ -61,7 +61,7 @@ CHIP_ERROR ReportData::Parser::CheckSchemaValidity() const
     AttributeDataList::Parser attributeDataList;
     EventList::Parser eventList;
 
-    PRETTY_PRINT("ReportData =");
+    PRETTY_PRINT("ReportDataMessage =");
     PRETTY_PRINT("{");
 
     // make a copy of the reader
@@ -165,17 +165,17 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR ReportData::Parser::GetSuppressResponse(bool * const apSuppressResponse) const
+CHIP_ERROR ReportDataMessage::Parser::GetSuppressResponse(bool * const apSuppressResponse) const
 {
     return GetSimpleValue(kCsTag_SuppressResponse, chip::TLV::kTLVType_Boolean, apSuppressResponse);
 }
 
-CHIP_ERROR ReportData::Parser::GetSubscriptionId(uint64_t * const apSubscriptionId) const
+CHIP_ERROR ReportDataMessage::Parser::GetSubscriptionId(uint64_t * const apSubscriptionId) const
 {
     return GetUnsignedInteger(kCsTag_SubscriptionId, apSubscriptionId);
 }
 
-CHIP_ERROR ReportData::Parser::GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const
+CHIP_ERROR ReportDataMessage::Parser::GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -194,7 +194,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReportData::Parser::GetEventDataList(EventList::Parser * const apEventDataList) const
+CHIP_ERROR ReportDataMessage::Parser::GetEventDataList(EventList::Parser * const apEventDataList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -213,17 +213,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReportData::Parser::GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const
+CHIP_ERROR ReportDataMessage::Parser::GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const
 {
     return GetSimpleValue(kCsTag_MoreChunkedMessages, chip::TLV::kTLVType_Boolean, apMoreChunkedMessages);
 }
 
-CHIP_ERROR ReportData::Builder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR ReportDataMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 {
     return InitAnonymousStructure(apWriter);
 }
 
-ReportData::Builder & ReportData::Builder::SuppressResponse(const bool aSuppressResponse)
+ReportDataMessage::Builder & ReportDataMessage::Builder::SuppressResponse(const bool aSuppressResponse)
 {
     // skip if error has already been set
     SuccessOrExit(mError);
@@ -233,7 +233,7 @@ exit:
     return *this;
 }
 
-ReportData::Builder & ReportData::Builder::SubscriptionId(const uint64_t aSubscriptionId)
+ReportDataMessage::Builder & ReportDataMessage::Builder::SubscriptionId(const uint64_t aSubscriptionId)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -243,7 +243,7 @@ ReportData::Builder & ReportData::Builder::SubscriptionId(const uint64_t aSubscr
     return *this;
 }
 
-AttributeDataList::Builder & ReportData::Builder::CreateAttributeDataListBuilder()
+AttributeDataList::Builder & ReportDataMessage::Builder::CreateAttributeDataListBuilder()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -257,7 +257,7 @@ AttributeDataList::Builder & ReportData::Builder::CreateAttributeDataListBuilder
     return mAttributeDataListBuilder;
 }
 
-EventList::Builder & ReportData::Builder::CreateEventDataListBuilder()
+EventList::Builder & ReportDataMessage::Builder::CreateEventDataListBuilder()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -271,7 +271,7 @@ EventList::Builder & ReportData::Builder::CreateEventDataListBuilder()
     return mEventDataListBuilder;
 }
 
-ReportData::Builder & ReportData::Builder::MoreChunkedMessages(const bool aMoreChunkedMessages)
+ReportDataMessage::Builder & ReportDataMessage::Builder::MoreChunkedMessages(const bool aMoreChunkedMessages)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -281,7 +281,7 @@ ReportData::Builder & ReportData::Builder::MoreChunkedMessages(const bool aMoreC
     return *this;
 }
 
-ReportData::Builder & ReportData::Builder::EndOfReportData()
+ReportDataMessage::Builder & ReportDataMessage::Builder::EndOfReportDataMessage()
 {
     EndOfContainer();
     return *this;

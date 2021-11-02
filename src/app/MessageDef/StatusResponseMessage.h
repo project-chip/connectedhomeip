@@ -28,7 +28,7 @@
 
 namespace chip {
 namespace app {
-namespace StatusResponse {
+namespace StatusResponseMessage {
 enum
 {
     kCsTag_Status = 0,
@@ -71,8 +71,8 @@ class Builder : public app::Builder
 {
 public:
     CHIP_ERROR Init(TLV::TLVWriter * const apWriter);
-    StatusResponse::Builder & Status(const Protocols::InteractionModel::Status aStatus);
+    StatusResponseMessage::Builder & Status(const Protocols::InteractionModel::Status aStatus);
 };
-} // namespace StatusResponse
+} // namespace StatusResponseMessage
 } // namespace app
 } // namespace chip

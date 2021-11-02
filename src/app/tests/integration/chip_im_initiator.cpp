@@ -55,9 +55,9 @@ constexpr chip::FabricIndex gFabricIndex          = 0;
 constexpr size_t kMaxSubMessageCount              = 1;
 constexpr uint64_t gSubMaxReport                  = 5;
 
-constexpr chip::System::Clock::Timeout gSubscribeRequestTimeout = chip::System::Clock::Seconds16(1);
-constexpr chip::System::Clock::Timeout gMessageInterval         = chip::System::Clock::Milliseconds32(1200);
-constexpr chip::System::Clock::Timeout gMessageTimeout          = chip::System::Clock::Milliseconds32(1000);
+constexpr chip::System::Clock::Timeout gSubscribeRequestMessageTimeout = chip::System::Clock::Seconds16(1);
+constexpr chip::System::Clock::Timeout gMessageInterval                = chip::System::Clock::Milliseconds32(1200);
+constexpr chip::System::Clock::Timeout gMessageTimeout                 = chip::System::Clock::Milliseconds32(1000);
 
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::Inet::IPAddress gDestAddr;
@@ -71,22 +71,22 @@ uint64_t gCommandCount = 0;
 // Count of the number of CommandResponses received.
 uint64_t gCommandRespCount = 0;
 
-// Count of the number of ReadRequests sent.
+// Count of the number of ReadRequestMessages sent.
 uint64_t gReadCount = 0;
 
 // Count of the number of ReadResponses received.
 uint64_t gReadRespCount = 0;
 
-// Count of the number of WriteRequests sent.
+// Count of the number of WriteRequestMessages sent.
 uint64_t gWriteCount = 0;
 
-// Count of the number of WriteResponses received.
+// Count of the number of WriteResponseMessages received.
 uint64_t gWriteRespCount = 0;
 
-// Count of the number of SubscribeRequests sent.
+// Count of the number of SubscribeRequestMessages sent.
 uint64_t gSubCount = 0;
 
-// Count of the number of SubscribeResponses received.
+// Count of the number of SubscribeResponseMessages received.
 uint64_t gSubRespCount = 0;
 
 // Count of the number of reports for subscription.
@@ -556,7 +556,7 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
     }
     else
     {
-        err = chip::DeviceLayer::SystemLayer().StartTimer(gSubscribeRequestTimeout, SubscribeRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer().StartTimer(gSubscribeRequestMessageTimeout, SubscribeRequestTimerHandler, NULL);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
 

@@ -297,7 +297,7 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
             System::PacketBufferTLVReader reader;
             reader.Init(aPayload.Retain());
             SuccessOrExit(err = reader.Next());
-            SubscribeRequest::Parser subscribeRequestParser;
+            SubscribeRequestMessage::Parser subscribeRequestParser;
             SuccessOrExit(err = subscribeRequestParser.Init(reader));
             err = subscribeRequestParser.GetKeepSubscriptions(&keepSubscriptions);
             if (err == CHIP_NO_ERROR && !keepSubscriptions)
@@ -364,7 +364,7 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
     reader.Init(aPayload.Retain());
     ReturnLogErrorOnFailure(reader.Next());
 
-    ReportData::Parser report;
+    ReportDataMessage::Parser report;
     ReturnLogErrorOnFailure(report.Init(reader));
 
     uint64_t subscriptionId = 0;

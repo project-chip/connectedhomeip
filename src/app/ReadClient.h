@@ -27,10 +27,10 @@
 #include <app/AttributePathParams.h>
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
-#include <app/MessageDef/ReadRequest.h>
-#include <app/MessageDef/StatusResponse.h>
-#include <app/MessageDef/SubscribeRequest.h>
-#include <app/MessageDef/SubscribeResponse.h>
+#include <app/MessageDef/ReadRequestMessage.h>
+#include <app/MessageDef/StatusResponseMessage.h>
+#include <app/MessageDef/SubscribeRequestMessage.h>
+#include <app/MessageDef/SubscribeResponseMessage.h>
 #include <app/ReadPrepareParams.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>

@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-#include "StatusResponse.h"
+#include "StatusResponseMessage.h"
 #include "MessageDefHelper.h"
 
 namespace chip {
 namespace app {
-CHIP_ERROR StatusResponse::Parser::Init(const TLV::TLVReader & aReader)
+CHIP_ERROR StatusResponseMessage::Parser::Init(const TLV::TLVReader & aReader)
 {
     // make a copy of the reader here
     mReader.Init(aReader);
@@ -29,12 +29,12 @@ CHIP_ERROR StatusResponse::Parser::Init(const TLV::TLVReader & aReader)
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR StatusResponse::Parser::CheckSchemaValidity() const
+CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     bool statusTagPresence = false;
     TLV::TLVReader reader;
-    PRETTY_PRINT("StatusResponse =");
+    PRETTY_PRINT("StatusResponseMessage =");
     PRETTY_PRINT("{");
 
     // make a copy of the reader
@@ -73,7 +73,7 @@ CHIP_ERROR StatusResponse::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR StatusResponse::Parser::GetStatus(Protocols::InteractionModel::Status & aStatus) const
+CHIP_ERROR StatusResponseMessage::Parser::GetStatus(Protocols::InteractionModel::Status & aStatus) const
 {
     uint16_t status = 0;
     CHIP_ERROR err  = GetUnsignedInteger(kCsTag_Status, &status);
@@ -81,12 +81,12 @@ CHIP_ERROR StatusResponse::Parser::GetStatus(Protocols::InteractionModel::Status
     return err;
 }
 
-CHIP_ERROR StatusResponse::Builder::Init(TLV::TLVWriter * const apWriter)
+CHIP_ERROR StatusResponseMessage::Builder::Init(TLV::TLVWriter * const apWriter)
 {
     return InitAnonymousStructure(apWriter);
 }
 
-StatusResponse::Builder & StatusResponse::Builder::Status(const Protocols::InteractionModel::Status aStatus)
+StatusResponseMessage::Builder & StatusResponseMessage::Builder::Status(const Protocols::InteractionModel::Status aStatus)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)

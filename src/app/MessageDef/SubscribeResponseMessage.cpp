@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-#include "SubscribeResponse.h"
+#include "SubscribeResponseMessage.h"
 #include "MessageDefHelper.h"
 
 namespace chip {
 namespace app {
-CHIP_ERROR SubscribeResponse::Parser::Init(const chip::TLV::TLVReader & aReader)
+CHIP_ERROR SubscribeResponseMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     // make a copy of the reader here
     mReader.Init(aReader);
@@ -31,12 +31,12 @@ CHIP_ERROR SubscribeResponse::Parser::Init(const chip::TLV::TLVReader & aReader)
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR SubscribeResponse::Parser::CheckSchemaValidity() const
+CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
-    PRETTY_PRINT("SubscribeResponse =");
+    PRETTY_PRINT("SubscribeResponseMessage =");
     PRETTY_PRINT("{");
 
     // make a copy of the reader
@@ -105,27 +105,27 @@ CHIP_ERROR SubscribeResponse::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR SubscribeResponse::Parser::GetSubscriptionId(uint64_t * const apSubscribeId) const
+CHIP_ERROR SubscribeResponseMessage::Parser::GetSubscriptionId(uint64_t * const apSubscribeId) const
 {
     return GetUnsignedInteger(kCsTag_SubscriptionId, apSubscribeId);
 }
 
-CHIP_ERROR SubscribeResponse::Parser::GetMinIntervalFloorSeconds(uint16_t * const apMinIntervalFloorSeconds) const
+CHIP_ERROR SubscribeResponseMessage::Parser::GetMinIntervalFloorSeconds(uint16_t * const apMinIntervalFloorSeconds) const
 {
     return GetUnsignedInteger(kCsTag_MinIntervalFloorSeconds, apMinIntervalFloorSeconds);
 }
 
-CHIP_ERROR SubscribeResponse::Parser::GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const
+CHIP_ERROR SubscribeResponseMessage::Parser::GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const
 {
     return GetUnsignedInteger(kCsTag_MaxIntervalCeilingSeconds, apMaxIntervalCeilingSeconds);
 }
 
-CHIP_ERROR SubscribeResponse::Builder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR SubscribeResponseMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 {
     return InitAnonymousStructure(apWriter);
 }
 
-SubscribeResponse::Builder & SubscribeResponse::Builder::SubscriptionId(const uint64_t aSubscribeId)
+SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::SubscriptionId(const uint64_t aSubscribeId)
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -134,7 +134,8 @@ SubscribeResponse::Builder & SubscribeResponse::Builder::SubscriptionId(const ui
     return *this;
 }
 
-SubscribeResponse::Builder & SubscribeResponse::Builder::MinIntervalFloorSeconds(const uint16_t aMinIntervalFloorSeconds)
+SubscribeResponseMessage::Builder &
+SubscribeResponseMessage::Builder::MinIntervalFloorSeconds(const uint16_t aMinIntervalFloorSeconds)
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -143,7 +144,8 @@ SubscribeResponse::Builder & SubscribeResponse::Builder::MinIntervalFloorSeconds
     return *this;
 }
 
-SubscribeResponse::Builder & SubscribeResponse::Builder::MaxIntervalCeilingSeconds(const uint16_t aMaxIntervalCeilingSeconds)
+SubscribeResponseMessage::Builder &
+SubscribeResponseMessage::Builder::MaxIntervalCeilingSeconds(const uint16_t aMaxIntervalCeilingSeconds)
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -152,7 +154,7 @@ SubscribeResponse::Builder & SubscribeResponse::Builder::MaxIntervalCeilingSecon
     return *this;
 }
 
-SubscribeResponse::Builder & SubscribeResponse::Builder::EndOfSubscribeResponse()
+SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::EndOfSubscribeResponseMessage()
 {
     EndOfContainer();
     return *this;

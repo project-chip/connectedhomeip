@@ -15,11 +15,11 @@
  */
 /**
  *    @file
- *      This file defines WriteResponse parser and builder in CHIP interaction model
+ *      This file defines WriteResponseMessage parser and builder in CHIP interaction model
  *
  */
 
-#include "WriteResponse.h"
+#include "WriteResponseMessage.h"
 #include "MessageDefHelper.h"
 
 #include <inttypes.h>
@@ -33,7 +33,7 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR WriteResponse::Parser::Init(const chip::TLV::TLVReader & aReader)
+CHIP_ERROR WriteResponseMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -50,13 +50,13 @@ exit:
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR WriteResponse::Parser::CheckSchemaValidity() const
+CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
     AttributeStatusList::Parser attributeStatusList;
-    PRETTY_PRINT("WriteResponse =");
+    PRETTY_PRINT("WriteResponseMessage =");
     PRETTY_PRINT("{");
 
     // make a copy of the reader
@@ -103,7 +103,7 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR WriteResponse::Parser::GetAttributeStatusList(AttributeStatusList::Parser * const apAttributeStatusList) const
+CHIP_ERROR WriteResponseMessage::Parser::GetAttributeStatusList(AttributeStatusList::Parser * const apAttributeStatusList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -122,12 +122,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteResponse::Builder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR WriteResponseMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 {
     return InitAnonymousStructure(apWriter);
 }
 
-AttributeStatusList::Builder & WriteResponse::Builder::CreateAttributeStatusListBuilder()
+AttributeStatusList::Builder & WriteResponseMessage::Builder::CreateAttributeStatusListBuilder()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -142,12 +142,12 @@ AttributeStatusList::Builder & WriteResponse::Builder::CreateAttributeStatusList
     return mAttributeStatusListBuilder;
 }
 
-AttributeStatusList::Builder & WriteResponse::Builder::GetAttributeStatusListBuilder()
+AttributeStatusList::Builder & WriteResponseMessage::Builder::GetAttributeStatusListBuilder()
 {
     return mAttributeStatusListBuilder;
 }
 
-WriteResponse::Builder & WriteResponse::Builder::EndOfWriteResponse()
+WriteResponseMessage::Builder & WriteResponseMessage::Builder::EndOfWriteResponseMessage()
 {
     EndOfContainer();
     return *this;

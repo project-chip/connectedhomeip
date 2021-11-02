@@ -23,7 +23,7 @@
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/AttributeDataList.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/MessageDef/WriteRequest.h>
+#include <app/MessageDef/WriteRequestMessage.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -190,7 +190,7 @@ private:
     Callback * mpCallback                      = nullptr;
     State mState                               = State::Uninitialized;
     System::PacketBufferTLVWriter mMessageWriter;
-    WriteRequest::Builder mWriteRequestBuilder;
+    WriteRequestMessage::Builder mWriteRequestBuilder;
     uint8_t mAttributeStatusIndex = 0;
 };
 

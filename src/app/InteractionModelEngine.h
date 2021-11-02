@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <app/MessageDef/ReportData.h>
+#include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
