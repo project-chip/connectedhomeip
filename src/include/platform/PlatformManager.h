@@ -25,8 +25,11 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
-#include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <system/LwIPEventSupport.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
 

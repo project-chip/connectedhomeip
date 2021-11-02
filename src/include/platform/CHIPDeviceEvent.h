@@ -307,7 +307,10 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 
 #include <ble/BleConfig.h>
 #include <inet/InetLayer.h>
-#include <lib/support/LambdaBridge.h>
+#include <system/SystemEvent.h>
+#include <system/SystemLayer.h>
+#include <system/SystemObject.h>
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -322,7 +325,7 @@ struct ChipDeviceEvent final
     union
     {
         ChipDevicePlatformEvent Platform;
-        LambdaBridge LambdaEvent;
+        System::LambdaBridge LambdaEvent;
         struct
         {
             ::chip::System::EventType Type;
