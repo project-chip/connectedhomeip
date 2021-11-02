@@ -33,14 +33,9 @@ public:
 
     // Inherited from OTAProviderDelegate
     EmberAfStatus HandleQueryImage(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                   uint16_t vendorId, uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
-                                   const chip::Optional<uint16_t> & hardwareVersion,
-                                   const chip::Optional<chip::CharSpan> & location,
-                                   const chip::Optional<bool> & requestorCanConsent,
-                                   const chip::Optional<chip::ByteSpan> & metadataForServer) override;
+                                   const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) override;
     EmberAfStatus HandleApplyUpdateRequest(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath, const chip::ByteSpan & updateToken,
-                                           uint32_t newVersion) override;
+                                           const chip::app::ConcreteCommandPath & commandPath, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) override;
     EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t softwareVersion) override;
 
     enum queryImageBehaviorType

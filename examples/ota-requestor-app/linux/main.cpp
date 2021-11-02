@@ -151,13 +151,12 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
     constexpr EndpointId kOtaProviderEndpoint = 0;
 
     // These QueryImage params have been chosen arbitrarily
-    constexpr VendorId kExampleVendorId        = VendorId::Common;
-    constexpr uint16_t kExampleProductId       = 77;
-    constexpr uint16_t kExampleHWVersion       = 3;
-    constexpr uint16_t kExampleSoftwareVersion = 0;
-    constexpr EmberAfOTADownloadProtocol kExampleProtocolsSupported =
-        EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS; // TODO: support this as a list once ember adds list support
-    const char locationBuf[] = { 'U', 'S' };
+    constexpr VendorId kExampleVendorId                               = VendorId::Common;
+    constexpr uint16_t kExampleProductId                              = 77;
+    constexpr uint16_t kExampleHWVersion                              = 3;
+    constexpr uint16_t kExampleSoftwareVersion                        = 0;
+    constexpr EmberAfOTADownloadProtocol kExampleProtocolsSupported[] = { EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS };
+    const char locationBuf[]                                          = { 'U', 'S' };
     CharSpan exampleLocation(locationBuf);
     constexpr bool kExampleClientCanConsent = false;
     ByteSpan metadata;

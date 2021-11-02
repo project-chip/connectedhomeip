@@ -72,7 +72,6 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
     const Commands::ApplyUpdateRequest::DecodableType & commandData)
 {
     auto & updateToken = commandData.updateToken;
-    auto & newVersion  = commandData.newVersion;
 
     EndpointId endpoint = commandPath.mEndpointId;
 
@@ -90,9 +89,10 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
     {
         ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenMaxLength, updateToken.size());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+        return true;
     }
 
-    status = delegate->HandleApplyUpdateRequest(commandObj, commandPath, updateToken, newVersion);
+    status = delegate->HandleApplyUpdateRequest(commandObj, commandPath, commandData);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
@@ -133,6 +133,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     {
         ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenMaxLength, updateToken.size());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+        return true;
     }
 
     status = delegate->HandleNotifyUpdateApplied(updateToken, softwareVersion);
@@ -188,7 +189,13 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     ChipLogDetail(Zcl, "  VendorID: 0x%" PRIx16, vendorId);
     ChipLogDetail(Zcl, "  ProductID: %" PRIu16, productId);
     ChipLogDetail(Zcl, "  SoftwareVersion: %" PRIu32, softwareVersion);
-    ChipLogDetail(Zcl, "  ProtocolsSupported: %" PRIu8, protocolsSupported);
+    ChipLogDetail(Zcl, "  ProtocolsSupported: [");
+    auto protocolIter = protocolsSupported.begin();
+    while (protocolIter.Next())
+    {
+        ChipLogDetail(Zcl, "    %" PRIu8, protocolIter.GetValue());
+    }
+    ChipLogDetail(Zcl, "  ]");
     if (hardwareVersion.HasValue())
     {
         ChipLogDetail(Zcl, "  HardwareVersion: %" PRIu16, hardwareVersion.Value());
@@ -220,8 +227,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
         return true;
     }
 
-    status = delegate->HandleQueryImage(commandObj, commandPath, vendorId, productId, softwareVersion, protocolsSupported,
-                                        hardwareVersion, location, requestorCanConsent, metadataForProvider);
+    status = delegate->HandleQueryImage(commandObj, commandPath, commandData);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
