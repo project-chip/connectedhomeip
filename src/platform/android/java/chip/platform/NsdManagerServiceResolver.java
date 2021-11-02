@@ -64,10 +64,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
         new Runnable() {
           @Override
           public void run() {
-            // Ensure we always release the multicast lock. It's possible that we release
-            // the
-            // multicast lock here before ResolveListener returns, but since NsdManager has
-            // no API
+            // Ensure we always release the multicast lock. It's possible that we release the
+            // multicast lock here before ResolveListener returns, but since NsdManager has no API
             // to cancel service resolution, there's not much we can do here.
             if (multicastLock.isHeld()) {
               multicastLock.release();
@@ -84,7 +82,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                 TAG,
                 "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
             chipMdnsCallback.handleServiceResolve(
-                instanceName, serviceType, null, null, 0, null, callbackHandle, contextHandle);
+                instanceName, serviceType, null, 0, callbackHandle, contextHandle);
+
             if (multicastLock.isHeld()) {
               multicastLock.release();
             }
@@ -103,10 +102,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             chipMdnsCallback.handleServiceResolve(
                 instanceName,
                 serviceType,
-                serviceInfo.getHost().getHostName(),
                 serviceInfo.getHost().getHostAddress(),
                 serviceInfo.getPort(),
-                serviceInfo.getAttributes(),
                 callbackHandle,
                 contextHandle);
 
