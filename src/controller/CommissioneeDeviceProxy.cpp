@@ -192,7 +192,6 @@ void CommissioneeDeviceProxy::Reset()
 CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParameters()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    PASESession pairingSession;
 
     if (mSessionManager == nullptr || mState == ConnectionState::SecureConnected)
     {
@@ -204,10 +203,7 @@ CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParameters()
         ExitNow(err = CHIP_NO_ERROR);
     }
 
-    err = pairingSession.FromSerializable(mPairing);
-    SuccessOrExit(err);
-
-    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
+    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mPairing,
                                       CryptoContext::SessionRole::kInitiator, mFabricIndex);
     SuccessOrExit(err);
 

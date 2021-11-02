@@ -770,8 +770,6 @@ private:
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
-
-    PASESession mPairingSession;
 };
 
 } // namespace Controller

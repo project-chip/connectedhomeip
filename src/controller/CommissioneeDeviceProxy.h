@@ -55,7 +55,6 @@
 namespace chip {
 
 class DeviceStatusDelegate;
-struct SerializedDevice;
 
 constexpr size_t kOpCSRNonceLength       = 32;
 constexpr size_t kAttestationNonceLength = 32;
@@ -133,14 +132,12 @@ public:
      */
     void Init(ControllerDeviceInitParams params, FabricIndex fabric)
     {
-        mSessionManager  = params.sessionManager;
-        mExchangeMgr     = params.exchangeMgr;
-        mInetLayer       = params.inetLayer;
-        mFabricIndex     = fabric;
-        mStorageDelegate = params.storageDelegate;
-        mIDAllocator     = params.idAllocator;
-        mFabricsTable    = params.fabricsTable;
-        mpIMDelegate     = params.imDelegate;
+        mSessionManager = params.sessionManager;
+        mExchangeMgr    = params.exchangeMgr;
+        mInetLayer      = params.inetLayer;
+        mFabricIndex    = fabric;
+        mIDAllocator    = params.idAllocator;
+        mpIMDelegate    = params.imDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -257,13 +254,7 @@ public:
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
-    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval) const
-    {
-        idleInterval   = mMrpIdleInterval;
-        activeInterval = mMrpActiveInterval;
-    }
-
-    PASESessionSerializable & GetPairing() { return mPairing; }
+    PASESession & GetPairing() { return mPairing; }
 
     uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
 
@@ -313,12 +304,6 @@ public:
 
     Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mpIMDelegate; };
 
-    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval) const
-    {
-        idleInterval   = mMrpIdleInterval;
-        activeInterval = mMrpActiveInterval;
-    }
-
 private:
     enum class ConnectionState
     {
@@ -339,9 +324,6 @@ private:
      */
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
-    uint32_t mMrpIdleInterval   = CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL;
-    uint32_t mMrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
-
     Inet::InetLayer * mInetLayer = nullptr;
 
     bool mActive           = false;
@@ -351,7 +333,7 @@ private:
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
 
-    PASESessionSerializable mPairing;
+    PASESession mPairing;
 
     DeviceStatusDelegate * mStatusDelegate = nullptr;
 
@@ -391,10 +373,6 @@ private:
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
-    FabricTable * mFabricsTable = nullptr;
-
-    PersistentStorageDelegate * mStorageDelegate = nullptr;
-
     // TODO: Offload Nonces and DAC/PAI into a new struct
     uint8_t mCSRNonce[kOpCSRNonceLength];
     uint8_t mAttestationNonce[kAttestationNonceLength];
@@ -411,37 +389,6 @@ private:
     size_t mICACertBufferSize = 0;
 
     SessionIDAllocator * mIDAllocator = nullptr;
-
-    uint32_t mMrpIdleInterval   = CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL;
-    uint32_t mMrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
 };
-
-#ifdef IFNAMSIZ
-constexpr uint16_t kMaxInterfaceName = IFNAMSIZ;
-#else
-constexpr uint16_t kMaxInterfaceName = 32;
-#endif
-
-typedef struct SerializableDevice
-{
-    PASESessionSerializable mOpsCreds;
-    uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
-    uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort;  /* This field is serialized in LittleEndian byte order */
-    uint16_t mFabricIndex; /* This field is serialized in LittleEndian byte order */
-    uint8_t mDeviceTransport;
-    uint8_t mDeviceOperationalCertProvisioned;
-    uint8_t mInterfaceName[kMaxInterfaceName];
-    uint32_t mLocalMessageCounter; /* This field is serialized in LittleEndian byte order */
-    uint32_t mPeerMessageCounter;  /* This field is serialized in LittleEndian byte order */
-} SerializableDevice;
-
-typedef struct SerializedDevice
-{
-    // Extra uint64_t to account for padding bytes (NULL termination, and some decoding overheads)
-    // The encoder may not include a NULL character, and there are maximum 2 bytes of padding.
-    // So extra 8 bytes should be sufficient to absorb this overhead.
-    uint8_t inner[BASE64_ENCODED_LEN(sizeof(SerializableDevice) + sizeof(uint64_t))];
-} SerializedDevice;
 
 } // namespace chip

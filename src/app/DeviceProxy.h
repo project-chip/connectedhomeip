@@ -87,12 +87,21 @@ public:
 
     virtual bool IsActive() const { return true; }
 
+    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval) const
+    {
+        idleInterval   = mMrpIdleInterval;
+        activeInterval = mMrpActiveInterval;
+    }
+
 protected:
     virtual bool IsSecureConnected() const = 0;
 
     virtual uint8_t GetNextSequenceNumber() = 0;
 
     app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
+
+    uint32_t mMrpIdleInterval   = CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL;
+    uint32_t mMrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
 };
 
 /**

@@ -687,8 +687,6 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
-    mPairingSession.Clear();
-
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     if (mUdcTransportMgr != nullptr)
     {
@@ -863,10 +861,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
-    err = mPairingSession.MessageDispatch().Init(mSystemState->SessionMgr());
-    SuccessOrExit(err);
-
     device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, fabric->GetFabricIndex());
+
+    err = device->GetPairing().MessageDispatch().Init(mSystemState->SessionMgr());
+    SuccessOrExit(err);
 
     mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
                                             OnSessionEstablishmentTimeoutCallback, this);
@@ -898,13 +896,13 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     device->GetMRPIntervals(mrpIdleInterval, mrpActiveInterval);
     session.Value().GetUnauthenticatedSession()->SetMRPIntervals(mrpIdleInterval, mrpActiveInterval);
 
-    exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &mPairingSession);
+    exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     err = mIDAllocator.Allocate(keyID);
     SuccessOrExit(err);
 
-    err = mPairingSession.Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID, exchangeCtxt, this);
+    err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID, exchangeCtxt, this);
     // Immediately persist the updted mNextKeyID value
     // TODO maybe remove FreeRendezvousSession() since mNextKeyID is always persisted immediately
     PersistNextKeyId();
@@ -989,12 +987,14 @@ void DeviceCommissioner::OnSessionEstablished()
 {
     VerifyOrReturn(mDeviceBeingCommissioned != nullptr, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
 
-    // TODO: the session should know which peer we are trying to connect to when started
-    mPairingSession.SetPeerNodeId(mDeviceBeingCommissioned->GetDeviceId());
+    PASESession * pairing = &mDeviceBeingCommissioned->GetPairing();
 
-    CHIP_ERROR err = mSystemState->SessionMgr()->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
-        &mPairingSession, CryptoContext::SessionRole::kInitiator, mFabricIndex);
+    // TODO: the session should know which peer we are trying to connect to when started
+    pairing->SetPeerNodeId(mDeviceBeingCommissioned->GetDeviceId());
+
+    CHIP_ERROR err = mSystemState->SessionMgr()->NewPairing(Optional<Transport::PeerAddress>::Value(pairing->GetPeerAddress()),
+                                                            pairing->GetPeerNodeId(), pairing,
+                                                            CryptoContext::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1161,10 +1161,12 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
 
     DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
 
+    PASESession * pairing = &mDeviceBeingCommissioned->GetPairing();
+
     // Retrieve attestation challenge
     ByteSpan attestationChallenge = mSystemState->SessionMgr()
-                                        ->GetSecureSession({ mPairingSession.GetPeerNodeId(), mPairingSession.GetLocalSessionId(),
-                                                             mPairingSession.GetPeerSessionId(), mFabricIndex })
+                                        ->GetSecureSession({ pairing->GetPeerNodeId(), pairing->GetLocalSessionId(),
+                                                             pairing->GetPeerSessionId(), mFabricIndex })
                                         ->GetCryptoContext()
                                         .GetAttestationChallenge();
 
@@ -1498,7 +1500,6 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(Co
     else
 #endif
     {
-        mPairingSession.ToSerializable(device->GetPairing());
         mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
         mPairedDevices.Insert(device->GetDeviceId());
@@ -1859,7 +1860,6 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
     break;
     case CommissioningStage::kCleanup:
         ChipLogProgress(Controller, "Rendezvous cleanup");
-        mPairingSession.ToSerializable(device->GetPairing());
         mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
         mPairedDevices.Insert(device->GetDeviceId());
