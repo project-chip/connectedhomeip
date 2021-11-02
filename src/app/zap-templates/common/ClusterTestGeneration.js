@@ -371,13 +371,12 @@ const PICS = (() => {
   const yaml   = YAML.parse(data);
 
   const getAll = () => yaml.PICS;
-  const get    = (id) => has(id) ? yaml.PICS.filter(pics => pics.id == id)[0] : null;
-  const has    = (id) => !!(yaml.PICS.filter(pics => pics.id == id)).length;
+  const get = (id) => has(id) ? yaml.PICS.filter(pics => pics.id == id)[0] : null;
+  const has = (id) => !!(yaml.PICS.filter(pics => pics.id == id)).length;
 
-  return {
-    getAll: getAll,
-    get: get,
-    has: has,
+  return
+  {
+    getAll: getAll, get: get, has: has,
   }
   return yaml.PICS;
 })();
