@@ -37,6 +37,7 @@
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
 
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device_id";
 
@@ -51,6 +52,7 @@ static NSString * const kErrorStopPairing = @"Failure while trying to stop the p
 static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrieve a paired device";
 static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
 static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
+static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code failed";
 
 @interface CHIPDeviceController ()
 
@@ -267,7 +269,6 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
-          csrNonce:(nullable NSData *)csrNonce
              error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
@@ -277,16 +278,19 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         return success;
     }
     dispatch_sync(_chipWorkQueue, ^{
-        chip::RendezvousParameters params
-            = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
+        std::string manualPairingCode;
+        chip::SetupPayload payload;
+        payload.discriminator = discriminator;
+        payload.setUpPINCode = setupPINCode;
 
-        if (csrNonce != nil) {
-            params = params.SetCSRNonce(chip::ByteSpan((const uint8_t *) csrNonce.bytes, csrNonce.length));
+        errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
+        success = ![self checkForError:errorCode logMsg:kErrorSetupCodeGen error:error];
+        if (!success) {
+            return;
         }
-
         if ([self isRunning]) {
             _operationalCredentialsDelegate->SetDeviceID(deviceID);
-            errorCode = self.cppCommissioner->PairDevice(deviceID, params);
+            errorCode = self.cppCommissioner->PairDevice(deviceID, manualPairingCode.c_str());
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
@@ -326,24 +330,22 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return success;
 }
 
-- (BOOL)pairDevice:(uint64_t)deviceID
-        onboardingPayload:(NSString *)onboardingPayload
-    onboardingPayloadType:(CHIPOnboardingPayloadType)onboardingPayloadType
-                    error:(NSError * __autoreleasing *)error
+- (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
 {
-    BOOL didSucceed = NO;
-    CHIPSetupPayload * setupPayload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:onboardingPayload
-                                                                                             ofType:onboardingPayloadType
-                                                                                              error:error];
-    if (setupPayload) {
-        uint16_t discriminator = setupPayload.discriminator.unsignedShortValue;
-        uint32_t setupPINCode = setupPayload.setUpPINCode.unsignedIntValue;
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
-        didSucceed = [self pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode csrNonce:nil error:error];
-    } else {
-        CHIP_LOG_ERROR("Failed to create CHIPSetupPayload for pairing with error %@", *error);
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    __block BOOL success = NO;
+    if (![self isRunning]) {
+        success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
+        return success;
     }
-    return didSucceed;
+    dispatch_sync(_chipWorkQueue, ^{
+        if ([self isRunning]) {
+            _operationalCredentialsDelegate->SetDeviceID(deviceID);
+            errorCode = self.cppCommissioner->PairDevice(deviceID, [onboardingPayload UTF8String]);
+        }
+        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    });
+    return success;
 }
 
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
