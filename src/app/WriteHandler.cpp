@@ -215,22 +215,7 @@ CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAtt
                                                 AttributeStatusIB::Builder aAttributeStatusIB)
 {
     AttributePathIB::Builder attributePath = aAttributeStatusIB.CreatePath();
-    if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
-    {
-        attributePath.Attribute(aAttributePathParams.mFieldId);
-    }
-
-    if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kListIndexValid))
-    {
-        attributePath.ListIndex(aAttributePathParams.mListIndex);
-    }
-
-    attributePath.Node(aAttributePathParams.mNodeId)
-        .Cluster(aAttributePathParams.mClusterId)
-        .Endpoint(aAttributePathParams.mEndpointId)
-        .EndOfAttributePathIB();
-
-    return attributePath.GetError();
+    return aAttributePathParams.BuildAttributePath(attributePath);
 }
 
 CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathParams,

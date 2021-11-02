@@ -86,12 +86,9 @@ void TestWriteInteraction::AddAttributeDataElement(nlTestSuite * apSuite, void *
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId     = 1;
     attributePathParams.mEndpointId = 2;
     attributePathParams.mClusterId  = 3;
     attributePathParams.mFieldId    = 4;
-    attributePathParams.mListIndex  = 5;
-    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     err = aWriteClient->PrepareAttribute(attributePathParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -109,12 +106,9 @@ void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apCo
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId     = 1;
     attributePathParams.mEndpointId = 2;
     attributePathParams.mClusterId  = 3;
     attributePathParams.mFieldId    = 4;
-    attributePathParams.mListIndex  = 5;
-    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     err = aWriteHandler.AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -295,11 +289,9 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId     = 1;
     attributePathParams.mEndpointId = 2;
     attributePathParams.mClusterId  = 3;
     attributePathParams.mFieldId    = 4;
-    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     const uint8_t byteSpanData[] = { 0xde, 0xad, 0xbe, 0xef };
     const char charSpanData[]    = "a simple test string";

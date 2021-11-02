@@ -473,11 +473,9 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(Cluste
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId     = aClusterInfo.mNodeId;
     attributePathParams.mEndpointId = aClusterInfo.mEndpointId;
     attributePathParams.mClusterId  = aClusterInfo.mClusterId;
     attributePathParams.mFieldId    = aClusterInfo.mFieldId;
-    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
     return apWriteHandler->AddStatus(attributePathParams, imCode);

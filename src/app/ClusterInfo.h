@@ -35,6 +35,8 @@ namespace app {
 struct ClusterInfo
 {
 private:
+    // Allow AttributePathParams access these constants.
+    friend struct AttributePathParams;
     // Endpoint Id is a uint16 number, and should between 0 and 0xFFFE
     static constexpr EndpointId kInvalidEndpointId = 0xFFFF;
     // The ClusterId, AttributeId and EventId are MEIs,
