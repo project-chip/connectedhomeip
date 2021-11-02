@@ -105,7 +105,7 @@ typedef void (*OnDeviceConnected)(void * context, Device * device);
 typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
 typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
 
-class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEstablishmentDelegate
+class Device : public Messaging::ExchangeDelegate, public SessionEstablishmentDelegate
 {
 public:
     ~Device();
@@ -595,7 +595,7 @@ private:
  * Device when a new message or status update is received from the corresponding
  * CHIP device.
  */
-class DLL_EXPORT DeviceStatusDelegate
+class DeviceStatusDelegate
 {
 public:
     virtual ~DeviceStatusDelegate() {}

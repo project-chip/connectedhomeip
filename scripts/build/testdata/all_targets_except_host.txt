@@ -3,6 +3,7 @@ android-androidstudio-chip-tool
 android-arm-chip-tool
 android-arm64-chip-test
 android-arm64-chip-tool
+android-arm64-chip-tvserver
 android-x64-chip-tool
 android-x86-chip-tool
 efr32-brd4161a-light

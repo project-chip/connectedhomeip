@@ -23,7 +23,7 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-arm-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-arm-chip-tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+gn gen --check --fail-on-unused-args {out}/android-arm-chip-tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true '
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -35,7 +35,7 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-arm64-chip-test
-gn gen --check --fail-on-unused-args {out}/android-arm64-chip-test '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip-test '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true '
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -47,7 +47,19 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-arm64-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true '
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Generating android-arm64-chip-tvserver
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tvserver '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true chip_config_network_layer_ble=false '
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -59,7 +71,7 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-x64-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-x64-chip-tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+gn gen --check --fail-on-unused-args {out}/android-x64-chip-tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true '
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -71,7 +83,7 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-x86-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true '
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -304,11 +316,15 @@ cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libCHIPController.so {root}/s
 
 cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
+cp {out}/android-arm-chip-tool/lib/jni/armeabi-v7a/libCHIPAppServer.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libCHIPAppServer.so
+
 cp {out}/android-arm-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
 
 cp {out}/android-arm-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
 
 cp {out}/android-arm-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+
+cp {out}/android-arm-chip-tool/lib/src/app/server/java/CHIPAppServer.jar {root}/src/android/CHIPTool/app/libs/CHIPAppServer.jar
 
 # Building APP android-arm-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tool assembleDebug
@@ -325,11 +341,15 @@ cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libCHIPController.so {root}/s
 
 cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTest/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
+cp {out}/android-arm64-chip-test/lib/jni/arm64-v8a/libCHIPAppServer.so {root}/src/android/CHIPTest/app/libs/jniLibs/arm64-v8a/libCHIPAppServer.so
+
 cp {out}/android-arm64-chip-test/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTest/app/libs/CHIPController.jar
 
 cp {out}/android-arm64-chip-test/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTest/app/libs/SetupPayloadParser.jar
 
 cp {out}/android-arm64-chip-test/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTest/app/libs/AndroidPlatform.jar
+
+cp {out}/android-arm64-chip-test/lib/src/app/server/java/CHIPAppServer.jar {root}/src/android/CHIPTest/app/libs/CHIPAppServer.jar
 
 # Building APP android-arm64-chip-test
 {root}/src/android/CHIPTest/gradlew -p {root}/src/android/CHIPTest -PmatterBuildSrcDir={out}/android-arm64-chip-test -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-test assembleDebug
@@ -346,14 +366,43 @@ cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libCHIPController.so {root}/s
 
 cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
+cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libCHIPAppServer.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libCHIPAppServer.so
+
 cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
 
 cp {out}/android-arm64-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
 
 cp {out}/android-arm64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
 
+cp {out}/android-arm64-chip-tool/lib/src/app/server/java/CHIPAppServer.jar {root}/src/android/CHIPTool/app/libs/CHIPAppServer.jar
+
 # Building APP android-arm64-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tool assembleDebug
+
+# Building JNI android-arm64-chip-tvserver
+ninja -C {out}/android-arm64-chip-tvserver
+
+# Prepare Native libs android-arm64-chip-tvserver
+mkdir -p {root}/src/android/CHIPTVServer/app/libs/jniLibs/arm64-v8a
+
+cp {out}/android-arm64-chip-tvserver/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/src/android/CHIPTVServer/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
+
+cp {out}/android-arm64-chip-tvserver/lib/jni/arm64-v8a/libCHIPController.so {root}/src/android/CHIPTVServer/app/libs/jniLibs/arm64-v8a/libCHIPController.so
+
+cp {out}/android-arm64-chip-tvserver/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTVServer/app/libs/jniLibs/arm64-v8a/libc++_shared.so
+
+cp {out}/android-arm64-chip-tvserver/lib/jni/arm64-v8a/libCHIPAppServer.so {root}/src/android/CHIPTVServer/app/libs/jniLibs/arm64-v8a/libCHIPAppServer.so
+
+cp {out}/android-arm64-chip-tvserver/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTVServer/app/libs/CHIPController.jar
+
+cp {out}/android-arm64-chip-tvserver/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTVServer/app/libs/SetupPayloadParser.jar
+
+cp {out}/android-arm64-chip-tvserver/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTVServer/app/libs/AndroidPlatform.jar
+
+cp {out}/android-arm64-chip-tvserver/lib/src/app/server/java/CHIPAppServer.jar {root}/src/android/CHIPTVServer/app/libs/CHIPAppServer.jar
+
+# Building APP android-arm64-chip-tvserver
+{root}/src/android/CHIPTVServer/gradlew -p {root}/src/android/CHIPTVServer -PmatterBuildSrcDir={out}/android-arm64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tvserver assembleDebug
 
 # Building JNI android-x64-chip-tool
 ninja -C {out}/android-x64-chip-tool
@@ -367,11 +416,15 @@ cp {out}/android-x64-chip-tool/lib/jni/x86_64/libCHIPController.so {root}/src/an
 
 cp {out}/android-x64-chip-tool/lib/jni/x86_64/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libc++_shared.so
 
+cp {out}/android-x64-chip-tool/lib/jni/x86_64/libCHIPAppServer.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libCHIPAppServer.so
+
 cp {out}/android-x64-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
 
 cp {out}/android-x64-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
 
 cp {out}/android-x64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+
+cp {out}/android-x64-chip-tool/lib/src/app/server/java/CHIPAppServer.jar {root}/src/android/CHIPTool/app/libs/CHIPAppServer.jar
 
 # Building APP android-x64-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tool assembleDebug
@@ -388,11 +441,15 @@ cp {out}/android-x86-chip-tool/lib/jni/x86/libCHIPController.so {root}/src/andro
 
 cp {out}/android-x86-chip-tool/lib/jni/x86/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libc++_shared.so
 
+cp {out}/android-x86-chip-tool/lib/jni/x86/libCHIPAppServer.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libCHIPAppServer.so
+
 cp {out}/android-x86-chip-tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
 
 cp {out}/android-x86-chip-tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
 
 cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+
+cp {out}/android-x86-chip-tool/lib/src/app/server/java/CHIPAppServer.jar {root}/src/android/CHIPTool/app/libs/CHIPAppServer.jar
 
 # Building APP android-x86-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-x86-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tool assembleDebug
