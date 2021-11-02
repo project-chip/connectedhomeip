@@ -285,8 +285,8 @@ if (chip_device_platform != "none") {
       "GeneralUtils.cpp",
       "Globals.cpp",
       "LockTracker.cpp",
-      "LwIPEventSupport.cpp",
       "PersistedStorage.cpp",
+      "PlatformEventSupport.cpp",
       "TestIdentity.cpp",
     ]
 
