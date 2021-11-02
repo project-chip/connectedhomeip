@@ -23,6 +23,7 @@
 #if !CHIP_DEVICE_LAYER_NONE
 
 #include <ble/BleLayer.h>
+#include <inet/InetLayer.h>
 #include <lib/core/CHIPCore.h>
 #include <platform/CHIPDeviceError.h>
 #include <platform/ConfigurationManager.h>
@@ -42,29 +43,15 @@
 namespace chip {
 namespace DeviceLayer {
 
-namespace Internal {
-extern chip::System::Layer * gSystemLayer;
-} // namespace Internal
+void SetSystemLayerForTesting(System::LayerImpl * layer);
 
-struct ChipDeviceEvent;
-extern Inet::InetLayer InetLayer;
-
-inline chip::System::Layer & SystemLayer()
-{
-    return *Internal::gSystemLayer;
-}
+// These functions are defined in src/platform/Globals.cpp
+chip::Inet::InetLayer & InetLayer();
+chip::System::Layer & SystemLayer();
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-inline chip::System::LayerSockets & SystemLayerSockets()
-{
-    return *static_cast<chip::System::LayerSockets *>(Internal::gSystemLayer);
-}
+chip::System::LayerSockets & SystemLayerSockets();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-inline void SetSystemLayerForTesting(System::Layer * layer)
-{
-    Internal::gSystemLayer = layer;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

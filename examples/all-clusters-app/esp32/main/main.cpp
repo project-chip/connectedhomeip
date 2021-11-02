@@ -365,7 +365,7 @@ public:
 private:
     void DoReinit()
     {
-        CHIP_ERROR err = Dnssd::ServiceAdvertiser::Instance().Init(&DeviceLayer::InetLayer);
+        CHIP_ERROR err = Dnssd::ServiceAdvertiser::Instance().Init(&DeviceLayer::InetLayer());
         if (err != CHIP_NO_ERROR)
         {
             ESP_LOGE(TAG, "Error initializing: %s", err.AsString());

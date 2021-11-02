@@ -255,7 +255,7 @@ int main(int argc, char ** args)
         return 1;
     }
 
-    if (chip::Dnssd::ServiceAdvertiser::Instance().Init(&DeviceLayer::InetLayer) != CHIP_NO_ERROR)
+    if (chip::Dnssd::ServiceAdvertiser::Instance().Init(&DeviceLayer::InetLayer()) != CHIP_NO_ERROR)
     {
         fprintf(stderr, "FAILED to start MDNS advertisement\n");
         return 1;
