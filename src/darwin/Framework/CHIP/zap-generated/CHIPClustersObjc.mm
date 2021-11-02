@@ -3982,6 +3982,34 @@ using chip::Callback::Cancelable;
     });
 }
 
+- (void)readAttributeLifetimeRunningHoursWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeLifetimeRunningHours(success, failure);
+    });
+}
+
+- (void)writeAttributeLifetimeRunningHoursWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeLifetimeRunningHours(success, failure, value);
+    });
+}
+
+- (void)readAttributePowerWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributePower(success, failure);
+    });
+}
+
+- (void)writeAttributePowerWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributePower(success, failure, value);
+    });
+}
+
 - (void)readAttributeLifetimeEnergyConsumedWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {

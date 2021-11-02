@@ -972,6 +972,36 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
 
 } // namespace HighTempThreshold
 
+namespace LowTempDwellTripPoint {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) value,
+                                      sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) &value,
+                                       ZCL_INT24U_ATTRIBUTE_TYPE);
+}
+
+} // namespace LowTempDwellTripPoint
+
+namespace HighTempDwellTripPoint {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) value,
+                                      sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::DeviceTemperatureConfiguration::Id, Id, (uint8_t *) &value,
+                                       ZCL_INT24U_ATTRIBUTE_TYPE);
+}
+
+} // namespace HighTempDwellTripPoint
+
 } // namespace Attributes
 } // namespace DeviceTemperatureConfiguration
 
@@ -5917,6 +5947,34 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 } // namespace Speed
 
+namespace LifetimeRunningHours {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) value, sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &value,
+                                       ZCL_INT24U_ATTRIBUTE_TYPE);
+}
+
+} // namespace LifetimeRunningHours
+
+namespace Power {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) value, sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, (uint8_t *) &value,
+                                       ZCL_INT24U_ATTRIBUTE_TYPE);
+}
+
+} // namespace Power
+
 namespace LifetimeEnergyConsumed {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
@@ -7625,6 +7683,34 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 } // namespace LampManufacturer
 
+namespace LampRatedHours {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) value, sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &value,
+                                       ZCL_INT24U_ATTRIBUTE_TYPE);
+}
+
+} // namespace LampRatedHours
+
+namespace LampBurnHours {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) value, sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &value,
+                                       ZCL_INT24U_ATTRIBUTE_TYPE);
+}
+
+} // namespace LampBurnHours
+
 namespace LampAlarmMode {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
@@ -7638,6 +7724,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 }
 
 } // namespace LampAlarmMode
+
+namespace LampBurnHoursTripPoint {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) value, sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, (uint8_t *) &value,
+                                       ZCL_INT24U_ATTRIBUTE_TYPE);
+}
+
+} // namespace LampBurnHoursTripPoint
 
 } // namespace Attributes
 } // namespace BallastConfiguration
@@ -11503,6 +11603,34 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 }
 
 } // namespace Pod
+
+namespace AvailablePower {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::MeterIdentification::Id, Id, (uint8_t *) value, sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::MeterIdentification::Id, Id, (uint8_t *) &value,
+                                       ZCL_INT24S_ATTRIBUTE_TYPE);
+}
+
+} // namespace AvailablePower
+
+namespace PowerThreshold {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value)
+{
+    return emberAfReadServerAttribute(endpoint, Clusters::MeterIdentification::Id, Id, (uint8_t *) value, sizeof(*value));
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
+{
+    return emberAfWriteServerAttribute(endpoint, Clusters::MeterIdentification::Id, Id, (uint8_t *) &value,
+                                       ZCL_INT24S_ATTRIBUTE_TYPE);
+}
+
+} // namespace PowerThreshold
 
 } // namespace Attributes
 } // namespace MeterIdentification
