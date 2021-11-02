@@ -64,7 +64,7 @@ CHIP_ERROR AttributeStatusList::Parser::CheckSchemaValidity() const
     PRETTY_PRINT("AttributeStatusList =");
     PRETTY_PRINT("[");
 
-    // make a copy of the EventList reader
+    // make a copy of the EventReports reader
     reader.Init(mReader);
 
     while (CHIP_NO_ERROR == (err = reader.Next()))

@@ -234,7 +234,7 @@ CHIP_ERROR ReadClient::GenerateEventPaths(EventPaths::Builder & aEventPathsBuild
 
     for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
     {
-        EventPathIB::Builder eventPathBuilder = aEventPathsBuilder.CreateEventPath();
+        EventPathIB::Builder eventPathBuilder = aEventPathsBuilder.CreatePath();
         EventPathParams eventPath             = apEventPathParamsList[eventIndex];
         eventPathBuilder.Node(eventPath.mNodeId)
             .Event(eventPath.mEventId)
@@ -343,12 +343,12 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportDataMessage::Parser report;
 
-    bool isEventListPresent         = false;
+    bool isEventReportsPresent      = false;
     bool isAttributeDataListPresent = false;
     bool suppressResponse           = false;
     bool moreChunkedMessages        = false;
     uint64_t subscriptionId         = 0;
-    EventList::Parser eventList;
+    EventReports::Parser EventReports;
     AttributeDataList::Parser attributeDataList;
     System::PacketBufferTLVReader reader;
 
@@ -402,19 +402,20 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
-    err                = report.GetEventDataList(&eventList);
-    isEventListPresent = (err == CHIP_NO_ERROR);
+    err                   = report.GetEventReports(&EventReports);
+    isEventReportsPresent = (err == CHIP_NO_ERROR);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
-    if (isEventListPresent && nullptr != mpCallback)
+    if (isEventReportsPresent && nullptr != mpCallback)
     {
-        chip::TLV::TLVReader eventListReader;
-        eventList.GetReader(&eventListReader);
-        mpCallback->OnEventData(this, eventListReader);
+        chip::TLV::TLVReader EventReportsReader;
+        EventReports.GetReader(&EventReportsReader);
+        ChipLogProgress(DataManagement, "on event data is called!!!!!!!!!!!!!");
+        mpCallback->OnEventData(this, EventReportsReader);
     }
 
     err                        = report.GetAttributeDataList(&attributeDataList);
