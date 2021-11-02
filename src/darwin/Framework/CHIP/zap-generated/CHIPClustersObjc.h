@@ -1137,7 +1137,6 @@ NS_ASSUME_NONNULL_BEGIN
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
       responseHandler:(ResponseHandler)responseHandler;
-- (void)getLastNetworkCommissioningResult:(uint32_t)timeoutMs responseHandler:(ResponseHandler)responseHandler;
 - (void)removeNetwork:(NSData *)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs

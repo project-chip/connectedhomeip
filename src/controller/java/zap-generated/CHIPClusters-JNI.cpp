@@ -21670,53 +21670,6 @@ exit:
         onFailure.release();
     }
 }
-JNI_METHOD(void, NetworkCommissioningCluster, getLastNetworkCommissioningResult)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong timeoutMs)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    NetworkCommissioningCluster * cppCluster;
-
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(onFailure.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    cppCluster = reinterpret_cast<NetworkCommissioningCluster *>(clusterPtr);
-    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = cppCluster->GetLastNetworkCommissioningResult(onSuccess->Cancel(), onFailure->Cancel(), timeoutMs);
-    SuccessOrExit(err);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        jthrowable exception;
-        jmethodID method;
-
-        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
-            return;
-        }
-
-        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
-            return;
-        }
-        env->CallVoidMethod(callback, method, exception);
-    }
-    else
-    {
-        onSuccess.release();
-        onFailure.release();
-    }
-}
 JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jlong breadcrumb, jlong timeoutMs)
 {

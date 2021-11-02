@@ -2377,13 +2377,6 @@ class ChipClusters:
                     "timeoutMs": "int",
                 },
             },
-            0x00000010: {
-                "commandId": 0x00000010,
-                "commandName": "GetLastNetworkCommissioningResult",
-                "args": {
-                    "timeoutMs": "int",
-                },
-            },
             0x0000000A: {
                 "commandId": 0x0000000A,
                 "commandName": "RemoveNetwork",
@@ -5101,11 +5094,6 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork(
             device, ZCLendpoint, ZCLgroupid, networkID, len(
                 networkID), breadcrumb, timeoutMs
-        )
-
-    def ClusterNetworkCommissioning_CommandGetLastNetworkCommissioningResult(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutMs: int):
-        return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult(
-            device, ZCLendpoint, ZCLgroupid, timeoutMs
         )
 
     def ClusterNetworkCommissioning_CommandRemoveNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
@@ -8678,10 +8666,6 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork.restype = ctypes.c_uint32
-        # Cluster NetworkCommissioning Command GetLastNetworkCommissioningResult
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning Command RemoveNetwork
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]

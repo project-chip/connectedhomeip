@@ -3370,13 +3370,6 @@ using chip::Callback::Cancelable;
         });
 }
 
-- (void)getLastNetworkCommissioningResult:(uint32_t)timeoutMs responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.GetLastNetworkCommissioningResult(success, failure, timeoutMs);
-    });
-}
-
 - (void)removeNetwork:(NSData *)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs

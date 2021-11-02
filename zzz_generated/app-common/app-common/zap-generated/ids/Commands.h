@@ -658,10 +658,6 @@ namespace DisableNetworkResponse {
 static constexpr CommandId Id = 0x0000000F;
 } // namespace DisableNetworkResponse
 
-namespace GetLastNetworkCommissioningResult {
-static constexpr CommandId Id = 0x00000010;
-} // namespace GetLastNetworkCommissioningResult
-
 } // namespace Commands
 } // namespace NetworkCommissioning
 

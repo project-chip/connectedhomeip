@@ -4317,10 +4317,6 @@ public class ChipClusters {
       enableNetwork(chipClusterPtr, callback, networkID, breadcrumb, timeoutMs);
     }
 
-    public void getLastNetworkCommissioningResult(DefaultClusterCallback callback, long timeoutMs) {
-      getLastNetworkCommissioningResult(chipClusterPtr, callback, timeoutMs);
-    }
-
     public void removeNetwork(
         RemoveNetworkResponseCallback callback, byte[] networkID, long breadcrumb, long timeoutMs) {
       removeNetwork(chipClusterPtr, callback, networkID, breadcrumb, timeoutMs);
@@ -4376,9 +4372,6 @@ public class ChipClusters {
         byte[] networkID,
         long breadcrumb,
         long timeoutMs);
-
-    private native void getLastNetworkCommissioningResult(
-        long chipClusterPtr, DefaultClusterCallback callback, long timeoutMs);
 
     private native void removeNetwork(
         long chipClusterPtr,
