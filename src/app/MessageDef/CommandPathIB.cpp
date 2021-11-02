@@ -15,11 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines CommandPathIB parser and builder in CHIP interaction model
- *
- */
 
 #include "CommandPathIB.h"
 
@@ -39,8 +34,8 @@ namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint16_t TagPresenceMask = 0;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    int TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
     PRETTY_PRINT("CommandPathIB =");
     PRETTY_PRINT("{");
@@ -168,7 +163,7 @@ CommandPathIB::Builder & CommandPathIB::Builder::CommandId(const chip::CommandId
     return *this;
 }
 
-CommandPathIB::Builder & CommandPathIB::Builder::EndOfCommandPath()
+CommandPathIB::Builder & CommandPathIB::Builder::EndOfCommandPathIB()
 {
     EndOfContainer();
     return *this;

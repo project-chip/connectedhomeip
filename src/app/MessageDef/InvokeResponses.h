@@ -1,7 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,11 +17,6 @@
 
 #pragma once
 
-#include "CommandPathIB.h"
-#include "StatusIB.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
-
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -30,16 +24,14 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "ArrayBuilder.h"
+#include "ArrayParser.h"
+#include "InvokeResponseIB.h"
+
 namespace chip {
 namespace app {
-namespace CommandDataIB {
-enum class Tag : uint8_t
-{
-    kPath = 0,
-    kData = 1,
-};
-
-class Parser : public StructParser
+namespace InvokeResponses {
+class Parser : public ArrayParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -58,53 +50,33 @@ public:
      */
     CHIP_ERROR CheckSchemaValidity() const;
 #endif
-
-    /**
-     *  @brief Get a TLVReader for the CommandPathIB. Next() must be called before accessing them.
-     *
-     *  @param [in] apPath    A pointer to apCommandPath
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetPath(CommandPathIB::Parser * const apPath) const;
-
-    /**
-     *  @brief Get a TLVReader for the Data. Next() must be called before accessing them.
-     *
-     *  @param [in] apReader    A pointer to apReader
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetData(TLV::TLVReader * const apReader) const;
-
-protected:
-    // A recursively callable function to parse a data element and pretty-print it.
-    CHIP_ERROR ParseData(TLV::TLVReader & aReader, int aDepth) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public ArrayBuilder
 {
 public:
     /**
-     *  @brief Initialize a CommandPathIB::Builder for writing into the TLV stream
+     *  @brief Initialize a InvokeResponseIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to CommandPathIB::Builder
+     *  @return A reference to InvokeResponseIB::Builder
      */
-    CommandPathIB::Builder & CreatePath();
+    InvokeResponseIB::Builder & CreateInvokeResponse();
 
     /**
-     *  @brief Mark the end of this CommandDataIB
+     *  @return A reference to InvokeResponseIB::Builder
+     */
+    InvokeResponseIB::Builder & GetInvokeResponse() { return mInvokeResponse; };
+
+    /**
+     *  @brief Mark the end of this InvokeResponses
      *
      *  @return A reference to *this
      */
-    CommandDataIB::Builder & EndOfCommandDataIB();
+    InvokeResponses::Builder & EndOfInvokeResponses();
 
 private:
-    CommandPathIB::Builder mPath;
+    InvokeResponseIB::Builder mInvokeResponse;
 };
-} // namespace CommandDataIB
+} // namespace InvokeResponses
 } // namespace app
 } // namespace chip
