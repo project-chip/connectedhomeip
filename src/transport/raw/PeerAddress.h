@@ -28,6 +28,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/CHIPMemString.h>
 
 namespace chip {
 namespace Transport {
@@ -117,11 +118,15 @@ public:
 
     /// Maximum size of the string outputes by ToString. Format is of the form:
     /// "UDP:<ip>:<port>"
-    static constexpr size_t kMaxToStringSize = //
-        3 /* UDP/TCP/BLE */ + 1 /* : */        //
-        + kInetMaxAddrLen + 1 /* : */          //
-        + 5 /* 16 bit interger */              //
-        + 1 /* NullTerminator */;
+    static constexpr size_t kMaxToStringSize = 3 // type: UDP/TCP/BLE
+        + 1                                      // splitter :
+        + 2                                      // brackets around address
+        + kInetMaxAddrLen                        // address
+        + 1                                      // splitter %
+        + Inet::InterfaceId::kMaxIfNameLength    // interface
+        + 1                                      // splitter :
+        + 5                                      // port: 16 bit interger
+        + 1;                                     // NullTerminator
 
     template <size_t N>
     inline void ToString(char (&buf)[N]) const
@@ -133,6 +138,18 @@ public:
     {
         char ip_addr[kInetMaxAddrLen];
 
+        char interface[Inet::InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
+        if (mInterface.IsPresent())
+        {
+            interface[0]   = '%';
+            interface[1]   = 0;
+            CHIP_ERROR err = mInterface.GetInterfaceName(interface + 1, sizeof(interface) - 1);
+            if (err != CHIP_NO_ERROR)
+            {
+                Platform::CopyString(interface, sizeof(interface), "%(err)");
+            }
+        }
+
         switch (mTransportType)
         {
         case Type::kUndefined:
@@ -140,11 +157,21 @@ public:
             break;
         case Type::kUdp:
             mIPAddress.ToString(ip_addr);
-            snprintf(buf, bufSize, "UDP:%s:%d", ip_addr, mPort);
+#if INET_CONFIG_ENABLE_IPV4
+            if (mIPAddress.IsIPv4())
+                snprintf(buf, bufSize, "UDP:%s%s:%d", ip_addr, interface, mPort);
+            else
+#endif
+                snprintf(buf, bufSize, "UDP:[%s%s]:%d", ip_addr, interface, mPort);
             break;
         case Type::kTcp:
             mIPAddress.ToString(ip_addr);
-            snprintf(buf, bufSize, "TCP:%s:%d", ip_addr, mPort);
+#if INET_CONFIG_ENABLE_IPV4
+            if (mIPAddress.IsIPv4())
+                snprintf(buf, bufSize, "TCP:%s%s:%d", ip_addr, interface, mPort);
+            else
+#endif
+                snprintf(buf, bufSize, "TCP:[%s%s]:%d", ip_addr, interface, mPort);
             break;
         case Type::kBle:
             // Note that BLE does not currently use any specific address.
