@@ -122,7 +122,7 @@ void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedAction
     bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions,
                                    chip::System::Clock::Seconds16(20));
     otaUpdateToken = updateToken;
-    
+
 }
 
 void OnApplyUpdateResponse(void * context, uint8_t action, uint32_t delayedActionTime)

@@ -69,7 +69,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         break;
 //     case DeviceEventType::kCommissioningComplete:
 //         ESP_LOGI(TAG, "Commissioning complete");
-// 
+//
 //         /* Start on shot timer to Query for OTA image once commissinoning is complete */
 //         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32( 30 * 1000),
 //                                                     OnStartDelayTimerHandler, nullptr);

@@ -183,7 +183,7 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "RegisterUnsolicitedMessageHandler failed: %s", chip::ErrorStr(error));
         return;
     }
-     
+
     BdxOtaSenderCallbacks callbacks;
     callbacks.onBlockQuery       = &mOnBlockQuery;
     callbacks.onTransferComplete = &mOnTransferComplete;

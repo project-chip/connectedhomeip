@@ -96,7 +96,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             mOnBlockQueryCallback->mCall(mOnBlockQueryCallback->mContext, blockBuf, blockData.Length, blockData.IsEof, mNumBytesSent);
         }
         else
-        {            
+        {
             mTransfer.AbortTransfer(StatusCode::kUnknown);
             return;
         }
