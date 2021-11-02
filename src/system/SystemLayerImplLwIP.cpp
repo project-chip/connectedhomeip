@@ -22,7 +22,7 @@
  */
 
 #include <lib/support/CodeUtils.h>
-#include <system/LwIPEventSupport.h>
+#include <system/PlatformEventSupport.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/SystemLayerImplLwIP.h>
@@ -120,18 +120,6 @@ CHIP_ERROR LayerImplLwIP::AddEventHandlerDelegate(EventHandlerDelegate & aDelega
     VerifyOrReturnError(lDelegate.GetFunction() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     lDelegate.Prepend(mEventDelegateList);
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LayerImplLwIP::ScheduleLambdaBridge(const LambdaBridge & bridge)
-{
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-
-    CHIP_ERROR lReturn = PlatformEventing::ScheduleLambdaBridge(*this, bridge);
-    if (lReturn != CHIP_NO_ERROR)
-    {
-        ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer lambda event: %s", ErrorStr(lReturn));
-    }
-    return lReturn;
 }
 
 CHIP_ERROR LayerImplLwIP::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
