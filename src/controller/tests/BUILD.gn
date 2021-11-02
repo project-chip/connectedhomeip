@@ -22,13 +22,14 @@ chip_test_suite("tests") {
   output_name = "libControllerTests"
 
   test_sources = [ "TestCommissionableNodeController.cpp" ]
-
   test_sources += [ "TestDevice.cpp" ]
+  test_sources += [ "TestServerCommandDispatch.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/controller",
     "${chip_root}/src/controller/tests/data_model:interaction-tests",
     "${chip_root}/src/messaging/tests:helpers",

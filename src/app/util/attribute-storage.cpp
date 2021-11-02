@@ -40,6 +40,7 @@
  ******************************************************************************/
 
 #include "app/util/common.h"
+#include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -969,6 +970,10 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                     endpoint, cluster->clusterId,
                     (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
             }
+
+            // Clear out any command handler overrides registered for this
+            // endpoint.
+            chip::app::InteractionModelEngine::GetInstance()->DeregisterCommandHandlers(endpoint);
 
             // Clear out any attribute access overrides registered for this
             // endpoint.

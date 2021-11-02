@@ -40,6 +40,7 @@
 
 #include <app/ClusterInfo.h>
 #include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -178,19 +179,24 @@ public:
     bool MergeOverlappedAttributePath(ClusterInfo * apAttributePathList, ClusterInfo & aAttributePath);
     bool IsOverlappedAttributePath(ClusterInfo & aAttributePath);
 
+    CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
+    CHIP_ERROR DeregisterCommandHandler(CommandHandlerInterface * handler);
+    CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
+    void DeregisterCommandHandlers(EndpointId endpointId);
+
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
 
-    void OnDone(CommandHandler * apCommandObj);
+    void OnDone(CommandHandler & apCommandObj) override;
 
     CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                 System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                       System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                 System::PacketBufferHandle && aPayload);
-    void OnResponseTimeout(Messaging::ExchangeContext * ec);
+                                 System::PacketBufferHandle && aPayload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
@@ -213,8 +219,14 @@ private:
     CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                        System::PacketBufferHandle && aPayload);
 
+    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                         TLV::TLVReader & apPayload) override;
+    bool CommandExists(const ConcreteCommandPath & aCommandPath) override;
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
+
+    CommandHandlerInterface * mpCommandHandlerList = nullptr;
 
     // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
     // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
