@@ -185,7 +185,7 @@ private:
         }
         else
         {
-            // One of the interface is null
+            // One of the interfaces is null.
             return true;
         }
     }
