@@ -70,7 +70,7 @@ private:
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
 
-    chip::System::Clock::Timestamp mStartTime = System::Clock::Zero;
+    chip::System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
     static PlatformManagerImpl sInstance;
 };

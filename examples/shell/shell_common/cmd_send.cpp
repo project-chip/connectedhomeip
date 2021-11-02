@@ -47,7 +47,7 @@ public:
     {
         mProtocolId   = 0x0002;
         mMessageType  = 1;
-        mLastSendTime = System::Clock::Zero;
+        mLastSendTime = System::Clock::kZero;
         mPayloadSize  = 32;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         mUsingTCP = false;

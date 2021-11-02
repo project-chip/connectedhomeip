@@ -29,9 +29,9 @@ namespace Minimal {
 /// Represents available data (replies) for mDNS queries.
 struct QueryResponderRecord
 {
-    Responder * responder                            = nullptr;                   // what response/data is available
-    bool reportService                               = false;                     // report as a service when listing dnssd services
-    chip::System::Clock::Timestamp lastMulticastTime = chip::System::Clock::Zero; // last time this record was multicast
+    Responder * responder                            = nullptr; // what response/data is available
+    bool reportService                               = false;   // report as a service when listing dnssd services
+    chip::System::Clock::Timestamp lastMulticastTime = chip::System::Clock::kZero; // last time this record was multicast
 };
 
 namespace Internal {
@@ -140,7 +140,8 @@ public:
             return false;
         }
 
-        if ((mIncludeOnlyMulticastBefore > chip::System::Clock::Zero) && (record->lastMulticastTime >= mIncludeOnlyMulticastBefore))
+        if ((mIncludeOnlyMulticastBefore > chip::System::Clock::kZero) &&
+            (record->lastMulticastTime >= mIncludeOnlyMulticastBefore))
         {
             return false;
         }
@@ -156,7 +157,7 @@ public:
 private:
     bool mIncludeAdditionalRepliesOnly                         = false;
     ReplyFilter * mReplyFilter                                 = nullptr;
-    chip::System::Clock::Timestamp mIncludeOnlyMulticastBefore = chip::System::Clock::Zero;
+    chip::System::Clock::Timestamp mIncludeOnlyMulticastBefore = chip::System::Clock::kZero;
 };
 
 /// Iterates over an array of QueryResponderRecord items, providing only 'valid' ones, where

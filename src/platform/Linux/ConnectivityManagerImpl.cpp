@@ -452,7 +452,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP");
-        mLastAPDemandTime = System::Clock::Zero;
+        mLastAPDemandTime = System::Clock::kZero;
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
@@ -769,7 +769,7 @@ void ConnectivityManagerImpl::DriveAPState()
         {
             System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
-            if (mLastAPDemandTime != System::Clock::Zero && now < (mLastAPDemandTime + mWiFiAPIdleTimeout))
+            if (mLastAPDemandTime != System::Clock::kZero && now < (mLastAPDemandTime + mWiFiAPIdleTimeout))
             {
                 targetState = kWiFiAPState_Active;
 

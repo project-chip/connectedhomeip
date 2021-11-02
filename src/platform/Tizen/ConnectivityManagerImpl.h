@@ -145,7 +145,7 @@ inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled()
 
 inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
 {
-    return System::Clock::Zero;
+    return System::Clock::kZero;
 }
 
 #endif

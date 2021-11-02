@@ -123,7 +123,7 @@ inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_IsWiFiStationConn
 template <class ImplClass>
 inline System::Clock::Timeout GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiStationReconnectInterval(void)
 {
-    return System::Clock::Zero;
+    return System::Clock::kZero;
 }
 
 template <class ImplClass>
@@ -181,7 +181,7 @@ inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_MaintainOnDemandW
 template <class ImplClass>
 inline System::Clock::Timeout GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiAPIdleTimeout(void)
 {
-    return System::Clock::Zero;
+    return System::Clock::kZero;
 }
 
 template <class ImplClass>

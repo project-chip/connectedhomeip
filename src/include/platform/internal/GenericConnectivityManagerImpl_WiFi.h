@@ -109,7 +109,7 @@ private:
 template <class ImplClass>
 inline System::Clock::Timeout GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiStationReconnectInterval()
 {
-    return System::Clock::Zero;
+    return System::Clock::kZero;
 }
 
 template <class ImplClass>
@@ -167,7 +167,7 @@ inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_MaintainOnDemandWiF
 template <class ImplClass>
 inline System::Clock::Timeout GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiAPIdleTimeout()
 {
-    return System::Clock::Zero;
+    return System::Clock::kZero;
 }
 
 template <class ImplClass>

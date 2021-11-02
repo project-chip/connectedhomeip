@@ -63,7 +63,7 @@ chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Command was attempted to be sent.
-chip::System::Clock::Timestamp gLastMessageTime = chip::System::Clock::Zero;
+chip::System::Clock::Timestamp gLastMessageTime = chip::System::Clock::kZero;
 
 // Count of the number of CommandRequests sent.
 uint64_t gCommandCount = 0;
@@ -703,7 +703,7 @@ int main(int argc, char * argv[])
     err = EstablishSecureSession();
     SuccessOrExit(err);
 
-    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Zero, CommandRequestTimerHandler, NULL);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::kZero, CommandRequestTimerHandler, NULL);
     SuccessOrExit(err);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
