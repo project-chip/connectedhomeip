@@ -248,6 +248,21 @@
                 "linux-x64-chip-tool-ipv6only",
                 "linux-x64-thermostat",
                 "linux-x64-thermostat-ipv6only",
+                "mbed-CY8CPROTO_062_4343W-all-clusters-debug",
+                "mbed-CY8CPROTO_062_4343W-all-clusters-develop",
+                "mbed-CY8CPROTO_062_4343W-all-clusters-release",
+                "mbed-CY8CPROTO_062_4343W-light-debug",
+                "mbed-CY8CPROTO_062_4343W-light-develop",
+                "mbed-CY8CPROTO_062_4343W-light-release",
+                "mbed-CY8CPROTO_062_4343W-lock-debug",
+                "mbed-CY8CPROTO_062_4343W-lock-develop",
+                "mbed-CY8CPROTO_062_4343W-lock-release",
+                "mbed-CY8CPROTO_062_4343W-pigweed-debug",
+                "mbed-CY8CPROTO_062_4343W-pigweed-develop",
+                "mbed-CY8CPROTO_062_4343W-pigweed-release",
+                "mbed-CY8CPROTO_062_4343W-shell-debug",
+                "mbed-CY8CPROTO_062_4343W-shell-develop",
+                "mbed-CY8CPROTO_062_4343W-shell-release",
                 "nrf-nrf52840-light",
                 "nrf-nrf52840-lock",
                 "nrf-nrf52840-pump",
@@ -260,12 +275,7 @@
                 "nrf-nrf5340-shell",
                 "qpg-qpg6100-lock",
                 "telink-tlsr9518adk80d-light",
-                "tizen-arm-light",
-                "mbed-CY8CPROTO_062_4343W-all-clusters-release",
-                "mbed-CY8CPROTO_062_4343W-light-release",
-                "mbed-CY8CPROTO_062_4343W-lock-release",
-                "mbed-CY8CPROTO_062_4343W-pigweed-release",
-                "mbed-CY8CPROTO_062_4343W-shell-release"
+                "tizen-arm-light"
             ]
         }
     ]
