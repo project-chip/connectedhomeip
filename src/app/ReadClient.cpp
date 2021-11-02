@@ -295,6 +295,10 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     {
         VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
         err = ProcessSubscribeResponse(std::move(aPayload));
+        // Forget the context as SUBSCRIBE RESPONSE is the last message in SUBSCRIBE transaction and
+        // ExchangeContext::HandleMessage automatically closes a context if no other messages need to
+        // be sent or received.
+        mpExchangeCtx = nullptr;
         SuccessOrExit(err);
     }
     else
