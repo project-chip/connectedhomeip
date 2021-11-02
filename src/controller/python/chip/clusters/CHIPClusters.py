@@ -3160,6 +3160,16 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000002: {
+                "attributeName": "MultiPressMax",
+                "attributeId": 0x00000002,
+                "type": "int",
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -6493,6 +6503,12 @@ class ChipClusters:
     def ClusterSwitch_SubscribeAttributeCurrentPosition(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_Switch_CurrentPosition(device, ZCLendpoint, minInterval, maxInterval)
 
+    def ClusterSwitch_ReadAttributeMultiPressMax(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Switch_MultiPressMax(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterSwitch_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Switch_FeatureMap(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterSwitch_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -9191,6 +9207,14 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_Switch_CurrentPosition.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_Switch_CurrentPosition.restype = ctypes.c_uint32
+        # Cluster Switch ReadAttribute MultiPressMax
+        self._chipLib.chip_ime_ReadAttribute_Switch_MultiPressMax.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Switch_MultiPressMax.restype = ctypes.c_uint32
+        # Cluster Switch ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_Switch_FeatureMap.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Switch_FeatureMap.restype = ctypes.c_uint32
         # Cluster Switch ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
