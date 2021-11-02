@@ -271,11 +271,11 @@ public:
 
 private:
     static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                          bool aNeedInvalidReport = false);
+                                   bool aNeedInvalidReport = false);
 };
 
 void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                                    bool aNeedInvalidReport)
+                                             bool aNeedInvalidReport)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;

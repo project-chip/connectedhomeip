@@ -120,8 +120,7 @@ void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apCo
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * apContext,
-                                                       System::PacketBufferHandle & aPayload)
+void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
@@ -169,8 +168,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * apContext,
-                                                        System::PacketBufferHandle & aPayload)
+void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
