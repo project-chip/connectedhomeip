@@ -42,6 +42,8 @@ shared_library("jni") {
   public_configs = [ "${chip_root}/src:includes" ]
 
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+  
+  ldflags = [ "-Wl,--gc-sections" ]
 }
 
 android_library("java") {

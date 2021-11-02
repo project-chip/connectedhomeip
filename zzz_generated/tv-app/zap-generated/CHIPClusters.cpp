@@ -838,23 +838,5 @@ CHIP_ERROR OperationalCredentialsCluster::ReadAttributeClusterRevision(Callback:
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-// zzz_generated/tv-app/zap-generated deps src/controller, while src/controller deps zzz_generated/controller-clusters
-// to avoid loop deps, add this impl
-CHIP_ERROR AdministratorCommissioningCluster::OpenCommissioningWindow(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t commissioningTimeout, chip::ByteSpan PAKEVerifier,
-                                                                      uint16_t discriminator, uint32_t iterations,
-                                                                      chip::ByteSpan salt, uint16_t passcodeID)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR AdministratorCommissioningCluster::OpenBasicCommissioningWindow(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t commissioningTimeout)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 } // namespace Controller
 } // namespace chip
