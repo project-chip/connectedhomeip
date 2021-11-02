@@ -94,15 +94,15 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
     }
 }
 
-EmberAfStatus
-OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                     const QueryImage::DecodableType & commandData)
+EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
+                                                   const chip::app::ConcreteCommandPath & commandPath,
+                                                   const QueryImage::DecodableType & commandData)
 {
     // TODO: add confiuration for returning BUSY status
 
     EmberAfOTAQueryStatus queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
-    uint32_t newSoftwareVersion       = commandData.softwareVersion + 1; // This implementation will always indicate that an update is available
-                                                             // (if the user provides a file).
+    uint32_t newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
+                                                                   // available (if the user provides a file).
     constexpr char kExampleSoftwareString[] = "Example-Image-V0.1";
     bool userConsentNeeded                  = false;
     uint8_t updateToken[kUpdateTokenLen]    = { 0 };

@@ -37,10 +37,12 @@ namespace Clusters {
 class OTAProviderDelegate
 {
 public:
-    virtual EmberAfStatus HandleQueryImage(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) = 0;
+    virtual EmberAfStatus HandleQueryImage(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                           const OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) = 0;
 
-    virtual EmberAfStatus HandleApplyUpdateRequest(CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                                   const OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) = 0;
+    virtual EmberAfStatus
+    HandleApplyUpdateRequest(CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                             const OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) = 0;
 
     virtual EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t softwareVersion) = 0;
 
