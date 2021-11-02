@@ -4490,7 +4490,7 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void applyUpdateRequest(
-        ApplyUpdateRequestResponseCallback callback, byte[] updateToken, long newVersion) {
+        ApplyUpdateResponseCallback callback, byte[] updateToken, long newVersion) {
       applyUpdateRequest(chipClusterPtr, callback, updateToken, newVersion);
     }
 
@@ -4503,9 +4503,9 @@ public class ChipClusters {
         QueryImageResponseCallback callback,
         int vendorId,
         int productId,
-        int hardwareVersion,
         long softwareVersion,
         int protocolsSupported,
+        int hardwareVersion,
         String location,
         boolean requestorCanConsent,
         byte[] metadataForProvider) {
@@ -4514,9 +4514,9 @@ public class ChipClusters {
           callback,
           vendorId,
           productId,
-          hardwareVersion,
           softwareVersion,
           protocolsSupported,
+          hardwareVersion,
           location,
           requestorCanConsent,
           metadataForProvider);
@@ -4524,7 +4524,7 @@ public class ChipClusters {
 
     private native void applyUpdateRequest(
         long chipClusterPtr,
-        ApplyUpdateRequestResponseCallback callback,
+        ApplyUpdateResponseCallback callback,
         byte[] updateToken,
         long newVersion);
 
@@ -4539,14 +4539,14 @@ public class ChipClusters {
         QueryImageResponseCallback callback,
         int vendorId,
         int productId,
-        int hardwareVersion,
         long softwareVersion,
         int protocolsSupported,
+        int hardwareVersion,
         String location,
         boolean requestorCanConsent,
         byte[] metadataForProvider);
 
-    public interface ApplyUpdateRequestResponseCallback {
+    public interface ApplyUpdateResponseCallback {
       void onSuccess(int action, long delayedActionTime);
 
       void onError(Exception error);

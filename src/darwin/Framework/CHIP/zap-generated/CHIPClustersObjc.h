@@ -1174,9 +1174,9 @@ NS_ASSUME_NONNULL_BEGIN
             responseHandler:(ResponseHandler)responseHandler;
 - (void)queryImage:(uint16_t)vendorId
               productId:(uint16_t)productId
-        hardwareVersion:(uint16_t)hardwareVersion
         softwareVersion:(uint32_t)softwareVersion
      protocolsSupported:(uint8_t)protocolsSupported
+        hardwareVersion:(uint16_t)hardwareVersion
                location:(NSString *)location
     requestorCanConsent:(bool)requestorCanConsent
     metadataForProvider:(NSData *)metadataForProvider

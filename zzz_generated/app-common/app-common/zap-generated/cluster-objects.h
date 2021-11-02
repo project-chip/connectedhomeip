@@ -5886,9 +5886,9 @@ enum class Fields
 {
     kVendorId            = 0,
     kProductId           = 1,
-    kHardwareVersion     = 2,
-    kSoftwareVersion     = 3,
-    kProtocolsSupported  = 4,
+    kSoftwareVersion     = 2,
+    kProtocolsSupported  = 3,
+    kHardwareVersion     = 4,
     kLocation            = 5,
     kRequestorCanConsent = 6,
     kMetadataForProvider = 7,
@@ -5901,14 +5901,14 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::QueryImage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
-    uint16_t vendorId;
+    chip::VendorId vendorId;
     uint16_t productId;
-    uint16_t hardwareVersion;
     uint32_t softwareVersion;
     OTADownloadProtocol protocolsSupported;
-    chip::CharSpan location;
-    bool requestorCanConsent;
-    chip::ByteSpan metadataForProvider;
+    Optional<uint16_t> hardwareVersion;
+    Optional<chip::CharSpan> location;
+    Optional<bool> requestorCanConsent;
+    Optional<chip::ByteSpan> metadataForProvider;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -5919,14 +5919,14 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::QueryImage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
-    uint16_t vendorId;
+    chip::VendorId vendorId;
     uint16_t productId;
-    uint16_t hardwareVersion;
     uint32_t softwareVersion;
     OTADownloadProtocol protocolsSupported;
-    chip::CharSpan location;
-    bool requestorCanConsent;
-    chip::ByteSpan metadataForProvider;
+    Optional<uint16_t> hardwareVersion;
+    Optional<chip::CharSpan> location;
+    Optional<bool> requestorCanConsent;
+    Optional<chip::ByteSpan> metadataForProvider;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace QueryImage
@@ -6041,7 +6041,7 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace QueryImageResponse
-namespace ApplyUpdateRequestResponse {
+namespace ApplyUpdateResponse {
 enum class Fields
 {
     kAction            = 0,
@@ -6052,7 +6052,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateRequestResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     OTAApplyUpdateAction action;
@@ -6064,14 +6064,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateRequestResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     OTAApplyUpdateAction action;
     uint32_t delayedActionTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ApplyUpdateRequestResponse
+}; // namespace ApplyUpdateResponse
 } // namespace Commands
 
 namespace Attributes {

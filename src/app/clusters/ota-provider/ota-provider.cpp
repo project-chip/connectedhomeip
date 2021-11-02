@@ -92,7 +92,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    status = delegate->HandleApplyUpdateRequest(commandObj, updateToken, newVersion);
+    status = delegate->HandleApplyUpdateRequest(commandObj, commandPath, updateToken, newVersion);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
@@ -189,27 +189,39 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     ChipLogDetail(Zcl, "  ProductID: %" PRIu16, productId);
     ChipLogDetail(Zcl, "  SoftwareVersion: %" PRIu32, softwareVersion);
     ChipLogDetail(Zcl, "  ProtocolsSupported: %" PRIu8, protocolsSupported);
-    ChipLogDetail(Zcl, "  HardwareVersion: %" PRIu16, hardwareVersion);
-    ChipLogDetail(Zcl, "  Location: %.*s", static_cast<int>(location.size()), location.data());
-    ChipLogDetail(Zcl, "  RequestorCanConsent: %" PRIu8, requestorCanConsent);
-    ChipLogDetail(Zcl, "  MetadataForProvider: %zu", metadataForProvider.size());
-
-    if (location.size() != kLocationLen)
+    if (hardwareVersion.HasValue())
     {
-        ChipLogError(Zcl, "location param length %zu != expected length %zu", location.size(), kLocationLen);
+        ChipLogDetail(Zcl, "  HardwareVersion: %" PRIu16, hardwareVersion.Value());
+    }
+    if (location.HasValue())
+    {
+        ChipLogDetail(Zcl, "  Location: %.*s", static_cast<int>(location.Value().size()), location.Value().data());
+    }
+    if (requestorCanConsent.HasValue())
+    {
+        ChipLogDetail(Zcl, "  RequestorCanConsent: %" PRIu8, requestorCanConsent.Value());
+    }
+    if (metadataForProvider.HasValue())
+    {
+        ChipLogDetail(Zcl, "  MetadataForProvider: %zu", metadataForProvider.Value().size());
+    }
+
+    if (location.HasValue() && location.Value().size() != kLocationLen)
+    {
+        ChipLogError(Zcl, "location param length %zu != expected length %zu", location.Value().size(), kLocationLen);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
         return true;
     }
 
-    if (metadataForProvider.size() > kMaxMetadataLen)
+    if (metadataForProvider.HasValue() && metadataForProvider.Value().size() > kMaxMetadataLen)
     {
-        ChipLogError(Zcl, "metadata size %zu exceeds max %zu", metadataForProvider.size(), kMaxMetadataLen);
+        ChipLogError(Zcl, "metadata size %zu exceeds max %zu", metadataForProvider.Value().size(), kMaxMetadataLen);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
         return true;
     }
 
-    status = delegate->HandleQueryImage(commandObj, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
-                                        location, requestorCanConsent, metadataForProvider);
+    status = delegate->HandleQueryImage(commandObj, commandPath, vendorId, productId, softwareVersion, protocolsSupported,
+                                        hardwareVersion, location, requestorCanConsent, metadataForProvider);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);

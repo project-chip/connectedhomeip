@@ -3449,7 +3449,7 @@ using chip::Callback::Cancelable;
 
 - (void)applyUpdateRequest:(NSData *)updateToken newVersion:(uint32_t)newVersion responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge(
+    new CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
             return self.cppCluster.ApplyUpdateRequest(success, failure, [self asByteSpan:updateToken], newVersion);
         });
@@ -3466,9 +3466,9 @@ using chip::Callback::Cancelable;
 
 - (void)queryImage:(uint16_t)vendorId
               productId:(uint16_t)productId
-        hardwareVersion:(uint16_t)hardwareVersion
         softwareVersion:(uint32_t)softwareVersion
      protocolsSupported:(uint8_t)protocolsSupported
+        hardwareVersion:(uint16_t)hardwareVersion
                location:(NSString *)location
     requestorCanConsent:(bool)requestorCanConsent
     metadataForProvider:(NSData *)metadataForProvider
@@ -3476,8 +3476,8 @@ using chip::Callback::Cancelable;
 {
     new CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.QueryImage(success, failure, vendorId, productId, hardwareVersion, softwareVersion,
-                static_cast<uint8_t>(protocolsSupported), [self asCharSpan:location], requestorCanConsent,
+            return self.cppCluster.QueryImage(success, failure, static_cast<chip::VendorId>(vendorId), productId, softwareVersion,
+                static_cast<uint8_t>(protocolsSupported), hardwareVersion, [self asCharSpan:location], requestorCanConsent,
                 [self asByteSpan:metadataForProvider]);
         });
 }

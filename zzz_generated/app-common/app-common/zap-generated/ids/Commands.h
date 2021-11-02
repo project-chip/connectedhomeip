@@ -544,9 +544,9 @@ namespace QueryImageResponse {
 static constexpr CommandId Id = 0x00000003;
 } // namespace QueryImageResponse
 
-namespace ApplyUpdateRequestResponse {
+namespace ApplyUpdateResponse {
 static constexpr CommandId Id = 0x00000004;
-} // namespace ApplyUpdateRequestResponse
+} // namespace ApplyUpdateResponse
 
 } // namespace Commands
 } // namespace OtaSoftwareUpdateProvider

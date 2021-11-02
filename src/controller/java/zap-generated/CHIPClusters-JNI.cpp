@@ -4781,12 +4781,12 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback
-    : public Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>
+class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback
+    : public Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>
 {
 public:
-    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(jobject javaCallback) :
-        Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>(CallbackFn, this)
+    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(jobject javaCallback) :
+        Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>(CallbackFn, this)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -4801,7 +4801,7 @@ public:
             ChipLogError(Zcl, "Could not create global reference for Java callback");
         }
     }
-    ~CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback()
+    ~CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback()
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -4819,11 +4819,11 @@ public:
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
-        CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback * cppCallback = nullptr;
+        CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback * cppCallback = nullptr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
-        cppCallback = reinterpret_cast<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback *>(context);
+        cppCallback = reinterpret_cast<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback *>(context);
         VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
 
         javaCallbackRef = cppCallback->javaCallbackRef;
@@ -22000,10 +22000,10 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, applyUpdateRequest)
 
     JniByteArray updateTokenArr(env, updateToken);
 
-    std::unique_ptr<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback,
-                    void (*)(CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback *)>
-        onSuccess(Platform::New<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>(callback),
-                  Platform::Delete<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>);
+    std::unique_ptr<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback,
+                    void (*)(CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback *)>
+        onSuccess(Platform::New<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>(callback),
+                  Platform::Delete<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -22096,8 +22096,8 @@ exit:
     }
 }
 JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint vendorId, jint productId, jint hardwareVersion,
- jlong softwareVersion, jint protocolsSupported, jstring location, jboolean requestorCanConsent, jbyteArray metadataForProvider)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint vendorId, jint productId, jlong softwareVersion,
+ jint protocolsSupported, jint hardwareVersion, jstring location, jboolean requestorCanConsent, jbyteArray metadataForProvider)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -22118,8 +22118,8 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
     cppCluster = reinterpret_cast<OtaSoftwareUpdateProviderCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, hardwareVersion, softwareVersion,
-                                 static_cast<uint8_t>(protocolsSupported),
+    err = cppCluster->QueryImage(onSuccess->Cancel(), onFailure->Cancel(), static_cast<chip::VendorId>(vendorId), productId,
+                                 softwareVersion, static_cast<uint8_t>(protocolsSupported), hardwareVersion,
                                  chip::CharSpan(locationStr.c_str(), strlen(locationStr.c_str())), requestorCanConsent,
                                  chip::ByteSpan((const uint8_t *) metadataForProviderArr.data(), metadataForProviderArr.size()));
     SuccessOrExit(err);
