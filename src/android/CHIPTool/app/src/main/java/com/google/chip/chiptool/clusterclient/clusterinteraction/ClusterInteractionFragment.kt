@@ -28,6 +28,7 @@ class ClusterInteractionFragment : Fragment() {
   private lateinit var scope: CoroutineScope
   private lateinit var addressUpdateFragment: AddressUpdateFragment
   private lateinit var clusterMap: Map<String, ClusterInfo>
+  private var devicePtr = 0L
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -38,9 +39,12 @@ class ClusterInteractionFragment : Fragment() {
 
     return inflater.inflate(R.layout.cluster_interaction_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
+      endpointList.visibility = View.GONE
       getEndpointListBtn.setOnClickListener {
         scope.launch {
-          showMessage("Retrieving endpoints")
+          devicePtr =
+            ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+          showMessage("Button Clicked")
           endpointList.visibility = View.VISIBLE
         }
       }
@@ -104,7 +108,7 @@ class ClusterInteractionFragment : Fragment() {
   inner class EndpointListener : EndpointAdapter.OnItemClickListener {
     override fun onItemClick(position: Int) {
       Toast.makeText(requireContext(), "Item $position clicked", Toast.LENGTH_SHORT).show()
-      showFragment(ClusterDetailFragment.newInstance())
+      showFragment(ClusterDetailFragment.newInstance(clusterMap as HashMap<String, ClusterInfo>, devicePtr))
     }
   }
 }
