@@ -26,6 +26,7 @@
 #include <app/MessageDef/EventFilters.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
+#include <app/MessageDef/EventStatusIB.h>
 #include <app/MessageDef/ReadRequestMessage.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
@@ -190,7 +191,7 @@ void ParseAttributePathList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
 void BuildEventPath(nlTestSuite * apSuite, EventPathIB::Builder & aEventPathBuilder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    aEventPathBuilder.NodeId(1).EndpointId(2).ClusterId(3).EventId(4).EndOfEventPathIB();
+    aEventPathBuilder.Node(1).Endpoint(2).Cluster(3).Event(4).IsUrgent(true).EndOfEventPathIB();
     err = aEventPathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
@@ -202,22 +203,26 @@ void ParseEventPath(nlTestSuite * apSuite, EventPathIB::Parser & aEventPathParse
     chip::EndpointId endpointId = 2;
     chip::ClusterId clusterId   = 3;
     chip::EventId eventId       = 4;
+    bool isUrgent               = false;
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aEventPathParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
-    err = aEventPathParser.GetNodeId(&nodeId);
+    err = aEventPathParser.GetNode(&nodeId);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && nodeId == 1);
 
-    err = aEventPathParser.GetEndpointId(&endpointId);
+    err = aEventPathParser.GetEndpoint(&endpointId);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && endpointId == 2);
 
-    err = aEventPathParser.GetClusterId(&clusterId);
+    err = aEventPathParser.GetCluster(&clusterId);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && clusterId == 3);
 
-    err = aEventPathParser.GetEventId(&eventId);
+    err = aEventPathParser.GetEvent(&eventId);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && eventId == 4);
+
+    err = aEventPathParser.GetIsUrgent(&isUrgent);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && isUrgent == true);
 }
 
 void BuildEventPaths(nlTestSuite * apSuite, EventPaths::Builder & aEventPathsBuilder)
@@ -409,6 +414,36 @@ void ParseStatusIB(nlTestSuite * apSuite, StatusIB::Parser & aStatusIBParser)
     NL_TEST_ASSERT(apSuite,
                    err == CHIP_NO_ERROR && statusIB.mStatus == chip::Protocols::InteractionModel::Status::InvalidSubscription &&
                        !statusIB.mClusterStatus.HasValue());
+}
+
+void BuildEventStatusIB(nlTestSuite * apSuite, EventStatusIB::Builder & aEventStatusIBBuilder)
+{
+    EventPathIB::Builder eventPathBuilder = aEventStatusIBBuilder.CreatePath();
+    NL_TEST_ASSERT(apSuite, aEventStatusIBBuilder.GetError() == CHIP_NO_ERROR);
+    BuildEventPath(apSuite, eventPathBuilder);
+
+    StatusIB::Builder statusIBBuilder = aEventStatusIBBuilder.CreateErrorStatus();
+    NL_TEST_ASSERT(apSuite, statusIBBuilder.GetError() == CHIP_NO_ERROR);
+    BuildStatusIB(apSuite, statusIBBuilder);
+
+    aEventStatusIBBuilder.EndOfEventStatusIB();
+    NL_TEST_ASSERT(apSuite, aEventStatusIBBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseEventStatusIB(nlTestSuite * apSuite, EventStatusIB::Parser & aEventStatusIBParser)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EventPathIB::Parser eventPathParser;
+    StatusIB::Parser statusParser;
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = aEventStatusIBParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+    err = aEventStatusIBParser.GetPath(&eventPathParser);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = aEventStatusIBParser.GetErrorStatus(&statusParser);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
 void BuildAttributeStatusIB(nlTestSuite * apSuite, AttributeStatusIB::Builder & aAttributeStatusIBBuilder)
@@ -1450,6 +1485,30 @@ void StatusIBTest(nlTestSuite * apSuite, void * apContext)
     ParseStatusIB(apSuite, StatusIBParser);
 }
 
+void EventStatusIBTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EventStatusIB::Builder eventStatusIBBuilder;
+    EventStatusIB::Parser eventStatusIBParser;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    eventStatusIBBuilder.Init(&writer);
+    BuildEventStatusIB(apSuite, eventStatusIBBuilder);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    eventStatusIBParser.Init(reader);
+    ParseEventStatusIB(apSuite, eventStatusIBParser);
+}
+
 void AttributeStatusIBTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1964,6 +2023,7 @@ const nlTest sTests[] =
                 NL_TEST_DEF("EventDataElementTest", EventDataElementTest),
                 NL_TEST_DEF("EventListTest", EventListTest),
                 NL_TEST_DEF("StatusIBTest", StatusIBTest),
+                NL_TEST_DEF("EventStatusIBTest", EventStatusIBTest),
                 NL_TEST_DEF("AttributeStatusIBTest", AttributeStatusIBTest),
                 NL_TEST_DEF("AttributeStatusListTest", AttributeStatusListTest),
                 NL_TEST_DEF("AttributeDataElementTest", AttributeDataElementTest),

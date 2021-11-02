@@ -43,8 +43,8 @@ namespace ReadRequestMessage {
 enum
 {
     kCsTag_AttributePathList        = 0,
-    kCsTag_EventPaths               = 1,
-    kCsTag_AttributeDataVersionList = 2,
+    kCsTag_AttributeDataVersionList = 1,
+    kCsTag_EventPaths               = 2,
     kCsTag_EventNumber              = 3,
 };
 

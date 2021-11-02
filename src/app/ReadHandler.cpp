@@ -391,13 +391,13 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPaths::Parser & aEventPathsParser
         EventPathIB::Parser path;
         err = path.Init(reader);
         SuccessOrExit(err);
-        err = path.GetNodeId(&(clusterInfo.mNodeId));
+        err = path.GetNode(&(clusterInfo.mNodeId));
         SuccessOrExit(err);
-        err = path.GetEndpointId(&(clusterInfo.mEndpointId));
+        err = path.GetEndpoint(&(clusterInfo.mEndpointId));
         SuccessOrExit(err);
-        err = path.GetClusterId(&(clusterInfo.mClusterId));
+        err = path.GetCluster(&(clusterInfo.mClusterId));
         SuccessOrExit(err);
-        err = path.GetEventId(&(clusterInfo.mEventId));
+        err = path.GetEvent(&(clusterInfo.mEventId));
         if (CHIP_NO_ERROR == err)
         {
             clusterInfo.mFlags.Set(ClusterInfo::Flags::kEventIdValid);

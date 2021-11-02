@@ -77,6 +77,8 @@ static_library("app") {
     "MessageDef/InvokeResponseIB.cpp",
     "MessageDef/InvokeResponseMessage.cpp",
     "MessageDef/InvokeResponses.cpp",
+    "MessageDef/EventStatusIB.cpp",
+    "MessageDef/EventStatusIB.h",
     "MessageDef/ListBuilder.cpp",
     "MessageDef/ListParser.cpp",
     "MessageDef/MessageDefHelper.cpp",
