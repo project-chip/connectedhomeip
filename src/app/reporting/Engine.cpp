@@ -26,6 +26,7 @@
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
+#include <app/util/MatterCallbacks.h>
 
 namespace chip {
 namespace app {
@@ -80,7 +81,9 @@ Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeDataList
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId,
                   aClusterInfo.mFieldId);
 
+    MatterPreAttributeReadCallback(path);
     err = ReadSingleClusterData(aAccessingFabricIndex, path, attributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
+    MatterPostAttributeReadCallback(path);
     SuccessOrExit(err);
     attributeDataElementBuilder.MoreClusterData(false);
     attributeDataElementBuilder.EndOfAttributeDataElement();
@@ -459,3 +462,6 @@ void Engine::OnReportConfirm()
 }; // namespace reporting
 }; // namespace app
 }; // namespace chip
+
+void __attribute__((weak)) MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+void __attribute__((weak)) MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
