@@ -33,11 +33,12 @@ public:
 
     esp_err_t End(void);
 
-    esp_err_t Write(const void *data, size_t length);
+    esp_err_t Write(const void * data, size_t length);
 
     esp_err_t Abort(void);
 
     esp_err_t Apply(uint32_t delayedActionTime);
+
 private:
     OTAUpdater(void) {}
     ~OTAUpdater() {}

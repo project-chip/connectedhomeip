@@ -38,9 +38,9 @@
 
 #include <lib/support/ErrorStr.h>
 
-#include <esp_console.h>
-#include <argtable3/argtable3.h>
 #include "OTARequesterImpl.h"
+#include <argtable3/argtable3.h>
+#include <esp_console.h>
 
 using namespace ::chip;
 using namespace ::chip::System;
@@ -52,29 +52,29 @@ const char * TAG = "ota-requester-app";
 
 static DeviceCallbacks EchoCallbacks;
 
-struct CmdArgs {
-    struct arg_str *ipAddr;
-    struct arg_int *nodeId;
-    struct arg_end *end;
+struct CmdArgs
+{
+    struct arg_str * ipAddr;
+    struct arg_int * nodeId;
+    struct arg_end * end;
 };
 
 CmdArgs queryImageCmdArgs, applyUpdateCmdArgs;
 
-void QueryImageTimerHandler(Layer * systemLayer, void *appState)
+void QueryImageTimerHandler(Layer * systemLayer, void * appState)
 {
     ESP_LOGI(TAG, "Calling SendQueryImageCommand()");
-    OTARequesterImpl::GetInstance().SendQueryImageCommand(queryImageCmdArgs.ipAddr->sval[0],
-                                                          queryImageCmdArgs.nodeId->ival[0]);
+    OTARequesterImpl::GetInstance().SendQueryImageCommand(queryImageCmdArgs.ipAddr->sval[0], queryImageCmdArgs.nodeId->ival[0]);
 }
 
-void ApplyUpdateTimerHandler(Layer * systemLayer, void *appState)
+void ApplyUpdateTimerHandler(Layer * systemLayer, void * appState)
 {
     ESP_LOGI(TAG, "Calling SendApplyUpdateRequestCommand()");
     OTARequesterImpl::GetInstance().SendApplyUpdateRequestCommand(queryImageCmdArgs.ipAddr->sval[0],
                                                                   queryImageCmdArgs.nodeId->ival[0]);
 }
 
-int ESPQueryImageCmdHandler(int argc, char **argv)
+int ESPQueryImageCmdHandler(int argc, char ** argv)
 {
     int nerrors = arg_parse(argc, argv, (void **) &queryImageCmdArgs);
     if (nerrors != 0)
@@ -82,16 +82,14 @@ int ESPQueryImageCmdHandler(int argc, char **argv)
         arg_print_errors(stderr, queryImageCmdArgs.end, argv[0]);
         return 1;
     }
-    ESP_LOGI(TAG, "ipAddr:%s nodeId:%x", queryImageCmdArgs.ipAddr->sval[0],
-                                         queryImageCmdArgs.nodeId->ival[0]);
+    ESP_LOGI(TAG, "ipAddr:%s nodeId:%x", queryImageCmdArgs.ipAddr->sval[0], queryImageCmdArgs.nodeId->ival[0]);
 
     /* Start on shot timer to Query for OTA image once commissinoning is complete */
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000),
-                                                 QueryImageTimerHandler, nullptr);
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000), QueryImageTimerHandler, nullptr);
     return 0;
 }
 
-int ESPApplyUpdateCmdHandler(int argc, char **argv)
+int ESPApplyUpdateCmdHandler(int argc, char ** argv)
 {
     int nerrors = arg_parse(argc, argv, (void **) &applyUpdateCmdArgs);
     if (nerrors != 0)
@@ -99,19 +97,17 @@ int ESPApplyUpdateCmdHandler(int argc, char **argv)
         arg_print_errors(stderr, applyUpdateCmdArgs.end, argv[0]);
         return 1;
     }
-    ESP_LOGI(TAG, "ipAddr:%s nodeId:%x", applyUpdateCmdArgs.ipAddr->sval[0],
-                                         applyUpdateCmdArgs.nodeId->ival[0]);
+    ESP_LOGI(TAG, "ipAddr:%s nodeId:%x", applyUpdateCmdArgs.ipAddr->sval[0], applyUpdateCmdArgs.nodeId->ival[0]);
 
     /* Start on shot timer to Query for OTA image once commissinoning is complete */
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000),
-                                                 ApplyUpdateTimerHandler, nullptr);
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000), ApplyUpdateTimerHandler, nullptr);
     return 0;
 }
 
 void ESPInitConsole(void)
 {
-    esp_console_repl_t *repl = NULL;
-    esp_console_repl_config_t replConfig = ESP_CONSOLE_REPL_CONFIG_DEFAULT();
+    esp_console_repl_t * repl                = NULL;
+    esp_console_repl_config_t replConfig     = ESP_CONSOLE_REPL_CONFIG_DEFAULT();
     esp_console_dev_uart_config_t uartConfig = ESP_CONSOLE_DEV_UART_CONFIG_DEFAULT();
     /* Prompt to be printed before each line.
      * This can be customized, made dynamic, etc.
@@ -128,19 +124,15 @@ void ESPInitConsole(void)
     queryImageCmdArgs.nodeId = arg_int0(NULL, NULL, "<nodeID>", "OTA Provider Node ID in decimal");
     queryImageCmdArgs.end    = arg_end(1);
 
-    queryImageCommand.command = "QueryImage",
-    queryImageCommand.help = "Query for OTA image",
-    queryImageCommand.func = &ESPQueryImageCmdHandler,
-    queryImageCommand.argtable = &queryImageCmdArgs;
+    queryImageCommand.command = "QueryImage", queryImageCommand.help = "Query for OTA image",
+    queryImageCommand.func = &ESPQueryImageCmdHandler, queryImageCommand.argtable = &queryImageCmdArgs;
 
     applyUpdateCmdArgs.ipAddr = arg_str0(NULL, NULL, "<ipv4>", "OTA Provider IP Address");
     applyUpdateCmdArgs.nodeId = arg_int0(NULL, NULL, "<nodeID>", "OTA Provider Node ID in decimal");
     applyUpdateCmdArgs.end    = arg_end(1);
 
-    applyUpdateCommand.command = "ApplyUpdateRequest",
-    applyUpdateCommand.help = "Request to OTA update image",
-    applyUpdateCommand.func = &ESPApplyUpdateCmdHandler,
-    applyUpdateCommand.argtable = &applyUpdateCmdArgs;
+    applyUpdateCommand.command = "ApplyUpdateRequest", applyUpdateCommand.help = "Request to OTA update image",
+    applyUpdateCommand.func = &ESPApplyUpdateCmdHandler, applyUpdateCommand.argtable = &applyUpdateCmdArgs;
 
     esp_console_cmd_register(&queryImageCommand);
     esp_console_cmd_register(&applyUpdateCommand);
@@ -158,12 +150,15 @@ extern "C" void app_main()
     esp_chip_info(&chip_info);
     uint8_t ble_mac[6];
     char ble_mac_str[18];
-    if (esp_read_mac(ble_mac, ESP_MAC_BT) == ESP_OK) {
-        sprintf(ble_mac_str, "%02x:%02x:%02x:%02x:%02x:%02x", ble_mac[0], ble_mac[1], ble_mac[2],
-                                                              ble_mac[3], ble_mac[4], ble_mac[5]);
+    if (esp_read_mac(ble_mac, ESP_MAC_BT) == ESP_OK)
+    {
+        sprintf(ble_mac_str, "%02x:%02x:%02x:%02x:%02x:%02x", ble_mac[0], ble_mac[1], ble_mac[2], ble_mac[3], ble_mac[4],
+                ble_mac[5]);
         ble_mac_str[17] = 0;
         ESP_LOGI(TAG, "ESP32 BLE MAC ADD: %s", ble_mac_str);
-    } else {
+    }
+    else
+    {
         ESP_LOGE(TAG, "Could not fetch MAC address.");
     }
 
@@ -204,5 +199,4 @@ extern "C" void app_main()
     {
         vTaskDelay(50 / portTICK_PERIOD_MS);
     }
-
 }

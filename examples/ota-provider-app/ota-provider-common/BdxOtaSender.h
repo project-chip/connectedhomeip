@@ -21,9 +21,10 @@
 #pragma once
 
 // Callback to handle block query
-typedef void(*OnBdxBlockQuery)(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
-typedef void(*OnBdxTransferComplete)(void *context);
-typedef void(*OnBdxTransferFailed)(void *context);
+typedef void (*OnBdxBlockQuery)(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof,
+                                uint32_t offset);
+typedef void (*OnBdxTransferComplete)(void * context);
+typedef void (*OnBdxTransferFailed)(void * context);
 
 struct BdxOtaSenderCallbacks
 {

@@ -14,20 +14,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <esp_log.h>
-#include <esp_system.h>
-#include <esp_ota_ops.h>
 #include <OTAUpdater.h>
+#include <esp_log.h>
+#include <esp_ota_ops.h>
+#include <esp_system.h>
 
 namespace {
 
-const char *TAG = "OTAUpdate";
-bool mOTAUpdateInProgress = false;
-const esp_partition_t *mOTAUpdatePartition = nullptr;
+const char * TAG                            = "OTAUpdate";
+bool mOTAUpdateInProgress                   = false;
+const esp_partition_t * mOTAUpdatePartition = nullptr;
 esp_ota_handle_t mOTAUpdateHandle;
 uint32_t mOTAUpdateImageLen = 0;
 
-} //namespace
+} // namespace
 
 bool OTAUpdater::IsInProgress(void)
 {
@@ -49,8 +49,7 @@ esp_err_t OTAUpdater::Begin(void)
         ESP_LOGE(TAG, "Partition not found");
         return ESP_ERR_NOT_FOUND;
     }
-    ESP_LOGI(TAG, "Writing to partition subtype %d at offset 0x%x",
-                 mOTAUpdatePartition->subtype, mOTAUpdatePartition->address);
+    ESP_LOGI(TAG, "Writing to partition subtype %d at offset 0x%x", mOTAUpdatePartition->subtype, mOTAUpdatePartition->address);
 
     esp_err_t err = esp_ota_begin(mOTAUpdatePartition, OTA_WITH_SEQUENTIAL_WRITES, &mOTAUpdateHandle);
     if (err != ESP_OK)
@@ -58,12 +57,12 @@ esp_err_t OTAUpdater::Begin(void)
         ESP_LOGE(TAG, "esp_ota_begin failed (%s)", esp_err_to_name(err));
         return err;
     }
-    mOTAUpdateImageLen = 0;
+    mOTAUpdateImageLen   = 0;
     mOTAUpdateInProgress = true;
     return ESP_OK;
 }
 
-esp_err_t OTAUpdater::Write(const void *data, size_t length)
+esp_err_t OTAUpdater::Write(const void * data, size_t length)
 {
     if (mOTAUpdateInProgress == false)
     {
@@ -92,7 +91,7 @@ esp_err_t OTAUpdater::Abort(void)
 
     ESP_LOGI(TAG, "Abort");
     mOTAUpdateInProgress = false;
-    mOTAUpdateImageLen = 0;
+    mOTAUpdateImageLen   = 0;
     return esp_ota_abort(mOTAUpdateHandle);
 }
 

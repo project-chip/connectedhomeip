@@ -67,14 +67,13 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             chip::app::DnssdServer::Instance().StartServer();
         }
         break;
-//     case DeviceEventType::kCommissioningComplete:
-//         ESP_LOGI(TAG, "Commissioning complete");
-//
-//         /* Start on shot timer to Query for OTA image once commissinoning is complete */
-//         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32( 30 * 1000),
-//                                                     OnStartDelayTimerHandler, nullptr);
-//         break;
-
+        //     case DeviceEventType::kCommissioningComplete:
+        //         ESP_LOGI(TAG, "Commissioning complete");
+        //
+        //         /* Start on shot timer to Query for OTA image once commissinoning is complete */
+        //         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32( 30 * 1000),
+        //                                                     OnStartDelayTimerHandler, nullptr);
+        //         break;
     }
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }

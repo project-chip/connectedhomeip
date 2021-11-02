@@ -25,11 +25,11 @@ public:
         return instance;
     }
 
-    void SendQueryImageCommand(const char *ipAddress, uint32_t nodeId);
+    void SendQueryImageCommand(const char * ipAddress, uint32_t nodeId);
 
-    void SendApplyUpdateRequestCommand(const char *ipAddress, uint32_t nodeId);
+    void SendApplyUpdateRequestCommand(const char * ipAddress, uint32_t nodeId);
 
-    void SendNotifyUpdateAppliedCommand(const char *ipAddress, uint32_t nodeId);
+    void SendNotifyUpdateAppliedCommand(const char * ipAddress, uint32_t nodeId);
 
 private:
     OTARequesterImpl() {}

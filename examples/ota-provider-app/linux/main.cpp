@@ -62,11 +62,11 @@ constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milli
 OTAProviderExample::queryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
 uint32_t gDelayedActionTimeSec                                 = 0;
 const char * gOtaFilepath                                      = nullptr;
-uint32_t otaTransferInProgress = false;
+uint32_t otaTransferInProgress                                 = false;
 
 void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
-void OnTransferComplete(void *context);
-void OnTransferFailed(void *context);
+void OnTransferComplete(void * context);
+void OnTransferFailed(void * context);
 
 chip::Callback::Callback<OnBdxBlockQuery> mOnBlockQuery(OnBlockQuery, nullptr);
 chip::Callback::Callback<OnBdxTransferComplete> mOnTransferComplete(OnTransferComplete, nullptr);
@@ -84,17 +84,17 @@ void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, s
         return;
     }
 
-    size = static_cast<size_t>(otaFile.gcount());
-    isEof  = (size < kMaxBdxBlockSize || otaFile.peek() == EOF);
+    size  = static_cast<size_t>(otaFile.gcount());
+    isEof = (size < kMaxBdxBlockSize || otaFile.peek() == EOF);
 }
 
-void OnTransferComplete(void *context)
+void OnTransferComplete(void * context)
 {
     ChipLogDetail(SoftwareUpdate, "OTA file transfer Complete!");
     otaTransferInProgress = false;
 }
 
-void OnTransferFailed(void *context)
+void OnTransferFailed(void * context)
 {
     ChipLogDetail(SoftwareUpdate, "OTA file transfer failed");
     otaTransferInProgress = false;
