@@ -532,6 +532,7 @@
 #define ZCL_SUPPORTED_FABRICS_ATTRIBUTE_ID (0x0002)
 #define ZCL_COMMISSIONED_FABRICS_ATTRIBUTE_ID (0x0003)
 #define ZCL_TRUSTED_ROOTS_ATTRIBUTE_ID (0x0004)
+#define ZCL_CURRENT_FABRIC_INDEX_ATTRIBUTE_ID (0x0005)
 
 // Attribute ids for cluster: Fixed Label
 
@@ -546,6 +547,17 @@
 
 // Server attributes
 #define ZCL_STATE_VALUE_ATTRIBUTE_ID (0x0000)
+
+// Attribute ids for cluster: Mode Select
+
+// Client attributes
+
+// Server attributes
+#define ZCL_CURRENT_MODE_ATTRIBUTE_ID (0x0000)
+#define ZCL_SUPPORTED_MODES_ATTRIBUTE_ID (0x0001)
+#define ZCL_ON_MODE_ATTRIBUTE_ID (0x0002)
+#define ZCL_START_UP_MODE_ATTRIBUTE_ID (0x0003)
+#define ZCL_MODE_DESCRIPTION_ATTRIBUTE_ID (0x0004)
 
 // Attribute ids for cluster: Shade Configuration
 
@@ -1378,6 +1390,7 @@
 #define ZCL_EPOCH_US_ATTRIBUTE_ID (0x0020)
 #define ZCL_EPOCH_S_ATTRIBUTE_ID (0x0021)
 #define ZCL_TEST_VENDOR_ID_ATTRIBUTE_ID (0x0022)
+#define ZCL_LIST_OF_STRUCTS_WITH_OPTIONALS_ATTRIBUTE_ID (0x0023)
 #define ZCL_UNSUPPORTED_ATTRIBUTE_ID (0x00FF)
 
 // Attribute ids for cluster: Messaging

@@ -17,19 +17,43 @@
  */
 package chip.platform;
 
+import android.content.Context;
+
 public final class AndroidChipPlatform {
   private BleManager mBleManager = null;
 
-  public AndroidChipPlatform(
+  /** Constructs AndroidChipPlatform with default implementations for all dependencies. */
+  public static AndroidChipPlatform defaultInstance(Context context) {
+    return new AndroidChipPlatform(
+        new AndroidBleManager(),
+        new PreferencesKeyValueStoreManager(context),
+        new PreferencesConfigurationManager(context),
+        new NsdManagerServiceResolver(context),
+        new NsdManagerServiceBrowser(context),
+        new ChipMdnsCallbackImpl());
+  }
+
+  public static AndroidChipPlatform newInstance(
       BleManager ble,
       KeyValueStoreManager kvm,
       ConfigurationManager cfg,
       ServiceResolver resolver,
+      ServiceBrowser browser,
+      ChipMdnsCallback chipMdnsCallback) {
+    return new AndroidChipPlatform(ble, kvm, cfg, resolver, browser, chipMdnsCallback);
+  }
+
+  private AndroidChipPlatform(
+      BleManager ble,
+      KeyValueStoreManager kvm,
+      ConfigurationManager cfg,
+      ServiceResolver resolver,
+      ServiceBrowser browser,
       ChipMdnsCallback chipMdnsCallback) {
     setBLEManager(ble);
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
-    setServiceResolver(resolver, chipMdnsCallback);
+    setDnssdDelegates(resolver, browser, chipMdnsCallback);
   }
 
   // for BLEManager
@@ -73,12 +97,13 @@ public final class AndroidChipPlatform {
   private native void setConfigurationManager(ConfigurationManager manager);
 
   // for ServiceResolver
-  private void setServiceResolver(ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback) {
+  private void setDnssdDelegates(
+      ServiceResolver resolver, ServiceBrowser browser, ChipMdnsCallback chipMdnsCallback) {
     if (resolver != null) {
-      nativeSetServiceResolver(resolver, chipMdnsCallback);
+      nativeSetDnssdDelegates(resolver, browser, chipMdnsCallback);
     }
   }
 
-  private native void nativeSetServiceResolver(
-      ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
+  private native void nativeSetDnssdDelegates(
+      ServiceResolver resolver, ServiceBrowser browser, ChipMdnsCallback chipMdnsCallback);
 }

@@ -47,6 +47,7 @@ argc
 args
 argv
 armeabi
+ARMmbed
 armv
 asdk
 ASYNC
@@ -69,6 +70,7 @@ autotools
 avL
 AwaitNextAction
 AXXXF
+AYNJV
 babaf
 backend
 backticks
@@ -118,6 +120,7 @@ CACACACA
 cacerts
 CAfile
 cancelled
+capacitive
 CBB
 cbd
 CCMP
@@ -148,6 +151,7 @@ ChipImResponder
 ChipLight
 ChipMessageLayer
 CHIPOBLE
+CHIPProjectConfig
 CHIPTest
 CHIPTool
 chmod
@@ -169,6 +173,7 @@ clusterListName
 ClusterRevision
 ClusterTestGeneration
 cmake
+CMakeLists
 CMD
 CMSIS
 CMVH
@@ -207,6 +212,7 @@ cp
 cpio
 cpp
 cppreference
+CPROTO
 cpuapp
 cpython
 crypto
@@ -304,6 +310,7 @@ eabi
 EB
 ECC
 ECD
+EchoMessage
 EchoRequests
 EchoResponse
 EchoService
@@ -394,6 +401,7 @@ GetDeviceInfo
 GetDns
 GetIP
 getstarted
+githubusercontent
 gitignore
 glibc
 gn
@@ -524,10 +532,12 @@ lifecycle
 lightbulb
 lightin
 LightingColor
+LightingState
 LinkSoftwareAndDocumentationPack
 LocalConfigDisabled
 localhost
 localstatedir
+LockingState
 loopback
 LowPower
 LPC
@@ -558,6 +568,11 @@ matterUTestLib
 MaxInterval
 MaxIntervalCeilingSeconds
 MaxRtrAdvInterval
+mbed
+MbedCommissioning
+MbedNewTarget
+mbedos
+mbedTarget
 mbedTLS
 mcu
 MCUboot
@@ -582,6 +597,7 @@ MfrDeviceCert
 MfrDeviceId
 mgmt
 microcontroller
+microcontrollers
 MicroSD
 middleware
 Minicom
@@ -607,6 +623,8 @@ Multiband
 Multicast
 multilib
 Multiprotocol
+multithreaded
+mutexes
 MX
 mydir
 MyPASSWORD
@@ -653,6 +671,7 @@ OnOff
 OnOffClusterTest
 OnPlatformEvent
 OO
+OpenOCD
 OpenSSL
 OpenThread
 OpenThreadDemo
@@ -690,6 +709,7 @@ peerAddrStr
 pem
 percentageLiftValue
 pexpect
+pickString
 PID
 Pigweed
 PinCode
@@ -714,15 +734,18 @@ productrev
 ProductRevision
 ProductURL
 proto
+protobuf
 protos
 Prover
 PRs
 PSCAN
 PSK
+PSoC
 PTR
 pts
 PumpConfigurationAndControl
 pwd
+PWM
 PXXXF
 py
 pychip
@@ -768,6 +791,7 @@ repo
 req
 Requestor
 responder
+retargeting
 reusability
 rfid
 rfids
@@ -802,8 +826,8 @@ SDC
 SDHC
 SDK
 sdkconfig
-SDKs
 SDK's
+SDKs
 SDKTARGETSYSROOT
 sdl
 segger
@@ -837,6 +861,7 @@ softmmu
 SoftwareDiagnostics
 SoftwareVersion
 SoftwareVersionString
+SPI
 spinel
 src
 SRP
@@ -846,6 +871,7 @@ startoffset
 StartScan
 stderr
 stdout
+sterm
 str
 strcpy
 su
@@ -877,6 +903,7 @@ systemduserunitdir
 sysv
 TargetNavigator
 TBD
+tcl
 TCP
 teardown
 Telink

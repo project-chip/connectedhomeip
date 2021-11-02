@@ -218,7 +218,7 @@ template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent * event)
 {
 #if CHIP_PROGRESS_LOGGING
-    uint64_t startUS = System::SystemClock().GetMonotonicMicroseconds();
+    System::Clock::Timestamp start = System::SystemClock().GetMonotonicTimestamp();
 #endif // CHIP_PROGRESS_LOGGING
 
     switch (event->Type)
@@ -233,7 +233,7 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         break;
 
     case DeviceEventType::kChipLambdaEvent:
-        event->LambdaEvent.LambdaProxy(static_cast<const void *>(event->LambdaEvent.LambdaBody));
+        event->LambdaEvent();
         break;
 
     case DeviceEventType::kCallWorkFunct:
@@ -257,10 +257,10 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 
     // TODO: make this configurable
 #if CHIP_PROGRESS_LOGGING
-    uint32_t delta = static_cast<uint32_t>((System::SystemClock().GetMonotonicMicroseconds() - startUS) / 1000);
-    if (delta > 100)
+    uint32_t deltaMs = System::Clock::Milliseconds32(System::SystemClock().GetMonotonicTimestamp() - start).count();
+    if (deltaMs > 100)
     {
-        ChipLogError(DeviceLayer, "Long dispatch time: %" PRIu32 " ms, for event type %d", delta, event->Type);
+        ChipLogError(DeviceLayer, "Long dispatch time: %" PRIu32 " ms, for event type %d", deltaMs, event->Type);
     }
 #endif // CHIP_PROGRESS_LOGGING
 }

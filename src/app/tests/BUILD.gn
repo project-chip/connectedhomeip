@@ -42,6 +42,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestAttributeValueEncoder.cpp",
+    "TestBuilderParser.cpp",
     "TestCHIPDeviceCallbacksMgr.cpp",
     "TestClusterInfo.cpp",
     "TestCommandPathParams.cpp",
@@ -50,7 +51,7 @@ chip_test_suite("tests") {
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
-    "TestStatusResponse.cpp",
+    "TestStatusResponseMessage.cpp",
   ]
 
   if (chip_device_platform != "efr32") {

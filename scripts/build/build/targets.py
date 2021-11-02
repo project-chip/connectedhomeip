@@ -24,6 +24,7 @@ from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
+from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
 
 
 class Target:
@@ -37,7 +38,18 @@ class Target:
     def __init__(self, name, builder_class, **kwargs):
         self.name = name
         self.builder_class = builder_class
+        self.glob_blacklist_reason = None
+
         self.create_kw_args = kwargs
+
+    def Clone(self):
+        """Creates a clone of self."""
+
+        clone = Target(self.name, self.builder_class,
+                       **self.create_kw_args.copy())
+        clone.glob_blacklist_reason = self.glob_blacklist_reason
+
+        return clone
 
     def Extend(self, suffix, **kargs):
         """Creates a clone of the current object extending its build parameters.
@@ -46,8 +58,7 @@ class Target:
            suffix: appended with a "-" as separator to the clone name
            **kargs: arguments needed to produce the new build variant
         """
-        clone = Target(self.name, self.builder_class,
-                       **self.create_kw_args.copy())
+        clone = self.Clone()
         clone.name += "-" + suffix
         clone.create_kw_args.update(kargs)
         return clone
@@ -56,11 +67,30 @@ class Target:
         builder = self.builder_class(
             repository_path, runner=runner, **self.create_kw_args)
 
+        builder.target = self
         builder.identifier = self.name
         builder.output_dir = os.path.join(output_prefix, self.name)
         builder.enable_flashbundle(enable_flashbundle)
 
         return builder
+
+    def GlobBlacklist(self, reason):
+        clone = self.Clone()
+        if clone.glob_blacklist_reason:
+            clone.glob_blacklist_reason += ", "
+            clone.glob_blacklist_reason += reason
+        else:
+            clone.glob_blacklist_reason = reason
+
+        return clone
+
+    @property
+    def IsGlobBlacklisted(self):
+        return self.glob_blacklist_reason is not None
+
+    @property
+    def GlobBlacklistReason(self):
+        return self.glob_blacklist_reason
 
 
 def HostTargets():
@@ -135,10 +165,17 @@ def NrfTargets():
     for target in targets:
         yield target.Extend('lock', app=NrfApp.LOCK)
         yield target.Extend('light', app=NrfApp.LIGHT)
-        yield target.Extend('light-rpc', app=NrfApp.LIGHT, enable_rpcs=True)
         yield target.Extend('shell', app=NrfApp.SHELL)
         yield target.Extend('pump', app=NrfApp.PUMP)
         yield target.Extend('pump-controller', app=NrfApp.PUMP_CONTROLLER)
+
+        rpc = target.Extend('light-rpc', app=NrfApp.LIGHT, enable_rpcs=True)
+
+        if '-nrf5340-' in rpc.name:
+            rpc = rpc.GlobBlacklist(
+                'Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760')
+
+        yield rpc
 
 
 def AndroidTargets():
@@ -153,6 +190,30 @@ def AndroidTargets():
     yield target.Extend('androidstudio-arm64-chip-tool', board=AndroidBoard.AndroidStudio_ARM64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('androidstudio-x86-chip-tool', board=AndroidBoard.AndroidStudio_X86, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('androidstudio-x64-chip-tool', board=AndroidBoard.AndroidStudio_X64, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('arm64-chip-tvserver', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TVServer)
+
+
+def MbedTargets():
+    target = Target('mbed', MbedBuilder)
+
+    targets = [
+        target.Extend('CY8CPROTO_062_4343W',
+                      board=MbedBoard.CY8CPROTO_062_4343W),
+    ]
+
+    app_targets = []
+    for target in targets:
+        app_targets.append(target.Extend('lock', app=MbedApp.LOCK))
+        app_targets.append(target.Extend('light', app=MbedApp.LIGHT))
+        app_targets.append(target.Extend(
+            'all-clusters', app=MbedApp.ALL_CLUSTERS))
+        app_targets.append(target.Extend('pigweed', app=MbedApp.PIGWEED))
+        app_targets.append(target.Extend('shell', app=MbedApp.SHELL))
+
+    for target in app_targets:
+        yield target.Extend('release', profile=MbedProfile.RELEASE)
+        yield target.Extend('develop', profile=MbedProfile.DEVELOP).GlobBlacklist('Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
+        yield target.Extend('debug', profile=MbedProfile.DEBUG).GlobBlacklist('Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
 
 
 ALL = []
@@ -163,6 +224,7 @@ target_generators = [
     Efr32Targets(),
     NrfTargets(),
     AndroidTargets(),
+    MbedTargets()
 ]
 
 for generator in target_generators:

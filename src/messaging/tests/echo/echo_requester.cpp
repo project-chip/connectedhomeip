@@ -62,7 +62,7 @@ chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPen
 chip::Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Echo was attempted to be sent.
-chip::System::Clock::Timestamp gLastEchoTime{ 0 };
+chip::System::Clock::Timestamp gLastEchoTime = chip::System::Clock::Zero;
 
 // Count of the number of EchoRequests sent.
 uint64_t gEchoCount = 0;

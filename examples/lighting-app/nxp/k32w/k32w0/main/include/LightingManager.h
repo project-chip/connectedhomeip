@@ -39,17 +39,12 @@ public:
 
     enum State_t
     {
-        kState_TurnOnInitiated = 0,
-        kState_TurnOnCompleted,
-        kState_TurnOffInitiated,
-        kState_TurnOffCompleted,
+        kState_On = 0,
+        kState_Off,
     } State;
 
     int Init();
     bool IsTurnedOff();
-    void EnableAutoTurnOn(bool aOn);
-    void SetAutoTurnOnDuration(uint32_t aDurationInSecs);
-    bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
 
     typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
@@ -62,17 +57,6 @@ private:
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
-
-    bool mAutoTurnOn;
-    uint32_t mAutoTurnOnDuration;
-    bool mAutoTurnOnTimerArmed;
-
-    void CancelTimer(void);
-    void StartTimer(uint32_t aTimeoutMs);
-
-    static void TimerEventHandler(TimerHandle_t xTimer);
-    static void AutoReTurnOnTimerEventHandler(AppEvent * aEvent);
-    static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     static LightingManager sLight;
 };

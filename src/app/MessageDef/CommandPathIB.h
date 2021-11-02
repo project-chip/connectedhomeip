@@ -15,16 +15,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines CommandPathIB parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
 
-#include "Builder.h"
-#include "Parser.h"
+#include "ListBuilder.h"
+#include "ListParser.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -43,18 +38,9 @@ enum
     kCsTag_CommandId  = 2,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public ListParser
 {
 public:
-    /**
-     *  @brief Initialize the parser object with TLVReader
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this CommandPathIB
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
@@ -106,29 +92,9 @@ public:
     CHIP_ERROR GetCommandId(chip::CommandId * const apCommandId) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public ListBuilder
 {
 public:
-    /**
-     *  @brief Initialize a CommandPathIB::Builder for writing into a TLV stream
-     *
-     *  @param [in] apWriter    A pointer to TLVWriter
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
-
-    /**
-     * Init the CommandPathIB container with an particular context tag.
-     * Required to implement arrays of arrays, and to test ListBuilder.
-     *
-     * @param[in]   apWriter    Pointer to the TLVWriter that is encoding the message.
-     * @param[in]   aContextTagToUse    A contextTag to use.
-     *
-     * @return                  CHIP_ERROR codes returned by chip::TLV objects.
-     */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
-
     /**
      *  @brief Inject EndpointId into the TLV stream to indicate the endpointId referenced by the path.
      *
@@ -161,12 +127,8 @@ public:
      *
      *  @return A reference to *this
      */
-    CommandPathIB::Builder & EndOfCommandPath();
-
-private:
-    CHIP_ERROR _Init(TLV::TLVWriter * const apWriter, const TLV::Tag aTag);
+    CommandPathIB::Builder & EndOfCommandPathIB();
 };
-}; // namespace CommandPathIB
-
-}; // namespace app
-}; // namespace chip
+} // namespace CommandPathIB
+} // namespace app
+} // namespace chip

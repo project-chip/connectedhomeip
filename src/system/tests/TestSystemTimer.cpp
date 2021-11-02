@@ -122,8 +122,8 @@ void HandleTimer10Success(Layer * inetLayer, void * aState)
 
 static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
 {
-    chip::System::Clock::Milliseconds32 timeout_overflow_0ms{ 652835029 };
-    chip::System::Clock::Milliseconds32 timeout_10ms{ 10 };
+    chip::System::Clock::Milliseconds32 timeout_overflow_0ms = chip::System::Clock::Milliseconds32(652835029);
+    chip::System::Clock::Milliseconds32 timeout_10ms         = chip::System::Clock::Milliseconds32(10);
 
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     Layer & lSys           = *lContext.mLayer;

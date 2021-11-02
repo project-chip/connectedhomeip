@@ -17,12 +17,27 @@
  */
 package chip.platform;
 
+import java.util.Map;
+
 public class ChipMdnsCallbackImpl implements ChipMdnsCallback {
   public native void handleServiceResolve(
       String instanceName,
       String serviceType,
+      String hostName,
       String address,
       int port,
+      Map<String, byte[]> attributes,
       long callbackHandle,
       long contextHandle);
+
+  public native void handleServiceBrowse(
+      String[] instanceName, String serviceType, long callbackHandle, long contextHandle);
+
+  public String[] getAttributeKeys(Map<String, byte[]> attributes) {
+    return attributes.keySet().toArray(new String[attributes.size()]);
+  }
+
+  public byte[] getAttributeData(Map<String, byte[]> attributes, String key) {
+    return attributes.get(key);
+  }
 }

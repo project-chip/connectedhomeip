@@ -28,8 +28,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/CommandDataIB.h>
-#include <app/MessageDef/CommandList.h>
-#include <app/MessageDef/InvokeCommand.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
@@ -47,12 +45,6 @@ namespace app {
 class Command
 {
 public:
-    enum class CommandRoleId
-    {
-        SenderId  = 0,
-        HandlerId = 1,
-    };
-
     enum class CommandState
     {
         Idle,                ///< Default state that the object starts out in, where no work has commenced
@@ -70,12 +62,6 @@ public:
      */
     virtual ~Command() { Abort(); }
 
-    /*
-     * A set of methods to construct command request or response payloads
-     */
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
-    TLV::TLVWriter * GetCommandDataIBTLVWriter();
-    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
 
     virtual CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus)
@@ -102,18 +88,8 @@ public:
      */
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
-    virtual CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement) = 0;
-
 protected:
     Command();
-
-    /*
-     * Allocates a packet buffer used for encoding an invoke request/response payload.
-     *
-     * This can be called multiple times safely, as it will only allocate the buffer once for the lifetime
-     * of this object.
-     */
-    CHIP_ERROR AllocateBuffer();
 
     /*
      * The actual closure of the exchange happens automatically in the exchange layer.
@@ -123,15 +99,14 @@ protected:
     void Close();
 
     void MoveToState(const CommandState aTargetState);
-    CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId);
-    CHIP_ERROR ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandDataIB::Builder aCommandDataIB);
+    CHIP_ERROR ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandPathIB::Builder & aCommandPath);
     const char * GetStateStr() const;
 
-    InvokeCommand::Builder mInvokeCommandBuilder;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     uint8_t mCommandIndex                      = 0;
     CommandState mState                        = CommandState::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
+    bool mBufferAllocated = false;
 
 private:
     /*
@@ -143,8 +118,6 @@ private:
     void Abort();
 
     friend class TestCommandInteraction;
-    TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
-    bool mBufferAllocated                  = false;
 };
 } // namespace app
 } // namespace chip

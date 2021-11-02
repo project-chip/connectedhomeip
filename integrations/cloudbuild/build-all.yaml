@@ -17,8 +17,8 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
-              ./scripts/build/build_examples.py --enable-flashbundle build
-              --create-archives /workspace/artifacts/
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target-glob '*' build --create-archives /workspace/artifacts/
       id: CompileAll
       waitFor:
           - Bootstrap

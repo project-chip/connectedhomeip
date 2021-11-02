@@ -448,7 +448,7 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
             VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters${{asUpperCamelCase parent.name}}Cluster${{asUpperCamelCase name}}Attribute"));
             JniClass attributeJniClass(attributeClass);
             jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>"
-                , "({{#chip_attribute_list_entryTypes}}{{#if (isString type)}}{{#if (isOctetString type)}}[B{{else}}Ljava/lang/String;{{/if}}{{else}}{{asJniSignature type}}{{/if}}{{/chip_attribute_list_entryTypes}})V");
+                , "({{#chip_attribute_list_entryTypes}}{{#if isOptional}}{{! TODO: Add support for optional types here }}{{else if isNullable}}{{! TODO: Add support for nullable types here }}{{else if isArray}}{{! TODO: Add support for lists here }}{{else if isStruct}}{{! TODO: Add support for structs here }}{{else if (isString type)}}{{#if (isOctetString type)}}[B{{else}}Ljava/lang/String;{{/if}}{{else}}{{asJniSignature type}}{{/if}}{{/chip_attribute_list_entryTypes}})V");
             VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find {{asUpperCamelCase name}}Attribute constructor"));
             {{/if}}
 
@@ -457,8 +457,17 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
             {
                 auto & entry = iter.GetValue();
                 {{#if isStruct}}
+                (void)entry; {{! In case all our struct members are not supported yet }}
                 {{#chip_attribute_list_entryTypes}}
-                {{#if (isOctetString type)}}
+                {{#if isOptional}}
+                {{! TODO: Add support for optional types here }}
+                {{else if isNullable}}
+                {{! TODO: Add support for nullable types here }}
+                {{else if isArray}}
+                {{! TODO: Add support for lists here }}
+                {{else if isStruct}}
+                {{! TODO: Add support for structs here }}
+                {{else if (isOctetString type)}}
                 jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entry.{{asLowerCamelCase name}}.size());
                 env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entry.{{asLowerCamelCase name}}.size(), reinterpret_cast<const jbyte *>(entry.{{asLowerCamelCase name}}.data()));
                 {{else if (isCharString type)}}
@@ -469,9 +478,19 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
                 {{/if}}
                 {{/chip_attribute_list_entryTypes}}
 
-                jobject attributeObj = env->NewObject(attributeClass, attributeCtor,
+                jobject attributeObj = env->NewObject(attributeClass, attributeCtor
                     {{#chip_attribute_list_entryTypes}}
-                    {{asLowerCamelCase name}}{{#not_last}}, {{/not_last}}
+                    {{#if isOptional}}
+                    {{! TODO: Add support for optional types here }}
+                    {{else if isNullable}}
+                    {{! TODO: Add support for nullable types here }}
+                    {{else if isArray}}
+                    {{! TODO: Add support for lists here }}
+                    {{else if isStruct}}
+                    {{! TODO: Add support for structs here }}
+                    {{else}}
+                    , {{asLowerCamelCase name}}
+                    {{/if}}
                     {{/chip_attribute_list_entryTypes}}
                 );
                 VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create {{asUpperCamelCase name}}Attribute object"));

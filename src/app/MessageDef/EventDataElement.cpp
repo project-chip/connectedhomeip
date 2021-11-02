@@ -241,7 +241,7 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
 
 #if CHIP_DETAIL_LOGGING
             {
-                EventPath::Parser path;
+                EventPathIB::Parser path;
                 err = path.Init(reader);
                 SuccessOrExit(err);
 
@@ -395,7 +395,7 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR EventDataElement::Parser::GetEventPath(EventPath::Parser * const apEventPath)
+CHIP_ERROR EventDataElement::Parser::GetEventPath(EventPathIB::Parser * const apEventPath)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -458,7 +458,7 @@ CHIP_ERROR EventDataElement::Builder::Init(chip::TLV::TLVWriter * const apWriter
     return InitAnonymousStructure(apWriter);
 }
 
-EventPath::Builder & EventDataElement::Builder::CreateEventPathBuilder()
+EventPathIB::Builder & EventDataElement::Builder::CreateEventPath()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)

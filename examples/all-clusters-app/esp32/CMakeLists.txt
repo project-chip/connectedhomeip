@@ -45,6 +45,7 @@ include(third_party/connectedhomeip/third_party/pigweed/repo/pw_build/pigweed.cm
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert pw_assert_log)
 pw_set_backend(pw_sys_io pw_sys_io.esp32)
+pw_set_backend(pw_trace pw_trace_tokenized)
 
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)

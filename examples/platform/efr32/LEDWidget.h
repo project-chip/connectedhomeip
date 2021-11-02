@@ -34,7 +34,7 @@ public:
     void Animate();
 
 private:
-    uint64_t mLastChangeTimeUS;
+    uint64_t mLastChangeTimeMS;
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
     const sl_led_t * mLed;

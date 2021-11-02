@@ -1642,28 +1642,31 @@ void DeviceControllerInteractionModelDelegate::OnDone(app::CommandSender * apCom
     return chip::Platform::Delete(apCommandSender);
 }
 
-void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
-                                                            TLV::TLVReader * apData, Protocols::InteractionModel::Status status)
+void DeviceControllerInteractionModelDelegate::OnAttributeData(const app::ReadClient * apReadClient,
+                                                               const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,
+                                                               const app::StatusIB & aStatus)
 {
-    IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, status);
+    IMReadReportAttributesResponseCallback(apReadClient, &aPath, apData, aStatus.mStatus);
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(app::ReadClient * apReadClient, CHIP_ERROR aError)
+void DeviceControllerInteractionModelDelegate::OnSubscriptionEstablished(const app::ReadClient * apReadClient)
+{
+    IMSubscribeResponseCallback(apReadClient, EMBER_ZCL_STATUS_SUCCESS);
+}
+
+void DeviceControllerInteractionModelDelegate::OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError)
 {
     app::ClusterInfo path;
     path.mNodeId = apReadClient->GetPeerNodeId();
-    IMReadReportAttributesResponseCallback(apReadClient, path, nullptr, Protocols::InteractionModel::Status::Failure);
-    return CHIP_NO_ERROR;
+    IMReadReportAttributesResponseCallback(apReadClient, nullptr, nullptr, Protocols::InteractionModel::Status::Failure);
 }
 
-CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(app::ReadClient * apReadClient)
+void DeviceControllerInteractionModelDelegate::OnDone(app::ReadClient * apReadClient)
 {
-    // Release the object for subscription
     if (apReadClient->IsSubscriptionType())
     {
-        FreeAttributePathParam(apReadClient->GetAppIdentifier());
+        this->FreeAttributePathParam(reinterpret_cast<uint64_t>(apReadClient));
     }
-    return CHIP_NO_ERROR;
 }
 
 void DeviceControllerInteractionModelDelegate::OnResponse(const app::WriteClient * apWriteClient,
@@ -1677,15 +1680,6 @@ void DeviceControllerInteractionModelDelegate::OnError(const app::WriteClient * 
 }
 
 void DeviceControllerInteractionModelDelegate::OnDone(app::WriteClient * apWriteClient) {}
-
-CHIP_ERROR DeviceControllerInteractionModelDelegate::SubscribeResponseProcessed(const app::ReadClient * apSubscribeClient)
-{
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
-    // When WriteResponseError occurred, it means we failed to receive the response from server.
-    IMSubscribeResponseCallback(apSubscribeClient, EMBER_ZCL_STATUS_SUCCESS);
-#endif
-    return CHIP_NO_ERROR;
-}
 
 void BasicSuccess(void * context, uint16_t val)
 {

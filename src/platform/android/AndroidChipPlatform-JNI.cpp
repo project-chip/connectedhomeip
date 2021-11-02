@@ -43,9 +43,9 @@ using namespace chip;
 #define JNI_MDNSCALLBACK_METHOD(RETURN, METHOD_NAME)                                                                               \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_ChipMdnsCallbackImpl_##METHOD_NAME
 
-static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
-static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUUID & uuid);
+#endif
 
 namespace {
 JavaVM * sJVM;
@@ -83,7 +83,7 @@ CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ThrowError(env, err);
+        JniReferences::GetInstance().ThrowError(env, sAndroidChipPlatformExceptionCls, err);
         JNI_OnUnload(jvm, reserved);
     }
 
@@ -108,6 +108,7 @@ JNI_METHOD(void, nativeSetBLEManager)(JNIEnv *, jobject, jobject manager)
 JNI_METHOD(void, handleWriteConfirmation)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -119,11 +120,13 @@ JNI_METHOD(void, handleWriteConfirmation)
                    ChipLogError(DeviceLayer, "handleWriteConfirmation() called with invalid characteristic ID"));
 
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleWriteConfirmation(connObj, &svcUUID, &charUUID);
+#endif
 }
 
 JNI_METHOD(void, handleIndicationReceived)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId, jbyteArray value)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
     const auto valueBegin               = env->GetByteArrayElements(value, nullptr);
@@ -144,11 +147,13 @@ JNI_METHOD(void, handleIndicationReceived)
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleIndicationReceived(connObj, &svcUUID, &charUUID, std::move(buffer));
 exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);
+#endif
 }
 
 JNI_METHOD(void, handleSubscribeComplete)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -160,11 +165,13 @@ JNI_METHOD(void, handleSubscribeComplete)
                    ChipLogError(DeviceLayer, "handleSubscribeComplete() called with invalid characteristic ID"));
 
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleSubscribeComplete(connObj, &svcUUID, &charUUID);
+#endif
 }
 
 JNI_METHOD(void, handleUnsubscribeComplete)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -176,14 +183,17 @@ JNI_METHOD(void, handleUnsubscribeComplete)
                    ChipLogError(DeviceLayer, "handleUnsubscribeComplete() called with invalid characteristic ID"));
 
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleUnsubscribeComplete(connObj, &svcUUID, &charUUID);
+#endif
 }
 
 JNI_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     chip::DeviceLayer::StackLock lock;
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectionError(connObj, BLE_ERROR_APP_CLOSED_CONNECTION);
+#endif
 }
 
 // for KeyValueStoreManager
@@ -200,73 +210,29 @@ JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject man
     chip::DeviceLayer::ConfigurationMgrImpl().InitializeWithObject(manager);
 }
 
-// for ServiceResolver
-JNI_METHOD(void, nativeSetServiceResolver)(JNIEnv * env, jclass self, jobject resolver, jobject chipMdnsCallback)
+// for ServiceResolver and  ServiceBrowser
+JNI_METHOD(void, nativeSetDnssdDelegates)(JNIEnv * env, jclass self, jobject resolver, jobject browser, jobject chipMdnsCallback)
 {
     chip::DeviceLayer::StackLock lock;
-    chip::Dnssd::InitializeWithObjects(resolver, chipMdnsCallback);
+    chip::Dnssd::InitializeWithObjects(resolver, browser, chipMdnsCallback);
 }
 
 JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)
-(JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring address, jint port, jlong callbackHandle,
- jlong contextHandle)
+(JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring hostName, jstring address, jint port,
+ jobject attributes, jlong callbackHandle, jlong contextHandle)
 {
     using ::chip::Dnssd::HandleResolve;
-    HandleResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
+    HandleResolve(instanceName, serviceType, hostName, address, port, attributes, callbackHandle, contextHandle);
 }
 
-void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow)
+JNI_MDNSCALLBACK_METHOD(void, handleServiceBrowse)
+(JNIEnv * env, jclass self, jobjectArray instanceName, jstring serviceType, jlong callbackHandle, jlong contextHandle)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    jthrowable ex;
-
-    err = N2J_Error(env, errToThrow, ex);
-    if (err == CHIP_NO_ERROR)
-    {
-        env->Throw(ex);
-    }
+    using ::chip::Dnssd::HandleBrowse;
+    HandleBrowse(instanceName, serviceType, callbackHandle, contextHandle);
 }
 
-CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
-{
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    const char * errStr = NULL;
-    jstring errStrObj   = NULL;
-    jmethodID constructor;
-
-    env->ExceptionClear();
-    constructor = env->GetMethodID(sAndroidChipPlatformExceptionCls, "<init>", "(ILjava/lang/String;)V");
-    VerifyOrExit(constructor != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
-
-    switch (inErr.AsInteger())
-    {
-    case CHIP_JNI_ERROR_TYPE_NOT_FOUND.AsInteger():
-        errStr = "CHIP Device Controller Error: JNI type not found";
-        break;
-    case CHIP_JNI_ERROR_METHOD_NOT_FOUND.AsInteger():
-        errStr = "CHIP Device Controller Error: JNI method not found";
-        break;
-    case CHIP_JNI_ERROR_FIELD_NOT_FOUND.AsInteger():
-        errStr = "CHIP Device Controller Error: JNI field not found";
-        break;
-    case CHIP_JNI_ERROR_DEVICE_NOT_FOUND.AsInteger():
-        errStr = "CHIP Device Controller Error: Device not found";
-        break;
-    default:
-        errStr = ErrorStr(inErr);
-        break;
-    }
-    errStrObj = (errStr != NULL) ? env->NewStringUTF(errStr) : NULL;
-
-    outEx =
-        (jthrowable) env->NewObject(sAndroidChipPlatformExceptionCls, constructor, static_cast<jint>(inErr.AsInteger()), errStrObj);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-
-exit:
-    env->DeleteLocalRef(errStrObj);
-    return err;
-}
-
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUUID & uuid)
 {
     const auto valueBegin  = env->GetByteArrayElements(value, nullptr);
@@ -280,3 +246,4 @@ exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);
     return result;
 }
+#endif

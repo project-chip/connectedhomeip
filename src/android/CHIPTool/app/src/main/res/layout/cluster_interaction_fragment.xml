@@ -7,12 +7,12 @@
     android:layout_height="match_parent">
 
   <Button
-      android:id="@+id/getClusterMappingBtn"
+      android:id="@+id/getEndpointListBtn"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginTop="132dp"
       android:layout_marginStart="16dp"
-      android:text="Button"
+      android:text="@string/retrieve_endpoint_list"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
   <androidx.fragment.app.FragmentContainerView
@@ -26,10 +26,9 @@
   <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/endpointList"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:layout_marginTop="180dp"
+      android:layout_height="wrap_content"
       android:clipToPadding="false"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/addressUpdateFragment" />
+      app:layout_constraintTop_toBottomOf="@+id/getEndpointListBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

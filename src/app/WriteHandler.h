@@ -19,7 +19,7 @@
 #pragma once
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelDelegate.h>
-#include <app/MessageDef/WriteResponse.h>
+#include <app/MessageDef/WriteResponseMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -107,7 +107,7 @@ private:
     void Shutdown();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    WriteResponse::Builder mWriteResponseBuilder;
+    WriteResponseMessage::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;
     State mState = State::Uninitialized;
 };

@@ -34,7 +34,7 @@ public:
     void Animate();
 
 private:
-    uint64_t mLastChangeTimeUS = 0;
+    uint64_t mLastChangeTimeMS = 0;
     uint32_t mBlinkOnTimeMS    = 0;
     uint32_t mBlinkOffTimeMS   = 0;
     int mLedNum                = 0;

@@ -42,6 +42,8 @@ shared_library("jni") {
   public_configs = [ "${chip_root}/src:includes" ]
 
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+
+  ldflags = [ "-Wl,--gc-sections" ]
 }
 
 android_library("java") {
@@ -67,6 +69,7 @@ android_library("java") {
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
+    "src/chip/devicecontroller/DiscoveredDevice.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
