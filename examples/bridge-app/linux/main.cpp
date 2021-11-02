@@ -55,17 +55,11 @@ static const int kUserLabelSize = 32;
 static const int kDescriptorAttributeArraySize = 254;
 static const int kFixedLabelAttributeArraySize = 254;
 // Four attributes in descriptor cluster: DeviceTypeList, ServerList, ClientList, PartsList
-static const int kDescriptorAttributeCount          = 4;
 static const int kFixedLabelElementsOctetStringSize = 16;
 
 static EndpointId gCurrentEndpointId;
 static EndpointId gFirstDynamicEndpointId;
 static Device * gDevices[DYNAMIC_ENDPOINT_COUNT];
-// Storage for descriptor clusters on dynamic endpoints. The contents of these
-// attrs are maintained by the descriptor code (descriptor.cpp). However, since
-// all attributes in clusters on dynamic endpoints are external, we must store
-// in the app.
-static uint8_t gDescriptorAttrStorage[DYNAMIC_ENDPOINT_COUNT][kDescriptorAttributeCount][kDescriptorAttributeArraySize];
 
 // ENDPOINT DEFINITIONS:
 // =================================================================================
@@ -325,25 +319,6 @@ EmberAfStatus HandleWriteOnOffAttribute(Device * dev, chip::AttributeId attribut
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleReadDescriptorAttribute(uint16_t endpointIndex, chip::AttributeId attributeId, uint8_t * buffer,
-                                            uint16_t maxReadLength)
-{
-    if ((maxReadLength <= kDescriptorAttributeArraySize) && (attributeId < kDescriptorAttributeCount))
-    {
-        memcpy(buffer, &gDescriptorAttrStorage[endpointIndex][attributeId][0], maxReadLength);
-    }
-    else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
-    {
-        *buffer = (uint16_t) ZCL_DESCRIPTOR_CLUSTER_REVISION;
-    }
-    else
-    {
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
 EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, EmberAfAttributeMetadata * am, uint8_t * buffer, uint16_t maxReadLength)
 {
     if ((am->attributeId == ZCL_LABEL_LIST_ATTRIBUTE_ID) && (maxReadLength <= kFixedLabelAttributeArraySize))
@@ -362,20 +337,6 @@ EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, EmberAfAttributeMetada
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleWriteDescriptorAttribute(uint16_t endpointIndex, EmberAfAttributeMetadata * am, uint8_t * buffer,
-                                             uint16_t length, int32_t index)
-{
-    chip::AttributeId attributeId = am->attributeId;
-
-    if (emberAfCopyList(ZCL_DESCRIPTOR_CLUSTER_ID, am, true, &gDescriptorAttrStorage[endpointIndex][attributeId][0], buffer,
-                        index) > 0)
-    {
-        return EMBER_ZCL_STATUS_SUCCESS;
-    }
-
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                    uint8_t * buffer, uint16_t maxReadLength, int32_t index)
@@ -391,10 +352,6 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
         if (clusterId == ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID)
         {
             ret = HandleReadBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
-        }
-        else if (clusterId == ZCL_DESCRIPTOR_CLUSTER_ID)
-        {
-            ret = HandleReadDescriptorAttribute(endpointIndex, attributeMetadata->attributeId, buffer, maxReadLength);
         }
         else if (clusterId == ZCL_FIXED_LABEL_CLUSTER_ID)
         {
@@ -426,10 +383,6 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
         if ((dev->IsReachable()) && (clusterId == ZCL_ON_OFF_CLUSTER_ID))
         {
             ret = HandleWriteOnOffAttribute(dev, attributeMetadata->attributeId, buffer);
-        }
-        else if (clusterId == ZCL_DESCRIPTOR_CLUSTER_ID)
-        {
-            ret = HandleWriteDescriptorAttribute(endpointIndex, attributeMetadata, buffer, attributeMetadata->size, index);
         }
     }
 
