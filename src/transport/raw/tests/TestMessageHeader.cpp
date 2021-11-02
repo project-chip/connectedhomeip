@@ -298,8 +298,9 @@ void TestPayloadHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext
     }
 }
 
-struct SpecComplianceTestVector {
-    uint8_t encoded[8+8+8]; // Fixed header + max source id + max dest id
+struct SpecComplianceTestVector
+{
+    uint8_t encoded[8 + 8 + 8]; // Fixed header + max source id + max dest id
     uint8_t messageFlags;
     uint16_t sessionId;
     uint8_t sessionType;
@@ -309,46 +310,46 @@ struct SpecComplianceTestVector {
     bool isSecure;
     uint8_t size;
 
-    int groupId;                // negative means no value
+    int groupId; // negative means no value
 };
 
 struct SpecComplianceTestVector theSpecComplianceTestVector[] = {
     {
         // Secure unicast message
-        .encoded = { 0x00,0x88,0x77,0x00,0x44,0x33,0x22,0x11 },
-        .messageFlags = 0x00,
-        .sessionId = 0x7788,
-        .sessionType = 0x00,
-        .securityFlags = 0x00,
+        .encoded        = { 0x00, 0x88, 0x77, 0x00, 0x44, 0x33, 0x22, 0x11 },
+        .messageFlags   = 0x00,
+        .sessionId      = 0x7788,
+        .sessionType    = 0x00,
+        .securityFlags  = 0x00,
         .messageCounter = 0x11223344,
-        .isSecure = true,
-        .size = 8,
+        .isSecure       = true,
+        .size           = 8,
 
         .groupId = -1,
     },
     {
         // Secure group message
-        .encoded = { 0x02,0xEE,0xDD,0xC1,0x40,0x30,0x20,0x10,0x56,0x34 },
-        .messageFlags = 0x02,
-        .sessionId = 0xDDEE,
-        .sessionType = 0x01,
-        .securityFlags = 0xC1,
+        .encoded        = { 0x02, 0xEE, 0xDD, 0xC1, 0x40, 0x30, 0x20, 0x10, 0x56, 0x34 },
+        .messageFlags   = 0x02,
+        .sessionId      = 0xDDEE,
+        .sessionType    = 0x01,
+        .securityFlags  = 0xC1,
         .messageCounter = 0x10203040,
-        .isSecure = true,
-        .size = 10,
+        .isSecure       = true,
+        .size           = 10,
 
         .groupId = 0x3456,
     },
     {
         // Unsecured message
-        .encoded = { 0x00,0x00,0x00,0x00,0x40,0x30,0x20,0x10 },
-        .messageFlags = 0x00,
-        .sessionId = 0x0000,
-        .sessionType = 0x00,
-        .securityFlags = 0x00,
+        .encoded        = { 0x00, 0x00, 0x00, 0x00, 0x40, 0x30, 0x20, 0x10 },
+        .messageFlags   = 0x00,
+        .sessionId      = 0x0000,
+        .sessionType    = 0x00,
+        .securityFlags  = 0x00,
         .messageCounter = 0x10203040,
-        .isSecure = false,
-        .size = 8,
+        .isSecure       = false,
+        .size           = 8,
 
         .groupId = -1,
     },
@@ -356,11 +357,11 @@ struct SpecComplianceTestVector theSpecComplianceTestVector[] = {
 
 const unsigned theSpecComplianceTestVectorLength = sizeof(theSpecComplianceTestVector) / sizeof(struct SpecComplianceTestVector);
 
-#define MAX_HEADER_SIZE (8+8+8)
+#define MAX_HEADER_SIZE (8 + 8 + 8)
 
 void TestSpecComplianceEncode(nlTestSuite * inSuite, void * inContext)
 {
-    struct SpecComplianceTestVector *testEntry;
+    struct SpecComplianceTestVector * testEntry;
     uint8_t buffer[MAX_HEADER_SIZE];
     uint16_t encodeSize;
 
@@ -374,7 +375,8 @@ void TestSpecComplianceEncode(nlTestSuite * inSuite, void * inContext)
         packetHeader.SetSessionId(testEntry->sessionId);
         packetHeader.SetMessageCounter(testEntry->messageCounter);
 
-        if (testEntry->groupId >= 0) {
+        if (testEntry->groupId >= 0)
+        {
             packetHeader.SetDestinationGroupId(static_cast<GroupId>(testEntry->groupId));
         }
 
@@ -386,7 +388,7 @@ void TestSpecComplianceEncode(nlTestSuite * inSuite, void * inContext)
 
 void TestSpecComplianceDecode(nlTestSuite * inSuite, void * inContext)
 {
-    struct SpecComplianceTestVector *testEntry;
+    struct SpecComplianceTestVector * testEntry;
     PacketHeader packetHeader;
     uint16_t decodeSize;
 
