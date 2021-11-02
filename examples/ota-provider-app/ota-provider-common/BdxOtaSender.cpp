@@ -81,7 +81,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
     case TransferSession::OutputEventType::kQueryReceived: {
         TransferSession::BlockData blockData;
         uint16_t blockSize   = mTransfer.GetTransferBlockSize();
-		uint16_t bytesToRead = blockSize;
+        uint16_t bytesToRead = blockSize;
 
         chip::System::PacketBufferHandle blockBuf = chip::System::PacketBufferHandle::New(bytesToRead);
         if (blockBuf.IsNull())
@@ -93,7 +93,8 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
 
         if (mOnBlockQueryCallback != nullptr && mOnBlockQueryCallback->mCall != nullptr)
         {
-            mOnBlockQueryCallback->mCall(mOnBlockQueryCallback->mContext, blockBuf, blockData.Length, blockData.IsEof, mNumBytesSent);
+            mOnBlockQueryCallback->mCall(mOnBlockQueryCallback->mContext, blockBuf, blockData.Length, blockData.IsEof,
+                                         mNumBytesSent);
         }
         else
         {
@@ -108,9 +109,9 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         }
 
         blockData.Data = blockBuf->Start();
-        mNumBytesSent = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
+        mNumBytesSent  = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
 
-		VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlock(blockData),
+        VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlock(blockData),
                        ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err)));
         break;
     }
@@ -120,7 +121,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         ChipLogDetail(BDX, "Transfer completed, got AckEOF");
         if (mOnTransferCompleteCallback != nullptr && mOnTransferCompleteCallback->mCall != nullptr)
         {
-             mOnTransferCompleteCallback->mCall(mOnTransferCompleteCallback->mContext);
+            mOnTransferCompleteCallback->mCall(mOnTransferCompleteCallback->mContext);
         }
         Reset();
         break;

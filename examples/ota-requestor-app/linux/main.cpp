@@ -16,12 +16,12 @@
  *    limitations under the License.
  */
 
-#include <fstream>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/device/OperationalDeviceProxy.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <fstream>
 #include <lib/support/CHIPArgParser.hpp>
 #include <platform/CHIPDeviceLayer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
@@ -53,9 +53,9 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
 void OnConnectionFailure(void * context, OperationalDeviceProxy * operationalDeviceProxy, CHIP_ERROR error);
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 
-void OnBlockReceived(void *context, chip::bdx::TransferSession::BlockData & blockdata);
-void OnTransferComplete(void *context);
-void OnTransferFailed(void *context);
+void OnBlockReceived(void * context, chip::bdx::TransferSession::BlockData & blockdata);
+void OnTransferComplete(void * context);
+void OnTransferFailed(void * context);
 
 // TODO: would be nicer to encapsulate these globals and the callbacks in some sort of class
 OperationalDeviceProxy gOperationalDeviceProxy;
@@ -81,7 +81,7 @@ FabricIndex providerFabricIndex = 1;
 uint16_t requestorSecurePort    = 0;
 uint16_t setupDiscriminator     = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
 uint16_t delayQueryTimeInSec    = 0;
-const char outFilePath[] = "test-ota-out.txt";
+const char outFilePath[]        = "test-ota-out.txt";
 
 OptionDef cmdLineOptionsDef[] = {
     { "providerNodeId", chip::ArgParser::kArgumentRequired, kOptionProviderNodeId },
@@ -259,18 +259,18 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     return (retval);
 }
 
-void OnBlockReceived(void *context, chip::bdx::TransferSession::BlockData & blockdata)
+void OnBlockReceived(void * context, chip::bdx::TransferSession::BlockData & blockdata)
 {
     std::ofstream otaFile(outFilePath, std::ifstream::out | std::ifstream::ate | std::ifstream::app);
     otaFile.write(reinterpret_cast<const char *>(blockdata.Data), static_cast<std::streamsize>(blockdata.Length));
 }
 
-void OnTransferComplete(void *context)
+void OnTransferComplete(void * context)
 {
     ChipLogDetail(SoftwareUpdate, "Transfer complete! Contents written/appended to %s", outFilePath);
 }
 
-void OnTransferFailed(void *context)
+void OnTransferFailed(void * context)
 {
     ChipLogDetail(SoftwareUpdate, "Transfer Failed");
 }

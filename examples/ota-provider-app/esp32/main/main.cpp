@@ -26,9 +26,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include <app-common/zap-generated/callback.h>
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <app-common/zap-generated/callback.h>
 
 #include <cmath>
 #include <cstdio>
@@ -47,8 +47,8 @@
 using chip::BitFlags;
 using chip::app::Clusters::OTAProviderDelegate;
 using chip::bdx::TransferControlFlags;
-using chip::Messaging::ExchangeManager;
 using chip::Callback::Callback;
+using chip::Messaging::ExchangeManager;
 using namespace ::chip;
 using namespace ::chip::System;
 using namespace ::chip::Credentials;
@@ -62,19 +62,19 @@ static DeviceCallbacks EchoCallbacks;
 // TODO: this should probably be done dynamically
 constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 
-constexpr uint32_t kMaxBdxBlockSize = 1024;
+constexpr uint32_t kMaxBdxBlockSize                = 1024;
 constexpr chip::System::Clock::Timeout kBdxTimeout = chip::System::Clock::Seconds16(5 * 60); // Specifications mandates >= 5 minutes
 constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
-const char *gOtaFilename = "hello-world.bin";
+const char * gOtaFilename                           = "hello-world.bin";
 BdxOtaSender bdxServer;
 
-const esp_partition_t *otaPartition = nullptr;
-uint32_t otaImageLen = 0;
-uint32_t otaTransferInProgress = false;
+const esp_partition_t * otaPartition = nullptr;
+uint32_t otaImageLen                 = 0;
+uint32_t otaTransferInProgress       = false;
 
 void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
-void OnTransferComplete(void *context);
-void OnTransferFailed(void *context);
+void OnTransferComplete(void * context);
+void OnTransferFailed(void * context);
 
 chip::Callback::Callback<OnBdxBlockQuery> mOnBlockQuery(OnBlockQuery, nullptr);
 chip::Callback::Callback<OnBdxTransferComplete> mOnTransferComplete(OnTransferComplete, nullptr);
@@ -94,12 +94,12 @@ void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, s
 
     if (offset + kMaxBdxBlockSize >= otaImageLen)
     {
-        size = otaImageLen - offset;
+        size  = otaImageLen - offset;
         isEof = true;
     }
     else
     {
-        size = kMaxBdxBlockSize;
+        size  = kMaxBdxBlockSize;
         isEof = false;
     }
 
@@ -107,20 +107,20 @@ void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, s
     if (err != ESP_OK)
     {
         ESP_LOGI(TAG, "Failed to read %d bytes from offset %d", size, offset + sizeof(otaImageLen));
-        size = 0;
+        size  = 0;
         isEof = false;
         return;
     }
     ESP_LOGI(TAG, "Read %d bytes from offset %d", size, offset + sizeof(otaImageLen));
 }
 
-void OnTransferComplete(void *context)
+void OnTransferComplete(void * context)
 {
     ESP_LOGI(TAG, "OTA Image Transfer Complete");
     otaTransferInProgress = false;
 }
 
-void OnTransferFailed(void *context)
+void OnTransferFailed(void * context)
 {
     ESP_LOGI(TAG, "OTA Image Transfer Failed");
     otaTransferInProgress = false;
@@ -135,12 +135,15 @@ extern "C" void app_main()
     esp_chip_info(&chip_info);
     uint8_t ble_mac[6];
     char ble_mac_str[18];
-    if (esp_read_mac(ble_mac, ESP_MAC_BT) == ESP_OK) {
-        sprintf(ble_mac_str, "%02x:%02x:%02x:%02x:%02x:%02x", ble_mac[0], ble_mac[1], ble_mac[2],
-                                                              ble_mac[3], ble_mac[4], ble_mac[5]);
+    if (esp_read_mac(ble_mac, ESP_MAC_BT) == ESP_OK)
+    {
+        sprintf(ble_mac_str, "%02x:%02x:%02x:%02x:%02x:%02x", ble_mac[0], ble_mac[1], ble_mac[2], ble_mac[3], ble_mac[4],
+                ble_mac[5]);
         ble_mac_str[17] = 0;
         ESP_LOGI(TAG, "ESP32 BLE MAC ADD: %s", ble_mac_str);
-    } else {
+    }
+    else
+    {
         ESP_LOGE(TAG, "Could not fetch MAC address.");
     }
 
@@ -177,7 +180,8 @@ extern "C" void app_main()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Register handler to handle bdx messages
-    error = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id, &bdxServer);
+    error = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
+                                                                                                          &bdxServer);
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "RegisterUnsolicitedMessageHandler failed: %s", chip::ErrorStr(error));
@@ -194,13 +198,13 @@ extern "C" void app_main()
     otaPartition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS, "test_data");
     if (otaPartition != nullptr)
     {
-        ESP_LOGI(TAG, "Partition found %s address:0x%x size:0x%x", otaPartition->label,
-                       otaPartition->address, otaPartition->size);
+        ESP_LOGI(TAG, "Partition found %s address:0x%x size:0x%x", otaPartition->label, otaPartition->address, otaPartition->size);
 
         // TODO: Use the OTA image header specified in specifications
         //       Right now we are using just image length instead of full header
         esp_partition_read(otaPartition, 0, &otaImageLen, sizeof(otaImageLen));
-        if (otaImageLen > otaPartition->size) {
+        if (otaImageLen > otaPartition->size)
+        {
             otaImageLen = 0;
         }
         ESP_LOGI(TAG, "OTA image length %d bytes", otaImageLen);
@@ -210,7 +214,8 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "OTA partition not found");
     }
 
-    if (otaImageLen > 0) {
+    if (otaImageLen > 0)
+    {
         otaProvider.SetQueryImageBehavior(OTAProviderExample::kRespondWithUpdateAvailable);
         otaProvider.SetOTAFilePath(gOtaFilename);
     }
@@ -219,7 +224,8 @@ extern "C" void app_main()
 
     BitFlags<TransferControlFlags> bdxFlags;
     bdxFlags.Set(TransferControlFlags::kReceiverDrive);
-    error = bdxServer.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
+    error = bdxServer.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
+                                         kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "Failed to init BDX server: %s", chip::ErrorStr(error));
