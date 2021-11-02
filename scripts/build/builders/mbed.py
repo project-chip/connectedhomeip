@@ -113,11 +113,11 @@ class MbedBuilder(Builder):
     def generate(self):
         if not os.path.exists(self.output_dir):
             self._Execute(['mbed-tools', 'configure',
-                            '-t', self.toolchain,
-                            '-m', self.board.BoardName,
-                            '-p', self.ExamplePath,
-                            '-o', self.output_dir,    
-                            '--mbed-os-path', self.mbed_os_path,
+                           '-t', self.toolchain,
+                           '-m', self.board.BoardName,
+                           '-p', self.ExamplePath,
+                           '-o', self.output_dir,
+                           '--mbed-os-path', self.mbed_os_path,
                            ], title='Generating config ' + self.identifier)
 
             self._Execute(['cmake', '-S', shlex.quote(self.ExamplePath), '-B', shlex.quote(self.output_dir), '-GNinja',
@@ -133,8 +133,8 @@ class MbedBuilder(Builder):
         # Remove old artifacts to force linking
         cmd = 'rm -rf {}/chip-*'.format(self.output_dir)
         self._Execute(['bash', '-c', cmd],
-                          title='Remove old artifacts ' + self.identifier)
-                      
+                      title='Remove old artifacts ' + self.identifier)
+
         self._Execute(['cmake', '--build', shlex.quote(self.output_dir)],
                       title='Building ' + self.identifier)
 
