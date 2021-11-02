@@ -17,9 +17,9 @@
 
 function getTests()
 {
-    const tests = [];
+  const tests = [];
 
-    return tests.join(', ');
+  return tests.join(', ');
 }
 
 //
