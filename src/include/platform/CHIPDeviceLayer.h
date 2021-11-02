@@ -43,9 +43,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-#ifndef NDEBUG
 void SetSystemLayerForTesting(System::LayerImpl * layer);
-#endif
 
 // These functions are defined in src/platform/Globals.cpp
 chip::Inet::InetLayer & InetLayer();

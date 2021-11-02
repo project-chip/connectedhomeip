@@ -191,7 +191,6 @@ public:
     }
 };
 
-#ifndef NDEBUG
 static void TestPlatformMgr_MockSystemLayer(nlTestSuite * inSuite, void * inContext)
 {
     MockSystemLayer systemLayer;
@@ -212,7 +211,6 @@ static void TestPlatformMgr_MockSystemLayer(nlTestSuite * inSuite, void * inCont
 
     DeviceLayer::SetSystemLayerForTesting(nullptr);
 }
-#endif
 
 /**
  *   Test Suite. It lists all the test functions.
@@ -226,9 +224,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test PlatformMgr::RunEventLoop with stop before sleep", TestPlatformMgr_RunEventLoopStopBeforeSleep),
     NL_TEST_DEF("Test PlatformMgr::TryLockChipStack", TestPlatformMgr_TryLockChipStack),
     NL_TEST_DEF("Test PlatformMgr::AddEventHandler", TestPlatformMgr_AddEventHandler),
-#ifndef NDEBUG
     NL_TEST_DEF("Test mock System::Layer", TestPlatformMgr_MockSystemLayer),
-#endif
 
     NL_TEST_SENTINEL()
 };
