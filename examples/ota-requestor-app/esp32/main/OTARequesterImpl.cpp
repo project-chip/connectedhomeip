@@ -161,7 +161,7 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
         chip::Callback::Cancelable * successCallback = mQueryImageResponseCallback.Cancel();
         chip::Callback::Cancelable * failureCallback = mOnQueryImageFailureCallback.Cancel();
 
-        // These parameters are choosen arbitrarily
+        // These parameters are chosen arbitrarily
         constexpr VendorId kExampleVendorId        = VendorId::Common;
         constexpr uint16_t kExampleProductId       = CONFIG_DEVICE_PRODUCT_ID;
         constexpr uint16_t kExampleHWVersion       = 0;
