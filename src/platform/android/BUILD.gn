@@ -75,9 +75,11 @@ android_library("java") {
     "java/chip/platform/ChipMdnsCallbackImpl.java",
     "java/chip/platform/ConfigurationManager.java",
     "java/chip/platform/KeyValueStoreManager.java",
+    "java/chip/platform/NsdManagerServiceBrowser.java",
     "java/chip/platform/NsdManagerServiceResolver.java",
     "java/chip/platform/PreferencesConfigurationManager.java",
     "java/chip/platform/PreferencesKeyValueStoreManager.java",
+    "java/chip/platform/ServiceBrowser.java",
     "java/chip/platform/ServiceResolver.java",
   ]
 
