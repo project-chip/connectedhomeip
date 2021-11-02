@@ -214,3 +214,7 @@ tests:
       attribute: "enhanced current hue"
       response:
           value: 0
+
+    - label: "Turn off light that we turned on"
+      cluster: "On/Off"
+      command: "off"

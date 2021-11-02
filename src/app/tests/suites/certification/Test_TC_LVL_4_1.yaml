@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Sending Off command"
+      cluster: "On/Off"
+      command: "on"
+
     - label: "Precondition: DUT level is set to 0x80"
       command: "Step"
       arguments:
@@ -105,3 +109,7 @@ tests:
       attribute: "current level"
       response:
           value: 128
+
+    - label: "Sending Off command"
+      cluster: "On/Off"
+      command: "off"
