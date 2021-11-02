@@ -36,12 +36,13 @@
 namespace chip {
 namespace app {
 namespace EventPathIB {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_NodeId     = 0,
-    kCsTag_EndpointId = 1,
-    kCsTag_ClusterId  = 2,
-    kCsTag_EventId    = 3,
+    kNode     = 0,
+    kEndpoint = 1,
+    kCluster  = 2,
+    kEvent    = 3,
+    kIsUrgent = 4,
 };
 
 class Parser : public ListParser
@@ -67,24 +68,24 @@ public:
     /**
      *  @brief Get a TLVReader for the NodeId. Next() must be called before accessing them.
      *
-     *  @param [in] apNodeId    A pointer to apNodeId
+     *  @param [in] apNode    A pointer to apNode
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetNodeId(NodeId * const apNodeId) const;
+    CHIP_ERROR GetNode(NodeId * const apNode) const;
 
     /**
      *  @brief Get a TLVReader for the EndpointId. Next() must be called before accessing them.
      *
-     *  @param [in] apEndpointId    A pointer to apEndpointId
+     *  @param [in] apEndpoint    A pointer to apEndpoint
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEndpointId(EndpointId * const apEndpointId) const;
+    CHIP_ERROR GetEndpoint(EndpointId * const apEndpoint) const;
 
     /**
      *  @brief Get a TLVReader for the ClusterId. Next() must be called before accessing them.
@@ -95,7 +96,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetClusterId(ClusterId * const apClusterId) const;
+    CHIP_ERROR GetCluster(ClusterId * const apCluster) const;
 
     /**
      *  @brief Get a TLVReader for the EventId. Next() must be called before accessing them.
@@ -106,38 +107,58 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventId(EventId * const apEventId) const;
+    CHIP_ERROR GetEvent(EventId * const apEvent) const;
+
+    /**
+     *  @brief Get a TLVReader for the EventId. Next() must be called before accessing them.
+     *
+     *  @param [in] apEventId    A pointer to apEventId
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetIsUrgent(bool * const apIsUrgent) const;
 };
 
 class Builder : public ListBuilder
 {
 public:
     /**
-     *  @brief Inject NodeId into the TLV stream.
+     *  @brief Inject Node into the TLV stream.
      *
-     *  @param [in] aNodeId NodeId for this event path
+     *  @param [in] aNode NodeId for this event path
      *
      *  @return A reference to *this
      */
-    EventPathIB::Builder & NodeId(const chip::NodeId aNodeId);
+    EventPathIB::Builder & Node(const NodeId aNode);
 
     /**
-     *  @brief Inject EndpointId into the TLV stream.
+     *  @brief Inject Endpoint into the TLV stream.
      *
-     *  @param [in] aEndpointId EndpointId for this eevent path
+     *  @param [in] aEndpoint EndpointId for this eevent path
      *
      *  @return A reference to *this
      */
-    EventPathIB::Builder & EndpointId(const chip::EndpointId aEndpointId);
+    EventPathIB::Builder & Endpoint(const EndpointId aEndpoint);
 
     /**
-     *  @brief Inject ClusterId into the TLV stream.
+     *  @brief Inject Cluster into the TLV stream.
      *
-     *  @param [in] aClusterId ClusterId for this event path
+     *  @param [in] aCluster ClusterId for this event path
      *
      *  @return A reference to *this
      */
-    EventPathIB::Builder & ClusterId(const chip::ClusterId aClusterId);
+    EventPathIB::Builder & Cluster(const ClusterId aCluster);
+
+    /**
+     *  @brief Inject Event into the TLV stream.
+     *
+     *  @param [in] aEvent ClusterId for this event path
+     *
+     *  @return A reference to *this
+     */
+    EventPathIB::Builder & Event(const EventId aEvent);
 
     /**
      *  @brief Inject EventId into the TLV stream.
@@ -146,7 +167,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventPathIB::Builder & EventId(const chip::EventId aEventId);
+    EventPathIB::Builder & IsUrgent(const bool aIsUrgent);
 
     /**
      *  @brief Mark the end of this EventPath
@@ -155,6 +176,6 @@ public:
      */
     EventPathIB::Builder & EndOfEventPathIB();
 };
-}; // namespace EventPathIB
-}; // namespace app
-}; // namespace chip
+} // namespace EventPathIB
+} // namespace app
+} // namespace chip
