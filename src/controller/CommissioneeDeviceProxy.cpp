@@ -43,6 +43,7 @@ using namespace chip::Callback;
 
 namespace chip {
 
+// TODO - Refactor LoadSecureSessionParametersIfNeeded() as device object is no longer persisted
 CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParametersIfNeeded(bool & didLoad)
 {
     didLoad = false;
@@ -139,6 +140,7 @@ CHIP_ERROR CommissioneeDeviceProxy::CloseSession()
         mSessionManager->ExpirePairing(mSecureSession.Value());
     }
     mState = ConnectionState::NotConnected;
+    mPairing.Clear();
     return CHIP_NO_ERROR;
 }
 

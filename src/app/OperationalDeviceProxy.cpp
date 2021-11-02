@@ -254,6 +254,7 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
         mInitParams.sessionManager->ExpirePairing(mSecureSession.Value());
     }
     mState = State::Initialized;
+    mCASESession.Clear();
     return CHIP_NO_ERROR;
 }
 
