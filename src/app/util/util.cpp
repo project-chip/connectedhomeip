@@ -420,8 +420,8 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
     else if ((cmd->type == EMBER_INCOMING_MULTICAST || cmd->type == EMBER_INCOMING_MULTICAST_LOOPBACK) &&
              !emberAfGroupsClusterEndpointInGroupCallback(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
     {
-        emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", (unsigned int) cmd->apsFrame->clusterId,
-                          (unsigned int) cmd->commandId);
+        emberAfDebugPrint("Drop cluster " ChipLogFormatMEI " command " ChipLogFormatMEI, ChipLogValueMEI(cmd->apsFrame->clusterId),
+                          ChipLogValueMEI(cmd->commandId));
         emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "group");
         emberAfDebugPrintln("0x%02x", cmd->apsFrame->groupId);
         return false;

@@ -26,6 +26,7 @@
 #include "qrcodegen.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -62,6 +63,7 @@ StaticTask_t appTaskStruct;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::app::Clusters;
 
 AppTask AppTask::sAppTask;
 
@@ -218,9 +220,9 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 void AppTask::OnOffUpdateClusterState(void)
 {
     uint8_t newValue = sLightLED.Get();
+
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(2, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
-                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = OnOff::Attributes::OnOff::Set(2, newValue);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         P6_LOG("ERR: updating on/off %x", status);

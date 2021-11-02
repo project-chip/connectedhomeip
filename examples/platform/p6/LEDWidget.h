@@ -43,11 +43,11 @@ public:
 
 private:
     uint64_t mLastChangeTimeMS = 0;
-    uint32_t mBlinkOnTimeMS   = 0;
-    uint32_t mBlinkOffTimeMS  = 0;
-    int mLedNum               = 0;
-    bool mState               = 0;
-    uint8_t mbrightness       = 0;
+    uint32_t mBlinkOnTimeMS    = 0;
+    uint32_t mBlinkOffTimeMS   = 0;
+    int mLedNum                = 0;
+    bool mState                = 0;
+    uint8_t mbrightness        = 0;
     uint16_t mHue;
     uint8_t mSaturation;
     cyhal_pwm_t pwm_red;

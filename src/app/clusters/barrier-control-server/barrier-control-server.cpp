@@ -318,8 +318,8 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
         state.currentPosition = getCurrentPosition(endpoint);
         state.targetPosition  = percentOpen;
         state.delayMs         = calculateDelayMs(endpoint, state.targetPosition, &state.increasing);
-        emberAfBarrierControlClusterPrintln("Scheduling barrier move from %d to %d with %dms delay", state.currentPosition,
-                                            state.targetPosition, (unsigned int) state.delayMs);
+        emberAfBarrierControlClusterPrintln("Scheduling barrier move from %d to %d with %" PRIu32 "ms delay", state.currentPosition,
+                                            state.targetPosition, state.delayMs);
         emberAfScheduleServerTick(endpoint, BarrierControl::Id, state.delayMs);
 
         if (state.currentPosition < state.targetPosition)

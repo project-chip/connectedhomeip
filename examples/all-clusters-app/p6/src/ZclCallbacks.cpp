@@ -41,27 +41,29 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     EndpointId endpoint     = attributePath.mEndpointId;
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
-    P6_LOG("emberAfPostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
-           endpoint, attributeId);
+    P6_LOG("MatterPostAttributeChangeCallback - Cluster ID: " ChipLogFormatMEI
+           ", EndPoint ID: '0x%02x', Attribute ID: " ChipLogFormatMEI,
+           ChipLogValueMEI(clusterId), endpoint, ChipLogValueMEI(attributeId));
+
     switch (clusterId)
     {
-    case ZCL_ON_OFF_CLUSTER_ID:
+    case OnOff::Id:
         ClusterMgr().OnOnOffPostAttributeChangeCallback(endpoint, attributeId, value);
         break;
 
-    case ZCL_IDENTIFY_CLUSTER_ID:
+    case Identify::Id:
         ClusterMgr().OnIdentifyPostAttributeChangeCallback(endpoint, attributeId, value);
         break;
 
-    case ZCL_LEVEL_CONTROL_CLUSTER_ID:
+    case LevelControl::Id:
         ClusterMgr().OnLevelControlAttributeChangeCallback(endpoint, attributeId, value);
         break;
 
-    case ZCL_COLOR_CONTROL_CLUSTER_ID:
+    case ColorControl::Id:
         ClusterMgr().OnColorControlAttributeChangeCallback(endpoint, attributeId, value);
         break;
     default:
-        P6_LOG("Unhandled cluster ID: %d", clusterId);
+        P6_LOG("Unhandled cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
         break;
     }
 }
