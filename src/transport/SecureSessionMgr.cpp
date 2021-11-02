@@ -336,7 +336,7 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
         return;
     }
 
-    Transport::UnauthenticatedSessionHandle session      = optionalSession.Value();
+    Transport::UnauthenticatedSessionHandle session        = optionalSession.Value();
     SecureSessionMgrDelegate::DuplicateMessage isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::No;
 
     // Verify message counter
