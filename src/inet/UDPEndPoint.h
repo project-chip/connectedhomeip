@@ -242,7 +242,7 @@ public:
     /**
      * Close the endpoint and recycle its memory.
      *
-     *  Invokes the \c Close method, then invokes the <tt>InetLayerBasis::Release</tt> method to return the object to its
+     *  Invokes the \c Close method, then invokes the <tt>EndPointBasis::Release</tt> method to return the object to its
      *  memory pool.
      *
      *  On LwIP systems, this method must not be called with the LwIP stack lock already acquired.
