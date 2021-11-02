@@ -36,32 +36,13 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#define TEST_TIME_MARGIN_MS 2
-#define TEST_TIME_MARGIN_US 500
-
 using namespace chip;
 using namespace chip::Logging;
+using namespace chip::System;
+using namespace chip::System::Clock::Literals;
 
-// =================================
-//      Test Vectors
-// =================================
-
-struct time_test_vector
-{
-    uint64_t delay;
-};
-
-static const struct time_test_vector test_vector_system_time_ms[] = {
-    { .delay = 10 },
-    { .delay = 100 },
-    { .delay = 250 },
-};
-
-static const struct time_test_vector test_vector_system_time_us[] = {
-    { .delay = 600 },
-    { .delay = 900 },
-    { .delay = 1500 },
-};
+constexpr Clock::Milliseconds64 kTestTimeMarginMs = 2_ms64;
+constexpr Clock::Microseconds64 kTestTimeMarginUs = 500_us64;
 
 // =================================
 //      Unit tests
@@ -69,26 +50,26 @@ static const struct time_test_vector test_vector_system_time_us[] = {
 
 static void TestDevice_GetMonotonicMicroseconds(nlTestSuite * inSuite, void * inContext)
 {
-    int numOfTestVectors = ArraySize(test_vector_system_time_us);
-    int numOfTestsRan    = 0;
-    const struct time_test_vector * test_params;
+    static const Clock::Microseconds64 kTestVectorSystemTimeUs[] = {
+        600_us64,
+        900_us64,
+        1500_us64,
+    };
+    int numOfTestsRan                      = 0;
+    constexpr Clock::Microseconds64 margin = kTestTimeMarginUs;
 
-    uint64_t margin = TEST_TIME_MARGIN_US;
-    uint64_t Tstart, Tend, Tdelta, Tdelay;
-
-    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    for (const Clock::Microseconds64 & Tdelay : kTestVectorSystemTimeUs)
     {
-        test_params = &test_vector_system_time_us[vectorIndex];
-        Tdelay      = test_params->delay;
-        Tstart      = System::SystemClock().GetMonotonicMicroseconds();
+        const Clock::Microseconds64 Tstart = System::SystemClock().GetMonotonicMicroseconds64();
 
-        chip::test_utils::SleepMicros(test_params->delay);
+        chip::test_utils::SleepMicros(Tdelay.count());
 
-        Tend   = System::SystemClock().GetMonotonicMicroseconds();
-        Tdelta = Tend - Tstart;
+        const Clock::Microseconds64 Tend   = System::SystemClock().GetMonotonicMicroseconds64();
+        const Clock::Microseconds64 Tdelta = Tend - Tstart;
 
-        ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart, Tend, Tdelta,
-                        Tdelay);
+        ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart.count(),
+                        Tend.count(), Tdelta.count(), Tdelay.count());
+
         // verify that timers don't fire early
         NL_TEST_ASSERT(inSuite, Tdelta > (Tdelay - margin));
         // verify they're not too late
@@ -100,26 +81,26 @@ static void TestDevice_GetMonotonicMicroseconds(nlTestSuite * inSuite, void * in
 
 static void TestDevice_GetMonotonicMilliseconds(nlTestSuite * inSuite, void * inContext)
 {
-    int numOfTestVectors = ArraySize(test_vector_system_time_ms);
-    int numOfTestsRan    = 0;
-    const struct time_test_vector * test_params;
+    static const System::Clock::Milliseconds64 kTestVectorSystemTimeMs[] = {
+        10_ms64,
+        100_ms64,
+        250_ms64,
+    };
+    int numOfTestsRan                      = 0;
+    constexpr Clock::Milliseconds64 margin = kTestTimeMarginMs;
 
-    uint64_t margin = TEST_TIME_MARGIN_MS;
-    uint64_t Tstart, Tend, Tdelta, Tdelay;
-
-    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    for (const Clock::Milliseconds64 & Tdelay : kTestVectorSystemTimeMs)
     {
-        test_params = &test_vector_system_time_ms[vectorIndex];
-        Tdelay      = test_params->delay;
-        Tstart      = System::SystemClock().GetMonotonicMilliseconds();
+        const Clock::Milliseconds64 Tstart = System::SystemClock().GetMonotonicMilliseconds64();
 
-        chip::test_utils::SleepMillis(test_params->delay);
+        chip::test_utils::SleepMillis(Tdelay.count());
 
-        Tend   = System::SystemClock().GetMonotonicMilliseconds();
-        Tdelta = Tend - Tstart;
+        const Clock::Milliseconds64 Tend   = System::SystemClock().GetMonotonicMilliseconds64();
+        const Clock::Milliseconds64 Tdelta = Tend - Tstart;
 
-        ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart, Tend, Tdelta,
-                        Tdelay);
+        ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart.count(),
+                        Tend.count(), Tdelta.count(), Tdelay.count());
+
         // verify that timers don't fire early
         NL_TEST_ASSERT(inSuite, Tdelta > (Tdelay - margin));
         // verify they're not too late

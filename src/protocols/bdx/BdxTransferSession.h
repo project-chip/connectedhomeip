@@ -352,10 +352,10 @@ private:
     uint32_t mLastQueryNum = 0;
     uint32_t mNextQueryNum = 0;
 
-    System::Clock::Timeout mTimeout{ 0 };
-    System::Clock::Timestamp mTimeoutStartTime{ 0 };
-    bool mShouldInitTimeoutStart = true;
-    bool mAwaitingResponse       = false;
+    System::Clock::Timeout mTimeout            = System::Clock::Zero;
+    System::Clock::Timestamp mTimeoutStartTime = System::Clock::Zero;
+    bool mShouldInitTimeoutStart               = true;
+    bool mAwaitingResponse                     = false;
 };
 
 } // namespace bdx

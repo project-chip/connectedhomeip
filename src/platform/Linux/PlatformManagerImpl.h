@@ -76,7 +76,7 @@ private:
     friend PlatformManagerImpl & PlatformMgrImpl();
     friend class Internal::BLEManagerImpl;
 
-    uint64_t mStartTimeMilliseconds = 0;
+    System::Clock::Timestamp mStartTime = System::Clock::Zero;
 
     static PlatformManagerImpl sInstance;
 

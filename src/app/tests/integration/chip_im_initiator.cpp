@@ -63,7 +63,7 @@ chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Command was attempted to be sent.
-uint64_t gLastMessageTime = 0;
+chip::System::Clock::Timestamp gLastMessageTime = chip::System::Clock::Zero;
 
 // Count of the number of CommandRequests sent.
 uint64_t gCommandCount = 0;
@@ -104,24 +104,26 @@ TestCommandResult gLastCommandResult = TestCommandResult::kUndefined;
 
 void HandleReadComplete()
 {
-    auto respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
-    auto transitTime = respTime - gLastMessageTime;
+    auto respTime                                   = chip::System::SystemClock().GetMonotonicTimestamp();
+    chip::System::Clock::Milliseconds64 transitTime = respTime - gLastMessageTime;
 
     gReadRespCount++;
 
-    printf("Read Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gReadRespCount, gReadCount,
-           static_cast<double>(gReadRespCount) * 100 / static_cast<double>(gReadCount), static_cast<double>(transitTime) / 1000);
+    printf("Read Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fs\n", gReadRespCount, gReadCount,
+           static_cast<double>(gReadRespCount) * 100 / static_cast<double>(gReadCount),
+           static_cast<double>(transitTime.count()) / 1000);
 }
 
 void HandleSubscribeReportComplete()
 {
-    auto respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
-    auto transitTime = respTime - gLastMessageTime;
+    auto respTime                                   = chip::System::SystemClock().GetMonotonicTimestamp();
+    chip::System::Clock::Milliseconds64 transitTime = respTime - gLastMessageTime;
 
     gSubRespCount++;
 
-    printf("Subscribe Complete: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gSubRespCount, gSubCount,
-           static_cast<double>(gSubRespCount) * 100 / static_cast<double>(gSubCount), static_cast<double>(transitTime) / 1000);
+    printf("Subscribe Complete: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fs\n", gSubRespCount, gSubCount,
+           static_cast<double>(gSubRespCount) * 100 / static_cast<double>(gSubCount),
+           static_cast<double>(transitTime.count()) / 1000);
 }
 
 class MockInteractionModelApp : public chip::app::InteractionModelDelegate,
@@ -164,15 +166,15 @@ public:
         printf("Command Response Success with EndpointId %d, ClusterId %d, CommandId %d", aPath.mEndpointId, aPath.mClusterId,
                aPath.mCommandId);
 
-        gLastCommandResult = TestCommandResult::kSuccess;
-        auto respTime      = chip::System::SystemClock().GetMonotonicMilliseconds();
-        auto transitTime   = respTime - gLastMessageTime;
+        gLastCommandResult                              = TestCommandResult::kSuccess;
+        auto respTime                                   = chip::System::SystemClock().GetMonotonicTimestamp();
+        chip::System::Clock::Milliseconds64 transitTime = respTime - gLastMessageTime;
 
         gCommandRespCount++;
 
-        printf("Command Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gCommandRespCount, gCommandCount,
+        printf("Command Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fs\n", gCommandRespCount, gCommandCount,
                static_cast<double>(gCommandRespCount) * 100 / static_cast<double>(gCommandCount),
-               static_cast<double>(transitTime) / 1000);
+               static_cast<double>(transitTime.count()) / 1000);
     }
     void OnError(const chip::app::CommandSender * apCommandSender, const chip::app::StatusIB & aStatus, CHIP_ERROR aError) override
     {
@@ -185,14 +187,14 @@ public:
     void OnResponse(const chip::app::WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path,
                     chip::app::StatusIB status) override
     {
-        auto respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
-        auto transitTime = respTime - gLastMessageTime;
+        auto respTime                                   = chip::System::SystemClock().GetMonotonicTimestamp();
+        chip::System::Clock::Milliseconds64 transitTime = respTime - gLastMessageTime;
 
         gWriteRespCount++;
 
-        printf("Write Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gWriteRespCount, gWriteCount,
+        printf("Write Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fs\n", gWriteRespCount, gWriteCount,
                static_cast<double>(gWriteRespCount) * 100 / static_cast<double>(gWriteCount),
-               static_cast<double>(transitTime) / 1000);
+               static_cast<double>(transitTime.count()) / 1000);
     }
     void OnError(const chip::app::WriteClient * apCommandSender, CHIP_ERROR aError) override
     {
@@ -215,7 +217,7 @@ CHIP_ERROR SendCommandRequest(std::unique_ptr<chip::app::CommandSender> && comma
 
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -263,7 +265,7 @@ CHIP_ERROR SendBadCommandRequest(std::unique_ptr<chip::app::CommandSender> && co
 
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -335,7 +337,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVWriter * writer;
-    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicTimestamp();
     chip::app::AttributePathParams attributePathParams;
 
     printf("\nSend write request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
@@ -369,7 +371,7 @@ exit:
 CHIP_ERROR SendSubscribeRequest()
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
-    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
     chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 1, 1, gFabricIndex));
     chip::app::EventPathParams eventPathParams[2];
@@ -431,7 +433,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         printf("Establish secure session failed, err: %s\n", chip::ErrorStr(err));
-        gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
+        gLastMessageTime = chip::System::SystemClock().GetMonotonicTimestamp();
     }
     else
     {

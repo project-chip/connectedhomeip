@@ -128,12 +128,6 @@ using Timeout = Milliseconds32;
 class ClockBase
 {
 public:
-    // Backwards compatibility types; avoid using in new code. These only provide documentation, not type safety.
-    using Tick = uint64_t;
-    static_assert(std::is_unsigned<Tick>::value, "Tick must be unsigned");
-    using MonotonicMicroseconds = Tick;
-    using MonotonicMilliseconds = Tick;
-
     virtual ~ClockBase() = default;
 
     /**
@@ -190,10 +184,6 @@ public:
      * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
      */
     virtual Milliseconds64 GetMonotonicMilliseconds64() = 0;
-
-    // Backwards compatibility methods; avoid using in new code. These only provide documentation, not type safety.
-    MonotonicMicroseconds GetMonotonicMicroseconds() { return GetMonotonicMicroseconds64().count(); }
-    MonotonicMilliseconds GetMonotonicMilliseconds() { return GetMonotonicMilliseconds64().count(); }
 };
 
 // Currently we have a single implementation class, ClockImpl, whose members are implemented in build-specific files.
@@ -216,10 +206,6 @@ inline void SetSystemClockForTesting(Clock::ClockBase * clock)
 }
 
 } // namespace Internal
-
-// Backwards compatibility types; avoid using in new code. These only provide documentation, not type safety.
-using MonotonicMicroseconds = ClockBase::MonotonicMicroseconds;
-using MonotonicMilliseconds = ClockBase::MonotonicMilliseconds;
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 Microseconds64 TimevalToMicroseconds(const timeval & in);

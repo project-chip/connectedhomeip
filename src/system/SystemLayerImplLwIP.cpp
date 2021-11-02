@@ -248,7 +248,7 @@ CHIP_ERROR LayerImplLwIP::HandlePlatformTimer()
     if (!mTimerList.Empty())
     {
         // timers still exist so restart the platform timer.
-        Clock::Timeout delay{ 0 };
+        Clock::Timeout delay = System::Clock::Zero;
 
         Clock::Timestamp currentTime = SystemClock().GetMonotonicTimestamp();
 

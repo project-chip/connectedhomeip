@@ -57,8 +57,8 @@ public:
     bool _IsWiFiStationEnabled(void);
     bool _IsWiFiStationApplicationControlled(void);
     bool _IsWiFiStationConnected(void);
-    uint32_t _GetWiFiStationReconnectIntervalMS(void);
-    CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
+    System::Clock::Timeout _GetWiFiStationReconnectInterval(void);
+    CHIP_ERROR _SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool _IsWiFiStationProvisioned(void);
     void _ClearWiFiStationProvision(void);
     ConnectivityManager::WiFiAPMode _GetWiFiAPMode(void);
@@ -68,8 +68,8 @@ public:
     void _DemandStartWiFiAP(void);
     void _StopOnDemandWiFiAP(void);
     void _MaintainOnDemandWiFiAP(void);
-    uint32_t _GetWiFiAPIdleTimeoutMS(void);
-    void _SetWiFiAPIdleTimeoutMS(uint32_t val);
+    System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
+    void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
     CHIP_ERROR _GetAndLogWifiStatsCounters(void);
     CHIP_ERROR _GetWiFiSecurityType(uint8_t & securityType);
     CHIP_ERROR _GetWiFiVersion(uint8_t & wiFiVersion);
@@ -121,13 +121,13 @@ inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_IsWiFiStationConn
 }
 
 template <class ImplClass>
-inline uint32_t GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiStationReconnectIntervalMS(void)
+inline System::Clock::Timeout GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiStationReconnectInterval(void)
 {
-    return 0;
+    return System::Clock::Zero;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiStationReconnectIntervalMS(uint32_t val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiStationReconnectInterval(System::Clock::Timeout val)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -179,13 +179,13 @@ inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_MaintainOnDemandW
 {}
 
 template <class ImplClass>
-inline uint32_t GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiAPIdleTimeoutMS(void)
+inline System::Clock::Timeout GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiAPIdleTimeout(void)
 {
-    return 0;
+    return System::Clock::Zero;
 }
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiAPIdleTimeoutMS(uint32_t val)
+inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {}
 
 template <class ImplClass>
