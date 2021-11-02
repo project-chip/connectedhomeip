@@ -254,9 +254,9 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
     }
     case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
     {
-        TLV::uint24_t uint24_data;
-        memcpy(static_cast<void *>(&uint24_data), attributeData, sizeof(uint24_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint24_data));
+        uint32_t uint32_data;
+        uint32_data = emberAfGetInt24u(attributeData, 0, 3);
+        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint32_data));
         break;
     }
     case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
@@ -289,9 +289,12 @@ CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWr
     }
     case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
     {
-        TLV::int24_t int24_data;
-        memcpy(static_cast<void *>(&int24_data), attributeData, sizeof(int24_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int24_data));
+        int32_t int32_data;
+        int32_data = emberAfGetInt24s(attributeData, 0, 3);
+        // Trigger the sign extension
+        int32_data <<= 8;
+        int32_data >>= 8;
+        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int32_data));
         break;
     }
     case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
@@ -418,7 +421,10 @@ CHIP_ERROR stringTlvDataToAttributeBuffer(TLV::TLVReader & aReader, uint16_t & d
 
 CHIP_ERROR prepareWriteData(EmberAfAttributeType expectedType, TLV::TLVReader & aReader, uint16_t & dataLen)
 {
-    switch (BaseType(expectedType))
+    EmberAfAttributeType baseType;
+
+    baseType = BaseType(expectedType);
+    switch (baseType)
     {
     case ZCL_BOOLEAN_ATTRIBUTE_TYPE: // Boolean
         return numericTlvDataToAttributeBuffer<bool>(aReader, dataLen);
@@ -427,7 +433,18 @@ CHIP_ERROR prepareWriteData(EmberAfAttributeType expectedType, TLV::TLVReader & 
     case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
         return numericTlvDataToAttributeBuffer<uint16_t>(aReader, dataLen);
     case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-        return numericTlvDataToAttributeBuffer<TLV::uint24_t>(aReader, dataLen);
+    {
+        uint32_t value;
+        static_assert(3 <= sizeof(attributeData), "Value cannot fit into attribute data");
+        ReturnErrorOnFailure(aReader.Get(value));
+        if (value > static_cast<uint32_t>((1UL << (3 * 8)) - 1))
+        {
+            return CHIP_ERROR_INVALID_INTEGER_VALUE;
+        }
+        dataLen = emberAfGetDataSize(baseType);
+        emberAfCopyInt24u(attributeData, 0, value);
+        return CHIP_NO_ERROR;
+    }
     case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
         return numericTlvDataToAttributeBuffer<uint32_t>(aReader, dataLen);
     case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
@@ -437,7 +454,19 @@ CHIP_ERROR prepareWriteData(EmberAfAttributeType expectedType, TLV::TLVReader & 
     case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
         return numericTlvDataToAttributeBuffer<int16_t>(aReader, dataLen);
     case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
-        return numericTlvDataToAttributeBuffer<TLV::int24_t>(aReader, dataLen);
+    {
+        int32_t value;
+        static_assert(3 <= sizeof(attributeData), "Value cannot fit into attribute data");
+        ReturnErrorOnFailure(aReader.Get(value));
+        ReturnErrorOnFailure(aReader.Get(value));
+        if (value > static_cast<int32_t>((1UL << ((3 * 8) - 1)) - 1) || value < static_cast<int32_t>(-(1UL << ((3 * 8) - 1))))
+        {
+            return CHIP_ERROR_INVALID_INTEGER_VALUE;
+        }
+        dataLen = emberAfGetDataSize(baseType);
+        emberAfCopyInt24u(attributeData, 0, static_cast<uint32_t>(value));
+        return CHIP_NO_ERROR;
+    }
     case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
         return numericTlvDataToAttributeBuffer<int32_t>(aReader, dataLen);
     case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
