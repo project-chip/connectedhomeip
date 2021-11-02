@@ -24,9 +24,9 @@
 
 #include <app/AppBuildConfig.h>
 #include <app/MessageDef/EventFilters.h>
+#include <app/MessageDef/EventStatusIB.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
-#include <app/MessageDef/EventStatusIB.h>
 #include <app/MessageDef/ReadRequestMessage.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
