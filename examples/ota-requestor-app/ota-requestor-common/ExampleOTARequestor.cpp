@@ -61,18 +61,18 @@ void ExampleOTARequestor::Init(chip::Controller::ControllerDeviceInitParams conn
 
 void ExampleOTARequestor::ConnectToProvider()
 {
-    FabricInfo * providerFabric = GetProviderFabricInfo();
-    VerifyOrReturn(providerFabric != nullptr,
-                   ChipLogError(SoftwareUpdate, "No Fabric found for index %" PRIu8, mProviderFabricIndex));
 
-    ChipLogProgress(SoftwareUpdate,
-                    "Once #7976 is fixed, this would attempt to connect to 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8
-                    " (" ChipLogFormatX64 ")",
-                    ChipLogValueX64(mProviderNodeId), mProviderFabricIndex, ChipLogValueX64(providerFabric->GetFabricId()));
+    if (mConnectToProviderCallback != nullptr)
+    {
+        ChipLogProgress(SoftwareUpdate, "Attempting to connect to 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8,
+                        ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
 
-    // TODO: uncomment and fill in after #7976 is fixed
-    // mProviderDevice.Init(mConnectParams, mProviderNodeId, address, mProviderFabricIndex);
-    // mProviderDevice.EstablishConnectivity();
+        mConnectToProviderCallback(mProviderNodeId, mProviderFabricIndex);
+    }
+    else
+    {
+        ChipLogError(SoftwareUpdate, "ConnectToProviderCallback is not set");
+    }
 }
 
 EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
@@ -91,16 +91,15 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
     mProviderNodeId      = providerLocation;
     mProviderFabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
 
-    FabricInfo * providerFabric = GetProviderFabricInfo();
-    if (providerFabric == nullptr)
+    ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
+    ChipLogDetail(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
+    ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(mProviderNodeId));
+    ChipLogDetail(SoftwareUpdate, "  VendorID: 0x%" PRIx16, commandData.vendorId);
+    ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %" PRIu8, announcementReason);
+    if (commandData.metadataForNode.HasValue())
     {
-        ChipLogError(SoftwareUpdate, "No Fabric found for index %" PRIu8, mProviderFabricIndex);
-        return EMBER_ZCL_STATUS_SUCCESS;
+        ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %zu", commandData.metadataForNode.Value().size());
     }
-
-    ChipLogProgress(SoftwareUpdate,
-                    "Notified of Provider at NodeID: 0x" ChipLogFormatX64 "on FabricIndex 0x%" PRIu8 " (" ChipLogFormatX64 ")",
-                    ChipLogValueX64(mProviderNodeId), mProviderFabricIndex, ChipLogValueX64(providerFabric->GetFabricId()));
 
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.

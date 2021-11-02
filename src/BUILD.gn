@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ if (chip_build_tests) {
 
   chip_test_group("tests") {
     deps = [
+      "${chip_root}/src/access/tests",
       "${chip_root}/src/app/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",

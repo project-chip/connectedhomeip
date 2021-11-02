@@ -25,11 +25,7 @@
 
 #include <cstdint>
 
-#include <lib/core/GroupId.h>
-#include <lib/core/NodeId.h>
-
-// Pull in other core types
-#include <lib/core/CHIPVendorIdentifiers.hpp>
+// Pull in core types
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {

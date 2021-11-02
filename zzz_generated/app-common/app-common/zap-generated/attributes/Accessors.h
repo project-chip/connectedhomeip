@@ -796,6 +796,17 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace PollControl
 
+namespace BridgedActions {
+namespace Attributes {
+
+namespace SetupUrl {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace SetupUrl
+
+} // namespace Attributes
+} // namespace BridgedActions
+
 namespace Basic {
 namespace Attributes {
 
@@ -1640,6 +1651,11 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace CommissionedFabrics
 
+namespace CurrentFabricIndex {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::FabricIndex * value); // fabric_idx
+EmberAfStatus Set(chip::EndpointId endpoint, chip::FabricIndex value);
+} // namespace CurrentFabricIndex
+
 } // namespace Attributes
 } // namespace OperationalCredentials
 
@@ -1659,6 +1675,32 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 
 } // namespace Attributes
 } // namespace BooleanState
+
+namespace ModeSelect {
+namespace Attributes {
+
+namespace CurrentMode {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace CurrentMode
+
+namespace OnMode {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace OnMode
+
+namespace StartUpMode {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace StartUpMode
+
+namespace Description {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace Description
+
+} // namespace Attributes
+} // namespace ModeSelect
 
 namespace ShadeConfiguration {
 namespace Attributes {

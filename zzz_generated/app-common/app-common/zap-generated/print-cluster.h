@@ -114,6 +114,12 @@
 #define CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_BRIDGED_ACTIONS_CLUSTER_SERVER) || defined(ZCL_USING_BRIDGED_ACTIONS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER { ZCL_BRIDGED_ACTIONS_CLUSTER_ID, 37, "Bridged Actions" },
+#else
+#define CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER
+#endif
+
 #if defined(ZCL_USING_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BASIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_BASIC_CLUSTER { ZCL_BASIC_CLUSTER_ID, 40, "Basic" },
 #else
@@ -224,6 +230,12 @@
 #define CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER { ZCL_BOOLEAN_STATE_CLUSTER_ID, 69, "Boolean State" },
 #else
 #define CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_MODE_SELECT_CLUSTER_SERVER) || defined(ZCL_USING_MODE_SELECT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER { ZCL_MODE_SELECT_CLUSTER_ID, 80, "Mode Select" },
+#else
+#define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER
 #endif
 
 #if defined(ZCL_USING_SHADE_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_SHADE_CONFIG_CLUSTER_CLIENT)
@@ -748,6 +760,7 @@
     CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
+    CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER                                                                                        \
@@ -766,6 +779,7 @@
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
+    CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \

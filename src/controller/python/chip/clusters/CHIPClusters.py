@@ -468,6 +468,135 @@ class ChipClusters:
             },
         },
     }
+    _BRIDGED_ACTIONS_CLUSTER_INFO = {
+        "clusterName": "BridgedActions",
+        "clusterId": 0x00000025,
+        "commands": {
+            0x0000000A: {
+                "commandId": 0x0000000A,
+                "commandName": "DisableAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x0000000B: {
+                "commandId": 0x0000000B,
+                "commandName": "DisableActionWithDuration",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                    "duration": "int",
+                },
+            },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "EnableAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "EnableActionWithDuration",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                    "duration": "int",
+                },
+            },
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "InstantAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "InstantActionWithTransition",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                    "transitionTime": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "PauseAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "PauseActionWithDuration",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                    "duration": "int",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "ResumeAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "StartAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "StartActionWithDuration",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                    "duration": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "StopAction",
+                "args": {
+                    "actionID": "int",
+                    "invokeID": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "ActionList",
+                "attributeId": 0x00000000,
+                "type": "",
+            },
+            0x00000001: {
+                "attributeName": "EndpointList",
+                "attributeId": 0x00000001,
+                "type": "",
+            },
+            0x00000002: {
+                "attributeName": "SetupUrl",
+                "attributeId": 0x00000002,
+                "type": "str",
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+            },
+        },
+    }
     _BRIDGED_DEVICE_BASIC_CLUSTER_INFO = {
         "clusterName": "BridgedDeviceBasic",
         "clusterId": 0x00000039,
@@ -1520,6 +1649,11 @@ class ChipClusters:
                 "attributeId": 0x00000002,
                 "type": "int",
             },
+            0x00000003: {
+                "attributeName": "Tolerance",
+                "attributeId": 0x00000003,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -2155,6 +2289,53 @@ class ChipClusters:
             },
         },
     }
+    _MODE_SELECT_CLUSTER_INFO = {
+        "clusterName": "ModeSelect",
+        "clusterId": 0x00000050,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000001,
+                "type": "",
+            },
+            0x00000002: {
+                "attributeName": "OnMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000003,
+                "type": "int",
+            },
+            0x00000004: {
+                "attributeName": "Description",
+                "attributeId": 0x00000004,
+                "type": "str",
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+            },
+        },
+    }
     _NETWORK_COMMISSIONING_CLUSTER_INFO = {
         "clusterName": "NetworkCommissioning",
         "clusterId": 0x00000031,
@@ -2280,9 +2461,9 @@ class ChipClusters:
                 "args": {
                     "vendorId": "int",
                     "productId": "int",
-                    "hardwareVersion": "int",
                     "softwareVersion": "int",
                     "protocolsSupported": "int",
+                    "hardwareVersion": "int",
                     "location": "str",
                     "requestorCanConsent": "bool",
                     "metadataForProvider": "bytes",
@@ -2566,6 +2747,11 @@ class ChipClusters:
                 "attributeId": 0x00000004,
                 "type": "bytes",
             },
+            0x00000005: {
+                "attributeName": "CurrentFabricIndex",
+                "attributeId": 0x00000005,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -2831,6 +3017,12 @@ class ChipClusters:
                 "attributeId": 0x00000002,
                 "type": "int",
             },
+            0x00000003: {
+                "attributeName": "Tolerance",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -3092,6 +3284,12 @@ class ChipClusters:
                 "attributeId": 0x00000002,
                 "type": "int",
             },
+            0x00000003: {
+                "attributeName": "Tolerance",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -3336,6 +3534,11 @@ class ChipClusters:
                 "attributeId": 0x00000022,
                 "type": "int",
                 "writable": True,
+            },
+            0x00000023: {
+                "attributeName": "ListNullablesAndOptionalsStruct",
+                "attributeId": 0x00000023,
+                "type": "",
             },
             0x000000FF: {
                 "attributeName": "Unsupported",
@@ -4121,6 +4324,11 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -4140,6 +4348,7 @@ class ChipClusters:
         0x0000000F: _BINARY_INPUT_BASIC_CLUSTER_INFO,
         0x0000F000: _BINDING_CLUSTER_INFO,
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
+        0x00000025: _BRIDGED_ACTIONS_CLUSTER_INFO,
         0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
         0x00000300: _COLOR_CONTROL_CLUSTER_INFO,
         0x0000050A: _CONTENT_LAUNCHER_CLUSTER_INFO,
@@ -4161,6 +4370,7 @@ class ChipClusters:
         0x00000508: _LOW_POWER_CLUSTER_INFO,
         0x00000507: _MEDIA_INPUT_CLUSTER_INFO,
         0x00000506: _MEDIA_PLAYBACK_CLUSTER_INFO,
+        0x00000050: _MODE_SELECT_CLUSTER_INFO,
         0x00000031: _NETWORK_COMMISSIONING_CLUSTER_INFO,
         0x00000029: _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
         0x0000002A: _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
@@ -4198,6 +4408,7 @@ class ChipClusters:
         "BinaryInputBasic": _BINARY_INPUT_BASIC_CLUSTER_INFO,
         "Binding": _BINDING_CLUSTER_INFO,
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
+        "BridgedActions": _BRIDGED_ACTIONS_CLUSTER_INFO,
         "BridgedDeviceBasic": _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
         "ColorControl": _COLOR_CONTROL_CLUSTER_INFO,
         "ContentLauncher": _CONTENT_LAUNCHER_CLUSTER_INFO,
@@ -4219,6 +4430,7 @@ class ChipClusters:
         "LowPower": _LOW_POWER_CLUSTER_INFO,
         "MediaInput": _MEDIA_INPUT_CLUSTER_INFO,
         "MediaPlayback": _MEDIA_PLAYBACK_CLUSTER_INFO,
+        "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
         "NetworkCommissioning": _NETWORK_COMMISSIONING_CLUSTER_INFO,
         "OtaSoftwareUpdateProvider": _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
         "OtaSoftwareUpdateRequestor": _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
@@ -4385,6 +4597,66 @@ class ChipClusters:
     def ClusterBinding_CommandUnbind(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nodeId: int, groupId: int, endpointId: int, clusterId: int):
         return self._chipLib.chip_ime_AppendCommand_Binding_Unbind(
             device, ZCLendpoint, ZCLgroupid, nodeId, groupId, endpointId, clusterId
+        )
+
+    def ClusterBridgedActions_CommandDisableAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandDisableActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandEnableAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandEnableActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandInstantAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandInstantActionWithTransition(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, transitionTime: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantActionWithTransition(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, transitionTime
+        )
+
+    def ClusterBridgedActions_CommandPauseAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandPauseActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandResumeAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_ResumeAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandStartAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_StartAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
+        )
+
+    def ClusterBridgedActions_CommandStartActionWithDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int, duration: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_StartActionWithDuration(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID, duration
+        )
+
+    def ClusterBridgedActions_CommandStopAction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, actionID: int, invokeID: int):
+        return self._chipLib.chip_ime_AppendCommand_BridgedActions_StopAction(
+            device, ZCLendpoint, ZCLgroupid, actionID, invokeID
         )
 
     def ClusterColorControl_CommandColorLoopSet(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, updateFlags: int, action: int, direction: int, time: int, startHue: int, optionsMask: int, optionsOverride: int):
@@ -4814,6 +5086,11 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid
         )
 
+    def ClusterModeSelect_CommandChangeToMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, newMode: int):
+        return self._chipLib.chip_ime_AppendCommand_ModeSelect_ChangeToMode(
+            device, ZCLendpoint, ZCLgroupid, newMode
+        )
+
     def ClusterNetworkCommissioning_CommandAddThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork(
             device, ZCLendpoint, ZCLgroupid, operationalDataset, len(
@@ -4879,10 +5156,10 @@ class ChipClusters:
                 updateToken), softwareVersion
         )
 
-    def ClusterOtaSoftwareUpdateProvider_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, hardwareVersion: int, softwareVersion: int, protocolsSupported: int, location: str, requestorCanConsent: bool, metadataForProvider: bytes):
+    def ClusterOtaSoftwareUpdateProvider_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, softwareVersion: int, protocolsSupported: int, hardwareVersion: int, location: str, requestorCanConsent: bool, metadataForProvider: bytes):
         location = location.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
-            device, ZCLendpoint, ZCLgroupid, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported, location, len(
+            device, ZCLendpoint, ZCLgroupid, vendorId, productId, softwareVersion, protocolsSupported, hardwareVersion, location, len(
                 location), requestorCanConsent, metadataForProvider, len(metadataForProvider)
         )
 
@@ -5336,6 +5613,18 @@ class ChipClusters:
     def ClusterBooleanState_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterBridgedActions_ReadAttributeActionList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_ActionList(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBridgedActions_ReadAttributeEndpointList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_EndpointList(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBridgedActions_ReadAttributeSetupUrl(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_SetupUrl(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBridgedActions_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedActions_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterBridgedDeviceBasic_ReadAttributeVendorName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName(device, ZCLendpoint, ZCLgroupid)
 
@@ -5718,6 +6007,9 @@ class ChipClusters:
     def ClusterFlowMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterFlowMeasurement_ReadAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_Tolerance(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterFlowMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -5910,6 +6202,30 @@ class ChipClusters:
     def ClusterMediaPlayback_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterModeSelect_ReadAttributeCurrentMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_CurrentMode(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterModeSelect_SubscribeAttributeCurrentMode(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_ModeSelect_CurrentMode(device, ZCLendpoint, minInterval, maxInterval)
+
+    def ClusterModeSelect_ReadAttributeSupportedModes(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_SupportedModes(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterModeSelect_ReadAttributeOnMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_OnMode(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterModeSelect_WriteAttributeOnMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ModeSelect_OnMode(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterModeSelect_ReadAttributeStartUpMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_StartUpMode(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterModeSelect_ReadAttributeDescription(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_Description(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterModeSelect_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ModeSelect_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterNetworkCommissioning_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_FeatureMap(device, ZCLendpoint, ZCLgroupid)
 
@@ -6002,6 +6318,9 @@ class ChipClusters:
 
     def ClusterOperationalCredentials_ReadAttributeTrustedRootCertificates(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_TrustedRootCertificates(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterOperationalCredentials_ReadAttributeCurrentFabricIndex(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CurrentFabricIndex(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterOperationalCredentials_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -6162,6 +6481,12 @@ class ChipClusters:
     def ClusterRelativeHumidityMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterRelativeHumidityMeasurement_ReadAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_Tolerance(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterRelativeHumidityMeasurement_SubscribeAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_RelativeHumidityMeasurement_Tolerance(device, ZCLendpoint, minInterval, maxInterval)
+
     def ClusterRelativeHumidityMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -6236,6 +6561,12 @@ class ChipClusters:
 
     def ClusterTemperatureMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTemperatureMeasurement_ReadAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_Tolerance(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTemperatureMeasurement_SubscribeAttributeTolerance(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_TemperatureMeasurement_Tolerance(device, ZCLendpoint, minInterval, maxInterval)
 
     def ClusterTemperatureMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -6382,6 +6713,9 @@ class ChipClusters:
 
     def ClusterTestCluster_WriteAttributeVendorId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeListNullablesAndOptionalsStruct(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterTestCluster_ReadAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid)
@@ -6821,6 +7155,9 @@ class ChipClusters:
     def ClusterWindowCovering_SubscribeAttributeSafetyStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_WindowCovering_SafetyStatus(device, ZCLendpoint, minInterval, maxInterval)
 
+    def ClusterWindowCovering_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_FeatureMap(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterWindowCovering_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -7125,6 +7462,71 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_BooleanState_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster BridgedActions
+        # Cluster BridgedActions Command DisableAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command DisableActionWithDuration
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableActionWithDuration.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_DisableActionWithDuration.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command EnableAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command EnableActionWithDuration
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableActionWithDuration.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_EnableActionWithDuration.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command InstantAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command InstantActionWithTransition
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantActionWithTransition.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_InstantActionWithTransition.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command PauseAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command PauseActionWithDuration
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseActionWithDuration.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_PauseActionWithDuration.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command ResumeAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_ResumeAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_ResumeAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command StartAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StartAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StartAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command StartActionWithDuration
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StartActionWithDuration.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StartActionWithDuration.restype = ctypes.c_uint32
+        # Cluster BridgedActions Command StopAction
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StopAction.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_BridgedActions_StopAction.restype = ctypes.c_uint32
+        # Cluster BridgedActions ReadAttribute ActionList
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_ActionList.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_ActionList.restype = ctypes.c_uint32
+        # Cluster BridgedActions ReadAttribute EndpointList
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_EndpointList.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_EndpointList.restype = ctypes.c_uint32
+        # Cluster BridgedActions ReadAttribute SetupUrl
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_SetupUrl.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_SetupUrl.restype = ctypes.c_uint32
+        # Cluster BridgedActions ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_ClusterRevision.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_BridgedActions_ClusterRevision.restype = ctypes.c_uint32
         # Cluster BridgedDeviceBasic
         # Cluster BridgedDeviceBasic ReadAttribute VendorName
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName.argtypes = [
@@ -7827,6 +8229,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster FlowMeasurement ReadAttribute Tolerance
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_Tolerance.restype = ctypes.c_uint32
         # Cluster FlowMeasurement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8242,6 +8648,43 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster ModeSelect
+        # Cluster ModeSelect Command ChangeToMode
+        self._chipLib.chip_ime_AppendCommand_ModeSelect_ChangeToMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ModeSelect_ChangeToMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute CurrentMode
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_CurrentMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_CurrentMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect SubscribeAttribute CurrentMode
+        self._chipLib.chip_ime_SubscribeAttribute_ModeSelect_CurrentMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_ModeSelect_CurrentMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute SupportedModes
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_SupportedModes.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_SupportedModes.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute OnMode
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_OnMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_OnMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect WriteAttribute OnMode
+        self._chipLib.chip_ime_WriteAttribute_ModeSelect_OnMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_ModeSelect_OnMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute StartUpMode
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_StartUpMode.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_StartUpMode.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute Description
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_Description.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_Description.restype = ctypes.c_uint32
+        # Cluster ModeSelect ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_ClusterRevision.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ModeSelect_ClusterRevision.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning
         # Cluster NetworkCommissioning Command AddThreadNetwork
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork.argtypes = [
@@ -8298,7 +8741,7 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_NotifyUpdateApplied.restype = ctypes.c_uint32
         # Cluster OtaSoftwareUpdateProvider Command QueryImage
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_bool, ctypes.c_char_p, ctypes.c_uint32]
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_bool, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage.restype = ctypes.c_uint32
         # Cluster OtaSoftwareUpdateProvider ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision.argtypes = [
@@ -8485,6 +8928,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_TrustedRootCertificates.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_TrustedRootCertificates.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials ReadAttribute CurrentFabricIndex
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CurrentFabricIndex.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CurrentFabricIndex.restype = ctypes.c_uint32
         # Cluster OperationalCredentials ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8701,6 +9148,14 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_MaxMeasuredValue.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster RelativeHumidityMeasurement ReadAttribute Tolerance
+        self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_Tolerance.restype = ctypes.c_uint32
+        # Cluster RelativeHumidityMeasurement SubscribeAttribute Tolerance
+        self._chipLib.chip_ime_SubscribeAttribute_RelativeHumidityMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_RelativeHumidityMeasurement_Tolerance.restype = ctypes.c_uint32
         # Cluster RelativeHumidityMeasurement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -8855,6 +9310,14 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster TemperatureMeasurement ReadAttribute Tolerance
+        self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_Tolerance.restype = ctypes.c_uint32
+        # Cluster TemperatureMeasurement SubscribeAttribute Tolerance
+        self._chipLib.chip_ime_SubscribeAttribute_TemperatureMeasurement_Tolerance.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_TemperatureMeasurement_Tolerance.restype = ctypes.c_uint32
         # Cluster TemperatureMeasurement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -9092,6 +9555,10 @@ class ChipClusters:
         self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_WriteAttribute_TestCluster_VendorId.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute ListNullablesAndOptionalsStruct
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Unsupported
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -9738,6 +10205,10 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_WindowCovering_SafetyStatus.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_WindowCovering_SafetyStatus.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_FeatureMap.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_FeatureMap.restype = ctypes.c_uint32
         # Cluster WindowCovering ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

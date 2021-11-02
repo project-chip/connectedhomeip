@@ -288,7 +288,7 @@ int main(int argc, char * argv[])
 
     if (gInterfaceName != nullptr)
     {
-        lStatus = InterfaceNameToId(gInterfaceName, gInterfaceId);
+        lStatus = InterfaceId::InterfaceNameToId(gInterfaceName, gInterfaceId);
         if (lStatus != CHIP_NO_ERROR)
         {
             PrintArgError("%s: unknown network interface %s\n", kToolName, gInterfaceName);
@@ -300,7 +300,7 @@ int main(int argc, char * argv[])
     // If any multicast groups have been specified, ensure that a
     // network interface identifier has been specified and is valid.
 
-    if ((sGroupAddresses.mSize > 0) && !IsInterfaceIdPresent(gInterfaceId))
+    if ((sGroupAddresses.mSize > 0) && !gInterfaceId.IsPresent())
     {
         PrintArgError("%s: a network interface is required when specifying one or more multicast groups\n", kToolName);
         lSuccessful = false;
@@ -589,7 +589,7 @@ static bool HandleDataReceived(const PacketBufferHandle & aBuffer, const IPPacke
 
 // UDP Endpoint Callbacks
 
-static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
+static void HandleUDPMessageReceived(UDPEndPoint * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
 {
     const bool lCheckBuffer = true;
     bool lStatus;
@@ -609,7 +609,7 @@ exit:
     }
 }
 
-static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
+static void HandleUDPReceiveError(UDPEndPoint * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleUDPReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -719,7 +719,7 @@ static void StartTest()
     IPAddressType lIPAddressType = IPAddressType::kIPv6;
     IPVersion lIPVersion         = kIPVersion_6;
     IPAddress lAddress           = IPAddress::Any;
-    IPEndPointBasis * lEndPoint  = nullptr;
+    UDPEndPoint * lEndPoint      = nullptr;
     const bool lUseLoopback      = ((gOptFlags & kOptFlagNoLoopback) == 0);
     CHIP_ERROR lStatus;
 
@@ -749,7 +749,7 @@ static void StartTest()
         lStatus = sUDPIPEndPoint->Bind(lIPAddressType, lAddress, kUDPPort);
         INET_FAIL_ERROR(lStatus, "UDPEndPoint::Bind failed");
 
-        if (IsInterfaceIdPresent(gInterfaceId))
+        if (gInterfaceId.IsPresent())
         {
             lStatus = sUDPIPEndPoint->BindInterface(lIPAddressType, gInterfaceId);
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::BindInterface failed");
@@ -775,7 +775,7 @@ static void StartTest()
         GroupAddress & lGroupAddress  = sGroupAddresses.mAddresses[i];
         IPAddress & lMulticastAddress = lGroupAddress.mMulticastAddress;
 
-        if ((lEndPoint != nullptr) && IsInterfaceIdPresent(gInterfaceId))
+        if ((lEndPoint != nullptr) && gInterfaceId.IsPresent())
         {
             if (gOptFlags & kOptFlagUseIPv4)
             {
@@ -803,7 +803,7 @@ static void StartTest()
 
 static void CleanupTest()
 {
-    IPEndPointBasis * lEndPoint = nullptr;
+    UDPEndPoint * lEndPoint = nullptr;
     CHIP_ERROR lStatus;
 
     gSendIntervalExpired = false;
@@ -822,7 +822,7 @@ static void CleanupTest()
         GroupAddress & lGroupAddress  = sGroupAddresses.mAddresses[i];
         IPAddress & lMulticastAddress = lGroupAddress.mMulticastAddress;
 
-        if ((lEndPoint != nullptr) && IsInterfaceIdPresent(gInterfaceId))
+        if ((lEndPoint != nullptr) && gInterfaceId.IsPresent())
         {
             lMulticastAddress.ToString(lAddressBuffer, sizeof(lAddressBuffer));
 

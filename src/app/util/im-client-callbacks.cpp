@@ -362,28 +362,32 @@ bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, chip::P
     return true;
 }
 
-bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
+bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient, const app::ConcreteAttributePath * aPath,
                                             TLV::TLVReader * apData, Protocols::InteractionModel::Status status)
 {
     ChipLogProgress(Zcl, "ReadAttributesResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(aPath.mClusterId));
+    if (aPath != nullptr)
+    {
+        ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(aPath->mClusterId));
+    }
 
     Callback::Cancelable * onSuccessCallback = nullptr;
     Callback::Cancelable * onFailureCallback = nullptr;
     app::TLVDataFilter tlvFilter             = nullptr;
-    NodeId sourceId                          = apReadClient->GetPeerNodeId();
     // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
-    uint8_t sequenceNumber = static_cast<uint8_t>(apReadClient->GetAppIdentifier());
-
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (apReadClient->IsSubscriptionType())
     {
-        err = gCallbacks.GetReportCallback(sourceId, aPath.mEndpointId, aPath.mClusterId, aPath.mFieldId, &onSuccessCallback,
-                                           &tlvFilter);
+        if (aPath != nullptr)
+        {
+            err = gCallbacks.GetReportCallback(apReadClient->GetPeerNodeId(), aPath->mEndpointId, aPath->mClusterId,
+                                               aPath->mAttributeId, &onSuccessCallback, &tlvFilter);
+        }
     }
     else
     {
-        err = gCallbacks.GetResponseCallback(sourceId, sequenceNumber, &onSuccessCallback, &onFailureCallback, &tlvFilter);
+        err = gCallbacks.GetResponseCallback(reinterpret_cast<uint64_t>(apReadClient), 0, &onSuccessCallback, &onFailureCallback,
+                                             &tlvFilter);
     }
 
     if (CHIP_NO_ERROR != err)
@@ -405,7 +409,10 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
         return true;
     }
 
-    ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(aPath.mFieldId));
+    if (aPath != nullptr)
+    {
+        ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(aPath->mAttributeId));
+    }
     LogIMStatus(status);
 
     if (status == Protocols::InteractionModel::Status::Success && apData != nullptr)
@@ -436,17 +443,13 @@ bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient
     {
         ChipLogProgress(Zcl, "  SubscriptionId:        <missing>");
     }
-    ChipLogProgress(Zcl, "  ApplicationIdentifier: %" PRIx64, apSubscribeClient->GetAppIdentifier());
     LogStatus(status);
 
     // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
-    uint8_t sequenceNumber = static_cast<uint8_t>(apSubscribeClient->GetAppIdentifier());
-
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     Callback::Cancelable * onSuccessCallback = nullptr;
     Callback::Cancelable * onFailureCallback = nullptr;
-    err =
-        gCallbacks.GetResponseCallback(apSubscribeClient->GetPeerNodeId(), sequenceNumber, &onSuccessCallback, &onFailureCallback);
+    err = gCallbacks.GetResponseCallback(reinterpret_cast<uint64_t>(apSubscribeClient), 0, &onSuccessCallback, &onFailureCallback);
 
     if (CHIP_NO_ERROR != err)
     {

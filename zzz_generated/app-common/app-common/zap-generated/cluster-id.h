@@ -67,6 +67,9 @@ static constexpr chip::ClusterId ZCL_DESCRIPTOR_CLUSTER_ID = 0x001D;
 // Definitions for cluster: Poll Control
 static constexpr chip::ClusterId ZCL_POLL_CONTROL_CLUSTER_ID = 0x0020;
 
+// Definitions for cluster: Bridged Actions
+static constexpr chip::ClusterId ZCL_BRIDGED_ACTIONS_CLUSTER_ID = 0x0025;
+
 // Definitions for cluster: Basic
 static constexpr chip::ClusterId ZCL_BASIC_CLUSTER_ID = 0x0028;
 
@@ -120,6 +123,9 @@ static constexpr chip::ClusterId ZCL_FIXED_LABEL_CLUSTER_ID = 0x0040;
 
 // Definitions for cluster: Boolean State
 static constexpr chip::ClusterId ZCL_BOOLEAN_STATE_CLUSTER_ID = 0x0045;
+
+// Definitions for cluster: Mode Select
+static constexpr chip::ClusterId ZCL_MODE_SELECT_CLUSTER_ID = 0x0050;
 
 // Definitions for cluster: Shade Configuration
 static constexpr chip::ClusterId ZCL_SHADE_CONFIG_CLUSTER_ID = 0x0100;

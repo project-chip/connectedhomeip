@@ -61,6 +61,10 @@
 @property (readonly) chip::Controller::BooleanStateCluster cppCluster;
 @end
 
+@interface CHIPBridgedActions ()
+@property (readonly) chip::Controller::BridgedActionsCluster cppCluster;
+@end
+
 @interface CHIPBridgedDeviceBasic ()
 @property (readonly) chip::Controller::BridgedDeviceBasicCluster cppCluster;
 @end
@@ -143,6 +147,10 @@
 
 @interface CHIPMediaPlayback ()
 @property (readonly) chip::Controller::MediaPlaybackCluster cppCluster;
+@end
+
+@interface CHIPModeSelect ()
+@property (readonly) chip::Controller::ModeSelectCluster cppCluster;
 @end
 
 @interface CHIPNetworkCommissioning ()

@@ -166,6 +166,14 @@ void emberAfDescriptorClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfPollControlClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Bridged Actions Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfBridgedActionsClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Basic Cluster Init
  *
  * Cluster Init
@@ -309,6 +317,14 @@ void emberAfFixedLabelClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfBooleanStateClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Mode Select Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfModeSelectClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Shade Configuration Cluster Init
  *
@@ -2463,6 +2479,112 @@ void emberAfPollControlClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfPollControlClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
+// Bridged Actions Cluster
+//
+
+/** @brief Bridged Actions Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfBridgedActionsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Bridged Actions Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfBridgedActionsClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Bridged Actions Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterBridgedActionsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Bridged Actions Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterBridgedActionsClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Bridged Actions Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfBridgedActionsClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                           EmberStatus status);
+
+/** @brief Bridged Actions Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfBridgedActionsClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                           EmberStatus status);
+
+/** @brief Bridged Actions Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterBridgedActionsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Bridged Actions Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterBridgedActionsClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Bridged Actions Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfBridgedActionsClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Bridged Actions Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfBridgedActionsClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
 // Basic Cluster
 //
 
@@ -4335,6 +4457,110 @@ void emberAfBooleanStateClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfBooleanStateClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Mode Select Cluster
+//
+
+/** @brief Mode Select Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfModeSelectClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Mode Select Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfModeSelectClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Mode Select Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterModeSelectClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Mode Select Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterModeSelectClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Mode Select Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfModeSelectClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                       uint16_t msgLen, uint8_t * message, EmberStatus status);
+
+/** @brief Mode Select Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfModeSelectClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                       uint16_t msgLen, uint8_t * message, EmberStatus status);
+
+/** @brief Mode Select Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterModeSelectClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Mode Select Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterModeSelectClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Mode Select Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfModeSelectClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Mode Select Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfModeSelectClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Shade Configuration Cluster
@@ -12554,6 +12780,78 @@ bool emberAfPollControlClusterSetShortPollIntervalCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::PollControl::Commands::SetShortPollInterval::DecodableType & commandData);
 /**
+ * @brief Bridged Actions Cluster InstantAction Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterInstantActionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::InstantAction::DecodableType & commandData);
+/**
+ * @brief Bridged Actions Cluster InstantActionWithTransition Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterInstantActionWithTransitionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::DecodableType & commandData);
+/**
+ * @brief Bridged Actions Cluster StartAction Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterStartActionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::StartAction::DecodableType & commandData);
+/**
+ * @brief Bridged Actions Cluster StartActionWithDuration Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterStartActionWithDurationCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::DecodableType & commandData);
+/**
+ * @brief Bridged Actions Cluster StopAction Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterStopActionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::StopAction::DecodableType & commandData);
+/**
+ * @brief Bridged Actions Cluster PauseAction Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterPauseActionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::PauseAction::DecodableType & commandData);
+/**
+ * @brief Bridged Actions Cluster PauseActionWithDuration Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterPauseActionWithDurationCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::DecodableType & commandData);
+/**
+ * @brief Bridged Actions Cluster ResumeAction Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterResumeActionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::ResumeAction::DecodableType & commandData);
+/**
+ * @brief Bridged Actions Cluster EnableAction Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterEnableActionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::EnableAction::DecodableType & commandData);
+/**
+ * @brief Bridged Actions Cluster EnableActionWithDuration Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterEnableActionWithDurationCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::DecodableType & commandData);
+/**
+ * @brief Bridged Actions Cluster DisableAction Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterDisableActionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::DisableAction::DecodableType & commandData);
+/**
+ * @brief Bridged Actions Cluster DisableActionWithDuration Command callback (from client)
+ */
+bool emberAfBridgedActionsClusterDisableActionWithDurationCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::DecodableType & commandData);
+/**
  * @brief Basic Cluster StartUp Command callback (from server)
  */
 bool emberAfBasicClusterStartUpCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
@@ -12597,11 +12895,11 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
     chip::CharSpan imageURI, uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
     bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 /**
- * @brief OTA Software Update Provider Cluster ApplyUpdateRequestResponse Command callback (from server)
+ * @brief OTA Software Update Provider Cluster ApplyUpdateResponse Command callback (from server)
  */
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(chip::EndpointId endpoint,
-                                                                               chip::app::CommandSender * commandObj,
-                                                                               uint8_t action, uint32_t delayedActionTime);
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(chip::EndpointId endpoint,
+                                                                        chip::app::CommandSender * commandObj, uint8_t action,
+                                                                        uint32_t delayedActionTime);
 /**
  * @brief OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback (from client)
  */
@@ -12892,6 +13190,12 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::DecodableType & commandData);
+/**
+ * @brief Mode Select Cluster ChangeToMode Command callback (from client)
+ */
+bool emberAfModeSelectClusterChangeToModeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
@@ -13907,7 +14211,8 @@ bool emberAfTestClusterClusterTestStructArrayArgumentRequestCallback(
  * @brief Test Cluster Cluster TestNullableOptionalResponse Command callback (from server)
  */
 bool emberAfTestClusterClusterTestNullableOptionalResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                   bool wasPresent, bool wasNull, uint8_t value);
+                                                                   bool wasPresent, bool wasNull, uint8_t value,
+                                                                   uint8_t originalValue);
 /**
  * @brief Test Cluster Cluster TestStructArgumentRequest Command callback (from client)
  */

@@ -28,7 +28,6 @@
 #include <utility>
 
 #include <inet/IPAddress.h>
-#include <inet/IPEndPointBasis.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -269,6 +268,9 @@ public:
         return session.HasValue() ? MakeOptional<SessionHandle>(session.Value()) : NullOptional;
     }
 
+    // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
+    SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
+
 private:
     /**
      *    The State of a secure transport object.
@@ -287,8 +289,8 @@ private:
 
     System::Layer * mSystemLayer = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
-    Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
-    State mState;                                                                          // < Initialization state of the object
+    Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions; // < Active connections to other peers
+    State mState;                                                                         // < Initialization state of the object
 
     SessionManagerDelegate * mCB                                       = nullptr;
     TransportMgrBase * mTransportMgr                                   = nullptr;

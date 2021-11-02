@@ -41,14 +41,17 @@ public:
         delete onReportDoorLockLockStateCallback;
         delete onReportIlluminanceMeasurementMeasuredValueCallback;
         delete onReportLevelControlCurrentLevelCallback;
+        delete onReportModeSelectCurrentModeCallback;
         delete onReportOccupancySensingOccupancyCallback;
         delete onReportOnOffOnOffCallback;
         delete onReportPressureMeasurementMeasuredValueCallback;
         delete onReportPumpConfigurationAndControlPumpStatusCallback;
         delete onReportPumpConfigurationAndControlCapacityCallback;
         delete onReportRelativeHumidityMeasurementMeasuredValueCallback;
+        delete onReportRelativeHumidityMeasurementToleranceCallback;
         delete onReportSwitchCurrentPositionCallback;
         delete onReportTemperatureMeasurementMeasuredValueCallback;
+        delete onReportTemperatureMeasurementToleranceCallback;
         delete onReportThermostatLocalTemperatureCallback;
         delete onReportWindowCoveringCurrentPositionLiftPercentageCallback;
         delete onReportWindowCoveringCurrentPositionTiltPercentageCallback;
@@ -87,6 +90,8 @@ public:
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0000, onReportLevelControlCurrentLevelCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0050, 0x0000, onReportModeSelectCurrentModeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0406, 0x0000, onReportOccupancySensingOccupancyCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0006, 0x0000, onReportOnOffOnOffCallback->Cancel(),
@@ -103,11 +108,17 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0405, 0x0000,
                                        onReportRelativeHumidityMeasurementMeasuredValueCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0405, 0x0003,
+                                       onReportRelativeHumidityMeasurementToleranceCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003B, 0x0001, onReportSwitchCurrentPositionCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0402, 0x0000,
                                        onReportTemperatureMeasurementMeasuredValueCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0402, 0x0003,
+                                       onReportTemperatureMeasurementToleranceCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0000, onReportThermostatLocalTemperatureCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0008,
@@ -190,6 +201,8 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportModeSelectCurrentModeCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportOccupancySensingOccupancyCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
@@ -202,10 +215,14 @@ private:
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementMeasuredValueCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementToleranceCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportSwitchCurrentPositionCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportTemperatureMeasurementMeasuredValueCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportTemperatureMeasurementToleranceCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatLocalTemperatureCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringCurrentPositionLiftPercentageCallback =

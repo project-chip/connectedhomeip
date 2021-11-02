@@ -150,8 +150,6 @@ struct tm gValidFrom;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
-    uint64_t chip64bitAttr;
-
     switch (id)
     {
     case 't':
@@ -181,20 +179,18 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         gSubjectCN = arg;
         break;
     case 'V':
-        if (!ParseChip64bitAttr(arg, chip64bitAttr) || !chip::CanCastTo<uint16_t>(chip64bitAttr))
+        if (!ParseInt(arg, gSubjectVID, 16))
         {
             PrintArgError("%s: Invalid value specified for the subject VID attribute: %s\n", progName, arg);
             return false;
         }
-        gSubjectVID = static_cast<uint16_t>(chip64bitAttr);
         break;
     case 'P':
-        if (!ParseChip64bitAttr(arg, chip64bitAttr) || !chip::CanCastTo<uint16_t>(chip64bitAttr))
+        if (!ParseInt(arg, gSubjectPID, 16))
         {
             PrintArgError("%s: Invalid value specified for the subject PID attribute: %s\n", progName, arg);
             return false;
         }
-        gSubjectPID = static_cast<uint16_t>(chip64bitAttr);
         break;
     case 'k':
         gInKeyFileName = arg;

@@ -70,6 +70,9 @@ static constexpr ClusterId Id = 0x0000001D;
 namespace PollControl {
 static constexpr ClusterId Id = 0x00000020;
 } // namespace PollControl
+namespace BridgedActions {
+static constexpr ClusterId Id = 0x00000025;
+} // namespace BridgedActions
 namespace Basic {
 static constexpr ClusterId Id = 0x00000028;
 } // namespace Basic
@@ -124,6 +127,9 @@ static constexpr ClusterId Id = 0x00000040;
 namespace BooleanState {
 static constexpr ClusterId Id = 0x00000045;
 } // namespace BooleanState
+namespace ModeSelect {
+static constexpr ClusterId Id = 0x00000050;
+} // namespace ModeSelect
 namespace ShadeConfiguration {
 static constexpr ClusterId Id = 0x00000100;
 } // namespace ShadeConfiguration

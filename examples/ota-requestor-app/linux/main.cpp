@@ -175,9 +175,8 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
         ChipLogError(SoftwareUpdate, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
-    err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleHWVersion,
-                             kExampleSoftwareVersion, kExampleProtocolsSupported, exampleLocation, kExampleClientCanConsent,
-                             metadata);
+    err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleSoftwareVersion,
+                             kExampleProtocolsSupported, kExampleHWVersion, exampleLocation, kExampleClientCanConsent, metadata);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "QueryImage() failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -244,7 +243,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     return (retval);
 }
 
-void SendQueryImageCommand()
+void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::FabricIndex peerFabricIndex = providerFabricIndex)
 {
     // Explicitly calling UpdateAddress() should not be needed once OperationalDeviceProxy can resolve IP address from node ID and
     // fabric index
@@ -261,9 +260,8 @@ void SendQueryImageCommand()
         .fabricsTable   = &(server->GetFabricTable()),
     };
 
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    FabricIndex peerFabricIndex = providerFabricIndex;
-    gOperationalDeviceProxy.Init(providerNodeId, peerFabricIndex, initParams);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    gOperationalDeviceProxy.Init(peerNodeId, peerFabricIndex, initParams);
     err = gOperationalDeviceProxy.Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
@@ -315,6 +313,9 @@ int main(int argc, char * argv[])
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
+    // This will allow ExampleOTARequestor to call SendQueryImageCommand
+    ExampleOTARequestor::GetInstance().SetConnectToProviderCallback(SendQueryImageCommand);
 
     // If a delay is provided, QueryImage after the timer expires
     if (delayQueryTimeInSec > 0)

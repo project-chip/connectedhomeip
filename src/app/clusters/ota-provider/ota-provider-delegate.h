@@ -20,7 +20,9 @@
 
 #include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
@@ -34,13 +36,14 @@ class OTAProviderDelegate
 {
 public:
     // TODO(#8605): protocolsSupported should be list of OTADownloadProtocol enums, not uint8_t
-    virtual EmberAfStatus HandleQueryImage(CommandHandler * commandObj, uint16_t vendorId, uint16_t productId,
-                                           uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported,
-                                           const chip::Span<const char> & location, bool requestorCanConsent,
-                                           const chip::ByteSpan & metadataForProvider) = 0;
+    virtual EmberAfStatus HandleQueryImage(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, uint16_t vendorId,
+                                           uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
+                                           const Optional<uint16_t> & hardwareVersion, const Optional<CharSpan> & location,
+                                           const Optional<bool> & requestorCanConsent,
+                                           const Optional<ByteSpan> & metadataForProvider) = 0;
 
-    virtual EmberAfStatus HandleApplyUpdateRequest(CommandHandler * commandObj, const chip::ByteSpan & updateToken,
-                                                   uint32_t newVersion) = 0;
+    virtual EmberAfStatus HandleApplyUpdateRequest(CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                                   const chip::ByteSpan & updateToken, uint32_t newVersion) = 0;
 
     virtual EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t softwareVersion) = 0;
 

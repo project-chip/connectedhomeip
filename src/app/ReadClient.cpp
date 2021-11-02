@@ -29,8 +29,7 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                            InteractionType aInteractionType, uint64_t aAppIdentifier)
+CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, InteractionType aInteractionType)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
@@ -38,9 +37,8 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interact
     VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     mpExchangeMgr              = apExchangeMgr;
-    mpDelegate                 = apDelegate;
+    mpCallback                 = apCallback;
     mState                     = ClientState::Initialized;
-    mAppIdentifier             = aAppIdentifier;
     mMinIntervalFloorSeconds   = 0;
     mMaxIntervalCeilingSeconds = 0;
     mSubscriptionId            = 0;
@@ -60,17 +58,14 @@ void ReadClient::Shutdown()
 
 void ReadClient::ShutdownInternal(CHIP_ERROR aError)
 {
-    if (mpDelegate != nullptr)
+    if (mpCallback != nullptr)
     {
         if (aError != CHIP_NO_ERROR)
         {
-            mpDelegate->ReadError(this, aError);
+            mpCallback->OnError(this, aError);
         }
-        else
-        {
-            mpDelegate->ReadDone(this);
-        }
-        mpDelegate = nullptr;
+        mpCallback->OnDone(this);
+        mpCallback = nullptr;
     }
     if (IsSubscriptionType())
     {
@@ -122,7 +117,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     ChipLogDetail(DataManagement, "%s: Client[%u] [%5.5s]", __func__,
                   InteractionModelEngine::GetInstance()->GetReadClientArrayIndex(this), GetStateStr());
     VerifyOrExit(ClientState::Initialized == mState, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Discard any existing exchange context. Effectively we can only have one exchange per ReadClient
     // at any one time.
@@ -130,7 +125,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
     {
         System::PacketBufferTLVWriter writer;
-        ReadRequest::Builder request;
+        ReadRequestMessage::Builder request;
 
         msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
         VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -142,10 +137,10 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
         if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
         {
-            EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
+            EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
             SuccessOrExit(err = eventPathListBuilder.GetError());
-            err = GenerateEventPathList(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
-                                        aReadPrepareParams.mEventPathParamsListSize);
+            err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
+                                     aReadPrepareParams.mEventPathParamsListSize);
             SuccessOrExit(err);
             if (aReadPrepareParams.mEventNumber != 0)
             {
@@ -163,7 +158,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
             SuccessOrExit(err);
         }
 
-        request.EndOfReadRequest();
+        request.EndOfReadRequestMessage();
         SuccessOrExit(err = request.GetError());
 
         err = writer.Finalize(&msgBuf);
@@ -202,7 +197,7 @@ CHIP_ERROR ReadClient::SendStatusResponse(CHIP_ERROR aError)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
 
-    StatusResponse::Builder response;
+    StatusResponseMessage::Builder response;
     ReturnLogErrorOnFailure(response.Init(&writer));
     Status statusCode = Status::Success;
     if (aError != CHIP_NO_ERROR)
@@ -232,25 +227,25 @@ CHIP_ERROR ReadClient::SendStatusResponse(CHIP_ERROR aError)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadClient::GenerateEventPathList(EventPathList::Builder & aEventPathListBuilder,
-                                             EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize)
+CHIP_ERROR ReadClient::GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
+                                          size_t aEventPathParamsListSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
     {
-        EventPath::Builder eventPathBuilder = aEventPathListBuilder.CreateEventPathBuilder();
-        EventPathParams eventPath           = apEventPathParamsList[eventIndex];
+        EventPathIB::Builder eventPathBuilder = aEventPathsBuilder.CreateEventPath();
+        EventPathParams eventPath             = apEventPathParamsList[eventIndex];
         eventPathBuilder.NodeId(eventPath.mNodeId)
             .EventId(eventPath.mEventId)
             .EndpointId(eventPath.mEndpointId)
             .ClusterId(eventPath.mClusterId)
-            .EndOfEventPath();
+            .EndOfEventPathIB();
         SuccessOrExit(err = eventPathBuilder.GetError());
     }
 
-    aEventPathListBuilder.EndOfEventPathList();
-    SuccessOrExit(err = aEventPathListBuilder.GetError());
+    aEventPathsBuilder.EndOfEventPaths();
+    SuccessOrExit(err = aEventPathsBuilder.GetError());
 
 exit:
     return err;
@@ -290,7 +285,7 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(!IsFree(), err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
         err = ProcessReportData(std::move(aPayload));
@@ -300,6 +295,10 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     {
         VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
         err = ProcessSubscribeResponse(std::move(aPayload));
+        // Forget the context as SUBSCRIBE RESPONSE is the last message in SUBSCRIBE transaction and
+        // ExchangeContext::HandleMessage automatically closes a context if no other messages need to
+        // be sent or received.
+        mpExchangeCtx = nullptr;
         SuccessOrExit(err);
     }
     else
@@ -342,7 +341,7 @@ CHIP_ERROR ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apEx
 CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ReportData::Parser report;
+    ReportDataMessage::Parser report;
 
     bool isEventListPresent         = false;
     bool isAttributeDataListPresent = false;
@@ -411,12 +410,11 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
-    if (isEventListPresent && nullptr != mpDelegate)
+    if (isEventListPresent && nullptr != mpCallback)
     {
         chip::TLV::TLVReader eventListReader;
         eventList.GetReader(&eventListReader);
-        err = mpDelegate->EventStreamReceived(mpExchangeCtx, &eventListReader);
-        SuccessOrExit(err);
+        mpCallback->OnEventData(this, eventListReader);
     }
 
     err                        = report.GetAttributeDataList(&attributeDataList);
@@ -426,7 +424,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
-    if (isAttributeDataListPresent && nullptr != mpDelegate && !moreChunkedMessages)
+    if (isAttributeDataListPresent && nullptr != mpCallback && !moreChunkedMessages)
     {
         chip::TLV::TLVReader attributeDataListReader;
         attributeDataList.GetReader(&attributeDataListReader);
@@ -440,10 +438,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         // are multiple reports
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        mpDelegate->ReportProcessed(this);
-    }
 exit:
     SendStatusResponse(err);
     if (!mInitialReport)
@@ -524,7 +518,9 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         {
             ExitNow();
         }
-        mpDelegate->OnReportData(this, clusterInfo, &dataReader, status);
+        mpCallback->OnAttributeData(
+            this, ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mFieldId),
+            status == Protocols::InteractionModel::Status::Success ? &dataReader : nullptr, StatusIB(status));
     }
 
     if (CHIP_END_OF_TLV == err)
@@ -579,7 +575,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     reader.Init(std::move(aPayload));
     ReturnLogErrorOnFailure(reader.Next());
 
-    SubscribeResponse::Parser subscribeResponse;
+    SubscribeResponseMessage::Parser subscribeResponse;
     ReturnLogErrorOnFailure(subscribeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -591,7 +587,11 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     VerifyOrReturnLogError(IsMatchingClient(subscriptionId), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnLogErrorOnFailure(subscribeResponse.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnLogErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
-    mpDelegate->SubscribeResponseProcessed(this);
+
+    if (mpCallback != nullptr)
+    {
+        mpCallback->OnSubscriptionEstablished(this);
+    }
 
     MoveToState(ClientState::SubscriptionActive);
 
@@ -603,10 +603,10 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
-    SubscribeRequest::Builder request;
+    SubscribeRequestMessage::Builder request;
     VerifyOrExit(ClientState::Initialized == mState, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
@@ -617,10 +617,10 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
     {
-        EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
+        EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
         SuccessOrExit(err = eventPathListBuilder.GetError());
-        err = GenerateEventPathList(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
-                                    aReadPrepareParams.mEventPathParamsListSize);
+        err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
+                                 aReadPrepareParams.mEventPathParamsListSize);
         SuccessOrExit(err);
 
         if (aReadPrepareParams.mEventNumber != 0)
@@ -642,7 +642,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     request.MinIntervalSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
         .MaxIntervalSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds)
         .KeepSubscriptions(aReadPrepareParams.mKeepSubscriptions)
-        .EndOfSubscribeRequest();
+        .EndOfSubscribeRequestMessage();
     SuccessOrExit(err = request.GetError());
 
     err = writer.Finalize(&msgBuf);

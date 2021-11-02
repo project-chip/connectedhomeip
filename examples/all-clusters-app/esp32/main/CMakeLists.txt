@@ -53,6 +53,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/content-launch-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/media-input-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/mode-select-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/low-power-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/keypad-input-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/media-playback-server"
@@ -187,6 +188,10 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
   pw_hdlc
   pw_log
   pw_rpc.server
+  pw_trace_tokenized
+  pw_trace_tokenized.trace_buffer
+  pw_trace_tokenized.rpc_service
+  pw_trace_tokenized.protos.nanopb_rpc
 )
 
 set_property(TARGET ${chip_lib} APPEND PROPERTY LINK_LIBRARIES ${COMPONENT_LIB})

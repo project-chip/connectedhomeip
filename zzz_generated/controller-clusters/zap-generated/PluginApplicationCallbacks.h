@@ -32,6 +32,7 @@
     MatterBinaryInputBasicPluginClientInitCallback();                                                                              \
     MatterBindingPluginClientInitCallback();                                                                                       \
     MatterBooleanStatePluginClientInitCallback();                                                                                  \
+    MatterBridgedActionsPluginClientInitCallback();                                                                                \
     MatterBridgedDeviceBasicPluginClientInitCallback();                                                                            \
     MatterColorControlPluginClientInitCallback();                                                                                  \
     MatterContentLauncherPluginClientInitCallback();                                                                               \
@@ -53,6 +54,7 @@
     MatterLowPowerPluginClientInitCallback();                                                                                      \
     MatterMediaInputPluginClientInitCallback();                                                                                    \
     MatterMediaPlaybackPluginClientInitCallback();                                                                                 \
+    MatterModeSelectPluginClientInitCallback();                                                                                    \
     MatterNetworkCommissioningPluginClientInitCallback();                                                                          \
     MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOtaSoftwareUpdateRequestorPluginClientInitCallback();                                                                    \

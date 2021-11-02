@@ -277,7 +277,7 @@ int main(int argc, char * argv[])
 
     if (gInterfaceName != nullptr)
     {
-        lStatus = InterfaceNameToId(gInterfaceName, gInterfaceId);
+        lStatus = InterfaceId::InterfaceNameToId(gInterfaceName, gInterfaceId);
         if (lStatus != CHIP_NO_ERROR)
         {
             PrintArgError("%s: unknown network interface %s\n", kToolName, gInterfaceName);
@@ -641,7 +641,7 @@ static void HandleTCPConnectionReceived(TCPEndPoint * aListenEndPoint, TCPEndPoi
 
 // UDP Endpoint Callbacks
 
-static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
+static void HandleUDPMessageReceived(UDPEndPoint * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
 {
     const bool lCheckBuffer = true;
     bool lStatus;
@@ -661,7 +661,7 @@ exit:
     }
 }
 
-static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
+static void HandleUDPReceiveError(UDPEndPoint * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleUDPReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -823,7 +823,7 @@ static void StartTest()
         lStatus = gInet.NewUDPEndPoint(&sUDPIPEndPoint);
         INET_FAIL_ERROR(lStatus, "InetLayer::NewUDPEndPoint failed");
 
-        if (IsInterfaceIdPresent(gInterfaceId))
+        if (gInterfaceId.IsPresent())
         {
             lStatus = sUDPIPEndPoint->BindInterface(lIPAddressType, gInterfaceId);
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::BindInterface failed");

@@ -64,6 +64,9 @@ void __attribute__((weak)) MatterDescriptorPluginServerInitCallback(){};
 void __attribute__((weak)) MatterPollControlPluginClientInitCallback(){};
 void __attribute__((weak)) MatterPollControlPluginServerInitCallback(){};
 
+void __attribute__((weak)) MatterBridgedActionsPluginClientInitCallback(){};
+void __attribute__((weak)) MatterBridgedActionsPluginServerInitCallback(){};
+
 void __attribute__((weak)) MatterBasicPluginClientInitCallback(){};
 void __attribute__((weak)) MatterBasicPluginServerInitCallback(){};
 
@@ -117,6 +120,9 @@ void __attribute__((weak)) MatterFixedLabelPluginServerInitCallback(){};
 
 void __attribute__((weak)) MatterBooleanStatePluginClientInitCallback(){};
 void __attribute__((weak)) MatterBooleanStatePluginServerInitCallback(){};
+
+void __attribute__((weak)) MatterModeSelectPluginClientInitCallback(){};
+void __attribute__((weak)) MatterModeSelectPluginServerInitCallback(){};
 
 void __attribute__((weak)) MatterShadeConfigurationPluginClientInitCallback(){};
 void __attribute__((weak)) MatterShadeConfigurationPluginServerInitCallback(){};

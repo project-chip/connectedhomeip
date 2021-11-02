@@ -188,7 +188,8 @@
                 "lock-app",
                 "lighting-app",
                 "pigweed-app",
-                "all-clusters-app"
+                "all-clusters-app",
+                "shell"
             ],
             "default": "lock-app"
         },

@@ -97,6 +97,17 @@ typedef struct _ContentLaunchParamater
     /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
 } ContentLaunchParamater;
 
+// Struct for ActionStruct
+typedef struct _ActionStruct
+{
+    uint16_t ActionID;
+    chip::CharSpan Name;
+    uint8_t Type;
+    uint16_t EndpointListID;
+    uint16_t SupportedCommands;
+    uint8_t Status;
+} ActionStruct;
+
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp
 {
@@ -166,6 +177,15 @@ typedef struct _DeviceType
     uint16_t revision;
 } DeviceType;
 
+// Struct for EndpointListStruct
+typedef struct _EndpointListStruct
+{
+    uint16_t EndpointListID;
+    chip::CharSpan Name;
+    uint8_t Type;
+    chip::ByteSpan Endpoints;
+} EndpointListStruct;
+
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor
 {
@@ -224,6 +244,14 @@ typedef struct _MediaPlaybackPosition
     uint64_t updatedAt;
     uint64_t position;
 } MediaPlaybackPosition;
+
+// Struct for ModeOptionStruct
+typedef struct _ModeOptionStruct
+{
+    chip::CharSpan Label;
+    uint8_t Mode;
+    uint32_t SemanticTag;
+} ModeOptionStruct;
 
 // Struct for NOCStruct
 typedef struct _NOCStruct
@@ -362,6 +390,13 @@ typedef struct _SecurityPolicy
     uint16_t RotationTime;
     uint16_t Flags;
 } SecurityPolicy;
+
+// Struct for SemanticTag
+typedef struct _SemanticTag
+{
+    uint16_t MfgCode;
+    uint16_t Value;
+} SemanticTag;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
