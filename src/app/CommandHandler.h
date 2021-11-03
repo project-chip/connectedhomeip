@@ -71,6 +71,53 @@ public:
         virtual bool CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
     };
 
+    class Handle
+    {
+    public:
+        Handle() {}
+        Handle(const Handle & handle) = delete;
+        Handle(Handle && handle)
+        {
+            mpHandler        = handle.mpHandler;
+            handle.mpHandler = nullptr;
+        }
+        Handle(decltype(nullptr)) {}
+        Handle(CommandHandler * handle)
+        {
+            handle->IncRef();
+            mpHandler = handle;
+        }
+        ~Handle() { Release(); }
+
+        Handle & operator=(Handle && handle)
+        {
+            Release();
+            mpHandler        = handle.mpHandler;
+            handle.mpHandler = nullptr;
+            return *this;
+        }
+
+        Handle & operator=(decltype(nullptr))
+        {
+            Release();
+            return *this;
+        }
+
+        CommandHandler * operator->() { return mpHandler; }
+
+        void Release()
+        {
+            if (mpHandler != nullptr)
+            {
+                mpHandler->DecRef();
+                mpHandler = nullptr;
+            }
+        }
+
+    private:
+        CommandHandler * mpHandler = nullptr;
+    };
+
     /*
      * Constructor.
      *
@@ -91,6 +138,8 @@ public:
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus) override;
 
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus) override;
+
+    size_t RefCount() const { return mRefCount; }
 
     CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload);
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
@@ -122,6 +171,22 @@ public:
 
 private:
     friend class TestCommandInteraction;
+    friend class CommandHandler::Handle;
+
+    /**
+     * IncRef will increase the inner refcount of the CommandHandler.
+     *
+     * Users should use CommandHandler::Handle for management the lifespan of the CommandHandler.
+     * DefRef should be released in reasonable time, and Close() should only be called when the refcount reached 0.
+     */
+    void IncRef();
+
+    /**
+     * DefRef is used by CommandHandler::Handle for decreasing the refcount of the CommandHandler.
+     * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
+     */
+    void DecRef();
+
     /*
      * Allocates a packet buffer used for encoding an invoke response payload.
      *
@@ -146,6 +211,7 @@ private:
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
+    size_t mRefCount                       = 0;
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
 };
