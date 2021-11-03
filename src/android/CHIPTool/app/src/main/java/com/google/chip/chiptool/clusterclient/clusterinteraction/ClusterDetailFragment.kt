@@ -19,6 +19,7 @@ import chip.clusterinfo.ClusterInfo
 import chip.clusterinfo.CommandInfo
 import chip.clusterinfo.CommandResponseInfo
 import chip.clusterinfo.DelegatedClusterCallback
+import chip.clusterinfo.ResponseValueInfo
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ClusterInfoMapping
@@ -168,8 +169,12 @@ class ClusterDetailFragment : Fragment() {
         override fun onSuccess(responseValues: Map<CommandResponseInfo, Any>) {
 =======
       selectedCommandCallback!!.setCallbackDelegate(object : ClusterCommandCallback {
+<<<<<<< HEAD
         override fun onSuccess(responseValues: Map<String, Any>) {
 >>>>>>> d3d83a0bc (select different cluster, command will remove previous displayed parameter)
+=======
+        override fun onSuccess(responseValues: Map<ResponseValueInfo, Any>) {
+>>>>>>> 7a1c5d850 (add responseValueInfo class instead of string split)
           showMessage("Command success")
           // Populate UI based on response values. We know the types from CommandInfo.getCommandResponses().
           requireActivity().runOnUiThread {
@@ -201,19 +206,30 @@ class ClusterDetailFragment : Fragment() {
 
   private fun populateCallbackResult(
 <<<<<<< HEAD
+<<<<<<< HEAD
     responseValues: Map<CommandResponseInfo, Any>,
 =======
     responseValues: Map<String, Any>,
 >>>>>>> 7c783e227 (add back class description)
+=======
+    responseValues: Map<ResponseValueInfo, Any>,
+>>>>>>> 7a1c5d850 (add responseValueInfo class instead of string split)
     inflater: LayoutInflater,
     callbackList: LinearLayout
   ) {
     responseValues.forEach { (variableNameType, response) ->
+<<<<<<< HEAD
       val callback =
         inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
       callback.clusterCallbackNameTv.text = variableNameType.name
       callback.clusterCallbackDataTv.text = response.toString()
       callback.clusterCallbackTypeTv.text = variableNameType.type
+=======
+      val callback = inflater.inflate(R.layout.callback_item, null, false) as LinearLayout
+      callback.callbackName.text = variableNameType.name
+      callback.callbackData.text = response.toString()
+      callback.callbackType.text = variableNameType.type
+>>>>>>> 7a1c5d850 (add responseValueInfo class instead of string split)
       callbackList.addView(callback)
     }
   }
