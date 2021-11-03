@@ -6,5 +6,5 @@ phy_init, data, phy,     ,        0x1000,
 # Factory partition size about 1.9MB
 factory,  app,  factory, ,        1945K,
 # OTA partition of size 1M
-test_data,    data,  nvs,   ,     1M,
+ota_data, data, nvs,     ,        1M,
 # ota_1,    app,  ota_1,   ,        512K,

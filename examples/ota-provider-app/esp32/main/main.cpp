@@ -72,34 +72,39 @@ const esp_partition_t * otaPartition = nullptr;
 uint32_t otaImageLen                 = 0;
 uint32_t otaTransferInProgress       = false;
 
-void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
+CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
 void OnTransferComplete(void * context);
-void OnTransferFailed(void * context);
+void OnTransferFailed(void * context, BdxSenderErrorTypes status);
 
 chip::Callback::Callback<OnBdxBlockQuery> mOnBlockQuery(OnBlockQuery, nullptr);
 chip::Callback::Callback<OnBdxTransferComplete> mOnTransferComplete(OnTransferComplete, nullptr);
 chip::Callback::Callback<OnBdxTransferFailed> mOnTransferFailed(OnTransferFailed, nullptr);
 
-void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset)
+CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf,
+                        size_t & size, bool & isEof, uint32_t offset)
 {
     if (otaTransferInProgress == false)
     {
         if (otaPartition == nullptr || otaImageLen == 0)
         {
             ESP_LOGE(TAG, "OTA partition not found");
-            return;
+            return CHIP_ERROR_OPEN_FAILED;
         }
         otaTransferInProgress = true;
     }
 
-    if (offset + kMaxBdxBlockSize >= otaImageLen)
+    uint16_t blockBufAvailableLength = blockBuf->AvailableDataLength();
+    uint16_t transferBlockSize = bdxServer.GetTransferBlockSize();
+
+    size = (blockBufAvailableLength < transferBlockSize) ? blockBufAvailableLength : transferBlockSize;
+
+    if (offset + size >= otaImageLen)
     {
         size  = otaImageLen - offset;
         isEof = true;
     }
     else
     {
-        size  = kMaxBdxBlockSize;
         isEof = false;
     }
 
@@ -109,9 +114,11 @@ void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, s
         ESP_LOGI(TAG, "Failed to read %d bytes from offset %d", size, offset + sizeof(otaImageLen));
         size  = 0;
         isEof = false;
-        return;
+        return CHIP_ERROR_READ_FAILED;
     }
+
     ESP_LOGI(TAG, "Read %d bytes from offset %d", size, offset + sizeof(otaImageLen));
+    return CHIP_NO_ERROR;
 }
 
 void OnTransferComplete(void * context)
@@ -120,9 +127,9 @@ void OnTransferComplete(void * context)
     otaTransferInProgress = false;
 }
 
-void OnTransferFailed(void * context)
+void OnTransferFailed(void * context, BdxSenderErrorTypes status)
 {
-    ESP_LOGI(TAG, "OTA Image Transfer Failed");
+    ESP_LOGI(TAG, "OTA Image Transfer Failed, status:%x", status);
     otaTransferInProgress = false;
 }
 
@@ -133,20 +140,6 @@ extern "C" void app_main()
     /* Print chip information */
     esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
-    uint8_t ble_mac[6];
-    char ble_mac_str[18];
-    if (esp_read_mac(ble_mac, ESP_MAC_BT) == ESP_OK)
-    {
-        sprintf(ble_mac_str, "%02x:%02x:%02x:%02x:%02x:%02x", ble_mac[0], ble_mac[1], ble_mac[2], ble_mac[3], ble_mac[4],
-                ble_mac[5]);
-        ble_mac_str[17] = 0;
-        ESP_LOGI(TAG, "ESP32 BLE MAC ADD: %s", ble_mac_str);
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Could not fetch MAC address.");
-    }
-
     ESP_LOGI(TAG, "This is ESP32 chip with %d CPU cores, WiFi%s%s, ", chip_info.cores,
              (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "", (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
 
@@ -195,12 +188,12 @@ extern "C" void app_main()
     bdxServer.SetCallbacks(callbacks);
 
     // If OTA image is available in flash storage then set to update available
-    otaPartition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS, "test_data");
+    otaPartition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS, "ota_data");
     if (otaPartition != nullptr)
     {
         ESP_LOGI(TAG, "Partition found %s address:0x%x size:0x%x", otaPartition->label, otaPartition->address, otaPartition->size);
 
-        // TODO: Use the OTA image header specified in specifications
+        // TODO: Use the OTA image header specified in the specification
         //       Right now we are using just image length instead of full header
         esp_partition_read(otaPartition, 0, &otaImageLen, sizeof(otaImageLen));
         if (otaImageLen > otaPartition->size)

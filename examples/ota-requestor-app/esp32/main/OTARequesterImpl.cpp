@@ -55,15 +55,22 @@ void OnApplyUpdateRequestFailure(void * context, uint8_t status);
 void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy);
 void OnConnectionFailure(void * context, OperationalDeviceProxy * operationalDeviceProxy, CHIP_ERROR error);
 
-void OnBlockReceived(void * context, chip::bdx::TransferSession::BlockData & blockdata);
+void OnBlockReceived(void * context, const chip::bdx::TransferSession::BlockData & blockdata);
 void OnTransferComplete(void * context);
-void OnTransferFailed(void * context);
+void OnTransferFailed(void * context, BdxDownloaderErrorTypes status);
+
+enum OTARequestorCommands
+{
+    kCommandQueryImage = 0,
+    kCommandApplyUpdateRequest,
+    kCommandNotifyUpdateApplied,
+};
 
 // TODO: Encapsulate these globals and the callbacks in some class
 OperationalDeviceProxy gOperationalDeviceProxy;
 ExchangeContext * exchangeCtx = nullptr;
 BdxDownloader bdxDownloader;
-uint8_t operationalDeviceContext; // 0 - none, 1 - QueryImage, 2 - ApplyUpdateRequest, 3 - NotifyUpdateApplied
+enum OTARequestorCommands operationalDeviceContext;
 ByteSpan otaUpdateToken;
 
 /* Callbacks for QueryImage response */
@@ -157,7 +164,7 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
 
     switch (*command)
     {
-    case 1: { // QueryImage
+    case kCommandQueryImage: {
         chip::Callback::Cancelable * successCallback = mQueryImageResponseCallback.Cancel();
         chip::Callback::Cancelable * failureCallback = mOnQueryImageFailureCallback.Cancel();
 
@@ -182,7 +189,7 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
         }
         break;
     }
-    case 2: { // ApplyUpdateRequest
+    case kCommandApplyUpdateRequest: {
         chip::Callback::Cancelable * successCallback = mApplyUpdateResponseCallback.Cancel();
         chip::Callback::Cancelable * failureCallback = mOnApplyUpdateRequestFailureCallback.Cancel();
 
@@ -195,7 +202,7 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
         }
         break;
     }
-    case 3: { // NotifyUpdateApplied
+    case kCommandNotifyUpdateApplied: {
         constexpr uint32_t softwareVersion = 1;
 
         err = cluster.NotifyUpdateApplied(nullptr, nullptr, otaUpdateToken, softwareVersion);
@@ -215,12 +222,13 @@ void OnConnectionFailure(void * context, OperationalDeviceProxy * operationalDev
     ChipLogError(SoftwareUpdate, "failed to connect to: %s", chip::ErrorStr(error));
 }
 
-void OnBlockReceived(void * context, chip::bdx::TransferSession::BlockData & blockdata)
+void OnBlockReceived(void * context, const chip::bdx::TransferSession::BlockData & blockdata)
 {
     if (OTAUpdater::GetInstance().IsInProgress() == false)
     {
         OTAUpdater::GetInstance().Begin();
     }
+    // TODO: Process/skip the Matter OTA header
     OTAUpdater::GetInstance().Write(reinterpret_cast<const void *>(blockdata.Data), blockdata.Length);
 }
 
@@ -230,15 +238,16 @@ void OnTransferComplete(void * context)
     OTAUpdater::GetInstance().End();
 }
 
-void OnTransferFailed(void * context)
+void OnTransferFailed(void * context, BdxDownloaderErrorTypes status)
 {
-    ESP_LOGI(TAG, "Transfer Failed");
+    ESP_LOGI(TAG, "Transfer Failed, status:%x", status);
     OTAUpdater::GetInstance().Abort();
 }
 
 void ConnectToProvider(const char * ipAddress, uint32_t nodeId)
 {
     // Explicitly calling UpdateAddress() should not be needed once OperationalDeviceProxy can resolve IP address from node ID and
+    // fabric index
     NodeId providerNodeId = nodeId;
     IPAddress ipAddr;
     IPAddress::FromString(ipAddress, ipAddr);
@@ -265,18 +274,18 @@ void ConnectToProvider(const char * ipAddress, uint32_t nodeId)
 
 void OTARequesterImpl::SendQueryImageCommand(const char * ipAddress, uint32_t nodeId)
 {
-    operationalDeviceContext = 1;
+    operationalDeviceContext = kCommandQueryImage;
     ConnectToProvider(ipAddress, nodeId);
 }
 
 void OTARequesterImpl::SendApplyUpdateRequestCommand(const char * ipAddress, uint32_t nodeId)
 {
-    operationalDeviceContext = 2;
+    operationalDeviceContext = kCommandApplyUpdateRequest;
     ConnectToProvider(ipAddress, nodeId);
 }
 
 void OTARequesterImpl::SendNotifyUpdateAppliedCommand(const char * ipAddress, uint32_t nodeId)
 {
-    operationalDeviceContext = 2;
+    operationalDeviceContext = kCommandNotifyUpdateApplied;
     ConnectToProvider(ipAddress, nodeId);
 }

@@ -23,7 +23,6 @@
  *
  **/
 #include "DeviceCallbacks.h"
-// #include "OTARequesterImpl.h"
 
 #include "esp_heap_caps.h"
 #include "esp_log.h"
@@ -38,12 +37,6 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
-
-// void OnStartDelayTimerHandler(Layer * systemLayer, void *appState)
-// {
-//     ESP_LOGI(TAG, "Calling SendQueryImageCommand()");
-//     OTARequesterImpl::GetInstance().SendQueryImageCommand();
-// }
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -67,13 +60,6 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             chip::app::DnssdServer::Instance().StartServer();
         }
         break;
-        //     case DeviceEventType::kCommissioningComplete:
-        //         ESP_LOGI(TAG, "Commissioning complete");
-        //
-        //         /* Start on shot timer to Query for OTA image once commissinoning is complete */
-        //         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32( 30 * 1000),
-        //                                                     OnStartDelayTimerHandler, nullptr);
-        //         break;
     }
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
@@ -85,7 +71,7 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
              endpointId, ChipLogValueMEI(attributeId));
 
     // TODO handle this callback in switch statement
-    ESP_LOGI(TAG, "Unhandled cluster ID: " CHIPLogFormatMEI, ChipLogValueMEI(clusterId));
+    ESP_LOGI(TAG, "Unhandled cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }

@@ -93,17 +93,17 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
 
         if (mOnBlockQueryCallback != nullptr && mOnBlockQueryCallback->mCall != nullptr)
         {
-            mOnBlockQueryCallback->mCall(mOnBlockQueryCallback->mContext, blockBuf, blockData.Length, blockData.IsEof,
-                                         mNumBytesSent);
+            if (CHIP_NO_ERROR != mOnBlockQueryCallback->mCall(mOnBlockQueryCallback->mContext, blockBuf,
+                                                              blockData.Length, blockData.IsEof, mNumBytesSent))
+            {
+                ChipLogError(BDX, "onBlockQuery Callback failed");
+                mTransfer.AbortTransfer(StatusCode::kUnknown);
+                return;
+            }
         }
         else
         {
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
-            return;
-        }
-
-        if (blockData.Length == 0 && blockData.IsEof == false)
-        {
+            ChipLogError(BDX, "onBlockQuery Callback not set");
             mTransfer.AbortTransfer(StatusCode::kUnknown);
             return;
         }
@@ -123,13 +123,21 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         {
             mOnTransferCompleteCallback->mCall(mOnTransferCompleteCallback->mContext);
         }
+        else
+        {
+            ChipLogError(BDX, "onTransferComplete Callback not set");
+        }
         Reset();
         break;
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
         if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
         {
-            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext);
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext, kErrorBdxSenderStatusReceived);
+        }
+        else
+        {
+            ChipLogError(BDX, "onTransferFailed Callback not set");
         }
         Reset();
         break;
@@ -137,7 +145,10 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         ChipLogError(BDX, "InternalError");
         if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
         {
-            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext);
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext, kErrorBdxSenderInternal);
+        }
+        {
+            ChipLogError(BDX, "onTransferFailed Callback not set");
         }
         Reset();
         break;
@@ -145,7 +156,10 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         ChipLogError(BDX, "Transfer timed out");
         if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
         {
-            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext);
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext, kErrorBdxSenderTimeOut);
+        }
+        {
+            ChipLogError(BDX, "onTransferFailed Callback not set");
         }
         Reset();
         break;
@@ -165,4 +179,14 @@ void BdxOtaSender::Reset()
         mExchangeCtx->Close();
     }
     mNumBytesSent = 0;
+}
+
+uint16_t BdxOtaSender::GetTransferBlockSize(void)
+{
+    return mTransfer.GetTransferBlockSize();
+}
+
+uint64_t BdxOtaSender::GetTransferLength()
+{
+    return mTransfer.GetTransferLength();
 }
