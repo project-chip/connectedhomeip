@@ -39,7 +39,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
       "${nlunit_test_root}:nlunit-test",
     ]
 
-    if (chip_mdns != "none" && chip_enable_happy_tests &&
+    if (chip_mdns != "none" &&
         (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
       test_sources += [ "TestDnssd.cpp" ]
       public_deps += [ "${chip_root}/src/lib/dnssd" ]
