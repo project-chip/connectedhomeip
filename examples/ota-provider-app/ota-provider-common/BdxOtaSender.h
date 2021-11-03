@@ -20,23 +20,12 @@
 
 #pragma once
 
-// Callback to handle block query
-typedef void (*OnBdxBlockQuery)(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof,
-                                uint32_t offset);
-typedef void (*OnBdxTransferComplete)(void * context);
-typedef void (*OnBdxTransferFailed)(void * context);
-
-struct BdxOtaSenderCallbacks
-{
-    chip::Callback::Callback<OnBdxBlockQuery> * onBlockQuery             = nullptr;
-    chip::Callback::Callback<OnBdxTransferComplete> * onTransferComplete = nullptr;
-    chip::Callback::Callback<OnBdxTransferFailed> * onTransferFailed     = nullptr;
-};
-
 class BdxOtaSender : public chip::bdx::Responder
 {
 public:
-    void SetCallbacks(BdxOtaSenderCallbacks callbacks);
+    BdxOtaSender();
+
+    void SetFilepath(const char * path);
 
 private:
     // Inherited from bdx::TransferFacilitator
@@ -44,9 +33,8 @@ private:
 
     void Reset();
 
-    uint32_t mNumBytesSent = 0;
+    static constexpr size_t kFilepathMaxLength = 256;
+    char mFilepath[kFilepathMaxLength];
 
-    chip::Callback::Callback<OnBdxBlockQuery> * mOnBlockQueryCallback             = nullptr;
-    chip::Callback::Callback<OnBdxTransferComplete> * mOnTransferCompleteCallback = nullptr;
-    chip::Callback::Callback<OnBdxTransferFailed> * mOnTransferFailedCallback     = nullptr;
+    uint32_t mNumBytesSent = 0;
 };

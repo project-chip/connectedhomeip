@@ -22,16 +22,18 @@
 #include <messaging/Flags.h>
 #include <protocols/bdx/BdxTransferSession.h>
 
-#include <fstream>
-
 using namespace chip::bdx;
-
-uint32_t numBlocksRead   = 0;
-const char outFilePath[] = "test-ota-out.txt";
 
 void BdxDownloader::SetInitialExchange(chip::Messaging::ExchangeContext * ec)
 {
     mExchangeCtx = ec;
+}
+
+void BdxDownloader::SetCallbacks(BdxDownloaderCallbacks callbacks)
+{
+    mOnBlockReceivedCallback    = callbacks.onBlockReceived;
+    mOnTransferCompleteCallback = callbacks.onTransferComplete;
+    mOnTransferFailedCallback   = callbacks.onTransferFailed;
 }
 
 void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
@@ -48,7 +50,14 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
     case TransferSession::OutputEventType::kNone:
         if (mIsTransferComplete)
         {
-            ChipLogDetail(BDX, "Transfer complete! Contents written/appended to %s", outFilePath);
+            if (mOnTransferCompleteCallback != nullptr && mOnTransferCompleteCallback->mCall != nullptr)
+            {
+                mOnTransferCompleteCallback->mCall(mOnTransferCompleteCallback->mContext);
+            }
+            else
+            {
+                ChipLogError(BDX, "onTransferComplete Callback not set");
+            }
             mTransfer.Reset();
             mIsTransferComplete = false;
         }
@@ -75,11 +84,15 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
     case TransferSession::OutputEventType::kBlockReceived: {
         ChipLogDetail(BDX, "Got block length %zu", event.blockdata.Length);
 
-        // TODO: something more elegant than appending to a local file
         // TODO: while convenient, we should not do a synchronous block write in our example application - this is bad practice
-        std::ofstream otaFile(outFilePath, std::ifstream::out | std::ifstream::ate | std::ifstream::app);
-        otaFile.write(reinterpret_cast<const char *>(event.blockdata.Data), static_cast<std::streamsize>(event.blockdata.Length));
-
+        if (mOnBlockReceivedCallback != nullptr && mOnBlockReceivedCallback->mCall != nullptr)
+        {
+            mOnBlockReceivedCallback->mCall(mOnBlockReceivedCallback->mContext, event.blockdata);
+        }
+        else
+        {
+            ChipLogError(BDX, "onBlockReceived Callback not set");
+        }
         if (event.blockdata.IsEof)
         {
             err = mTransfer.PrepareBlockAck();
@@ -95,16 +108,40 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
     }
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
+        if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
+        {
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext, kErrorBdxDownloaderStatusReceived);
+        }
+        else
+        {
+            ChipLogError(BDX, "onTransferFailed Callback not set");
+        }
         mTransfer.Reset();
         mExchangeCtx->Close();
         break;
     case TransferSession::OutputEventType::kInternalError:
         ChipLogError(BDX, "InternalError");
+        if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
+        {
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext, kErrorBdxDownloaderInternal);
+        }
+        else
+        {
+            ChipLogError(BDX, "onTransferFailed Callback not set");
+        }
         mTransfer.Reset();
         mExchangeCtx->Close();
         break;
     case TransferSession::OutputEventType::kTransferTimeout:
         ChipLogError(BDX, "Transfer timed out");
+        if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
+        {
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext, kErrorBdxDownloaderTimeOut);
+        }
+        else
+        {
+            ChipLogError(BDX, "onTransferFailed Callback not set");
+        }
         mTransfer.Reset();
         mExchangeCtx->Close();
         break;

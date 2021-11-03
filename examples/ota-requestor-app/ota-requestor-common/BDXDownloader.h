@@ -22,34 +22,14 @@
 
 #pragma once
 
-// Callback to handle received data
-typedef void (*OnBdxBlockReceived)(void * context, chip::bdx::TransferSession::BlockData & blockdata);
-typedef void (*OnBdxTransferComplete)(void * context);
-typedef void (*OnBdxTransferFailed)(void * context);
-
-// TODO: With this approach we might end up adding callback for every bdx event/message.
-//       Can be refactored into a single callback with events
-struct BdxDownloaderCallbacks
-{
-    chip::Callback::Callback<OnBdxBlockReceived> * onBlockReceived       = nullptr;
-    chip::Callback::Callback<OnBdxTransferComplete> * onTransferComplete = nullptr;
-    chip::Callback::Callback<OnBdxTransferFailed> * onTransferFailed     = nullptr;
-};
-
 class BdxDownloader : public chip::bdx::Initiator
 {
 public:
     void SetInitialExchange(chip::Messaging::ExchangeContext * ec);
-
-    void SetCallbacks(BdxDownloaderCallbacks callbacks);
 
 private:
     // inherited from bdx::Endpoint
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event);
 
     bool mIsTransferComplete = false;
-
-    chip::Callback::Callback<OnBdxBlockReceived> * mOnBlockReceivedCallback       = nullptr;
-    chip::Callback::Callback<OnBdxTransferComplete> * mOnTransferCompleteCallback = nullptr;
-    chip::Callback::Callback<OnBdxTransferFailed> * mOnTransferFailedCallback     = nullptr;
 };
