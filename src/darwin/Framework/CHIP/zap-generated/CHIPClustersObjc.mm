@@ -4785,9 +4785,10 @@ using chip::Callback::Cancelable;
 
 - (void)testListInt8UArgumentRequest:(uint8_t)arg1 responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.TestListInt8UArgumentRequest(success, failure, arg1);
-    });
+    new CHIPTestClusterClusterBooleanResponseCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.TestListInt8UArgumentRequest(success, failure, arg1);
+        });
 }
 
 - (void)testListInt8UReverseRequest:(uint8_t)arg1 responseHandler:(ResponseHandler)responseHandler
@@ -4806,10 +4807,11 @@ using chip::Callback::Cancelable;
                                     f:(uint8_t)f
                       responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.TestListStructArgumentRequest(
-            success, failure, a, b, static_cast<uint8_t>(c), [self asByteSpan:d], [self asCharSpan:e], f);
-    });
+    new CHIPTestClusterClusterBooleanResponseCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.TestListStructArgumentRequest(
+                success, failure, a, b, static_cast<uint8_t>(c), [self asByteSpan:d], [self asCharSpan:e], f);
+        });
 }
 
 - (void)testNotHandled:(ResponseHandler)responseHandler
@@ -4843,10 +4845,11 @@ using chip::Callback::Cancelable;
                                 f:(uint8_t)f
                   responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.TestStructArgumentRequest(
-            success, failure, a, b, static_cast<uint8_t>(c), [self asByteSpan:d], [self asCharSpan:e], f);
-    });
+    new CHIPTestClusterClusterBooleanResponseCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.TestStructArgumentRequest(
+                success, failure, a, b, static_cast<uint8_t>(c), [self asByteSpan:d], [self asCharSpan:e], f);
+        });
 }
 
 - (void)testUnknownCommand:(ResponseHandler)responseHandler

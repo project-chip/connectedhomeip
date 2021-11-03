@@ -22952,7 +22952,7 @@ private:
         cluster.Associate(mDevice, 1);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
         chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type request;
 
@@ -22964,7 +22964,7 @@ private:
         request.arg1.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_0();
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_0(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -22975,7 +22975,11 @@ private:
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_0() { NextTest(); }
+    void OnSuccessResponse_0(bool value)
+    {
+        VerifyOrReturn(CheckValue<bool>("value", value, true));
+        NextTest();
+    }
 
     CHIP_ERROR TestSendTestCommandWithStructArgumentAndArg1bIsFalse_1()
     {
@@ -22983,7 +22987,7 @@ private:
         cluster.Associate(mDevice, 1);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
         chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type request;
 
@@ -22995,7 +22999,7 @@ private:
         request.arg1.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_1();
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_1(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -23004,9 +23008,13 @@ private:
         return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
     }
 
-    void OnFailureResponse_1(uint8_t status) { NextTest(); }
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_1(bool value)
+    {
+        VerifyOrReturn(CheckValue<bool>("value", value, false));
+        NextTest();
+    }
 
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndNoneOfThemIsSetTo0_2()
     {
@@ -23014,7 +23022,7 @@ private:
         cluster.Associate(mDevice, 1);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
         chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
 
@@ -23031,7 +23039,7 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_2();
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_2(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -23042,7 +23050,11 @@ private:
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2() { NextTest(); }
+    void OnSuccessResponse_2(bool value)
+    {
+        VerifyOrReturn(CheckValue<bool>("value", value, true));
+        NextTest();
+    }
 
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndOneOfThemIsSetTo0_3()
     {
@@ -23050,7 +23062,7 @@ private:
         cluster.Associate(mDevice, 1);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
         chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
 
@@ -23068,7 +23080,7 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_3();
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_3(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -23077,9 +23089,13 @@ private:
         return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
     }
 
-    void OnFailureResponse_3(uint8_t status) { NextTest(); }
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_3(bool value)
+    {
+        VerifyOrReturn(CheckValue<bool>("value", value, false));
+        NextTest();
+    }
 
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndGetItReversed_4()
     {
@@ -23127,7 +23143,7 @@ private:
         cluster.Associate(mDevice, 1);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
         chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type request;
 
@@ -23150,7 +23166,7 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_5();
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_5(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -23161,7 +23177,11 @@ private:
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5() { NextTest(); }
+    void OnSuccessResponse_5(bool value)
+    {
+        VerifyOrReturn(CheckValue<bool>("value", value, true));
+        NextTest();
+    }
 
     CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_6()
     {
@@ -23169,7 +23189,7 @@ private:
         cluster.Associate(mDevice, 1);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
         chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type request;
 
@@ -23192,7 +23212,7 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_6();
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_6(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -23201,9 +23221,13 @@ private:
         return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
     }
 
-    void OnFailureResponse_6(uint8_t status) { NextTest(); }
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_6(bool value)
+    {
+        VerifyOrReturn(CheckValue<bool>("value", value, false));
+        NextTest();
+    }
 
     CHIP_ERROR TestSendTestCommandWithOptionalArgSet_7()
     {

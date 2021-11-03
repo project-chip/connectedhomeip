@@ -35,6 +35,10 @@ tests:
                         e: "char_string",
                         f: 1,
                     }
+      response:
+          values:
+              - name: "value"
+                value: true
 
     - label: "Send Test Command With Struct Argument and arg1.b is false"
       command: "testStructArgumentRequest"
@@ -51,7 +55,9 @@ tests:
                         f: 1,
                     }
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     - label:
           "Send Test Command With Nested Struct Argument and arg1.c.b is true"
@@ -74,6 +80,10 @@ tests:
                                 f: 1,
                             },
                     }
+      response:
+          values:
+              - name: "value"
+                value: true
 
     - label: "Send Test Command With Nested Struct Argument arg1.c.b is false"
       disabled: true
@@ -96,7 +106,9 @@ tests:
                             },
                     }
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     - label:
           "Send Test Command With Nested Struct List Argument and all fields b
@@ -147,6 +159,10 @@ tests:
                             ],
                         g: [0, 255],
                     }
+      response:
+          values:
+              - name: "value"
+                value: false
 
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
@@ -198,7 +214,9 @@ tests:
                         g: [0, 255],
                     }
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     # Tests for List
 
@@ -208,6 +226,10 @@ tests:
           values:
               - name: "arg1"
                 value: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      response:
+          values:
+              - name: "value"
+                value: true
 
     - label: "Send Test Command With List of INT8U and one of them is set to 0"
       command: "testListInt8UArgumentRequest"
@@ -216,7 +238,9 @@ tests:
               - name: "arg1"
                 value: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     - label: "Send Test Command With List of INT8U and get it reversed"
       command: "testListInt8UReverseRequest"
@@ -255,6 +279,10 @@ tests:
                             f: 1,
                         },
                     ]
+      response:
+          values:
+              - name: "value"
+                value: true
 
     - label:
           "Send Test Command With List of Struct Argument and arg1.b of first
@@ -283,7 +311,9 @@ tests:
                         },
                     ]
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     - label:
           "Send Test Command With List of Nested Struct List Argument and all
@@ -336,6 +366,10 @@ tests:
                             g: [0, 255],
                         },
                     ]
+      response:
+          values:
+              - name: "value"
+                value: true
 
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
@@ -389,7 +423,9 @@ tests:
                         },
                     ]
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     # Tests for Nullables and Optionals
 
