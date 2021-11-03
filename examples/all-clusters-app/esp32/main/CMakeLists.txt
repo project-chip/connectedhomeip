@@ -125,6 +125,19 @@ include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
+pw_proto_library(attributes_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/attributes_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/attributes_service.options
+  PREFIX
+    attributes_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
 pw_proto_library(button_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/button_service.proto
@@ -160,6 +173,17 @@ pw_proto_library(lighting_service
     pw_protobuf.common_protos
 )
 
+pw_proto_library(locking_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/locking_service.proto
+  PREFIX
+    locking_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
 pw_proto_library(wifi_service
   SOURCES
     ${CHIP_ROOT}/examples/ipv6only-app/common/wifi_service/wifi_service.proto
@@ -174,9 +198,11 @@ pw_proto_library(wifi_service
 )
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC
+  attributes_service.nanopb_rpc
   button_service.nanopb_rpc
   device_service.nanopb_rpc
   lighting_service.nanopb_rpc
+  locking_service.nanopb_rpc
   wifi_service.nanopb_rpc
   pw_checksum
   pw_hdlc
