@@ -188,6 +188,18 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
 }
 
 template <class ImplClass>
+void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_ProcessDeviceEvents()
+{
+    ChipDeviceEvent event;
+    BaseType_t eventReceived = xQueueReceive(mChipEventQueue, &event, 0);
+    while (eventReceived == pdTRUE)
+    {
+        Impl()->DispatchEvent(&event);
+        eventReceived = xQueueReceive(mChipEventQueue, &event, 0);
+    }
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartEventLoopTask(void)
 {
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK

@@ -91,6 +91,8 @@ protected:
     void _UnlockChipStack();
     CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop();
+    void _ProcessDeviceEvents();
+
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
@@ -106,8 +108,6 @@ private:
     // ===== Private members for use by this class only.
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
-
-    void ProcessDeviceEvents();
 
     DeviceSafeQueue mChipEventQueue;
     std::atomic<bool> mShouldRunEventLoop;

@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 // Include configuration headers
 #include <system/SystemConfig.h>
 

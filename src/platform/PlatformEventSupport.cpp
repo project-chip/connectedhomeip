@@ -27,8 +27,6 @@
 
 #include <platform/PlatformManager.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-
 namespace chip {
 namespace System {
 
@@ -62,5 +60,3 @@ CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, System::Clock::T
 
 } // namespace System
 } // namespace chip
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP

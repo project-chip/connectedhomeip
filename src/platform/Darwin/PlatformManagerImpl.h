@@ -62,6 +62,7 @@ private:
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
     void _RunEventLoop();
+    void _ProcessDeviceEvents();
     void _LockChipStack(){};
     bool _TryLockChipStack() { return false; };
     void _UnlockChipStack(){};
