@@ -23,7 +23,6 @@
  *
  **/
 #include "DeviceCallbacks.h"
-// #include "OTARequesterImpl.h"
 
 #include "esp_heap_caps.h"
 #include "esp_log.h"
@@ -68,8 +67,10 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                                   uint8_t type, uint16_t size, uint8_t * value)
 {
-    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '" ChipLogFormatMEI "', EndPoint ID: '0x%02x', Attribute ID: '" ChipLogFormatMEI "'", ChipLogValueMEI(clusterId),
-             endpointId, ChipLogValueMEI(attributeId));
+    ESP_LOGI(TAG,
+             "PostAttributeChangeCallback - Cluster ID: '" ChipLogFormatMEI
+             "', EndPoint ID: '0x%02x', Attribute ID: '" ChipLogFormatMEI "'",
+             ChipLogValueMEI(clusterId), endpointId, ChipLogValueMEI(attributeId));
 
     // TODO handle this callback in switch statement
     ESP_LOGI(TAG, "Unhandled cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
