@@ -38,13 +38,13 @@ class ClusterInteractionFragment : Fragment() {
     scope = viewLifecycleOwner.lifecycleScope
 
     return inflater.inflate(R.layout.cluster_interaction_fragment, container, false).apply {
-      deviceController.setCompletionListener(ChipControllerCallback())
+      deviceController.setCompletionListener(GenericChipDeviceListener())
       endpointList.visibility = View.GONE
       getEndpointListBtn.setOnClickListener {
         scope.launch {
           devicePtr =
             ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-          showMessage("Button Clicked")
+          showMessage("Retrieving endpoints")
           endpointList.visibility = View.VISIBLE
         }
       }
@@ -69,6 +69,7 @@ class ClusterInteractionFragment : Fragment() {
     }
   }
 
+<<<<<<< HEAD
   inner class ChipControllerCallback : GenericChipDeviceListener() {
     override fun onConnectDeviceComplete() {}
 
@@ -86,6 +87,11 @@ class ClusterInteractionFragment : Fragment() {
     override fun onError(error: Throwable?) {
       Log.d(TAG, "onError: $error")
     }
+=======
+  override fun onStop() {
+    super.onStop()
+    scope.cancel()
+>>>>>>> d3d83a0bc (select different cluster, command will remove previous displayed parameter)
   }
 
   companion object {

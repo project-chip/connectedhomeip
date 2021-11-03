@@ -1,10 +1,12 @@
 package com.google.chip.chiptool.clusterclient.clusterinteraction
 
 import android.os.Bundle
+import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.LinearLayout
@@ -72,15 +74,28 @@ class ClusterDetailFragment : Fragment() {
 >>>>>>> 7c783e227 (add back class description)
     return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
       deviceController.setCompletionListener(GenericChipDeviceListener())
+<<<<<<< HEAD
       commandAutoCompleteTv.visibility = View.GONE
       clusterAutoCompleteSetup(clusterAutoCompleteTv, commandAutoCompleteTv, parameterList)
       commandAutoCompleteSetup(commandAutoCompleteTv, inflater, parameterList, callbackList)
+=======
+      commandAutoComplete.visibility = View.GONE
+      clusterAutoCompleteSetup(clusterAutoComplete, commandAutoComplete, parameterList)
+      commandAutoCompleteSetup(commandAutoComplete, inflater, parameterList, callbackList)
+>>>>>>> d3d83a0bc (select different cluster, command will remove previous displayed parameter)
       invokeCommand.setOnClickListener {
         val commandArguments = HashMap<String, Any>()
         parameterList.forEach {
           val type =
+<<<<<<< HEAD
             selectedCommandInfo.commandParameters[it.clusterParameterNameTv.text.toString()]!!.type
           val data = castStringToType(it.clusterParameterData.text.toString(), type)!!
+=======
+            selectedCommandInfo.commandParameters[it.parameterName.text.toString()]!!.type!!
+          val data = castCorrectType(type, it.parameterData.text.toString())!!
+          commandArguments[it.parameterName.text.toString()] = data
+        }
+>>>>>>> d3d83a0bc (select different cluster, command will remove previous displayed parameter)
 
 <<<<<<< HEAD
           commandArguments[it.clusterParameterNameTv.text.toString()] = data
@@ -148,8 +163,13 @@ class ClusterDetailFragment : Fragment() {
       selectedCommandInfo = selectedClusterInfo.commands[selectedCommand]!!
       selectedCommandCallback = selectedCommandInfo.commandCallbackSupplier.get()
       populateCommandParameter(inflater, parameterList)
+<<<<<<< HEAD
       selectedCommandCallback.setCallbackDelegate(object : ClusterCommandCallback {
         override fun onSuccess(responseValues: Map<CommandResponseInfo, Any>) {
+=======
+      selectedCommandCallback!!.setCallbackDelegate(object : ClusterCommandCallback {
+        override fun onSuccess(responseValues: Map<String, Any>) {
+>>>>>>> d3d83a0bc (select different cluster, command will remove previous displayed parameter)
           showMessage("Command success")
           // Populate UI based on response values. We know the types from CommandInfo.getCommandResponses().
           requireActivity().runOnUiThread {
@@ -199,10 +219,14 @@ class ClusterDetailFragment : Fragment() {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   private fun getCommandOptions(
 =======
   private fun getCommand(
 >>>>>>> 7c783e227 (add back class description)
+=======
+  private fun getCommandOptions(
+>>>>>>> d3d83a0bc (select different cluster, command will remove previous displayed parameter)
     clusterName: String
   ): ArrayAdapter<String> {
     selectedClusterInfo = clusterMap[clusterName]!!
@@ -210,8 +234,17 @@ class ClusterDetailFragment : Fragment() {
     return ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, commandNameList)
   }
 
+<<<<<<< HEAD
   private fun constructHint(clusterMap: Map<String, *>): Array<String> {
     return clusterMap.keys.toTypedArray()
+=======
+  private fun constructHint(clusterMap: HashMap<String, *>): Array<String> {
+    val clusterName = mutableListOf<String>()
+    for ((name, info) in clusterMap) {
+      clusterName.add(name)
+    }
+    return clusterName.toTypedArray()
+>>>>>>> d3d83a0bc (select different cluster, command will remove previous displayed parameter)
   }
 
   override fun onStop() {
