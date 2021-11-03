@@ -62,8 +62,8 @@ static DeviceCallbacks EchoCallbacks;
 // TODO: this should probably be done dynamically
 constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 
-constexpr uint32_t kMaxBdxBlockSize                = 1024;
-constexpr chip::System::Clock::Timeout kBdxTimeout = chip::System::Clock::Seconds16(5 * 60); // Specification mandates >= 5 minutes
+constexpr uint32_t kMaxBdxBlockSize                 = 1024;
+constexpr chip::System::Clock::Timeout kBdxTimeout  = chip::System::Clock::Seconds16(5 * 60); // Specification mandates >= 5 minutes
 constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
 const char * gOtaFilename                           = "hello-world.bin";
 BdxOtaSender bdxServer;
@@ -80,8 +80,7 @@ chip::Callback::Callback<OnBdxBlockQuery> mOnBlockQuery(OnBlockQuery, nullptr);
 chip::Callback::Callback<OnBdxTransferComplete> mOnTransferComplete(OnTransferComplete, nullptr);
 chip::Callback::Callback<OnBdxTransferFailed> mOnTransferFailed(OnTransferFailed, nullptr);
 
-CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf,
-                        size_t & size, bool & isEof, uint32_t offset)
+CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset)
 {
     if (otaTransferInProgress == false)
     {
@@ -94,7 +93,7 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
     }
 
     uint16_t blockBufAvailableLength = blockBuf->AvailableDataLength();
-    uint16_t transferBlockSize = bdxServer.GetTransferBlockSize();
+    uint16_t transferBlockSize       = bdxServer.GetTransferBlockSize();
 
     size = (blockBufAvailableLength < transferBlockSize) ? blockBufAvailableLength : transferBlockSize;
 

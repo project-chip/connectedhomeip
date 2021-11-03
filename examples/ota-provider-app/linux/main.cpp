@@ -76,7 +76,7 @@ chip::Callback::Callback<OnBdxTransferFailed> mOnTransferFailed(OnTransferFailed
 CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset)
 {
     uint16_t blockBufAvailableLength = blockBuf->AvailableDataLength();
-    uint16_t transferBlockSize = bdxServer.GetTransferBlockSize();
+    uint16_t transferBlockSize       = bdxServer.GetTransferBlockSize();
 
     uint16_t bytesToRead = (blockBufAvailableLength < transferBlockSize) ? blockBufAvailableLength : transferBlockSize;
 
@@ -95,9 +95,9 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
         return CHIP_ERROR_READ_FAILED;
     }
 
-    size  = static_cast<size_t>(otaFile.gcount());
-    isEof = (size < bytesToRead) ||
-            (offset + static_cast<uint64_t>(size) == bdxServer.GetTransferLength() || otaFile.peek() == EOF);
+    size = static_cast<size_t>(otaFile.gcount());
+    isEof =
+        (size < bytesToRead) || (offset + static_cast<uint64_t>(size) == bdxServer.GetTransferLength() || otaFile.peek() == EOF);
     return CHIP_NO_ERROR;
 }
 

@@ -93,8 +93,9 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
 
         if (mOnBlockQueryCallback != nullptr && mOnBlockQueryCallback->mCall != nullptr)
         {
-            if (CHIP_NO_ERROR != mOnBlockQueryCallback->mCall(mOnBlockQueryCallback->mContext, blockBuf,
-                                                              blockData.Length, blockData.IsEof, mNumBytesSent))
+            if (CHIP_NO_ERROR !=
+                mOnBlockQueryCallback->mCall(mOnBlockQueryCallback->mContext, blockBuf, blockData.Length, blockData.IsEof,
+                                             mNumBytesSent))
             {
                 ChipLogError(BDX, "onBlockQuery Callback failed");
                 mTransfer.AbortTransfer(StatusCode::kUnknown);

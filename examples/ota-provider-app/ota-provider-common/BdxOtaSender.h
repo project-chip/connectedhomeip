@@ -40,8 +40,8 @@ enum BdxSenderErrorTypes
  *
  * @return \c CHIP_NO_ERROR on success; return appropriate error code otherwise
  */
-typedef CHIP_ERROR (*OnBdxBlockQuery)(void * context, chip::System::PacketBufferHandle & blockBuf,
-                                      size_t & size, bool & isEof, uint32_t offset);
+typedef CHIP_ERROR (*OnBdxBlockQuery)(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof,
+                                      uint32_t offset);
 
 /**
  * @brief
