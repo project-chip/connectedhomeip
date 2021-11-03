@@ -130,7 +130,7 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
     return CHIP_NO_ERROR;
 }
 
-void PlatformManagerImpl::ProcessDeviceEvents()
+void PlatformManagerImpl::_ProcessDeviceEvents()
 {
     mQueue.dispatch(0);
 }
@@ -178,7 +178,7 @@ void PlatformManagerImpl::_RunEventLoop()
 
         SystemLayerSocketsLoop().HandleEvents();
 
-        ProcessDeviceEvents();
+        _ProcessDeviceEvents();
     }
     SystemLayerSocketsLoop().EventLoopEnds();
 

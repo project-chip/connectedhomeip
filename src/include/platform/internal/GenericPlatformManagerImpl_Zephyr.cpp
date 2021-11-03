@@ -124,7 +124,7 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDe
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_Zephyr<ImplClass>::ProcessDeviceEvents()
+void GenericPlatformManagerImpl_Zephyr<ImplClass>::_ProcessDeviceEvents()
 {
     ChipDeviceEvent event;
 
@@ -148,7 +148,7 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
 
         SystemLayerSocketsLoop().HandleEvents();
 
-        ProcessDeviceEvents();
+        _ProcessDeviceEvents();
     }
     SystemLayerSocketsLoop().EventLoopEnds();
 
