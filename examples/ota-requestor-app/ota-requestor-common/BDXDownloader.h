@@ -22,10 +22,40 @@
 
 #pragma once
 
-// Callback to handle received data
-typedef void (*OnBdxBlockReceived)(void * context, chip::bdx::TransferSession::BlockData & blockdata);
+enum BdxDownloaderErrorTypes
+{
+    kErrorBdxDownloaderNoError = 0,
+    kErrorBdxDownloaderStatusReceived,
+    kErrorBdxDownloaderInternal,
+    kErrorBdxDownloaderTimeOut,
+};
+
+/**
+ * @brief
+ *   This callback is called when bdx transfer receives Block or BlockEOF message
+ *
+ * @param[in] context   User context
+ * @param[in] blockData BlockData structure which contains pointer to data, length of data and IsEof flag
+ */
+typedef void (*OnBdxBlockReceived)(void * context, const chip::bdx::TransferSession::BlockData & blockdata);
+
+/**
+ * @brief
+ *   This callback is called after BlockEOF message is processed
+ *
+ * @param[in] context User context
+ */
 typedef void (*OnBdxTransferComplete)(void * context);
-typedef void (*OnBdxTransferFailed)(void * context);
+
+/**
+ * @brief
+ *   This callback is called when bdx transfer receives StatusReport messages,
+ *   if there is any internal error, or transfer timed out
+ *
+ * @param[in] context User context
+ * @param[in] status Error code
+ */
+typedef void (*OnBdxTransferFailed)(void * context, BdxDownloaderErrorTypes status);
 
 // TODO: With this approach we might end up adding callback for every bdx event/message.
 //       Can be refactored into a single callback with events

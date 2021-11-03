@@ -63,29 +63,42 @@ OTAProviderExample::queryImageBehaviorType gQueryImageBehavior = OTAProviderExam
 uint32_t gDelayedActionTimeSec                                 = 0;
 const char * gOtaFilepath                                      = nullptr;
 uint32_t otaTransferInProgress                                 = false;
+BdxOtaSender bdxServer;
 
-void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
+CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
 void OnTransferComplete(void * context);
-void OnTransferFailed(void * context);
+void OnTransferFailed(void * context, BdxSenderErrorTypes status);
 
 chip::Callback::Callback<OnBdxBlockQuery> mOnBlockQuery(OnBlockQuery, nullptr);
 chip::Callback::Callback<OnBdxTransferComplete> mOnTransferComplete(OnTransferComplete, nullptr);
 chip::Callback::Callback<OnBdxTransferFailed> mOnTransferFailed(OnTransferFailed, nullptr);
 
-void OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset)
+CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset)
 {
+    uint16_t blockBufAvailableLength = blockBuf->AvailableDataLength();
+    uint16_t transferBlockSize       = bdxServer.GetTransferBlockSize();
+
+    uint16_t bytesToRead = (blockBufAvailableLength < transferBlockSize) ? blockBufAvailableLength : transferBlockSize;
+
     std::ifstream otaFile(gOtaFilepath, std::ifstream::in);
-    VerifyOrReturn(otaFile.good(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
+    if (otaFile.good() == false)
+    {
+        ChipLogError(BDX, "%s: file read failed", __FUNCTION__);
+        return CHIP_ERROR_READ_FAILED;
+    }
+
     otaFile.seekg(offset);
-    otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), kMaxBdxBlockSize);
+    otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
     if ((otaFile.good() || otaFile.eof()) == false)
     {
         ChipLogError(BDX, "%s: file read failed", __FUNCTION__);
-        return;
+        return CHIP_ERROR_READ_FAILED;
     }
 
-    size  = static_cast<size_t>(otaFile.gcount());
-    isEof = (size < kMaxBdxBlockSize || otaFile.peek() == EOF);
+    size = static_cast<size_t>(otaFile.gcount());
+    isEof =
+        (size < bytesToRead) || (offset + static_cast<uint64_t>(size) == bdxServer.GetTransferLength() || otaFile.peek() == EOF);
+    return CHIP_NO_ERROR;
 }
 
 void OnTransferComplete(void * context)
@@ -94,9 +107,9 @@ void OnTransferComplete(void * context)
     otaTransferInProgress = false;
 }
 
-void OnTransferFailed(void * context)
+void OnTransferFailed(void * context, BdxSenderErrorTypes status)
 {
-    ChipLogDetail(SoftwareUpdate, "OTA file transfer failed");
+    ChipLogDetail(SoftwareUpdate, "OTA file transfer failed, status:%x", status);
     otaTransferInProgress = false;
 }
 
@@ -176,7 +189,6 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     OTAProviderExample otaProvider;
-    BdxOtaSender bdxServer;
 
     if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
     {

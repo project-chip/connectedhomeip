@@ -54,6 +54,10 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
             {
                 mOnTransferCompleteCallback->mCall(mOnTransferCompleteCallback->mContext);
             }
+            else
+            {
+                ChipLogError(BDX, "onTransferComplete Callback not set");
+            }
             mTransfer.Reset();
             mIsTransferComplete = false;
         }
@@ -85,6 +89,10 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
         {
             mOnBlockReceivedCallback->mCall(mOnBlockReceivedCallback->mContext, event.blockdata);
         }
+        else
+        {
+            ChipLogError(BDX, "onBlockReceived Callback not set");
+        }
         if (event.blockdata.IsEof)
         {
             err = mTransfer.PrepareBlockAck();
@@ -102,7 +110,11 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
         ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
         if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
         {
-            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext);
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext, kErrorBdxDownloaderStatusReceived);
+        }
+        else
+        {
+            ChipLogError(BDX, "onTransferFailed Callback not set");
         }
         mTransfer.Reset();
         mExchangeCtx->Close();
@@ -111,7 +123,11 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
         ChipLogError(BDX, "InternalError");
         if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
         {
-            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext);
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext, kErrorBdxDownloaderInternal);
+        }
+        else
+        {
+            ChipLogError(BDX, "onTransferFailed Callback not set");
         }
         mTransfer.Reset();
         mExchangeCtx->Close();
@@ -120,7 +136,11 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
         ChipLogError(BDX, "Transfer timed out");
         if (mOnTransferFailedCallback != nullptr && mOnTransferFailedCallback->mCall != nullptr)
         {
-            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext);
+            mOnTransferFailedCallback->mCall(mOnTransferFailedCallback->mContext, kErrorBdxDownloaderTimeOut);
+        }
+        else
+        {
+            ChipLogError(BDX, "onTransferFailed Callback not set");
         }
         mTransfer.Reset();
         mExchangeCtx->Close();

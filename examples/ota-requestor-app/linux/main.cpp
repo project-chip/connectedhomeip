@@ -53,9 +53,9 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
 void OnConnectionFailure(void * context, OperationalDeviceProxy * operationalDeviceProxy, CHIP_ERROR error);
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 
-void OnBlockReceived(void * context, chip::bdx::TransferSession::BlockData & blockdata);
+void OnBlockReceived(void * context, const chip::bdx::TransferSession::BlockData & blockdata);
 void OnTransferComplete(void * context);
-void OnTransferFailed(void * context);
+void OnTransferFailed(void * context, BdxDownloaderErrorTypes status);
 
 // TODO: would be nicer to encapsulate these globals and the callbacks in some sort of class
 OperationalDeviceProxy gOperationalDeviceProxy;
@@ -259,7 +259,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     return (retval);
 }
 
-void OnBlockReceived(void * context, chip::bdx::TransferSession::BlockData & blockdata)
+void OnBlockReceived(void * context, const chip::bdx::TransferSession::BlockData & blockdata)
 {
     std::ofstream otaFile(outFilePath, std::ifstream::out | std::ifstream::ate | std::ifstream::app);
     otaFile.write(reinterpret_cast<const char *>(blockdata.Data), static_cast<std::streamsize>(blockdata.Length));
@@ -270,9 +270,9 @@ void OnTransferComplete(void * context)
     ChipLogDetail(SoftwareUpdate, "Transfer complete! Contents written/appended to %s", outFilePath);
 }
 
-void OnTransferFailed(void * context)
+void OnTransferFailed(void * context, BdxDownloaderErrorTypes status)
 {
-    ChipLogDetail(SoftwareUpdate, "Transfer Failed");
+    ChipLogDetail(SoftwareUpdate, "Transfer Failed, status:%x", status);
 }
 
 void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::FabricIndex peerFabricIndex = providerFabricIndex)

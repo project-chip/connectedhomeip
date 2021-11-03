@@ -13,8 +13,9 @@ $ cd examples/ota-requestor-app/esp32
 $ idf.py -p <ProviderSerialPort> build flash
 ```
 
--   Flash hello-world OTA binary in providor app. Please find hello-world.bin
-    [here](http://shubhamdp.github.io/esp_ota/esp32/hello-world-flash-in-ota-provider-partition.bin)
+-   Flash hello-world OTA binary in provider app. Please find hello-world.bin
+    [here](http://shubhamdp.github.io/esp_ota/esp32/hello-world-flash-in-ota-provider-partition.bin).
+    This is the OTA upgrade image and will be sent to OTA requestor.
 
 ```
 esptool.py -p <ProviderSerialPort> write_flash 0x206400 hello-world-flash-in-ota-provider-partition.bin
@@ -40,14 +41,14 @@ $ ./chip-tool pairing ble-wifi 123456 <ssid> <passphrase> 0 20202021 3840
 ## QueryImage from requestor console
 
 ```
-esp32> QueryImage <ip> 12345 // node id should be in decimal
+esp32> QueryImage <IPAddressOfProvider> 12345 // node id should be in decimal
 ```
 
 When the image download is complete device waits for an ApplyUpdate command, so
 fire following command from Requestor app
 
 ```
-esp32> ApplyUpdateRequest <ip> 12345 // node id should be in decimal
+esp32> ApplyUpdateRequest <IPAddressOfProvider> 12345 // node id should be in decimal
 ```
 
 After this Requestor will run hello-world application.
