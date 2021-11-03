@@ -71,6 +71,7 @@ protected:
     void _UnlockChipStack(void);
     CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop(void);
+    void _ProcessDeviceEvents();
     CHIP_ERROR _StartEventLoopTask(void);
     CHIP_ERROR _StopEventLoopTask();
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);

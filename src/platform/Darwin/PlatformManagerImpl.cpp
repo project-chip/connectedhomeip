@@ -108,6 +108,11 @@ void PlatformManagerImpl::_RunEventLoop()
     dispatch_semaphore_wait(mRunLoopSem, DISPATCH_TIME_FOREVER);
 }
 
+void PlatformManagerImpl::_ProcessDeviceEvents()
+{
+    // Not implemented
+}
+
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
     // Call up to the base class _Shutdown() to perform the bulk of the shutdown.

@@ -123,6 +123,7 @@ static_library("system") {
   output_name = "libSystemLayer"
 
   sources = [
+    "PlatformEventSupport.h",
     "SystemAlignSize.h",
     "SystemClock.cpp",
     "SystemClock.h",
@@ -168,10 +169,6 @@ static_library("system") {
     if (chip_system_config_event_loop == "Libevent") {
       libs = [ "event" ]
     }
-  }
-
-  if (chip_system_config_use_lwip) {
-    sources += [ "PlatformEventSupport.h" ]
   }
 
   if (chip_with_nlfaultinjection) {
