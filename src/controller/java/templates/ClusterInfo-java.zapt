@@ -13,6 +13,7 @@ import chip.clusterinfo.CommandInfo;
 import chip.clusterinfo.CommandParameterInfo;
 import chip.clusterinfo.DelegatedClusterCallback;
 import chip.clusterinfo.ClusterCommandCallback;
+import chip.clusterinfo.ResponseValueInfo;
 import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
 
 
@@ -29,7 +30,7 @@ public class ClusterInfoMapping {
     // Parameters and list-adds here should be generated - refer to the template code that creates each callback interface.
     @Override
     public void onSuccess() {
-      Map<String, Object> responseValues = new LinkedHashMap<>();
+      Map<ResponseValueInfo, Object> responseValues = new LinkedHashMap<>();
       callback.onSuccess(responseValues);
     }
 
@@ -62,13 +63,14 @@ public class ClusterInfoMapping {
            {{/if}}
         {{/chip_cluster_response_arguments}}
         ) {
-           Map<String, Object> responseValues = new LinkedHashMap<>();
+           Map<ResponseValueInfo, Object> responseValues = new LinkedHashMap<>();
            {{#chip_cluster_response_arguments}}
              {{#if isArray}}
                // {{asSymbol label}}: {{asUnderlyingZclType type}}
                // Conversion from this type to Java is not properly implemented yet
              {{else}}
-           responseValues.put("{{asSymbol label}},{{asJavaBasicType type}}", {{asSymbol label}});
+           ResponseValueInfo {{asSymbol label}}ResponseValue = new ResponseValueInfo("{{asSymbol label}}", "{{asJavaBasicType type}}");
+           responseValues.put({{asSymbol label}}ResponseValue, {{asSymbol label}});
              {{/if}}
            {{/chip_cluster_response_arguments}}
            callback.onSuccess(responseValues);

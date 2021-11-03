@@ -71,6 +71,7 @@ android_library("java") {
     "src/chip/clusterinfo/ClusterInfo.java",
     "src/chip/clusterinfo/CommandInfo.java",
     "src/chip/clusterinfo/CommandParameterInfo.java",
+    "src/chip/clusterinfo/ResponseValueInfo.java",
     "src/chip/clusterinfo/DelegatedClusterCallback.java",
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
