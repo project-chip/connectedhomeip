@@ -22,7 +22,7 @@ tests:
     - label: "Sending Off command"
       cluster: "On/Off"
       command: "on"
-
+      
     - label: "Precondition: DUT level is set to 0x80"
       command: "Step"
       arguments:
@@ -46,9 +46,7 @@ tests:
               - name: "ms"
                 value: 3000
 
-    #Disabling test steps as test cases was failing on darwin build [Attribute was returning 255 [null]]
     - label: "Reads current level attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "current level"
       response:
