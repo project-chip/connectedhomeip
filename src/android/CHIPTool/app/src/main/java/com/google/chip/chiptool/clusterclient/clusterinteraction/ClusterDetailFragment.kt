@@ -280,7 +280,6 @@ class ClusterDetailFragment : Fragment() {
 =======
     private const val CLUSTER_MAP_INFO = "cluster_map_info"
     private const val DEVICE_PTR = "device_ptr"
-    private const val ENDPOINT_ID = "endpoint_id"
     fun newInstance(
       clusterMap: HashMap<String, ClusterInfo>,
       deviceId: Long
