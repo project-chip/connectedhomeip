@@ -6607,6 +6607,25 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTest_TC_CC_9_2_000013_Off
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster off:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Turn off light that we turned on Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTest_TC_CC_9_3_000000_On
 {
@@ -6922,6 +6941,25 @@ CHIPDevice * GetConnectedDevice()
         XCTAssertEqual(err.code, 0);
 
         XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_3_000013_Off
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster off:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Turn off light that we turned on Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
 
         [expectation fulfill];
     }];
@@ -8159,7 +8197,26 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_LVL_4_1_000000_Step
+- (void)testSendClusterTest_TC_LVL_4_1_000000_On
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sending Off command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster on:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Sending Off command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_LVL_4_1_000001_Step
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Precondition: DUT level is set to 0x80"];
 
@@ -8188,7 +8245,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000001_WaitForMs
+- (void)testSendClusterTest_TC_LVL_4_1_000002_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
@@ -8196,7 +8253,7 @@ CHIPDevice * GetConnectedDevice()
     WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000002_ReadAttribute
+- (void)testSendClusterTest_TC_LVL_4_1_000003_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads current level attribute from DUT"];
 
@@ -8217,7 +8274,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000003_Step
+- (void)testSendClusterTest_TC_LVL_4_1_000004_Step
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends step down command to DUT"];
 
@@ -8246,7 +8303,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000004_WaitForMs
+- (void)testSendClusterTest_TC_LVL_4_1_000005_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
@@ -8254,7 +8311,7 @@ CHIPDevice * GetConnectedDevice()
     WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000005_ReadAttribute
+- (void)testSendClusterTest_TC_LVL_4_1_000006_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads current level attribute from DUT"];
 
@@ -8275,7 +8332,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000006_Step
+- (void)testSendClusterTest_TC_LVL_4_1_000007_Step
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends a Step up command"];
 
@@ -8304,7 +8361,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000007_WaitForMs
+- (void)testSendClusterTest_TC_LVL_4_1_000008_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
@@ -8312,7 +8369,7 @@ CHIPDevice * GetConnectedDevice()
     WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000008_ReadAttribute
+- (void)testSendClusterTest_TC_LVL_4_1_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads current level attribute from DUT"];
 
@@ -8333,8 +8390,46 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTest_TC_LVL_4_1_000010_Off
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sending Off command"];
 
-- (void)testSendClusterTest_TC_LVL_5_1_000000_Step
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster off:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Sending Off command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_LVL_5_1_000000_On
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sending Off command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster on:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Sending Off command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_LVL_5_1_000001_Step
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Precondition: DUT level is set to 0x80"];
 
@@ -8363,7 +8458,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_5_1_000001_WaitForMs
+- (void)testSendClusterTest_TC_LVL_5_1_000002_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
@@ -8371,7 +8466,7 @@ CHIPDevice * GetConnectedDevice()
     WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_5_1_000002_ReadAttribute
+- (void)testSendClusterTest_TC_LVL_5_1_000003_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads current level attribute from DUT"];
 
@@ -8392,7 +8487,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_5_1_000003_Move
+- (void)testSendClusterTest_TC_LVL_5_1_000004_Move
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends a move up command to DUT"];
 
@@ -8419,7 +8514,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_5_1_000004_WaitForMs
+- (void)testSendClusterTest_TC_LVL_5_1_000005_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
@@ -8427,7 +8522,7 @@ CHIPDevice * GetConnectedDevice()
     WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_5_1_000005_Stop
+- (void)testSendClusterTest_TC_LVL_5_1_000006_Stop
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends stop command to DUT"];
 
@@ -8447,6 +8542,25 @@ CHIPDevice * GetConnectedDevice()
 
             [expectation fulfill];
         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_LVL_5_1_000007_Off
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sending Off command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster off:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Sending Off command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
