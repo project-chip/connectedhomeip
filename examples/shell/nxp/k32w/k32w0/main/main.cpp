@@ -133,7 +133,7 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-    cmd_otcli_init();
+    //cmd_otcli_init();
     cmd_ping_init();
     cmd_send_init();
 
