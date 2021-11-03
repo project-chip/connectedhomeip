@@ -503,9 +503,26 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     attributePathParams.mClusterId   = aClusterInfo.mClusterId;
     attributePathParams.mAttributeId = aClusterInfo.mAttributeId;
 
+    // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
+    // as the input argument.
+    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
+    if (attrOverride != nullptr)
+    {
+        bool dataWrite;
+        ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
+
+        ReturnErrorOnFailure(attrOverride->Write(path, aReader, &dataWrite));
+
+        if (dataWrite)
+        {
+            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+        }
+    }
+
     auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
     return apWriteHandler->AddStatus(attributePathParams, imCode);
 }
+
 } // namespace app
 } // namespace chip
 

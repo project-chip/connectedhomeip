@@ -128,6 +128,27 @@ public:
     virtual CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) = 0;
 
     /**
+     * Callback for writing attributes.
+     *
+     * @param [in] aPath indicates which exact data is being write.
+     * @param [in] aTLVReader  A pointer to a TLVReader, which should point to the beginning
+     *                         of this AttributeDataElement to write.
+     * @param [out] aDataWrite whether we actually tried to write data.  If
+     *                         this function returns success and aDataWrite is
+     *                         false, the AttributeAccessInterface did not try
+     *                         to write any data.  In this case, normal attribute
+     *                         access will happen for the write.  This may involve
+     *                         writing to the attribute store or external attribute
+     *                         callbacks.
+     */
+    virtual CHIP_ERROR Write(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, bool * aDataWrite)
+    {
+        *aDataWrite = false;
+
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      * Mechanism for keeping track of a chain of AttributeAccessInterfaces.
      */
     void SetNext(AttributeAccessInterface * aNext) { mNext = aNext; }
