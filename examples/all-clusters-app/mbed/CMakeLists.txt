@@ -37,6 +37,7 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
                            ${CMAKE_CURRENT_SOURCE_DIR}/main/include/
                            ${APP_ROOT}/all-clusters-common
+                           ${APP_CLUSTERS}
                            ${MBED_COMMON}/util/include
                            ${CHIP_ROOT}/src/app
                            ${CHIP_ROOT}/third_party/nlio/repo/include
@@ -49,6 +50,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/LowPowerManager.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/main/static-supported-modes-manager.cpp
 
                ${MBED_COMMON}/util/LEDWidget.cpp
 
@@ -112,7 +114,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/media-input-server/media-input-server.cpp
                ${APP_CLUSTERS}/media-playback-server/media-playback-server.cpp
                ${APP_CLUSTERS}/mode-select-server/mode-select-server.cpp
-               ${APP_CLUSTERS}/mode-select-server/static-supported-modes-manager.cpp
                ${APP_CLUSTERS}/network-commissioning/network-commissioning-ember.cpp
                ${APP_CLUSTERS}/network-commissioning/network-commissioning.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
