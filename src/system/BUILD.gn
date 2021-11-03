@@ -131,7 +131,6 @@ static_library("system") {
     "SystemError.h",
     "SystemEvent.h",
     "SystemFaultInjection.h",
-    "SystemLayer.cpp",
     "SystemLayer.h",
     "SystemLayerImpl${chip_system_config_event_loop}.cpp",
     "SystemLayerImpl${chip_system_config_event_loop}.h",
@@ -171,7 +170,7 @@ static_library("system") {
   }
 
   if (chip_system_config_use_lwip) {
-    sources += [ "PlatformEventSupport.h" ]
+    sources += [ "LwIPEventSupport.h" ]
   }
 
   if (chip_with_nlfaultinjection) {

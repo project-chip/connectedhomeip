@@ -226,7 +226,7 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         break;
 
     case DeviceEventType::kChipLambdaEvent:
-        event->LambdaEvent();
+        event->LambdaEvent.LambdaProxy(static_cast<const void *>(event->LambdaEvent.LambdaBody));
         break;
 
     case DeviceEventType::kCallWorkFunct:

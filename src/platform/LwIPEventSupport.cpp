@@ -34,11 +34,11 @@ namespace System {
 
 using namespace ::chip::DeviceLayer;
 
-CHIP_ERROR PlatformEventing::ScheduleLambdaBridge(System::Layer & aLayer, LambdaBridge && bridge)
+CHIP_ERROR PlatformEventing::ScheduleLambdaBridge(System::Layer & aLayer, const LambdaBridge & bridge)
 {
     ChipDeviceEvent event;
     event.Type        = DeviceEventType::kChipLambdaEvent;
-    event.LambdaEvent = std::move(bridge);
+    event.LambdaEvent = bridge;
 
     return PlatformMgr().PostEvent(&event);
 }
