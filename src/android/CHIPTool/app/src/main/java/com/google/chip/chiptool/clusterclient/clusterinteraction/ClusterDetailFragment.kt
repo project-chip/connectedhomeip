@@ -36,6 +36,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 
+/**
+ * ClusterDetailFragment allows user to pick cluster, command, specify parameters and see
+ * the callback result.
+ */
 class ClusterDetailFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
@@ -55,7 +59,8 @@ class ClusterDetailFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    clusterMap = checkNotNull(requireArguments().getSerializable(CLUSTER_MAP_INFO )) as HashMap<String, ClusterInfo>
+    clusterMap =
+      checkNotNull(requireArguments().getSerializable(CLUSTER_MAP_INFO)) as HashMap<String, ClusterInfo>
     devicePtr = checkNotNull(requireArguments().getLong(DEVICE_PTR))
     return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
@@ -69,14 +74,15 @@ class ClusterDetailFragment : Fragment() {
           commandArguments.put(it.parameterName.text.toString(), data)
         }
 
-        selectedCommandInfo.getCommandFunction().invokeCommand(selectedCluster, selectedCommandCallback, commandArguments)
+        selectedCommandInfo.getCommandFunction()
+          .invokeCommand(selectedCluster, selectedCommandCallback, commandArguments)
       }
     }
   }
 
   private fun castCorrectType(type: Class<*>, data: String): Any? {
 
-    return when (type){
+    return when (type) {
       Int::class.java -> data.toInt()
       String::class.java -> data
       Boolean::class.java -> data.toBoolean()
@@ -96,7 +102,8 @@ class ClusterDetailFragment : Fragment() {
     commandAutoComplete: AutoCompleteTextView
   ) {
     val clusterNameList = constructHint(clusterMap)
-    val clusterAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, clusterNameList)
+    val clusterAdapter =
+      ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, clusterNameList)
     clusterAutoComplete.setAdapter(clusterAdapter)
     clusterAutoComplete.setOnItemClickListener { parent, view, position, id ->
 
@@ -117,13 +124,19 @@ class ClusterDetailFragment : Fragment() {
       selectedCluster = selectedClusterInfo.createClusterFunction.create(devicePtr, endpointId)
       val selectedCommand: String = commandAutoComplete.adapter.getItem(position).toString()
       selectedCommandInfo = selectedClusterInfo.commands[selectedCommand]!!
-      selectedCommandCallback =  selectedCommandInfo.commandCallbackSupplier.get()
+      selectedCommandCallback = selectedCommandInfo.commandCallbackSupplier.get()
       populateCommandParameter(inflater, parameterList)
       selectedCommandCallback?.setCallbackDelegate(object : ClusterCommandCallback {
         override fun onSuccess(responseValues: Map<String, Any>) {
           showMessage("Command success")
           // Populate UI based on response values. We know the types from CommandInfo.getCommandResponses().
-          requireActivity().runOnUiThread { populateCallbackResult(responseValues,  inflater, callbackList) }
+          requireActivity().runOnUiThread {
+            populateCallbackResult(
+              responseValues,
+              inflater,
+              callbackList
+            )
+          }
           responseValues.forEach { Log.d(TAG, it.toString()) }
         }
 
@@ -145,7 +158,11 @@ class ClusterDetailFragment : Fragment() {
     }
   }
 
-  private fun populateCallbackResult(responseValues: Map<String, Any>, inflater: LayoutInflater, callbackList: LinearLayout) {
+  private fun populateCallbackResult(
+    responseValues: Map<String, Any>,
+    inflater: LayoutInflater,
+    callbackList: LinearLayout
+  ) {
     responseValues.forEach { (variableNameType, response) ->
       val callback = inflater.inflate(R.layout.callback_item, null, false) as LinearLayout
       callback.callbackName.text = variableNameType.split(',')[0]
@@ -156,7 +173,8 @@ class ClusterDetailFragment : Fragment() {
   }
 
   private fun getCommand(
-    clusterName: String): ArrayAdapter<String> {
+    clusterName: String
+  ): ArrayAdapter<String> {
     selectedClusterInfo = clusterMap[clusterName]!!
     val commandNameList = constructHint(selectedClusterInfo.commands as HashMap<String, Any>)
     return ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, commandNameList)
@@ -199,7 +217,10 @@ class ClusterDetailFragment : Fragment() {
     private const val CLUSTER_MAP_INFO = "cluster_map_info"
     private const val DEVICE_PTR = "device_ptr"
     private const val ENDPOINT_ID = "endpoint_id"
-    fun newInstance(clusterMap: HashMap<String, ClusterInfo>, deviceId: Long): ClusterDetailFragment {
+    fun newInstance(
+      clusterMap: HashMap<String, ClusterInfo>,
+      deviceId: Long
+    ): ClusterDetailFragment {
       return ClusterDetailFragment().apply {
         arguments = Bundle(1).apply {
           putSerializable(CLUSTER_MAP_INFO, clusterMap)
@@ -207,7 +228,6 @@ class ClusterDetailFragment : Fragment() {
         }
       }
     }
-
-
   }
+
 }
