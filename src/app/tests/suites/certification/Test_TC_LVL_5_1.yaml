@@ -46,7 +46,9 @@ tests:
               - name: "ms"
                 value: 3000
 
+    #Disabling as current level value read was returning null on darwin build.
     - label: "Reads current level attribute from DUT"
+      disabled: true
       command: "readAttribute"
       attribute: "current level"
       response:

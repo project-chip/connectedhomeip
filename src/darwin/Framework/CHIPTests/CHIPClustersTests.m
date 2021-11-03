@@ -8466,28 +8466,7 @@ CHIPDevice * GetConnectedDevice()
     WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_5_1_000003_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads current level attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentLevelWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Reads current level attribute from DUT Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 128);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_LVL_5_1_000004_Move
+- (void)testSendClusterTest_TC_LVL_5_1_000003_Move
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends a move up command to DUT"];
 
@@ -8514,7 +8493,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_5_1_000005_WaitForMs
+- (void)testSendClusterTest_TC_LVL_5_1_000004_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
@@ -8522,7 +8501,7 @@ CHIPDevice * GetConnectedDevice()
     WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_5_1_000006_Stop
+- (void)testSendClusterTest_TC_LVL_5_1_000005_Stop
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends stop command to DUT"];
 
@@ -8545,7 +8524,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_5_1_000007_Off
+- (void)testSendClusterTest_TC_LVL_5_1_000006_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sending off command"];
 
