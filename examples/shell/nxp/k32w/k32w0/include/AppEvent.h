@@ -31,7 +31,7 @@ struct AppEvent
         kEventType_Install,
     };
 
-    uint16_t Type;
+    AppEventTypes Type;
 
     union
     {
