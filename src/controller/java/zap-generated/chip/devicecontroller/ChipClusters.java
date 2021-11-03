@@ -5765,6 +5765,14 @@ public class ChipClusters {
       reportCurrentPositionAttribute(chipClusterPtr, callback);
     }
 
+    public void readMultiPressMaxAttribute(IntegerAttributeCallback callback) {
+      readMultiPressMaxAttribute(chipClusterPtr, callback);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -5780,6 +5788,12 @@ public class ChipClusters {
 
     private native void reportCurrentPositionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMultiPressMaxAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
