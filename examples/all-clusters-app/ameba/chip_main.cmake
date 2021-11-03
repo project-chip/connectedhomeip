@@ -42,6 +42,7 @@ list(
     ${chip_dir}/examples/all-clusters-app/ameba/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/Globals.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/LEDWidget.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/static-supported-modes-manager.cpp
 )
 
 add_library(
