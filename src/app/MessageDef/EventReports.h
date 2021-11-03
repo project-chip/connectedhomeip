@@ -17,7 +17,7 @@
  */
 /**
  *    @file
- *      This file defines EventList parser and builder in CHIP interaction model
+ *      This file defines EventReports parser and builder in CHIP interaction model
  *
  */
 
@@ -25,7 +25,7 @@
 
 #include "ArrayBuilder.h"
 #include "ArrayParser.h"
-#include "EventDataElement.h"
+#include "EventReportIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -36,7 +36,7 @@
 
 namespace chip {
 namespace app {
-namespace EventList {
+namespace EventReports {
 class Parser : public ArrayParser
 {
 public:
@@ -62,23 +62,22 @@ class Builder : public ArrayBuilder
 {
 public:
     /**
-     *  @brief Initialize a EventDataElement::Builder for writing into the TLV stream
+     *  @brief Initialize a EventReportIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventDataElement::Builder
+     *  @return A reference to EventReportIB::Builder
      */
-    EventDataElement::Builder & CreateEventBuilder();
+    EventReportIB::Builder & CreateEventReport();
 
     /**
-     *  @brief Mark the end of this EventList
+     *  @brief Mark the end of this EventReports
      *
      *  @return A reference to *this
      */
-    EventList::Builder & EndOfEventList();
+    EventReports::Builder & EndOfEventReports();
 
 private:
-    EventDataElement::Builder mEventDataElementBuilder;
+    EventReportIB::Builder mEventReport;
 };
-}; // namespace EventList
-
-}; // namespace app
-}; // namespace chip
+} // namespace EventReports
+} // namespace app
+} // namespace chip

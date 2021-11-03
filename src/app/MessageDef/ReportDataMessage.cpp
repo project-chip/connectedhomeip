@@ -36,22 +36,6 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReportDataMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // make a copy of the reader here
-    mReader.Init(aReader);
-
-    VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = mReader.EnterContainer(mOuterContainerType);
-
-exit:
-
-    return err;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
 {
@@ -59,7 +43,7 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
     AttributeDataList::Parser attributeDataList;
-    EventList::Parser eventList;
+    EventReports::Parser EventReports;
 
     PRETTY_PRINT("ReportDataMessage =");
     PRETTY_PRINT("{");
@@ -115,17 +99,17 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_EventDataList:
+        case kCsTag_EventReports:
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventDataList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_EventDataList);
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventReports)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_EventReports);
             VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                eventList.Init(reader);
+                EventReports.Init(reader);
 
                 PRETTY_PRINT_INCDEPTH();
-                err = eventList.CheckSchemaValidity();
+                err = EventReports.CheckSchemaValidity();
                 SuccessOrExit(err);
                 PRETTY_PRINT_DECDEPTH();
             }
@@ -194,17 +178,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReportDataMessage::Parser::GetEventDataList(EventList::Parser * const apEventDataList) const
+CHIP_ERROR ReportDataMessage::Parser::GetEventReports(EventReports::Parser * const apEventReports) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
 
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventDataList), reader);
+    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventReports), reader);
     SuccessOrExit(err);
 
     VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    err = apEventDataList->Init(reader);
+    err = apEventReports->Init(reader);
     SuccessOrExit(err);
 
 exit:
@@ -216,11 +200,6 @@ exit:
 CHIP_ERROR ReportDataMessage::Parser::GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const
 {
     return GetSimpleValue(kCsTag_MoreChunkedMessages, chip::TLV::kTLVType_Boolean, apMoreChunkedMessages);
-}
-
-CHIP_ERROR ReportDataMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
 }
 
 ReportDataMessage::Builder & ReportDataMessage::Builder::SuppressResponse(const bool aSuppressResponse)
@@ -257,18 +236,18 @@ AttributeDataList::Builder & ReportDataMessage::Builder::CreateAttributeDataList
     return mAttributeDataListBuilder;
 }
 
-EventList::Builder & ReportDataMessage::Builder::CreateEventDataListBuilder()
+EventReports::Builder & ReportDataMessage::Builder::CreateEventReportsBuilder()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mEventDataListBuilder.Init(mpWriter, kCsTag_EventDataList);
+        mError = mEventReportsBuilder.Init(mpWriter, kCsTag_EventReports);
     }
     else
     {
         mAttributeDataListBuilder.ResetError(mError);
     }
-    return mEventDataListBuilder;
+    return mEventReportsBuilder;
 }
 
 ReportDataMessage::Builder & ReportDataMessage::Builder::MoreChunkedMessages(const bool aMoreChunkedMessages)

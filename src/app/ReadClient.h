@@ -64,12 +64,12 @@ public:
          * The ReadClient object MUST continue to exist after this call is completed.
          *
          * @param[in]  apReadClient The read client which initialized the read transaction.
-         * @param[in]  apEventListReader  TLV reader positioned at the list that contains the events.  The
+         * @param[in]  apEventReportsReader  TLV reader positioned at the list that contains the events.  The
          *                                implementation of EventStreamReceived is expected to call Next() on the reader to
          *                                advance it to the first element of the list, then process the elements from beginning to
          *                                the end. The callee is expected to consume all events.
          */
-        virtual void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventList) {}
+        virtual void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventReports) {}
 
         /**
          * OnResponse will be called when a report data response has been received and processed for the given path.

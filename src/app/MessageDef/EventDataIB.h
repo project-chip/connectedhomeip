@@ -17,18 +17,17 @@
  */
 /**
  *    @file
- *      This file defines EventDataElement parser and builder in CHIP interaction model
+ *      This file defines EventDataIB parser and builder in CHIP interaction model
  *
  */
 
 #pragma once
 
-#include "Builder.h"
 #include "EventPathIB.h"
-
-#include "Parser.h"
-
+#include "StructBuilder.h"
+#include "StructParser.h"
 #include <app/AppBuildConfig.h>
+#include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -37,31 +36,22 @@
 
 namespace chip {
 namespace app {
-namespace EventDataElement {
-enum
+namespace EventDataIB {
+enum class Tag : uint8_t
 {
-    kCsTag_EventPath            = 0,
-    kCsTag_PriorityLevel        = 1,
-    kCsTag_Number               = 2,
-    kCsTag_UTCTimestamp         = 3,
-    kCsTag_SystemTimestamp      = 4,
-    kCsTag_DeltaUTCTimestamp    = 5,
-    kCsTag_DeltaSystemTimestamp = 6,
-    kCsTag_Data                 = 7,
+    kPath                 = 0,
+    kEventNumber          = 1,
+    kPriority             = 2,
+    kEpochTimestamp       = 3,
+    kSystemTimestamp      = 4,
+    kDeltaEpochTimestamp  = 5,
+    kDeltaSystemTimestamp = 6,
+    kData                 = 7,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @brief Initialize the parser object with TLVReader
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this EventDataElement
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
@@ -82,46 +72,46 @@ public:
     /**
      *  @brief Get a TLVReader for the EventPath. Next() must be called before accessing them.
      *
-     *  @param [in] apEventPath    A pointer to apEventPath
+     *  @param [in] apPath    A pointer to apPath
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventPath(EventPathIB::Parser * const apEventPath);
+    CHIP_ERROR GetPath(EventPathIB::Parser * const apPath);
+
+    /**
+     *  @brief Get a TLVReader for the EventNumber. Next() must be called before accessing them.
+     *
+     *  @param [in] apEventNumber    A pointer to apEventNumber
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetEventNumber(uint64_t * const apEventNumber);
 
     /**
      *  @brief Get a TLVReader for the Number. Next() must be called before accessing them.
      *
-     *  @param [in] apPriorityLevel    A pointer to apPriorityLevel
+     *  @param [in] apPriority    A pointer to apPriorityLevel
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetPriorityLevel(uint8_t * const apPriorityLevel);
+    CHIP_ERROR GetPriority(uint8_t * const apPriority);
 
     /**
-     *  @brief Get a TLVReader for the Number. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the EpochTimestamp. Next() must be called before accessing them.
      *
-     *  @param [in] apNumber    A pointer to apNumber
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetNumber(uint64_t * const apNumber);
-
-    /**
-     *  @brief Get a TLVReader for the UTCTimestamp. Next() must be called before accessing them.
-     *
-     *  @param [in] apUTCTimestamp    A pointer to apUTCTimestamp
+     *  @param [in] apEpochTimestamp    A pointer to apEpochTimestamp
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetUTCTimestamp(uint64_t * const apUTCTimestamp);
+    CHIP_ERROR GetEpochTimestamp(uint64_t * const apEpochTimestamp);
 
     /**
      *  @brief Get a TLVReader for the SystemTimestamp. Next() must be called before accessing them.
@@ -135,15 +125,15 @@ public:
     CHIP_ERROR GetSystemTimestamp(uint64_t * const apSystemTimestamp);
 
     /**
-     *  @brief Get a TLVReader for the DeltaUTCTimestamp. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the DeltaEpochTimestamp. Next() must be called before accessing them.
      *
-     *  @param [in] apDeltaUTCTimestamp   A pointer to apDeltaUTCTimestamp
+     *  @param [in] apDeltaEpochTimestamp   A pointer to apDeltaEpochTimestamp
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetDeltaUTCTimestamp(uint64_t * const apDeltaUTCTimestamp);
+    CHIP_ERROR GetDeltaEpochTimestamp(uint64_t * const apDeltaEpochTimestamp);
 
     /**
      *  @brief Get a TLVReader for the DeltaSystemTimestamp. Next() must be called before accessing them.
@@ -164,31 +154,22 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetData(chip::TLV::TLVReader * const apReader) const;
+    CHIP_ERROR GetData(TLV::TLVReader * const apReader) const;
 
 protected:
     // A recursively callable function to parse a data element and pretty-print it.
-    CHIP_ERROR ParseData(chip::TLV::TLVReader & aReader, int aDepth) const;
+    CHIP_ERROR ParseData(TLV::TLVReader & aReader, int aDepth) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public StructBuilder
 {
 public:
-    /**
-     *  @brief Initialize a EventDataElement::Builder for writing into a TLV stream
-     *
-     *  @param [in] apWriter    A pointer to TLVWriter
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
-
     /**
      *  @brief Initialize a EventPathIB::Builder for writing into the TLV stream
      *
      *  @return A reference to EventPathIB::Builder
      */
-    EventPathIB::Builder & CreateEventPath();
+    EventPathIB::Builder & CreatePath();
 
     /**
      *  @brief Inject PriorityLevel into the TLV stream to indicate the priority level associated with
@@ -198,49 +179,49 @@ public:
      *
      *  @return A reference to *this
      */
-    EventDataElement::Builder PriorityLevel(const uint8_t aPriorityLevel);
+    EventDataIB::Builder Priority(const uint8_t aPriority);
 
     /**
      *  @brief Inject Number into the TLV stream to indicate the number associated with
      *  the cluster that is referenced by the path. The event number is a monotonically increasing number that
      *  uniquely identifies each emitted event. This number is scoped to the PriorityLevel.
      *
-     *  @param [in] aNumber The uint64_t variable to reflectt the event number
+     *  @param [in] aEventNumber The uint64_t variable to reflect the event number
      *
      *  @return A reference to *this
      */
-    EventDataElement::Builder Number(const uint64_t aNumber);
+    EventDataIB::Builder EventNumber(const EventNumber aEventNumber);
 
     /**
-     *  @brief Inject UTCTimestamp into the TLV stream.
+     *  @brief Inject EpochTimestamp into the TLV stream.
      *  This is encoded as a 64-bit millisecond number since UNIX epoch (Jan 1 1970 00:00:00 GMT).
      *
-     *  @param [in] aUTCTimestamp The uint64_t variable to reflect the UTC timestamp of the Event.
+     *  @param [in] aEpochTimestamp The uint64_t variable to reflect the Epoch timestamp of the Event.
      *
      *  @return A reference to *this
      */
-    EventDataElement::Builder UTCTimestamp(const uint64_t aUTCTimestamp);
+    EventDataIB::Builder EpochTimestamp(const uint64_t aEpochTimestamp);
 
     /**
-     *  @brief Inject SystemTimestamp into the TLV stream. If UTC time is not available, time since boot
+     *  @brief Inject SystemTimestamp into the TLV stream. If Epoch time is not available, time since boot
      *  SHALL be encoded in this field as 64-bit, milliseconds.
      *
      *  @param [in] aSystemTimestamp The uint64_t variable to reflect system time
      *
      *  @return A reference to *this
      */
-    EventDataElement::Builder SystemTimestamp(const uint64_t aSystemTimestamp);
+    EventDataIB::Builder SystemTimestamp(const uint64_t aSystemTimestamp);
 
     /**
-     *  @brief Inject DeltaUTCTimestamp into the TLV stream.
-     *      This field is present if delta encoding of the UTC timestamp relative to a prior event is desired for compression
-     *      reasons. When this field is present, the UTC Timestamp field SHALL be omitted.
+     *  @brief Inject DeltaEpochTimestamp into the TLV stream.
+     *      This field is present if delta encoding of the Epoch timestamp relative to a prior event is desired for compression
+     *      reasons. When this field is present, the Epoch Timestamp field SHALL be omitted.
      *
-     *  @param [in] aDeltaUTCTimestamp The uint64_t variable to reflect DeltaUTCTimestamp
+     *  @param [in] aDeltaEpochTimestamp The uint64_t variable to reflect DeltaEpochTimestamp
      *
      *  @return A reference to *this
      */
-    EventDataElement::Builder DeltaUTCTimestamp(const uint64_t aDeltaUTCTimestamp);
+    EventDataIB::Builder DeltaEpochTimestamp(const uint64_t aDeltaEpochTimestamp);
 
     /**
      *  @brief Inject DeltaSystemTimestamp into the TLV stream.
@@ -251,18 +232,18 @@ public:
      *
      *  @return A reference to *this
      */
-    EventDataElement::Builder DeltaSystemTimestamp(const uint64_t aDeltaSystemTimestamp);
+    EventDataIB::Builder DeltaSystemTimestamp(const uint64_t aDeltaSystemTimestamp);
 
     /**
-     *  @brief Mark the end of this EventDataElement
+     *  @brief Mark the end of this EventDataIB
      *
      *  @return A reference to *this
      */
-    EventDataElement::Builder & EndOfEventDataElement();
+    EventDataIB::Builder & EndOfEventDataIB();
 
 private:
-    EventPathIB::Builder mEventPathBuilder;
+    EventPathIB::Builder mPath;
 };
-}; // namespace EventDataElement
-}; // namespace app
-}; // namespace chip
+} // namespace EventDataIB
+} // namespace app
+} // namespace chip
