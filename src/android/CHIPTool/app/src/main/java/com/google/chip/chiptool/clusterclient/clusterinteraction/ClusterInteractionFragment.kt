@@ -38,13 +38,13 @@ class ClusterInteractionFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     return inflater.inflate(R.layout.cluster_interaction_fragment, container, false).apply {
-      deviceController.setCompletionListener(ChipControllerCallback())
+      deviceController.setCompletionListener(GenericChipDeviceListener())
       endpointList.visibility = View.GONE
       getEndpointListBtn.setOnClickListener {
         scope.launch {
           devicePtr =
             ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-          showMessage("Button Clicked")
+          showMessage("Retrieving endpoints")
           endpointList.visibility = View.VISIBLE
         }
       }
@@ -66,25 +66,6 @@ class ClusterInteractionFragment : Fragment() {
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread {
       Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-    }
-  }
-
-  inner class ChipControllerCallback : GenericChipDeviceListener() {
-    override fun onConnectDeviceComplete() {}
-
-    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-    }
-
-    override fun onNotifyChipConnectionClosed() {
-      Log.d(TAG, "onNotifyChipConnectionClosed")
-    }
-
-    override fun onCloseBleComplete() {
-      Log.d(TAG, "onCloseBleComplete")
-    }
-
-    override fun onError(error: Throwable?) {
-      Log.d(TAG, "onError: $error")
     }
   }
 

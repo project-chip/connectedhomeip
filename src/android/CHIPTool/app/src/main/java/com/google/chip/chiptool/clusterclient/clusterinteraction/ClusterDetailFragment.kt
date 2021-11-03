@@ -1,10 +1,12 @@
 package com.google.chip.chiptool.clusterclient.clusterinteraction
 
 import android.os.Bundle
+import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.LinearLayout
@@ -63,15 +65,16 @@ class ClusterDetailFragment : Fragment() {
       checkNotNull(requireArguments().getSerializable(CLUSTER_MAP_INFO)) as HashMap<String, ClusterInfo>
     devicePtr = checkNotNull(requireArguments().getLong(DEVICE_PTR))
     return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
-      deviceController.setCompletionListener(ChipControllerCallback())
+      deviceController.setCompletionListener(GenericChipDeviceListener())
       commandAutoComplete.visibility = View.GONE
-      clusterAutoCompleteSetup(clusterAutoComplete, commandAutoComplete)
+      clusterAutoCompleteSetup(clusterAutoComplete, commandAutoComplete, parameterList)
       commandAutoCompleteSetup(commandAutoComplete, inflater, parameterList, callbackList)
       invokeCommand.setOnClickListener {
         parameterList.forEach {
-          val type = selectedCommandInfo.commandParameters[it.parameterName.text.toString()]?.type!!
+          val type =
+            selectedCommandInfo.commandParameters[it.parameterName.text.toString()]!!.type!!
           val data = castCorrectType(type, it.parameterData.text.toString())!!
-          commandArguments.put(it.parameterName.text.toString(), data)
+          commandArguments[it.parameterName.text.toString()] = data
         }
 
         selectedCommandInfo.getCommandFunction()
@@ -99,17 +102,21 @@ class ClusterDetailFragment : Fragment() {
 
   private fun clusterAutoCompleteSetup(
     clusterAutoComplete: AutoCompleteTextView,
-    commandAutoComplete: AutoCompleteTextView
+    commandAutoComplete: AutoCompleteTextView,
+    parameterList: LinearLayout
   ) {
     val clusterNameList = constructHint(clusterMap)
     val clusterAdapter =
       ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, clusterNameList)
     clusterAutoComplete.setAdapter(clusterAdapter)
     clusterAutoComplete.setOnItemClickListener { parent, view, position, id ->
-
       commandAutoComplete.visibility = View.VISIBLE
+      // when new cluster is selected, clear the command text and possible parameterList
+      commandAutoComplete.setText("", false)
+      parameterList.removeAllViews()
+      // populate all the commands that belong to the selected cluster
       val selectedCluster: String = clusterAutoComplete.adapter.getItem(position).toString()
-      val commandAdapter = getCommand(selectedCluster)
+      val commandAdapter = getCommandOptions(selectedCluster)
       commandAutoComplete.setAdapter(commandAdapter)
     }
   }
@@ -121,12 +128,14 @@ class ClusterDetailFragment : Fragment() {
     callbackList: LinearLayout
   ) {
     commandAutoComplete.setOnItemClickListener { parent, view, position, id ->
+      // when new command is selected, clear all the parameterList
+      parameterList.removeAllViews()
       selectedCluster = selectedClusterInfo.createClusterFunction.create(devicePtr, endpointId)
       val selectedCommand: String = commandAutoComplete.adapter.getItem(position).toString()
       selectedCommandInfo = selectedClusterInfo.commands[selectedCommand]!!
       selectedCommandCallback = selectedCommandInfo.commandCallbackSupplier.get()
       populateCommandParameter(inflater, parameterList)
-      selectedCommandCallback?.setCallbackDelegate(object : ClusterCommandCallback {
+      selectedCommandCallback!!.setCallbackDelegate(object : ClusterCommandCallback {
         override fun onSuccess(responseValues: Map<String, Any>) {
           showMessage("Command success")
           // Populate UI based on response values. We know the types from CommandInfo.getCommandResponses().
@@ -172,7 +181,7 @@ class ClusterDetailFragment : Fragment() {
     }
   }
 
-  private fun getCommand(
+  private fun getCommandOptions(
     clusterName: String
   ): ArrayAdapter<String> {
     selectedClusterInfo = clusterMap[clusterName]!!
@@ -186,25 +195,6 @@ class ClusterDetailFragment : Fragment() {
       clusterName.add(name)
     }
     return clusterName.toTypedArray()
-  }
-
-  inner class ChipControllerCallback : GenericChipDeviceListener() {
-    override fun onConnectDeviceComplete() {}
-
-    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-    }
-
-    override fun onNotifyChipConnectionClosed() {
-      Log.d(TAG, "onNotifyChipConnectionClosed")
-    }
-
-    override fun onCloseBleComplete() {
-      Log.d(TAG, "onCloseBleComplete")
-    }
-
-    override fun onError(error: Throwable?) {
-      Log.d(TAG, "onError: $error")
-    }
   }
 
   override fun onStop() {
