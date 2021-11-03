@@ -77,15 +77,18 @@ def test_echo_check(device):
     assert ret != None and len(ret) > 1
     assert "Hello" in ret[-2]
 
+
 def test_log_check(device):
     ret = device.send(command="log Hello", expected_output="Done")
     assert ret != None and len(ret) > 1
     assert "[INFO][CHIP]: [TOO]Hello" in ret[-2]
 
+
 def test_rand_check(device):
     ret = device.send(command="rand", expected_output="Done")
     assert ret != None and len(ret) > 1
     assert ret[-2].rstrip().isdigit()
+
 
 def test_base64_encode_decode(device):
     hex_string = "1234"
@@ -96,9 +99,6 @@ def test_base64_encode_decode(device):
     assert ret != None and len(ret) > 1
     assert ret[-2].rstrip() == hex_string
 
-def test_exit_check(device):
-    ret = device.send(command="exit", expected_output="Goodbye")
-    assert ret != None and len(ret) > 0
 
 def test_version_check(device):
     ret = device.send(command="version", expected_output="Done")
@@ -106,6 +106,7 @@ def test_version_check(device):
     assert "CHIP" in ret[-2].split()[0]
     app_version = ret[-2].split()[1]
     assert isinstance(version.parse(app_version), version.Version)
+
 
 def test_ble_adv_check(device):
     devCtrl = ChipDeviceCtrl.ChipDeviceController()
@@ -132,15 +133,6 @@ def test_ble_adv_check(device):
     ble_chip_device = scan_chip_ble_devices(devCtrl, BLE_DEVICE_NAME)
     assert ble_chip_device != None and len(ble_chip_device) == 0
 
-def test_device_factory_reset(device):
-    ret = device.send(command="device factoryreset")
-
-    sleep(1)
-
-    ret = device.wait_for_output("Mbed shell example application start")
-    assert ret != None and len(ret) > 0
-    ret = device.wait_for_output("Mbed shell example application run")
-    assert ret != None and len(ret) > 0
 
 def test_device_config_check(device):
     ret = device.send(command="config", expected_output="Done")
@@ -191,6 +183,7 @@ def test_on_boarding_codes(device):
         assert False
     assert device_details != None and len(device_details) != 0
 
+
 def test_wifi_mode(device):
     ret = device.send(command="wifi mode", expected_output="Done")
     assert ret != None and len(ret) > 1
@@ -206,6 +199,7 @@ def test_wifi_mode(device):
         assert ret != None and len(ret) > 1
         assert ret[-2].strip() == mode
 
+
 def test_wifi_connect(device, network):
     network_ssid = network[0]
     network_pass = network[1]
@@ -214,4 +208,20 @@ def test_wifi_connect(device, network):
     assert ret != None and len(ret) > 0
 
     ret = device.wait_for_output("StationConnected", 30)
+    assert ret != None and len(ret) > 0
+
+
+def test_device_factory_reset(device):
+    ret = device.send(command="device factoryreset")
+
+    sleep(1)
+
+    ret = device.wait_for_output("Mbed shell example application start")
+    assert ret != None and len(ret) > 0
+    ret = device.wait_for_output("Mbed shell example application run")
+    assert ret != None and len(ret) > 0
+
+
+def test_exit_check(device):
+    ret = device.send(command="exit", expected_output="Goodbye")
     assert ret != None and len(ret) > 0
