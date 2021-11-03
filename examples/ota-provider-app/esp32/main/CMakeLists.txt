@@ -17,12 +17,8 @@
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 idf_component_register(PRIV_INCLUDE_DIRS 
-                      "${CMAKE_CURRENT_LIST_DIR}"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlio/repo/include"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/ota-provider-app/"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/ota-provider-app/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/ota-provider-app"
                       SRC_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"
@@ -48,6 +44,8 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ota-provider"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/ota-provider-app/ota-provider-common"
+                      EXCLUDE_SRCS
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/ota-provider-app/ota-provider-common/BdxOtaSender.cpp"
                       PRIV_REQUIRES chip QRCode bt console)
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 14) 

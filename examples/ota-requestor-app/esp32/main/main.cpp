@@ -84,7 +84,7 @@ int ESPQueryImageCmdHandler(int argc, char ** argv)
     }
     ESP_LOGI(TAG, "ipAddr:%s nodeId:%x", queryImageCmdArgs.ipAddr->sval[0], queryImageCmdArgs.nodeId->ival[0]);
 
-    /* Start on shot timer to Query for OTA image once commissinoning is complete */
+    /* Start one shot timer with 1 second timeout to send ApplyUpdateRequest command */
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000), QueryImageTimerHandler, nullptr);
     return 0;
 }
@@ -99,7 +99,7 @@ int ESPApplyUpdateCmdHandler(int argc, char ** argv)
     }
     ESP_LOGI(TAG, "ipAddr:%s nodeId:%x", applyUpdateCmdArgs.ipAddr->sval[0], applyUpdateCmdArgs.nodeId->ival[0]);
 
-    /* Start on shot timer to Query for OTA image once commissinoning is complete */
+    /* Start one shot timer with 1 second timeout to Query for OTA image */
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000), ApplyUpdateTimerHandler, nullptr);
     return 0;
 }
@@ -148,20 +148,6 @@ extern "C" void app_main()
     /* Print chip information */
     esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
-    uint8_t ble_mac[6];
-    char ble_mac_str[18];
-    if (esp_read_mac(ble_mac, ESP_MAC_BT) == ESP_OK)
-    {
-        sprintf(ble_mac_str, "%02x:%02x:%02x:%02x:%02x:%02x", ble_mac[0], ble_mac[1], ble_mac[2], ble_mac[3], ble_mac[4],
-                ble_mac[5]);
-        ble_mac_str[17] = 0;
-        ESP_LOGI(TAG, "ESP32 BLE MAC ADD: %s", ble_mac_str);
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Could not fetch MAC address.");
-    }
-
     ESP_LOGI(TAG, "This is ESP32 chip with %d CPU cores, WiFi%s%s, ", chip_info.cores,
              (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "", (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
 
