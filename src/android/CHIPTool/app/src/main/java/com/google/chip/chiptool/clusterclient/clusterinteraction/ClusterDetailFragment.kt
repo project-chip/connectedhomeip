@@ -61,9 +61,15 @@ class ClusterDetailFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+<<<<<<< HEAD
     clusterMap = ClusterInfoMapping().clusterMap
     devicePtr = checkNotNull(requireArguments().getLong(DEVICE_PTR_KEY))
     endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID_KEY))
+=======
+    clusterMap =
+      checkNotNull(requireArguments().getSerializable(CLUSTER_MAP_INFO)) as HashMap<String, ClusterInfo>
+    devicePtr = checkNotNull(requireArguments().getLong(DEVICE_PTR))
+>>>>>>> 7c783e227 (add back class description)
     return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
       deviceController.setCompletionListener(GenericChipDeviceListener())
       commandAutoCompleteTv.visibility = View.GONE
@@ -76,15 +82,23 @@ class ClusterDetailFragment : Fragment() {
             selectedCommandInfo.commandParameters[it.clusterParameterNameTv.text.toString()]!!.type
           val data = castStringToType(it.clusterParameterData.text.toString(), type)!!
 
+<<<<<<< HEAD
           commandArguments[it.clusterParameterNameTv.text.toString()] = data
         }
+=======
+>>>>>>> 7c783e227 (add back class description)
         selectedCommandInfo.getCommandFunction()
           .invokeCommand(selectedCluster, selectedCommandCallback, commandArguments)
       }
     }
   }
 
+<<<<<<< HEAD
   private fun castStringToType(data: String, type: Class<*>): Any? {
+=======
+  private fun castCorrectType(type: Class<*>, data: String): Any? {
+
+>>>>>>> 7c783e227 (add back class description)
     return when (type) {
       Int::class.java -> data.toInt()
       String::class.java -> data
@@ -166,7 +180,11 @@ class ClusterDetailFragment : Fragment() {
   }
 
   private fun populateCallbackResult(
+<<<<<<< HEAD
     responseValues: Map<CommandResponseInfo, Any>,
+=======
+    responseValues: Map<String, Any>,
+>>>>>>> 7c783e227 (add back class description)
     inflater: LayoutInflater,
     callbackList: LinearLayout
   ) {
@@ -180,7 +198,11 @@ class ClusterDetailFragment : Fragment() {
     }
   }
 
+<<<<<<< HEAD
   private fun getCommandOptions(
+=======
+  private fun getCommand(
+>>>>>>> 7c783e227 (add back class description)
     clusterName: String
   ): ArrayAdapter<String> {
     selectedClusterInfo = clusterMap[clusterName]!!
@@ -199,12 +221,21 @@ class ClusterDetailFragment : Fragment() {
 
   companion object {
     private const val TAG = "ClusterDetailFragment"
+<<<<<<< HEAD
     private const val ENDPOINT_ID_KEY = "endpoint_id"
     private const val DEVICE_PTR_KEY = "device_ptr"
 
     fun newInstance(
       deviceId: Long,
       endpointId: Int
+=======
+    private const val CLUSTER_MAP_INFO = "cluster_map_info"
+    private const val DEVICE_PTR = "device_ptr"
+    private const val ENDPOINT_ID = "endpoint_id"
+    fun newInstance(
+      clusterMap: HashMap<String, ClusterInfo>,
+      deviceId: Long
+>>>>>>> 7c783e227 (add back class description)
     ): ClusterDetailFragment {
       return ClusterDetailFragment().apply {
         arguments = Bundle(2).apply {
@@ -214,4 +245,5 @@ class ClusterDetailFragment : Fragment() {
       }
     }
   }
+
 }
