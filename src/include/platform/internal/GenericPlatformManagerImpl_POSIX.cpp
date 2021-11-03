@@ -138,7 +138,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDev
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::ProcessDeviceEvents()
+void GenericPlatformManagerImpl_POSIX<ImplClass>::_ProcessDeviceEvents()
 {
     while (!mChipEventQueue.Empty())
     {
@@ -180,7 +180,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 
         SystemLayerSocketsLoop().HandleEvents();
 
-        ProcessDeviceEvents();
+        _ProcessDeviceEvents();
     } while (mShouldRunEventLoop.load(std::memory_order_relaxed));
     SystemLayerSocketsLoop().EventLoopEnds();
 

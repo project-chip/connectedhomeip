@@ -133,6 +133,7 @@ public:
      * before calling Shutdown.
      */
     void RunEventLoop();
+    void ProcessDeviceEvents();
 
     /**
      * Process work items until StopEventLoopTask is called.
@@ -222,9 +223,7 @@ private:
     friend class Internal::GenericThreadStackManagerImpl_OpenThread_LwIP;
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
     friend class System::PlatformEventing;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     /*
      * PostEvent can be called safely on any thread without locking the stack.
@@ -350,6 +349,13 @@ inline void PlatformManager::RunEventLoop()
 {
     static_cast<ImplClass *>(this)->_RunEventLoop();
 }
+
+#if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
+inline void PlatformManager::ProcessDeviceEvents()
+{
+    static_cast<ImplClass *>(this)->_ProcessDeviceEvents();
+}
+#endif
 
 /**
  * @brief
