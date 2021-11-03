@@ -459,7 +459,6 @@ CHIP_ERROR prepareWriteData(EmberAfAttributeType expectedType, TLV::TLVReader & 
         int32_t value;
         static_assert(3 <= sizeof(attributeData), "Value cannot fit into attribute data");
         ReturnErrorOnFailure(aReader.Get(value));
-        ReturnErrorOnFailure(aReader.Get(value));
         if (value > static_cast<int32_t>((1UL << ((3 * 8) - 1)) - 1) || value < static_cast<int32_t>(-(1UL << ((3 * 8) - 1))))
         {
             return CHIP_ERROR_INVALID_INTEGER_VALUE;
