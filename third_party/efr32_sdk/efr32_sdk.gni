@@ -137,6 +137,7 @@ template("efr32_sdk") {
       "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
       "__HEAP_SIZE=0",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
+
       #"__STACK_SIZE=0",
     ]
 
