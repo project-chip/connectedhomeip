@@ -27,5 +27,10 @@ env
 
 "$(dirname "$0")"/../../third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
 
-gn gen --check --fail-on-unused-args --root="$1" "$2" --args="k32w0_sdk_root=\"$K32W061_SDK_ROOT\" is_debug=false chip_with_low_power=1"
+if [ -z "$3" ]; then
+    gn gen --check --fail-on-unused-args --root="$1" "$2" --args="k32w0_sdk_root=\"$K32W061_SDK_ROOT\" is_debug=false chip_with_low_power=1"
+else
+    gn gen --check --fail-on-unused-args --root="$1" "$2" --args="k32w0_sdk_root=\"$K32W061_SDK_ROOT\" is_debug=false chip_with_low_power=0"
+fi
+
 ninja -C "$2"

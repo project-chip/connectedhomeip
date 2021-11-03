@@ -69,7 +69,7 @@ jobs:
               timeout-minutes: 5
               run: |
                   scripts/examples/k32w_example.sh \
-                  examples/shell/nxp/k32w/k32w0 out/shell_app_debug
+                  examples/shell/nxp/k32w/k32w0 out/shell_app_debug no_low_power
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     k32w k32w061+debug shell \
                     out/shell_app_debug/chip-k32w061-shell-example \
