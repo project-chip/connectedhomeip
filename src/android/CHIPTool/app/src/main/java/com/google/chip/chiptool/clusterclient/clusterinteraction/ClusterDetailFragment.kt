@@ -17,6 +17,7 @@ import chip.clusterinfo.ClusterCommandCallback
 import chip.clusterinfo.ClusterInfo
 import chip.clusterinfo.CommandInfo
 import chip.clusterinfo.DelegatedClusterCallback
+import chip.clusterinfo.ResponseValueInfo
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
@@ -136,7 +137,7 @@ class ClusterDetailFragment : Fragment() {
       selectedCommandCallback = selectedCommandInfo.commandCallbackSupplier.get()
       populateCommandParameter(inflater, parameterList)
       selectedCommandCallback!!.setCallbackDelegate(object : ClusterCommandCallback {
-        override fun onSuccess(responseValues: Map<String, Any>) {
+        override fun onSuccess(responseValues: Map<ResponseValueInfo, Any>) {
           showMessage("Command success")
           // Populate UI based on response values. We know the types from CommandInfo.getCommandResponses().
           requireActivity().runOnUiThread {
@@ -168,15 +169,15 @@ class ClusterDetailFragment : Fragment() {
   }
 
   private fun populateCallbackResult(
-    responseValues: Map<String, Any>,
+    responseValues: Map<ResponseValueInfo, Any>,
     inflater: LayoutInflater,
     callbackList: LinearLayout
   ) {
     responseValues.forEach { (variableNameType, response) ->
       val callback = inflater.inflate(R.layout.callback_item, null, false) as LinearLayout
-      callback.callbackName.text = variableNameType.split(',')[0]
+      callback.callbackName.text = variableNameType.name
       callback.callbackData.text = response.toString()
-      callback.callbackType.text = variableNameType.split(',')[1]
+      callback.callbackType.text = variableNameType.type
       callbackList.addView(callback)
     }
   }
