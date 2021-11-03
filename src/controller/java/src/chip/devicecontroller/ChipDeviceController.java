@@ -210,6 +210,7 @@ public class ChipDeviceController {
     return isActive(deviceControllerPtr, deviceId);
   }
 
+  /* Shutdown all cluster attribute subscriptions for a given device */
   public void shutdownSubscriptions(long devicePtr) {
     shutdownSubscriptions(deviceControllerPtr, devicePtr);
   }

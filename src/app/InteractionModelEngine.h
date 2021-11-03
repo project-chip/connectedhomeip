@@ -125,7 +125,7 @@ public:
      * @retval #CHIP_ERROR_KEY_NOT_FOUND If no active subscription is found.
      * @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR ShutdownSubscriptionsByNodeId(uint64_t aPeerNodeId);
+    CHIP_ERROR ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
     /**
      *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
