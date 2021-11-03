@@ -48,7 +48,7 @@ static void CheckScheduleLambda(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     Layer & lSys           = *lContext.mLayer;
-    bool * called = new bool(false);
+    bool * called          = new bool(false);
     lSys.ScheduleLambda([called] { *called = true; });
     while (!*called)
     {
@@ -93,7 +93,7 @@ static int TestSetup(void * aContext)
     chip::DeviceLayer::SetSystemLayerForTesting(&sLayer);
     sLayer.Init();
 
-    lContext.mLayer     = &sLayer;
+    lContext.mLayer = &sLayer;
 
     return (SUCCESS);
 }

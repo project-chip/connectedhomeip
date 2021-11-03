@@ -50,7 +50,8 @@ private:
     void _RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) {}
     void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) {}
     void _RunEventLoop() {}
-    void _ProcessDeviceEvents() {
+    void _ProcessDeviceEvents()
+    {
         while (!mQueue.empty())
         {
             const ChipDeviceEvent & event = mQueue.front();
@@ -60,19 +61,21 @@ private:
     }
     CHIP_ERROR _StartEventLoopTask() { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StopEventLoopTask() { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event) {
+    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event)
+    {
         mQueue.emplace(*event);
         return CHIP_NO_ERROR;
     }
-    void _DispatchEvent(const ChipDeviceEvent * event) {
+    void _DispatchEvent(const ChipDeviceEvent * event)
+    {
         switch (event->Type)
         {
-            case DeviceEventType::kChipLambdaEvent:
-                event->LambdaEvent();
-                break;
+        case DeviceEventType::kChipLambdaEvent:
+            event->LambdaEvent();
+            break;
 
-            default:
-                break;
+        default:
+            break;
         }
     }
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration) { return CHIP_ERROR_NOT_IMPLEMENTED; }
