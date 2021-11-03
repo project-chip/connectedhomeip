@@ -134,7 +134,7 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
     {
         ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
 
-        MessageCounter & counter = sessionHandle.GetUnauthenticatedSession()->GetLocalMessageCounter();
+        MessageCounter & counter = mGlobalUnencryptedMessageCounter;
         uint32_t messageCounter  = counter.Value();
         ReturnErrorOnFailure(counter.Advance());
 
