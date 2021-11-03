@@ -50,4 +50,4 @@ while (($#)); do
     shift
 done
 
-docker buildx build -t "$ORG/$IMAGE:$TAG" -f $CIRQUE_RESOURCES/Dockerfile.android_emulator "${ARGS[@]}" $CIRQUE_RESOURCES
+docker buildx build -t "$ORG/$IMAGE:$TAG" -f "$CIRQUE_RESOURCES"/Dockerfile.android_emulator "${ARGS[@]}" "$CIRQUE_RESOURCES"
