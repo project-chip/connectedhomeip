@@ -25,10 +25,17 @@ shared_library("jni") {
     "AndroidCallbacks-JNI.cpp",
     "AndroidCallbacks.cpp",
     "AndroidCallbacks.h",
+    "AndroidClusterExceptions.cpp",
+    "AndroidClusterExceptions.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
+    "CHIPDefaultCallbacks.cpp",
+    "CHIPDefaultCallbacks.h",
     "CHIPDeviceController-JNI.cpp",
     "zap-generated/CHIPClusters-JNI.cpp",
+    "zap-generated/CHIPClustersRead-JNI.cpp",
+    "zap-generated/CHIPReadCallbacks.cpp",
+    "zap-generated/CHIPReadCallbacks.h",
   ]
 
   deps = [
