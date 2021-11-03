@@ -22,7 +22,7 @@ tests:
     - label: "Sending Off command"
       cluster: "On/Off"
       command: "on"
-      
+
     - label: "Precondition: DUT level is set to 0x80"
       command: "Step"
       arguments:
