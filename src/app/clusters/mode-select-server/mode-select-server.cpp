@@ -51,8 +51,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
 {
     VerifyOrDie(aPath.mClusterId == ModeSelect::Id);
 
-    const ModeSelect::SupportedModesManager * gSupportedModeManager =
-        ModeSelect::getSupportedModesManager();
+    const ModeSelect::SupportedModesManager * gSupportedModeManager = ModeSelect::getSupportedModesManager();
 
     if (ModeSelect::Attributes::SupportedModes::Id == aPath.mAttributeId)
     {
@@ -88,7 +87,8 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
     uint8_t newMode       = commandData.newMode;
     // Check that the newMode matches one of the supported options
     const ModeSelect::Structs::ModeOptionStruct::Type * modeOptionPtr;
-    EmberAfStatus checkSupportedModeStatus = ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
+    EmberAfStatus checkSupportedModeStatus =
+        ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
     if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %" PRIu8, newMode);

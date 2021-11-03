@@ -24,14 +24,13 @@ Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_
 } // namespace
 
 // TODO: Configure your options for each endpoint
-storage_value_type StaticSupportedModesManager::coffeeOptions[] = {
-    buildModeOptionStruct("Black", 0, 0),
-    buildModeOptionStruct("Cappuccino", 4, 0),
-    buildModeOptionStruct("Espresso", 7, 0)
-};
-const StaticSupportedModesManager::EndpointSpanPair StaticSupportedModesManager::supportedOptionsByEndpoints[ENDPOINTS_WITH_MODES] = {
-    EndpointSpanPair(1, Span<storage_value_type>(StaticSupportedModesManager::coffeeOptions))  // Options for Endpoint 1
-};
+storage_value_type StaticSupportedModesManager::coffeeOptions[] = { buildModeOptionStruct("Black", 0, 0),
+                                                                    buildModeOptionStruct("Cappuccino", 4, 0),
+                                                                    buildModeOptionStruct("Espresso", 7, 0) };
+const StaticSupportedModesManager::EndpointSpanPair
+    StaticSupportedModesManager::supportedOptionsByEndpoints[ENDPOINTS_WITH_MODES] = {
+        EndpointSpanPair(1, Span<storage_value_type>(StaticSupportedModesManager::coffeeOptions)) // Options for Endpoint 1
+    };
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
@@ -39,7 +38,7 @@ const SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::ge
 {
     for (size_t i = 0; i < ENDPOINTS_WITH_MODES; ++i)
     {
-        const EndpointSpanPair& endpointSpanPair = supportedOptionsByEndpoints[i];
+        const EndpointSpanPair & endpointSpanPair = supportedOptionsByEndpoints[i];
         if (endpointSpanPair.mEndpointId == endpointId)
         {
             return ModeOptionsProvider(endpointSpanPair.mSpan.data(), endpointSpanPair.mSpan.end());
@@ -56,10 +55,10 @@ EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short en
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
     }
-    auto* begin = this->getModeOptionsProvider(endpointId).begin();
-    auto* end = this->getModeOptionsProvider(endpointId).end();
+    auto * begin = this->getModeOptionsProvider(endpointId).begin();
+    auto * end   = this->getModeOptionsProvider(endpointId).end();
 
-    for (auto* it = begin; it != end; ++it)
+    for (auto * it = begin; it != end; ++it)
     {
         auto & modeOption = *it;
         if (modeOption.mode == mode)
@@ -72,7 +71,7 @@ EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short en
     return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
 }
 
-const ModeSelect::SupportedModesManager* ModeSelect::getSupportedModesManager()
+const ModeSelect::SupportedModesManager * ModeSelect::getSupportedModesManager()
 {
     return &StaticSupportedModesManager::instance;
 }

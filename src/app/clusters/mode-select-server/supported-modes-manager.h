@@ -41,13 +41,12 @@ class SupportedModesManager
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
 
 public:
-
     /**
      * A class that can return the supported ModeOptions for a specific endpoint.
      */
     struct ModeOptionsProvider
     {
-        using pointer = const ModeOptionStructType*;
+        using pointer = const ModeOptionStructType *;
 
         /**
          * Returns the ModeOptionStructIterator to the first option.
@@ -59,11 +58,10 @@ public:
          */
         inline pointer end() const { return mEnd; }
 
-        ModeOptionsProvider(const pointer aBegin, const pointer aEnd): mBegin(aBegin), mEnd(aEnd) {}
+        ModeOptionsProvider(const pointer aBegin, const pointer aEnd) : mBegin(aBegin), mEnd(aEnd) {}
 
         pointer mBegin;
         pointer mEnd;
-
     };
 
     /**
@@ -86,7 +84,7 @@ public:
     virtual ~SupportedModesManager() {}
 };
 
-const SupportedModesManager* getSupportedModesManager ();
+const SupportedModesManager * getSupportedModesManager();
 
 } // namespace ModeSelect
 } // namespace Clusters

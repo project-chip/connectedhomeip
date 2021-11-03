@@ -47,7 +47,9 @@ class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::Supp
         const EndpointId mEndpointId;
         const Span<storage_value_type> mSpan;
 
-        EndpointSpanPair(const EndpointId aEndpointId, const Span<storage_value_type>&& aSpan ): mEndpointId(aEndpointId), mSpan(aSpan) {}
+        EndpointSpanPair(const EndpointId aEndpointId, const Span<storage_value_type> && aSpan) :
+            mEndpointId(aEndpointId), mSpan(aSpan)
+        {}
     };
 
     static storage_value_type coffeeOptions[];
