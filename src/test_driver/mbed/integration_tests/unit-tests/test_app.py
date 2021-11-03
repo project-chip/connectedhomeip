@@ -16,14 +16,17 @@
 import pytest
 import re
 
-def test_chip_unit_tests(device):
-    device.reset(duration=2)
-    # Check if application running
-    ret=device.wait_for_output("Starting CHIP tests!")
+def test_unit_tests(device):
+    device.reset(duration=1)
+    # smoke test
+    ret = device.wait_for_output("Mbed unit-tests application start")
     assert ret != None and len(ret) > 0
-    lines = device.wait_for_output("CHIP test status:", 500)
-    # extract number of failures: 
-    last_line = lines[-1]
-    result = re.findall(r'\d+', last_line)
+    ret = device.wait_for_output("Mbed unit-tests application run")
+    assert ret != None and len(ret) > 0
+
+    ret = device.wait_for_output("CHIP test status:", 500)
+    # extract number of failures:
+    test_status = ret[-1]
+    result = re.findall(r'\d+', test_status)
     assert len(result) == 1
-    assert int(result[0]) < 15
+    assert int(result[0]) == 0
