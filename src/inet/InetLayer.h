@@ -49,12 +49,12 @@
 
 #include <inet/InetConfig.h>
 
+#include <inet/EndPointBasis.h>
 #include <inet/IANAConstants.h>
 #include <inet/IPAddress.h>
 #include <inet/IPPrefix.h>
 #include <inet/InetError.h>
 #include <inet/InetInterface.h>
-#include <inet/InetLayerBasis.h>
 #include <inet/InetLayerEvents.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT

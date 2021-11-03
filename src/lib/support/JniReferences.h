@@ -78,6 +78,8 @@ public:
 
     void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName);
 
+    void ThrowError(JNIEnv * env, jclass exceptionCls, CHIP_ERROR errToThrow);
+
 private:
     JniReferences() {}
 

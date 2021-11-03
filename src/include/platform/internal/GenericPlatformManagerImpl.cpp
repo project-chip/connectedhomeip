@@ -42,9 +42,6 @@ namespace DeviceLayer {
 
 namespace Internal {
 
-extern chip::System::Layer * gSystemLayer;
-extern chip::System::LayerImpl gSystemLayerImpl;
-
 extern CHIP_ERROR InitEntropy();
 
 template <class ImplClass>
@@ -75,11 +72,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP system layer.
-    if (gSystemLayer == nullptr)
-    {
-        gSystemLayer = &gSystemLayerImpl;
-    }
-    err = gSystemLayer->Init();
+    err = SystemLayer().Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
@@ -87,7 +80,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP Inet layer.
-    err = InetLayer.Init(*gSystemLayer, nullptr);
+    err = InetLayer().Init(SystemLayer(), nullptr);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));
@@ -137,7 +130,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
     CHIP_ERROR err;
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
-    err = InetLayer.Shutdown();
+    err = InetLayer().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     ChipLogError(DeviceLayer, "BLE layer shutdown");
@@ -145,7 +138,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 #endif
 
     ChipLogError(DeviceLayer, "System Layer shutdown");
-    err = gSystemLayer->Shutdown();
+    err = SystemLayer().Shutdown();
 
     return err;
 }
@@ -218,7 +211,7 @@ template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent * event)
 {
 #if CHIP_PROGRESS_LOGGING
-    uint64_t startUS = System::SystemClock().GetMonotonicMicroseconds();
+    System::Clock::Timestamp start = System::SystemClock().GetMonotonicTimestamp();
 #endif // CHIP_PROGRESS_LOGGING
 
     switch (event->Type)
@@ -257,10 +250,10 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 
     // TODO: make this configurable
 #if CHIP_PROGRESS_LOGGING
-    uint32_t delta = static_cast<uint32_t>((System::SystemClock().GetMonotonicMicroseconds() - startUS) / 1000);
-    if (delta > 100)
+    uint32_t deltaMs = System::Clock::Milliseconds32(System::SystemClock().GetMonotonicTimestamp() - start).count();
+    if (deltaMs > 100)
     {
-        ChipLogError(DeviceLayer, "Long dispatch time: %" PRIu32 " ms, for event type %d", delta, event->Type);
+        ChipLogError(DeviceLayer, "Long dispatch time: %" PRIu32 " ms, for event type %d", deltaMs, event->Type);
     }
 #endif // CHIP_PROGRESS_LOGGING
 }

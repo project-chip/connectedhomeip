@@ -13039,12 +13039,6 @@ bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::Endp
                                                                       chip::app::CommandSender * commandObj, uint8_t errorCode,
                                                                       chip::CharSpan debugText);
 /**
- * @brief Network Commissioning Cluster GetLastNetworkCommissioningResult Command callback (from client)
- */
-bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::DecodableType & commandData);
-/**
  * @brief Diagnostic Logs Cluster RetrieveLogsRequest Command callback (from client)
  */
 bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(

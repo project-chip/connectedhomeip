@@ -20,6 +20,7 @@
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
 #include "pw_sys_io_nrfconnect/init.h"
+#include "rpc_services/Attributes.h"
 #include "rpc_services/Button.h"
 #include "rpc_services/Device.h"
 #include "rpc_services/Lighting.h"
@@ -69,15 +70,17 @@ constexpr int kRpcPriority    = 5;
 K_THREAD_STACK_DEFINE(rpc_stack_area, kRpcTaskSize);
 struct k_thread rpc_thread_data;
 
-chip::rpc::NrfButton button_service;
-chip::rpc::Lighting lighting_service;
-chip::rpc::NrfDevice device_service;
+Attributes attributes_service;
+NrfButton button_service;
+NrfDevice device_service;
+Lighting lighting_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
-    server.RegisterService(lighting_service);
+    server.RegisterService(attributes_service);
     server.RegisterService(button_service);
     server.RegisterService(device_service);
+    server.RegisterService(lighting_service);
 }
 
 } // namespace

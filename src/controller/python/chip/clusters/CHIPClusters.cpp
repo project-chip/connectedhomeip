@@ -5678,14 +5678,6 @@ chip::ChipError::StorageType chip_ime_AppendCommand_NetworkCommissioning_EnableN
     cluster.Associate(device, ZCLendpointId);
     return cluster.EnableNetwork(nullptr, nullptr, chip::ByteSpan(networkID, networkID_Len), breadcrumb, timeoutMs).AsInteger();
 }
-chip::ChipError::StorageType chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint32_t timeoutMs)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::NetworkCommissioningCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.GetLastNetworkCommissioningResult(nullptr, nullptr, timeoutMs).AsInteger();
-}
 chip::ChipError::StorageType chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork(chip::Controller::Device * device,
                                                                                        chip::EndpointId ZCLendpointId,
                                                                                        chip::GroupId, const uint8_t * networkID,
@@ -7077,6 +7069,26 @@ chip::ChipError::StorageType chip_ime_SubscribeAttribute_Switch_CurrentPosition(
         .SubscribeAttributeCurrentPosition(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
                                            maxInterval)
         .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_Switch_MultiPressMax(chip::Controller::Device * device,
+                                                                         chip::EndpointId ZCLendpointId,
+                                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::SwitchCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMultiPressMax(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_Switch_FeatureMap(chip::Controller::Device * device,
+                                                                      chip::EndpointId ZCLendpointId,
+                                                                      chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::SwitchCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeFeatureMap(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_Switch_ClusterRevision(chip::Controller::Device * device,

@@ -671,12 +671,6 @@ ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::
     CommandResponseFailureCallback);
 
 template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
 ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type,
                            chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>(
     const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type &, void *,

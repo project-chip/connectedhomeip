@@ -28,43 +28,13 @@ Device::Device(const char * szDeviceName, const char * szLocation)
 {
     strncpy(mName, szDeviceName, sizeof(mName));
     strncpy(mLocation, szLocation, sizeof(mLocation));
-    mState      = kState_Off;
     mReachable  = false;
     mEndpointId = 0;
-    mChanged_CB = nullptr;
-}
-
-bool Device::IsOn()
-{
-    return mState == kState_On;
 }
 
 bool Device::IsReachable()
 {
     return mReachable;
-}
-
-void Device::SetOnOff(bool aOn)
-{
-    bool changed;
-
-    if (aOn)
-    {
-        changed = (mState != kState_On);
-        mState  = kState_On;
-        ChipLogProgress(DeviceLayer, "Device[%s]: ON", mName);
-    }
-    else
-    {
-        changed = (mState != kState_Off);
-        mState  = kState_Off;
-        ChipLogProgress(DeviceLayer, "Device[%s]: OFF", mName);
-    }
-
-    if ((changed) && (mChanged_CB))
-    {
-        mChanged_CB(this, kChanged_State);
-    }
 }
 
 void Device::SetReachable(bool aReachable)
@@ -82,9 +52,9 @@ void Device::SetReachable(bool aReachable)
         ChipLogProgress(DeviceLayer, "Device[%s]: OFFLINE", mName);
     }
 
-    if ((changed) && (mChanged_CB))
+    if (changed)
     {
-        mChanged_CB(this, kChanged_Reachable);
+        HandleDeviceChange(this, kChanged_Reachable);
     }
 }
 
@@ -96,9 +66,9 @@ void Device::SetName(const char * szName)
 
     strncpy(mName, szName, sizeof(mName));
 
-    if ((changed) && (mChanged_CB))
+    if (changed)
     {
-        mChanged_CB(this, kChanged_Name);
+        HandleDeviceChange(this, kChanged_Name);
     }
 }
 
@@ -110,13 +80,106 @@ void Device::SetLocation(const char * szLocation)
 
     ChipLogProgress(DeviceLayer, "Device[%s]: Location=\"%s\"", mName, mLocation);
 
-    if ((changed) && (mChanged_CB))
+    if (changed)
     {
-        mChanged_CB(this, kChanged_Location);
+        HandleDeviceChange(this, kChanged_Location);
     }
 }
 
-void Device::SetChangeCallback(DeviceCallback_fn aChanged_CB)
+DeviceOnOff::DeviceOnOff(const char * szDeviceName, const char * szLocation) : Device(szDeviceName, szLocation)
+{
+    mOn = false;
+}
+
+bool DeviceOnOff::IsOn()
+{
+    return mOn;
+}
+
+void DeviceOnOff::SetOnOff(bool aOn)
+{
+    bool changed;
+
+    changed = aOn ^ mOn;
+    mOn     = aOn;
+    ChipLogProgress(DeviceLayer, "Device[%s]: %s", mName, aOn ? "ON" : "OFF");
+
+    if ((changed) && (mChanged_CB))
+    {
+        mChanged_CB(this, kChanged_OnOff);
+    }
+}
+
+void DeviceOnOff::SetChangeCallback(DeviceCallback_fn aChanged_CB)
 {
     mChanged_CB = aChanged_CB;
+}
+
+void DeviceOnOff::HandleDeviceChange(Device * device, Device::Changed_t changeMask)
+{
+    if (mChanged_CB)
+    {
+        mChanged_CB(this, (DeviceOnOff::Changed_t) changeMask);
+    }
+}
+
+DeviceSwitch::DeviceSwitch(const char * szDeviceName, const char * szLocation, uint32_t aFeatureMap) :
+    Device(szDeviceName, szLocation)
+{
+    mNumberOfPositions = 2;
+    mCurrentPosition   = 0;
+    mMultiPressMax     = 2;
+    mFeatureMap        = aFeatureMap;
+}
+
+void DeviceSwitch::SetNumberOfPositions(uint8_t aNumberOfPositions)
+{
+    bool changed;
+
+    changed            = aNumberOfPositions != mNumberOfPositions;
+    mNumberOfPositions = aNumberOfPositions;
+
+    if ((changed) && (mChanged_CB))
+    {
+        mChanged_CB(this, kChanged_NumberOfPositions);
+    }
+}
+
+void DeviceSwitch::SetCurrentPosition(uint8_t aCurrentPosition)
+{
+    bool changed;
+
+    changed          = aCurrentPosition != mCurrentPosition;
+    mCurrentPosition = aCurrentPosition;
+
+    if ((changed) && (mChanged_CB))
+    {
+        mChanged_CB(this, kChanged_CurrentPosition);
+    }
+}
+
+void DeviceSwitch::SetMultiPressMax(uint8_t aMultiPressMax)
+{
+    bool changed;
+
+    changed        = aMultiPressMax != mMultiPressMax;
+    mMultiPressMax = aMultiPressMax;
+
+    if ((changed) && (mChanged_CB))
+    {
+        mChanged_CB(this, kChanged_MultiPressMax);
+    }
+}
+
+void DeviceSwitch::SetChangeCallback(DeviceCallback_fn aChanged_CB)
+{
+    mChanged_CB = aChanged_CB;
+}
+
+void DeviceSwitch::HandleDeviceChange(Device * device, Device::Changed_t changeMask)
+{
+    if (mChanged_CB)
+    {
+        mChanged_CB(this, (DeviceSwitch::Changed_t) changeMask);
+    }
 }

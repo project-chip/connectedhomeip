@@ -81,6 +81,16 @@ if (current_os == "zephyr" || current_os == "mbed") {
   group("all") {
     deps = [ ":lwip" ]
   }
+} else if (lwip_platform == "p6") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_configs = [ "${chip_root}/src:includes" ]
+    public_configs += [ "${p6_sdk_build_root}:p6_sdk_config" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
 } else {
   config("lwip_config") {
     include_dirs = [ lwip_platform ]
@@ -127,9 +137,5 @@ if (current_os == "zephyr" || current_os == "mbed") {
       ":lwip_config",
       "${chip_root}/src:includes",
     ]
-
-    if (lwip_platform == "p6") {
-      public_configs += [ "${p6_sdk_build_root}:p6_sdk_config" ]
-    }
   }
 }

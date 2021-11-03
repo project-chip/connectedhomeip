@@ -361,8 +361,8 @@ void TransferSession::Reset()
     mLastQueryNum      = 0;
     mNextQueryNum      = 0;
 
-    mTimeout                = System::Clock::Zero;
-    mTimeoutStartTime       = System::Clock::Zero;
+    mTimeout                = System::Clock::kZero;
+    mTimeoutStartTime       = System::Clock::kZero;
     mShouldInitTimeoutStart = true;
     mAwaitingResponse       = false;
 }

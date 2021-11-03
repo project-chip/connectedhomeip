@@ -91,7 +91,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
     stateParams.systemLayer = &DeviceLayer::SystemLayer();
-    stateParams.inetLayer   = &DeviceLayer::InetLayer;
+    stateParams.inetLayer   = &DeviceLayer::InetLayer();
 #else
     stateParams.systemLayer = params.systemLayer;
     stateParams.inetLayer   = params.inetLayer;

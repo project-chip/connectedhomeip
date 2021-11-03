@@ -56,7 +56,7 @@ CHIP_ERROR LayerImplLwIP::StartTimer(Clock::Timeout delay, TimerCompleteCallback
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = Clock::Zero);
+    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = Clock::kZero);
 
     CancelTimer(onComplete, appState);
 
@@ -91,7 +91,7 @@ CHIP_ERROR LayerImplLwIP::ScheduleWork(TimerCompleteCallback onComplete, void * 
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    Timer * timer = Timer::New(*this, System::Clock::Zero, onComplete, appState);
+    Timer * timer = Timer::New(*this, System::Clock::kZero, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     return ScheduleLambda([timer] { timer->HandleComplete(); });
@@ -248,7 +248,7 @@ CHIP_ERROR LayerImplLwIP::HandlePlatformTimer()
     if (!mTimerList.Empty())
     {
         // timers still exist so restart the platform timer.
-        Clock::Timeout delay{ 0 };
+        Clock::Timeout delay = System::Clock::kZero;
 
         Clock::Timestamp currentTime = SystemClock().GetMonotonicTimestamp();
 

@@ -160,7 +160,7 @@ void QueryResponderBase::ClearBroadcastThrottle()
 {
     for (size_t i = 0; i < mResponderInfoSize; i++)
     {
-        mResponderInfos[i].lastMulticastTime = chip::System::Clock::Zero;
+        mResponderInfos[i].lastMulticastTime = chip::System::Clock::kZero;
     }
 }
 

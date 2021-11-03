@@ -15,19 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines CommandDataIB parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
 
-#include "Builder.h"
 #include "CommandPathIB.h"
-
-#include "Parser.h"
 #include "StatusIB.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -39,11 +33,10 @@
 namespace chip {
 namespace app {
 namespace CommandDataIB {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_CommandPath = 0,
-    kCsTag_Data        = 1,
-    kCsTag_StatusIB    = 2,
+    kPath = 0,
+    kData = 1,
 };
 
 class Parser : public StructParser
@@ -69,13 +62,13 @@ public:
     /**
      *  @brief Get a TLVReader for the CommandPathIB. Next() must be called before accessing them.
      *
-     *  @param [in] apCommandPath    A pointer to apCommandPath
+     *  @param [in] apPath    A pointer to apCommandPath
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetCommandPath(CommandPathIB::Parser * const apCommandPath) const;
+    CHIP_ERROR GetPath(CommandPathIB::Parser * const apPath) const;
 
     /**
      *  @brief Get a TLVReader for the Data. Next() must be called before accessing them.
@@ -85,22 +78,11 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetData(chip::TLV::TLVReader * const apReader) const;
-
-    /**
-     *  @brief Get a TLVReader for the StatusIB. Next() must be called before accessing them.
-     *
-     *  @param [in] apStatusIB    A pointer to apStatusIB
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          # CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a structure
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetStatusIB(StatusIB::Parser * const apStatusIB) const;
+    CHIP_ERROR GetData(TLV::TLVReader * const apReader) const;
 
 protected:
     // A recursively callable function to parse a data element and pretty-print it.
-    CHIP_ERROR ParseData(chip::TLV::TLVReader & aReader, int aDepth) const;
+    CHIP_ERROR ParseData(TLV::TLVReader & aReader, int aDepth) const;
 };
 
 class Builder : public StructBuilder
@@ -111,14 +93,7 @@ public:
      *
      *  @return A reference to CommandPathIB::Builder
      */
-    CommandPathIB::Builder & CreateCommandPathBuilder();
-
-    /**
-     *  @brief Initialize a StatusIB::Builder for writing into the TLV stream
-     *
-     *  @return A reference to StatusIB::Builder
-     */
-    StatusIB::Builder & CreateStatusIBBuilder();
+    CommandPathIB::Builder & CreatePath();
 
     /**
      *  @brief Mark the end of this CommandDataIB
@@ -128,9 +103,8 @@ public:
     CommandDataIB::Builder & EndOfCommandDataIB();
 
 private:
-    CommandPathIB::Builder mCommandPathBuilder;
-    StatusIB::Builder mStatusIBBuilder;
+    CommandPathIB::Builder mPath;
 };
-}; // namespace CommandDataIB
-}; // namespace app
-}; // namespace chip
+} // namespace CommandDataIB
+} // namespace app
+} // namespace chip

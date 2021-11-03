@@ -6270,22 +6270,6 @@ class NetworkCommissioning:
             errorCode: 'uint' = None
             debugText: 'str' = None
 
-        @dataclass
-        class GetLastNetworkCommissioningResult(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x0010
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(
-                            Label="timeoutMs", Tag=0, Type=uint),
-                    ])
-
-            timeoutMs: 'uint' = None
-
     class Attributes:
         class FeatureMap(ClusterAttributeDescriptor):
             @ChipUtility.classproperty

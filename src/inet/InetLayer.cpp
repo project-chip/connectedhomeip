@@ -656,8 +656,8 @@ CHIP_ERROR InetLayer::HandleInetLayerEvent(chip::System::Object & aTarget, chip:
     // If the event was droppable, record the fact that it has been dequeued.
     if (IsDroppableEvent(aEventType))
     {
-        InetLayerBasis & lBasis = static_cast<InetLayerBasis &>(aTarget);
-        InetLayer & lInetLayer  = lBasis.Layer();
+        EndPointBasis & lBasis = static_cast<EndPointBasis &>(aTarget);
+        InetLayer & lInetLayer = lBasis.Layer();
 
         lInetLayer.DroppableEventDequeued();
     }

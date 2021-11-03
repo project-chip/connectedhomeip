@@ -14588,7 +14588,6 @@ private:
 | * AddWiFiNetwork                                                    |   0x02 |
 | * DisableNetwork                                                    |   0x0E |
 | * EnableNetwork                                                     |   0x0C |
-| * GetLastNetworkCommissioningResult                                 |   0x10 |
 | * RemoveNetwork                                                     |   0x0A |
 | * ScanNetworks                                                      |   0x00 |
 | * UpdateThreadNetwork                                               |   0x08 |
@@ -14706,31 +14705,6 @@ public:
 
 private:
     chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type mRequest;
-};
-
-/*
- * Command GetLastNetworkCommissioningResult
- */
-class NetworkCommissioningGetLastNetworkCommissioningResult : public ModelCommand
-{
-public:
-    NetworkCommissioningGetLastNetworkCommissioningResult() : ModelCommand("get-last-network-commissioning-result")
-    {
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000010) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::NetworkCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
-    }
-
-private:
-    chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type mRequest;
 };
 
 /*
@@ -19154,6 +19128,8 @@ private:
 | Attributes:                                                         |        |
 | * NumberOfPositions                                                 | 0x0000 |
 | * CurrentPosition                                                   | 0x0001 |
+| * MultiPressMax                                                     | 0x0002 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -19269,6 +19245,74 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+};
+
+/*
+ * Attribute MultiPressMax
+ */
+class ReadSwitchMultiPressMax : public ModelCommand
+{
+public:
+    ReadSwitchMultiPressMax() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "multi-press-max");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSwitchMultiPressMax()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SwitchCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMultiPressMax(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadSwitchFeatureMap : public ModelCommand
+{
+public:
+    ReadSwitchFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSwitchFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SwitchCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -28163,17 +28207,16 @@ void registerClusterNetworkCommissioning(Commands & commands)
     const char * clusterName = "NetworkCommissioning";
 
     commands_list clusterCommands = {
-        make_unique<NetworkCommissioningAddThreadNetwork>(),                  //
-        make_unique<NetworkCommissioningAddWiFiNetwork>(),                    //
-        make_unique<NetworkCommissioningDisableNetwork>(),                    //
-        make_unique<NetworkCommissioningEnableNetwork>(),                     //
-        make_unique<NetworkCommissioningGetLastNetworkCommissioningResult>(), //
-        make_unique<NetworkCommissioningRemoveNetwork>(),                     //
-        make_unique<NetworkCommissioningScanNetworks>(),                      //
-        make_unique<NetworkCommissioningUpdateThreadNetwork>(),               //
-        make_unique<NetworkCommissioningUpdateWiFiNetwork>(),                 //
-        make_unique<ReadNetworkCommissioningFeatureMap>(),                    //
-        make_unique<ReadNetworkCommissioningClusterRevision>(),               //
+        make_unique<NetworkCommissioningAddThreadNetwork>(),    //
+        make_unique<NetworkCommissioningAddWiFiNetwork>(),      //
+        make_unique<NetworkCommissioningDisableNetwork>(),      //
+        make_unique<NetworkCommissioningEnableNetwork>(),       //
+        make_unique<NetworkCommissioningRemoveNetwork>(),       //
+        make_unique<NetworkCommissioningScanNetworks>(),        //
+        make_unique<NetworkCommissioningUpdateThreadNetwork>(), //
+        make_unique<NetworkCommissioningUpdateWiFiNetwork>(),   //
+        make_unique<ReadNetworkCommissioningFeatureMap>(),      //
+        make_unique<ReadNetworkCommissioningClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -28417,6 +28460,8 @@ void registerClusterSwitch(Commands & commands)
         make_unique<ReadSwitchNumberOfPositions>(), //
         make_unique<ReadSwitchCurrentPosition>(),   //
         make_unique<ReportSwitchCurrentPosition>(), //
+        make_unique<ReadSwitchMultiPressMax>(),     //
+        make_unique<ReadSwitchFeatureMap>(),        //
         make_unique<ReadSwitchClusterRevision>(),   //
     };
 

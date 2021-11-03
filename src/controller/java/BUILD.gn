@@ -25,10 +25,17 @@ shared_library("jni") {
     "AndroidCallbacks-JNI.cpp",
     "AndroidCallbacks.cpp",
     "AndroidCallbacks.h",
+    "AndroidClusterExceptions.cpp",
+    "AndroidClusterExceptions.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
+    "CHIPDefaultCallbacks.cpp",
+    "CHIPDefaultCallbacks.h",
     "CHIPDeviceController-JNI.cpp",
     "zap-generated/CHIPClusters-JNI.cpp",
+    "zap-generated/CHIPClustersRead-JNI.cpp",
+    "zap-generated/CHIPReadCallbacks.cpp",
+    "zap-generated/CHIPReadCallbacks.h",
   ]
 
   deps = [
@@ -42,6 +49,8 @@ shared_library("jni") {
   public_configs = [ "${chip_root}/src:includes" ]
 
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+
+  ldflags = [ "-Wl,--gc-sections" ]
 }
 
 android_library("java") {

@@ -38,7 +38,7 @@
 namespace chip {
 namespace System {
 
-constexpr Clock::Seconds64 kDefaultMinSleepPeriod{ 60 * 60 * 24 * 30 }; // Month [sec]
+constexpr Clock::Seconds64 kDefaultMinSleepPeriod = Clock::Seconds64(60 * 60 * 24 * 30); // Month [sec]
 
 CHIP_ERROR LayerImplSelect::Init()
 {
@@ -120,7 +120,7 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = System::Clock::Zero);
+    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = System::Clock::kZero);
 
     CancelTimer(onComplete, appState);
 
@@ -188,7 +188,7 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
 
     CancelTimer(onComplete, appState);
 
-    Timer * timer = Timer::New(*this, Clock::Zero, onComplete, appState);
+    Timer * timer = Timer::New(*this, Clock::kZero, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -339,7 +339,7 @@ void LayerImplSelect::PrepareEvents()
         awakenTime = timer->AwakenTime();
     }
 
-    const Clock::Timestamp sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : Clock::Zero;
+    const Clock::Timestamp sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : Clock::kZero;
     Clock::ToTimeval(sleepTime, mNextTimeout);
 
     mMaxFd = -1;

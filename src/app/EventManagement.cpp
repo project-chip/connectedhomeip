@@ -87,7 +87,7 @@ struct EventEnvelopeContext
 
     uint16_t mFieldsToRead = 0;
     /* PriorityLevel and DeltaSystemTimestamp are there if that is not first event when putting events in report*/
-    Timestamp mDeltaSystemTime = Timestamp::System(0);
+    Timestamp mDeltaSystemTime = Timestamp::System(System::Clock::kZero);
     Timestamp mDeltaUtc        = Timestamp::UTC(0);
     PriorityLevel mPriority    = PriorityLevel::First;
     NodeId mNodeId             = 0;
@@ -318,10 +318,11 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     SuccessOrExit(err);
 
     // TODO: Revisit NodeId since the the encoding spec and the IM seem to disagree on how this stuff works
-    eventPathBuilder.NodeId(apOptions->mpEventSchema->mNodeId)
-        .EndpointId(apOptions->mpEventSchema->mEndpointId)
-        .ClusterId(apOptions->mpEventSchema->mClusterId)
-        .EventId(apOptions->mpEventSchema->mEventId)
+    eventPathBuilder.Node(apOptions->mpEventSchema->mNodeId)
+        .Endpoint(apOptions->mpEventSchema->mEndpointId)
+        .Cluster(apOptions->mpEventSchema->mClusterId)
+        .Event(apOptions->mpEventSchema->mEventId)
+        .IsUrgent(false)
         .EndOfEventPathIB();
     err = eventPathBuilder.GetError();
     SuccessOrExit(err);
@@ -496,7 +497,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
     CircularEventBuffer * buffer   = nullptr;
     EventLoadOutContext ctxt       = EventLoadOutContext(writer, aEventOptions.mpEventSchema->mPriority,
                                                    GetPriorityBuffer(aEventOptions.mpEventSchema->mPriority)->GetLastEventNumber());
-    Timestamp timestamp(Timestamp::Type::kSystem, System::SystemClock().GetMonotonicMilliseconds());
+    Timestamp timestamp(System::SystemClock().GetMonotonicTimestamp());
     EventOptions opts = EventOptions(timestamp);
     // Start the event container (anonymous structure) in the circular buffer
     writer.Init(*mpEventBuffer);
@@ -753,10 +754,10 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
     {
         EventPathIB::Parser path;
         ReturnErrorOnFailure(path.Init(aReader));
-        ReturnErrorOnFailure(path.GetNodeId(&(envelope->mNodeId)));
-        ReturnErrorOnFailure(path.GetEndpointId(&(envelope->mEndpointId)));
-        ReturnErrorOnFailure(path.GetClusterId(&(envelope->mClusterId)));
-        ReturnErrorOnFailure(path.GetEventId(&(envelope->mEventId)));
+        ReturnErrorOnFailure(path.GetNode(&(envelope->mNodeId)));
+        ReturnErrorOnFailure(path.GetEndpoint(&(envelope->mEndpointId)));
+        ReturnErrorOnFailure(path.GetCluster(&(envelope->mClusterId)));
+        ReturnErrorOnFailure(path.GetEvent(&(envelope->mEventId)));
         envelope->mFieldsToRead |= 1 << EventDataElement::kCsTag_EventPath;
     }
 
@@ -854,8 +855,8 @@ void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, Circu
     mPriority                  = aPriorityLevel;
     mFirstEventNumber          = 1;
     mLastEventNumber           = 0;
-    mFirstEventSystemTimestamp = Timestamp::System(0);
-    mLastEventSystemTimestamp  = Timestamp::System(0);
+    mFirstEventSystemTimestamp = Timestamp::System(System::Clock::kZero);
+    mLastEventSystemTimestamp  = Timestamp::System(System::Clock::kZero);
     mpEventNumberCounter       = nullptr;
 }
 

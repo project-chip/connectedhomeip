@@ -50,7 +50,7 @@ public:
     {
         mMaxEchoCount       = 3;
         mEchoInterval       = 1000;
-        mLastEchoTime       = 0;
+        mLastEchoTime       = System::Clock::kZero;
         mEchoCount          = 0;
         mEchoRespCount      = 0;
         mPayloadSize        = 32;
@@ -62,8 +62,8 @@ public:
         mEchoPort = CHIP_PORT;
     }
 
-    uint64_t GetLastEchoTime() const { return mLastEchoTime; }
-    void SetLastEchoTime(uint64_t value) { mLastEchoTime = value; }
+    System::Clock::Timestamp GetLastEchoTime() const { return mLastEchoTime; }
+    void SetLastEchoTime(System::Clock::Timestamp value) { mLastEchoTime = value; }
 
     uint64_t GetEchoCount() const { return mEchoCount; }
     void SetEchoCount(uint64_t value) { mEchoCount = value; }
@@ -98,7 +98,7 @@ public:
 
 private:
     // The last time a echo request was attempted to be sent.
-    uint64_t mLastEchoTime;
+    System::Clock::Timestamp mLastEchoTime;
 
     // Count of the number of echo requests sent.
     uint64_t mEchoCount;
@@ -210,7 +210,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
         sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
     }
 
-    gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicMilliseconds());
+    gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicTimestamp());
     SuccessOrExit(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(gPingArguments.GetEchoInterval()),
                                                               EchoTimerHandler, NULL));
 
@@ -256,7 +256,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Establish secure session failed, err: %s\n", ErrorStr(err));
-        gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicMilliseconds());
+        gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicTimestamp());
     }
     else
     {
@@ -268,17 +268,17 @@ exit:
 
 void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload)
 {
-    uint64_t respTime    = System::SystemClock().GetMonotonicMilliseconds();
-    uint64_t transitTime = respTime - gPingArguments.GetLastEchoTime();
-    streamer_t * sout    = streamer_get();
+    System::Clock::Timestamp respTime         = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Milliseconds64 transitTime = respTime - gPingArguments.GetLastEchoTime();
+    streamer_t * sout                         = streamer_get();
 
     gPingArguments.SetWaitingForEchoResp(false);
     gPingArguments.IncrementEchoRespCount();
 
-    streamer_printf(sout, "Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gPingArguments.GetEchoRespCount(),
+    streamer_printf(sout, "Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fs\n", gPingArguments.GetEchoRespCount(),
                     gPingArguments.GetEchoCount(),
                     static_cast<double>(gPingArguments.GetEchoRespCount()) * 100 / gPingArguments.GetEchoCount(),
-                    payload->DataLength(), static_cast<double>(transitTime) / 1000);
+                    payload->DataLength(), static_cast<double>(transitTime.count()) / 1000);
 }
 
 void StartPinging(streamer_t * stream, char * destination)
@@ -292,13 +292,13 @@ void StartPinging(streamer_t * stream, char * destination)
     }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
+    err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer())
                                .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gPingArguments.GetEchoPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\n", ErrorStr(err)));
 #endif
 
-    err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
+    err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer())
                                .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gPingArguments.GetEchoPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\n", ErrorStr(err)));

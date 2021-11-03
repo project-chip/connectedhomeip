@@ -21,6 +21,7 @@
 #include <app/MessageDef/EventPathIB.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <app/util/MatterCallbacks.h>
 #include <lib/support/TypeTraits.h>
 
 namespace chip {
@@ -151,7 +152,14 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
-        err = WriteSingleClusterData(clusterInfo, dataReader, this);
+
+        {
+            const ConcreteAttributePath concretePath =
+                ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mFieldId);
+            MatterPreAttributeWriteCallback(concretePath);
+            err = WriteSingleClusterData(clusterInfo, dataReader, this);
+            MatterPostAttributeWriteCallback(concretePath);
+        }
         SuccessOrExit(err);
     }
 
@@ -286,3 +294,6 @@ void WriteHandler::ClearState()
 
 } // namespace app
 } // namespace chip
+
+void __attribute__((weak)) MatterPreAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+void __attribute__((weak)) MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}

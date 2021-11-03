@@ -34,7 +34,8 @@ namespace Inet {
 
 void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 {
-    InitInetLayerBasis(aInetLayer, aAppState);
+    AppState          = aAppState;
+    mInetLayer        = &aInetLayer;
     mLwIPEndPointType = LwIPEndPointType::Unknown;
 }
 
@@ -56,8 +57,9 @@ void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTac
 
 void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 {
-    InitInetLayerBasis(aInetLayer, aAppState);
-    mSocket = kInvalidSocketFd;
+    AppState   = aAppState;
+    mInetLayer = &aInetLayer;
+    mSocket    = kInvalidSocketFd;
 }
 
 void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
@@ -71,7 +73,8 @@ void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTac
 
 void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 {
-    InitInetLayerBasis(aInetLayer, aAppState);
+    AppState   = aAppState;
+    mInetLayer = &aInetLayer;
 }
 
 void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)

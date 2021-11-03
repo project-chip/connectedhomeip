@@ -21,7 +21,7 @@ using namespace ::chip::Protocols;
 
 namespace {
 // Use this as a timestamp if not needing to test BDX timeouts.
-constexpr System::Clock::Timestamp kNoAdvanceTime{ 0 };
+constexpr System::Clock::Timestamp kNoAdvanceTime = System::Clock::kZero;
 
 const TLV::Tag tlvStrTag  = TLV::ContextTag(4);
 const TLV::Tag tlvListTag = TLV::ProfileTag(7777, 8888);
