@@ -27,7 +27,7 @@
 #if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
 static void CheckScheduleLambda(nlTestSuite * inSuite, void * aContext)
 {
-    bool * called          = new bool(false);
+    bool * called = new bool(false);
     chip::DeviceLayer::SystemLayer().ScheduleLambda([called] { *called = true; });
     while (!*called)
     {
