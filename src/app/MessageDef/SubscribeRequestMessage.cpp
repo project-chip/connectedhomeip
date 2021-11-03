@@ -35,7 +35,7 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
-    AttributePathList::Parser attributePathList;
+    AttributePaths::Parser AttributePaths;
     EventPaths::Parser eventPathList;
     AttributeDataVersionList::Parser attributeDataVersionList;
     PRETTY_PRINT("SubscribeRequestMessage =");
@@ -54,10 +54,10 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
             TagPresenceMask |= (1 << kCsTag_AttributePathList);
             VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
-            attributePathList.Init(reader);
+            AttributePaths.Init(reader);
 
             PRETTY_PRINT_INCDEPTH();
-            ReturnLogErrorOnFailure(attributePathList.CheckSchemaValidity());
+            ReturnLogErrorOnFailure(AttributePaths.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
             break;
         case kCsTag_EventPaths:
@@ -165,7 +165,7 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR SubscribeRequestMessage::Parser::GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetAttributePathList(AttributePaths::Parser * const apAttributePathList) const
 {
     TLV::TLVReader reader;
     ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributePathList), reader));
@@ -221,7 +221,7 @@ CHIP_ERROR SubscribeRequestMessage::Builder::Init(chip::TLV::TLVWriter * const a
     return InitAnonymousStructure(apWriter);
 }
 
-AttributePathList::Builder & SubscribeRequestMessage::Builder::CreateAttributePathListBuilder()
+AttributePaths::Builder & SubscribeRequestMessage::Builder::CreateAttributePathListBuilder()
 {
     if (mError == CHIP_NO_ERROR)
     {

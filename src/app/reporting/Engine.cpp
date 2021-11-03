@@ -69,11 +69,11 @@ Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeDataList
     CHIP_ERROR err = CHIP_NO_ERROR;
     ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId);
     AttributeDataElement::Builder attributeDataElementBuilder = aAttributeDataList.CreateAttributeDataElementBuilder();
-    AttributePath::Builder attributePathBuilder               = attributeDataElementBuilder.CreateAttributePathBuilder();
-    attributePathBuilder.EndpointId(aClusterInfo.mEndpointId)
-        .ClusterId(aClusterInfo.mClusterId)
-        .FieldId(aClusterInfo.mFieldId)
-        .EndOfAttributePath();
+    AttributePathIB::Builder attributePathBuilder             = attributeDataElementBuilder.CreateAttributePath();
+    attributePathBuilder.Endpoint(aClusterInfo.mEndpointId)
+        .Cluster(aClusterInfo.mClusterId)
+        .Attribute(aClusterInfo.mFieldId)
+        .EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     SuccessOrExit(err);
 
