@@ -40,7 +40,7 @@ private:
     CHIP_ERROR StoreProductRevision(uint16_t productRev) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }

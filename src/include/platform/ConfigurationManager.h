@@ -74,7 +74,7 @@ public:
     virtual CHIP_ERROR GetProductId(uint16_t & productId)                                           = 0;
     virtual CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize)                         = 0;
     virtual CHIP_ERROR GetProductRevision(uint16_t & productRev)                                    = 0;
-    virtual CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)           = 0;
+    virtual CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize)                                  = 0;
     virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)                                    = 0;
     virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf)                                      = 0;
     virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                                    = 0;
