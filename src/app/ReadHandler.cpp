@@ -259,7 +259,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     ReadRequestMessage::Parser readRequestParser;
     EventPaths::Parser eventPathListParser;
 
-    AttributePathList::Parser attributePathListParser;
+    AttributePaths::Parser attributePathListParser;
 
     reader.Init(std::move(aPayload));
 
@@ -321,7 +321,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser)
+CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePaths::Parser & aAttributePathListParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
@@ -332,26 +332,26 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
         VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
         ClusterInfo clusterInfo;
-        AttributePath::Parser path;
+        AttributePathIB::Parser path;
         err = path.Init(reader);
         SuccessOrExit(err);
         // TODO: Support wildcard paths here
         // TODO: MEIs (ClusterId and AttributeId) have a invalid pattern instead of a single invalid value, need to add separate
         // functions for checking if we have received valid values.
-        err = path.GetEndpointId(&(clusterInfo.mEndpointId));
+        err = path.GetEndpoint(&(clusterInfo.mEndpointId));
         if (err == CHIP_NO_ERROR)
         {
             VerifyOrExit(!clusterInfo.HasWildcardEndpointId(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
         }
         SuccessOrExit(err);
-        err = path.GetClusterId(&(clusterInfo.mClusterId));
+        err = path.GetCluster(&(clusterInfo.mClusterId));
         if (err == CHIP_NO_ERROR)
         {
             VerifyOrExit(!clusterInfo.HasWildcardClusterId(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
         }
 
         SuccessOrExit(err);
-        err = path.GetFieldId(&(clusterInfo.mFieldId));
+        err = path.GetAttribute(&(clusterInfo.mFieldId));
         if (CHIP_END_OF_TLV == err)
         {
             err = CHIP_NO_ERROR;
@@ -538,7 +538,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnLogErrorOnFailure(subscribeRequestParser.CheckSchemaValidity());
 #endif
 
-    AttributePathList::Parser attributePathListParser;
+    AttributePaths::Parser attributePathListParser;
     CHIP_ERROR err = subscribeRequestParser.GetAttributePathList(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
     {

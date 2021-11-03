@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,6 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
- */
-/**
- *    @file
- *      This file defines AttributeStatusList parser and builder in CHIP interaction model
- *
  */
 
 #pragma once
@@ -36,26 +31,26 @@
 
 namespace chip {
 namespace app {
-namespace AttributeStatusList {
+namespace AttributeStatuses {
 class Builder : public ArrayBuilder
 {
 public:
     /**
-     *  @brief Initialize a AttributeStatus::Builder for writing into the TLV stream
+     *  @brief Initialize a AttributeStatusIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeStatus::Builder
+     *  @return A reference to AttributeStatusIB::Builder
      */
-    AttributeStatusIB::Builder & CreateAttributeStatusBuilder();
+    AttributeStatusIB::Builder & CreateAttributeStatus();
 
     /**
-     *  @brief Mark the end of this AttributeStatusList
+     *  @brief Mark the end of this AttributeStatuses
      *
      *  @return A reference to *this
      */
-    AttributeStatusList::Builder & EndOfAttributeStatusList();
+    AttributeStatuses::Builder & EndOfAttributeStatuses();
 
 private:
-    AttributeStatusIB::Builder mAttributeStatusBuilder;
+    AttributeStatusIB::Builder mAttributeStatus;
 };
 
 class Parser : public ArrayParser
@@ -78,7 +73,6 @@ public:
     CHIP_ERROR CheckSchemaValidity() const;
 #endif
 };
-}; // namespace AttributeStatusList
-
-}; // namespace app
-}; // namespace chip
+} // namespace AttributeStatuses
+} // namespace app
+} // namespace chip

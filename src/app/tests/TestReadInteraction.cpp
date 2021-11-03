@@ -295,16 +295,16 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     AttributeDataElement::Builder attributeDataElementBuilder = attributeDataListBuilder.CreateAttributeDataElementBuilder();
     NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributeDataElementBuilder.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePathBuilder = attributeDataElementBuilder.CreateAttributePath();
     NL_TEST_ASSERT(apSuite, attributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
 
     if (aNeedInvalidReport)
     {
-        attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).ListIndex(5).EndOfAttributePath();
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB();
     }
     else
     {
-        attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
     }
 
     err = attributePathBuilder.GetError();
@@ -398,17 +398,17 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathList::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
+    AttributePaths::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    attributePathListBuilder.EndOfAttributePathList();
+    attributePathListBuilder.EndOfAttributePaths();
     err = attributePathListBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -447,7 +447,7 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
     attributePathParams[0].mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
     attributePathParams[1].mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
     attributePathParams[1].mFlags.Set(AttributePathParams::Flags::kListIndexValid);
-    AttributePathList::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
+    AttributePaths::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
     err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
@@ -473,7 +473,7 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
     AttributePathParams attributePathParams[2];
     attributePathParams[0].mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
     attributePathParams[1].mFlags.Set(AttributePathParams::Flags::kListIndexValid);
-    AttributePathList::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
+    AttributePaths::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
     err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 }
@@ -527,13 +527,13 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathList::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
+    AttributePaths::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).ListIndex(5).EndOfAttributePath();
+    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -797,17 +797,17 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     err = subscribeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathList::Builder attributePathListBuilder = subscribeRequestBuilder.CreateAttributePathListBuilder();
+    AttributePaths::Builder attributePathListBuilder = subscribeRequestBuilder.CreateAttributePathListBuilder();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    attributePathListBuilder.EndOfAttributePathList();
+    attributePathListBuilder.EndOfAttributePaths();
     err = attributePathListBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
