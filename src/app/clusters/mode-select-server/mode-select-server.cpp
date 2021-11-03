@@ -51,25 +51,23 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
 {
     VerifyOrDie(aPath.mClusterId == ModeSelect::Id);
 
-    const ModeSelect::StaticSupportedModesManager & gSupportedModeManager =
-        ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
+    const ModeSelect::SupportedModesManager * gSupportedModeManager =
+        ModeSelect::getSupportedModesManager();
 
     if (ModeSelect::Attributes::SupportedModes::Id == aPath.mAttributeId)
     {
-        const ModeSelect::StaticSupportedModesManager::IteratorFactory * iteratorFactory =
-            gSupportedModeManager.getIteratorFactory(aPath.mEndpointId);
-        if (iteratorFactory == nullptr)
+        const ModeSelect::SupportedModesManager::ModeOptionsProvider modeOptionsProvider = 
+            gSupportedModeManager->getModeOptionsProvider(aPath.mEndpointId);
+        if (modeOptionsProvider.begin() == nullptr)
         {
             aEncoder.Encode(DataModel::List<ModeSelect::Structs::ModeOptionStruct::Type>());
             return CHIP_NO_ERROR;
         }
         CHIP_ERROR err;
-        err = aEncoder.EncodeList([iteratorFactory](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-            const auto & end = *(iteratorFactory->end());
-            for (auto it = *(iteratorFactory->begin()); it != end; ++it)
+        err = aEncoder.EncodeList([modeOptionsProvider](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+            const auto * end = modeOptionsProvider.end();
+            for (auto * it = modeOptionsProvider.begin(); it != end; ++it)
             {
-                emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: dereferencing it");
-                emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: it= %p", (void *) it.operator->());
                 auto & modeOption = *it;
                 ReturnErrorOnFailure(encoder.Encode(modeOption));
             }
@@ -90,9 +88,7 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
     uint8_t newMode       = commandData.newMode;
     // Check that the newMode matches one of the supported options
     const ModeSelect::Structs::ModeOptionStruct::Type * modeOptionPtr;
-    const ModeSelect::StaticSupportedModesManager & gSupportedModeManager =
-        ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
-    EmberAfStatus checkSupportedModeStatus = gSupportedModeManager.getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
+    EmberAfStatus checkSupportedModeStatus = ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
     if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %" PRIu8, newMode);

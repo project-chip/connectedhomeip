@@ -11,7 +11,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-using storage_value_type   = const ModeOptionStructType *;
+using storage_value_type   = const ModeOptionStructType;
 namespace {
 Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode, uint32_t semanticTag)
 {
@@ -23,35 +23,43 @@ Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_
 }
 } // namespace
 
-const Structs::ModeOptionStruct::Type StaticSupportedModesManager::blackOption      = buildModeOptionStruct("Black", 0, 0);
-const Structs::ModeOptionStruct::Type StaticSupportedModesManager::cappuccinoOption = buildModeOptionStruct("Cappuccino", 4, 0);
-const Structs::ModeOptionStruct::Type StaticSupportedModesManager::espressoOption   = buildModeOptionStruct("Espresso", 7, 0);
-storage_value_type StaticSupportedModesManager::coffeeOptions[] = { &blackOption, &cappuccinoOption, &espressoOption };
-const Span<storage_value_type> StaticSupportedModesManager::coffeeOptionsSpan =
-    Span<storage_value_type>(StaticSupportedModesManager::coffeeOptions);
-const map<EndpointId, Span<storage_value_type>> StaticSupportedModesManager::optionsByEndpoints = {
-    { 1, StaticSupportedModesManager::coffeeOptionsSpan }
+// TODO: Configure your options for each endpoint
+storage_value_type StaticSupportedModesManager::coffeeOptions[] = { 
+    buildModeOptionStruct("Black", 0, 0),
+    buildModeOptionStruct("Cappuccino", 4, 0),
+    buildModeOptionStruct("Espresso", 7, 0)
+};
+const StaticSupportedModesManager::EndpointSpanPair StaticSupportedModesManager::supportedOptionsByEndpoints[ENDPOINTS_WITH_MODES] = {
+    EndpointSpanPair(1, Span<storage_value_type>(StaticSupportedModesManager::coffeeOptions))  // Options for Endpoint 1
 };
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
-const StaticSupportedModesManager::IteratorFactory * StaticSupportedModesManager::getIteratorFactory(EndpointId endpointId) const
+const SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
 {
-    const auto & it = _iteratorFactoriesByEndpoints.find(endpointId);
-    return (it == _iteratorFactoriesByEndpoints.end()) ? nullptr : &(it->second);
+    for (size_t i = 0; i < ENDPOINTS_WITH_MODES; ++i)
+    {
+        const EndpointSpanPair& endpointSpanPair = supportedOptionsByEndpoints[i];
+        if (endpointSpanPair.mEndpointId == endpointId)
+        {
+            return ModeOptionsProvider(endpointSpanPair.mSpan.data(), endpointSpanPair.mSpan.end());
+        }
+    }
+    return ModeOptionsProvider(nullptr, nullptr);
 }
 
 EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointId, unsigned char mode,
                                                                const ModeOptionStructType ** dataPtr) const
 {
-    auto * iteratorFactory = this->getIteratorFactory(endpointId);
-    if (iteratorFactory == nullptr)
+    auto modeOptionsProvider = this->getModeOptionsProvider(endpointId);
+    if (modeOptionsProvider.begin() == nullptr)
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
     }
-    const StaticSupportedModesManager::Iterator & begin = *(this->getIteratorFactory(endpointId)->begin());
-    const StaticSupportedModesManager::Iterator & end   = *(this->getIteratorFactory(endpointId)->end());
-    for (auto it = begin; it != end; ++it)
+    auto* begin = this->getModeOptionsProvider(endpointId).begin();
+    auto* end = this->getModeOptionsProvider(endpointId).end();
+
+    for (auto* it = begin; it != end; ++it)
     {
         auto & modeOption = *it;
         if (modeOption.mode == mode)
@@ -62,4 +70,9 @@ EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short en
     }
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %c", mode);
     return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+}
+
+const ModeSelect::SupportedModesManager* ModeSelect::getSupportedModesManager()
+{
+    return &StaticSupportedModesManager::instance;
 }

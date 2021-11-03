@@ -41,53 +41,37 @@ class SupportedModesManager
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
 
 public:
-    struct ModeOptionStructIterator
-    {
-        using iterator_category = std::forward_iterator_tag;
-        using difference_type   = std::ptrdiff_t;
-        using value_type        = const ModeOptionStructType;
-        using pointer           = value_type *;
-        using reference         = value_type &;
-
-        virtual reference operator*() const = 0;
-        virtual pointer operator->()        = 0;
-        virtual pointer operator->() const  = 0;
-
-        // Prefix increment
-        virtual ModeOptionStructIterator & operator++() = 0;
-
-        virtual bool operator==(const ModeOptionStructIterator & other) const = 0;
-        virtual bool operator!=(const ModeOptionStructIterator & other) const = 0;
-
-        virtual ~ModeOptionStructIterator() {}
-    };
 
     /**
-     * A factory that can return the ModeOptionStructIterators for a specific endpoint.
+     * A class that can return the supported ModeOptions for a specific endpoint.
      */
-    struct ModeOptionStructIteratorFactory
+    struct ModeOptionsProvider
     {
-        using const_pointer = const ModeOptionStructIterator *;
+        using pointer = const ModeOptionStructType*;
 
         /**
          * Returns the ModeOptionStructIterator to the first option.
          */
-        virtual const_pointer begin() const = 0;
+        inline pointer begin() const { return mBegin; }
 
         /**
          * Returns the ModeOptionStructIterator to an element after the last option.
          */
-        virtual const_pointer end() const = 0;
+        inline pointer end() const { return mEnd; }
 
-        virtual ~ModeOptionStructIteratorFactory() {}
+        ModeOptionsProvider(const pointer aBegin, const pointer aEnd): mBegin(aBegin), mEnd(aEnd) {}
+
+        pointer mBegin;
+        pointer mEnd;
+
     };
 
     /**
      * Given the endpointId, returns all its supported modes options.
      * @param endpointId
-     * @return The iterator factory for the endpoint, or nullptr if the endpoint doesn't support ModeSelectCluster.
+     * @return The mode options provider for the endpoint.
      */
-    virtual const ModeOptionStructIteratorFactory * getIteratorFactory(EndpointId endpointId) const = 0;
+    virtual const ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const = 0;
 
     /**
      * Given the endpointId and a mode value, find the ModeOptionStruct that matches the mode.
@@ -101,6 +85,8 @@ public:
 
     virtual ~SupportedModesManager() {}
 };
+
+const SupportedModesManager* getSupportedModesManager ();
 
 } // namespace ModeSelect
 } // namespace Clusters
