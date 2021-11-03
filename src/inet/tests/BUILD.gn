@@ -86,4 +86,3 @@ chip_test_suite("tests") {
     sources += [ "TestLwIPDNS.cpp" ]
   }
 }
-
