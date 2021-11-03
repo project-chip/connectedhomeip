@@ -20,16 +20,21 @@ from .gn import GnBuilder
 
 class InfineonApp(Enum):
     LOCK = auto()
+    ALL_CLUSTERS = auto()
 
     def ExampleName(self):
         if self == InfineonApp.LOCK:
             return 'lock-app'
+        elif self == InfineonApp.ALL_CLUSTERS:
+            return 'all-clusters-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == InfineonApp.LOCK:
             return 'chip-p6-lock-example'
+        elif self == InfineonApp.ALL_CLUSTERS:
+            return 'chip-p6-all-clusters-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
