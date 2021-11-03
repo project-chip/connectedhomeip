@@ -248,3 +248,5 @@ void SetDelegate(EndpointId endpoint, OTAProviderDelegate * delegate)
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+void MatterOtaSoftwareUpdateProviderPluginServerInitCallback() {}
