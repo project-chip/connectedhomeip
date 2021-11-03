@@ -63,7 +63,7 @@ static DeviceCallbacks EchoCallbacks;
 constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 
 constexpr uint32_t kMaxBdxBlockSize                = 1024;
-constexpr chip::System::Clock::Timeout kBdxTimeout = chip::System::Clock::Seconds16(5 * 60); // Specifications mandates >= 5 minutes
+constexpr chip::System::Clock::Timeout kBdxTimeout = chip::System::Clock::Seconds16(5 * 60); // Specification mandates >= 5 minutes
 constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
 const char * gOtaFilename                           = "hello-world.bin";
 BdxOtaSender bdxServer;
