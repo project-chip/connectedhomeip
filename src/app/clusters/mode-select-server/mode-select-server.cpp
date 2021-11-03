@@ -56,7 +56,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
 
     if (ModeSelect::Attributes::SupportedModes::Id == aPath.mAttributeId)
     {
-        const ModeSelect::SupportedModesManager::ModeOptionsProvider modeOptionsProvider = 
+        const ModeSelect::SupportedModesManager::ModeOptionsProvider modeOptionsProvider =
             gSupportedModeManager->getModeOptionsProvider(aPath.mEndpointId);
         if (modeOptionsProvider.begin() == nullptr)
         {

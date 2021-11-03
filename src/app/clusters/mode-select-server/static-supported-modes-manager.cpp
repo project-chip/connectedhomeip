@@ -24,7 +24,7 @@ Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_
 } // namespace
 
 // TODO: Configure your options for each endpoint
-storage_value_type StaticSupportedModesManager::coffeeOptions[] = { 
+storage_value_type StaticSupportedModesManager::coffeeOptions[] = {
     buildModeOptionStruct("Black", 0, 0),
     buildModeOptionStruct("Cappuccino", 4, 0),
     buildModeOptionStruct("Espresso", 7, 0)
