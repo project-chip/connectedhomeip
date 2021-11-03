@@ -132,7 +132,7 @@ def _start_ipython_terminal(client: HdlcRpcClient) -> None:
     interactive_console = PwConsoleEmbed(
         global_vars=local_variables,
         local_vars=None,
-        loggers= {
+        loggers={
             'Device Logs': [_DEVICE_LOG],
             'Host Logs': [logging.getLogger()],
         },
