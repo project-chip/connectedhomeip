@@ -120,4 +120,3 @@ int TestSystemScheduleLambda(void)
 }
 
 CHIP_REGISTER_TEST_SUITE(TestSystemScheduleLambda)
-
