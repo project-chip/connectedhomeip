@@ -42,23 +42,23 @@ class DnsShellResolverDelegate : public Dnssd::ResolverDelegate
 public:
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override
     {
-        streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\n",
+        streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\r\n",
                         ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
-        streamer_printf(streamer_get(), "   Hostname: %s\n", nodeData.mHostName);
-        streamer_printf(streamer_get(), "   IP address: %s\n", nodeData.mAddress.ToString(ipAddressBuf));
-        streamer_printf(streamer_get(), "   Port: %" PRIu16 "\n", nodeData.mPort);
+        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.mHostName);
+        streamer_printf(streamer_get(), "   IP address: %s\r\n", nodeData.mAddress.ToString(ipAddressBuf));
+        streamer_printf(streamer_get(), "   Port: %" PRIu16 "\r\n", nodeData.mPort);
 
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 
         if (retryInterval.HasValue())
-            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\n", retryInterval.Value());
+            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", retryInterval.Value());
 
         retryInterval = nodeData.GetMrpRetryIntervalActive();
 
         if (retryInterval.HasValue())
-            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\n", retryInterval.Value());
+            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval.Value());
 
-        streamer_printf(streamer_get(), "   Supports TCP: %s\n", nodeData.mSupportsTcp ? "yes" : "no");
+        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.mSupportsTcp ? "yes" : "no");
     }
 
     void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}
@@ -67,41 +67,41 @@ public:
     {
         if (!nodeData.IsValid())
         {
-            streamer_printf(streamer_get(), "DNS browse failed - not found valid services \n");
+            streamer_printf(streamer_get(), "DNS browse failed - not found valid services \r\n");
             return;
         }
 
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1];
         Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
 
-        streamer_printf(streamer_get(), "DNS browse succeeded: \n");
-        streamer_printf(streamer_get(), "   Hostname: %s\n", nodeData.hostName);
-        streamer_printf(streamer_get(), "   Vendor ID: %" PRIu16 "\n", nodeData.vendorId);
-        streamer_printf(streamer_get(), "   Product ID: %" PRIu16 "\n", nodeData.productId);
-        streamer_printf(streamer_get(), "   Long discriminator: %" PRIu16 "\n", nodeData.longDiscriminator);
-        streamer_printf(streamer_get(), "   Device type: %" PRIu16 "\n", nodeData.deviceType);
+        streamer_printf(streamer_get(), "DNS browse succeeded: \r\n");
+        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
+        streamer_printf(streamer_get(), "   Vendor ID: %" PRIu16 "\r\n", nodeData.vendorId);
+        streamer_printf(streamer_get(), "   Product ID: %" PRIu16 "\r\n", nodeData.productId);
+        streamer_printf(streamer_get(), "   Long discriminator: %" PRIu16 "\r\n", nodeData.longDiscriminator);
+        streamer_printf(streamer_get(), "   Device type: %" PRIu16 "\r\n", nodeData.deviceType);
         streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.deviceName);
-        streamer_printf(streamer_get(), "   Commissioning mode: %d\n", static_cast<int>(nodeData.commissioningMode));
-        streamer_printf(streamer_get(), "   Pairing hint: %" PRIu16 "\n", nodeData.pairingHint);
-        streamer_printf(streamer_get(), "   Pairing instruction: %s\n", nodeData.pairingInstruction);
-        streamer_printf(streamer_get(), "   Rotating ID %s\n", rotatingId);
+        streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n", static_cast<int>(nodeData.commissioningMode));
+        streamer_printf(streamer_get(), "   Pairing hint: %" PRIu16 "\r\n", nodeData.pairingHint);
+        streamer_printf(streamer_get(), "   Pairing instruction: %s\r\n", nodeData.pairingInstruction);
+        streamer_printf(streamer_get(), "   Rotating ID %s\r\n", rotatingId);
 
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 
         if (retryInterval.HasValue())
-            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\n", retryInterval.Value());
+            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", retryInterval.Value());
 
         retryInterval = nodeData.GetMrpRetryIntervalActive();
 
         if (retryInterval.HasValue())
-            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\n", retryInterval.Value());
+            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval.Value());
 
-        streamer_printf(streamer_get(), "   Supports TCP: %s\n", nodeData.supportsTcp ? "yes" : "no");
-        streamer_printf(streamer_get(), "   IP addresses:\n");
+        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.supportsTcp ? "yes" : "no");
+        streamer_printf(streamer_get(), "   IP addresses:\r\n");
         for (uint8_t i = 0; i < nodeData.kMaxIPAddresses; i++)
         {
             if (nodeData.ipAddress[i] != Inet::IPAddress::Any)
-                streamer_printf(streamer_get(), "      %s\n", nodeData.ipAddress[i].ToString(ipAddressBuf));
+                streamer_printf(streamer_get(), "      %s\r\n", nodeData.ipAddress[i].ToString(ipAddressBuf));
         }
     }
 
@@ -115,7 +115,7 @@ CHIP_ERROR ResolveHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
 
-    streamer_printf(streamer_get(), "Resolving ...\n");
+    streamer_printf(streamer_get(), "Resolving ...\r\n");
 
     PeerId peerId;
     peerId.SetCompressedFabricId(strtoull(argv[0], NULL, 10));
@@ -175,11 +175,11 @@ CHIP_ERROR BrowseCommissionableHandler(int argc, char ** argv)
 
     if (!ParseSubType(argc, argv, filter))
     {
-        streamer_printf(streamer_get(), "Invalid argument\n");
+        streamer_printf(streamer_get(), "Invalid argument\r\n");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    streamer_printf(streamer_get(), "Browsing commissionable nodes...\n");
+    streamer_printf(streamer_get(), "Browsing commissionable nodes...\r\n");
 
     return Dnssd::Resolver::Instance().FindCommissionableNodes(filter);
 }
@@ -190,11 +190,11 @@ CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
 
     if (!ParseSubType(argc, argv, filter))
     {
-        streamer_printf(streamer_get(), "Invalid argument\n");
+        streamer_printf(streamer_get(), "Invalid argument\r\n");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    streamer_printf(streamer_get(), "Browsing commissioners...\n");
+    streamer_printf(streamer_get(), "Browsing commissioners...\r\n");
 
     return Dnssd::Resolver::Instance().FindCommissioners(filter);
 }
