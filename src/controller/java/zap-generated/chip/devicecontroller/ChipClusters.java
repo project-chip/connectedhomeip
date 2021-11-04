@@ -6415,6 +6415,142 @@ public class ChipClusters {
       writeUnsupportedAttribute(chipClusterPtr, callback, value);
     }
 
+    public void readNullableBooleanAttribute(BooleanAttributeCallback callback) {
+      readNullableBooleanAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableBooleanAttribute(DefaultClusterCallback callback, boolean value) {
+      writeNullableBooleanAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableBitmap8Attribute(IntegerAttributeCallback callback) {
+      readNullableBitmap8Attribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableBitmap8Attribute(DefaultClusterCallback callback, int value) {
+      writeNullableBitmap8Attribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableBitmap16Attribute(IntegerAttributeCallback callback) {
+      readNullableBitmap16Attribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableBitmap16Attribute(DefaultClusterCallback callback, int value) {
+      writeNullableBitmap16Attribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableBitmap32Attribute(LongAttributeCallback callback) {
+      readNullableBitmap32Attribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableBitmap32Attribute(DefaultClusterCallback callback, long value) {
+      writeNullableBitmap32Attribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableBitmap64Attribute(LongAttributeCallback callback) {
+      readNullableBitmap64Attribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableBitmap64Attribute(DefaultClusterCallback callback, long value) {
+      writeNullableBitmap64Attribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableInt8uAttribute(IntegerAttributeCallback callback) {
+      readNullableInt8uAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableInt8uAttribute(DefaultClusterCallback callback, int value) {
+      writeNullableInt8uAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableInt16uAttribute(IntegerAttributeCallback callback) {
+      readNullableInt16uAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableInt16uAttribute(DefaultClusterCallback callback, int value) {
+      writeNullableInt16uAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableInt32uAttribute(LongAttributeCallback callback) {
+      readNullableInt32uAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableInt32uAttribute(DefaultClusterCallback callback, long value) {
+      writeNullableInt32uAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableInt64uAttribute(LongAttributeCallback callback) {
+      readNullableInt64uAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableInt64uAttribute(DefaultClusterCallback callback, long value) {
+      writeNullableInt64uAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableInt8sAttribute(IntegerAttributeCallback callback) {
+      readNullableInt8sAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableInt8sAttribute(DefaultClusterCallback callback, int value) {
+      writeNullableInt8sAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableInt16sAttribute(IntegerAttributeCallback callback) {
+      readNullableInt16sAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableInt16sAttribute(DefaultClusterCallback callback, int value) {
+      writeNullableInt16sAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableInt32sAttribute(LongAttributeCallback callback) {
+      readNullableInt32sAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableInt32sAttribute(DefaultClusterCallback callback, long value) {
+      writeNullableInt32sAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableInt64sAttribute(LongAttributeCallback callback) {
+      readNullableInt64sAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableInt64sAttribute(DefaultClusterCallback callback, long value) {
+      writeNullableInt64sAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableEnum8Attribute(IntegerAttributeCallback callback) {
+      readNullableEnum8Attribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableEnum8Attribute(DefaultClusterCallback callback, int value) {
+      writeNullableEnum8Attribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableEnum16Attribute(IntegerAttributeCallback callback) {
+      readNullableEnum16Attribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableEnum16Attribute(DefaultClusterCallback callback, int value) {
+      writeNullableEnum16Attribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableOctetStringAttribute(OctetStringAttributeCallback callback) {
+      readNullableOctetStringAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableOctetStringAttribute(DefaultClusterCallback callback, byte[] value) {
+      writeNullableOctetStringAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readNullableCharStringAttribute(CharStringAttributeCallback callback) {
+      readNullableCharStringAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableCharStringAttribute(DefaultClusterCallback callback, String value) {
+      writeNullableCharStringAttribute(chipClusterPtr, callback, value);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -6554,6 +6690,108 @@ public class ChipClusters {
 
     private native void writeUnsupportedAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, boolean value);
+
+    private native void readNullableBooleanAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void writeNullableBooleanAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, boolean value);
+
+    private native void readNullableBitmap8Attribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeNullableBitmap8Attribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readNullableBitmap16Attribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeNullableBitmap16Attribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readNullableBitmap32Attribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void writeNullableBitmap32Attribute(
+        long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void readNullableBitmap64Attribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void writeNullableBitmap64Attribute(
+        long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void readNullableInt8uAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeNullableInt8uAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readNullableInt16uAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeNullableInt16uAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readNullableInt32uAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void writeNullableInt32uAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void readNullableInt64uAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void writeNullableInt64uAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void readNullableInt8sAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeNullableInt8sAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readNullableInt16sAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeNullableInt16sAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readNullableInt32sAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void writeNullableInt32sAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void readNullableInt64sAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void writeNullableInt64sAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void readNullableEnum8Attribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeNullableEnum8Attribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readNullableEnum16Attribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeNullableEnum16Attribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readNullableOctetStringAttribute(
+        long chipClusterPtr, OctetStringAttributeCallback callback);
+
+    private native void writeNullableOctetStringAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, byte[] value);
+
+    private native void readNullableCharStringAttribute(
+        long chipClusterPtr, CharStringAttributeCallback callback);
+
+    private native void writeNullableCharStringAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, String value);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
