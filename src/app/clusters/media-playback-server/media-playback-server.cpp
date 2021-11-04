@@ -193,3 +193,5 @@ bool emberAfMediaPlaybackClusterMediaStartOverCallback(app::CommandHandler * com
     sendResponse(command, "MediaStartOver", Commands::MediaStartOverResponse::Id, status);
     return true;
 }
+
+void MatterMediaPlaybackPluginServerInitCallback() {}

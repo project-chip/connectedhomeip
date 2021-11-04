@@ -533,3 +533,5 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(EndpointId endpoint)
 }
 
 void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, const CharSpan & groupName) {}
+
+void MatterGroupsPluginServerInitCallback() {}
