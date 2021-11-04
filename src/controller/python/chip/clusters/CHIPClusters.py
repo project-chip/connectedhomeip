@@ -3542,6 +3542,108 @@ class ChipClusters:
                 "type": "bool",
                 "writable": True,
             },
+            0x00008000: {
+                "attributeName": "NullableBoolean",
+                "attributeId": 0x00008000,
+                "type": "bool",
+                "writable": True,
+            },
+            0x00008001: {
+                "attributeName": "NullableBitmap8",
+                "attributeId": 0x00008001,
+                "type": "int",
+                "writable": True,
+            },
+            0x00008002: {
+                "attributeName": "NullableBitmap16",
+                "attributeId": 0x00008002,
+                "type": "int",
+                "writable": True,
+            },
+            0x00008003: {
+                "attributeName": "NullableBitmap32",
+                "attributeId": 0x00008003,
+                "type": "int",
+                "writable": True,
+            },
+            0x00008004: {
+                "attributeName": "NullableBitmap64",
+                "attributeId": 0x00008004,
+                "type": "int",
+                "writable": True,
+            },
+            0x00008005: {
+                "attributeName": "NullableInt8u",
+                "attributeId": 0x00008005,
+                "type": "int",
+                "writable": True,
+            },
+            0x00008006: {
+                "attributeName": "NullableInt16u",
+                "attributeId": 0x00008006,
+                "type": "int",
+                "writable": True,
+            },
+            0x00008008: {
+                "attributeName": "NullableInt32u",
+                "attributeId": 0x00008008,
+                "type": "int",
+                "writable": True,
+            },
+            0x0000800C: {
+                "attributeName": "NullableInt64u",
+                "attributeId": 0x0000800C,
+                "type": "int",
+                "writable": True,
+            },
+            0x0000800D: {
+                "attributeName": "NullableInt8s",
+                "attributeId": 0x0000800D,
+                "type": "int",
+                "writable": True,
+            },
+            0x0000800E: {
+                "attributeName": "NullableInt16s",
+                "attributeId": 0x0000800E,
+                "type": "int",
+                "writable": True,
+            },
+            0x00008010: {
+                "attributeName": "NullableInt32s",
+                "attributeId": 0x00008010,
+                "type": "int",
+                "writable": True,
+            },
+            0x00008014: {
+                "attributeName": "NullableInt64s",
+                "attributeId": 0x00008014,
+                "type": "int",
+                "writable": True,
+            },
+            0x00008015: {
+                "attributeName": "NullableEnum8",
+                "attributeId": 0x00008015,
+                "type": "int",
+                "writable": True,
+            },
+            0x00008016: {
+                "attributeName": "NullableEnum16",
+                "attributeId": 0x00008016,
+                "type": "int",
+                "writable": True,
+            },
+            0x00008019: {
+                "attributeName": "NullableOctetString",
+                "attributeId": 0x00008019,
+                "type": "bytes",
+                "writable": True,
+            },
+            0x0000801E: {
+                "attributeName": "NullableCharString",
+                "attributeId": 0x0000801E,
+                "type": "str",
+                "writable": True,
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -6711,6 +6813,109 @@ class ChipClusters:
     def ClusterTestCluster_WriteAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bool):
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid, value)
 
+    def ClusterTestCluster_ReadAttributeNullableBoolean(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBoolean(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableBoolean(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bool):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBoolean(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableBitmap8(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap8(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableBitmap8(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap8(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableBitmap16(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap16(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableBitmap16(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap16(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableBitmap32(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap32(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableBitmap32(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap32(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableBitmap64(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap64(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableBitmap64(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap64(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableInt8u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt8u(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableInt8u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt8u(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableInt16u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt16u(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableInt16u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt16u(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableInt32u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt32u(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableInt32u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt32u(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableInt64u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt64u(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableInt64u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt64u(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableInt8s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt8s(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableInt8s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt8s(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableInt16s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt16s(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableInt16s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt16s(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableInt32s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt32s(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableInt32s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt32s(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableInt64s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt64s(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableInt64s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt64s(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableEnum8(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableEnum8(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableEnum8(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableEnum8(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableEnum16(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableEnum16(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableEnum16(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableEnum16(device, ZCLendpoint, ZCLgroupid, value)
+
+    def ClusterTestCluster_ReadAttributeNullableOctetString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableOctetString(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableOctetString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableOctetString(device, ZCLendpoint, ZCLgroupid, value, len(value))
+
+    def ClusterTestCluster_ReadAttributeNullableCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableCharString(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_WriteAttributeNullableCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: str):
+        value = value.encode("utf-8")
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableCharString(device, ZCLendpoint, ZCLgroupid, value, len(value))
+
     def ClusterTestCluster_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -9547,6 +9752,142 @@ class ChipClusters:
         self._chipLib.chip_ime_WriteAttribute_TestCluster_Unsupported.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_bool]
         self._chipLib.chip_ime_WriteAttribute_TestCluster_Unsupported.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableBoolean
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBoolean.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBoolean.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableBoolean
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBoolean.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_bool]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBoolean.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableBitmap8
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap8.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap8.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableBitmap8
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap8.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap8.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableBitmap16
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap16.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap16.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableBitmap16
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap16.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap16.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableBitmap32
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap32.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap32.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableBitmap32
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap32.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap32.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableBitmap64
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap64.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableBitmap64.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableBitmap64
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap64.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableBitmap64.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableInt8u
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt8u.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt8u.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableInt8u
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt8u.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt8u.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableInt16u
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt16u.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt16u.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableInt16u
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt16u.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt16u.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableInt32u
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt32u.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt32u.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableInt32u
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt32u.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt32u.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableInt64u
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt64u.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt64u.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableInt64u
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt64u.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt64u.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableInt8s
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt8s.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt8s.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableInt8s
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt8s.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int8]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt8s.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableInt16s
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt16s.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt16s.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableInt16s
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt16s.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt16s.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableInt32s
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt32s.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt32s.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableInt32s
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt32s.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt32s.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableInt64s
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt64s.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableInt64s.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableInt64s
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt64s.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int64]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableInt64s.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableEnum8
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableEnum8.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableEnum8.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableEnum8
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableEnum8.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableEnum8.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableEnum16
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableEnum16.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableEnum16.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableEnum16
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableEnum16.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableEnum16.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableOctetString
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableOctetString.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableOctetString.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableOctetString
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableOctetString.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableOctetString.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute NullableCharString
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableCharString.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_NullableCharString.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute NullableCharString
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableCharString.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_NullableCharString.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_TestCluster_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

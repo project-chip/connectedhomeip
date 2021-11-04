@@ -20342,6 +20342,792 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 
 } // namespace Unsupported
 
+namespace NullableBoolean {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<bool> & value)
+{
+    NumericAttributeTraits<bool>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<bool>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, bool value)
+{
+    if (!NumericAttributeTraits<bool>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<bool>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<bool> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableBoolean
+
+namespace NullableBitmap8 {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+{
+    NumericAttributeTraits<uint8_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<uint8_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<uint8_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_BITMAP8_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableBitmap8
+
+namespace NullableBitmap16 {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
+{
+    NumericAttributeTraits<uint16_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<uint16_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<uint16_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_BITMAP16_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint16_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableBitmap16
+
+namespace NullableBitmap32 {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+{
+    NumericAttributeTraits<uint32_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<uint32_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    if (!NumericAttributeTraits<uint32_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<uint32_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint32_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableBitmap32
+
+namespace NullableBitmap64 {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value)
+{
+    NumericAttributeTraits<uint64_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<uint64_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
+{
+    if (!NumericAttributeTraits<uint64_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_BITMAP64_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<uint64_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_BITMAP64_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint64_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableBitmap64
+
+namespace NullableInt8u {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+{
+    NumericAttributeTraits<uint8_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<uint8_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<uint8_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableInt8u
+
+namespace NullableInt16u {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
+{
+    NumericAttributeTraits<uint16_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<uint16_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<uint16_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint16_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableInt16u
+
+namespace NullableInt32u {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+{
+    NumericAttributeTraits<uint32_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<uint32_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    if (!NumericAttributeTraits<uint32_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<uint32_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint32_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableInt32u
+
+namespace NullableInt64u {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value)
+{
+    NumericAttributeTraits<uint64_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<uint64_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
+{
+    if (!NumericAttributeTraits<uint64_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_INT64U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<uint64_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_INT64U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint64_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableInt64u
+
+namespace NullableInt8s {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int8_t> & value)
+{
+    NumericAttributeTraits<int8_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<int8_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
+{
+    if (!NumericAttributeTraits<int8_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_INT8S_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<int8_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_INT8S_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<int8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableInt8s
+
+namespace NullableInt16s {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & value)
+{
+    NumericAttributeTraits<int16_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<int16_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    if (!NumericAttributeTraits<int16_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<int16_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<int16_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableInt16s
+
+namespace NullableInt32s {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int32_t> & value)
+{
+    NumericAttributeTraits<int32_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<int32_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
+{
+    if (!NumericAttributeTraits<int32_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_INT32S_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<int32_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_INT32S_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<int32_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableInt32s
+
+namespace NullableInt64s {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & value)
+{
+    NumericAttributeTraits<int64_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<int64_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
+{
+    if (!NumericAttributeTraits<int64_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_INT64S_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<int64_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_INT64S_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<int64_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableInt64s
+
+namespace NullableEnum8 {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+{
+    NumericAttributeTraits<uint8_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<uint8_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<uint8_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableEnum8
+
+namespace NullableEnum16 {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
+{
+    NumericAttributeTraits<uint16_t>::StorageType temp;
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (NumericAttributeTraits<uint16_t>::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = temp;
+    }
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    }
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, (uint8_t *) &value, ZCL_ENUM16_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    auto value = NumericAttributeTraits<uint16_t>::kNullValue;
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, reinterpret_cast<uint8_t *>(&value),
+                                       ZCL_ENUM16_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint16_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableEnum16
+
+namespace NullableOctetString {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
+{
+    uint8_t zclString[10 + 1];
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, sizeof(zclString));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    size_t length = emberAfStringLength(zclString);
+    if (length == NumericAttributeTraits<uint8_t>::kNullValue)
+    {
+        value.SetNull();
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+    auto & span = value.SetNonNull();
+
+    VerifyOrReturnError(span.size() == 10, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    memcpy(span.data(), &zclString[1], 10);
+    span.reduce_size(length);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
+{
+    static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 10, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    uint8_t zclString[10 + 1];
+    emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    uint8_t zclString[1] = { 0xFF };
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<chip::ByteSpan> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableOctetString
+
+namespace NullableCharString {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableCharSpan> & value)
+{
+    uint8_t zclString[10 + 1];
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, sizeof(zclString));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    size_t length = emberAfStringLength(zclString);
+    if (length == NumericAttributeTraits<uint8_t>::kNullValue)
+    {
+        value.SetNull();
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+    auto & span = value.SetNonNull();
+
+    VerifyOrReturnError(span.size() == 10, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    memcpy(span.data(), &zclString[1], 10);
+    span.reduce_size(length);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
+{
+    static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 10, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    uint8_t zclString[10 + 1];
+    emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    uint8_t zclString[1] = { 0xFF };
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<chip::CharSpan> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace NullableCharString
+
 } // namespace Attributes
 } // namespace TestCluster
 

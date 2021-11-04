@@ -1706,6 +1706,57 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeNullableBooleanWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableBooleanWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableBitmap8WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableBitmap8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableBitmap16WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableBitmap16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableBitmap32WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableBitmap32WithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableBitmap64WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableBitmap64WithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableInt8uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableInt8uWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableInt16uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableInt16uWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableInt32uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableInt32uWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableInt64uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableInt64uWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableInt8sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableInt8sWithValue:(int8_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableInt16sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableInt16sWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableInt32sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableInt32sWithValue:(int32_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableInt64sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableInt64sWithValue:(int64_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableEnum8WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableEnum8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableEnum16WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableEnum16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeNullableCharStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNullableCharStringWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
