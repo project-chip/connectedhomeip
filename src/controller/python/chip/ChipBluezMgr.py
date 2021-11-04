@@ -35,7 +35,7 @@ import traceback
 import uuid
 import queue
 
-from ctypes import CFUNCTYPE, PYFUNCTYPE, c_void_p, c_int
+from ctypes import *
 
 try:
     from gi.repository import GObject
