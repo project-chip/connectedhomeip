@@ -197,9 +197,15 @@ class ClusterDetailFragment : Fragment() {
 
   private fun populateCommandParameter(inflater: LayoutInflater, parameterList: LinearLayout) {
     selectedCommandInfo.commandParameters.forEach { (paramName, paramInfo) ->
+<<<<<<< HEAD
       val param = inflater.inflate(R.layout.cluster_parameter_item, null, false) as ConstraintLayout
       param.clusterParameterNameTv.text = "${paramName}"
       param.clusterParameterTypeTv.text = "${paramInfo.type}"
+=======
+      val param = inflater.inflate(R.layout.parameter_item, null, false) as ConstraintLayout
+      param.parameterName.text = "${paramName}"
+      param.parameterType.text = "${paramInfo.type}"
+>>>>>>> 78cf954d9 (fix parameter response ui alignment issue)
       parameterList.addView(param)
     }
   }
@@ -219,6 +225,7 @@ class ClusterDetailFragment : Fragment() {
   ) {
     responseValues.forEach { (variableNameType, response) ->
 <<<<<<< HEAD
+<<<<<<< HEAD
       val callback =
         inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
       callback.clusterCallbackNameTv.text = variableNameType.name
@@ -226,6 +233,9 @@ class ClusterDetailFragment : Fragment() {
       callback.clusterCallbackTypeTv.text = variableNameType.type
 =======
       val callback = inflater.inflate(R.layout.callback_item, null, false) as LinearLayout
+=======
+      val callback = inflater.inflate(R.layout.callback_item, null, false) as ConstraintLayout
+>>>>>>> 78cf954d9 (fix parameter response ui alignment issue)
       callback.callbackName.text = variableNameType.name
       callback.callbackData.text = response.toString()
       callback.callbackType.text = variableNameType.type
