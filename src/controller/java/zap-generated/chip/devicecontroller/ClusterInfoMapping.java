@@ -1974,8 +1974,9 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(boolean value) {
-      List<Object> responseValues = new ArrayList<>();
-      responseValues.add(value);
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo valueResponseValue = new CommandResponseInfo("value", "boolean");
+      responseValues.put(valueResponseValue, value);
       callback.onSuccess(responseValues);
     }
 
