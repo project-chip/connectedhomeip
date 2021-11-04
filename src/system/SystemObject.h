@@ -204,8 +204,8 @@ union ObjectArena
  *    This is the abstract base class for Static and Dynamic ObjectPool objects.
  *
  *  @note
- *      This base class can be used to pass pointers to the sized ObjectPoolStatic and ObjectPoolDynamic classes withouth requiring
- * the class holding the reference to be templated on the pool size.
+ *      This base class can be used to pass pointers to the ObjectPoolDynamic and sized ObjectPoolStatic classes without requiring
+ * the class holding the reference to be templated on pool size.
  */
 template <typename T>
 class ObjectPoolBase
@@ -235,7 +235,7 @@ public:
         T * lReturn = nullptr;
         (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
 
-        unsigned int lIndex = 0;
+        size_t lIndex = 0;
         for (lIndex = 0; lIndex < N; ++lIndex)
         {
             T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
@@ -247,7 +247,7 @@ public:
             }
         }
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-        unsigned int lNumInUse = 0;
+        size_t lNumInUse = 0;
 
         if (lReturn != nullptr)
         {
@@ -364,7 +364,7 @@ public:
  *  @class ObjectPoolDynamic
  *
  *  @brief
- *    This is the data class for dyanmic object pools.
+ *    This is the data class for dynamic object pools.
  *
  *  @tparam     T   a subclass of Object to be allocated.
  */
