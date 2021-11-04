@@ -213,8 +213,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         msgFlags.Set(MessageFlagValues::kDuplicateMessage);
     }
 
-    // Skip retrieval of exchange for group message
-    if (!session.GetGroupId().HasValue())
+    // Skip retrieval of exchange for group message since no exchange is stored
+    // for group msg (optimization)
+    if (!packetHeader.IsGroupSession())
     {
         // Search for an existing exchange that the message applies to. If a match is found...
         bool found = false;
@@ -277,7 +278,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
     // If we found a handler or we need to send an ack, create an exchange to
     // handle the message.
-    if (matchingUMH != nullptr || payloadHeader.NeedsAck() || session.GetGroupId().HasValue())
+    if (matchingUMH != nullptr || payloadHeader.NeedsAck())
     {
         ExchangeDelegate * delegate = matchingUMH ? matchingUMH->Delegate : nullptr;
         // If rcvd msg is from initiator then this exchange is created as not Initiator.
@@ -309,12 +310,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             // Using same error message for all errors to reduce code size.
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
-        }
-
-        // close Exchange for group message
-        if (session.GetGroupId().HasValue())
-        {
-            ec->Close();
         }
     }
 }

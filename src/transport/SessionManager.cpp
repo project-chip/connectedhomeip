@@ -463,7 +463,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     // Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
-    VerifyOrExit(!payloadHeader.NeedsAck(), ChipLogError(Inet, "Group message received with ack request, discarding"));
 
     // Check if Message Header is valid first
     if (!(packetHeader.IsValidMCSPMsg() || packetHeader.IsValidGroupMsg()))
