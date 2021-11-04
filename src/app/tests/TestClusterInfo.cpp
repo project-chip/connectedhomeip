@@ -34,9 +34,9 @@ void TestAttributePathIncludedSameFieldId(nlTestSuite * apSuite, void * apContex
     ClusterInfo clusterInfo1;
     ClusterInfo clusterInfo2;
     ClusterInfo clusterInfo3;
-    clusterInfo1.mFieldId = 1;
-    clusterInfo2.mFieldId = 1;
-    clusterInfo3.mFieldId = 1;
+    clusterInfo1.mAttributeId = 1;
+    clusterInfo2.mAttributeId = 1;
+    clusterInfo3.mAttributeId = 1;
     NL_TEST_ASSERT(apSuite, clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
     clusterInfo2.mListIndex = 1;
     NL_TEST_ASSERT(apSuite, clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
@@ -53,14 +53,14 @@ void TestAttributePathIncludedDifferentFieldId(nlTestSuite * apSuite, void * apC
     {
         ClusterInfo clusterInfo1;
         ClusterInfo clusterInfo2;
-        clusterInfo1.mFieldId = 1;
-        clusterInfo2.mFieldId = 2;
+        clusterInfo1.mAttributeId = 1;
+        clusterInfo2.mAttributeId = 2;
         NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
     }
     {
         ClusterInfo clusterInfo1;
         ClusterInfo clusterInfo2;
-        clusterInfo2.mFieldId = 2;
+        clusterInfo2.mAttributeId = 2;
         NL_TEST_ASSERT(apSuite, clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
     }
     {
@@ -72,7 +72,7 @@ void TestAttributePathIncludedDifferentFieldId(nlTestSuite * apSuite, void * apC
         ClusterInfo clusterInfo1;
         ClusterInfo clusterInfo2;
 
-        clusterInfo1.mFieldId = 1;
+        clusterInfo1.mAttributeId = 1;
         NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
     }
 }

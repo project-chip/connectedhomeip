@@ -22,7 +22,7 @@
 
 """Provides Python APIs for CHIP."""
 import enum
-from .delegate import OnSubscriptionReport, SetAttributeReportCallback, AttributePath, AttributePathStruct
+from .delegate import OnSubscriptionReport, SetAttributeReportCallback, AttributePath, AttributePathIBstruct
 
 from chip.exceptions import ChipStackException
 
