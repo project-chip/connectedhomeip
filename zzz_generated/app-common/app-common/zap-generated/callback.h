@@ -14237,6 +14237,10 @@ bool emberAfTestClusterClusterTestNestedStructArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster BooleanResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterBooleanResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, bool value);
+/**
  * @brief Test Cluster Cluster TestListStructArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(

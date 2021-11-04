@@ -2046,6 +2046,17 @@ static void OnTargetNavigatorNavigateTargetResponseSuccess(
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 };
 
+static void
+OnTestClusterBooleanResponseSuccess(void * context,
+                                    const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received BooleanResponse:");
+    ChipLogProgress(Zcl, "  value: %d", data.value);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+};
+
 static void OnTestClusterTestAddArgumentsResponseSuccess(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & data)
 {
@@ -19957,7 +19968,7 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return cluster.InvokeCommand(mRequest, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure);
     }
 
 private:
@@ -20007,7 +20018,7 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return cluster.InvokeCommand(mRequest, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure);
     }
 
 private:
@@ -20099,7 +20110,7 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return cluster.InvokeCommand(mRequest, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure);
     }
 
 private:

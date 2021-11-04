@@ -1664,6 +1664,10 @@ namespace TestNestedStructArgumentRequest {
 static constexpr CommandId Id = 0x00000008;
 } // namespace TestNestedStructArgumentRequest
 
+namespace BooleanResponse {
+static constexpr CommandId Id = 0x00000008;
+} // namespace BooleanResponse
+
 namespace TestListStructArgumentRequest {
 static constexpr CommandId Id = 0x00000009;
 } // namespace TestListStructArgumentRequest

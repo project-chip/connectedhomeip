@@ -21155,6 +21155,22 @@ class TestCluster:
             arg1: 'TestCluster.Structs.NestedStruct' = None
 
         @dataclass
+        class BooleanResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0008
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="value", Tag=0, Type=bool),
+                    ])
+
+            value: 'bool' = None
+
+        @dataclass
         class TestListStructArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050F
             command_id: typing.ClassVar[int] = 0x0009

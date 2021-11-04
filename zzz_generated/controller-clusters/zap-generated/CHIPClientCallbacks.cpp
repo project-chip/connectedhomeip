@@ -1869,6 +1869,19 @@ bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(EndpointId endp
     return true;
 }
 
+bool emberAfTestClusterClusterBooleanResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, bool value)
+{
+    ChipLogProgress(Zcl, "BooleanResponse:");
+    ChipLogProgress(Zcl, "  value: %d", value);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterBooleanResponseCallback");
+
+    Callback::Callback<TestClusterClusterBooleanResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterBooleanResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, value);
+    return true;
+}
+
 bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                                uint8_t returnValue)
 {

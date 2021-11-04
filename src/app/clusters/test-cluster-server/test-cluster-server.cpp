@@ -283,20 +283,30 @@ bool emberAfTestClusterClusterTestAddArgumentsCallback(CommandHandler * apComman
     return true;
 }
 
+static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool value)
+{
+    Commands::BooleanResponse::Type response;
+    response.value = value;
+    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
+    if (err != CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
+    }
+    return true;
+}
+
 bool emberAfTestClusterClusterTestStructArgumentRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestStructArgumentRequest::DecodableType & commandData)
 {
-    emberAfSendImmediateDefaultResponse(commandData.arg1.b ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, commandData.arg1.b);
 }
 
 bool emberAfTestClusterClusterTestNestedStructArgumentRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestNestedStructArgumentRequest::DecodableType & commandData)
 {
-    emberAfSendImmediateDefaultResponse(commandData.arg1.c.b ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, commandData.arg1.c.b);
 }
 
 bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
@@ -314,11 +324,11 @@ bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        shouldReturnTrue = false;
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
     }
 
-    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
 bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
@@ -336,11 +346,11 @@ bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != uint8Iterator.GetStatus())
     {
-        shouldReturnTrue = false;
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
     }
 
-    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
 bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
@@ -358,11 +368,11 @@ bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        shouldReturnTrue = false;
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
     }
 
-    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
 bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
@@ -386,18 +396,18 @@ bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
 
         if (CHIP_NO_ERROR != subStructIterator.GetStatus())
         {
-            shouldReturnTrue = false;
-            break;
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            return true;
         }
     }
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        shouldReturnTrue = false;
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
     }
 
-    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
 bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
