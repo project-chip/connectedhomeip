@@ -51,15 +51,15 @@ struct AttributePathParams
     AttributePathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, AttributeId aFieldId, ListIndex aListIndex,
                         const BitFlags<Flags> aFlags) :
         mNodeId(aNodeId),
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mAttributeId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
     {}
 
     AttributePathParams() {}
-    NodeId mNodeId         = 0;
-    EndpointId mEndpointId = 0;
-    ClusterId mClusterId   = 0;
-    AttributeId mFieldId   = 0;
-    ListIndex mListIndex   = 0;
+    NodeId mNodeId           = 0;
+    EndpointId mEndpointId   = 0;
+    ClusterId mClusterId     = 0;
+    AttributeId mAttributeId = 0;
+    ListIndex mListIndex     = 0;
     BitFlags<Flags> mFlags;
 };
 } // namespace app

@@ -227,30 +227,35 @@ public:
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
-                                 bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+                                 AttributeReportIB::Builder & aAttributeReport)
 {
-    uint64_t version = 0;
+    AttributeDataIB::Builder attributeData;
+    AttributePathIB::Builder attributePath;
     ChipLogDetail(DataManagement, "TEST Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aPath.mClusterId, aPath.mAttributeId);
-
-    if (apDataExists != nullptr)
-    {
-        *apDataExists = (aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId);
-    }
-
-    if (apWriter == nullptr)
-    {
-        return CHIP_NO_ERROR;
-    }
 
     if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))
     {
-        return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                             chip::Protocols::InteractionModel::Status::UnsupportedAttribute);
+        AttributeStatusIB::Builder attributeStatus;
+        attributeStatus = aAttributeReport.CreateAttributeStatus();
+        attributePath   = attributeStatus.CreatePath();
+        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        ReturnErrorOnFailure(attributePath.GetError());
+        StatusIB::Builder errorStatus = attributeStatus.CreateErrorStatus();
+        errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
+        attributeStatus.EndOfAttributeStatusIB();
+        ReturnErrorOnFailure(attributeStatus.GetError());
+        return CHIP_NO_ERROR;
     }
 
-    ReturnErrorOnFailure(AttributeValueEncoder(apWriter, 0).Encode(kTestFieldValue1));
-    return apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
+    attributeData = aAttributeReport.CreateAttributeData();
+    attributePath = attributeData.CreatePath();
+    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+    ReturnErrorOnFailure(attributePath.GetError());
+    ReturnErrorOnFailure(AttributeValueEncoder(attributeData.GetWriter(), 0).Encode(kTestFieldValue1));
+    attributeData.DataVersion(0).EndOfAttributeDataIB();
+    ReturnErrorOnFailure(attributeData.GetError());
+    return CHIP_NO_ERROR;
 }
 
 class TestReadInteraction
@@ -284,19 +289,22 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
-    ReportDataMessage::Builder reportDataBuilder;
+    ReportDataMessage::Builder reportDataMessageBuilder;
 
-    err = reportDataBuilder.Init(&writer);
+    err = reportDataMessageBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributeDataList::Builder attributeDataListBuilder = reportDataBuilder.CreateAttributeDataListBuilder();
-    NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
+    AttributeReports::Builder attributeReportsBuilder = reportDataMessageBuilder.CreateAttributeReports();
+    NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributeDataElement::Builder attributeDataElementBuilder = attributeDataListBuilder.CreateAttributeDataElementBuilder();
-    NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
+    AttributeReportIB::Builder attributeReportIBBuilder = attributeReportsBuilder.CreateAttributeReport();
+    NL_TEST_ASSERT(apSuite, attributeReportsBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder attributePathBuilder = attributeDataElementBuilder.CreateAttributePath();
-    NL_TEST_ASSERT(apSuite, attributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
+    AttributeDataIB::Builder attributeDataIBBuilder = attributeReportIBBuilder.CreateAttributeData();
+    NL_TEST_ASSERT(apSuite, attributeReportIBBuilder.GetError() == CHIP_NO_ERROR);
+
+    AttributePathIB::Builder attributePathBuilder = attributeDataIBBuilder.CreatePath();
+    NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
 
     if (aNeedInvalidReport)
     {
@@ -310,16 +318,16 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    attributeDataElementBuilder.DataVersion(2);
-    err = attributeDataElementBuilder.GetError();
+    attributeDataIBBuilder.DataVersion(2);
+    err = attributeDataIBBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     // Construct attribute data
     {
-        chip::TLV::TLVWriter * pWriter = attributeDataElementBuilder.GetWriter();
+        chip::TLV::TLVWriter * pWriter = attributeDataIBBuilder.GetWriter();
         chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
-        err = pWriter->StartContainer(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure,
-                                      dummyType);
+        err = pWriter->StartContainer(chip::TLV::ContextTag(chip::to_underlying(chip::app::AttributeDataIB::Tag::kData)),
+                                      chip::TLV::kTLVType_Structure, dummyType);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
@@ -329,24 +337,23 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 
-    attributeDataElementBuilder.MoreClusterData(false);
-    err = attributeDataElementBuilder.GetError();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    attributeDataIBBuilder.EndOfAttributeDataIB();
+    NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributeDataElementBuilder.EndOfAttributeDataElement();
-    NL_TEST_ASSERT(apSuite, attributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
+    attributeReportIBBuilder.EndOfAttributeReportIB();
+    NL_TEST_ASSERT(apSuite, attributeReportIBBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributeDataListBuilder.EndOfAttributeDataList();
-    NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
+    attributeReportsBuilder.EndOfAttributeReports();
+    NL_TEST_ASSERT(apSuite, attributeReportsBuilder.GetError() == CHIP_NO_ERROR);
 
-    reportDataBuilder.SuppressResponse(true);
-    NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
+    reportDataMessageBuilder.SuppressResponse(true);
+    NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
-    reportDataBuilder.MoreChunkedMessages(false);
-    NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
+    reportDataMessageBuilder.MoreChunkedMessages(false);
+    NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
-    reportDataBuilder.EndOfReportDataMessage();
-    NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
+    reportDataMessageBuilder.EndOfReportDataMessage();
+    NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -682,18 +689,18 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     eventPathParams[1].mEventId    = kTestEventIdCritical;
 
     chip::app::AttributePathParams attributePathParams[2];
-    attributePathParams[0].mNodeId     = chip::kTestDeviceNodeId;
-    attributePathParams[0].mEndpointId = kTestEndpointId;
-    attributePathParams[0].mClusterId  = kTestClusterId;
-    attributePathParams[0].mFieldId    = 1;
-    attributePathParams[0].mListIndex  = 0;
+    attributePathParams[0].mNodeId      = chip::kTestDeviceNodeId;
+    attributePathParams[0].mEndpointId  = kTestEndpointId;
+    attributePathParams[0].mClusterId   = kTestClusterId;
+    attributePathParams[0].mAttributeId = 1;
+    attributePathParams[0].mListIndex   = 0;
     attributePathParams[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
-    attributePathParams[1].mNodeId     = chip::kTestDeviceNodeId;
-    attributePathParams[1].mEndpointId = kTestEndpointId;
-    attributePathParams[1].mClusterId  = kTestClusterId;
-    attributePathParams[1].mFieldId    = 2;
-    attributePathParams[1].mListIndex  = 1;
+    attributePathParams[1].mNodeId      = chip::kTestDeviceNodeId;
+    attributePathParams[1].mEndpointId  = kTestEndpointId;
+    attributePathParams[1].mClusterId   = kTestClusterId;
+    attributePathParams[1].mAttributeId = 2;
+    attributePathParams[1].mListIndex   = 1;
     attributePathParams[1].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     attributePathParams[1].mFlags.Set(chip::app::AttributePathParams::Flags::kListIndexValid);
 
@@ -735,11 +742,11 @@ void TestReadInteraction::TestReadInvalidAttributePathRoundtrip(nlTestSuite * ap
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
     chip::app::AttributePathParams attributePathParams[2];
-    attributePathParams[0].mNodeId     = chip::kTestDeviceNodeId;
-    attributePathParams[0].mEndpointId = kTestEndpointId;
-    attributePathParams[0].mClusterId  = kInvalidTestClusterId;
-    attributePathParams[0].mFieldId    = 1;
-    attributePathParams[0].mListIndex  = 0;
+    attributePathParams[0].mNodeId      = chip::kTestDeviceNodeId;
+    attributePathParams[0].mEndpointId  = kTestEndpointId;
+    attributePathParams[0].mClusterId   = kInvalidTestClusterId;
+    attributePathParams[0].mAttributeId = 1;
+    attributePathParams[0].mListIndex   = 0;
     attributePathParams[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
@@ -869,19 +876,19 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     readPrepareParams.mEventPathParamsListSize = 2;
 
     chip::app::AttributePathParams attributePathParams[2];
-    readPrepareParams.mpAttributePathParamsList                = attributePathParams;
-    readPrepareParams.mpAttributePathParamsList[0].mNodeId     = chip::kTestDeviceNodeId;
-    readPrepareParams.mpAttributePathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpAttributePathParamsList[0].mClusterId  = kTestClusterId;
-    readPrepareParams.mpAttributePathParamsList[0].mFieldId    = 1;
-    readPrepareParams.mpAttributePathParamsList[0].mListIndex  = 0;
+    readPrepareParams.mpAttributePathParamsList                 = attributePathParams;
+    readPrepareParams.mpAttributePathParamsList[0].mNodeId      = chip::kTestDeviceNodeId;
+    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId;
+    readPrepareParams.mpAttributePathParamsList[0].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = 1;
+    readPrepareParams.mpAttributePathParamsList[0].mListIndex   = 0;
     readPrepareParams.mpAttributePathParamsList[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
-    readPrepareParams.mpAttributePathParamsList[1].mNodeId     = chip::kTestDeviceNodeId;
-    readPrepareParams.mpAttributePathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpAttributePathParamsList[1].mClusterId  = kTestClusterId;
-    readPrepareParams.mpAttributePathParamsList[1].mFieldId    = 2;
-    readPrepareParams.mpAttributePathParamsList[1].mListIndex  = 0;
+    readPrepareParams.mpAttributePathParamsList[1].mNodeId      = chip::kTestDeviceNodeId;
+    readPrepareParams.mpAttributePathParamsList[1].mEndpointId  = kTestEndpointId;
+    readPrepareParams.mpAttributePathParamsList[1].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[1].mAttributeId = 2;
+    readPrepareParams.mpAttributePathParamsList[1].mListIndex   = 0;
     readPrepareParams.mpAttributePathParamsList[1].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     readPrepareParams.mAttributePathParamsListSize = 2;
@@ -904,30 +911,30 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 1);
 
     chip::app::ClusterInfo dirtyPath1;
-    dirtyPath1.mClusterId  = kTestClusterId;
-    dirtyPath1.mEndpointId = kTestEndpointId;
-    dirtyPath1.mFieldId    = 1;
+    dirtyPath1.mClusterId   = kTestClusterId;
+    dirtyPath1.mEndpointId  = kTestEndpointId;
+    dirtyPath1.mAttributeId = 1;
 
     chip::app::ClusterInfo dirtyPath2;
-    dirtyPath2.mClusterId  = kTestClusterId;
-    dirtyPath2.mEndpointId = kTestEndpointId;
-    dirtyPath2.mFieldId    = 2;
+    dirtyPath2.mClusterId   = kTestClusterId;
+    dirtyPath2.mEndpointId  = kTestEndpointId;
+    dirtyPath2.mAttributeId = 2;
 
     chip::app::ClusterInfo dirtyPath3;
-    dirtyPath3.mClusterId  = kTestClusterId;
-    dirtyPath3.mEndpointId = kTestEndpointId;
-    dirtyPath3.mFieldId    = 2;
-    dirtyPath3.mListIndex  = 1;
+    dirtyPath3.mClusterId   = kTestClusterId;
+    dirtyPath3.mEndpointId  = kTestEndpointId;
+    dirtyPath3.mAttributeId = 2;
+    dirtyPath3.mListIndex   = 1;
 
     chip::app::ClusterInfo dirtyPath4;
-    dirtyPath4.mClusterId  = kTestClusterId;
-    dirtyPath4.mEndpointId = kTestEndpointId;
-    dirtyPath4.mFieldId    = 3;
+    dirtyPath4.mClusterId   = kTestClusterId;
+    dirtyPath4.mEndpointId  = kTestEndpointId;
+    dirtyPath4.mAttributeId = 3;
 
     chip::app::ClusterInfo dirtyPath5;
-    dirtyPath5.mClusterId  = kTestClusterId;
-    dirtyPath5.mEndpointId = kTestEndpointId;
-    dirtyPath5.mFieldId    = 4;
+    dirtyPath5.mClusterId   = kTestClusterId;
+    dirtyPath5.mEndpointId  = kTestEndpointId;
+    dirtyPath5.mAttributeId = 4;
 
     // Test report with 2 different path
     delegate.mpReadHandler->mHoldReport = false;
@@ -995,12 +1002,12 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     delegate.mGotReport            = false;
     ReadPrepareParams readPrepareParams1(ctx.GetSessionBobToAlice());
     chip::app::AttributePathParams attributePathParams1[1];
-    readPrepareParams1.mpAttributePathParamsList                = attributePathParams1;
-    readPrepareParams1.mpAttributePathParamsList[0].mNodeId     = chip::kTestDeviceNodeId;
-    readPrepareParams1.mpAttributePathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams1.mpAttributePathParamsList[0].mClusterId  = kTestClusterId;
-    readPrepareParams1.mpAttributePathParamsList[0].mFieldId    = 1;
-    readPrepareParams1.mpAttributePathParamsList[0].mListIndex  = 0;
+    readPrepareParams1.mpAttributePathParamsList                 = attributePathParams1;
+    readPrepareParams1.mpAttributePathParamsList[0].mNodeId      = chip::kTestDeviceNodeId;
+    readPrepareParams1.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId;
+    readPrepareParams1.mpAttributePathParamsList[0].mClusterId   = kTestClusterId;
+    readPrepareParams1.mpAttributePathParamsList[0].mAttributeId = 1;
+    readPrepareParams1.mpAttributePathParamsList[0].mListIndex   = 0;
     readPrepareParams1.mpAttributePathParamsList[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     readPrepareParams1.mAttributePathParamsListSize = 1;
     readPrepareParams1.mMinIntervalFloorSeconds     = 2;
@@ -1049,11 +1056,11 @@ void TestReadInteraction::TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void
 
     // Subscribe to the attribute
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId     = chip::kTestDeviceNodeId;
-    attributePathParams.mEndpointId = kTestEndpointId;
-    attributePathParams.mClusterId  = kTestClusterId;
-    attributePathParams.mFieldId    = 1;
-    attributePathParams.mListIndex  = 0;
+    attributePathParams.mNodeId      = chip::kTestDeviceNodeId;
+    attributePathParams.mEndpointId  = kTestEndpointId;
+    attributePathParams.mClusterId   = kTestClusterId;
+    attributePathParams.mAttributeId = 1;
+    attributePathParams.mListIndex   = 0;
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
@@ -1103,12 +1110,12 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::AttributePathParams attributePathParams[1];
-    readPrepareParams.mpAttributePathParamsList                = attributePathParams;
-    readPrepareParams.mpAttributePathParamsList[0].mNodeId     = chip::kTestDeviceNodeId;
-    readPrepareParams.mpAttributePathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpAttributePathParamsList[0].mClusterId  = kInvalidTestClusterId;
-    readPrepareParams.mpAttributePathParamsList[0].mFieldId    = 1;
-    readPrepareParams.mpAttributePathParamsList[0].mListIndex  = 0;
+    readPrepareParams.mpAttributePathParamsList                 = attributePathParams;
+    readPrepareParams.mpAttributePathParamsList[0].mNodeId      = chip::kTestDeviceNodeId;
+    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId;
+    readPrepareParams.mpAttributePathParamsList[0].mClusterId   = kInvalidTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = 1;
+    readPrepareParams.mpAttributePathParamsList[0].mListIndex   = 0;
     readPrepareParams.mpAttributePathParamsList[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     readPrepareParams.mAttributePathParamsListSize = 1;

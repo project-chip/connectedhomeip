@@ -99,12 +99,12 @@ void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ClusterInfo clusterInfoList[2];
 
-    clusterInfoList[0].mFieldId = 1;
-    clusterInfoList[1].mFieldId = 2;
+    clusterInfoList[0].mAttributeId = 1;
+    clusterInfoList[1].mAttributeId = 2;
 
     {
         chip::app::ClusterInfo testClusterInfo;
-        testClusterInfo.mFieldId = 3;
+        testClusterInfo.mAttributeId = 3;
         NL_TEST_ASSERT(apSuite,
                        !InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
     }
@@ -115,8 +115,8 @@ void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * 
     }
     {
         chip::app::ClusterInfo testClusterInfo;
-        testClusterInfo.mFieldId   = 1;
-        testClusterInfo.mListIndex = 2;
+        testClusterInfo.mAttributeId = 1;
+        testClusterInfo.mListIndex   = 2;
         NL_TEST_ASSERT(apSuite,
                        InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
     }

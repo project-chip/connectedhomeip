@@ -72,7 +72,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributePathList(AttributePaths::Parser * const apAttributePathList) const;
+    CHIP_ERROR GetPathList(AttributePaths::Parser * const apAttributePathList) const;
 
     /**
      *  @brief Get a TLVReader for the EventPaths. Next() must be called before accessing them.

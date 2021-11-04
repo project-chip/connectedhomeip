@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "AttributeDataList.h"
 #include "AttributeDataVersionList.h"
+#include "AttributeDatas.h"
 #include "Builder.h"
 #include "Parser.h"
 #include <app/util/basic-types.h>
@@ -38,7 +38,7 @@ namespace WriteRequestMessage {
 enum
 {
     kCsTag_SuppressResponse         = 0,
-    kCsTag_AttributeDataList        = 1,
+    kCsTag_AttributeDatas           = 1,
     kCsTag_AttributeDataVersionList = 2,
     kCsTag_MoreChunkedMessages      = 3,
 };
@@ -81,12 +81,12 @@ public:
     /**
      *  @brief Get a TLVReader for the AttributePaths. Next() must be called before accessing them.
      *
-     *  @param [in] apAttributeDataList    A pointer to apAttributeDataList
+     *  @param [in] apAttributeDatas    A pointer to apAttributeDatas
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const;
+    CHIP_ERROR GetAttributeReports(AttributeDatas::Parser * const apAttributeDatas) const;
 
     /**
      *  @brief Get a TLVReader for the AttributeDataVersionList. Next() must be called before accessing them.
@@ -129,11 +129,11 @@ public:
     WriteRequestMessage::Builder & SuppressResponse(const bool aSuppressResponse);
 
     /**
-     *  @brief Initialize a AttributeDataList::Builder for writing into the TLV stream
+     *  @brief Initialize a AttributeDatas::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataList::Builder
+     *  @return A reference to AttributeDatas::Builder
      */
-    AttributeDataList::Builder & CreateAttributeDataListBuilder();
+    AttributeDatas::Builder & CreateAttributeDatasBuilder();
 
     /**
      *  @brief Initialize a AttributeDataVersionList::Builder for writing into the TLV stream
@@ -143,13 +143,13 @@ public:
     AttributeDataVersionList::Builder & CreateAttributeDataVersionListBuilder();
 
     /**
-     *  @brief Set True if the set of AttributeDataElements have to be sent across multiple packets in a single transaction
+     *  @brief Set True if the set of AttributeDataIBs have to be sent across multiple packets in a single transaction
      *  @param [in] aMoreChunkedMessages  true if more chunked messaged is needed
      *  @return A reference to *this
      */
     WriteRequestMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
-    AttributeDataList::Builder & GetAttributeDataListBuilder();
+    AttributeDatas::Builder & GetAttributeReportsBuilder();
 
     /**
      *  @brief Mark the end of this WriteRequestMessage
@@ -159,7 +159,7 @@ public:
     WriteRequestMessage::Builder & EndOfWriteRequestMessage();
 
 private:
-    AttributeDataList::Builder mAttributeDataListBuilder;
+    AttributeDatas::Builder mAttributeDatasBuilder;
     AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
 };
 }; // namespace WriteRequestMessage

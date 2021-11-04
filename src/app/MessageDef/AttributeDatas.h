@@ -17,7 +17,7 @@
  */
 /**
  *    @file
- *      This file defines AttributeDataVersionList parser and builder in CHIP interaction model
+ *      This file defines AttributeDatas parser and builder in CHIP interaction model
  *
  */
 
@@ -36,7 +36,7 @@
 
 namespace chip {
 namespace app {
-namespace AttributeDataVersionList {
+namespace AttributeDatas {
 class Parser : public ArrayParser
 {
 public:
@@ -56,59 +56,31 @@ public:
      */
     CHIP_ERROR CheckSchemaValidity() const;
 #endif
-
-    /**
-     *  @brief Check if this element is valid
-     *
-     *  @return A Boolean
-     */
-    bool IsElementValid(void);
-
-    /**
-     *  @brief Check if this element is NULL
-     *
-     *  @return A Boolean
-     */
-    bool IsNull(void);
-
-    /**
-     *  @brief Get a value for the DataVersion. Next() must be called before accessing them.
-     *
-     *  @param [in] apVersion    A pointer to apVersion
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetVersion(chip::DataVersion * const apVersion);
 };
 
 class Builder : public ArrayBuilder
 {
 public:
     /**
-     *  @brief Add version in AttributeDataVersionList
+     *  @brief Initialize a AttributeDataIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataVersionList::Builder
+     *  @return A reference to AttributeDataIB::Builder
      */
-    AttributeDataVersionList::Builder & AddVersion(const uint64_t aVersion);
+    AttributeDataIB::Builder & CreateAttributeDataIBBuilder();
+
+    AttributeDataIB::Builder & GetAttributeDataIBBuilder();
 
     /**
-     *  @brief Add Null in version list
+     *  @brief Mark the end of this AttributeDatas
      *
      *  @return A reference to *this
      */
-    AttributeDataVersionList::Builder & AddNull(void);
-    /**
-     *  @brief Mark the end of this AttributeDataVersionList
-     *
-     *  @return A reference to *this
-     */
-    AttributeDataVersionList::Builder & EndOfAttributeDataVersionList();
+    AttributeDatas::Builder & EndOfAttributeDatas();
 
 private:
     AttributeDataIB::Builder mAttributeDataIBBuilder;
 };
-}; // namespace AttributeDataVersionList
+}; // namespace AttributeDatas
+
 }; // namespace app
 }; // namespace chip

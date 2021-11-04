@@ -30,7 +30,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "AttributeDataList.h"
+#include "AttributeReports.h"
 #include "EventReports.h"
 #include "StructBuilder.h"
 #include "StructParser.h"
@@ -42,7 +42,7 @@ enum
 {
     kCsTag_SuppressResponse    = 0,
     kCsTag_SubscriptionId      = 1,
-    kCsTag_AttributeDataList   = 2,
+    kCsTag_AttributeReports    = 2,
     kCsTag_EventReports        = 3,
     kCsTag_MoreChunkedMessages = 4,
 };
@@ -91,13 +91,13 @@ public:
     /**
      *  @brief Get a TLVReader for the AttributesDataList. Next() must be called before accessing them.
      *
-     *  @param [in] apAttributeDataList    A pointer to apAttributeDataList
+     *  @param [in] apAttributeReports    A pointer to apAttributeReports
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Array
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const;
+    CHIP_ERROR GetAttributeReports(AttributeReports::Parser * const apAttributeReports) const;
 
     /**
      *  @brief Get a TLVReader for the EventReports. Next() must be called before accessing them.
@@ -148,18 +148,18 @@ public:
     ReportDataMessage::Builder & SubscriptionId(const uint64_t aSubscriptionId);
 
     /**
-     *  @brief Initialize a AttributeDataList::Builder for writing into the TLV stream
+     *  @brief Initialize a AttributeReports::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataList::Builder
+     *  @return A reference to AttributeReports::Builder
      */
-    AttributeDataList::Builder & CreateAttributeDataListBuilder();
+    AttributeReports::Builder & CreateAttributeReports();
 
     /**
      *  @brief Initialize a EventReports::Builder for writing into the TLV stream
      *
      *  @return A reference to EventReports::Builder
      */
-    EventReports::Builder & CreateEventReportsBuilder();
+    EventReports::Builder & CreateEventReports();
 
     /**
      *  @brief This flag is set to ‘true’ when there are more chunked messages in a transaction.
@@ -176,7 +176,7 @@ public:
     ReportDataMessage::Builder & EndOfReportDataMessage();
 
 private:
-    AttributeDataList::Builder mAttributeDataListBuilder;
+    AttributeReports::Builder mAttributeReportsBuilder;
     EventReports::Builder mEventReportsBuilder;
 };
 }; // namespace ReportDataMessage

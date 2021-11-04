@@ -165,7 +165,7 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR SubscribeRequestMessage::Parser::GetAttributePathList(AttributePaths::Parser * const apAttributePathList) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetPathList(AttributePaths::Parser * const apAttributePathList) const
 {
     TLV::TLVReader reader;
     ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributePathList), reader));

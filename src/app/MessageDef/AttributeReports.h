@@ -17,7 +17,7 @@
  */
 /**
  *    @file
- *      This file defines AttributeDataList parser and builder in CHIP interaction model
+ *      This file defines AttributeReports parser and builder in CHIP interaction model
  *
  */
 
@@ -25,7 +25,7 @@
 
 #include "ArrayBuilder.h"
 #include "ArrayParser.h"
-#include "AttributeDataElement.h"
+#include "AttributeReportIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -36,7 +36,7 @@
 
 namespace chip {
 namespace app {
-namespace AttributeDataList {
+namespace AttributeReports {
 class Parser : public ArrayParser
 {
 public:
@@ -62,25 +62,22 @@ class Builder : public ArrayBuilder
 {
 public:
     /**
-     *  @brief Initialize a AttributeDataElement::Builder for writing into the TLV stream
+     *  @brief Initialize a AttributeReportIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataElement::Builder
+     *  @return A reference to AttributeReportIB::Builder
      */
-    AttributeDataElement::Builder & CreateAttributeDataElementBuilder();
-
-    AttributeDataElement::Builder & GetAttributeDataElementBuilder();
+    AttributeReportIB::Builder & CreateAttributeReport();
 
     /**
-     *  @brief Mark the end of this AttributeDataList
+     *  @brief Mark the end of this AttributeReports
      *
      *  @return A reference to *this
      */
-    AttributeDataList::Builder & EndOfAttributeDataList();
+    AttributeReports::Builder & EndOfAttributeReports();
 
 private:
-    AttributeDataElement::Builder mAttributeDataElementBuilder;
+    AttributeReportIB::Builder mAttributeReport;
 };
-}; // namespace AttributeDataList
-
-}; // namespace app
-}; // namespace chip
+} // namespace AttributeReports
+} // namespace app
+} // namespace chip

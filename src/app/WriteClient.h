@@ -21,7 +21,7 @@
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegate.h>
-#include <app/MessageDef/AttributeDataList.h>
+#include <app/MessageDef/AttributeDatas.h>
 #include <app/MessageDef/AttributeStatusIB.h>
 #include <app/MessageDef/WriteRequestMessage.h>
 #include <app/data-model/Encode.h>
@@ -111,7 +111,7 @@ public:
 
     CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
     CHIP_ERROR FinishAttribute();
-    TLV::TLVWriter * GetAttributeDataElementTLVWriter();
+    TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 
     NodeId GetSourceNodeId() const
     {
@@ -174,8 +174,7 @@ private:
     void MoveToState(const State aTargetState);
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB);
-    CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                      AttributeDataElement::Builder aAttributeDataElement);
+    CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams, AttributeDataIB::Builder aAttributeDataIB);
     void ClearExistingExchangeContext();
     const char * GetStateStr() const;
     void ClearState();
@@ -238,9 +237,9 @@ public:
 
         VerifyOrReturnError(mpWriteClient != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(mpWriteClient->PrepareAttribute(attributePath));
-        VerifyOrReturnError((writer = mpWriteClient->GetAttributeDataElementTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError((writer = mpWriteClient->GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(
-            DataModel::Encode(*writer, chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), value));
+            DataModel::Encode(*writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
         ReturnErrorOnFailure(mpWriteClient->FinishAttribute());
 
         return CHIP_NO_ERROR;

@@ -161,7 +161,7 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR ReadRequestMessage::Parser::GetAttributePathList(AttributePaths::Parser * const apAttributePathList) const
+CHIP_ERROR ReadRequestMessage::Parser::GetPathList(AttributePaths::Parser * const apAttributePathList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;

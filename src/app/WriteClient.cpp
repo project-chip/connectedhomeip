@@ -36,7 +36,7 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callbac
     VerifyOrReturnError(mpExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    AttributeDataList::Builder attributeDataListBuilder;
+    AttributeDatas::Builder AttributeDatasBuilder;
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -44,8 +44,8 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callbac
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
 
-    attributeDataListBuilder = mWriteRequestBuilder.CreateAttributeDataListBuilder();
-    ReturnErrorOnFailure(attributeDataListBuilder.GetError());
+    AttributeDatasBuilder = mWriteRequestBuilder.CreateAttributeDatasBuilder();
+    ReturnErrorOnFailure(AttributeDatasBuilder.GetError());
 
     ClearExistingExchangeContext();
     mpExchangeMgr         = apExchangeMgr;
@@ -137,10 +137,9 @@ CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    AttributeDataElement::Builder attributeDataElement =
-        mWriteRequestBuilder.GetAttributeDataListBuilder().CreateAttributeDataElementBuilder();
-    SuccessOrExit(attributeDataElement.GetError());
-    err = ConstructAttributePath(attributePathParams, attributeDataElement);
+    AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetAttributeReportsBuilder().CreateAttributeDataIBBuilder();
+    SuccessOrExit(AttributeDataIB.GetError());
+    err = ConstructAttributePath(attributePathParams, AttributeDataIB);
 
 exit:
     return err;
@@ -150,31 +149,30 @@ CHIP_ERROR WriteClient::FinishAttribute()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    AttributeDataElement::Builder attributeDataElement =
-        mWriteRequestBuilder.GetAttributeDataListBuilder().GetAttributeDataElementBuilder();
+    AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetAttributeReportsBuilder().GetAttributeDataIBBuilder();
 
     // TODO: Add attribute version support
-    attributeDataElement.DataVersion(0);
-    attributeDataElement.EndOfAttributeDataElement();
-    SuccessOrExit(err = attributeDataElement.GetError());
+    AttributeDataIB.DataVersion(0);
+    AttributeDataIB.EndOfAttributeDataIB();
+    SuccessOrExit(err = AttributeDataIB.GetError());
     MoveToState(State::AddAttribute);
 
 exit:
     return err;
 }
 
-TLV::TLVWriter * WriteClient::GetAttributeDataElementTLVWriter()
+TLV::TLVWriter * WriteClient::GetAttributeDataIBTLVWriter()
 {
-    return mWriteRequestBuilder.GetAttributeDataListBuilder().GetAttributeDataElementBuilder().GetWriter();
+    return mWriteRequestBuilder.GetAttributeReportsBuilder().GetAttributeDataIBBuilder().GetWriter();
 }
 
 CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                               AttributeDataElement::Builder aAttributeDataElement)
+                                               AttributeDataIB::Builder aAttributeDataIB)
 {
-    AttributePathIB::Builder attributePath = aAttributeDataElement.CreateAttributePath();
+    AttributePathIB::Builder attributePath = aAttributeDataIB.CreatePath();
     if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
     {
-        attributePath.Attribute(aAttributePathParams.mFieldId);
+        attributePath.Attribute(aAttributePathParams.mAttributeId);
     }
 
     if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kListIndexValid))
@@ -193,10 +191,10 @@ CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttr
 CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributeDataList::Builder attributeDataListBuilder;
+    AttributeDatas::Builder AttributeDatasBuilder;
     VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
-    attributeDataListBuilder = mWriteRequestBuilder.GetAttributeDataListBuilder().EndOfAttributeDataList();
-    err                      = attributeDataListBuilder.GetError();
+    AttributeDatasBuilder = mWriteRequestBuilder.GetAttributeReportsBuilder().EndOfAttributeDatas();
+    err                   = AttributeDatasBuilder.GetError();
     SuccessOrExit(err);
 
     mWriteRequestBuilder.EndOfWriteRequestMessage();
@@ -335,7 +333,7 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
     err = attributePath.GetEndpoint(&(attributePathParams.mEndpointId));
     SuccessOrExit(err);
 
-    err = attributePath.GetAttribute(&(attributePathParams.mFieldId));
+    err = attributePath.GetAttribute(&(attributePathParams.mAttributeId));
     if (CHIP_NO_ERROR == err)
     {
         attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
@@ -362,7 +360,7 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
         if (mpCallback != nullptr)
         {
             ConcreteAttributePath path(attributePathParams.mEndpointId, attributePathParams.mClusterId,
-                                       attributePathParams.mFieldId);
+                                       attributePathParams.mAttributeId);
             mpCallback->OnResponse(this, path, statusIB);
         }
     }
