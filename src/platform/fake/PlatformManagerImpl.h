@@ -51,10 +51,12 @@ private:
     void _RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) {}
     void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) {}
 
-    void _RunEventLoop() {
-        do {
+    void _RunEventLoop()
+    {
+        do
+        {
             _ProcessDeviceEvents();
-        } while(mShouldRunEventLoop);
+        } while (mShouldRunEventLoop);
     }
 
     void _ProcessDeviceEvents()
@@ -69,7 +71,8 @@ private:
 
     CHIP_ERROR _StartEventLoopTask() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    CHIP_ERROR _StopEventLoopTask() {
+    CHIP_ERROR _StopEventLoopTask()
+    {
         mShouldRunEventLoop = false;
         return CHIP_NO_ERROR;
     }
