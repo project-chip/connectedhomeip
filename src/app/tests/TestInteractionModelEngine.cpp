@@ -99,22 +99,27 @@ void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ClusterInfo clusterInfoList[2];
 
-    clusterInfoList[0].mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
     clusterInfoList[0].mFieldId = 1;
-    clusterInfoList[1].mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
     clusterInfoList[1].mFieldId = 2;
 
-    chip::app::ClusterInfo testClusterInfo;
-    testClusterInfo.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    testClusterInfo.mFieldId = 3;
-
-    NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
-    testClusterInfo.mFieldId = 0xFFFFFFFF;
-    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
-    testClusterInfo.mFlags.Set(chip::app::ClusterInfo::Flags::kListIndexValid);
-    testClusterInfo.mFieldId   = 1;
-    testClusterInfo.mListIndex = 2;
-    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
+    {
+        chip::app::ClusterInfo testClusterInfo;
+        testClusterInfo.mFieldId = 3;
+        NL_TEST_ASSERT(apSuite,
+                       !InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
+    }
+    {
+        chip::app::ClusterInfo testClusterInfo;
+        NL_TEST_ASSERT(apSuite,
+                       InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
+    }
+    {
+        chip::app::ClusterInfo testClusterInfo;
+        testClusterInfo.mFieldId   = 1;
+        testClusterInfo.mListIndex = 2;
+        NL_TEST_ASSERT(apSuite,
+                       InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
+    }
 }
 } // namespace app
 } // namespace chip

@@ -82,6 +82,11 @@ void appError(int err)
         ;
 }
 
+void appError(CHIP_ERROR error)
+{
+    appError(static_cast<int>(error.AsInteger()));
+}
+
 extern "C" unsigned int sleep(unsigned int seconds)
 {
     const TickType_t xDelay = 1000 * seconds / portTICK_PERIOD_MS;
@@ -169,9 +174,10 @@ int main(void)
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
-    ret = chip::Shell::streamer_init(chip::Shell::streamer_get());
-    assert(ret == 0);
+    int status = chip::Shell::streamer_init(chip::Shell::streamer_get());
+    assert(status == 0);
 
+    cmd_misc_init();
     cmd_otcli_init();
     cmd_ping_init();
     cmd_send_init();

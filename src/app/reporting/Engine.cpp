@@ -70,8 +70,7 @@ Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeDataList
     ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId);
     AttributeDataElement::Builder attributeDataElementBuilder = aAttributeDataList.CreateAttributeDataElementBuilder();
     AttributePath::Builder attributePathBuilder               = attributeDataElementBuilder.CreateAttributePathBuilder();
-    attributePathBuilder.NodeId(aClusterInfo.mNodeId)
-        .EndpointId(aClusterInfo.mEndpointId)
+    attributePathBuilder.EndpointId(aClusterInfo.mEndpointId)
         .ClusterId(aClusterInfo.mClusterId)
         .FieldId(aClusterInfo.mFieldId)
         .EndOfAttributePath();
@@ -154,7 +153,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
@@ -164,15 +163,15 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & a
     ClusterInfo * clusterInfoList  = apReadHandler->GetEventClusterInfolist();
     EventNumber * eventNumberList  = apReadHandler->GetVendedEventNumberList();
     EventManagement & eventManager = EventManagement::GetInstance();
-    EventList::Builder eventList;
+    EventReports::Builder EventReports;
 
     aReportDataBuilder.Checkpoint(backup);
 
     VerifyOrExit(clusterInfoList != nullptr, );
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    eventList = aReportDataBuilder.CreateEventDataListBuilder();
-    SuccessOrExit(err = eventList.GetError());
+    EventReports = aReportDataBuilder.CreateEventReportsBuilder();
+    SuccessOrExit(err = EventReports.GetError());
 
     memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
     // If the eventManager is not valid or has not been initialized,
@@ -199,7 +198,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & a
     while (apReadHandler->GetCurrentPriority() != PriorityLevel::Invalid)
     {
         uint8_t priorityIndex = static_cast<uint8_t>(apReadHandler->GetCurrentPriority());
-        err = eventManager.FetchEventsSince(*(eventList.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
+        err = eventManager.FetchEventsSince(*(EventReports.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
                                             eventNumberList[priorityIndex], eventCount);
 
         if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
@@ -244,8 +243,8 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & a
         }
     }
 
-    eventList.EndOfEventList();
-    SuccessOrExit(err = eventList.GetError());
+    EventReports.EndOfEventReports();
+    SuccessOrExit(err = EventReports.GetError());
 
     ChipLogDetail(DataManagement, "Fetched %zu events", eventCount);
 
@@ -282,7 +281,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     err = BuildSingleReportDataAttributeDataList(reportDataBuilder, apReadHandler);
     SuccessOrExit(err);
 
-    err = BuildSingleReportDataEventList(reportDataBuilder, apReadHandler);
+    err = BuildSingleReportDataEventReports(reportDataBuilder, apReadHandler);
     SuccessOrExit(err);
 
     // TODO: Add mechanism to set mSuppressResponse to handle status reports for multiple reports

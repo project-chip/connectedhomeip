@@ -93,6 +93,14 @@ config CHIP_ENABLE_DNS_CLIENT
 	help
 	  Enables DNS client support used for resolving and browsing services.
 
+config CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+	bool "Enable sleepy end device support"
+	default n
+	depends on OPENTHREAD_MTD
+	imply OPENTHREAD_MTD_SED
+	help
+	  Enables Thread Sleepy End Device support in Matter.
+
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"
 	default y

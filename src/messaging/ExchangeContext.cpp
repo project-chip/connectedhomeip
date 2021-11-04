@@ -43,6 +43,10 @@
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
+
 using namespace chip::Encoding;
 using namespace chip::Inet;
 using namespace chip::System;
@@ -78,6 +82,23 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 {
     mResponseTimeout = timeout;
 }
+
+#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
+void ExchangeContext::UpdateSEDPollingMode(Transport::Type transportType)
+{
+    if (transportType != Transport::Type::kBle)
+    {
+        if (!IsResponseExpected() && !IsSendExpected() && (mExchangeMgr->GetNumActiveExchanges() == 1))
+        {
+            chip::DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
+        }
+        else
+        {
+            chip::DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
+        }
+    }
+}
+#endif
 
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
@@ -464,6 +485,11 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 
 void ExchangeContext::MessageHandled()
 {
+#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
+    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    UpdateSEDPollingMode(peerAddress->GetTransportType());
+#endif
+
     if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())
     {
         return;

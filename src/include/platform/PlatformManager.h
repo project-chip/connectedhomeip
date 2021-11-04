@@ -393,8 +393,10 @@ inline CHIP_ERROR PlatformManager::StopEventLoopTask()
  */
 inline CHIP_ERROR PlatformManager::Shutdown()
 {
-    mInitialized = false;
-    return static_cast<ImplClass *>(this)->_Shutdown();
+    CHIP_ERROR err = static_cast<ImplClass *>(this)->_Shutdown();
+    if (err == CHIP_NO_ERROR)
+        mInitialized = false;
+    return err;
 }
 
 inline void PlatformManager::LockChipStack()

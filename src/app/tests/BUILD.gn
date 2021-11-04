@@ -45,23 +45,18 @@ chip_test_suite("tests") {
     "TestBuilderParser.cpp",
     "TestCHIPDeviceCallbacksMgr.cpp",
     "TestClusterInfo.cpp",
+    "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
     "TestDataModelSerialization.cpp",
     "TestEventLogging.cpp",
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
+    "TestReadInteraction.cpp",
+    "TestReportingEngine.cpp",
     "TestStatusResponseMessage.cpp",
+    "TestWriteInteraction.cpp",
   ]
-
-  if (chip_device_platform != "efr32") {
-    test_sources += [
-      "TestCommandInteraction.cpp",
-      "TestReadInteraction.cpp",
-      "TestReportingEngine.cpp",
-      "TestWriteInteraction.cpp",
-    ]
-  }
 
   cflags = [ "-Wconversion" ]
 

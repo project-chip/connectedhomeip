@@ -5005,6 +5005,74 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPTestClusterClusterBooleanResponseCallback : public Callback::Callback<TestClusterClusterBooleanResponseCallback>
+{
+public:
+    CHIPTestClusterClusterBooleanResponseCallback(jobject javaCallback) :
+        Callback::Callback<TestClusterClusterBooleanResponseCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+    ~CHIPTestClusterClusterBooleanResponseCallback()
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+        env->DeleteGlobalRef(javaCallbackRef);
+    };
+
+    static void CallbackFn(void * context, bool value)
+    {
+        chip::DeviceLayer::StackUnlock unlock;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+        jmethodID javaMethod;
+        CHIPTestClusterClusterBooleanResponseCallback * cppCallback = nullptr;
+
+        VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+        cppCallback = reinterpret_cast<CHIPTestClusterClusterBooleanResponseCallback *>(context);
+        VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+
+        javaCallbackRef = cppCallback->javaCallbackRef;
+        VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
+
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Z)V", &javaMethod);
+        SuccessOrExit(err);
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jboolean>(value));
+
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        if (cppCallback != nullptr)
+        {
+            cppCallback->Cancel();
+            delete cppCallback;
+        }
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPTestClusterClusterTestAddArgumentsResponseCallback
     : public Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback>
 {
@@ -15743,8 +15811,9 @@ JNI_METHOD(void, TestClusterCluster, testListInt8UArgumentRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPTestClusterClusterBooleanResponseCallback, void (*)(CHIPTestClusterClusterBooleanResponseCallback *)>
+        onSuccess(Platform::New<CHIPTestClusterClusterBooleanResponseCallback>(callback),
+                  Platform::Delete<CHIPTestClusterClusterBooleanResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -15844,8 +15913,9 @@ JNI_METHOD(void, TestClusterCluster, testListStructArgumentRequest)
     JniByteArray dArr(env, d);
     JniUtfString eStr(env, e);
 
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPTestClusterClusterBooleanResponseCallback, void (*)(CHIPTestClusterClusterBooleanResponseCallback *)>
+        onSuccess(Platform::New<CHIPTestClusterClusterBooleanResponseCallback>(callback),
+                  Platform::Delete<CHIPTestClusterClusterBooleanResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -16043,8 +16113,9 @@ JNI_METHOD(void, TestClusterCluster, testStructArgumentRequest)
     JniByteArray dArr(env, d);
     JniUtfString eStr(env, e);
 
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPTestClusterClusterBooleanResponseCallback, void (*)(CHIPTestClusterClusterBooleanResponseCallback *)>
+        onSuccess(Platform::New<CHIPTestClusterClusterBooleanResponseCallback>(callback),
+                  Platform::Delete<CHIPTestClusterClusterBooleanResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrExit(onSuccess.get() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

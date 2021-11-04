@@ -64,18 +64,19 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
-    err = ConfigurationMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
-
     // Initialize the CHIP system layer.
     err = SystemLayer().Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+
+    // Initialize the Configuration Manager.
+    err = ConfigurationMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %s", ErrorStr(err));
     }
     SuccessOrExit(err);
 
@@ -307,10 +308,6 @@ void GenericPlatformManagerImpl<ImplClass>::HandleMessageLayerActivityChanged(bo
     if (messageLayerIsActive != self.mMsgLayerWasActive)
     {
         self.mMsgLayerWasActive = messageLayerIsActive;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ThreadStackMgr().OnMessageLayerActivityChanged(messageLayerIsActive);
-#endif
     }
 }
 

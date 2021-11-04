@@ -114,3 +114,5 @@ bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
+
+void MatterAdministratorCommissioningPluginServerInitCallback() {}

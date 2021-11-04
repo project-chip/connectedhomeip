@@ -12,6 +12,7 @@ android-x86-chip-tool
 efr32-brd4161a-light
 efr32-brd4161a-light-rpc
 efr32-brd4161a-lock
+efr32-brd4161a-unit-test
 efr32-brd4161a-window-covering
 esp32-c3devkit-all-clusters
 esp32-devkitc-all-clusters

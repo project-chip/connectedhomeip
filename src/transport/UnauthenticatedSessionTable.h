@@ -47,7 +47,7 @@ public:
 class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
-    UnauthenticatedSession(const PeerAddress & address) : mPeerAddress(address) { mLocalMessageCounter.Init(); }
+    UnauthenticatedSession(const PeerAddress & address) : mPeerAddress(address) {}
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession & operator=(const UnauthenticatedSession &) = delete;
@@ -59,14 +59,12 @@ public:
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
-    MessageCounter & GetLocalMessageCounter() { return mLocalMessageCounter; }
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
     uint64_t mLastActivityTimeMs = 0;
 
     const PeerAddress mPeerAddress;
-    GlobalUnencryptedMessageCounter mLocalMessageCounter;
     PeerMessageCounter mPeerMessageCounter;
 };
 

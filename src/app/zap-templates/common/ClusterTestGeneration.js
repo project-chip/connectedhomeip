@@ -42,6 +42,7 @@ const kArgumentsName     = 'arguments';
 const kResponseName      = 'response';
 const kDisabledName      = 'disabled';
 const kResponseErrorName = 'error';
+const kPICSName          = 'PICS';
 
 class NullObject {
   toString()
@@ -137,6 +138,21 @@ function setDefaultTypeForCommand(test)
   }
 
   test.isWait = false;
+}
+
+function setDefaultPICS(test)
+{
+  const defaultPICS = '';
+  setDefault(test, kPICSName, defaultPICS);
+
+  if (test[kPICSName] == '') {
+    return;
+  }
+
+  if (!PICS.has(test[kPICSName])) {
+    const errorStr = 'PICS database does not contains any defined value for: ' + test[kPICSName];
+    throwError(test, errorStr);
+  }
 }
 
 function setDefaultArguments(test)
@@ -237,6 +253,7 @@ function setDefaults(test, defaultConfig)
   setDefault(test, kClusterName, defaultClusterName);
   setDefault(test, kEndpointName, defaultEndpointId);
   setDefault(test, kDisabledName, defaultDisabled);
+  setDefaultPICS(test);
   setDefaultArguments(test);
   setDefaultResponse(test);
 }
@@ -291,6 +308,10 @@ function parse(filename)
 
   // Filter disabled tests
   yaml.tests = yaml.tests.filter(test => !test.disabled);
+
+  // Filter tests based on PICS
+  yaml.tests = yaml.tests.filter(test => test[kPICSName] == '' || PICS.get(test[kPICSName]).value == true);
+
   yaml.tests.forEach((test, index) => {
     setDefault(test, kIndexName, index);
   });
@@ -385,9 +406,31 @@ function assertCommandOrAttribute(context)
   });
 }
 
+const PICS = (() => {
+  let filepath = path.resolve(__dirname, basePath + certificationPath + 'PICS.yaml');
+  const data   = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
+  const yaml   = YAML.parse(data);
+
+  const getAll = () => yaml.PICS;
+  const get = (id) => has(id) ? yaml.PICS.filter(pics => pics.id == id)[0] : null;
+  const has = (id) => !!(yaml.PICS.filter(pics => pics.id == id)).length;
+
+  const PICS = {
+    getAll : getAll,
+    get : get,
+    has : has,
+  };
+  return PICS;
+})();
+
 //
 // Templates
 //
+function chip_tests_pics(options)
+{
+  return templateUtil.collectBlocks(PICS.getAll(), options, this);
+}
+
 function chip_tests(list, options)
 {
   const items = Array.isArray(list) ? list : list.split(',');
@@ -552,5 +595,6 @@ exports.chip_tests_items                    = chip_tests_items;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
 exports.chip_tests_item_response_type       = chip_tests_item_response_type;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
+exports.chip_tests_pics                     = chip_tests_pics;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;

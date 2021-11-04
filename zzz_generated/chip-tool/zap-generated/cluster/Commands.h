@@ -1889,14 +1889,13 @@ static void OnOtaSoftwareUpdateProviderQueryImageResponseSuccess(
 {
     ChipLogProgress(Zcl, "Received QueryImageResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", data.status);
-    ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", data.delayedActionTime);
-    ChipLogProgress(Zcl, "  imageURI: %.*s", static_cast<int>(data.imageURI.size()), data.imageURI.data());
-    ChipLogProgress(Zcl, "  softwareVersion: %" PRIu32 "", data.softwareVersion);
-    ChipLogProgress(Zcl, "  softwareVersionString: %.*s", static_cast<int>(data.softwareVersionString.size()),
-                    data.softwareVersionString.data());
-    ChipLogProgress(Zcl, "  updateToken: %zu", data.updateToken.size());
-    ChipLogProgress(Zcl, "  userConsentNeeded: %d", data.userConsentNeeded);
-    ChipLogProgress(Zcl, "  metadataForRequestor: %zu", data.metadataForRequestor.size());
+    ChipLogProgress(Zcl, "  delayedActionTime: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  imageURI: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  softwareVersion: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  softwareVersionString: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  updateToken: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  userConsentNeeded: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  metadataForRequestor: Optional printing is not implemented yet.");
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -2042,6 +2041,17 @@ static void OnTargetNavigatorNavigateTargetResponseSuccess(
     ChipLogProgress(Zcl, "Received NavigateTargetResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", data.status);
     ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.data.size()), data.data.data());
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+};
+
+static void
+OnTestClusterBooleanResponseSuccess(void * context,
+                                    const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received BooleanResponse:");
+    ChipLogProgress(Zcl, "  value: %d", data.value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -14959,9 +14969,7 @@ public:
         AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
         AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId);
         AddArgument("SoftwareVersion", 0, UINT32_MAX, &mRequest.softwareVersion);
-        AddArgument(
-            "ProtocolsSupported", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<decltype(mRequest.protocolsSupported)> *>(&mRequest.protocolsSupported));
+        // protocolsSupported Array parsing is not supported yet
         AddArgument("HardwareVersion", 0, UINT16_MAX, &mRequest.hardwareVersion);
         AddArgument("Location", &mRequest.location);
         AddArgument("RequestorCanConsent", 0, 1, &mRequest.requestorCanConsent);
@@ -19960,7 +19968,7 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return cluster.InvokeCommand(mRequest, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure);
     }
 
 private:
@@ -20010,7 +20018,7 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return cluster.InvokeCommand(mRequest, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure);
     }
 
 private:
@@ -20102,7 +20110,7 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return cluster.InvokeCommand(mRequest, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure);
     }
 
 private:

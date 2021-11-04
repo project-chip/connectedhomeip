@@ -1785,6 +1785,28 @@ public class ClusterInfoMapping {
     }
   }
 
+  public class DelegatedBooleanResponseCallback
+      implements ChipClusters.TestClusterCluster.BooleanResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(boolean value) {
+      List<Object> responseValues = new ArrayList<>();
+      responseValues.add(value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public class DelegatedTestAddArgumentsResponseCallback
       implements ChipClusters.TestClusterCluster.TestAddArgumentsResponseCallback,
           DelegatedClusterCallback {
@@ -6738,7 +6760,8 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> testClustertestListInt8UArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClustertestListInt8UArgumentRequestCommandParameterInfo =
-        new CommandParameterInfo("TestCluster", ChipClusters.DefaultClusterCallback.class);
+        new CommandParameterInfo(
+            "TestCluster", ChipClusters.TestClusterCluster.BooleanResponseCallback.class);
     CommandParameterInfo testClustertestListInt8UArgumentRequestarg1CommandParameterInfo =
         new CommandParameterInfo("arg1", int.class);
     testClustertestListInt8UArgumentRequestCommandParams.put(
@@ -6750,9 +6773,10 @@ public class ClusterInfoMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
                   .testListInt8UArgumentRequest(
-                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("arg1"));
+                      (ChipClusters.TestClusterCluster.BooleanResponseCallback) callback,
+                      (Integer) commandArguments.get("arg1"));
             },
-            () -> new DelegatedDefaultClusterCallback(),
+            () -> new DelegatedBooleanResponseCallback(),
             testClustertestListInt8UArgumentRequestCommandParams);
     testClusterClusterCommandInfoMap.put(
         "testListInt8UArgumentRequest", testClustertestListInt8UArgumentRequestCommandInfo);
@@ -6784,7 +6808,8 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> testClustertestListStructArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClustertestListStructArgumentRequestCommandParameterInfo =
-        new CommandParameterInfo("TestCluster", ChipClusters.DefaultClusterCallback.class);
+        new CommandParameterInfo(
+            "TestCluster", ChipClusters.TestClusterCluster.BooleanResponseCallback.class);
     CommandParameterInfo testClustertestListStructArgumentRequestaCommandParameterInfo =
         new CommandParameterInfo("a", int.class);
     testClustertestListStructArgumentRequestCommandParams.put(
@@ -6821,7 +6846,7 @@ public class ClusterInfoMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
                   .testListStructArgumentRequest(
-                      (DefaultClusterCallback) callback,
+                      (ChipClusters.TestClusterCluster.BooleanResponseCallback) callback,
                       (Integer) commandArguments.get("a"),
                       (Boolean) commandArguments.get("b"),
                       (Integer) commandArguments.get("c"),
@@ -6829,7 +6854,7 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("e"),
                       (Integer) commandArguments.get("f"));
             },
-            () -> new DelegatedDefaultClusterCallback(),
+            () -> new DelegatedBooleanResponseCallback(),
             testClustertestListStructArgumentRequestCommandParams);
     testClusterClusterCommandInfoMap.put(
         "testListStructArgumentRequest", testClustertestListStructArgumentRequestCommandInfo);
@@ -6891,7 +6916,8 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> testClustertestStructArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClustertestStructArgumentRequestCommandParameterInfo =
-        new CommandParameterInfo("TestCluster", ChipClusters.DefaultClusterCallback.class);
+        new CommandParameterInfo(
+            "TestCluster", ChipClusters.TestClusterCluster.BooleanResponseCallback.class);
     CommandParameterInfo testClustertestStructArgumentRequestaCommandParameterInfo =
         new CommandParameterInfo("a", int.class);
     testClustertestStructArgumentRequestCommandParams.put(
@@ -6928,7 +6954,7 @@ public class ClusterInfoMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
                   .testStructArgumentRequest(
-                      (DefaultClusterCallback) callback,
+                      (ChipClusters.TestClusterCluster.BooleanResponseCallback) callback,
                       (Integer) commandArguments.get("a"),
                       (Boolean) commandArguments.get("b"),
                       (Integer) commandArguments.get("c"),
@@ -6936,7 +6962,7 @@ public class ClusterInfoMapping {
                       (String) commandArguments.get("e"),
                       (Integer) commandArguments.get("f"));
             },
-            () -> new DelegatedDefaultClusterCallback(),
+            () -> new DelegatedBooleanResponseCallback(),
             testClustertestStructArgumentRequestCommandParams);
     testClusterClusterCommandInfoMap.put(
         "testStructArgumentRequest", testClustertestStructArgumentRequestCommandInfo);

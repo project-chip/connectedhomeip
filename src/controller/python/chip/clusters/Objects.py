@@ -4973,7 +4973,7 @@ class OtaSoftwareUpdateProvider:
                         ClusterObjectFieldDescriptor(
                             Label="softwareVersion", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="protocolsSupported", Tag=3, Type=OtaSoftwareUpdateProvider.Enums.OTADownloadProtocol),
+                            Label="protocolsSupported", Tag=3, Type=OtaSoftwareUpdateProvider.Enums.OTADownloadProtocol, IsArray=True),
                         ClusterObjectFieldDescriptor(
                             Label="hardwareVersion", Tag=4, Type=uint),
                         ClusterObjectFieldDescriptor(
@@ -4987,7 +4987,7 @@ class OtaSoftwareUpdateProvider:
             vendorId: 'uint' = None
             productId: 'uint' = None
             softwareVersion: 'uint' = None
-            protocolsSupported: 'OtaSoftwareUpdateProvider.Enums.OTADownloadProtocol' = None
+            protocolsSupported: typing.List['OtaSoftwareUpdateProvider.Enums.OTADownloadProtocol'] = None
             hardwareVersion: 'uint' = None
             location: 'str' = None
             requestorCanConsent: 'bool' = None
@@ -21153,6 +21153,22 @@ class TestCluster:
                     ])
 
             arg1: 'TestCluster.Structs.NestedStruct' = None
+
+        @dataclass
+        class BooleanResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0008
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="value", Tag=0, Type=bool),
+                    ])
+
+            value: 'bool' = None
 
         @dataclass
         class TestListStructArgumentRequest(ClusterCommand):

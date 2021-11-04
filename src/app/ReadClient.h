@@ -64,12 +64,12 @@ public:
          * The ReadClient object MUST continue to exist after this call is completed.
          *
          * @param[in]  apReadClient The read client which initialized the read transaction.
-         * @param[in]  apEventListReader  TLV reader positioned at the list that contains the events.  The
+         * @param[in]  apEventReportsReader  TLV reader positioned at the list that contains the events.  The
          *                                implementation of EventStreamReceived is expected to call Next() on the reader to
          *                                advance it to the first element of the list, then process the elements from beginning to
          *                                the end. The callee is expected to consume all events.
          */
-        virtual void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventList) {}
+        virtual void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventReports) {}
 
         /**
          * OnResponse will be called when a report data response has been received and processed for the given path.
@@ -175,6 +175,7 @@ public:
         return mInteractionType == InteractionType::Subscribe ? returnType(mSubscriptionId) : returnType::Missing();
     }
 
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
@@ -184,7 +185,7 @@ private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
 
-    enum class ClientState
+    enum class ClientState : uint8_t
     {
         Uninitialized = 0,         ///< The client has not been initialized
         Initialized,               ///< The client has been initialized and is ready for a SendReadRequest
@@ -268,6 +269,7 @@ private:
     uint16_t mMaxIntervalCeilingSeconds        = 0;
     uint64_t mSubscriptionId                   = 0;
     NodeId mPeerNodeId                         = kUndefinedNodeId;
+    FabricIndex mFabricIndex                   = kUndefinedFabricIndex;
     InteractionType mInteractionType           = InteractionType::Read;
 };
 

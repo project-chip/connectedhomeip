@@ -77,7 +77,7 @@ CHIP_ERROR EventPaths::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-EventPathIB::Builder & EventPaths::Builder::CreateEventPath()
+EventPathIB::Builder & EventPaths::Builder::CreatePath()
 {
     if (mError == CHIP_NO_ERROR)
     {
