@@ -549,9 +549,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                     "IP Rx Fail:                   %" PRIu32 "\n",
                     ipCounters->mTxSuccess, ipCounters->mRxSuccess, ipCounters->mTxFailure, ipCounters->mRxFailure);
 
-    Impl()->UnlockThreadStack();
-
 exit:
+    Impl()->UnlockThreadStack();
     return err;
 }
 
@@ -604,9 +603,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                     extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4], extAddress->m8[5],
                     extAddress->m8[6], extAddress->m8[7], instantRssi);
 
+exit:
     Impl()->UnlockThreadStack();
 
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "GetAndLogThreadTopologyMinimul failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -758,9 +757,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                         neighbor->mFullNetworkData ? 'Y' : 'n', neighbor->mIsChild ? 'Y' : 'n', printBuf);
     }
 
+exit:
+
     Impl()->UnlockThreadStack();
 
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %s", ErrorStr(err));
@@ -1971,8 +1971,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
         return;
     }
 
-    ThreadStackMgrImpl().LockThreadStack();
-
     VerifyOrExit(aError == OT_ERROR_NONE, error = MapOpenThreadError(aError));
 
     error = MapOpenThreadError(otDnsBrowseResponseGetServiceName(aResponse, type, sizeof(type)));
@@ -2004,8 +2002,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
     }
 
 exit:
-
-    ThreadStackMgrImpl().UnlockThreadStack();
 
     // In case no service was found invoke callback to notify about failure. In other case it was already called before.
     if (!wasAnythingBrowsed)
@@ -2059,8 +2055,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
         return;
     }
 
-    ThreadStackMgrImpl().LockThreadStack();
-
     VerifyOrExit(aError == OT_ERROR_NONE, error = MapOpenThreadError(aError));
 
     error = MapOpenThreadError(otDnsServiceResponseGetServiceName(aResponse, resolveResult.mMdnsService.mName,
@@ -2081,7 +2075,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
 
 exit:
 
-    ThreadStackMgrImpl().UnlockThreadStack();
     ThreadStackMgrImpl().mDnsResolveCallback(aContext, &(resolveResult.mMdnsService), error);
 }
 
