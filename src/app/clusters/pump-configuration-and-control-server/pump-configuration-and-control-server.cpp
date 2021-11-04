@@ -35,5 +35,3 @@ void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(cons
                         (unsigned int) attributePath.mAttributeId);
     // TODO
 }
-
-void MatterPumpConfigurationAndControlPluginServerInitCallback() {}

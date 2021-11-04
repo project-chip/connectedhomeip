@@ -66,5 +66,3 @@ bool emberAfTargetNavigatorClusterNavigateTargetCallback(app::CommandHandler * c
     sendResponse(command, response);
     return true;
 }
-
-void MatterTargetNavigatorPluginServerInitCallback() {}

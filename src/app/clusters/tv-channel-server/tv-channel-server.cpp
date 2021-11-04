@@ -108,5 +108,3 @@ bool emberAfTvChannelClusterSkipChannelCallback(app::CommandHandler * command, c
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
-
-void MatterTvChannelPluginServerInitCallback() {}

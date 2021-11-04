@@ -108,5 +108,3 @@ HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(EndpointI
 {
     return HAL_OCCUPANCY_SENSOR_TYPE_PIR;
 }
-
-void MatterOccupancySensingPluginServerInitCallback() {}

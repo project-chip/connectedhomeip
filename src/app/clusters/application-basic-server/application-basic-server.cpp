@@ -46,5 +46,3 @@ bool emberAfApplicationBasicClusterChangeStatusCallback(app::CommandHandler * co
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
-
-void MatterApplicationBasicPluginServerInitCallback() {}
