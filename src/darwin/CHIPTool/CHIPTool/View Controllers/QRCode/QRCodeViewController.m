@@ -726,9 +726,7 @@
     NSError * error;
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
 
-    if ([self.chipController pairDevice:deviceID
-                      onboardingPayload:payload
-                                  error:&error]) {
+    if ([self.chipController pairDevice:deviceID onboardingPayload:payload error:&error]) {
         deviceID++;
         CHIPSetNextAvailableDeviceID(deviceID);
     }
