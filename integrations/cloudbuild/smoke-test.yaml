@@ -35,7 +35,7 @@ steps:
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob '*-nrf52840-{lock,light}' build --create-archives
+              --target-glob '*-nrf52840-{lock,light}*' build --create-archives
               /workspace/artifacts/
       waitFor:
           - Bootstrap
@@ -52,8 +52,8 @@ steps:
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob '*-brd4161a-{lock,light}' build --create-archives
-              /workspace/artifacts/
+              --target-glob '*-brd4161a-{lock,light,unit-test}*' build
+              --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap
           - NRFConnect
