@@ -84,10 +84,10 @@ using HKDF_sha_crypto = HKDF_shaHSM;
 using HKDF_sha_crypto = HKDF_sha;
 #endif
 
-// Wait at most 10 seconds for the response from the peer.
+// Wait at most 30 seconds for the response from the peer.
 // This timeout value assumes the underlying transport is reliable.
 // The session establishment fails if the response is not received within timeout window.
-static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = System::Clock::Seconds16(10);
+static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = System::Clock::Seconds16(30);
 
 CASESession::CASESession()
 {
