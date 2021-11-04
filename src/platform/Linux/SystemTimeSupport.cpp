@@ -40,11 +40,6 @@ namespace Internal {
 ClockImpl gClockImpl;
 } // namespace Internal
 
-Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
-{
-    return std::chrono::duration_cast<Microseconds64>(std::chrono::steady_clock::now().time_since_epoch());
-}
-
 Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
     return std::chrono::duration_cast<Milliseconds64>(std::chrono::steady_clock::now().time_since_epoch());

@@ -90,11 +90,6 @@ uint64_t FreeRTOSTicksSinceBoot(void)
     return static_cast<uint64_t>(timeOut.xTimeOnEntering) + (static_cast<uint64_t>(timeOut.xOverflowCount) << kTicksOverflowShift);
 }
 
-Clock::Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
-{
-    return Clock::Microseconds64((FreeRTOSTicksSinceBoot() * kMicrosecondsPerSecond) / configTICK_RATE_HZ);
-}
-
 Clock::Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
     return Clock::Milliseconds64((FreeRTOSTicksSinceBoot() * kMillisecondsPerSecond) / configTICK_RATE_HZ);

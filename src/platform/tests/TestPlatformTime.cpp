@@ -42,42 +42,10 @@ using namespace chip::System;
 using namespace chip::System::Clock::Literals;
 
 constexpr Clock::Milliseconds64 kTestTimeMarginMs = 2_ms64;
-constexpr Clock::Microseconds64 kTestTimeMarginUs = 500_us64;
 
 // =================================
 //      Unit tests
 // =================================
-
-static void TestDevice_GetMonotonicMicroseconds(nlTestSuite * inSuite, void * inContext)
-{
-    static const Clock::Microseconds64 kTestVectorSystemTimeUs[] = {
-        600_us64,
-        900_us64,
-        1500_us64,
-    };
-    int numOfTestsRan                      = 0;
-    constexpr Clock::Microseconds64 margin = kTestTimeMarginUs;
-
-    for (const Clock::Microseconds64 & Tdelay : kTestVectorSystemTimeUs)
-    {
-        const Clock::Microseconds64 Tstart = System::SystemClock().GetMonotonicMicroseconds64();
-
-        chip::test_utils::SleepMicros(Tdelay.count());
-
-        const Clock::Microseconds64 Tend   = System::SystemClock().GetMonotonicMicroseconds64();
-        const Clock::Microseconds64 Tdelta = Tend - Tstart;
-
-        ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart.count(),
-                        Tend.count(), Tdelta.count(), Tdelay.count());
-
-        // verify that timers don't fire early
-        NL_TEST_ASSERT(inSuite, Tdelta > (Tdelay - margin));
-        // verify they're not too late
-        //        NL_TEST_ASSERT(inSuite, Tdelta < (Tdelay + margin));
-        numOfTestsRan++;
-    }
-    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
-}
 
 static void TestDevice_GetMonotonicMilliseconds(nlTestSuite * inSuite, void * inContext)
 {
@@ -115,7 +83,6 @@ static void TestDevice_GetMonotonicMilliseconds(nlTestSuite * inSuite, void * in
  */
 static const nlTest sTests[] = {
 
-    NL_TEST_DEF("Test DeviceLayer::GetMonotonicMicroseconds", TestDevice_GetMonotonicMicroseconds),
     NL_TEST_DEF("Test DeviceLayer::GetMonotonicMilliseconds", TestDevice_GetMonotonicMilliseconds),
 
     NL_TEST_SENTINEL()
