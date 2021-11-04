@@ -57,7 +57,7 @@ public:
     CHECK_RETURN_VALUE
     SecureSession * CreateNewSecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric)
     {
-        return mEntries.CreateObject(localSessionId, peerNodeId, peerSessionId, fabric, mTimeSource.GetCurrentMonotonicTimeMs());
+        return mEntries.CreateObject(localSessionId, peerNodeId, peerSessionId, fabric, mTimeSource.GetMonotonicTimestamp());
     }
 
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
@@ -91,7 +91,7 @@ public:
     }
 
     /// Convenience method to mark a session as active
-    void MarkSessionActive(SecureSession * state) { state->SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs()); }
+    void MarkSessionActive(SecureSession * state) { state->SetLastActivityTime(mTimeSource.GetMonotonicTimestamp()); }
 
     /**
      * Iterates through all active sessions and expires any sessions with an idle time
@@ -100,11 +100,11 @@ public:
      * Expiring a session involves callback execution and then clearing the internal state.
      */
     template <typename Callback>
-    void ExpireInactiveSessions(uint64_t maxIdleTimeMs, Callback callback)
+    void ExpireInactiveSessions(System::Clock::Timestamp maxIdleTime, Callback callback)
     {
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        const System::Clock::Timestamp currentTime = mTimeSource.GetMonotonicTimestamp();
         mEntries.ForEachActiveObject([&](auto session) {
-            if (session->GetLastActivityTimeMs() + maxIdleTimeMs < currentTime)
+            if (session->GetLastActivityTime() + maxIdleTime < currentTime)
             {
                 callback(*session);
                 ReleaseSession(session);

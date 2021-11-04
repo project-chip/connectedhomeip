@@ -26,7 +26,7 @@ namespace Protocols {
 namespace UserDirectedCommissioning {
 
 // UDC client state times out after 1 hour. This may need to be tweaked.
-constexpr const uint64_t kUDCClientTimeoutMs = 60 * 60 * 1000;
+constexpr const System::Clock::Timestamp kUDCClientTimeout = System::Clock::Milliseconds64(60 * 60 * 1000);
 
 /**
  * Handles a set of UDC Client Processing States.
@@ -54,7 +54,7 @@ public:
     CHECK_RETURN_VALUE
     CHIP_ERROR CreateNewUDCClientState(const char * instanceName, UDCClientState ** state)
     {
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        const System::Clock::Timestamp currentTime = mTimeSource.GetMonotonicTimestamp();
 
         CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
@@ -68,7 +68,7 @@ public:
             if (!stateiter.IsInitialized(currentTime))
             {
                 stateiter.SetInstanceName(instanceName);
-                stateiter.SetExpirationTimeMs(currentTime + kUDCClientTimeoutMs);
+                stateiter.SetExpirationTime(currentTime + kUDCClientTimeout);
                 stateiter.SetUDCClientProcessingState(UDCClientProcessingState::kDiscoveringNode);
 
                 if (state)
@@ -99,8 +99,8 @@ public:
             return nullptr;
         }
 
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
-        UDCClientState state       = mStates[index];
+        const System::Clock::Timestamp currentTime = mTimeSource.GetMonotonicTimestamp();
+        UDCClientState state                       = mStates[index];
         if (!state.IsInitialized(currentTime))
         {
             return nullptr;
@@ -118,7 +118,7 @@ public:
     CHECK_RETURN_VALUE
     UDCClientState * FindUDCClientState(const PeerAddress & address)
     {
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        const System::Clock::Timestamp currentTime = mTimeSource.GetMonotonicTimestamp();
 
         UDCClientState * state = nullptr;
 
@@ -147,7 +147,7 @@ public:
     CHECK_RETURN_VALUE
     UDCClientState * FindUDCClientState(const char * instanceName)
     {
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        const System::Clock::Timestamp currentTime = mTimeSource.GetMonotonicTimestamp();
 
         UDCClientState * state = nullptr;
 
@@ -180,7 +180,7 @@ public:
     /// Convenience method to mark a UDC Client state as active (non-expired)
     void MarkUDCClientActive(UDCClientState * state)
     {
-        state->SetExpirationTimeMs(mTimeSource.GetCurrentMonotonicTimeMs() + kUDCClientTimeoutMs);
+        state->SetExpirationTime(mTimeSource.GetMonotonicTimestamp() + kUDCClientTimeout);
     }
 
 private:
