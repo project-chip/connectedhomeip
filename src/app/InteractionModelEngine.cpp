@@ -510,14 +510,14 @@ bool InteractionModelEngine::MergeOverlappedAttributePath(ClusterInfo * apAttrib
         // If overlapped, we would skip this target path,
         // --If targetPath is part of previous path, return true
         // --If previous path is part of target path, update filedid and listindex and mflags with target path, return true
-        if (runner->IsAttributePathSupersetOf(aAttributePath))
+        if (runner->IsAttributePathIBsupersetOf(aAttributePath))
         {
             return true;
         }
-        if (aAttributePath.IsAttributePathSupersetOf(*runner))
+        if (aAttributePath.IsAttributePathIBsupersetOf(*runner))
         {
-            runner->mListIndex = aAttributePath.mListIndex;
-            runner->mFieldId   = aAttributePath.mFieldId;
+            runner->mListIndex   = aAttributePath.mListIndex;
+            runner->mAttributeId = aAttributePath.mAttributeId;
             return true;
         }
         runner = runner->mpNext;
@@ -534,8 +534,8 @@ bool InteractionModelEngine::IsOverlappedAttributePath(ClusterInfo & aAttributeP
             for (auto clusterInfo = handler.GetAttributeClusterInfolist(); clusterInfo != nullptr;
                  clusterInfo      = clusterInfo->mpNext)
             {
-                if (clusterInfo->IsAttributePathSupersetOf(aAttributePath) ||
-                    aAttributePath.IsAttributePathSupersetOf(*clusterInfo))
+                if (clusterInfo->IsAttributePathIBsupersetOf(aAttributePath) ||
+                    aAttributePath.IsAttributePathIBsupersetOf(*clusterInfo))
                 {
                     return true;
                 }

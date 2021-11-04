@@ -1,7 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,17 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines AttributeDataVersionList parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
 
-#include "ArrayBuilder.h"
-#include "ArrayParser.h"
 #include "AttributeDataIB.h"
+#include "AttributeStatusIB.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -36,8 +31,14 @@
 
 namespace chip {
 namespace app {
-namespace AttributeDataVersionList {
-class Parser : public ArrayParser
+namespace AttributeReportIB {
+enum class Tag : uint8_t
+{
+    kAttributeStatus = 0,
+    kAttributeData   = 1,
+};
+
+class Parser : public StructParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -58,57 +59,56 @@ public:
 #endif
 
     /**
-     *  @brief Check if this element is valid
+     *  @brief Get a TLVReader for the StatusIB. Next() must be called before accessing them.
      *
-     *  @return A Boolean
-     */
-    bool IsElementValid(void);
-
-    /**
-     *  @brief Check if this element is NULL
-     *
-     *  @return A Boolean
-     */
-    bool IsNull(void);
-
-    /**
-     *  @brief Get a value for the DataVersion. Next() must be called before accessing them.
-     *
-     *  @param [in] apVersion    A pointer to apVersion
+     *  @param [in] apAttributeStatus    A pointer to apAttributeStatus
      *
      *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     *          # CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a structure
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetVersion(chip::DataVersion * const apVersion);
+    CHIP_ERROR GetAttributeStatus(AttributeStatusIB::Parser * const apAttributeStatus) const;
+
+    /**
+     *  @brief Get a TLVReader for the AttributeDataIB. Next() must be called before accessing them.
+     *
+     *  @param [in] apAttributeData    A pointer to apAttributeData
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a AttributeData
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetAttributeData(AttributeDataIB::Parser * const apAttributeData) const;
 };
 
-class Builder : public ArrayBuilder
+class Builder : public StructBuilder
 {
 public:
     /**
-     *  @brief Add version in AttributeDataVersionList
+     *  @brief Initialize a AttributeDataIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataVersionList::Builder
+     *  @return A reference to AttributeDataIB::Builder
      */
-    AttributeDataVersionList::Builder & AddVersion(const uint64_t aVersion);
+    AttributeDataIB::Builder & CreateAttributeData();
 
     /**
-     *  @brief Add Null in version list
+     *  @brief Initialize a StatusIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to *this
+     *  @return A reference to StatusIB::Builder
      */
-    AttributeDataVersionList::Builder & AddNull(void);
+    AttributeStatusIB::Builder & CreateAttributeStatus();
+
     /**
-     *  @brief Mark the end of this AttributeDataVersionList
+     *  @brief Mark the end of this AttributeReportIB
      *
      *  @return A reference to *this
      */
-    AttributeDataVersionList::Builder & EndOfAttributeDataVersionList();
+    AttributeReportIB::Builder & EndOfAttributeReportIB();
 
 private:
-    AttributeDataIB::Builder mAttributeDataIBBuilder;
+    AttributeStatusIB::Builder mAttributeStatus;
+    AttributeDataIB::Builder mAttributeData;
 };
-}; // namespace AttributeDataVersionList
-}; // namespace app
-}; // namespace chip
+} // namespace AttributeReportIB
+} // namespace app
+} // namespace chip

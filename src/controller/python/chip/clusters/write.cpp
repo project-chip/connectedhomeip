@@ -125,11 +125,12 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
 
             SuccessOrExit(err = client->PrepareAttribute(
                               chip::app::AttributePathParams(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId)));
-            VerifyOrExit((writer = client->GetAttributeDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrExit((writer = client->GetAttributeDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
             reader.Init(tlvBuffer, static_cast<uint32_t>(length));
             reader.Next();
-            SuccessOrExit(err = writer->CopyElement(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), reader));
+            SuccessOrExit(err = writer->CopyElement(
+                              chip::TLV::ContextTag(chip::to_underlying(chip::app::AttributeDataIB::Tag::kData)), reader));
 
             SuccessOrExit(err = client->FinishAttribute());
         }

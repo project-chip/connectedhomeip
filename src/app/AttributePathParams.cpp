@@ -36,7 +36,7 @@ CHIP_ERROR AttributePathParams::BuildAttributePath(AttributePathIB::Builder & aB
 
     if (!HasWildcardAttributeId())
     {
-        aBuilder.Attribute(mFieldId);
+        aBuilder.Attribute(mAttributeId);
     }
 
     if (!HasWildcardListIndex())

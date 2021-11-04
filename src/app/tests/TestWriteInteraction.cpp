@@ -49,7 +49,7 @@ public:
     static void TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext);
 
 private:
-    static void AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient);
+    static void AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient);
     static void AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler);
     static void GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
@@ -82,20 +82,20 @@ public:
     int mOnDoneCalled    = 0;
 };
 
-void TestWriteInteraction::AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient)
+void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
-    attributePathParams.mEndpointId = 2;
-    attributePathParams.mClusterId  = 3;
-    attributePathParams.mFieldId    = 4;
+    attributePathParams.mEndpointId  = 2;
+    attributePathParams.mClusterId   = 3;
+    attributePathParams.mAttributeId = 4;
 
     err = aWriteClient->PrepareAttribute(attributePathParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    chip::TLV::TLVWriter * writer = aWriteClient->GetAttributeDataElementTLVWriter();
+    chip::TLV::TLVWriter * writer = aWriteClient->GetAttributeDataIBTLVWriter();
 
-    err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true);
+    err = writer->PutBoolean(chip::TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), true);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = aWriteClient->FinishAttribute();
@@ -106,9 +106,9 @@ void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apCo
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
-    attributePathParams.mEndpointId = 2;
-    attributePathParams.mClusterId  = 3;
-    attributePathParams.mFieldId    = 4;
+    attributePathParams.mEndpointId  = 2;
+    attributePathParams.mClusterId   = 3;
+    attributePathParams.mAttributeId = 4;
 
     err = aWriteHandler.AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -123,12 +123,12 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     WriteRequestMessage::Builder writeRequestBuilder;
     err = writeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    AttributeDataList::Builder attributeDataListBuilder = writeRequestBuilder.CreateAttributeDataListBuilder();
-    NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
-    AttributeDataElement::Builder attributeDataElementBuilder = attributeDataListBuilder.CreateAttributeDataElementBuilder();
-    NL_TEST_ASSERT(apSuite, attributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
+    AttributeDataIBs::Builder attributeDataIBsBuilder = writeRequestBuilder.CreateAttributeDataIBsBuilder();
+    NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    AttributeDataIB::Builder attributeDataIBBuilder = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
+    NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder attributePathBuilder = attributeDataElementBuilder.CreateAttributePath();
+    AttributePathIB::Builder attributePathBuilder = attributeDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
     attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
@@ -136,10 +136,10 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
 
     // Construct attribute data
     {
-        chip::TLV::TLVWriter * pWriter = attributeDataElementBuilder.GetWriter();
+        chip::TLV::TLVWriter * pWriter = attributeDataIBBuilder.GetWriter();
         chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
-        err = pWriter->StartContainer(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure,
-                                      dummyType);
+        err                            = pWriter->StartContainer(chip::TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
+                                      chip::TLV::kTLVType_Structure, dummyType);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
@@ -149,12 +149,11 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 
-    attributeDataElementBuilder.DataVersion(0);
-    attributeDataElementBuilder.EndOfAttributeDataElement();
-    NL_TEST_ASSERT(apSuite, attributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
+    attributeDataIBBuilder.DataVersion(0).EndOfAttributeDataIB();
+    NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributeDataListBuilder.EndOfAttributeDataList();
-    NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
+    attributeDataIBsBuilder.EndOfAttributeDataIBs();
+    NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
     writeRequestBuilder.EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
@@ -216,7 +215,7 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
     TestWriteClientCallback callback;
     err = writeClient.Init(&ctx.GetExchangeManager(), &callback);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    AddAttributeDataElement(apSuite, apContext, writeClientHandle);
+    AddAttributeDataIB(apSuite, apContext, writeClientHandle);
 
     err = writeClientHandle.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -263,8 +262,9 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     writer.Init(attributeDataTLV);
     writer.CopyElement(TLV::AnonymousTag, aReader);
     attributeDataTLVLen = writer.GetLengthWritten();
-    return aWriteHandler->AddStatus(AttributePathParams(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId),
-                                    Protocols::InteractionModel::Status::Success);
+    return aWriteHandler->AddStatus(
+        AttributePathParams(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId),
+        Protocols::InteractionModel::Status::Success);
 }
 
 void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext)
@@ -289,9 +289,9 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     AttributePathParams attributePathParams;
-    attributePathParams.mEndpointId = 2;
-    attributePathParams.mClusterId  = 3;
-    attributePathParams.mFieldId    = 4;
+    attributePathParams.mEndpointId  = 2;
+    attributePathParams.mClusterId   = 3;
+    attributePathParams.mAttributeId = 4;
 
     const uint8_t byteSpanData[] = { 0xde, 0xad, 0xbe, 0xef };
     const char charSpanData[]    = "a simple test string";
@@ -355,7 +355,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    AddAttributeDataElement(apSuite, apContext, writeClient);
+    AddAttributeDataIB(apSuite, apContext, writeClient);
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
 

@@ -107,20 +107,20 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)
+CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    while (CHIP_NO_ERROR == (err = aAttributeDataListReader.Next()))
+    while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
     {
         chip::TLV::TLVReader dataReader;
-        AttributeDataElement::Parser element;
+        AttributeDataIB::Parser element;
         AttributePathIB::Parser attributePath;
         ClusterInfo clusterInfo;
-        TLV::TLVReader reader = aAttributeDataListReader;
+        TLV::TLVReader reader = aAttributeDataIBsReader;
         err                   = element.Init(reader);
         SuccessOrExit(err);
 
-        err = element.GetAttributePath(&attributePath);
+        err = element.GetPath(&attributePath);
         SuccessOrExit(err);
 
         // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
@@ -138,7 +138,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
         err = attributePath.GetCluster(&(clusterInfo.mClusterId));
         SuccessOrExit(err);
 
-        err = attributePath.GetAttribute(&(clusterInfo.mFieldId));
+        err = attributePath.GetAttribute(&(clusterInfo.mAttributeId));
         SuccessOrExit(err);
 
         err = attributePath.GetListIndex(&(clusterInfo.mListIndex));
@@ -156,7 +156,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
 
         {
             const ConcreteAttributePath concretePath =
-                ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mFieldId);
+                ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
             MatterPreAttributeWriteCallback(concretePath);
             err = WriteSingleClusterData(clusterInfo, dataReader, this);
             MatterPostAttributeWriteCallback(concretePath);
@@ -179,8 +179,8 @@ CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayl
     System::PacketBufferTLVReader reader;
 
     WriteRequestMessage::Parser writeRequestParser;
-    AttributeDataList::Parser attributeDataListParser;
-    TLV::TLVReader attributeDataListReader;
+    AttributeDataIBs::Parser AttributeDataIBsParser;
+    TLV::TLVReader AttributeDataIBsReader;
     bool needSuppressResponse = false;
 
     reader.Init(std::move(aPayload));
@@ -202,10 +202,10 @@ CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayl
     }
     SuccessOrExit(err);
 
-    err = writeRequestParser.GetAttributeDataList(&attributeDataListParser);
+    err = writeRequestParser.GetAttributeReportIBs(&AttributeDataIBsParser);
     SuccessOrExit(err);
-    attributeDataListParser.GetReader(&attributeDataListReader);
-    err = ProcessAttributeDataList(attributeDataListReader);
+    AttributeDataIBsParser.GetReader(&AttributeDataIBsReader);
+    err = ProcessAttributeDataIBs(AttributeDataIBsReader);
 
 exit:
     return err;
