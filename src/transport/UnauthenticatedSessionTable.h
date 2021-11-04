@@ -47,7 +47,7 @@ public:
 class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
-    UnauthenticatedSession(const PeerAddress & address) : mPeerAddress(address) { mLocalMessageCounter.Init(); }
+    UnauthenticatedSession(const PeerAddress & address) : mPeerAddress(address) {}
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession & operator=(const UnauthenticatedSession &) = delete;
@@ -59,14 +59,12 @@ public:
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
-    MessageCounter & GetLocalMessageCounter() { return mLocalMessageCounter; }
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
     uint64_t mLastActivityTimeMs = 0;
 
     const PeerAddress mPeerAddress;
-    GlobalUnencryptedMessageCounter mLocalMessageCounter;
     PeerMessageCounter mPeerMessageCounter;
 };
 
@@ -175,6 +173,21 @@ private:
         return result;
     }
 
+    // A temporary solution for #11120
+    // Enforce interface match if not null
+    static bool MatchInterface(Inet::InterfaceId i1, Inet::InterfaceId i2)
+    {
+        if (i1.IsPresent() && i2.IsPresent())
+        {
+            return i1 == i2;
+        }
+        else
+        {
+            // One of the interfaces is null.
+            return true;
+        }
+    }
+
     static bool MatchPeerAddress(const PeerAddress & a1, const PeerAddress & a2)
     {
         if (a1.GetTransportType() != a2.GetTransportType())
@@ -188,7 +201,9 @@ private:
         case Transport::Type::kTcp:
             return a1.GetIPAddress() == a2.GetIPAddress() && a1.GetPort() == a2.GetPort() &&
                 // Enforce interface equal-ness if the address is link-local, otherwise ignore interface
-                (a1.GetIPAddress().IsIPv6LinkLocal() ? a1.GetInterface() == a2.GetInterface() : true);
+                // Use MatchInterface for a temporary solution for #11120
+                (a1.GetIPAddress().IsIPv6LinkLocal() ? a1.GetInterface() == a2.GetInterface()
+                                                     : MatchInterface(a1.GetInterface(), a2.GetInterface()));
         case Transport::Type::kBle:
             // TODO: complete BLE address comparation
             return true;

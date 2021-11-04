@@ -92,7 +92,6 @@ if (chip_device_platform != "none") {
     chip_device_config_enable_dnssd = chip_mdns != "none"
     chip_stack_lock_tracking_log = chip_stack_lock_tracking != "none"
     chip_stack_lock_tracking_fatal = chip_stack_lock_tracking == "fatal"
-
     defines = [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
@@ -285,8 +284,8 @@ if (chip_device_platform != "none") {
       "GeneralUtils.cpp",
       "Globals.cpp",
       "LockTracker.cpp",
+      "LwIPEventSupport.cpp",
       "PersistedStorage.cpp",
-      "PlatformEventSupport.cpp",
       "TestIdentity.cpp",
     ]
 

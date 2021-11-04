@@ -58,15 +58,18 @@ class {{filename}}: public TestCommand
 
     {{#chip_tests_items}}
     {{#unless (isTestOnlyCluster cluster)}}
+    {{#unless isWait}}
     {{#unless isCommand}}
     chip::Callback::Callback<void (*) ({{>failureArguments}})> {{>failureCallback}} { {{>failureResponse}}, this };
     chip::Callback::Callback<void (*) ({{>successArguments}})> {{>successCallback}} { {{>successResponse}}, this };
+    {{/unless}}
     {{/unless}}
     {{/unless}}
     {{/chip_tests_items}}
 
     {{#chip_tests_items}}
     {{#unless (isTestOnlyCluster cluster)}}
+    {{#unless isWait}}
     {{#unless isCommand}}
     static void {{>failureResponse}}({{> failureArguments}})
     {
@@ -85,6 +88,7 @@ class {{filename}}: public TestCommand
 
     {{/unless}}
     {{/unless}}
+    {{/unless}}
     {{/chip_tests_items}}
 
     //
@@ -97,6 +101,16 @@ class {{filename}}: public TestCommand
     CHIP_ERROR {{>testCommand}}()
     {
         return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{#if (isString type)}}"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
+    }
+    {{else if isWait}}
+    CHIP_ERROR {{>testCommand}}()
+    {
+      ChipLogError(chipTool, "[Endpoint: {{endpoint}} Cluster: {{cluster}} {{#if isAttribute}}Attribute: {{attribute}}{{else}}Command: {{wait}}{{/if}}] {{label}}");
+      {{#*inline "waitForTypeName"}}{{#if isAttribute}}Attribute{{else}}Command{{/if}}{{/inline}}
+      {{#*inline "waitForTypeId"}}chip::app::Clusters::{{asUpperCamelCase cluster}}::{{#if isAttribute}}Attributes::{{attribute}}{{else}}Commands::{{wait}}{{/if}}::Id{{/inline}}
+      ClearAttributeAndCommandPaths();
+      m{{>waitForTypeName}}Path = chip::app::Concrete{{>waitForTypeName}}Path({{endpoint}}, chip::app::Clusters::{{asUpperCamelCase cluster}}::Id, {{>waitForTypeId}});
+      return CHIP_NO_ERROR;
     }
     {{else}}
     {{#*inline "failureResponse"}}OnFailureResponse_{{index}}{{/inline}}

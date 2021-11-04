@@ -12,6 +12,7 @@ android-x86-chip-tool
 efr32-brd4161a-light
 efr32-brd4161a-light-rpc
 efr32-brd4161a-lock
+efr32-brd4161a-unit-test
 efr32-brd4161a-window-covering
 esp32-c3devkit-all-clusters
 esp32-devkitc-all-clusters
@@ -24,6 +25,7 @@ esp32-m5stack-all-clusters
 esp32-m5stack-all-clusters-ipv6only
 esp32-m5stack-all-clusters-rpc
 esp32-m5stack-all-clusters-rpc-ipv6only
+infineon-p6-all-clusters
 infineon-p6-lock
 mbed-CY8CPROTO_062_4343W-all-clusters-debug (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
 mbed-CY8CPROTO_062_4343W-all-clusters-develop (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)

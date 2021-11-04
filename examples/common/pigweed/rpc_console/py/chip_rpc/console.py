@@ -51,6 +51,7 @@ from pw_console.__main__ import create_temp_log_file
 from pw_hdlc.rpc import HdlcRpcClient, default_channels
 
 # Protos
+from attributes_service import attributes_service_pb2
 from button_service import button_service_pb2
 from device_service import device_service_pb2
 from lighting_service import lighting_service_pb2
@@ -66,6 +67,7 @@ SOCKET_SERVER = 'localhost'
 SOCKET_PORT = 33000
 
 PROTOS = [button_service_pb2,
+          attributes_service_pb2,
           lighting_service_pb2,
           locking_service_pb2,
           wifi_service_pb2,

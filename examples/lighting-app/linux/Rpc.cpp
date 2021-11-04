@@ -18,6 +18,7 @@
 
 #include "pw_rpc/server.h"
 #include "pw_rpc_system_server/rpc_server.h"
+#include "rpc_services/Attributes.h"
 #include "rpc_services/Button.h"
 #include "rpc_services/Device.h"
 #include "rpc_services/Lighting.h"
@@ -29,12 +30,14 @@ namespace rpc {
 
 namespace {
 
+chip::rpc::Attributes attribute_service;
 chip::rpc::Button button_service;
 chip::rpc::Lighting lighting_service;
 chip::rpc::Device device_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
+    server.RegisterService(attribute_service);
     server.RegisterService(lighting_service);
     server.RegisterService(button_service);
     server.RegisterService(device_service);

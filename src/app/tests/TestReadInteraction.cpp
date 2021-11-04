@@ -24,7 +24,7 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/EventDataElement.h>
+#include <app/MessageDef/EventDataIB.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -156,25 +156,27 @@ void GenerateSubscribeResponse(nlTestSuite * apSuite, void * apContext, chip::Sy
 class MockInteractionModelApp : public chip::app::ReadClient::Callback, public chip::app::InteractionModelDelegate
 {
 public:
-    void OnEventData(const chip::app::ReadClient * apReadClient, chip::TLV::TLVReader & apEventListReader) override
+    void OnEventData(const chip::app::ReadClient * apReadClient, chip::TLV::TLVReader & apEventReportsReader) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         chip::TLV::TLVReader reader;
         int numDataElementIndex = 0;
-        reader.Init(apEventListReader);
+        reader.Init(apEventReportsReader);
         while (CHIP_NO_ERROR == (err = reader.Next()))
         {
             uint8_t priorityLevel = 0;
-            chip::app::EventDataElement::Parser event;
-            VerifyOrReturn(event.Init(reader) == CHIP_NO_ERROR);
-            VerifyOrReturn(event.GetPriorityLevel(&priorityLevel) == CHIP_NO_ERROR);
+            chip::app::EventReportIB::Parser eventReport;
+            chip::app::EventDataIB::Parser eventData;
+            VerifyOrReturn(eventReport.Init(reader) == CHIP_NO_ERROR);
+            VerifyOrReturn(eventReport.GetEventData(&eventData) == CHIP_NO_ERROR);
+            VerifyOrReturn(eventData.GetPriority(&priorityLevel) == CHIP_NO_ERROR);
             if (numDataElementIndex == 0)
             {
-                VerifyOrReturn(priorityLevel == static_cast<uint8_t>(chip::app::PriorityLevel::Critical));
+                VerifyOrReturn(priorityLevel == chip::to_underlying(chip::app::PriorityLevel::Critical));
             }
             else if (numDataElementIndex == 1)
             {
-                VerifyOrReturn(priorityLevel == static_cast<uint8_t>(chip::app::PriorityLevel::Info));
+                VerifyOrReturn(priorityLevel == chip::to_underlying(chip::app::PriorityLevel::Info));
             }
             ++numDataElementIndex;
         }
@@ -904,34 +906,28 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     chip::app::ClusterInfo dirtyPath1;
     dirtyPath1.mClusterId  = kTestClusterId;
     dirtyPath1.mEndpointId = kTestEndpointId;
-    dirtyPath1.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath1.mFieldId = 1;
+    dirtyPath1.mFieldId    = 1;
 
     chip::app::ClusterInfo dirtyPath2;
     dirtyPath2.mClusterId  = kTestClusterId;
     dirtyPath2.mEndpointId = kTestEndpointId;
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath2.mFieldId = 2;
+    dirtyPath2.mFieldId    = 2;
 
     chip::app::ClusterInfo dirtyPath3;
-    dirtyPath2.mClusterId  = kTestClusterId;
-    dirtyPath2.mEndpointId = kTestEndpointId;
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kListIndexValid);
-    dirtyPath2.mFieldId   = 2;
-    dirtyPath2.mListIndex = 1;
+    dirtyPath3.mClusterId  = kTestClusterId;
+    dirtyPath3.mEndpointId = kTestEndpointId;
+    dirtyPath3.mFieldId    = 2;
+    dirtyPath3.mListIndex  = 1;
 
     chip::app::ClusterInfo dirtyPath4;
     dirtyPath4.mClusterId  = kTestClusterId;
     dirtyPath4.mEndpointId = kTestEndpointId;
-    dirtyPath4.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath4.mFieldId = 3;
+    dirtyPath4.mFieldId    = 3;
 
     chip::app::ClusterInfo dirtyPath5;
     dirtyPath5.mClusterId  = kTestClusterId;
     dirtyPath5.mEndpointId = kTestEndpointId;
-    dirtyPath5.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath5.mFieldId = 4;
+    dirtyPath5.mFieldId    = 4;
 
     // Test report with 2 different path
     delegate.mpReadHandler->mHoldReport = false;

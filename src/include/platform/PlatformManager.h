@@ -25,8 +25,11 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
-#include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <system/LwIPEventSupport.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
 
@@ -390,8 +393,10 @@ inline CHIP_ERROR PlatformManager::StopEventLoopTask()
  */
 inline CHIP_ERROR PlatformManager::Shutdown()
 {
-    mInitialized = false;
-    return static_cast<ImplClass *>(this)->_Shutdown();
+    CHIP_ERROR err = static_cast<ImplClass *>(this)->_Shutdown();
+    if (err == CHIP_NO_ERROR)
+        mInitialized = false;
+    return err;
 }
 
 inline void PlatformManager::LockChipStack()

@@ -43,7 +43,6 @@ efr32_sdk("sdk") {
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
   defines = [

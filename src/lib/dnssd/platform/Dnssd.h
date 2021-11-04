@@ -66,7 +66,8 @@ struct DnssdService
     char mHostName[kHostNameMaxLength + 1] = "";
     char mType[kDnssdTypeMaxSize + 1];
     DnssdServiceProtocol mProtocol;
-    Inet::IPAddressType mAddressType;
+    Inet::IPAddressType mAddressType;   // Address record type to query or publish (A or AAAA)
+    Inet::IPAddressType mTransportType; // Transport to use for the query.
     uint16_t mPort;
     chip::Inet::InterfaceId mInterface;
     TextEntry * mTextEntries;

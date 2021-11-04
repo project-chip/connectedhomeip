@@ -21,6 +21,7 @@
 #include <app/MessageDef/EventPathIB.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <app/util/MatterCallbacks.h>
 #include <lib/support/TypeTraits.h>
 
 namespace chip {
@@ -122,8 +123,14 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
         err = element.GetAttributePath(&attributePath);
         SuccessOrExit(err);
 
+        // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
+        // cluster info will be invalid / wildcard, it is safe ignore CHIP_END_OF_TLV directly.
+
         err = attributePath.GetNodeId(&(clusterInfo.mNodeId));
-        SuccessOrExit(err);
+        if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
+        }
 
         err = attributePath.GetEndpointId(&(clusterInfo.mEndpointId));
         SuccessOrExit(err);
@@ -132,26 +139,28 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
         SuccessOrExit(err);
 
         err = attributePath.GetFieldId(&(clusterInfo.mFieldId));
-        if (CHIP_NO_ERROR == err)
-        {
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
-        }
-        else if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
         SuccessOrExit(err);
 
         err = attributePath.GetListIndex(&(clusterInfo.mListIndex));
-        if (CHIP_NO_ERROR == err)
+        if (CHIP_END_OF_TLV == err)
         {
-            VerifyOrExit(clusterInfo.mFlags.Has(ClusterInfo::Flags::kFieldIdValid), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kListIndexValid);
+            err = CHIP_NO_ERROR;
         }
+
+        // We do not support Wildcard writes for now, reject all wildcard write requests.
+        VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasWildcard(),
+                     err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
-        err = WriteSingleClusterData(clusterInfo, dataReader, this);
+
+        {
+            const ConcreteAttributePath concretePath =
+                ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mFieldId);
+            MatterPreAttributeWriteCallback(concretePath);
+            err = WriteSingleClusterData(clusterInfo, dataReader, this);
+            MatterPostAttributeWriteCallback(concretePath);
+        }
         SuccessOrExit(err);
     }
 
@@ -286,3 +295,6 @@ void WriteHandler::ClearState()
 
 } // namespace app
 } // namespace chip
+
+void __attribute__((weak)) MatterPreAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+void __attribute__((weak)) MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}

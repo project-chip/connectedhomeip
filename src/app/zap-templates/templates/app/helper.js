@@ -367,7 +367,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
   }
 
-  let promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  let typeStr = await templateUtil.ensureZclPackageId(this).then(fn.bind(this));
   if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
     passByReference = true;
     // If we did not have a namespace provided, we can assume we're inside
@@ -375,13 +375,13 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     let listNamespace = options.hash.ns ? "chip::app::" : ""
     if (isDecodable)
     {
-      promise = promise.then(typeStr => `${listNamespace}DataModel::DecodableList<${typeStr}>`);
+      typeStr = `${listNamespace}DataModel::DecodableList<${typeStr}>`;
     }
     else
     {
       // Use const ${typeStr} so that consumers don't have to create non-const
       // data to encode.
-      promise = promise.then(typeStr => `${listNamespace}DataModel::List<const ${typeStr}>`);
+      typeStr = `${listNamespace}DataModel::List<const ${typeStr}>`;
     }
   }
   if (this.isNullable && !options.hash.forceNotNullable) {
@@ -389,19 +389,19 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     // If we did not have a namespace provided, we can assume we're inside
     // chip::app::.
     let ns  = options.hash.ns ? "chip::app::" : ""
-    promise = promise.then(typeStr => `${ns}DataModel::Nullable<${typeStr}>`);
+    typeStr = `${ns}DataModel::Nullable<${typeStr}>`;
   }
   if (this.isOptional && !options.hash.forceNotOptional) {
     passByReference = true;
     // If we did not have a namespace provided, we can assume we're inside
     // chip::.
     let ns  = options.hash.ns ? "chip::" : ""
-    promise = promise.then(typeStr => `${ns}Optional<${typeStr}>`);
+    typeStr = `${ns}Optional<${typeStr}>`;
   }
   if (options.hash.isArgument && passByReference) {
-    promise = promise.then(typeStr => `const ${typeStr} &`);
+    typeStr = `const ${typeStr} &`;
   }
-  return templateUtil.templatePromise(this.global, promise)
+  return templateUtil.templatePromise(this.global, Promise.resolve(typeStr))
 }
 
 function zapTypeToEncodableClusterObjectType(type, options)

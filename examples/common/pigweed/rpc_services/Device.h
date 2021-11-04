@@ -20,8 +20,11 @@
 
 #include <platform/CHIPDeviceConfig.h>
 
+#include "app/server/Server.h"
 #include "device_service/device_service.rpc.pb.h"
 #include "platform/ConfigurationManager.h"
+#include "platform/PlatformManager.h"
+#include "transport/FabricTable.h"
 
 namespace chip {
 namespace rpc {
@@ -48,12 +51,71 @@ public:
         return pw::Status::Unimplemented();
     }
 
+    virtual pw::Status GetDeviceState(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceState & response)
+    {
+        uint64_t time_since_boot_sec;
+        DeviceLayer::PlatformMgr().GetUpTime(time_since_boot_sec);
+        response.time_since_boot_millis = time_since_boot_sec * 1000;
+        size_t count                    = 0;
+        for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
+        {
+            if (count < ArraySize(response.fabric_info) && fabricInfo.IsInitialized())
+            {
+                response.fabric_info[count].fabric_id = fabricInfo.GetFabricId();
+                response.fabric_info[count].node_id   = fabricInfo.GetPeerId().GetNodeId();
+                count++;
+            }
+        }
+        response.fabric_info_count = count;
+        return pw::OkStatus();
+    }
+
     virtual pw::Status GetDeviceInfo(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
     {
-        response.vendor_id        = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
-        response.product_id       = CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID;
-        response.software_version = CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION;
-        snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
+        uint16_t vendor_id;
+        if (DeviceLayer::ConfigurationMgr().GetVendorId(vendor_id) == CHIP_NO_ERROR)
+        {
+            response.vendor_id = static_cast<uint32_t>(vendor_id);
+        }
+
+        uint16_t product_id;
+        if (DeviceLayer::ConfigurationMgr().GetProductId(product_id) == CHIP_NO_ERROR)
+        {
+            response.product_id = static_cast<uint32_t>(product_id);
+        }
+
+        uint16_t software_version;
+        if (DeviceLayer::ConfigurationMgr().GetFirmwareRevision(software_version) == CHIP_NO_ERROR)
+        {
+            response.software_version = software_version;
+        }
+
+        uint32_t code;
+        if (DeviceLayer::ConfigurationMgr().GetSetupPinCode(code) == CHIP_NO_ERROR)
+        {
+            response.pairing_info.code = code;
+            response.has_pairing_info  = true;
+        }
+
+        uint16_t discriminator;
+        if (DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator) == CHIP_NO_ERROR)
+        {
+            response.pairing_info.discriminator = static_cast<uint32_t>(discriminator);
+            response.has_pairing_info           = true;
+        }
+        size_t serial_size;
+        DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number), serial_size);
+
+        return pw::OkStatus();
+    }
+
+    virtual pw::Status SetPairingInfo(ServerContext &, const chip_rpc_PairingInfo & request, pw_protobuf_Empty & response)
+    {
+        if (DeviceLayer::ConfigurationMgr().StoreSetupPinCode(request.code) != CHIP_NO_ERROR ||
+            DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(request.discriminator) != CHIP_NO_ERROR)
+        {
+            return pw::Status::Unknown();
+        }
         return pw::OkStatus();
     }
 };

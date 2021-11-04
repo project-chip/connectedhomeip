@@ -1889,14 +1889,13 @@ static void OnOtaSoftwareUpdateProviderQueryImageResponseSuccess(
 {
     ChipLogProgress(Zcl, "Received QueryImageResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", data.status);
-    ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", data.delayedActionTime);
-    ChipLogProgress(Zcl, "  imageURI: %.*s", static_cast<int>(data.imageURI.size()), data.imageURI.data());
-    ChipLogProgress(Zcl, "  softwareVersion: %" PRIu32 "", data.softwareVersion);
-    ChipLogProgress(Zcl, "  softwareVersionString: %.*s", static_cast<int>(data.softwareVersionString.size()),
-                    data.softwareVersionString.data());
-    ChipLogProgress(Zcl, "  updateToken: %zu", data.updateToken.size());
-    ChipLogProgress(Zcl, "  userConsentNeeded: %d", data.userConsentNeeded);
-    ChipLogProgress(Zcl, "  metadataForRequestor: %zu", data.metadataForRequestor.size());
+    ChipLogProgress(Zcl, "  delayedActionTime: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  imageURI: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  softwareVersion: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  softwareVersionString: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  updateToken: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  userConsentNeeded: Optional printing is not implemented yet.");
+    ChipLogProgress(Zcl, "  metadataForRequestor: Optional printing is not implemented yet.");
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -14959,9 +14958,7 @@ public:
         AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
         AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId);
         AddArgument("SoftwareVersion", 0, UINT32_MAX, &mRequest.softwareVersion);
-        AddArgument(
-            "ProtocolsSupported", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<decltype(mRequest.protocolsSupported)> *>(&mRequest.protocolsSupported));
+        // protocolsSupported Array parsing is not supported yet
         AddArgument("HardwareVersion", 0, UINT16_MAX, &mRequest.hardwareVersion);
         AddArgument("Location", &mRequest.location);
         AddArgument("RequestorCanConsent", 0, 1, &mRequest.requestorCanConsent);
@@ -18992,6 +18989,8 @@ private:
 | Attributes:                                                         |        |
 | * NumberOfPositions                                                 | 0x0000 |
 | * CurrentPosition                                                   | 0x0001 |
+| * MultiPressMax                                                     | 0x0002 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -19107,6 +19106,74 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+};
+
+/*
+ * Attribute MultiPressMax
+ */
+class ReadSwitchMultiPressMax : public ModelCommand
+{
+public:
+    ReadSwitchMultiPressMax() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "multi-press-max");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSwitchMultiPressMax()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SwitchCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMultiPressMax(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadSwitchFeatureMap : public ModelCommand
+{
+public:
+    ReadSwitchFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSwitchFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SwitchCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -28250,6 +28317,8 @@ void registerClusterSwitch(Commands & commands)
         make_unique<ReadSwitchNumberOfPositions>(), //
         make_unique<ReadSwitchCurrentPosition>(),   //
         make_unique<ReportSwitchCurrentPosition>(), //
+        make_unique<ReadSwitchMultiPressMax>(),     //
+        make_unique<ReadSwitchFeatureMap>(),        //
         make_unique<ReadSwitchClusterRevision>(),   //
     };
 

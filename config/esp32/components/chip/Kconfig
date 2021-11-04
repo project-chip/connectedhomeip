@@ -431,9 +431,16 @@ menu "CHIP Device Layer"
 
     menu "WiFi Station Options"
 
+        config ENABLE_WIFI_STATION
+            bool "Enable CHIP WIFI STATION"
+            default y
+            help
+                Enables WiFi station for CHIP.
+
         config DEFAULT_WIFI_SSID
             string "Default WiFi SSID"
             default ""
+            depends on ENABLE_WIFI_STATION
             help
                 The SSID of network to connect to if no WiFi station configuration exists in NV storage
                 at the time the device boots.
@@ -443,6 +450,7 @@ menu "CHIP Device Layer"
         config DEFAULT_WIFI_PASSWORD
             string "Default WiFi Password"
             default ""
+            depends on ENABLE_WIFI_STATION
             help
                 The password for the default WiFi network.
 
@@ -452,6 +460,7 @@ menu "CHIP Device Layer"
             int "WiFi Station Interface Reconnect Interval (ms)"
             range 0 65535
             default 5000
+            depends on ENABLE_WIFI_STATION
             help
                 The interval at which the CHIP platform will attempt to reconnect to the configured WiFi network (in milliseconds).
 
@@ -459,6 +468,7 @@ menu "CHIP Device Layer"
             int "Max ScanNetworks Results"
             range 0 65535
             default 10
+            depends on ENABLE_WIFI_STATION
             help
                 The maximum number of networks to return as a result of a CHIP NetworkProvisioning:ScanNetworks request.
 
@@ -466,6 +476,7 @@ menu "CHIP Device Layer"
             int "WiFi Scan Completion Timeout (ms)"
             range 0 65535
             default 10000
+            depends on ENABLE_WIFI_STATION
             help
                 The amount of time (in milliseconds) after which the CHIP platform will timeout a WiFi scan
                 operation that hasn't completed.  A value of 0 will disable the timeout logic.
@@ -474,6 +485,7 @@ menu "CHIP Device Layer"
             int "WiFi Connectivity Timeout (ms)"
             range 0 65535
             default 30000
+            depends on ENABLE_WIFI_STATION
             help
                 The amount of time (in milliseconds) to wait for Internet connectivity to be established on
                 the device's WiFi station interface during a Network Provisioning TestConnectivity operation.
@@ -482,9 +494,16 @@ menu "CHIP Device Layer"
 
     menu "WiFi AP Options"
 
+        config ENABLE_WIFI_AP
+            bool "Enable CHIP WIFI AP"
+            default y
+            help
+                Enables WiFi AP for CHIP.
+
         config WIFI_AP_SSID_PREFIX
             string "WiFi AP SSID Prefix"
             default "MATTER-"
+            depends on ENABLE_WIFI_AP
             help
                 A prefix string used in forming the WiFi soft-AP SSID.  The remainder of the SSID
                 consists of the final two bytes of the device's primary WiFi MAC address in hex.
@@ -493,6 +512,7 @@ menu "CHIP Device Layer"
             int "WiFi AP Channel"
             range 1 14
             default 1
+            depends on ENABLE_WIFI_AP
             help
                 The WiFi channel number to be used by the soft-AP.
 
@@ -500,6 +520,7 @@ menu "CHIP Device Layer"
             int "WiFi AP Max Allowed Stations"
             range 1 10
             default 4
+            depends on ENABLE_WIFI_AP
             help
                 The maximum number of stations allowed to connect to the soft-AP.
 
@@ -507,6 +528,7 @@ menu "CHIP Device Layer"
             int "WiFi AP Beacon Interval (ms)"
             range 100 60000
             default 100
+            depends on ENABLE_WIFI_AP
             help
                 The beacon interval (in milliseconds) for the WiFi soft-AP.
 
@@ -514,6 +536,7 @@ menu "CHIP Device Layer"
             int "WiFi AP Idle Timeout (ms)"
             range 0 600000
             default 120000
+            depends on ENABLE_WIFI_AP
             help
                 The amount of time (in milliseconds) after which the CHIP platform will deactivate the soft-AP
                 if it has been idle.
