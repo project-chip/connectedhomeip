@@ -92,7 +92,19 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(val != kWiFiAPMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (mWiFiAPMode != val)
+    {
+        ChipLogDetail(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiStationMode), WiFiAPModeToStr(val));
+    }
+
+    mWiFiAPMode = val;
+
+exit:
+    return err;
 }
 
 // ==================== ConnectivityManager Platform Internal Methods ====================
