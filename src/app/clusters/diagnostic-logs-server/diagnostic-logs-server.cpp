@@ -31,5 +31,3 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(app::CommandHandler
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
-
-void MatterDiagnosticLogsPluginServerInitCallback() {}

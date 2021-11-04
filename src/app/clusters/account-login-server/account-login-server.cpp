@@ -79,5 +79,3 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
-
-void MatterAccountLoginPluginServerInitCallback() {}

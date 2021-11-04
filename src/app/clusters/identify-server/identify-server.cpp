@@ -331,5 +331,3 @@ Identify::~Identify()
 {
     unreg(this);
 }
-
-void MatterIdentifyPluginServerInitCallback() {}

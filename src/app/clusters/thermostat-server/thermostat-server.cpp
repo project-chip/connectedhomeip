@@ -774,5 +774,3 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
-
-void MatterThermostatPluginServerInitCallback() {}
