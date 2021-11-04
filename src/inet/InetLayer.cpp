@@ -87,9 +87,7 @@ namespace Inet {
  *  method must be called successfully prior to using the object.
  *
  */
-InetLayer::InetLayer()
-{
-}
+InetLayer::InetLayer() {}
 
 #if INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
 

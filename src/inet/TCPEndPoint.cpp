@@ -964,7 +964,7 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, 
 
     if (arg != NULL)
     {
-        TCPEndPoint * ep                 = static_cast<TCPEndPoint *>(arg);
+        TCPEndPoint * ep             = static_cast<TCPEndPoint *>(arg);
         System::Layer * lSystemLayer = ep->Layer().SystemLayer();
 
         if (lwipErr == ERR_OK)
@@ -1001,8 +1001,8 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
 
     if (arg != NULL)
     {
-        TCPEndPoint * listenEP           = static_cast<TCPEndPoint *>(arg);
-        TCPEndPoint * conEP              = NULL;
+        TCPEndPoint * listenEP       = static_cast<TCPEndPoint *>(arg);
+        TCPEndPoint * conEP          = NULL;
         System::Layer * lSystemLayer = listenEP->Layer().SystemLayer();
 
         // Tell LwIP we've accepted the connection so it can decrement the listen PCB's pending_accepts counter.
@@ -1066,7 +1066,8 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
         }
 
         // Otherwise, there was an error accepting the connection, so post a callback to the HandleError function.
-        else {
+        else
+        {
             listenEP->Retain();
             err = lSystemLayer->ScheduleLambda([listenEP, err] {
                 listenEP->HandleError(err);
@@ -1098,7 +1099,7 @@ err_t TCPEndPoint::LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, str
 
     if (arg != NULL)
     {
-        TCPEndPoint * ep                 = static_cast<TCPEndPoint *>(arg);
+        TCPEndPoint * ep             = static_cast<TCPEndPoint *>(arg);
         System::Layer * lSystemLayer = ep->Layer().SystemLayer();
 
         // Post callback to HandleDataReceived.
@@ -1128,7 +1129,7 @@ err_t TCPEndPoint::LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb, u16_t l
 
     if (arg != NULL)
     {
-        TCPEndPoint * ep                 = static_cast<TCPEndPoint *>(arg);
+        TCPEndPoint * ep             = static_cast<TCPEndPoint *>(arg);
         System::Layer * lSystemLayer = ep->Layer().SystemLayer();
 
         // Post callback to HandleDataReceived.

@@ -536,10 +536,10 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
 void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port)
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
-    UDPEndPoint * ep                 = static_cast<UDPEndPoint *>(arg);
-    System::Layer * lSystemLayer = ep->Layer().SystemLayer();
-    IPPacketInfo * pktInfo           = nullptr;
-    System::PacketBufferHandle buf   = System::PacketBufferHandle::Adopt(p);
+    UDPEndPoint * ep               = static_cast<UDPEndPoint *>(arg);
+    System::Layer * lSystemLayer   = ep->Layer().SystemLayer();
+    IPPacketInfo * pktInfo         = nullptr;
+    System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
     if (buf->HasChainedBuffer())
     {
         // Try the simple expedient of flattening in-place.

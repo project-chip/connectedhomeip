@@ -32,8 +32,8 @@
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/ReferenceCounted.h>
-#include <system/SystemPacketBuffer.h>
 #include <lib/support/Pool.h>
+#include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #include <dispatch/dispatch.h>
