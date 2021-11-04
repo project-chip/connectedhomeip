@@ -25,8 +25,8 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
-#include <system/SystemLayer.h>
 #include <system/PlatformEventSupport.h>
+#include <system/SystemLayer.h>
 
 namespace chip {
 
@@ -209,7 +209,7 @@ public:
 #endif
 
 private:
-    bool mInitialized = false;
+    bool mInitialized                   = false;
     PlatformManagerDelegate * mDelegate = nullptr;
     // ===== Members for internal use by the following friends.
 
