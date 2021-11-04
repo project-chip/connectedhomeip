@@ -55,5 +55,3 @@ bool emberAfAudioOutputClusterSelectOutputCallback(app::CommandHandler * command
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
-
-void MatterAudioOutputPluginServerInitCallback() {}

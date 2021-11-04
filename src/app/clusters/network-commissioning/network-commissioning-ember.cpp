@@ -117,5 +117,3 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(app::CommandHan
 {
     return false;
 }
-
-void MatterNetworkCommissioningPluginServerInitCallback() {}

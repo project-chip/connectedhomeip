@@ -548,5 +548,3 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
     }
     return true;
 }
-
-void MatterWindowCoveringPluginServerInitCallback() {}

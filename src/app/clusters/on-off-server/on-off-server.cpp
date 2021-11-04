@@ -286,5 +286,3 @@ static bool areStartUpOnOffServerAttributesTokenized(EndpointId endpoint)
 #endif
 
 void emberAfPluginOnOffClusterServerPostInitCallback(EndpointId endpoint) {}
-
-void MatterOnOffPluginServerInitCallback() {}
