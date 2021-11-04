@@ -69,7 +69,7 @@ Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeDataList
     CHIP_ERROR err = CHIP_NO_ERROR;
     ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId);
     AttributeDataElement::Builder attributeDataElementBuilder = aAttributeDataList.CreateAttributeDataElementBuilder();
-    AttributePathIB::Builder attributePathBuilder               = attributeDataElementBuilder.CreateAttributePath();
+    AttributePathIB::Builder attributePathBuilder             = attributeDataElementBuilder.CreateAttributePath();
     attributePathBuilder.Endpoint(aClusterInfo.mEndpointId)
         .Cluster(aClusterInfo.mClusterId)
         .Attribute(aClusterInfo.mFieldId)
