@@ -586,7 +586,7 @@ CHIP_ERROR InteractionModelEngine::RegisterCommandHandler(CommandHandlerInterfac
     return CHIP_NO_ERROR;
 }
 
-void InteractionModelEngine::DeregisterCommandHandlers(EndpointId endpointId)
+void InteractionModelEngine::UnregisterCommandHandlers(EndpointId endpointId)
 {
     CommandHandlerInterface * prev = nullptr;
 
@@ -610,7 +610,7 @@ void InteractionModelEngine::DeregisterCommandHandlers(EndpointId endpointId)
     }
 }
 
-CHIP_ERROR InteractionModelEngine::DeregisterCommandHandler(CommandHandlerInterface * handler)
+CHIP_ERROR InteractionModelEngine::UnregisterCommandHandler(CommandHandlerInterface * handler)
 {
     VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CommandHandlerInterface * prev = nullptr;

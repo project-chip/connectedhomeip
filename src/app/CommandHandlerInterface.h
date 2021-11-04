@@ -106,7 +106,7 @@ public:
 
     /**
      * Check whether another CommandHandlerInterface wants to handle the same set of
-     * attributes as we do.
+     * commands as we do.
      */
     bool Matches(const CommandHandlerInterface & aOther) const
     {
