@@ -123,3 +123,16 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+
+/**
+ *  @def CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+ *
+ *  @brief
+ *    Active retransmit interval, or time to wait before retransmission after
+ *    subsequent failures in milliseconds.
+ *
+ *  This is the default value, that might be adjusted by end device depending on its
+ *  needs (e.g. sleeping period) using Service Discovery TXT record CRA key.
+ *
+ */
+#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (2000)
