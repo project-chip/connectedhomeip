@@ -84,8 +84,8 @@ class ClusterDetailFragment : Fragment() {
 >>>>>>> d3d83a0bc (select different cluster, command will remove previous displayed parameter)
 =======
     clusterMap = ClusterInfoMapping().clusterMap
-    devicePtr = checkNotNull(requireArguments().getLong(DEVICE_PTR))
-    endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID))
+    devicePtr = checkNotNull(requireArguments().getLong(DEVICE_PTR_KEY))
+    endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID_KEY))
     return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
       deviceController.setCompletionListener(GenericChipDeviceListener())
       commandAutoCompleteTv.visibility = View.GONE
@@ -305,6 +305,7 @@ class ClusterDetailFragment : Fragment() {
 <<<<<<< HEAD
   private fun constructHint(clusterMap: Map<String, *>): Array<String> {
     return clusterMap.keys.toTypedArray()
+<<<<<<< HEAD
 =======
   private fun constructHint(clusterMap: HashMap<String, *>): Array<String> {
 =======
@@ -316,6 +317,8 @@ class ClusterDetailFragment : Fragment() {
     }
     return clusterName.toTypedArray()
 >>>>>>> d3d83a0bc (select different cluster, command will remove previous displayed parameter)
+=======
+>>>>>>> d419b4060 (resolve comments)
   }
 
   override fun onStop() {
@@ -325,6 +328,7 @@ class ClusterDetailFragment : Fragment() {
 
   companion object {
     private const val TAG = "ClusterDetailFragment"
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     private const val ENDPOINT_ID_KEY = "endpoint_id"
@@ -348,15 +352,25 @@ class ClusterDetailFragment : Fragment() {
 =======
     private const val ENDPOINT_ID = "endpoint_id"
     private const val DEVICE_PTR = "device_ptr"
+=======
+    private const val ENDPOINT_ID_KEY = "endpoint_id"
+    private const val DEVICE_PTR_KEY = "device_ptr"
+
+>>>>>>> d419b4060 (resolve comments)
     fun newInstance(
       deviceId: Long,
       endpointId: Int
     ): ClusterDetailFragment {
       return ClusterDetailFragment().apply {
         arguments = Bundle(2).apply {
+<<<<<<< HEAD
           putLong(DEVICE_PTR, deviceId)
           putInt(ENDPOINT_ID, endpointId)
 >>>>>>> cd1c99028 (resolve comments)
+=======
+          putLong(DEVICE_PTR_KEY, deviceId)
+          putInt(ENDPOINT_ID_KEY, endpointId)
+>>>>>>> d419b4060 (resolve comments)
         }
       }
     }
