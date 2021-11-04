@@ -15,11 +15,6 @@
  *    limitations under the License.
  */
 
-/****************************************************************************
- * @file
- * @brief Stub implementation for the Bridged Actions Cluster
- ***************************************************************************/
-
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -56,19 +51,19 @@ private:
 CHIP_ERROR BridgedActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     // Just return an empty list
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    return aEncoder.Encode(DataModel::List<BridgedActions::Structs::ActionStruct::Type>());
 }
 
 CHIP_ERROR BridgedActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     // Just return an empty list
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    return aEncoder.Encode(DataModel::List<BridgedActions::Structs::EndpointListStruct::Type>());
 }
 
 CHIP_ERROR BridgedActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    const char SetupUrl[] = "www.signify.com";
-    return aEncoder.Encode(chip::Span<const char>(SetupUrl, sizeof(SetupUrl)));
+    const char SetupUrl[] = "https://example.com";
+    return aEncoder.Encode(chip::Span<const char>(SetupUrl, strlen(SetupUrl)));
 }
 
 CHIP_ERROR BridgedActionsAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -84,21 +79,16 @@ CHIP_ERROR BridgedActionsAttrAccess::Read(const ConcreteAttributePath & aPath, A
 
     switch (aPath.mAttributeId)
     {
-    case ActionList::Id: {
+    case ActionList::Id:
         return ReadActionListAttribute(aPath.mEndpointId, aEncoder);
-    }
-    case EndpointList::Id: {
+    case EndpointList::Id:
         return ReadEndpointListAttribute(aPath.mEndpointId, aEncoder);
-    }
-    case SetupUrl::Id: {
+    case SetupUrl::Id:
         return ReadSetupUrlAttribute(aPath.mEndpointId, aEncoder);
-    }
-    case ClusterRevision::Id: {
+    case ClusterRevision::Id:
         return ReadClusterRevision(aPath.mEndpointId, aEncoder);
-    }
-    default: {
+    default:
         break;
-    }
     }
     return CHIP_NO_ERROR;
 }
