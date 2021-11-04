@@ -74,7 +74,8 @@ public:
     CHIP_ERROR CheckSchemaValidity() const;
 #endif
     /**
-     *  @brief Get a TLVReader for the NodeId. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the NodeId. Next() must be called before accessing them. If the node id field does not exist, the
+     * nodeid will not be touched.
      *
      *  @param [in] apNodeId    A pointer to apNodeId
      *
@@ -85,7 +86,8 @@ public:
     CHIP_ERROR GetNodeId(chip::NodeId * const apNodeId) const;
 
     /**
-     *  @brief Get a TLVReader for the EndpointId. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the EndpointId. Next() must be called before accessing them. If the endpoint id field does not
+     * exist, the value will not be touched.
      *
      *  @param [in] apEndpointId    A pointer to apEndpointId
      *
@@ -96,7 +98,8 @@ public:
     CHIP_ERROR GetEndpointId(chip::EndpointId * const apEndpointId) const;
 
     /**
-     *  @brief Get a TLVReader for the ClusterId. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the ClusterId. Next() must be called before accessing them. If the cluster id field does not
+     * exist, the value will not be touched.
      *
      *  @param [in] apClusterId    A pointer to apClusterId
      *
@@ -107,7 +110,8 @@ public:
     CHIP_ERROR GetClusterId(chip::ClusterId * const apClusterId) const;
 
     /**
-     *  @brief Get a TLVReader for the FieldId. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the FieldId. Next() must be called before accessing them. If the field id field does not exist,
+     * the value will not be touched.
      *
      *  @param [in] apFieldId    A pointer to apFieldId
      *
@@ -118,7 +122,8 @@ public:
     CHIP_ERROR GetFieldId(chip::AttributeId * const apFieldId) const;
 
     /**
-     *  @brief Get a TLVReader for the ListIndex. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the ListIndex. Next() must be called before accessing them. If the list index field does not
+     * exist, the value will not be touched.
      *
      *  @param [in] apListIndex    A pointer to apListIndex
      *

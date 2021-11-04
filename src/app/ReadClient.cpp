@@ -473,39 +473,37 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         SuccessOrExit(err);
 
         err = element.GetAttributePath(&attributePathParser);
-        SuccessOrExit(err);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+
+        // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
+        // cluster info will be invalid / wildcard, it is safe ignore CHIP_END_OF_TLV directly.
 
         err = attributePathParser.GetNodeId(&(clusterInfo.mNodeId));
-        SuccessOrExit(err);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+
+        // The ReportData must contain a concrete attribute path
 
         err = attributePathParser.GetEndpointId(&(clusterInfo.mEndpointId));
-        SuccessOrExit(err);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
         err = attributePathParser.GetClusterId(&(clusterInfo.mClusterId));
-        SuccessOrExit(err);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
         err = attributePathParser.GetFieldId(&(clusterInfo.mFieldId));
-        if (CHIP_NO_ERROR == err)
-        {
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
-        }
-        else if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        SuccessOrExit(err);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
         err = attributePathParser.GetListIndex(&(clusterInfo.mListIndex));
-        if (CHIP_NO_ERROR == err)
-        {
-            VerifyOrExit(clusterInfo.mFlags.Has(ClusterInfo::Flags::kFieldIdValid), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kListIndexValid);
-        }
-        else if (CHIP_END_OF_TLV == err)
+        if (CHIP_END_OF_TLV == err)
         {
             err = CHIP_NO_ERROR;
         }
-        SuccessOrExit(err);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+
+        VerifyOrExit(clusterInfo.IsValidAttributePath(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
         err = element.GetData(&dataReader);
         if (err == CHIP_END_OF_TLV)

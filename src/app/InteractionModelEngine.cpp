@@ -465,7 +465,6 @@ void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
     {
         lastClusterInfo = lastClusterInfo->mpNext;
     }
-    lastClusterInfo->mFlags.ClearAll();
     lastClusterInfo->mpNext    = mpNextAvailableClusterInfo;
     mpNextAvailableClusterInfo = aClusterInfo;
     aClusterInfo               = nullptr;
@@ -502,7 +501,6 @@ bool InteractionModelEngine::MergeOverlappedAttributePath(ClusterInfo * apAttrib
         {
             runner->mListIndex = aAttributePath.mListIndex;
             runner->mFieldId   = aAttributePath.mFieldId;
-            runner->mFlags     = aAttributePath.mFlags;
             return true;
         }
         runner = runner->mpNext;
