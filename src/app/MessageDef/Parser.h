@@ -88,7 +88,7 @@ protected:
     };
 
     /**
-     * Gets a scaler value with the given tag, the value is not touched when the tag is not found in the TLV.
+     * Gets a scalar value with the given tag, the value is not touched when the tag is not found in the TLV.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types

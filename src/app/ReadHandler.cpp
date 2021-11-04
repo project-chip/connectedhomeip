@@ -341,13 +341,13 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         err = path.GetEndpointId(&(clusterInfo.mEndpointId));
         if (err == CHIP_NO_ERROR)
         {
-            VerifyOrExit(clusterInfo.mEndpointId != ClusterInfo::kInvalidEndpointId, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+            VerifyOrExit(!clusterInfo.HasWildcardEndpointId(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
         }
         SuccessOrExit(err);
         err = path.GetClusterId(&(clusterInfo.mClusterId));
         if (err == CHIP_NO_ERROR)
         {
-            VerifyOrExit(clusterInfo.mClusterId != ClusterInfo::kInvalidClusterId, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+            VerifyOrExit(!clusterInfo.HasWildcardClusterId(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
         }
 
         SuccessOrExit(err);
@@ -358,14 +358,15 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         }
         else if (err == CHIP_NO_ERROR)
         {
-            VerifyOrExit(clusterInfo.mFieldId != ClusterInfo::kInvalidAttributeId, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+            VerifyOrExit(!clusterInfo.HasWildcardAttributeId(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
         }
         SuccessOrExit(err);
 
         err = path.GetListIndex(&(clusterInfo.mListIndex));
         if (CHIP_NO_ERROR == err)
         {
-            VerifyOrExit(clusterInfo.mFieldId != ClusterInfo::kInvalidAttributeId, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+            VerifyOrExit(!clusterInfo.HasWildcardAttributeId() && !clusterInfo.HasWildcardListIndex(),
+                         err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
         }
         else if (CHIP_END_OF_TLV == err)
         {

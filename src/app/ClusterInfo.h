@@ -34,6 +34,7 @@ namespace app {
 // Note: The change will happen after #11171 with a better linked list.
 struct ClusterInfo
 {
+private:
     // Endpoint Id is a uint16 number, and should between 0 and 0xFFFE
     static constexpr EndpointId kInvalidEndpointId = 0xFFFF;
     // The ClusterId, AttributeId and EventId are MEIs,
@@ -44,6 +45,7 @@ struct ClusterInfo
     // ListIndex is a uint16 number, thus 0xFFFF is not a valid list index.
     static constexpr ListIndex kInvalidListIndex = 0xFFFF;
 
+public:
     bool IsAttributePathSupersetOf(const ClusterInfo & other) const
     {
         VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
