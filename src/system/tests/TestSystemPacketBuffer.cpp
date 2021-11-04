@@ -37,8 +37,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
-#include <system/SystemPacketBuffer.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>
