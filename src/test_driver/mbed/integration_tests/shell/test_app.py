@@ -200,11 +200,10 @@ def test_wifi_mode(device):
         assert ret[-2].strip() == mode
 
 
-def test_wifi_connect(device, network):
-    network_ssid = network[0]
-    network_pass = network[1]
+def test_wifi_connect(device, ap):
+    network_param = ap.get_network_param()
 
-    ret = device.send(command="wifi connect {} {}".format(network_ssid, network_pass), expected_output="Done")
+    ret = device.send(command="wifi connect {} {}".format(network_param['ssid'], network_param['password']), expected_output="Done")
     assert ret != None and len(ret) > 0
 
     ret = device.wait_for_output("StationConnected", 30)
