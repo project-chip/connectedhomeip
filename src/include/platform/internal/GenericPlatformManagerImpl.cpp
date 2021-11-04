@@ -134,8 +134,8 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
     err = InetLayer().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    ChipLogError(DeviceLayer, "BLE layer shutdown");
-    err = BLEMgr().GetBleLayer()->Shutdown();
+    ChipLogError(DeviceLayer, "BLE shutdown");
+    err = BLEMgr().Shutdown();
 #endif
 
     ChipLogError(DeviceLayer, "System Layer shutdown");
