@@ -304,6 +304,14 @@ JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
     return chipDevice->IsActive();
 }
 
+JNI_METHOD(void, shutdownSubscriptions)(JNIEnv * env, jobject self, jlong handle, jlong devicePtr)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    Device * device = reinterpret_cast<Device *>(devicePtr);
+    device->ShutdownSubscriptions();
+}
+
 JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;

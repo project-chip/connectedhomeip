@@ -175,6 +175,7 @@ public:
         return mInteractionType == InteractionType::Subscribe ? returnType(mSubscriptionId) : returnType::Missing();
     }
 
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
@@ -184,7 +185,7 @@ private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
 
-    enum class ClientState
+    enum class ClientState : uint8_t
     {
         Uninitialized = 0,         ///< The client has not been initialized
         Initialized,               ///< The client has been initialized and is ready for a SendReadRequest
@@ -268,6 +269,7 @@ private:
     uint16_t mMaxIntervalCeilingSeconds        = 0;
     uint64_t mSubscriptionId                   = 0;
     NodeId mPeerNodeId                         = kUndefinedNodeId;
+    FabricIndex mFabricIndex                   = kUndefinedFabricIndex;
     InteractionType mInteractionType           = InteractionType::Read;
 };
 

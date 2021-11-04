@@ -220,6 +220,23 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId
     return err;
 }
 
+CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
+{
+    CHIP_ERROR err = CHIP_ERROR_KEY_NOT_FOUND;
+
+    for (ReadClient & readClient : mReadClients)
+    {
+        if (!readClient.IsFree() && readClient.IsSubscriptionType() && readClient.GetFabricIndex() == aFabricIndex &&
+            readClient.GetPeerNodeId() == aPeerNodeId)
+        {
+            readClient.Shutdown();
+            err = CHIP_NO_ERROR;
+        }
+    }
+
+    return err;
+}
+
 CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * apCallback)
 {
     apWriteClient.SetWriteClient(nullptr);

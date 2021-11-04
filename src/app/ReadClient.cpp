@@ -79,6 +79,7 @@ void ReadClient::ShutdownInternal(CHIP_ERROR aError)
     mpExchangeCtx              = nullptr;
     mInitialReport             = true;
     mPeerNodeId                = kUndefinedNodeId;
+    mFabricIndex               = kUndefinedFabricIndex;
     MoveToState(ClientState::Uninitialized);
 }
 
@@ -173,7 +174,8 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
-    mPeerNodeId = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
+    mPeerNodeId  = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
+    mFabricIndex = aReadPrepareParams.mSessionHandle.GetFabricIndex();
 
     MoveToState(ClientState::AwaitingInitialReport);
 
@@ -655,7 +657,8 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
-    mPeerNodeId = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
+    mPeerNodeId  = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
+    mFabricIndex = aReadPrepareParams.mSessionHandle.GetFabricIndex();
     MoveToState(ClientState::AwaitingInitialReport);
 
 exit:
