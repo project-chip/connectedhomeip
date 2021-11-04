@@ -24,6 +24,8 @@ from .device import Device
 from .serial_connection import SerialConnection
 from .serial_device import SerialDevice
 
+from .wlan_access_point import AccessPoint
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -130,3 +132,16 @@ def device(board_allocator):
     device = board_allocator.allocate(name='DUT')
     yield device
     board_allocator.release(device)
+
+
+@pytest.fixture(scope="function")
+def ap(network):
+    if network is not None:
+        ap = AccessPoint(ssid=network[0], password=network[1])
+    else:
+        ap = AccessPoint()
+    ap.start()
+    sleep(5)
+    yield ap
+    ap.stop()
+    sleep(5)
