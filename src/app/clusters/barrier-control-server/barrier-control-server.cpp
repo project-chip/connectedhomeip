@@ -347,5 +347,3 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback(app::CommandHandler 
     sendDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
-
-void MatterBarrierControlPluginServerInitCallback() {}

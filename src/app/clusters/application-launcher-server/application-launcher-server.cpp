@@ -85,5 +85,3 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
     sendResponse(command, response);
     return true;
 }
-
-void MatterApplicationLauncherPluginServerInitCallback() {}

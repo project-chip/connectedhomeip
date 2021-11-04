@@ -56,5 +56,3 @@ bool emberAfContentLauncherClusterLaunchURLCallback(app::CommandHandler * comman
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
-
-void MatterContentLauncherPluginServerInitCallback() {}

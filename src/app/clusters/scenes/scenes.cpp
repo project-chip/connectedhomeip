@@ -1314,5 +1314,3 @@ void emberAfScenesClusterRemoveScenesInGroupCallback(EndpointId endpoint, GroupI
         }
     }
 }
-
-void MatterScenesPluginServerInitCallback() {}

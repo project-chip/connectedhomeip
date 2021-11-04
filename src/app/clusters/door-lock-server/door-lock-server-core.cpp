@@ -137,5 +137,3 @@ EmberAfStatus emAfPluginDoorLockServerNoteDoorStateChanged(EmberAfDoorState stat
 
     return status;
 }
-
-void MatterDoorLockPluginServerInitCallback() {}
