@@ -9,21 +9,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import chip.devicecontroller.ChipDeviceController
-import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-<<<<<<< HEAD
-=======
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
->>>>>>> cd1c99028 (resolve comments)
 import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.endpointList
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getEndpointListBtn
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class ClusterInteractionFragment : Fragment() {
@@ -71,29 +66,9 @@ class ClusterInteractionFragment : Fragment() {
     }
   }
 
-<<<<<<< HEAD
-  inner class ChipControllerCallback : GenericChipDeviceListener() {
-    override fun onConnectDeviceComplete() {}
-
-    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-    }
-
-    override fun onNotifyChipConnectionClosed() {
-      Log.d(TAG, "onNotifyChipConnectionClosed")
-    }
-
-    override fun onCloseBleComplete() {
-      Log.d(TAG, "onCloseBleComplete")
-    }
-
-    override fun onError(error: Throwable?) {
-      Log.d(TAG, "onError: $error")
-    }
-=======
   override fun onStop() {
     super.onStop()
     scope.cancel()
->>>>>>> d3d83a0bc (select different cluster, command will remove previous displayed parameter)
   }
 
   companion object {
