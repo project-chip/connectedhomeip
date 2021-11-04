@@ -277,7 +277,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Sess
     SetMsgRcvdFromPeer(false);
 
     // Do not request Ack for multicast
-    SetAutoRequestAck(!session.GetGroupId().HasValue());
+    SetAutoRequestAck(!session.IsGroupSession());
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogDetail(ExchangeManager, "ec++ id: " ChipLogFormatExchange, ChipLogValueExchange(this));

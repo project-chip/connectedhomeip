@@ -73,9 +73,9 @@ public:
     }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    bool IsGroupSession() const { return mGroupId.HasValue(); }
     const Optional<uint16_t> & GetPeerSessionId() const { return mPeerSessionId; }
     const Optional<uint16_t> & GetLocalSessionId() const { return mLocalSessionId; }
-    const Optional<GroupId> & GetGroupId() const { return mGroupId; }
 
     // Return the peer address for this session.  May return null if the peer
     // address is not known.  This can happen for secure sessions that have been
