@@ -198,26 +198,6 @@ union ObjectArena
 };
 
 /**
- *  @class ObjectPoolBase
- *
- *  @brief
- *    This is the abstract base class for Static and Dynamic ObjectPool objects.
- *
- *  @note
- *      This base class can be used to pass pointers to the ObjectPoolDynamic and sized ObjectPoolStatic classes without requiring
- * the class holding the reference to be templated on pool size.
- */
-template <typename T>
-class ObjectPoolBase
-{
-public:
-    virtual ~ObjectPoolBase()                                                                                           = default;
-    virtual T * TryCreate()                                                                                             = 0;
-    virtual void Reset()                                                                                                = 0;
-    virtual void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark) = 0;
-};
-
-/**
  *  @class ObjectPoolStatic
  *
  *  @brief
@@ -227,10 +207,10 @@ public:
  *  @tparam     N   a positive integer number of objects of class T to allocate from the arena.
  */
 template <typename T, size_t N>
-class ObjectPoolStatic : public ObjectPoolBase<T>
+class ObjectPoolStatic
 {
 public:
-    T * TryCreate() override
+    T * TryCreate()
     {
         T * lReturn = nullptr;
         (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
@@ -273,11 +253,11 @@ public:
      * @param[in/out] aNumInUse    The number of objects in use. If aStartIndex is not 0,
      *                             the function adds to the counter without resetting it first.
      */
-    void GetNumObjectsInUse(unsigned int aStartIndex, unsigned int & aNumInUse)
+    void GetNumObjectsInUse(size_t aStartIndex, size_t & aNumInUse)
     {
-        unsigned int count = 0;
+        size_t count = 0;
 
-        for (unsigned int lIndex = aStartIndex; lIndex < N; ++lIndex)
+        for (size_t lIndex = aStartIndex; lIndex < N; ++lIndex)
         {
             T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
 
@@ -294,23 +274,23 @@ public:
 
         aNumInUse += count;
     }
-    void UpdateHighWatermark(const unsigned int & aCandidate)
+    void UpdateHighWatermark(const size_t & aCandidate)
     {
-        unsigned int lTmp;
+        size_t lTmp;
         while (aCandidate > (lTmp = mHighWatermark))
         {
             SYSTEM_OBJECT_HWM_TEST_HOOK();
             (void) __sync_bool_compare_and_swap(&mHighWatermark, lTmp, aCandidate);
         }
     }
-    volatile unsigned int mHighWatermark;
+    volatile size_t mHighWatermark;
 #endif
 
-    void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark) override
+    void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
     {
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-        unsigned int lNumInUse;
-        unsigned int lHighWatermark;
+        size_t lNumInUse;
+        size_t lHighWatermark;
 
         GetNumObjectsInUse(0, lNumInUse);
         lHighWatermark = mHighWatermark;
@@ -337,7 +317,7 @@ public:
     template <typename Function>
     bool ForEachActiveObject(Function && function)
     {
-        for (unsigned int i = 0; i < N; ++i)
+        for (size_t i = 0; i < N; ++i)
         {
             T & lObject = reinterpret_cast<T *>(mArena.uMemory)[i];
 
@@ -349,7 +329,7 @@ public:
         }
         return true;
     }
-    void Reset() override
+    void Reset()
     {
         memset(mArena.uMemory, 0, N * sizeof(T));
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
@@ -369,10 +349,10 @@ public:
  *  @tparam     T   a subclass of Object to be allocated.
  */
 template <typename T>
-class ObjectPoolDynamic : public ObjectPoolBase<T>
+class ObjectPoolDynamic
 {
 public:
-    T * TryCreate() override
+    T * TryCreate()
     {
 
         T * newNode = new T();
@@ -420,7 +400,7 @@ public:
         }
         return true;
     }
-    void Reset() override
+    void Reset()
     {
         std::lock_guard<std::mutex> lock(mMutex);
         Object * p = mDummyHead.mNext;
@@ -434,7 +414,7 @@ public:
 
         mDummyHead.mNext = nullptr;
     }
-    void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark) override {}
+    void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark) {}
     std::mutex mMutex;
     Object mDummyHead;
     friend class TestObject;
