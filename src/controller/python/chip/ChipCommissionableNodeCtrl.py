@@ -25,7 +25,7 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-from ctypes import c_void_p, c_uint32
+from ctypes import *
 from .ChipStack import *
 from .exceptions import *
 

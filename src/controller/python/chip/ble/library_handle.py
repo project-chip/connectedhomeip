@@ -15,7 +15,7 @@
 #
 
 import chip.native
-import ctypes  # lgtm [py/import-and-import-from]
+import ctypes
 from ctypes import c_bool, c_void_p, c_char_p, c_uint32, py_object
 from chip.ble.types import DeviceScannedCallback, ScanDoneCallback
 

@@ -33,7 +33,7 @@ import glob
 import platform
 import logging
 from threading import Lock, Event, Condition
-from ctypes import *  # lgtm [py/polluting-import]
+from ctypes import *
 from .ChipUtility import ChipUtility
 from .exceptions import *
 

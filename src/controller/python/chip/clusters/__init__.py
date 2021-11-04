@@ -23,5 +23,5 @@
 """Provides Python APIs for CHIP."""
 from . import Command
 from . import Attribute
-from .Objects import *  # lgtm [py/polluting-import]
+from .Objects import *
 from . import CHIPClusters
