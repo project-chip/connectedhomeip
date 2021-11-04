@@ -1,45 +1,42 @@
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/parameterRow"
+    android:id="@+id/clusterCallbackRow"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-  <EditText
-      android:id="@+id/parameterData"
+  <TextView
+      android:id="@+id/clusterCallbackNameTv"
       android:layout_width="80dp"
       android:layout_height="wrap_content"
       android:layout_marginHorizontal="10dp"
       android:padding="16dp"
-      android:inputType="text"
       android:minWidth="48dp"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/clusterCallbackDataTv"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toStartOf="@id/parameterName"
-      tools:ignore="SpeakableTextPresentCheck" />
+      app:layout_constraintTop_toTopOf="parent" />
 
   <TextView
-      android:id="@+id/parameterName"
+      android:id="@+id/clusterCallbackDataTv"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:padding="16dp"
       android:singleLine="false"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toStartOf="@id/parameterType"
-      app:layout_constraintStart_toEndOf="@id/parameterData"
+      app:layout_constraintEnd_toStartOf="@id/clusterCallbackTypeTv"
+      app:layout_constraintStart_toEndOf="@id/clusterCallbackNameTv"
       app:layout_constraintTop_toTopOf="parent" />
 
+
   <TextView
-      android:id="@+id/parameterType"
+      android:id="@+id/clusterCallbackTypeTv"
       android:textStyle="bold"
       android:layout_width="100dp"
       android:layout_height="wrap_content"
       android:padding="16dp"
       android:singleLine="false"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintStart_toEndOf="@id/parameterName"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintEnd_toEndOf="parent" />
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toEndOf="@id/clusterCallbackDataTv"
+      app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

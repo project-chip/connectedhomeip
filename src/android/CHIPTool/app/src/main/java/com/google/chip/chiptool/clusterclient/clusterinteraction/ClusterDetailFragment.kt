@@ -1,12 +1,10 @@
 package com.google.chip.chiptool.clusterclient.clusterinteraction
 
 import android.os.Bundle
-import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.LinearLayout
@@ -19,7 +17,6 @@ import chip.clusterinfo.ClusterInfo
 import chip.clusterinfo.CommandInfo
 import chip.clusterinfo.CommandResponseInfo
 import chip.clusterinfo.DelegatedClusterCallback
-import chip.clusterinfo.ResponseValueInfo
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ClusterInfoMapping
@@ -65,6 +62,7 @@ class ClusterDetailFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
 <<<<<<< HEAD
+<<<<<<< HEAD
     clusterMap = ClusterInfoMapping().clusterMap
     devicePtr = checkNotNull(requireArguments().getLong(DEVICE_PTR_KEY))
     endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID_KEY))
@@ -84,10 +82,21 @@ class ClusterDetailFragment : Fragment() {
       clusterAutoCompleteSetup(clusterAutoComplete, commandAutoComplete, parameterList)
       commandAutoCompleteSetup(commandAutoComplete, inflater, parameterList, callbackList)
 >>>>>>> d3d83a0bc (select different cluster, command will remove previous displayed parameter)
+=======
+    clusterMap = ClusterInfoMapping().clusterMap
+    devicePtr = checkNotNull(requireArguments().getLong(DEVICE_PTR))
+    endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID))
+    return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
+      deviceController.setCompletionListener(GenericChipDeviceListener())
+      commandAutoCompleteTv.visibility = View.GONE
+      clusterAutoCompleteSetup(clusterAutoCompleteTv, commandAutoCompleteTv, parameterList)
+      commandAutoCompleteSetup(commandAutoCompleteTv, inflater, parameterList, callbackList)
+>>>>>>> cd1c99028 (resolve comments)
       invokeCommand.setOnClickListener {
         val commandArguments = HashMap<String, Any>()
         parameterList.forEach {
           val type =
+<<<<<<< HEAD
 <<<<<<< HEAD
             selectedCommandInfo.commandParameters[it.clusterParameterNameTv.text.toString()]!!.type
           val data = castStringToType(it.clusterParameterData.text.toString(), type)!!
@@ -103,6 +112,13 @@ class ClusterDetailFragment : Fragment() {
         }
 =======
 >>>>>>> 7c783e227 (add back class description)
+=======
+            selectedCommandInfo.commandParameters[it.clusterParameterNameTv.text.toString()]!!.type
+          val data = castStringToType(it.clusterParameterData.text.toString(), type)!!
+
+          commandArguments[it.clusterParameterNameTv.text.toString()] = data
+        }
+>>>>>>> cd1c99028 (resolve comments)
         selectedCommandInfo.getCommandFunction()
           .invokeCommand(selectedCluster, selectedCommandCallback, commandArguments)
       }
@@ -110,11 +126,15 @@ class ClusterDetailFragment : Fragment() {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   private fun castStringToType(data: String, type: Class<*>): Any? {
 =======
   private fun castCorrectType(type: Class<*>, data: String): Any? {
 
 >>>>>>> 7c783e227 (add back class description)
+=======
+  private fun castStringToType(data: String, type: Class<*>): Any? {
+>>>>>>> cd1c99028 (resolve comments)
     return when (type) {
       Int::class.java -> data.toInt()
       String::class.java -> data
@@ -165,6 +185,7 @@ class ClusterDetailFragment : Fragment() {
       selectedCommandCallback = selectedCommandInfo.commandCallbackSupplier.get()
       populateCommandParameter(inflater, parameterList)
 <<<<<<< HEAD
+<<<<<<< HEAD
       selectedCommandCallback.setCallbackDelegate(object : ClusterCommandCallback {
         override fun onSuccess(responseValues: Map<CommandResponseInfo, Any>) {
 =======
@@ -175,6 +196,10 @@ class ClusterDetailFragment : Fragment() {
 =======
         override fun onSuccess(responseValues: Map<ResponseValueInfo, Any>) {
 >>>>>>> 7a1c5d850 (add responseValueInfo class instead of string split)
+=======
+      selectedCommandCallback.setCallbackDelegate(object : ClusterCommandCallback {
+        override fun onSuccess(responseValues: Map<CommandResponseInfo, Any>) {
+>>>>>>> cd1c99028 (resolve comments)
           showMessage("Command success")
           // Populate UI based on response values. We know the types from CommandInfo.getCommandResponses().
           requireActivity().runOnUiThread {
@@ -198,6 +223,7 @@ class ClusterDetailFragment : Fragment() {
   private fun populateCommandParameter(inflater: LayoutInflater, parameterList: LinearLayout) {
     selectedCommandInfo.commandParameters.forEach { (paramName, paramInfo) ->
 <<<<<<< HEAD
+<<<<<<< HEAD
       val param = inflater.inflate(R.layout.cluster_parameter_item, null, false) as ConstraintLayout
       param.clusterParameterNameTv.text = "${paramName}"
       param.clusterParameterTypeTv.text = "${paramInfo.type}"
@@ -206,11 +232,17 @@ class ClusterDetailFragment : Fragment() {
       param.parameterName.text = "${paramName}"
       param.parameterType.text = "${paramInfo.type}"
 >>>>>>> 78cf954d9 (fix parameter response ui alignment issue)
+=======
+      val param = inflater.inflate(R.layout.cluster_parameter_item, null, false) as ConstraintLayout
+      param.clusterParameterNameTv.text = "${paramName}"
+      param.clusterParameterTypeTv.text = "${paramInfo.type}"
+>>>>>>> cd1c99028 (resolve comments)
       parameterList.addView(param)
     }
   }
 
   private fun populateCallbackResult(
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     responseValues: Map<CommandResponseInfo, Any>,
@@ -220,17 +252,24 @@ class ClusterDetailFragment : Fragment() {
 =======
     responseValues: Map<ResponseValueInfo, Any>,
 >>>>>>> 7a1c5d850 (add responseValueInfo class instead of string split)
+=======
+    responseValues: Map<CommandResponseInfo, Any>,
+>>>>>>> cd1c99028 (resolve comments)
     inflater: LayoutInflater,
     callbackList: LinearLayout
   ) {
     responseValues.forEach { (variableNameType, response) ->
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> cd1c99028 (resolve comments)
       val callback =
         inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
       callback.clusterCallbackNameTv.text = variableNameType.name
       callback.clusterCallbackDataTv.text = response.toString()
       callback.clusterCallbackTypeTv.text = variableNameType.type
+<<<<<<< HEAD
 =======
       val callback = inflater.inflate(R.layout.callback_item, null, false) as LinearLayout
 =======
@@ -240,6 +279,8 @@ class ClusterDetailFragment : Fragment() {
       callback.callbackData.text = response.toString()
       callback.callbackType.text = variableNameType.type
 >>>>>>> 7a1c5d850 (add responseValueInfo class instead of string split)
+=======
+>>>>>>> cd1c99028 (resolve comments)
       callbackList.addView(callback)
     }
   }
@@ -261,10 +302,14 @@ class ClusterDetailFragment : Fragment() {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   private fun constructHint(clusterMap: Map<String, *>): Array<String> {
     return clusterMap.keys.toTypedArray()
 =======
   private fun constructHint(clusterMap: HashMap<String, *>): Array<String> {
+=======
+  private fun constructHint(clusterMap: Map<String, *>): Array<String> {
+>>>>>>> cd1c99028 (resolve comments)
     val clusterName = mutableListOf<String>()
     for ((name, info) in clusterMap) {
       clusterName.add(name)
@@ -280,6 +325,7 @@ class ClusterDetailFragment : Fragment() {
 
   companion object {
     private const val TAG = "ClusterDetailFragment"
+<<<<<<< HEAD
 <<<<<<< HEAD
     private const val ENDPOINT_ID_KEY = "endpoint_id"
     private const val DEVICE_PTR_KEY = "device_ptr"
@@ -299,9 +345,20 @@ class ClusterDetailFragment : Fragment() {
         arguments = Bundle(2).apply {
           putLong(DEVICE_PTR_KEY, deviceId)
           putInt(ENDPOINT_ID_KEY, endpointId)
+=======
+    private const val ENDPOINT_ID = "endpoint_id"
+    private const val DEVICE_PTR = "device_ptr"
+    fun newInstance(
+      deviceId: Long,
+      endpointId: Int
+    ): ClusterDetailFragment {
+      return ClusterDetailFragment().apply {
+        arguments = Bundle(2).apply {
+          putLong(DEVICE_PTR, deviceId)
+          putInt(ENDPOINT_ID, endpointId)
+>>>>>>> cd1c99028 (resolve comments)
         }
       }
     }
   }
-
 }

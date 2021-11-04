@@ -1,7 +1,6 @@
 package com.google.chip.chiptool.clusterclient.clusterinteraction
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,12 +8,18 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import chip.clusterinfo.ClusterInfo
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
+<<<<<<< HEAD
+=======
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+>>>>>>> cd1c99028 (resolve comments)
 import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.endpointList
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getEndpointListBtn
@@ -27,7 +32,6 @@ class ClusterInteractionFragment : Fragment() {
 
   private lateinit var scope: CoroutineScope
   private lateinit var addressUpdateFragment: AddressUpdateFragment
-  private lateinit var clusterMap: Map<String, ClusterInfo>
   private var devicePtr = 0L
 
   override fun onCreateView(
@@ -48,10 +52,8 @@ class ClusterInteractionFragment : Fragment() {
           endpointList.visibility = View.VISIBLE
         }
       }
-
       addressUpdateFragment =
         childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
-      clusterMap = ClusterInfoMapping().clusterMap
       var dataList: List<EndpointItem> = ArrayList()
       // TODO: Dynamically retrieve endpoint information using descriptor cluster
       // hardcode the endpoint for now
@@ -114,7 +116,7 @@ class ClusterInteractionFragment : Fragment() {
   inner class EndpointListener : EndpointAdapter.OnItemClickListener {
     override fun onItemClick(position: Int) {
       Toast.makeText(requireContext(), "Item $position clicked", Toast.LENGTH_SHORT).show()
-      showFragment(ClusterDetailFragment.newInstance(clusterMap as HashMap<String, ClusterInfo>, devicePtr))
+      showFragment(ClusterDetailFragment.newInstance(devicePtr, position))
     }
   }
 }
