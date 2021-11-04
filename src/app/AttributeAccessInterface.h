@@ -148,7 +148,7 @@ public:
      * specific endpoint.  This is used to clean up overrides registered for an
      * endpoint that becomes disabled.
      */
-    bool MatchesExactly(EndpointId aEndpointId) const { return mEndpointId.HasValue() && mEndpointId.Value() == aEndpointId; }
+    bool MatchesEndpoint(EndpointId aEndpointId) const { return mEndpointId.HasValue() && mEndpointId.Value() == aEndpointId; }
 
     /**
      * Check whether another AttributeAccessInterface wants to handle the same set of

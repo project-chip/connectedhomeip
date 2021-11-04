@@ -66,7 +66,7 @@ public:
         chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this);
     }
 
-    ~TestClusterCommandHandler() { chip::app::InteractionModelEngine::GetInstance()->DeregisterCommandHandler(this); }
+    ~TestClusterCommandHandler() { chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this); }
 
 private:
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) final;
@@ -74,10 +74,8 @@ private:
 
 void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = HandleCommand<TestCluster::Commands::TestSimpleArgumentRequest::DecodableType>(
-        handlerContext, [](chip::app::CommandHandlerInterface::HandlerContext & ctx, auto & requestPayload) {
+    HandleCommand<TestCluster::Commands::TestSimpleArgumentRequest::DecodableType>(
+        handlerContext, [](chip::app::CommandHandlerInterface::HandlerContext & ctx, const auto & requestPayload) {
             if (responseDirective == kSendDataResponse)
             {
                 TestCluster::Commands::TestStructArrayArgumentResponse::Type dataResponse;
@@ -101,11 +99,6 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
 
             return CHIP_NO_ERROR;
         });
-
-    SuccessOrExit(err);
-
-exit:
-    return;
 }
 
 } // namespace

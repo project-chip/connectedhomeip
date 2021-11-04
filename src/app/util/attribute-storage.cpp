@@ -973,7 +973,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 
             // Clear out any command handler overrides registered for this
             // endpoint.
-            chip::app::InteractionModelEngine::GetInstance()->DeregisterCommandHandlers(endpoint);
+            chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandlers(endpoint);
 
             // Clear out any attribute access overrides registered for this
             // endpoint.
@@ -982,7 +982,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             while (cur)
             {
                 app::AttributeAccessInterface * next = cur->GetNext();
-                if (cur->MatchesExactly(endpoint))
+                if (cur->MatchesEndpoint(endpoint))
                 {
                     // Remove it from the list
                     if (prev)
@@ -993,6 +993,8 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                     {
                         gAttributeAccessOverrides = next;
                     }
+
+                    cur->SetNext(nullptr);
 
                     // Do not change prev in this case.
                 }

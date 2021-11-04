@@ -180,9 +180,9 @@ public:
     bool IsOverlappedAttributePath(ClusterInfo & aAttributePath);
 
     CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
-    CHIP_ERROR DeregisterCommandHandler(CommandHandlerInterface * handler);
+    CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
     CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
-    void DeregisterCommandHandlers(EndpointId endpointId);
+    void UnregisterCommandHandlers(EndpointId endpointId);
 
 private:
     friend class reporting::Engine;
@@ -226,7 +226,7 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
 
-    CommandHandlerInterface * mpCommandHandlerList = nullptr;
+    CommandHandlerInterface * mCommandHandlerList = nullptr;
 
     // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
     // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.

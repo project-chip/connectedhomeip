@@ -52,6 +52,22 @@ public:
         {}
 
         void SetCommandHandled() { mCommandHandled = true; }
+        void SetCommandNotHandled() { mCommandHandled = false; }
+
+        /*
+         * Returns a TLVReader positioned at the TLV struct that contains the payload of the command.
+         *
+         * If the reader is requested from the context, then we can assume there is an intention
+         * to acccess the payload of this command and consequently, to handle this command.
+         *
+         * If this is not true, the application should call SetCommandNotHandled().
+         *
+         */
+        TLV::TLVReader & GetReader()
+        {
+            SetCommandHandled();
+            return mPayload;
+        }
 
         CommandHandler & mCommandHandler;
         const ConcreteCommandPath & mRequestPath;
@@ -71,6 +87,14 @@ public:
 
     /**
      * Callback that must be implemented to handle an invoke request.
+     *
+     * The callee is required to handle *all* errors that may occur during the handling of this command,
+     * including errors like those encountered during decode and encode of the payloads as
+     * well as application-specific errors. As part of handling the error, the callee is required
+     * to handle generation of an appropriate status response.
+     *
+     * The only exception to this rule is if the HandleCommand helper method is used below - it will
+     * help handle some of these cases (see below).
      *
      * @param [in] handlerContext Context that encapsulates the current invoke request.
      *                            Handlers are responsible for correctly calling SetCommandHandled()
@@ -102,7 +126,7 @@ public:
      * specific endpoint.  This is used to clean up overrides registered for an
      * endpoint that becomes disabled.
      */
-    bool MatchesExactly(EndpointId aEndpointId) const { return mEndpointId.HasValue() && mEndpointId.Value() == aEndpointId; }
+    bool MatchesEndpoint(EndpointId aEndpointId) const { return mEndpointId.HasValue() && mEndpointId.Value() == aEndpointId; }
 
     /**
      * Check whether another CommandHandlerInterface wants to handle the same set of
@@ -118,34 +142,39 @@ protected:
     /*
      * Helper function to automatically de-serialize the data payload into a cluster object
      * of type RequestT if the Cluster ID and Command ID in the context match. Upon successful
-     * de-serialization, the provided lambda is invoked and passed in a reference to the cluster object.
+     * de-serialization, the provided function is invoked and passed in a reference to the cluster object.
      *
-     * Provided lambda is expected to have the following signature:
-     *  CHIP_ERROR Func(HandlerContext &handlerContext, RequestT &requestPayload);
+     * Any errors encountered in this function prior to calling func result in the automatic generation of a status response.
+     * However, the responsibility for doing so shifts to `func` to handle any further errors that are encountered.
+     *
+     * Provided function is expected to have the following signature:
+     *  void Func(HandlerContext &handlerContext, const RequestT &requestPayload);
      */
     template <typename RequestT, typename FuncT>
-    CHIP_ERROR HandleCommand(HandlerContext & handlerContext, FuncT func)
+    void HandleCommand(HandlerContext & handlerContext, FuncT func)
     {
-        //
-        // If already handled, no more work to be done.
-        //
-        if (handlerContext.mCommandHandled)
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        if (handlerContext.mRequestPath.mClusterId == RequestT::GetClusterId() &&
-            handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId())
+        if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mClusterId == RequestT::GetClusterId()) &&
+            (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
         {
             RequestT requestPayload;
 
-            ReturnErrorOnFailure(DataModel::Decode(handlerContext.mPayload, requestPayload));
-            ReturnErrorOnFailure(func(handlerContext, requestPayload));
-
+            //
+            // If the command matches what the caller is looking for, let's mark this as being handled
+            // even if errors happen after this. This ensures that we don't execute any fall-back strategies
+            // to handle this command since at this point, the caller is taking responsibility for handling
+            // the command in its entirety, warts and all.
+            //
             handlerContext.SetCommandHandled();
-        }
 
-        return CHIP_NO_ERROR;
+            if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
+            {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                         Protocols::InteractionModel::Status::InvalidCommand);
+                return;
+            }
+
+            func(handlerContext, requestPayload);
+        }
     }
 
 private:

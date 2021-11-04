@@ -571,7 +571,7 @@ CHIP_ERROR InteractionModelEngine::RegisterCommandHandler(CommandHandlerInterfac
 {
     VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    for (auto * cur = mpCommandHandlerList; cur; cur = cur->GetNext())
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
     {
         if (cur->Matches(*handler))
         {
@@ -580,8 +580,8 @@ CHIP_ERROR InteractionModelEngine::RegisterCommandHandler(CommandHandlerInterfac
         }
     }
 
-    handler->SetNext(mpCommandHandlerList);
-    mpCommandHandlerList = handler;
+    handler->SetNext(mCommandHandlerList);
+    mCommandHandlerList = handler;
 
     return CHIP_NO_ERROR;
 }
@@ -590,18 +590,20 @@ void InteractionModelEngine::UnregisterCommandHandlers(EndpointId endpointId)
 {
     CommandHandlerInterface * prev = nullptr;
 
-    for (auto * cur = mpCommandHandlerList; cur; cur = cur->GetNext())
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
     {
-        if (cur->MatchesExactly(endpointId))
+        if (cur->MatchesEndpoint(endpointId))
         {
             if (prev == nullptr)
             {
-                mpCommandHandlerList = cur->GetNext();
+                mCommandHandlerList = cur->GetNext();
             }
             else
             {
                 prev->SetNext(cur->GetNext());
             }
+
+            cur->SetNext(nullptr);
         }
         else
         {
@@ -615,18 +617,20 @@ CHIP_ERROR InteractionModelEngine::UnregisterCommandHandler(CommandHandlerInterf
     VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CommandHandlerInterface * prev = nullptr;
 
-    for (auto * cur = mpCommandHandlerList; cur; cur = cur->GetNext())
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
     {
         if (cur->Matches(*handler))
         {
             if (prev == nullptr)
             {
-                mpCommandHandlerList = cur->GetNext();
+                mCommandHandlerList = cur->GetNext();
             }
             else
             {
                 prev->SetNext(cur->GetNext());
             }
+
+            cur->SetNext(nullptr);
 
             return CHIP_NO_ERROR;
         }
@@ -639,7 +643,7 @@ CHIP_ERROR InteractionModelEngine::UnregisterCommandHandler(CommandHandlerInterf
 
 CommandHandlerInterface * InteractionModelEngine::FindCommandHandler(EndpointId endpointId, ClusterId clusterId)
 {
-    for (auto * cur = mpCommandHandlerList; cur; cur = cur->GetNext())
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
     {
         if (cur->Matches(endpointId, clusterId))
         {
