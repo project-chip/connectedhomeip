@@ -27,8 +27,8 @@ namespace app {
 
 /**
  * ClusterInfo is the representation of an attribute path or an event path used by ReadHandler, ReadClient, WriteHandler,
- * Report::Engine etc, tt uses some invalid values for representing the wildcard value for its field and  contains a mpNext field so
- * it can be used as a linked list.
+ * Report::Engine etc, it uses some invalid values for representing the wildcard values for its fields and  contains a mpNext field
+ * so it can be used as a linked list.
  */
 // TODO: The cluster info should be separated into AttributeInfo and EventInfo.
 // Note: The change will happen after #11171 with a better linked list.
@@ -46,39 +46,39 @@ struct ClusterInfo
 
     bool IsAttributePathSupersetOf(const ClusterInfo & other) const
     {
-        VerifyOrReturnError(!HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
-        VerifyOrReturnError(!HasWildcardClusterId() || mClusterId == other.mClusterId, false);
-        VerifyOrReturnError(!HasWildcardAttributeId() || mFieldId == other.mFieldId, false);
-        VerifyOrReturnError(!HasWildcardListIndex() || mListIndex == other.mListIndex, false);
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+        VerifyOrReturnError(HasWildcardAttributeId() || mFieldId == other.mFieldId, false);
+        VerifyOrReturnError(HasWildcardListIndex() || mListIndex == other.mListIndex, false);
 
         return true;
     }
 
-    bool HasWildcard() const { return !HasWildcardEndpointId() || !HasWildcardClusterId() || !HasWildcardAttributeId(); }
+    bool HasWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
 
     /**
-     * Verify if it mets some basic constrants of a attribute path: If list index is valid, then field id must be valid too.
-     * There are other conditions that the path is not a valid path, e.g. the path does not exists, wildcard cluster id with
-     * non-wildcard attribute id and valid list index on a non-array attributes etc.
+     * Check that the path meets some basic constraints of an attribute path: If list index is not wildcard, then field id must not
+     * be wildcard. This does not verify that the attribute being targeted is actually of list type when the list index is not
+     * wildcard.
      */
-    bool IsValidAttributePath() const { return mListIndex == kInvalidListIndex || mFieldId != kInvalidAttributeId; }
+    bool IsValidAttributePath() const { return HasWildcardListIndex() || !HasWildcardAttributeId(); }
 
-    inline bool HasWildcardNodeId() const { return mNodeId != kUndefinedNodeId; }
-    inline bool HasWildcardEndpointId() const { return mEndpointId != kInvalidEndpointId; }
-    inline bool HasWildcardClusterId() const { return mClusterId != kInvalidClusterId; }
-    inline bool HasWildcardAttributeId() const { return mFieldId != kInvalidAttributeId; }
-    inline bool HasWildcardListIndex() const { return mListIndex != kInvalidListIndex; }
-    inline bool HasWildcardEventId() const { return mEventId != kInvalidEventId; }
+    inline bool HasWildcardNodeId() const { return mNodeId == kUndefinedNodeId; }
+    inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
+    inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
+    inline bool HasWildcardAttributeId() const { return mFieldId == kInvalidAttributeId; }
+    inline bool HasWildcardListIndex() const { return mListIndex == kInvalidListIndex; }
+    inline bool HasWildcardEventId() const { return mEventId == kInvalidEventId; }
 
     ClusterInfo() {}
     /*
      * For better structure alignment
-     * Above ordering is by bit-size to ensure least amount of memory alignment padding.
+     * Below ordering is by bit-size to ensure least amount of memory alignment padding.
      * Changing order to something more natural (e.g. endpoint id before cluster id) will result
      * in extra memory alignment padding.
      */
-    ClusterInfo * mpNext   = nullptr;             // pointer width (32/64 bits)
     NodeId mNodeId         = kUndefinedNodeId;    // uint64
+    ClusterInfo * mpNext   = nullptr;             // pointer width (32/64 bits)
     ClusterId mClusterId   = kInvalidClusterId;   // uint32
     AttributeId mFieldId   = kInvalidAttributeId; // uint32
     EventId mEventId       = kInvalidEventId;     // uint32

@@ -123,6 +123,9 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
         err = element.GetAttributePath(&attributePath);
         SuccessOrExit(err);
 
+        // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
+        // cluster info will be invalid / wildcard, it is safe ignore CHIP_END_OF_TLV directly.
+
         err = attributePath.GetNodeId(&(clusterInfo.mNodeId));
         if (CHIP_END_OF_TLV == err)
         {
@@ -144,6 +147,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
             err = CHIP_NO_ERROR;
         }
 
+        // We do not support Wildcard writes for now, reject all wildcard write requests.
         VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasWildcard(),
                      err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 

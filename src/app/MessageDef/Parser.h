@@ -74,12 +74,26 @@ protected:
     chip::TLV::TLVType mOuterContainerType;
     Parser();
 
+    /**
+     * Gets a unsigned integer value with the given tag, the value is not touched when the tag is not found in the TLV.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
     template <typename T>
     CHIP_ERROR GetUnsignedInteger(const uint8_t aContextTag, T * const apLValue) const
     {
         return GetSimpleValue(aContextTag, chip::TLV::kTLVType_UnsignedInteger, apLValue);
     };
 
+    /**
+     * Gets a scaler value with the given tag, the value is not touched when the tag is not found in the TLV.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
     template <typename T>
     CHIP_ERROR GetSimpleValue(const uint8_t aContextTag, const chip::TLV::TLVType aTLVType, T * const apLValue) const
     {
