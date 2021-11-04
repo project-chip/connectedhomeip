@@ -28,7 +28,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import asyncio
-from ctypes import *
+from ctypes import *  # lgtm [py/polluting-import]
 from .ChipStack import *
 from .interaction_model import delegate as im
 from .exceptions import *
@@ -334,11 +334,11 @@ class ChipDeviceController(object):
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
-        if returnDevice.value == None:
+        if returnDevice.value is None:
             with deviceAvailableCV:
                 deviceAvailableCV.wait()
 
-        if returnDevice.value == None:
+        if returnDevice.value is None:
             raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
         return returnDevice
 
