@@ -10,6 +10,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
@@ -18,16 +19,26 @@ import com.jjoe64.graphview.LabelFormatter
 import com.jjoe64.graphview.Viewport
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
-import kotlinx.android.synthetic.main.sensor_client_fragment.*
-import kotlinx.android.synthetic.main.sensor_client_fragment.view.*
-import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import kotlinx.android.synthetic.main.sensor_client_fragment.clusterNameSpinner
+import kotlinx.android.synthetic.main.sensor_client_fragment.deviceIdEd
+import kotlinx.android.synthetic.main.sensor_client_fragment.endpointIdEd
+import kotlinx.android.synthetic.main.sensor_client_fragment.lastValueTv
+import kotlinx.android.synthetic.main.sensor_client_fragment.sensorGraph
+import kotlinx.android.synthetic.main.sensor_client_fragment.view.clusterNameSpinner
+import kotlinx.android.synthetic.main.sensor_client_fragment.view.readSensorBtn
+import kotlinx.android.synthetic.main.sensor_client_fragment.view.sensorGraph
+import kotlinx.android.synthetic.main.sensor_client_fragment.view.watchSensorBtn
+import kotlinx.android.synthetic.main.sensor_client_fragment.watchSensorBtn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 private typealias ReadCallback = ChipClusters.IntegerAttributeCallback
 
 class SensorClientFragment : Fragment() {
-  private val scope = CoroutineScope(Dispatchers.Main + Job())
+  private lateinit var scope: CoroutineScope
 
   // History of sensor values
   private val sensorData = LineGraphSeries<DataPoint>()
@@ -40,6 +51,8 @@ class SensorClientFragment : Fragment() {
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View {
+    scope = viewLifecycleOwner.lifecycleScope
+
     return inflater.inflate(R.layout.sensor_client_fragment, container, false).apply {
       ChipClient.getDeviceController(requireContext()).setCompletionListener(null)
       deviceIdEd.setOnEditorActionListener { textView, actionId, _ ->
@@ -97,7 +110,6 @@ class SensorClientFragment : Fragment() {
   }
 
   override fun onStop() {
-    scope.cancel()
     resetSensorGraph() // reset the graph on fragment exit
     super.onStop()
   }

@@ -7,27 +7,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import chip.clusterinfo.ClusterInfo
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.endpointList
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getEndpointListBtn
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class ClusterInteractionFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
 
-  private val scope = CoroutineScope(Dispatchers.Main + Job())
+  private lateinit var scope: CoroutineScope
   private lateinit var addressUpdateFragment: AddressUpdateFragment
   private lateinit var clusterMap: Map<String, ClusterInfo>
 
@@ -36,6 +34,8 @@ class ClusterInteractionFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    scope = viewLifecycleOwner.lifecycleScope
+
     return inflater.inflate(R.layout.cluster_interaction_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
       getEndpointListBtn.setOnClickListener {
@@ -82,11 +82,6 @@ class ClusterInteractionFragment : Fragment() {
     override fun onError(error: Throwable?) {
       Log.d(TAG, "onError: $error")
     }
-  }
-
-  override fun onStop() {
-    super.onStop()
-    scope.cancel()
   }
 
   companion object {
