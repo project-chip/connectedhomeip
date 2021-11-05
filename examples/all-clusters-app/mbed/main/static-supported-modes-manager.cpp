@@ -1,6 +1,3 @@
-//
-// Created by Ding, Li-an on 10/21/21.
-//
 #include <static-supported-modes-manager.h>
 
 using namespace std;
