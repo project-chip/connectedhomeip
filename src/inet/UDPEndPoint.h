@@ -60,7 +60,7 @@ public:
  *  endpoints (SOCK_DGRAM sockets on Linux and BSD-derived systems) or LwIP
  *  UDP protocol control blocks, as the system is configured accordingly.
  */
-class DLL_EXPORT UDPEndPoint : public EndPointBasis, public AtomicReferenceCounted<UDPEndPoint, UDPEndPointDeletor>
+class DLL_EXPORT UDPEndPoint : public EndPointBasis, public ReferenceCounted<UDPEndPoint, UDPEndPointDeletor>
 {
 public:
     UDPEndPoint() = default;

@@ -2748,13 +2748,6 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
         }
 
         // Decrement the ref count that was added when the connection started (in Connect()) or listening started (in Listen()).
-        //
-        // When using LwIP, post a callback to Release() rather than calling it directly. Since up-calls
-        // from LwIP are delivered as events (via the LwIP* methods), we must ensure that all events have been
-        // cleared from the queue before the end point gets freed, otherwise we'll end up accessing freed memory.
-        // We achieve this by first preventing further up-calls from LwIP (via the call to tcp_abort() above)
-        // and then queuing the Release() call to happen after all existing events have been processed.
-        //
         if (oldState != State::kReady && oldState != State::kBound)
         {
             Release();

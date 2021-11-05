@@ -67,7 +67,7 @@ public:
  *  endpoints (SOCK_STREAM sockets on Linux and BSD-derived systems) or LwIP
  *  TCP protocol control blocks, as the system is configured accordingly.
  */
-class DLL_EXPORT TCPEndPoint : public EndPointBasis, public AtomicReferenceCounted<TCPEndPoint, TCPEndPointDeletor>
+class DLL_EXPORT TCPEndPoint : public EndPointBasis, public ReferenceCounted<TCPEndPoint, TCPEndPointDeletor>
 {
     friend class InetLayer;
     friend class ::chip::Transport::TCPTest;

@@ -81,46 +81,4 @@ private:
     count_type mRefCount = kInitRefCount;
 };
 
-/// An variant of ReferenceCounted, with atomic counter.
-template <class Subclass, class Deletor = DeleteDeletor<Subclass>, int kInitRefCount = 1>
-class AtomicReferenceCounted
-{
-public:
-    using count_type = uint32_t;
-
-    AtomicReferenceCounted() : mRefCount(kInitRefCount) {}
-
-    /** Adds one to the usage count of this class */
-    Subclass * Retain()
-    {
-        if (mRefCount == std::numeric_limits<count_type>::max())
-        {
-            abort();
-        }
-        ++mRefCount;
-
-        return static_cast<Subclass *>(this);
-    }
-
-    /** Release usage of this class */
-    void Release()
-    {
-        if (mRefCount == 0)
-        {
-            abort();
-        }
-
-        if (--mRefCount == 0)
-        {
-            Deletor::Release(static_cast<Subclass *>(this));
-        }
-    }
-
-    /** Get the current reference counter value */
-    count_type GetReferenceCount() const { return mRefCount.load(); }
-
-private:
-    std::atomic<count_type> mRefCount;
-};
-
 } // namespace chip
