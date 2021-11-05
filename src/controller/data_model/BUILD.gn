@@ -24,7 +24,7 @@ chip_data_model("data_model") {
 
   # On Android, we don't really need the tests APIs, and the compiler has
   # trouble compiling some of those files anyway.
-  use_tests_apis = (current_os != "android")
+  use_tests_apis = current_os != "android"
   use_default_client_callbacks = true
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }
