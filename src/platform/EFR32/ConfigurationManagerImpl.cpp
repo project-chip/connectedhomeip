@@ -31,6 +31,9 @@
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
+template class GenericConfigurationManagerImpl<EFR32Config>;
+} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -46,7 +49,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
+    err = Internal::GenericConfigurationManagerImpl<EFR32Config>::Init();
     SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here (#1626)
@@ -81,7 +84,7 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
     // (where persistedStorageKey represents an index to the counter).
     CHIP_ERROR err;
 
-    err = ReadConfigValueCounter(persistedStorageKey, value);
+    err = EFR32Config::ReadConfigValueCounter(persistedStorageKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -99,7 +102,7 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
     // (where persistedStorageKey represents an index to the counter).
     CHIP_ERROR err;
 
-    err = WriteConfigValueCounter(persistedStorageKey, value);
+    err = EFR32Config::WriteConfigValueCounter(persistedStorageKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -110,13 +113,73 @@ exit:
     return err;
 }
 
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(EFR32Config::Key key, bool & val)
+{
+    return EFR32Config::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(EFR32Config::Key key, uint32_t & val)
+{
+    return EFR32Config::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(EFR32Config::Key key, uint64_t & val)
+{
+    return EFR32Config::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(EFR32Config::Key key, char * buf, size_t bufSize, size_t & outLen)
+{
+    return EFR32Config::ReadConfigValueStr(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(EFR32Config::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+{
+    return EFR32Config::ReadConfigValueBin(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(EFR32Config::Key key, bool val)
+{
+    return EFR32Config::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(EFR32Config::Key key, uint32_t val)
+{
+    return EFR32Config::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(EFR32Config::Key key, uint64_t val)
+{
+    return EFR32Config::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(EFR32Config::Key key, const char * str)
+{
+    return EFR32Config::WriteConfigValueStr(key, str);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(EFR32Config::Key key, const char * str, size_t strLen)
+{
+    return EFR32Config::WriteConfigValueStr(key, str, strLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(EFR32Config::Key key, const uint8_t * data, size_t dataLen)
+{
+    return EFR32Config::WriteConfigValueBin(key, data, dataLen);
+}
+
+void ConfigurationManagerImpl::RunConfigUnitTest(void)
+{
+    EFR32Config::RunConfigUnitTest();
+}
+
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = FactoryResetConfig();
+    err = EFR32Config::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", chip::ErrorStr(err));

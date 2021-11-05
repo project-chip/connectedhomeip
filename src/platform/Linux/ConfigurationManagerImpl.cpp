@@ -37,6 +37,9 @@
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
+template class GenericConfigurationManagerImpl<PosixConfig>;
+} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -53,18 +56,18 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
-    err = EnsureNamespace(kConfigNamespace_ChipFactory);
+    err = EnsureNamespace(PosixConfig::kConfigNamespace_ChipFactory);
     SuccessOrExit(err);
-    err = EnsureNamespace(kConfigNamespace_ChipConfig);
+    err = EnsureNamespace(PosixConfig::kConfigNamespace_ChipConfig);
     SuccessOrExit(err);
-    err = EnsureNamespace(kConfigNamespace_ChipCounters);
+    err = EnsureNamespace(PosixConfig::kConfigNamespace_ChipCounters);
     SuccessOrExit(err);
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
+    err = Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
     SuccessOrExit(err);
 
-    if (ConfigValueExists(kCounterKey_RebootCount))
+    if (ConfigValueExists(PosixConfig::kCounterKey_RebootCount))
     {
         err = GetRebootCount(rebootCount);
         SuccessOrExit(err);
@@ -79,13 +82,13 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!ConfigValueExists(kCounterKey_TotalOperationalHours))
+    if (!ConfigValueExists(PosixConfig::kCounterKey_TotalOperationalHours))
     {
         err = StoreTotalOperationalHours(0);
         SuccessOrExit(err);
     }
 
-    if (!ConfigValueExists(kCounterKey_BootReason))
+    if (!ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
         err = StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
         SuccessOrExit(err);
@@ -144,7 +147,7 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    PosixConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
+    PosixConfig::Key configKey{ PosixConfig::kConfigNamespace_ChipCounters, key };
 
     CHIP_ERROR err = ReadConfigValue(configKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -156,7 +159,7 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
 
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    PosixConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
+    PosixConfig::Key configKey{ PosixConfig::kConfigNamespace_ChipCounters, key };
     return WriteConfigValue(configKey, value);
 }
 
@@ -166,7 +169,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetWiFiStationSecurityType(WiFiAuthSecurity
     CHIP_ERROR err;
     uint32_t secTypeInt;
 
-    err = ReadConfigValue(kConfigKey_WiFiStationSecType, secTypeInt);
+    err = ReadConfigValue(PosixConfig::kConfigKey_WiFiStationSecType, secTypeInt);
     if (err == CHIP_NO_ERROR)
     {
         secType = static_cast<WiFiAuthSecurityType>(secTypeInt);
@@ -185,13 +188,13 @@ CHIP_ERROR ConfigurationManagerImpl::UpdateWiFiStationSecurityType(WiFiAuthSecur
         if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || (err == CHIP_NO_ERROR && secType != curSecType))
         {
             uint32_t secTypeInt = static_cast<uint32_t>(secType);
-            err                 = WriteConfigValue(kConfigKey_WiFiStationSecType, secTypeInt);
+            err                 = WriteConfigValue(PosixConfig::kConfigKey_WiFiStationSecType, secTypeInt);
         }
         SuccessOrExit(err);
     }
     else
     {
-        err = ClearConfigValue(kConfigKey_WiFiStationSecType);
+        err = ClearConfigValue(PosixConfig::kConfigKey_WiFiStationSecType);
         SuccessOrExit(err);
     }
 
@@ -200,13 +203,73 @@ exit:
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(PosixConfig::Key key, bool & val)
+{
+    return PosixConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(PosixConfig::Key key, uint32_t & val)
+{
+    return PosixConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(PosixConfig::Key key, uint64_t & val)
+{
+    return PosixConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(PosixConfig::Key key, char * buf, size_t bufSize, size_t & outLen)
+{
+    return PosixConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(PosixConfig::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+{
+    return PosixConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(PosixConfig::Key key, bool val)
+{
+    return PosixConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(PosixConfig::Key key, uint32_t val)
+{
+    return PosixConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(PosixConfig::Key key, uint64_t val)
+{
+    return PosixConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(PosixConfig::Key key, const char * str)
+{
+    return PosixConfig::WriteConfigValueStr(key, str);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(PosixConfig::Key key, const char * str, size_t strLen)
+{
+    return PosixConfig::WriteConfigValueStr(key, str, strLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(PosixConfig::Key key, const uint8_t * data, size_t dataLen)
+{
+    return PosixConfig::WriteConfigValueBin(key, data, dataLen);
+}
+
+void ConfigurationManagerImpl::RunConfigUnitTest(void)
+{
+    PosixConfig::RunConfigUnitTest();
+}
+
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = FactoryResetConfig();
+    err = PosixConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to factory reset configurations: %s", ErrorStr(err));
@@ -232,32 +295,32 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
-    return ReadConfigValue(kCounterKey_RebootCount, rebootCount);
+    return ReadConfigValue(PosixConfig::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
 {
-    return WriteConfigValue(kCounterKey_RebootCount, rebootCount);
+    return WriteConfigValue(PosixConfig::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    return ReadConfigValue(kCounterKey_TotalOperationalHours, totalOperationalHours);
+    return ReadConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
 {
-    return WriteConfigValue(kCounterKey_TotalOperationalHours, totalOperationalHours);
+    return WriteConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetBootReasons(uint32_t & bootReasons)
 {
-    return ReadConfigValue(kCounterKey_BootReason, bootReasons);
+    return ReadConfigValue(PosixConfig::kCounterKey_BootReason, bootReasons);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreBootReasons(uint32_t bootReasons)
 {
-    return WriteConfigValue(kCounterKey_BootReason, bootReasons);
+    return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReasons);
 }
 
 } // namespace DeviceLayer

@@ -38,6 +38,9 @@
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
+template class GenericConfigurationManagerImpl<QPGConfig>;
+} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -53,7 +56,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
+    err = Internal::GenericConfigurationManagerImpl<QPGConfig>::Init();
     SuccessOrExit(err);
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
@@ -83,9 +86,9 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
                                                                uint32_t & value)
 {
     CHIP_ERROR err;
-    uintmax_t recordKey = persistedStorageKey + kConfigKey_GroupKeyBase;
+    uintmax_t recordKey = persistedStorageKey + QPGConfig::kConfigKey_GroupKeyBase;
 
-    VerifyOrExit(recordKey <= kConfigKey_GroupKeyMax, err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrExit(recordKey <= QPGConfig::kConfigKey_GroupKeyMax, err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     err = ReadConfigValue(persistedStorageKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -103,9 +106,9 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
 {
     CHIP_ERROR err;
 
-    uintmax_t recordKey = persistedStorageKey + kConfigKey_GroupKeyBase;
+    uintmax_t recordKey = persistedStorageKey + QPGConfig::kConfigKey_GroupKeyBase;
 
-    VerifyOrExit(recordKey <= kConfigKey_GroupKeyMax, err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrExit(recordKey <= QPGConfig::kConfigKey_GroupKeyMax, err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     err = WriteConfigValue(persistedStorageKey, value);
     SuccessOrExit(err);
@@ -121,7 +124,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = FactoryResetConfig();
+    err = QPGConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));

@@ -51,6 +51,9 @@
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
+template class GenericConfigurationManagerImpl<CC13X2_26X2Config>;
+} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -89,7 +92,7 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    CC13X2_26X2Config::Key configKey{ { kCC13X2_26X2ChipCounters_Sysid, key } };
+    CC13X2_26X2Config::Key configKey{ { CC13X2_26X2Config::kCC13X2_26X2ChipCounters_Sysid, key } };
 
     CHIP_ERROR err = ReadConfigValue(configKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -101,8 +104,68 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
 
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    CC13X2_26X2Config::Key configKey{ { kCC13X2_26X2ChipCounters_Sysid, key } };
+    CC13X2_26X2Config::Key configKey{ { CC13X2_26X2Config::kCC13X2_26X2ChipCounters_Sysid, key } };
     return WriteConfigValue(configKey, value);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(CC13X2_26X2Config::Key key, bool & val)
+{
+    return CC13X2_26X2Config::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(CC13X2_26X2Config::Key key, uint32_t & val)
+{
+    return CC13X2_26X2Config::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(CC13X2_26X2Config::Key key, uint64_t & val)
+{
+    return CC13X2_26X2Config::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(CC13X2_26X2Config::Key key, char * buf, size_t bufSize, size_t & outLen)
+{
+    return CC13X2_26X2Config::ReadConfigValueStr(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(CC13X2_26X2Config::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+{
+    return CC13X2_26X2Config::ReadConfigValueBin(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(CC13X2_26X2Config::Key key, bool val)
+{
+    return CC13X2_26X2Config::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(CC13X2_26X2Config::Key key, uint32_t val)
+{
+    return CC13X2_26X2Config::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(CC13X2_26X2Config::Key key, uint64_t val)
+{
+    return CC13X2_26X2Config::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(CC13X2_26X2Config::Key key, const char * str)
+{
+    return CC13X2_26X2Config::WriteConfigValueStr(key, str);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(CC13X2_26X2Config::Key key, const char * str, size_t strLen)
+{
+    return CC13X2_26X2Config::WriteConfigValueStr(key, str, strLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(CC13X2_26X2Config::Key key, const uint8_t * data, size_t dataLen)
+{
+    return CC13X2_26X2Config::WriteConfigValueBin(key, data, dataLen);
+}
+
+void ConfigurationManagerImpl::RunConfigUnitTest(void)
+{
+    CC13X2_26X2Config::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
@@ -111,7 +174,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = FactoryResetConfig();
+    err = CC13X2_26X2Config::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));

@@ -39,6 +39,9 @@
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
+template class GenericConfigurationManagerImpl<AndroidConfig>;
+} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -84,6 +87,66 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(AndroidConfig::Key key, bool & val)
+{
+    return AndroidConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(AndroidConfig::Key key, uint32_t & val)
+{
+    return AndroidConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(AndroidConfig::Key key, uint64_t & val)
+{
+    return AndroidConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(AndroidConfig::Key key, char * buf, size_t bufSize, size_t & outLen)
+{
+    return AndroidConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(AndroidConfig::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+{
+    return AndroidConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(AndroidConfig::Key key, bool val)
+{
+    return AndroidConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(AndroidConfig::Key key, uint32_t val)
+{
+    return AndroidConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(AndroidConfig::Key key, uint64_t val)
+{
+    return AndroidConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(AndroidConfig::Key key, const char * str)
+{
+    return AndroidConfig::WriteConfigValueStr(key, str);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(AndroidConfig::Key key, const char * str, size_t strLen)
+{
+    return AndroidConfig::WriteConfigValueStr(key, str, strLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(AndroidConfig::Key key, const uint8_t * data, size_t dataLen)
+{
+    return AndroidConfig::WriteConfigValueBin(key, data, dataLen);
+}
+
+void ConfigurationManagerImpl::RunConfigUnitTest(void)
+{
+    AndroidConfig::RunConfigUnitTest();
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION

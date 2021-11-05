@@ -40,6 +40,9 @@
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
+template class GenericConfigurationManagerImpl<ZephyrConfig>;
+} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -55,7 +58,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
+    err = Internal::GenericConfigurationManagerImpl<ZephyrConfig>::Init();
     SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here
@@ -87,6 +90,66 @@ exit:
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(ZephyrConfig::Key key, bool & val)
+{
+    return ZephyrConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(ZephyrConfig::Key key, uint32_t & val)
+{
+    return ZephyrConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(ZephyrConfig::Key key, uint64_t & val)
+{
+    return ZephyrConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(ZephyrConfig::Key key, char * buf, size_t bufSize, size_t & outLen)
+{
+    return ZephyrConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(ZephyrConfig::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+{
+    return ZephyrConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(ZephyrConfig::Key key, bool val)
+{
+    return ZephyrConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(ZephyrConfig::Key key, uint32_t val)
+{
+    return ZephyrConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(ZephyrConfig::Key key, uint64_t val)
+{
+    return ZephyrConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(ZephyrConfig::Key key, const char * str)
+{
+    return ZephyrConfig::WriteConfigValueStr(key, str);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(ZephyrConfig::Key key, const char * str, size_t strLen)
+{
+    return ZephyrConfig::WriteConfigValueStr(key, str, strLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(ZephyrConfig::Key key, const uint8_t * data, size_t dataLen)
+{
+    return ZephyrConfig::WriteConfigValueBin(key, data, dataLen);
+}
+
+void ConfigurationManagerImpl::RunConfigUnitTest(void)
+{
+    ZephyrConfig::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)

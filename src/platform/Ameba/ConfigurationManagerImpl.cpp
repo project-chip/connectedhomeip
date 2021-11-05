@@ -33,6 +33,9 @@
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
+template class GenericConfigurationManagerImpl<AmebaConfig>;
+} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -49,11 +52,11 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
-    err = EnsureNamespace(kConfigNamespace_ChipFactory);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipFactory);
     SuccessOrExit(err);
-    err = EnsureNamespace(kConfigNamespace_ChipConfig);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipConfig);
     SuccessOrExit(err);
-    err = EnsureNamespace(kConfigNamespace_ChipCounters);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipCounters);
     SuccessOrExit(err);
 
     if (ConfigValueExists(kCounterKey_RebootCount))
@@ -84,7 +87,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     }
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
+    err = Internal::GenericConfigurationManagerImpl<AmebaConfig>::Init();
     SuccessOrExit(err);
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
@@ -156,7 +159,7 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    AmebaConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
+    AmebaConfig::Key configKey{ AmebaConfig::kConfigNamespace_ChipCounters, key };
 
     CHIP_ERROR err = ReadConfigValue(configKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -168,8 +171,68 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
 
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    AmebaConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
+    AmebaConfig::Key configKey{ AmebaConfig::kConfigNamespace_ChipCounters, key };
     return WriteConfigValue(configKey, value);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(AmebaConfig::Key key, bool & val)
+{
+    return AmebaConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(AmebaConfig::Key key, uint32_t & val)
+{
+    return AmebaConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(AmebaConfig::Key key, uint64_t & val)
+{
+    return AmebaConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(AmebaConfig::Key key, char * buf, size_t bufSize, size_t & outLen)
+{
+    return AmebaConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(AmebaConfig::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+{
+    return AmebaConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(AmebaConfig::Key key, bool val)
+{
+    return AmebaConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(AmebaConfig::Key key, uint32_t val)
+{
+    return AmebaConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(AmebaConfig::Key key, uint64_t val)
+{
+    return AmebaConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(AmebaConfig::Key key, const char * str)
+{
+    return AmebaConfig::WriteConfigValueStr(key, str);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(AmebaConfig::Key key, const char * str, size_t strLen)
+{
+    return AmebaConfig::WriteConfigValueStr(key, str, strLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(AmebaConfig::Key key, const uint8_t * data, size_t dataLen)
+{
+    return AmebaConfig::WriteConfigValueBin(key, data, dataLen);
+}
+
+void ConfigurationManagerImpl::RunConfigUnitTest(void)
+{
+    AmebaConfig::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
@@ -179,7 +242,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
     // Erase all values in the chip-config NVS namespace.
-    err = ClearNamespace(kConfigNamespace_ChipConfig);
+    err = AmebaConfig::ClearNamespace(kConfigNamespace_ChipConfig);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %s", chip::ErrorStr(err));

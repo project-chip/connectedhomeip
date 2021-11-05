@@ -39,6 +39,9 @@
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
+template class GenericConfigurationManagerImpl<MbedConfig>;
+} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -110,13 +113,73 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
 
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    return WriteCounter(key, value);
+    return MbedConfig::WriteCounter(key, value);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(MbedConfig::Key key, bool & val)
+{
+    return MbedConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(MbedConfig::Key key, uint32_t & val)
+{
+    return MbedConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(MbedConfig::Key key, uint64_t & val)
+{
+    return MbedConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(MbedConfig::Key key, char * buf, size_t bufSize, size_t & outLen)
+{
+    return MbedConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(MbedConfig::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+{
+    return MbedConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(MbedConfig::Key key, bool val)
+{
+    return MbedConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(MbedConfig::Key key, uint32_t val)
+{
+    return MbedConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(MbedConfig::Key key, uint64_t val)
+{
+    return MbedConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(MbedConfig::Key key, const char * str)
+{
+    return MbedConfig::WriteConfigValueStr(key, str);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(MbedConfig::Key key, const char * str, size_t strLen)
+{
+    return MbedConfig::WriteConfigValueStr(key, str, strLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(MbedConfig::Key key, const uint8_t * data, size_t dataLen)
+{
+    return MbedConfig::WriteConfigValueBin(key, data, dataLen);
+}
+
+void ConfigurationManagerImpl::RunConfigUnitTest(void)
+{
+    MbedConfig::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     ChipLogProgress(DeviceLayer, "Performing factory reset");
-    const CHIP_ERROR err = FactoryResetConfig();
+    const CHIP_ERROR err = MbedConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));

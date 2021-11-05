@@ -33,6 +33,9 @@
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
+template class GenericConfigurationManagerImpl<P6Config>;
+} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -48,7 +51,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
+    err = Internal::GenericConfigurationManagerImpl<P6Config>::Init();
     VerifyOrReturnError(CHIP_NO_ERROR == err, err);
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
@@ -109,13 +112,73 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
     return PersistedStorage::KeyValueStoreMgr().Put(key, static_cast<void *>(&value), 4);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(P6Config::Key key, bool & val)
+{
+    return P6Config::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(P6Config::Key key, uint32_t & val)
+{
+    return P6Config::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(P6Config::Key key, uint64_t & val)
+{
+    return P6Config::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(P6Config::Key key, char * buf, size_t bufSize, size_t & outLen)
+{
+    return P6Config::ReadConfigValueStr(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(P6Config::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+{
+    return P6Config::ReadConfigValueBin(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(P6Config::Key key, bool val)
+{
+    return P6Config::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(P6Config::Key key, uint32_t val)
+{
+    return P6Config::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(P6Config::Key key, uint64_t val)
+{
+    return P6Config::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(P6Config::Key key, const char * str)
+{
+    return P6Config::WriteConfigValueStr(key, str);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(P6Config::Key key, const char * str, size_t strLen)
+{
+    return P6Config::WriteConfigValueStr(key, str, strLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(P6Config::Key key, const uint8_t * data, size_t dataLen)
+{
+    return P6Config::WriteConfigValueBin(key, data, dataLen);
+}
+
+void ConfigurationManagerImpl::RunConfigUnitTest(void)
+{
+    P6Config::RunConfigUnitTest();
+}
+
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = FactoryResetConfig();
+    err = P6Config::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
