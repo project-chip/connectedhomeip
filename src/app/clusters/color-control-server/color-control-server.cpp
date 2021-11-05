@@ -2585,3 +2585,5 @@ void emberAfPluginColorControlServerHueSatTransitionEventHandler(EndpointId endp
     ColorControlServer::Instance().updateHueSatCommand(endpoint);
 }
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+
+void MatterColorControlPluginServerInitCallback() {}
