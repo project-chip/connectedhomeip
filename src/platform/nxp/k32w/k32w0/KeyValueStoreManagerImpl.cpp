@@ -89,7 +89,7 @@ CHIP_ERROR RestoreFromFlash()
         {
             ChipLogProgress(DeviceLayer, "KVS, Error while restoring Matter key [%s] from flash with PDM id: %i", key_string_id,
                             pdm_internal_id);
-            break;
+            return err;
         }
 
         if (key_string_id_size)
@@ -162,7 +162,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
             if (iter == g_key_ids_set.end())
             {
-                assert(g_key_ids_set.size() < kMaxNumberOfKeys);
+                if (g_key_ids_set.size() >= kMaxNumberOfKeys)
+                {
+                    return CHIP_ERROR_NO_MEMORY;
+                }
+
                 g_key_ids_set.insert(key_id);
 
                 put_key = true;
@@ -188,20 +192,20 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
         if (err == CHIP_NO_ERROR)
         {
             pdm_internal_id = chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + kMaxNumberOfKeys);
-            ChipLogProgress(DeviceLayer, "KVS, save in flash the Matter key [%s] with PDM id: %i", key,
-                            pdm_internal_id);
+            ChipLogProgress(DeviceLayer, "KVS, save in flash the Matter key [%s] with PDM id: %i", key, pdm_internal_id);
 
             err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueStr(pdm_internal_id, key, strlen(key));
 
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogProgress(DeviceLayer, "KVS, Error while saving in flash the Matter key [%s] with PDM id: %i",
-                                key, pdm_internal_id);
+                ChipLogProgress(DeviceLayer, "KVS, Error while saving in flash the Matter key [%s] with PDM id: %i", key,
+                                pdm_internal_id);
             }
         }
         else
         {
-            ChipLogProgress(DeviceLayer, "KVS, Error while saving in flash the value of the Matter key [%s] with PDM id: %i", key, pdm_internal_id);
+            ChipLogProgress(DeviceLayer, "KVS, Error while saving in flash the value of the Matter key [%s] with PDM id: %i", key,
+                            pdm_internal_id);
         }
     }
 
