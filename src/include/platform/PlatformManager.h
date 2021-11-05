@@ -49,7 +49,7 @@ class DeviceControlServer;
 class FabricProvisioningServer;
 class ServiceProvisioningServer;
 class BLEManagerImpl;
-template <class>
+template <class, class>
 class GenericConfigurationManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
@@ -239,7 +239,7 @@ private:
     friend class Internal::GenericThreadStackManagerImpl_OpenThread;
     template <class>
     friend class Internal::GenericThreadStackManagerImpl_OpenThread_LwIP;
-    template <class>
+    template <class, class>
     friend class Internal::GenericConfigurationManagerImpl;
     friend class System::PlatformEventing;
 
