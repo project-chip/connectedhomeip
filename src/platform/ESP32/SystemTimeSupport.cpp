@@ -38,9 +38,14 @@ namespace Internal {
 ClockImpl gClockImpl;
 } // namespace Internal
 
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
+{
+    return Clock::Microseconds64(::esp_timer_get_time());
+}
+
 Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
-    return std::chrono::duration_cast<Milliseconds64>(std::chrono::duration<uint64_t, std::micro>(::esp_timer_get_time()));
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
 } // namespace Clock
