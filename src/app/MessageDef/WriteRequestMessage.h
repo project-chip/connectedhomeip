@@ -79,7 +79,7 @@ public:
     CHIP_ERROR GetSuppressResponse(bool * const apSuppressResponse) const;
 
     /**
-     *  @brief Get a TLVReader for the AttributePathList. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the AttributePaths. Next() must be called before accessing them.
      *
      *  @param [in] apAttributeDataList    A pointer to apAttributeDataList
      *

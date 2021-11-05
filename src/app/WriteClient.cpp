@@ -90,9 +90,9 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
-    TLV::TLVReader attributeStatusListReader;
+    TLV::TLVReader attributeStatusesReader;
     WriteResponseMessage::Parser writeResponse;
-    AttributeStatusList::Parser attributeStatusListParser;
+    AttributeStatuses::Parser attributeStatusesParser;
 
     reader.Init(std::move(payload));
     err = reader.Next();
@@ -105,18 +105,18 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     err = writeResponse.CheckSchemaValidity();
     SuccessOrExit(err);
 #endif
-    err = writeResponse.GetAttributeStatusList(&attributeStatusListParser);
+    err = writeResponse.GetWriteResponses(&attributeStatusesParser);
     SuccessOrExit(err);
 
-    attributeStatusListParser.GetReader(&attributeStatusListReader);
+    attributeStatusesParser.GetReader(&attributeStatusesReader);
 
-    while (CHIP_NO_ERROR == (err = attributeStatusListReader.Next()))
+    while (CHIP_NO_ERROR == (err = attributeStatusesReader.Next()))
     {
-        VerifyOrExit(TLV::AnonymousTag == attributeStatusListReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrExit(TLV::AnonymousTag == attributeStatusesReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
 
         AttributeStatusIB::Parser element;
 
-        err = element.Init(attributeStatusListReader);
+        err = element.Init(attributeStatusesReader);
         SuccessOrExit(err);
 
         err = ProcessAttributeStatusIB(element);
@@ -171,10 +171,10 @@ TLV::TLVWriter * WriteClient::GetAttributeDataElementTLVWriter()
 CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
                                                AttributeDataElement::Builder aAttributeDataElement)
 {
-    AttributePath::Builder attributePath = aAttributeDataElement.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePath = aAttributeDataElement.CreateAttributePath();
     if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
     {
-        attributePath.FieldId(aAttributePathParams.mFieldId);
+        attributePath.Attribute(aAttributePathParams.mFieldId);
     }
 
     if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kListIndexValid))
@@ -182,10 +182,10 @@ CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttr
         attributePath.ListIndex(aAttributePathParams.mListIndex);
     }
 
-    attributePath.NodeId(aAttributePathParams.mNodeId)
-        .ClusterId(aAttributePathParams.mClusterId)
-        .EndpointId(aAttributePathParams.mEndpointId)
-        .EndOfAttributePath();
+    attributePath.Node(aAttributePathParams.mNodeId)
+        .Cluster(aAttributePathParams.mClusterId)
+        .Endpoint(aAttributePathParams.mEndpointId)
+        .EndOfAttributePathIB();
 
     return attributePath.GetError();
 }
@@ -320,22 +320,22 @@ void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributePath::Parser attributePath;
+    AttributePathIB::Parser attributePath;
     StatusIB statusIB;
     StatusIB::Parser StatusIBParser;
     AttributePathParams attributePathParams;
 
     mAttributeStatusIndex++;
-    err = aAttributeStatusIB.GetAttributePath(&attributePath);
+    err = aAttributeStatusIB.GetPath(&attributePath);
     SuccessOrExit(err);
-    err = attributePath.GetNodeId(&(attributePathParams.mNodeId));
+    err = attributePath.GetNode(&(attributePathParams.mNodeId));
     SuccessOrExit(err);
-    err = attributePath.GetClusterId(&(attributePathParams.mClusterId));
+    err = attributePath.GetCluster(&(attributePathParams.mClusterId));
     SuccessOrExit(err);
-    err = attributePath.GetEndpointId(&(attributePathParams.mEndpointId));
+    err = attributePath.GetEndpoint(&(attributePathParams.mEndpointId));
     SuccessOrExit(err);
 
-    err = attributePath.GetFieldId(&(attributePathParams.mFieldId));
+    err = attributePath.GetAttribute(&(attributePathParams.mFieldId));
     if (CHIP_NO_ERROR == err)
     {
         attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
@@ -354,7 +354,7 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
         attributePathParams.mFlags.Set(AttributePathParams::Flags::kListIndexValid);
     }
 
-    err = aAttributeStatusIB.GetStatusIB(&(StatusIBParser));
+    err = aAttributeStatusIB.GetErrorStatus(&(StatusIBParser));
     if (CHIP_NO_ERROR == err)
     {
         err = StatusIBParser.DecodeStatusIB(statusIB);

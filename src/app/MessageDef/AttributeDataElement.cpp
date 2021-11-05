@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -243,7 +243,7 @@ CHIP_ERROR AttributeDataElement::Parser::CheckSchemaValidity() const
             VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
             {
-                AttributePath::Parser path;
+                AttributePathIB::Parser path;
                 err = path.Init(reader);
                 SuccessOrExit(err);
 
@@ -348,7 +348,7 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR AttributeDataElement::Parser::GetAttributePath(AttributePath::Parser * const apAttributePath) const
+CHIP_ERROR AttributeDataElement::Parser::GetAttributePath(AttributePathIB::Parser * const apAttributePath) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -403,7 +403,7 @@ CHIP_ERROR AttributeDataElement::Builder::Init(chip::TLV::TLVWriter * const apWr
     return InitAnonymousStructure(apWriter);
 }
 
-AttributePath::Builder & AttributeDataElement::Builder::CreateAttributePathBuilder()
+AttributePathIB::Builder & AttributeDataElement::Builder::CreateAttributePath()
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributePathBuilder.ResetError(mError));

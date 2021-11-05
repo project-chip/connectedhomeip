@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "AttributePath.h"
+#include "AttributePathIB.h"
 #include "Builder.h"
 #include "Parser.h"
 
@@ -76,7 +76,7 @@ public:
 #endif
 
     /**
-     *  @brief Get a TLVReader for the AttributePath. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the AttributePathIB. Next() must be called before accessing them.
      *
      *  @param [in] apAttributePath    A pointer to apAttributePath
      *
@@ -84,7 +84,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributePath(AttributePath::Parser * const apAttributePath) const;
+    CHIP_ERROR GetAttributePath(AttributePathIB::Parser * const apAttributePath) const;
 
     /**
      *  @brief Get a TLVReader for the DataVersion. Next() must be called before accessing them.
@@ -145,11 +145,11 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     *  @brief Initialize a AttributePath::Builder for writing into the TLV stream
+     *  @brief Initialize a AttributePathIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributePath::Builder
+     *  @return A reference to AttributePathIB::Builder
      */
-    AttributePath::Builder & CreateAttributePathBuilder();
+    AttributePathIB::Builder & CreateAttributePath();
 
     /**
      *  @brief Inject DataVersion into the TLV stream to indicate the numerical data version associated with
@@ -180,7 +180,7 @@ public:
     AttributeDataElement::Builder & EndOfAttributeDataElement();
 
 private:
-    AttributePath::Builder mAttributePathBuilder;
+    AttributePathIB::Builder mAttributePathBuilder;
 };
 }; // namespace AttributeDataElement
 
