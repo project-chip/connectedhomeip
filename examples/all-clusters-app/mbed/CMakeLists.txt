@@ -86,6 +86,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_UTIL}/util.cpp
                ${APP_UTIL}/error-mapping.cpp
 
+               ${APP_CLUSTERS}/application-basic-server/application-basic-server.cpp
                ${APP_CLUSTERS}/basic/basic.cpp
                ${APP_CLUSTERS}/bindings/bindings.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp

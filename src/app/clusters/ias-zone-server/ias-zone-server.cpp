@@ -924,3 +924,5 @@ uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry)
     return deltaTimeMs / MILLISECOND_TICKS_PER_QUARTERSECOND;
 }
 #endif
+
+void MatterIasZonePluginServerInitCallback() {}
