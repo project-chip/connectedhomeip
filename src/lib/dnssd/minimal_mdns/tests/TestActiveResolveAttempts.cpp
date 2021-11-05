@@ -29,6 +29,7 @@ using chip::System::Clock::Timeout;
 class MockClock : public System::Clock::ClockBase
 {
 public:
+    System::Clock::Microseconds64 GetMonotonicMicroseconds64() override { return mMsec; }
     System::Clock::Milliseconds64 GetMonotonicMilliseconds64() override { return mMsec; }
 
     void Advance(System::Clock::Milliseconds32 ms) { mMsec += ms; }

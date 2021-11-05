@@ -53,6 +53,9 @@ namespace Clock {
  * `std::chrono::duration_cast<>()`.
  */
 
+using Microseconds64 = std::chrono::duration<uint64_t, std::micro>;
+using Microseconds32 = std::chrono::duration<uint32_t, std::micro>;
+
 using Milliseconds64 = std::chrono::duration<uint64_t, std::milli>;
 using Milliseconds32 = std::chrono::duration<uint32_t, std::milli>;
 
@@ -63,6 +66,19 @@ using Seconds16 = std::chrono::duration<uint16_t>;
 constexpr Seconds16 kZero{ 0 };
 
 namespace Literals {
+
+constexpr Microseconds64 operator""_us(unsigned long long int us)
+{
+    return Microseconds64(us);
+}
+constexpr Microseconds64 operator""_us64(unsigned long long int us)
+{
+    return Microseconds64(us);
+}
+constexpr Microseconds32 operator""_us32(unsigned long long int us)
+{
+    return Microseconds32(us);
+}
 
 constexpr Milliseconds64 operator""_ms(unsigned long long int ms)
 {
@@ -128,6 +144,29 @@ public:
     Timestamp GetMonotonicTimestamp() { return GetMonotonicMilliseconds64(); }
 
     /**
+     * Returns a monotonic system time in units of microseconds.
+     *
+     * This function returns an elapsed time in microseconds since an arbitrary, platform-defined epoch.
+     * The value returned is guaranteed to be ever-increasing (i.e. never wrapping or decreasing) between
+     * reboots of the system.  Additionally, the underlying time source is guaranteed to tick
+     * continuously during any system sleep modes that do not entail a restart upon wake.
+     *
+     * Although some platforms may choose to return a value that measures the time since boot for the
+     * system, applications must *not* rely on this.
+     *
+     * Applications must not rely on the time returned by GetMonotonicMicroseconds64() actually having
+     * granularity finer than milliseconds.
+     *
+     * Platform implementations *must* use the same epoch for GetMonotonicMicroseconds64() and GetMonotonicMilliseconds64().
+     *
+     * Platforms *must* use an epoch such that the upper bit of a value returned by GetMonotonicMicroseconds64() is zero
+     * for the expected operational life of the system.
+     *
+     * @returns Elapsed time in microseconds since an arbitrary, platform-defined epoch.
+     */
+    virtual Microseconds64 GetMonotonicMicroseconds64() = 0;
+
+    /**
      * Returns a monotonic system time in units of milliseconds.
      *
      * This function returns an elapsed time in milliseconds since an arbitrary, platform-defined epoch.
@@ -138,8 +177,9 @@ public:
      * Although some platforms may choose to return a value that measures the time since boot for the
      * system, applications must *not* rely on this.
      *
-     * Platforms *must* use an epoch such that the upper bit of a value returned by GetMonotonicMilliseconds64() is zero
-     * for the expected operational life of the system.
+     * Platform implementations *must* use the same epoch for GetMonotonicMicroseconds64() and GetMonotonicMilliseconds64().
+     * (As a consequence of this, and the requirement for GetMonotonicMicroseconds64() to return high bit zero, values
+     * returned by GetMonotonicMilliseconds64() will have the high ten bits zero.)
      *
      * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
      */
@@ -151,6 +191,7 @@ class ClockImpl : public ClockBase
 {
 public:
     ~ClockImpl() = default;
+    Microseconds64 GetMonotonicMicroseconds64() override;
     Milliseconds64 GetMonotonicMilliseconds64() override;
 };
 
@@ -167,8 +208,8 @@ inline void SetSystemClockForTesting(Clock::ClockBase * clock)
 } // namespace Internal
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
-Milliseconds64 TimevalToMilliseconds(const timeval & in);
-void ToTimeval(Milliseconds64 in, timeval & out);
+Microseconds64 TimevalToMicroseconds(const timeval & in);
+void ToTimeval(Microseconds64 in, timeval & out);
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Clock
