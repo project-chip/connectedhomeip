@@ -178,6 +178,7 @@ template("chip_data_model") {
         sources += [
           "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.cpp",
           "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h",
+          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTestWrite.cpp",
         ]
       }
     }
