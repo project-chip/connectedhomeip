@@ -717,17 +717,6 @@ menu "CHIP Device Layer"
 
     menu "Testing Options"
 
-        config ENABLE_TEST_DEVICE_IDENTITY
-            int "Use Test Device Identity"
-            range 0 256
-            default 1
-            help
-                Enables the use of a hard-coded CHIP device id and credentials if no device id is
-                found in CHIP NV storage.  The value specifies which of 256 identities, numbered 1
-                through 256, is to be used.  A value of 0 disables use of a test identity.
-
-                This option is for testing only and should not be enabled in production releases.
-
         config USE_TEST_SERIAL_NUMBER
             string "Use Test Serial Number"
             default "TEST_SN"
