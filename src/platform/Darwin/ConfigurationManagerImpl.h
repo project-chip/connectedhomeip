@@ -33,14 +33,8 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Darwin platform.
  */
-class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl, Internal::PosixConfig>
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::PosixConfig>
 {
-    // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
-    // defined on this class.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl, Internal::PosixConfig>;
-#endif
-
 public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();

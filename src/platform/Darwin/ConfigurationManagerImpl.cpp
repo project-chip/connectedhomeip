@@ -46,7 +46,7 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-template class GenericConfigurationManagerImpl<ConfigurationManagerImpl, PosixConfig>;
+template class GenericConfigurationManagerImpl<PosixConfig>;
 } // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
@@ -142,7 +142,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     CHIP_ERROR err;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl, PosixConfig>::Init();
+    err = Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
     SuccessOrExit(err);
 
 exit:

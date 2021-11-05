@@ -47,7 +47,7 @@ namespace Internal {
  * or indirectly) by the ConfigurationManagerImpl class, which also appears as the template's ImplClass
  * parameter.
  */
-template <class ImplClass, class ConfigClass>
+template <class ConfigClass>
 class GenericConfigurationManagerImpl : public ConfigurationManager
 {
 public:
@@ -132,51 +132,48 @@ protected:
     virtual CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) = 0;
     virtual CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) = 0;
     virtual void RunConfigUnitTest(void) = 0;
-
-private:
-    ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
 // extern template class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
-template <class ImplClass, class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass, ConfigClass>::GetVendorId(uint16_t & vendorId)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorId(uint16_t & vendorId)
 {
     vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass, class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass, ConfigClass>::GetProductId(uint16_t & productId)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductId(uint16_t & productId)
 {
     productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass, class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass, ConfigClass>::GetFirmwareRevision(uint16_t & firmwareRev)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareRevision(uint16_t & firmwareRev)
 {
     firmwareRev = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass, class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass, ConfigClass>::GetDeviceTypeId(uint16_t & deviceType)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceTypeId(uint16_t & deviceType)
 {
     deviceType = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass, class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass, ConfigClass>::GetInitialPairingHint(uint16_t & pairingHint)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingHint(uint16_t & pairingHint)
 {
     pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass, class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass, ConfigClass>::GetSecondaryPairingHint(uint16_t & pairingHint)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingHint(uint16_t & pairingHint)
 {
     pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT);
     return CHIP_NO_ERROR;
