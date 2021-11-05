@@ -179,7 +179,7 @@ private:
     // Enforce interface match if not null
     static bool MatchInterface(Inet::InterfaceId i1, Inet::InterfaceId i2)
     {
-        if (i1.IsPresent() && i2.IsPresent())
+        if ((i1 != INET_NULL_INTERFACEID) && (i2 != INET_NULL_INTERFACEID))
         {
             return i1 == i2;
         }
