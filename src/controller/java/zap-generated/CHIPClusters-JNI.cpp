@@ -2319,8 +2319,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t capacity, uint8_t groupCount,
-                           /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
+    static void CallbackFn(void * context, uint8_t capacity, /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
     {
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2337,10 +2336,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(capacity), static_cast<jint>(groupCount)
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(capacity)
                             // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
                             // Conversion from this type to Java is not properly implemented yet
         );
@@ -10607,8 +10606,7 @@ exit:
         onFailure.release();
     }
 }
-JNI_METHOD(void, GroupsCluster, getGroupMembership)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupCount, jint groupList)
+JNI_METHOD(void, GroupsCluster, getGroupMembership)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupList)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10626,7 +10624,7 @@ JNI_METHOD(void, GroupsCluster, getGroupMembership)
     cppCluster = reinterpret_cast<GroupsCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->GetGroupMembership(onSuccess->Cancel(), onFailure->Cancel(), groupCount, groupList);
+    err = cppCluster->GetGroupMembership(onSuccess->Cancel(), onFailure->Cancel(), groupList);
     SuccessOrExit(err);
 
 exit:

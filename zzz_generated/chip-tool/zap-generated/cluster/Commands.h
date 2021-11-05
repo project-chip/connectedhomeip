@@ -3050,10 +3050,6 @@ static void OnGroupsGetGroupMembershipResponseSuccess(
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupCount", 1, data.groupCount);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
         err = LogValue("groupList", 1, data.groupList);
     }
 
@@ -13417,7 +13413,6 @@ class GroupsGetGroupMembership : public ModelCommand
 public:
     GroupsGetGroupMembership() : ModelCommand("get-group-membership")
     {
-        AddArgument("GroupCount", 0, UINT8_MAX, &mRequest.groupCount);
         // groupList Array parsing is not supported yet
         ModelCommand::AddArguments();
     }

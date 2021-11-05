@@ -1242,7 +1242,7 @@
             /* Endpoint: 1, Cluster: Thermostat (server), little-endian */                                                         \
                                                                                                                                    \
             /* 3406 - FeatureMap, */                                                                                               \
-            0x0B, 0x00, 0x00, 0x00,                                                                                                \
+            0x00, 0x00, 0x00, 0x0B,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Color Control (server), little-endian */                                                      \
                                                                                                                                    \

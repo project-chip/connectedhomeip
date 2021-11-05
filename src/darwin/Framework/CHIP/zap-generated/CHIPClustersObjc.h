@@ -874,7 +874,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)addGroup:(uint16_t)groupId groupName:(NSString *)groupName responseHandler:(ResponseHandler)responseHandler;
 - (void)addGroupIfIdentifying:(uint16_t)groupId groupName:(NSString *)groupName responseHandler:(ResponseHandler)responseHandler;
-- (void)getGroupMembership:(uint8_t)groupCount groupList:(uint16_t)groupList responseHandler:(ResponseHandler)responseHandler;
+- (void)getGroupMembership:(uint16_t)groupList responseHandler:(ResponseHandler)responseHandler;
 - (void)removeAllGroups:(ResponseHandler)responseHandler;
 - (void)removeGroup:(uint16_t)groupId responseHandler:(ResponseHandler)responseHandler;
 - (void)viewGroup:(uint16_t)groupId responseHandler:(ResponseHandler)responseHandler;
