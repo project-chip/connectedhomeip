@@ -44,8 +44,7 @@ namespace Internal {
  *
  * This template contains implementations of select features from the ConfigurationManager abstract
  * interface that are suitable for use on all platforms.  It is intended to be inherited (directly
- * or indirectly) by the ConfigurationManagerImpl class, which also appears as the template's ImplClass
- * parameter.
+ * or indirectly) by the ConfigurationManagerImpl class.
  */
 template <class ConfigClass>
 class GenericConfigurationManagerImpl : public ConfigurationManager
@@ -133,9 +132,6 @@ protected:
     virtual CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) = 0;
     virtual void RunConfigUnitTest(void) = 0;
 };
-
-// Instruct the compiler to instantiate the template only when explicitly told to do so.
-// extern template class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
 template <class ConfigClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorId(uint16_t & vendorId)

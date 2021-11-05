@@ -583,9 +583,6 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
     }
 }
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-// template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
