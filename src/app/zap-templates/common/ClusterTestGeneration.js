@@ -474,8 +474,8 @@ function chip_tests_item_parameters(options)
   const promise = assertCommandOrAttribute(this).then(item => {
     if (this.isAttribute && !this.isWriteAttribute) {
       if (this.isSubscribeAttribute) {
-        const minInterval = { name : 'minInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.minInterval };
-        const maxInterval = { name : 'maxInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.maxInterval };
+        const minInterval = { name : 'minInterval', type : 'int16u', chipType : 'uint16_t', definedValue : this.minInterval };
+        const maxInterval = { name : 'maxInterval', type : 'int16u', chipType : 'uint16_t', definedValue : this.maxInterval };
         return [ minInterval, maxInterval ];
       }
       return [];
