@@ -491,7 +491,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     // Group Messages should never send an Ack
     if (payloadHeader.NeedsAck())
     {
-        ChipLogError(Inet, "Invalid condition found in protocol header");
+        ChipLogError(Inet, "Unexpected ACK requested for group message");
         ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
 
