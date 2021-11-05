@@ -78,13 +78,13 @@ public:
     UDCClientProcessingState GetUDCClientProcessingState() const { return mUDCClientProcessingState; }
     void SetUDCClientProcessingState(UDCClientProcessingState state) { mUDCClientProcessingState = state; }
 
-    uint64_t GetExpirationTimeMs() const { return mExpirationTimeMs; }
-    void SetExpirationTimeMs(uint64_t value) { mExpirationTimeMs = value; }
+    System::Clock::Timestamp GetExpirationTime() const { return mExpirationTime; }
+    void SetExpirationTime(System::Clock::Timestamp value) { mExpirationTime = value; }
 
-    bool IsInitialized(uint64_t currentTime)
+    bool IsInitialized(System::Clock::Timestamp currentTime)
     {
         // if state is not the "not-initialized" and it has not expired
-        return (mUDCClientProcessingState != UDCClientProcessingState::kNotInitialized && mExpirationTimeMs > currentTime);
+        return (mUDCClientProcessingState != UDCClientProcessingState::kNotInitialized && mExpirationTime > currentTime);
     }
 
     /**
@@ -93,7 +93,7 @@ public:
     void Reset()
     {
         mPeerAddress              = PeerAddress::Uninitialized();
-        mExpirationTimeMs         = 0;
+        mExpirationTime           = System::Clock::kZero;
         mUDCClientProcessingState = UDCClientProcessingState::kNotInitialized;
     }
 
@@ -103,7 +103,7 @@ private:
     char mDeviceName[Dnssd::kMaxDeviceNameLen + 1];
     uint16_t mLongDiscriminator = 0;
     UDCClientProcessingState mUDCClientProcessingState;
-    uint64_t mExpirationTimeMs = 0;
+    System::Clock::Timestamp mExpirationTime = System::Clock::kZero;
 };
 
 } // namespace UserDirectedCommissioning

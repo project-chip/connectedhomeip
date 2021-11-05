@@ -54,15 +54,15 @@ public:
     UnauthenticatedSession(UnauthenticatedSession &&)                  = delete;
     UnauthenticatedSession & operator=(UnauthenticatedSession &&) = delete;
 
-    uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
-    void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
+    System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
+    void SetLastActivityTime(System::Clock::Timestamp value) { mLastActivityTime = value; }
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
-    uint64_t mLastActivityTimeMs = 0;
+    System::Clock::Timestamp mLastActivityTime = System::Clock::kZero;
 
     const PeerAddress mPeerAddress;
     PeerMessageCounter mPeerMessageCounter;
@@ -106,7 +106,7 @@ public:
     /// Mark a session as active
     void MarkSessionActive(UnauthenticatedSessionHandle session)
     {
-        session->SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
+        session->SetLastActivityTime(mTimeSource.GetMonotonicTimestamp());
     }
 
     /// Allows access to the underlying time source used for keeping track of session active time
@@ -158,14 +158,14 @@ private:
 
     UnauthenticatedSession * FindLeastRecentUsedEntry()
     {
-        UnauthenticatedSession * result = nullptr;
-        uint64_t oldestTimeMs           = std::numeric_limits<uint64_t>::max();
+        UnauthenticatedSession * result     = nullptr;
+        System::Clock::Timestamp oldestTime = System::Clock::Timestamp(std::numeric_limits<System::Clock::Timestamp::rep>::max());
 
         mEntries.ForEachActiveObject([&](UnauthenticatedSession * entry) {
-            if (entry->GetReferenceCount() == 0 && entry->GetLastActivityTimeMs() < oldestTimeMs)
+            if (entry->GetReferenceCount() == 0 && entry->GetLastActivityTime() < oldestTime)
             {
-                result       = entry;
-                oldestTimeMs = entry->GetLastActivityTimeMs();
+                result     = entry;
+                oldestTime = entry->GetLastActivityTime();
             }
             return true;
         });
