@@ -124,7 +124,11 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Bui
             {
                 if (clusterInfo->IsAttributePathSupersetOf(*path))
                 {
-                    err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, *path);
+                    // SetDirty injects path into GlobalDirtySet path that don't have the particular nodeId,
+                    // need to inject nodeId from subscribed path here.
+                    ClusterInfo dirtyPath = *path;
+                    dirtyPath.mNodeId     = clusterInfo->mNodeId;
+                    err                   = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, dirtyPath);
                 }
                 else if (path->IsAttributePathSupersetOf(*clusterInfo))
                 {
