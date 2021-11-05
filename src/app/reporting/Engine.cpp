@@ -119,6 +119,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
             {
                 if (clusterInfo->IsAttributePathSupersetOf(*path))
                 {
+                    //SetDirty's path don't have the particular nodeId, need to reover nodeId
+                    path->mNodeId = clusterInfo->mNodeId;
                     err = RetrieveClusterData(attributeDataList, *path);
                 }
                 else if (path->IsAttributePathSupersetOf(*clusterInfo))
