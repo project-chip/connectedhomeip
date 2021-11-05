@@ -2532,11 +2532,11 @@ using chip::Callback::Cancelable;
     });
 }
 
-- (void)getGroupMembership:(uint8_t)groupCount groupList:(uint16_t)groupList responseHandler:(ResponseHandler)responseHandler
+- (void)getGroupMembership:(uint16_t)groupList responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.GetGroupMembership(success, failure, groupCount, groupList);
+            return self.cppCluster.GetGroupMembership(success, failure, groupList);
         });
 }
 

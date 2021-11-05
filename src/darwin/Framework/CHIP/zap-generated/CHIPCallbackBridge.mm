@@ -1037,11 +1037,10 @@ void CHIPGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(void * context
 };
 
 void CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
-    void * context, uint8_t capacity, uint8_t groupCount, /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
+    void * context, uint8_t capacity, /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
 {
     DispatchSuccess(context, @ {
         @"capacity" : [NSNumber numberWithUnsignedChar:capacity],
-        @"groupCount" : [NSNumber numberWithUnsignedChar:groupCount],
         // groupList : /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Objc is not properly implemented yet
     });

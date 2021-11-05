@@ -202,7 +202,6 @@ limitations under the License.
       <description>
         Command description for GetGroupMembership
       </description>
-      <arg name="groupCount" type="INT8U" arrayLength="true"/>
       <arg name="groupList" type="INT16U" array="true"/>
     </command>
     <command source="client" code="0x03" name="RemoveGroup" optional="false" cli="zcl groups remove">
@@ -243,7 +242,6 @@ limitations under the License.
         Command description for GetGroupMembershipResponse
       </description>
       <arg name="capacity" type="INT8U"/>
-      <arg name="groupCount" type="INT8U" arrayLength="true"/>
       <arg name="groupList" type="INT16U" array="true"/>
     </command>
     <command source="server" code="0x03" name="RemoveGroupResponse" optional="false" disableDefaultResponse="true">

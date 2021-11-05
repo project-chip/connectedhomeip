@@ -853,13 +853,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int capacity, int groupCount
+    public void onSuccess(int capacity
         // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Java is not properly implemented yet
         ) {
       List<Object> responseValues = new ArrayList<>();
       responseValues.add(capacity);
-      responseValues.add(groupCount);
       // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
@@ -4594,11 +4593,6 @@ public class ClusterInfoMapping {
     CommandParameterInfo groupsgetGroupMembershipCommandParameterInfo =
         new CommandParameterInfo(
             "Groups", ChipClusters.GroupsCluster.GetGroupMembershipResponseCallback.class);
-    CommandParameterInfo groupsgetGroupMembershipgroupCountCommandParameterInfo =
-        new CommandParameterInfo("groupCount", int.class);
-    groupsgetGroupMembershipCommandParams.put(
-        "groupCount", groupsgetGroupMembershipgroupCountCommandParameterInfo);
-
     CommandParameterInfo groupsgetGroupMembershipgroupListCommandParameterInfo =
         new CommandParameterInfo("groupList", int.class);
     groupsgetGroupMembershipCommandParams.put(
@@ -4611,7 +4605,6 @@ public class ClusterInfoMapping {
               ((ChipClusters.GroupsCluster) cluster)
                   .getGroupMembership(
                       (ChipClusters.GroupsCluster.GetGroupMembershipResponseCallback) callback,
-                      (Integer) commandArguments.get("groupCount"),
                       (Integer) commandArguments.get("groupList"));
             },
             () -> new DelegatedGetGroupMembershipResponseCallback(),

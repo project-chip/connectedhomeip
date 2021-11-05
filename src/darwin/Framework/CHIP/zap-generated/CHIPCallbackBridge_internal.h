@@ -899,8 +899,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<GroupsClusterGetGroupMembershipResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t capacity, uint8_t groupCount,
-                            /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
+    static void OnSuccessFn(void * context, uint8_t capacity, /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 };
 
 class CHIPGroupsClusterRemoveGroupResponseCallbackBridge : public CHIPCallbackBridge<GroupsClusterRemoveGroupResponseCallback>

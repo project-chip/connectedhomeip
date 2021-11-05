@@ -1188,12 +1188,9 @@ class Groups:
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(
-                            Label="groupCount", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupList", Tag=1, Type=uint, IsArray=True),
+                            Label="groupList", Tag=0, Type=uint, IsArray=True),
                     ])
 
-            groupCount: 'uint' = None
             groupList: typing.List['uint'] = None
 
         @dataclass
@@ -1209,13 +1206,10 @@ class Groups:
                         ClusterObjectFieldDescriptor(
                             Label="capacity", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(
-                            Label="groupCount", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupList", Tag=2, Type=uint, IsArray=True),
+                            Label="groupList", Tag=1, Type=uint, IsArray=True),
                     ])
 
             capacity: 'uint' = None
-            groupCount: 'uint' = None
             groupList: typing.List['uint'] = None
 
         @dataclass

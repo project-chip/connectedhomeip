@@ -1795,7 +1795,6 @@ class ChipClusters:
                 "commandId": 0x00000002,
                 "commandName": "GetGroupMembership",
                 "args": {
-                    "groupCount": "int",
                     "groupList": "int",
                 },
             },
@@ -4916,9 +4915,9 @@ class ChipClusters:
             device, ZCLendpoint, ZCLgroupid, groupId, groupName, len(groupName)
         )
 
-    def ClusterGroups_CommandGetGroupMembership(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupCount: int, groupList: int):
+    def ClusterGroups_CommandGetGroupMembership(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupList: int):
         return self._chipLib.chip_ime_AppendCommand_Groups_GetGroupMembership(
-            device, ZCLendpoint, ZCLgroupid, groupCount, groupList
+            device, ZCLendpoint, ZCLgroupid, groupList
         )
 
     def ClusterGroups_CommandRemoveAllGroups(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -8295,7 +8294,7 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying.restype = ctypes.c_uint32
         # Cluster Groups Command GetGroupMembership
         self._chipLib.chip_ime_AppendCommand_Groups_GetGroupMembership.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Groups_GetGroupMembership.restype = ctypes.c_uint32
         # Cluster Groups Command RemoveAllGroups
         self._chipLib.chip_ime_AppendCommand_Groups_RemoveAllGroups.argtypes = [

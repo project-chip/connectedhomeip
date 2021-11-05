@@ -3324,9 +3324,8 @@ public class ChipClusters {
       addGroupIfIdentifying(chipClusterPtr, callback, groupId, groupName);
     }
 
-    public void getGroupMembership(
-        GetGroupMembershipResponseCallback callback, int groupCount, int groupList) {
-      getGroupMembership(chipClusterPtr, callback, groupCount, groupList);
+    public void getGroupMembership(GetGroupMembershipResponseCallback callback, int groupList) {
+      getGroupMembership(chipClusterPtr, callback, groupList);
     }
 
     public void removeAllGroups(DefaultClusterCallback callback) {
@@ -3348,10 +3347,7 @@ public class ChipClusters {
         long chipClusterPtr, DefaultClusterCallback callback, int groupId, String groupName);
 
     private native void getGroupMembership(
-        long chipClusterPtr,
-        GetGroupMembershipResponseCallback callback,
-        int groupCount,
-        int groupList);
+        long chipClusterPtr, GetGroupMembershipResponseCallback callback, int groupList);
 
     private native void removeAllGroups(long chipClusterPtr, DefaultClusterCallback callback);
 
@@ -3368,7 +3364,7 @@ public class ChipClusters {
     }
 
     public interface GetGroupMembershipResponseCallback {
-      void onSuccess(int capacity, int groupCount
+      void onSuccess(int capacity
           // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
           // Conversion from this type to Java is not properly implemented yet
           );
