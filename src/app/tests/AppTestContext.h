@@ -44,7 +44,7 @@ public:
      completed.
      * This is achieved using SystemLayer::ScheduleWork.
 
-     * This should be used on conjunction with the DrainAndServiceIO function below to correctly service and drain the event queue.
+     * This should be used in conjunction with the DrainAndServiceIO function below to correctly service and drain the event queue.
      *
      */
     void EnableAsyncDispatch()
