@@ -289,6 +289,26 @@ void emberAfTick(void)
 #endif
 }
 
+// Cluster init functions that don't have a cluster implementation to define
+// them in.
+void MatterBooleanStatePluginServerInitCallback() {}
+void MatterBridgedDeviceBasicPluginServerInitCallback() {}
+void MatterElectricalMeasurementPluginServerInitCallback() {}
+void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback() {}
+void MatterGroupKeyManagementPluginServerInitCallback() {}
+void MatterRelativeHumidityMeasurementPluginServerInitCallback() {}
+void MatterFixedLabelPluginServerInitCallback() {}
+void MatterSwitchPluginServerInitCallback() {}
+void MatterIlluminanceMeasurementPluginServerInitCallback() {}
+void MatterBinaryInputBasicPluginServerInitCallback() {}
+void MatterPressureMeasurementPluginServerInitCallback() {}
+void MatterTemperatureMeasurementPluginServerInitCallback() {}
+void MatterFlowMeasurementPluginServerInitCallback() {}
+void MatterWakeOnLanPluginServerInitCallback() {}
+void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
+void MatterPowerSourcePluginServerInitCallback() {}
+void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}
+
 // ****************************************
 // This function is called by the application when the stack goes down,
 // such as after a leave network. This allows zcl utils to clear state

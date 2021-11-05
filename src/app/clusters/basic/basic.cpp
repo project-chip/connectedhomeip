@@ -91,3 +91,5 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Software Version: 0x%02x", status));
     }
 }
+
+void MatterBasicPluginServerInitCallback() {}

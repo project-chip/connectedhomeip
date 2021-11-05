@@ -69,3 +69,5 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 
     return true;
 }
+
+void MatterGeneralCommissioningPluginServerInitCallback() {}

@@ -86,6 +86,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_UTIL}/util.cpp
                ${APP_UTIL}/error-mapping.cpp
 
+               ${APP_CLUSTERS}/application-basic-server/application-basic-server.cpp
                ${APP_CLUSTERS}/basic/basic.cpp
                ${APP_CLUSTERS}/bindings/bindings.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
@@ -118,6 +119,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/ota-provider/ota-provider.cpp
                ${APP_CLUSTERS}/scenes/scenes.cpp
                ${APP_CLUSTERS}/target-navigator-server/target-navigator-server.cpp
+               ${APP_CLUSTERS}/thermostat-server/thermostat-server.cpp
                ${APP_CLUSTERS}/tv-channel-server/tv-channel-server.cpp
                ${APP_CLUSTERS}/operational-credentials-server/operational-credentials-server.cpp
                ${APP_CLUSTERS}/test-cluster-server/test-cluster-server.cpp
