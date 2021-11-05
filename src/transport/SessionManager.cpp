@@ -463,30 +463,31 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
-    // MCSP check
-    if (packetHeader.IsSecureSessionControlMsg())
+    // Check if Message Header is valid first
+    if (!(packetHeader.IsValidMCSPMsg() || packetHeader.IsValidGroupMsg()))
     {
-        if (packetHeader.GetDestinationNodeId().HasValue() && packetHeader.HasPrivacyFlag())
-        {
-            // TODO
-            // if (packetHeader.GetDestinationNodeId().Value() == ThisDeviceNodeID)
-            // {
-            //     MCSP processing..
-            // }
-        }
-        else
-        {
-            ChipLogError(Inet, "Invalid condition found in packet header");
-            ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
-        }
+        ChipLogError(Inet, "Invalid condition found in packet header");
+        ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
-
-    // TODO: Handle Group message counter here spec 4.7.3
-    // spec 4.5.1.2 for msg counter
 
     // Trial decryption with GroupDataProvider. TODO: Implement the GroupDataProvider Class
     // VerifyOrExit(CHIP_NO_ERROR == groups->DecryptMessage(packetHeader, payloadHeader, msg),
     //     ChipLogError(Inet, "Secure transport received group message, but failed to decode it, discarding"));
+
+    // MCSP check
+    if (packetHeader.IsValidMCSPMsg())
+    {
+        // TODO
+        // if (packetHeader.GetDestinationNodeId().Value() == ThisDeviceNodeID)
+        // {
+        //     MCSP processing..
+        // }
+
+        ExitNow(err = CHIP_NO_ERROR);
+    }
+
+    // TODO: Handle Group message counter here spec 4.7.3
+    // spec 4.5.1.2 for msg counter
 
     if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {

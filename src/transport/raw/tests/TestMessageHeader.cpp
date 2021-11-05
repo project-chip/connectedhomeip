@@ -149,6 +149,8 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 
     header.ClearDestinationNodeId();
     header.SetSessionType(Header::SessionType::kGroupSession);
+    header.SetFlags(Header::SecFlagValues::kPrivacyFlag);
+    header.SetSecureSessionControlMsg(false);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
@@ -157,9 +159,12 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 234);
     NL_TEST_ASSERT(inSuite, header.GetDestinationGroupId() == Optional<uint16_t>::Value((uint16_t) 45));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
+    NL_TEST_ASSERT(inSuite, !header.IsSecureSessionControlMsg());
+    NL_TEST_ASSERT(inSuite, header.IsValidGroupMsg());
 
     // Verify MCSP state
     header.ClearDestinationGroupId().SetDestinationNodeId(42).SetFlags(Header::SecFlagValues::kPrivacyFlag);
+    header.SetSecureSessionControlMsg(true);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
@@ -168,6 +173,7 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(42ull));
     NL_TEST_ASSERT(inSuite, !header.GetDestinationGroupId().HasValue());
     NL_TEST_ASSERT(inSuite, header.HasPrivacyFlag());
+    NL_TEST_ASSERT(inSuite, header.IsValidMCSPMsg());
 }
 
 void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)

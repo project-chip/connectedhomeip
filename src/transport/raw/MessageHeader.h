@@ -196,6 +196,20 @@ public:
         }
     }
 
+    bool IsValidGroupMsg() const
+    {
+        // Check is based on spec 4.11.2
+        return (IsGroupSession() && GetSourceNodeId().HasValue() && GetDestinationGroupId().HasValue() &&
+                !IsSecureSessionControlMsg() && HasPrivacyFlag());
+    }
+
+    bool IsValidMCSPMsg() const
+    {
+        // Check is based on spec 4.9.2.4
+        return (IsGroupSession() && GetSourceNodeId().HasValue() && GetDestinationNodeId().HasValue() &&
+                IsSecureSessionControlMsg() && HasPrivacyFlag());
+    }
+
     bool IsEncrypted() const { return !((mSessionId == kMsgUnicastSessionIdUnsecured) && IsUnicastSession()); }
 
     uint16_t MICTagLength() const { return (IsEncrypted()) ? chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES : 0; }
