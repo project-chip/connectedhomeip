@@ -82,35 +82,25 @@ ClockBase * gClockBase = &gClockImpl;
 #define MONOTONIC_CLOCK_ID CLOCK_MONOTONIC
 #endif
 
-Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
     struct timespec ts;
     int res = clock_gettime(MONOTONIC_CLOCK_ID, &ts);
     VerifyOrDie(res == 0);
     return Seconds64(ts.tv_sec) +
-        std::chrono::duration_cast<Microseconds64>(std::chrono::duration<uint64_t, std::nano>(ts.tv_nsec));
-}
-
-Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
-{
-    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
+        std::chrono::duration_cast<Milliseconds64>(std::chrono::duration<uint64_t, std::nano>(ts.tv_nsec));
 }
 
 #endif // HAVE_CLOCK_GETTIME
 
 #if HAVE_GETTIMEOFDAY
 
-Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
     VerifyOrDie(res == 0);
-    return TimevalToMicroseconds(tv);
-}
-
-Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
-{
-    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
+    return TimevalToMilliseconds(tv);
 }
 
 #endif // HAVE_GETTIMEOFDAY
@@ -120,11 +110,6 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
 // -------------------- Default Get/SetClock Functions for LwIP Systems --------------------
-
-Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
-{
-    return GetMonotonicMilliseconds64();
-}
 
 Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
@@ -172,31 +157,27 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-Microseconds64 TimevalToMicroseconds(const timeval & tv)
+Milliseconds64 TimevalToMilliseconds(const timeval & tv)
 {
-    return Seconds64(tv.tv_sec) + Microseconds64(tv.tv_usec);
+    return Seconds64(tv.tv_sec) + Milliseconds64(tv.tv_usec);
 }
 
-void ToTimeval(Microseconds64 in, timeval & out)
+void ToTimeval(Milliseconds64 in, timeval & out)
 {
     Seconds32 seconds = std::chrono::duration_cast<Seconds32>(in);
     in -= seconds;
     out.tv_sec  = static_cast<time_t>(seconds.count());
-    out.tv_usec = static_cast<suseconds_t>(in.count());
+    out.tv_usec = static_cast<suseconds_t>(1000 * in.count());
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-static_assert(std::numeric_limits<Microseconds64::rep>::is_integer, "Microseconds64 must be an integer type");
-static_assert(std::numeric_limits<Microseconds32::rep>::is_integer, "Microseconds32 must be an integer type");
 static_assert(std::numeric_limits<Milliseconds64::rep>::is_integer, "Milliseconds64 must be an integer type");
 static_assert(std::numeric_limits<Milliseconds32::rep>::is_integer, "Milliseconds32 must be an integer type");
 static_assert(std::numeric_limits<Seconds64::rep>::is_integer, "Seconds64 must be an integer type");
 static_assert(std::numeric_limits<Seconds32::rep>::is_integer, "Seconds32 must be an integer type");
 static_assert(std::numeric_limits<Seconds16::rep>::is_integer, "Seconds16 must be an integer type");
 
-static_assert(std::numeric_limits<Microseconds64::rep>::digits >= 64, "Microseconds64 must be at least 64 bits");
-static_assert(std::numeric_limits<Microseconds32::rep>::digits >= 32, "Microseconds32 must be at least 32 bits");
 static_assert(std::numeric_limits<Milliseconds64::rep>::digits >= 64, "Milliseconds64 must be at least 64 bits");
 static_assert(std::numeric_limits<Milliseconds32::rep>::digits >= 32, "Milliseconds32 must be at least 32 bits");
 static_assert(std::numeric_limits<Seconds64::rep>::digits >= 64, "Seconds64 must be at least 64 bits");

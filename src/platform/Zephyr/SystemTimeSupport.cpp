@@ -38,11 +38,6 @@ namespace Internal {
 ClockImpl gClockImpl;
 } // namespace Internal
 
-Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
-{
-    return Microseconds64(k_ticks_to_us_floor64(k_uptime_ticks()));
-}
-
 Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
     return Milliseconds64(k_uptime_get());
