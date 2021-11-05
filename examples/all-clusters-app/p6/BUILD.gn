@@ -55,7 +55,6 @@ p6_sdk_sources("all_clusters_app_sdk_sources") {
 }
 
 static_library("static-supported-modes-manager") {
-
   sources = [ "src/static-supported-modes-manager.cpp" ]
 
   #zap_pregenerated_dir = "${chip_root}/zzz_generated"
@@ -67,7 +66,7 @@ static_library("static-supported-modes-manager") {
     "${chip_root}/src/controller",
     "${chip_root}/src/lib/core",
   ]
-  include_dirs = [ 
+  include_dirs = [
     "${chip_root}",
     "${chip_root}/src",
     "${chip_root}/zzz_generated/all-clusters-app",
@@ -76,7 +75,6 @@ static_library("static-supported-modes-manager") {
   cflags = [ "-Wconversion" ]
 
   print("include_dirs = ")
-
 }
 
 p6_executable("clusters_app") {
@@ -92,13 +90,13 @@ p6_executable("clusters_app") {
     "src/ButtonHandler.cpp",
     "src/ClusterManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/static-supported-modes-manager.cpp",
     "src/main.cpp",
+    "src/static-supported-modes-manager.cpp",
   ]
 
   deps = [
-    ":static-supported-modes-manager",
     ":all_clusters_app_sdk_sources",
+    ":static-supported-modes-manager",
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/src/lib",
