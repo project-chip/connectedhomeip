@@ -4723,12 +4723,12 @@ chip::ChipError::StorageType chip_ime_AppendCommand_Groups_AddGroupIfIdentifying
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_Groups_GetGroupMembership(chip::Controller::Device * device,
                                                                               chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                              uint8_t groupCount, uint16_t groupList)
+                                                                              uint16_t groupList)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::GroupsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.GetGroupMembership(nullptr, nullptr, groupCount, groupList).AsInteger();
+    return cluster.GetGroupMembership(nullptr, nullptr, groupList).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_Groups_RemoveAllGroups(chip::Controller::Device * device,
                                                                            chip::EndpointId ZCLendpointId, chip::GroupId)

@@ -1282,19 +1282,17 @@ bool emberAfGroupsClusterAddGroupResponseCallback(EndpointId endpoint, app::Comm
 }
 
 bool emberAfGroupsClusterGetGroupMembershipResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t capacity,
-                                                            uint8_t groupCount,
                                                             /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
 {
     ChipLogProgress(Zcl, "GetGroupMembershipResponse:");
     ChipLogProgress(Zcl, "  capacity: %" PRIu8 "", capacity);
-    ChipLogProgress(Zcl, "  groupCount: %" PRIu8 "", groupCount);
     ChipLogProgress(Zcl, "  groupList: %p", groupList);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("GroupsClusterGetGroupMembershipResponseCallback");
 
     Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback> * cb =
         Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, capacity, groupCount, groupList);
+    cb->mCall(cb->mContext, capacity, groupList);
     return true;
 }
 
