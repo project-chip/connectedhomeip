@@ -120,6 +120,12 @@ struct BdxMessage
      */
     virtual size_t MessageSize() const = 0;
 
+    /**
+     * @brief
+     * Log all parameters for this message.
+     */
+    virtual void LogMessage() const = 0;
+
     virtual ~BdxMessage() = default;
 };
 
@@ -129,6 +135,9 @@ struct BdxMessage
  */
 struct TransferInit : public BdxMessage
 {
+    TransferInit() {}
+    TransferInit(bdx::MessageType messageType) { MessageType = messageType; }
+
     /**
      * @brief
      *  Equality check method.
@@ -158,6 +167,12 @@ struct TransferInit : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+    void LogMessage() const override;
+
+private:
+    // These are only needed for logging purpose
+    bdx::MessageType MessageType;
+    BitFlags<RangeControlFlags> RangeCtlFlags;
 };
 
 using SendInit    = TransferInit;
@@ -192,6 +207,7 @@ struct SendAccept : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+    void LogMessage() const override;
 };
 
 /**
@@ -226,6 +242,11 @@ struct ReceiveAccept : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+    void LogMessage() const override;
+
+private:
+    // This is only needed for logging purpose
+    BitFlags<RangeControlFlags> RangeCtlFlags;
 };
 
 /**
@@ -234,6 +255,9 @@ struct ReceiveAccept : public BdxMessage
  */
 struct CounterMessage : public BdxMessage
 {
+    CounterMessage() {}
+    CounterMessage(bdx::MessageType messageType) { MessageType = messageType; }
+
     /**
      * @brief
      *  Equality check method.
@@ -245,6 +269,11 @@ struct CounterMessage : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+    void LogMessage() const override;
+
+private:
+    // This is only needed for logging purpose
+    bdx::MessageType MessageType;
 };
 
 using BlockQuery  = CounterMessage;
@@ -256,6 +285,9 @@ using BlockAckEOF = CounterMessage;
  */
 struct DataBlock : public BdxMessage
 {
+    DataBlock() {}
+    DataBlock(bdx::MessageType messageType) { MessageType = messageType; }
+
     /**
      * @brief
      *  Equality check method.
@@ -275,6 +307,11 @@ struct DataBlock : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+    void LogMessage() const override;
+
+private:
+    // This is only needed for logging purpose
+    bdx::MessageType MessageType;
 };
 
 using Block    = DataBlock;
