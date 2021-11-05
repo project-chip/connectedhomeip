@@ -65,11 +65,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
                                           ByteSpan & attestationNonce, uint32_t & timestamp, ByteSpan & firmwareInfo,
                                           DeviceAttestationVendorReservedDeconstructor & vendorReserved)
 {
-    bool certificationDeclarationExists = false;
-    bool attestationNonceExists         = false;
-    bool timestampExists                = false;
-    bool firmwareInfoExists             = false;
-    uint32_t lastContextTagId           = UINT32_MAX;
+    uint32_t lastContextTagId = UINT32_MAX;
     TLV::ContiguousBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
@@ -94,25 +90,18 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
         case kCertificationDeclarationTagId:
             VerifyOrReturnError(lastContextTagId == UINT32_MAX, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
             ReturnErrorOnFailure(tlvReader.GetByteView(certificationDeclaration));
-            certificationDeclarationExists = true;
             break;
         case kAttestationNonceTagId:
             VerifyOrReturnError(lastContextTagId == kCertificationDeclarationTagId, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-            VerifyOrReturnError(attestationNonceExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
             ReturnErrorOnFailure(tlvReader.GetByteView(attestationNonce));
-            attestationNonceExists = true;
             break;
         case kTimestampTagId:
             VerifyOrReturnError(lastContextTagId == kAttestationNonceTagId, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-            VerifyOrReturnError(timestampExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
             ReturnErrorOnFailure(tlvReader.Get(timestamp));
-            timestampExists = true;
             break;
         case kFirmwareInfoTagId:
             VerifyOrReturnError(lastContextTagId == kTimestampTagId, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-            VerifyOrReturnError(firmwareInfoExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
             ReturnErrorOnFailure(tlvReader.GetByteView(firmwareInfo));
-            firmwareInfoExists = true;
             break;
         default:
             return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
@@ -123,7 +112,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
 
     VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_END_OF_TLV, error);
 
-    VerifyOrReturnError(certificationDeclarationExists && attestationNonceExists && timestampExists,
+    VerifyOrReturnError(lastContextTagId == kTimestampTagId || lastContextTagId == kFirmwareInfoTagId,
                         CHIP_ERROR_MISSING_TLV_ELEMENT);
 
     size_t count = 0;

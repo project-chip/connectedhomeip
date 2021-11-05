@@ -43,7 +43,6 @@ public:
     // read TLV until first profile tag
     CHIP_ERROR PrepareToReadVendorReservedElements(const ByteSpan & attestationElements, size_t count)
     {
-        mIsUsed                = true;
         mNumVendorReservedData = count;
         mAttestationData       = attestationElements;
 
@@ -68,7 +67,7 @@ public:
     size_t GetNumberOfElements() { return mNumVendorReservedData; }
 
     /**
-     *  @brief Return next VendorReserved element.   PrepareToReadVendorReservedElements must be called first.
+     *  @brief Return next VendorReserved element. PrepareToReadVendorReservedElements must be called first.
      *
      *  @param[out] element  Next vendor Reserved element
      *
@@ -78,14 +77,14 @@ public:
      */
     CHIP_ERROR GetNextVendorReservedElement(struct VendorReservedElement & element)
     {
-        VerifyOrReturnError(mIsUsed && mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
         while (1)
         {
+            ReturnErrorOnFailure(Next());
             uint64_t tag = tlvReader.GetTag();
             if (!TLV::IsProfileTag(tag))
             {
-                ReturnErrorOnFailure(Next());
                 continue;
             }
             // tag is profile tag
@@ -98,7 +97,6 @@ public:
     }
 
 private:
-    bool mIsUsed = false;          // set to true when we have valid data
     size_t mNumVendorReservedData; // number of VendorReserved entries (could be 0)
     ByteSpan mAttestationData;
     bool mIsInitialized = false;
@@ -116,32 +114,34 @@ public:
 
     const_iterator Next()
     {
-        if (mCurrent + 1 == mIsUsed)
+        if ((mCurrentIndex + 1) == mNumEntriesUsed)
         {
             return nullptr;
         }
-        return &mElements[++mCurrent];
+        return &mElements[++mCurrentIndex];
     }
 
     const_iterator cbegin()
     {
         do_sorting(); // when beginning to iterator, make a linked list and return the head element
-        mCurrent = 0;
+        mCurrentIndex = 0;
         return mElements;
     }
 
     CHIP_ERROR addVendorReservedElement(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum, ByteSpan span)
     {
-        if (mIsUsed == mMaxSize)
+        if (mNumEntriesUsed == mMaxSize)
             return CHIP_ERROR_NO_MEMORY;
 
-        mElements[mIsUsed].tagNum             = tagNum;
-        mElements[mIsUsed].profileNum         = profileNum;
-        mElements[mIsUsed].vendorId           = vendorId;
-        mElements[mIsUsed].vendorReservedData = span;
-        mIsUsed++;
+        mElements[mNumEntriesUsed].tagNum             = tagNum;
+        mElements[mNumEntriesUsed].profileNum         = profileNum;
+        mElements[mNumEntriesUsed].vendorId           = vendorId;
+        mElements[mNumEntriesUsed].vendorReservedData = span;
+        mNumEntriesUsed++;
         return CHIP_NO_ERROR;
     }
+
+    size_t GetNumberOfElements() { return mNumEntriesUsed; }
 
 private:
     /*
@@ -154,13 +154,13 @@ private:
     {
         size_t starting = 0;
 
-        while (starting < mIsUsed)
+        while (starting < mNumEntriesUsed)
         {
             uint32_t minVendor = UINT32_MAX;
 
             // find lowest vendorId
             size_t i;
-            for (i = starting; i < mIsUsed; i++)
+            for (i = starting; i < mNumEntriesUsed; i++)
             {
                 if (mElements[i].vendorId < minVendor)
                 {
@@ -170,7 +170,7 @@ private:
 
             uint32_t minProfile = UINT32_MAX;
             // find lowest ProfileNum
-            for (i = starting; i < mIsUsed; i++)
+            for (i = starting; i < mNumEntriesUsed; i++)
             {
                 if (mElements[i].vendorId == minVendor)
                 {
@@ -182,7 +182,7 @@ private:
             // first lowest tagNum for this vendorId/profileNum
             uint64_t minTagNum = UINT64_MAX;
             size_t lowestIndex;
-            for (i = starting; i < mIsUsed; i++)
+            for (i = starting; i < mNumEntriesUsed; i++)
             {
                 if (mElements[i].vendorId == minVendor && mElements[i].profileNum == minProfile)
                 {
@@ -209,16 +209,10 @@ private:
     }
 
     VendorReservedElement * mElements;
-    size_t mMaxSize;    // size of elements array
-    size_t mIsUsed = 0; // elements used
-    size_t mCurrent;    // iterating from [0...maxSize -1]
+    size_t mMaxSize;            // size of elements array
+    size_t mNumEntriesUsed = 0; // elements used
+    size_t mCurrentIndex;       // iterating from [0...maxSize -1]
 };
-
-// allocate space for DeviceAttestationVendorReserved on the stack
-// caller should know how many elements are needed ahead of time
-#define CREATE_VENDOR_RESERVED(name, size)                                                                                         \
-    struct VendorReservedElement _vendorReservedArray[size];                                                                       \
-    DeviceAttestationVendorReservedConstructor name(_vendorReservedArray, size);
 
 } // namespace Credentials
 } // namespace chip
