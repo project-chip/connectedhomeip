@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <mode-select-server/supported-modes-manager.h>
 #include <app/util/af.h>
 #include <cstring>
+#include <mode-select-server/supported-modes-manager.h>
 
 namespace chip {
 namespace app {
@@ -45,7 +45,7 @@ class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::Supp
             mEndpointId(aEndpointId), mSpan(aSpan)
         {}
 
-        EndpointSpanPair(): mEndpointId(0), mSpan(Span<storage_value_type>()) {}
+        EndpointSpanPair() : mEndpointId(0), mSpan(Span<storage_value_type>()) {}
     };
 
     static storage_value_type coffeeOptions[];
