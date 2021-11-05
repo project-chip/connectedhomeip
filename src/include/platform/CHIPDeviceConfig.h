@@ -759,21 +759,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER 0
 #endif
 
-// -------------------- Test Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
- *
- * Enables the use of a hard-coded default chip device id and credentials if no device id
- * is found in chip NV storage.  The value specifies which of 10 identities, numbered 1 through 10,
- * is to be used.  A value of 0 disables use of a default identity.
- *
- * This option is for testing only and should be disabled in production releases.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 0
-#endif
-
 // -------------------- Network Telemetry Configuration --------------------
 
 /**

@@ -286,7 +286,6 @@ if (chip_device_platform != "none") {
       "LockTracker.cpp",
       "PersistedStorage.cpp",
       "PlatformEventSupport.cpp",
-      "TestIdentity.cpp",
     ]
 
     cflags = [ "-Wconversion" ]
