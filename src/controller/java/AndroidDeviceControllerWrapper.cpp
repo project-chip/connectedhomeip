@@ -32,8 +32,8 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/ThreadOperationalDataset.h>
-#include <platform/android/PlatformManagerImpl.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/android/PlatformManagerImpl.h>
 
 using namespace chip;
 using namespace chip::Controller;

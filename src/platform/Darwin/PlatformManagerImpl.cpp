@@ -37,7 +37,10 @@ PlatformManagerImpl & PlatformMgrImpl()
     return sInstance;
 }
 
-PlatformManager & PlatformMgr(){ return PlatformMgrImpl(); }
+PlatformManager & PlatformMgr()
+{
+    return PlatformMgrImpl();
+}
 
 CHIP_ERROR PlatformManagerImpl::InitChipStackInner()
 {

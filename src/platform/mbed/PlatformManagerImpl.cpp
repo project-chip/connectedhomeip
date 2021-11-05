@@ -29,7 +29,10 @@ PlatformManagerImpl & PlatformMgrImpl()
     return sInstance;
 }
 
-PlatformManager & PlatformMgr(){ return PlatformMgrImpl(); }
+PlatformManager & PlatformMgr()
+{
+    return PlatformMgrImpl();
+}
 
 // TODO: Event and timer processing is not efficient from a memory perspective.
 // Both occupy at least 24 bytes when only 4 bytes is required.

@@ -16,8 +16,8 @@
  */
 
 #include <platform/PlatformManager.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/Zephyr/GenericPlatformManagerImpl_Zephyr.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
