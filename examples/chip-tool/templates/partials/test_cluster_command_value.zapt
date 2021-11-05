@@ -19,12 +19,15 @@
   {{! forceNotList=true because we really want the type of a single item here.
       Similarly, forceNotOptional=true and forceNotNullable=true because we
       have accounted for those already. }}
+  {{#if definedValue.length}}
   {{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}} {{asLowerCamelCase label}}List[{{definedValue.length}}];
   {{#each definedValue}}
   {{>commandValue ns=../ns container=(concat (asLowerCamelCase ../label) "List[" @index "]") definedValue=. type=../type ignore=true}}
   {{/each}}
   {{container}}{{#unless ignore}}.{{asLowerCamelCase label}}{{/unless}} = {{asLowerCamelCase label}}List;
-
+  {{else}}
+  {{container}}{{#unless ignore}}.{{asLowerCamelCase label}}{{/unless}} = chip::app::DataModel::List<{{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}}>();
+  {{/if}}
 {{else}}
   {{#if_is_struct type}}
 
