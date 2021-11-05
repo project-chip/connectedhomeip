@@ -14,13 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <algorithm>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <algorithm>
 
 namespace chip {
 namespace Credentials {
