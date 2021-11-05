@@ -121,7 +121,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
     ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL));
 
-#endif //CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     return CHIP_NO_ERROR;
 }
@@ -131,7 +131,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     // Forward the event to the generic base classes as needed.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
-#endif //CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     if (event->Type == DeviceEventType::kRtkWiFiStationConnectedEvent)
@@ -144,7 +144,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         DriveStationState();
         DHCPProcess();
     }
-#endif //CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
