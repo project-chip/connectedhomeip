@@ -308,7 +308,7 @@ JNI_METHOD(void, shutdownSubscriptions)(JNIEnv * env, jobject self, jlong handle
 {
     chip::DeviceLayer::StackLock lock;
 
-    Device * device = reinterpret_cast<Device *>(devicePtr);
+    DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
     device->ShutdownSubscriptions();
 }
 
