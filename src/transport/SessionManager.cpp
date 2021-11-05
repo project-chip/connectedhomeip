@@ -459,6 +459,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
     SessionManagerDelegate::DuplicateMessage isDuplicate = SessionManagerDelegate::DuplicateMessage::No;
+    FabricIndex fabricIndex = 0; // TODO : remove initialization once GroupDataProvider->Decrypt is implemented
     // Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
@@ -471,6 +472,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     }
 
     // Trial decryption with GroupDataProvider. TODO: Implement the GroupDataProvider Class
+    // TODO retrieve also the fabricIndex with the GroupDataProvider.
     // VerifyOrExit(CHIP_NO_ERROR == groups->DecryptMessage(packetHeader, payloadHeader, msg),
     //     ChipLogError(Inet, "Secure transport received group message, but failed to decode it, discarding"));
 
@@ -488,29 +490,24 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
     // TODO: Handle Group message counter here spec 4.7.3
     // spec 4.5.1.2 for msg counter
-
-    if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
+    if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes)
     {
         ChipLogDetail(Inet,
                       "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
                       " on exchange " ChipLogFormatExchangeId,
-                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
-        if (!payloadHeader.NeedsAck())
-        {
-            // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
-            // cycles on further message processing.
-            ExitNow(err = CHIP_NO_ERROR);
-        }
+                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromSentHeader(payloadHeader));
+
+        // If it's a duplicate message, let's drop it right here to save CPU
+        // cycles on further message processing.
+        ExitNow(err = CHIP_NO_ERROR);
     }
 
     // TODO: Commit Group Message Counter
 
     if (mCB != nullptr)
     {
-        // TODO: Update Session Handle for Group messages.
-        // SessionHandle session(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(),
-        //                       session->GetFabricIndex());
-        // mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, isDuplicate, std::move(msg));
+        SessionHandle session(packetHeader.GetSourceNodeId().Value(), packetHeader.GetDestinationGroupId().Value(), fabricIndex);
+        mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, isDuplicate, std::move(msg));
     }
 
 exit:
