@@ -124,6 +124,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Bui
             {
                 if (clusterInfo->IsAttributePathSupersetOf(*path))
                 {
+                    // SetDirty's path don't have the particular nodeId, need to reover nodeId from subscribed path
+                    path->mNodeId = clusterInfo->mNodeId;
                     err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, *path);
                 }
                 else if (path->IsAttributePathSupersetOf(*clusterInfo))
