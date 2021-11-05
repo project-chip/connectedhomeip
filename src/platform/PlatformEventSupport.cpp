@@ -27,18 +27,16 @@
 
 #include <platform/PlatformManager.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-
 namespace chip {
 namespace System {
 
 using namespace ::chip::DeviceLayer;
 
-CHIP_ERROR PlatformEventing::ScheduleLambdaBridge(System::Layer & aLayer, const LambdaBridge & bridge)
+CHIP_ERROR PlatformEventing::ScheduleLambdaBridge(System::Layer & aLayer, LambdaBridge && bridge)
 {
     ChipDeviceEvent event;
     event.Type        = DeviceEventType::kChipLambdaEvent;
-    event.LambdaEvent = bridge;
+    event.LambdaEvent = std::move(bridge);
 
     return PlatformMgr().PostEvent(&event);
 }
@@ -62,5 +60,3 @@ CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, System::Clock::T
 
 } // namespace System
 } // namespace chip
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
