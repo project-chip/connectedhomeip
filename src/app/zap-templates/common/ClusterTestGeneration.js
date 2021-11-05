@@ -545,6 +545,9 @@ function chip_tests_item_response_parameters(options)
   const responseValues = this.response.values.slice();
 
   const promise = assertCommandOrAttribute(this).then(item => {
+    if (this.isWriteAttribute) {
+      return [];
+    }
     const responseArgs = item.response.arguments;
 
     const responses = responseArgs.map(responseArg => {
