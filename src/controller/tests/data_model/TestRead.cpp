@@ -144,7 +144,9 @@ void TestReadInteraction::TestDataResponse(nlTestSuite * apSuite, void * apConte
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
+    ctx.DrainAndServiceIO();
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
@@ -177,7 +179,9 @@ void TestReadInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCon
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
+    ctx.DrainAndServiceIO();
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
@@ -210,10 +214,14 @@ void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContex
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 1);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
 
     ctx.GetExchangeManager().OnConnectionExpired(ctx.GetSessionBobToAlice());
+
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
@@ -223,7 +231,9 @@ void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContex
     //
     // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
 
+    ctx.DrainAndServiceIO();
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
 
     ctx.GetExchangeManager().OnConnectionExpired(ctx.GetSessionAliceToBob());
 
@@ -250,7 +260,7 @@ nlTestSuite sSuite =
 {
     "TestRead",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on

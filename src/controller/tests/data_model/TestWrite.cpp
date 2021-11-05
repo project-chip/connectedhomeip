@@ -151,6 +151,8 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
     chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -190,6 +192,8 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
     chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -209,7 +213,7 @@ nlTestSuite sSuite =
 {
     "TestWrite",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on
