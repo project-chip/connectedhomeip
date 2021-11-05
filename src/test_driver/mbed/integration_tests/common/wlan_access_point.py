@@ -173,8 +173,8 @@ class AccessPoint:
         log.debug(ret)
 
         # Start dhcpd
-        cmd = 'dhcpd -cf {} {}'.format(self.hostapd_config_path, self.wlan)
-        log.debug('Starting HostAP daemon...')
+        cmd = 'dhcpd -cf {} {}'.format(self.dhcpd_config_path, self.wlan)
+        log.debug('Starting DHCP...')
         ret = self._execute_shell(cmd)
         log.debug(ret)
         
