@@ -488,17 +488,24 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         ExitNow(err = CHIP_NO_ERROR);
     }
 
+    // Group Messages should never send an Ack
+    if (payloadHeader.NeedsAck())
+    {
+        ChipLogError(Inet, "Invalid condition found in protocol header");
+        ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
+    }
+
     // TODO: Handle Group message counter here spec 4.7.3
     // spec 4.5.1.2 for msg counter
+
     if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes)
     {
         ChipLogDetail(Inet,
                       "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
                       " on exchange " ChipLogFormatExchangeId,
-                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromSentHeader(payloadHeader));
+                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
 
-        // If it's a duplicate message, let's drop it right here to save CPU
-        // cycles on further message processing.
+        // If it's a duplicate message, let's drop it right here to save CPU cycles
         ExitNow(err = CHIP_NO_ERROR);
     }
 
