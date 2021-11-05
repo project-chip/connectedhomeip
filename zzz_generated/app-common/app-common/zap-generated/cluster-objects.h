@@ -1249,8 +1249,7 @@ public:
 namespace GetGroupMembership {
 enum class Fields
 {
-    kGroupCount = 0,
-    kGroupList  = 1,
+    kGroupList = 0,
 };
 
 struct Type
@@ -1260,7 +1259,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembership::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t groupCount;
     DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1274,7 +1272,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembership::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t groupCount;
     DataModel::DecodableList<uint16_t> groupList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1282,9 +1279,8 @@ public:
 namespace GetGroupMembershipResponse {
 enum class Fields
 {
-    kCapacity   = 0,
-    kGroupCount = 1,
-    kGroupList  = 2,
+    kCapacity  = 0,
+    kGroupList = 1,
 };
 
 struct Type
@@ -1295,7 +1291,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t capacity;
-    uint8_t groupCount;
     DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1310,7 +1305,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t capacity;
-    uint8_t groupCount;
     DataModel::DecodableList<uint16_t> groupList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

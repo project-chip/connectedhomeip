@@ -35635,6 +35635,925 @@ private:
     void OnSuccessResponse_0() { NextTest(); }
 };
 
+class TestGroupsCluster : public TestCommand
+{
+public:
+    TestGroupsCluster() : TestCommand("TestGroupsCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestGroupsCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestGroupsCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : View Group 0 (invalid)\n");
+            err = TestViewGroup0Invalid_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : View Group 1 (not found)\n");
+            err = TestViewGroup1NotFound_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Add Group 1 (new)\n");
+            err = TestAddGroup1New_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : View Group 1 (new)\n");
+            err = TestViewGroup1New_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : View Group 2 (not found)\n");
+            err = TestViewGroup2NotFound_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Add Group 2 (new)\n");
+            err = TestAddGroup2New_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : View Group 2 (new)\n");
+            err = TestViewGroup2New_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : View Group 3 (not found)\n");
+            err = TestViewGroup3NotFound_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Add Group 3 (new)\n");
+            err = TestAddGroup3New_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : View Group 1 (existing)\n");
+            err = TestViewGroup1Existing_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : View Group 2 (existing)\n");
+            err = TestViewGroup2Existing_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Get Group Membership 1\n");
+            err = TestGetGroupMembership1_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : View Group 3 (new)\n");
+            err = TestViewGroup3New_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Remove Group 0 (invalid)\n");
+            err = TestRemoveGroup0Invalid_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Remove Group 4 (not found)\n");
+            err = TestRemoveGroup4NotFound_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Remove Group 2 (existing)\n");
+            err = TestRemoveGroup2Existing_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : View Group 1 (not removed)\n");
+            err = TestViewGroup1NotRemoved_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : View Group 2 (removed)\n");
+            err = TestViewGroup2Removed_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : View Group 3 (not removed)\n");
+            err = TestViewGroup3NotRemoved_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Get Group Membership 3\n");
+            err = TestGetGroupMembership3_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Remove All\n");
+            err = TestRemoveAll_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : View Group 1 (removed)\n");
+            err = TestViewGroup1Removed_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : View Group 2 (still removed)\n");
+            err = TestViewGroup2StillRemoved_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : View Group 3 (removed)\n");
+            err = TestViewGroup3Removed_23();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 24;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestViewGroup0Invalid_0()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 0U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_0(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_0(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 135));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup1NotFound_1()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_1(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_1(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestAddGroup1New_2()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::AddGroup::Type request;
+        request.groupId   = 1U;
+        request.groupName = chip::Span<const char>("Group #1", strlen("Group #1"));
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_2(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_2(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup1New_3()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_3(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_3(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #1"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup2NotFound_4()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_4(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_4(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestAddGroup2New_5()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::AddGroup::Type request;
+        request.groupId   = 4369U;
+        request.groupName = chip::Span<const char>("Group #2", strlen("Group #2"));
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_5(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_5(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup2New_6()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_6(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_6(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #2"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup3NotFound_7()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 32767U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_7(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_7(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestAddGroup3New_8()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::AddGroup::Type request;
+        request.groupId   = 32767U;
+        request.groupName = chip::Span<const char>("Group #3", strlen("Group #3"));
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_8(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_8(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup1Existing_9()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_9(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_9(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #1"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup2Existing_10()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_10(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_10(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #2"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetGroupMembership1_11()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::GetGroupMembership::Type request;
+
+        uint16_t groupListList[4];
+        groupListList[0]  = 1U;
+        groupListList[1]  = 2U;
+        groupListList[2]  = 3U;
+        groupListList[3]  = 32767U;
+        request.groupList = groupListList;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_11(data.capacity, data.groupList);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_11(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("capacity", capacity, 255));
+
+        VerifyOrReturn(CheckValueAsList("groupList", groupList, 1, 32767));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup3New_12()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 32767U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_12(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_12(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #3"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveGroup0Invalid_13()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::RemoveGroup::Type request;
+        request.groupId = 0U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_13(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_13(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 135));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveGroup4NotFound_14()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::RemoveGroup::Type request;
+        request.groupId = 4U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_14(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_14(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveGroup2Existing_15()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::RemoveGroup::Type request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_15(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_15(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup1NotRemoved_16()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_16(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_16(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_16(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_16(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #1"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup2Removed_17()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_17(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_17(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_17(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup3NotRemoved_18()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 32767U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_18(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_18(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_18(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, "Group #3"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetGroupMembership3_19()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::GetGroupMembership::Type request;
+
+        uint16_t groupListList[5];
+        groupListList[0]  = 1U;
+        groupListList[1]  = 2U;
+        groupListList[2]  = 4369U;
+        groupListList[3]  = 3U;
+        groupListList[4]  = 32767U;
+        request.groupList = groupListList;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_19(data.capacity, data.groupList);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_19(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_19(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_19(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("capacity", capacity, 255));
+
+        VerifyOrReturn(CheckValueAsList("groupList", groupList, 1, 32767));
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveAll_20()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type;
+        using responseType = chip::app::DataModel::NullObjectType;
+
+        chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type request;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_20();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_20(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_20() { NextTest(); }
+
+    CHIP_ERROR TestViewGroup1Removed_21()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_21(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_21(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_21(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_21(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup2StillRemoved_22()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_22(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_22(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_22(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_22(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup3Removed_23()
+    {
+        chip::Controller::GroupsClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using responseType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+        chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
+        request.groupId = 32767U;
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_23(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_23(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_23(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_23(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
+
+        NextTest();
+    }
+};
+
 class TestOperationalCredentialsCluster : public TestCommand
 {
 public:
@@ -36721,6 +37640,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestDescriptorCluster>(),
         make_unique<TestBasicInformation>(),
         make_unique<TestIdentifyCluster>(),
+        make_unique<TestGroupsCluster>(),
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestModeSelectCluster>(),
         make_unique<TestGroupMessaging>(),
