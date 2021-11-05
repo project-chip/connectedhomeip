@@ -200,7 +200,7 @@ class {{filename}}: public TestCommand
                 {{/if}}
                 VerifyOrReturn(CheckValue
                   {{~#if isList}}AsListLength("{{>itemValue}}", {{>itemValue}}, {{expectedValue.length}})
-                  {{else if isArray}}AsList("{{>itemValue}}", {{>itemValue}}, {{expectedValue}})
+                  {{else if isArray}}AsList("{{>itemValue}}", {{>itemValue}}{{#if expectedValue.length}}, {{expectedValue}}{{/if}})
                   {{else if (isString type)}}AsString("{{>itemValue}}", {{>itemValue}}, "{{expectedValue}}")
                   {{else}}<{{chipType}}>("{{>itemValue}}", {{>itemValue}}, {{expectedValue}}{{asTypeLiteralSuffix type}})
                   {{/if}}

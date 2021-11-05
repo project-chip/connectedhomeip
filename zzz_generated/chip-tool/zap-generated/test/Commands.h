@@ -26177,27 +26177,32 @@ public:
             err = TestSendTestCommandWithListOfInt8uAndGetItReversed_4();
             break;
         case 5:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 5 : Send Test Command With List of Struct Argument and arg1.b of first item is true\n");
-            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_5();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 5 : Send Test Command With empty List of INT8U and get an empty list back\n");
+            err = TestSendTestCommandWithEmptyListOfInt8uAndGetAnEmptyListBack_5();
             break;
         case 6:
             ChipLogProgress(
-                chipTool,
-                " ***** Test Step 6 : Send Test Command With List of Struct Argument and arg1.b of first item is false\n");
-            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_6();
+                chipTool, " ***** Test Step 6 : Send Test Command With List of Struct Argument and arg1.b of first item is true\n");
+            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Send Test Command with optional arg set.\n");
-            err = TestSendTestCommandWithOptionalArgSet_7();
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 7 : Send Test Command With List of Struct Argument and arg1.b of first item is false\n");
+            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Send Test Command without its optional arg.\n");
-            err = TestSendTestCommandWithoutItsOptionalArg_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Send Test Command with optional arg set.\n");
+            err = TestSendTestCommandWithOptionalArgSet_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Send Test Command with optional arg set to null.\n");
-            err = TestSendTestCommandWithOptionalArgSetToNull_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Send Test Command without its optional arg.\n");
+            err = TestSendTestCommandWithoutItsOptionalArg_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Send Test Command with optional arg set to null.\n");
+            err = TestSendTestCommandWithOptionalArgSetToNull_10();
             break;
         }
 
@@ -26210,7 +26215,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 10;
+    const uint16_t mTestCount = 11;
 
     //
     // Tests methods
@@ -26407,7 +26412,37 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_5()
+    CHIP_ERROR TestSendTestCommandWithEmptyListOfInt8uAndGetAnEmptyListBack_5()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
+        using responseType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
+
+        chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type request;
+
+        request.arg1 = chip::app::DataModel::List<uint8_t>();
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_5(data.arg1);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_5(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(const chip::app::DataModel::DecodableList<uint8_t> & arg1)
+    {
+        VerifyOrReturn(CheckValueAsList("arg1", arg1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_6()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -26436,24 +26471,24 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_5(data.value);
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_6(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_5(status);
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_6(status);
         };
         return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
     }
 
-    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(bool value)
+    void OnSuccessResponse_6(bool value)
     {
         VerifyOrReturn(CheckValue<bool>("value", value, true));
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_6()
+    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_7()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -26482,37 +26517,7 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_6(data.value);
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_6(status);
-        };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
-    }
-
-    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_6(bool value)
-    {
-        VerifyOrReturn(CheckValue<bool>("value", value, false));
-        NextTest();
-    }
-
-    CHIP_ERROR TestSendTestCommandWithOptionalArgSet_7()
-    {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
-        request.arg1.Emplace().SetNonNull() = 5;
-
-        auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))
-                ->OnSuccessResponse_7(data.wasPresent, data.wasNull, data.value, data.originalValue);
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_7(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -26523,24 +26528,13 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
-                             const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
+    void OnSuccessResponse_7(bool value)
     {
-        VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
-
-        VerifyOrReturn(CheckValuePresent("wasNull", wasNull));
-        VerifyOrReturn(CheckValue<bool>("wasNull.Value()", wasNull.Value(), false));
-
-        VerifyOrReturn(CheckValuePresent("value", value));
-        VerifyOrReturn(CheckValue<uint8_t>("value.Value()", value.Value(), 5));
-
-        VerifyOrReturn(CheckValuePresent("originalValue", originalValue));
-        VerifyOrReturn(CheckValueNonNull("originalValue.Value()", originalValue.Value()));
-        VerifyOrReturn(CheckValue<uint8_t>("originalValue.Value().Value()", originalValue.Value().Value(), 5));
+        VerifyOrReturn(CheckValue<bool>("value", value, false));
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithoutItsOptionalArg_8()
+    CHIP_ERROR TestSendTestCommandWithOptionalArgSet_8()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -26549,6 +26543,7 @@ private:
         using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
 
         chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
+        request.arg1.Emplace().SetNonNull() = 5;
 
         auto success = [](void * context, const responseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))
@@ -26566,12 +26561,21 @@ private:
     void OnSuccessResponse_8(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
                              const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
     {
-        VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, false));
+        VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
 
+        VerifyOrReturn(CheckValuePresent("wasNull", wasNull));
+        VerifyOrReturn(CheckValue<bool>("wasNull.Value()", wasNull.Value(), false));
+
+        VerifyOrReturn(CheckValuePresent("value", value));
+        VerifyOrReturn(CheckValue<uint8_t>("value.Value()", value.Value(), 5));
+
+        VerifyOrReturn(CheckValuePresent("originalValue", originalValue));
+        VerifyOrReturn(CheckValueNonNull("originalValue.Value()", originalValue.Value()));
+        VerifyOrReturn(CheckValue<uint8_t>("originalValue.Value().Value()", originalValue.Value().Value(), 5));
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithOptionalArgSetToNull_9()
+    CHIP_ERROR TestSendTestCommandWithoutItsOptionalArg_9()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -26580,7 +26584,6 @@ private:
         using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
 
         chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
-        request.arg1.Emplace().SetNull();
 
         auto success = [](void * context, const responseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))
@@ -26597,6 +26600,38 @@ private:
 
     void OnSuccessResponse_9(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
                              const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
+    {
+        VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, false));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendTestCommandWithOptionalArgSetToNull_10()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
+        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
+
+        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
+        request.arg1.Emplace().SetNull();
+
+        auto success = [](void * context, const responseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))
+                ->OnSuccessResponse_10(data.wasPresent, data.wasNull, data.value, data.originalValue);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_10(status);
+        };
+        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+    }
+
+    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+                              const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
     {
         VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
 

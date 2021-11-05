@@ -253,6 +253,17 @@ tests:
               - name: "arg1"
                 value: [9, 8, 7, 6, 5, 4, 3, 2, 1]
 
+    - label: "Send Test Command With empty List of INT8U and get an empty list back"
+      command: "testListInt8UReverseRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: []
+      response:
+          values:
+              - name: "arg1"
+                value: []
+
     - label:
           "Send Test Command With List of Struct Argument and arg1.b of first
           item is true"
