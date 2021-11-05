@@ -447,7 +447,6 @@ EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, EmberAfAttributeMetada
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-<<<<<<< HEAD
 EmberAfStatus HandleWriteDescriptorAttribute(uint16_t endpointIndex, EmberAfAttributeMetadata * am, uint8_t * buffer,
                                              uint16_t length, int32_t index)
 {
@@ -460,7 +459,8 @@ EmberAfStatus HandleWriteDescriptorAttribute(uint16_t endpointIndex, EmberAfAttr
     }
 
     return EMBER_ZCL_STATUS_FAILURE;
-=======
+}
+
 EmberAfStatus HandleReadSwitchAttribute(DeviceSwitch * dev, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
 {
     if ((attributeId == ZCL_NUMBER_OF_POSITIONS_ATTRIBUTE_ID) && (maxReadLength == 1))
@@ -489,7 +489,6 @@ EmberAfStatus HandleReadSwitchAttribute(DeviceSwitch * dev, chip::AttributeId at
     }
 
     return EMBER_ZCL_STATUS_SUCCESS;
->>>>>>> d92034510 (Add a bridged switched device to the bridge app (#10703))
 }
 
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
