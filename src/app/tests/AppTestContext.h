@@ -15,6 +15,7 @@
  */
 #pragma once
 
+#include "system/SystemClock.h"
 #include <messaging/tests/MessagingContext.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
@@ -36,10 +37,63 @@ public:
     // Shutdown all layers, finalize operations
     CHIP_ERROR Shutdown();
 
+    /*
+     * For unit-tests that simulate end-to-end transmission and reception of messages in loopback mode,
+     * this mode better replicates a real-functioning stack that correctly handles the processing
+     * of a transmitted message as an asynchronous, bottom half handler dispatched after the current execution context has
+     completed.
+     * This is achieved using SystemLayer::ScheduleWork.
+
+     * This should be used on conjunction with the DrainAndServiceIO function below to correctly service and drain the event queue.
+     *
+     */
+    void EnableAsyncDispatch()
+    {
+        auto & impl = mTransportManager.GetTransport().GetImplAtIndex<0>();
+        impl.EnableAsyncDispatch(&mIOContext.GetSystemLayer());
+    }
+
+    /*
+     * This drives the servicing of events using the embedded IOContext while there are pending
+     * messages in the loopback transport's pending message queue. This should run to completion
+     * in well-behaved logic (i.e there isn't an indefinite ping-pong of messages transmitted back
+     * and forth).
+     *
+     * Consequently, this is guarded with a user-provided timeout to ensure we don't have unit-tests that stall
+     * in CI due to bugs in the code that is being tested.
+     *
+     * This DOES NOT ensure that all pending events are serviced to completion (i.e timers, any ScheduleWork calls).
+     *
+     */
+    void DrainAndServiceIO(System::Clock::Timeout maxWait = chip::System::Clock::Seconds16(5))
+    {
+        auto & impl                        = mTransportManager.GetTransport().GetImplAtIndex<0>();
+        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
+
+        while (impl.HasPendingMessages())
+        {
+            mIOContext.DriveIO();
+            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= maxWait)
+            {
+                break;
+            }
+        }
+    }
+
     static int Initialize(void * context)
     {
         auto * ctx = static_cast<AppContext *>(context);
         return ctx->Init() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+    }
+
+    static int InitializeAsync(void * context)
+    {
+        auto * ctx = static_cast<AppContext *>(context);
+
+        VerifyOrReturnError(ctx->Init() == CHIP_NO_ERROR, FAILURE);
+        ctx->EnableAsyncDispatch();
+
+        return SUCCESS;
     }
 
     static int Finalize(void * context)
