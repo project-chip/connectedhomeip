@@ -26,6 +26,7 @@ import com.google.chip.chiptool.R
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackDataTv
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackNameTv
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackTypeTv
+import kotlinx.android.synthetic.main.cluster_detail_fragment.callbackList
 import kotlinx.android.synthetic.main.cluster_detail_fragment.view.callbackList
 import kotlinx.android.synthetic.main.cluster_detail_fragment.view.clusterAutoCompleteTv
 import kotlinx.android.synthetic.main.cluster_detail_fragment.view.commandAutoCompleteTv
@@ -89,7 +90,7 @@ class ClusterDetailFragment : Fragment() {
       Int::class.java -> data.toInt()
       String::class.java -> data
       Boolean::class.java -> data.toBoolean()
-      else -> null
+      else -> data
     }
   }
 
@@ -113,6 +114,7 @@ class ClusterDetailFragment : Fragment() {
       // when new cluster is selected, clear the command text and possible parameterList
       commandAutoComplete.setText("", false)
       parameterList.removeAllViews()
+      callbackList.removeAllViews()
       // populate all the commands that belong to the selected cluster
       val selectedCluster: String = clusterAutoComplete.adapter.getItem(position).toString()
       val commandAdapter = getCommandOptions(selectedCluster)
@@ -127,8 +129,9 @@ class ClusterDetailFragment : Fragment() {
     callbackList: LinearLayout
   ) {
     commandAutoComplete.setOnItemClickListener { parent, view, position, id ->
-      // when new command is selected, clear all the parameterList
+      // when new command is selected, clear all the parameterList and callbackList
       parameterList.removeAllViews()
+      callbackList.removeAllViews()
       selectedCluster = selectedClusterInfo.createClusterFunction.create(devicePtr, endpointId)
       val selectedCommand: String = commandAutoComplete.adapter.getItem(position).toString()
       selectedCommandInfo = selectedClusterInfo.commands[selectedCommand]!!
@@ -174,6 +177,7 @@ class ClusterDetailFragment : Fragment() {
       val callback =
         inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
       callback.clusterCallbackNameTv.text = variableNameType.name
+      // TODO deserialize the response object and display it dynamically
       callback.clusterCallbackDataTv.text = response.toString()
       callback.clusterCallbackTypeTv.text = variableNameType.type
       callbackList.addView(callback)
