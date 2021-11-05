@@ -119,18 +119,18 @@ protected:
 
     // Methods to read and write configuration values, as well as run the configuration unit test.
     typedef typename ConfigClass::Key Key;
-    virtual CHIP_ERROR ReadConfigValue(Key key, bool & val) = 0;
-    virtual CHIP_ERROR ReadConfigValue(Key key, uint32_t & val) = 0;
-    virtual CHIP_ERROR ReadConfigValue(Key key, uint64_t & val) = 0;
-    virtual CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen) = 0;
+    virtual CHIP_ERROR ReadConfigValue(Key key, bool & val)                                        = 0;
+    virtual CHIP_ERROR ReadConfigValue(Key key, uint32_t & val)                                    = 0;
+    virtual CHIP_ERROR ReadConfigValue(Key key, uint64_t & val)                                    = 0;
+    virtual CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)    = 0;
     virtual CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen) = 0;
-    virtual CHIP_ERROR WriteConfigValue(Key key, bool val) = 0;
-    virtual CHIP_ERROR WriteConfigValue(Key key, uint32_t val) = 0;
-    virtual CHIP_ERROR WriteConfigValue(Key key, uint64_t val) = 0;
-    virtual CHIP_ERROR WriteConfigValueStr(Key key, const char * str) = 0;
-    virtual CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) = 0;
-    virtual CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) = 0;
-    virtual void RunConfigUnitTest(void) = 0;
+    virtual CHIP_ERROR WriteConfigValue(Key key, bool val)                                         = 0;
+    virtual CHIP_ERROR WriteConfigValue(Key key, uint32_t val)                                     = 0;
+    virtual CHIP_ERROR WriteConfigValue(Key key, uint64_t val)                                     = 0;
+    virtual CHIP_ERROR WriteConfigValueStr(Key key, const char * str)                              = 0;
+    virtual CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen)               = 0;
+    virtual CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)          = 0;
+    virtual void RunConfigUnitTest(void)                                                           = 0;
 };
 
 template <class ConfigClass>

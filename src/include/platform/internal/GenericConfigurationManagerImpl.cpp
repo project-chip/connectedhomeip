@@ -200,7 +200,8 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreProductRevi
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetManufacturingDate(uint16_t & year, uint8_t & month,
+                                                                              uint8_t & dayOfMonth)
 {
     CHIP_ERROR err;
     enum
