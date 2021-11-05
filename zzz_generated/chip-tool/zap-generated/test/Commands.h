@@ -139,7 +139,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 1U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 1U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
                                                      clusterRevisionArgument);
@@ -430,7 +431,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        bool outOfServiceArgument = 0;
+        bool outOfServiceArgument;
+        outOfServiceArgument = 0;
 
         return cluster.WriteAttributeOutOfService(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(),
                                                   outOfServiceArgument);
@@ -477,7 +479,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        bool presentValueArgument = 0;
+        bool presentValueArgument;
+        presentValueArgument = 0;
 
         return cluster.WriteAttributePresentValue(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel(),
                                                   presentValueArgument);
@@ -541,7 +544,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t statusFlagsArgument = 0;
+        uint8_t statusFlagsArgument;
+        statusFlagsArgument = 0;
 
         return cluster.WriteAttributeStatusFlags(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel(), statusFlagsArgument);
     }
@@ -637,7 +641,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 4U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 4U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
                                                      clusterRevisionArgument);
@@ -3133,7 +3138,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t currentHueArgument = 0;
+        uint8_t currentHueArgument;
+        currentHueArgument = 0;
 
         return cluster.WriteAttributeCurrentHue(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(), currentHueArgument);
     }
@@ -3196,7 +3202,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t currentSaturationArgument = 0;
+        uint8_t currentSaturationArgument;
+        currentSaturationArgument = 0;
 
         return cluster.WriteAttributeCurrentSaturation(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel(),
                                                        currentSaturationArgument);
@@ -3260,7 +3267,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t currentXArgument = 24939U;
+        uint16_t currentXArgument;
+        currentXArgument = 24939U;
 
         return cluster.WriteAttributeCurrentX(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel(), currentXArgument);
     }
@@ -3323,7 +3331,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t currentYArgument = 24701U;
+        uint16_t currentYArgument;
+        currentYArgument = 24701U;
 
         return cluster.WriteAttributeCurrentY(mOnSuccessCallback_14.Cancel(), mOnFailureCallback_14.Cancel(), currentYArgument);
     }
@@ -3419,7 +3428,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t colorControlOptionsArgument = 0;
+        uint8_t colorControlOptionsArgument;
+        colorControlOptionsArgument = 0;
 
         return cluster.WriteAttributeColorControlOptions(mOnSuccessCallback_20.Cancel(), mOnFailureCallback_20.Cancel(),
                                                          colorControlOptionsArgument);
@@ -3482,7 +3492,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t enhancedCurrentHueArgument = 0U;
+        uint16_t enhancedCurrentHueArgument;
+        enhancedCurrentHueArgument = 0U;
 
         return cluster.WriteAttributeEnhancedCurrentHue(mOnSuccessCallback_24.Cancel(), mOnFailureCallback_24.Cancel(),
                                                         enhancedCurrentHueArgument);
@@ -3561,7 +3572,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t colorLoopActiveArgument = 0;
+        uint8_t colorLoopActiveArgument;
+        colorLoopActiveArgument = 0;
 
         return cluster.WriteAttributeColorLoopActive(mOnSuccessCallback_29.Cancel(), mOnFailureCallback_29.Cancel(),
                                                      colorLoopActiveArgument);
@@ -3624,7 +3636,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t colorLoopDirectionArgument = 0;
+        uint8_t colorLoopDirectionArgument;
+        colorLoopDirectionArgument = 0;
 
         return cluster.WriteAttributeColorLoopDirection(mOnSuccessCallback_33.Cancel(), mOnFailureCallback_33.Cancel(),
                                                         colorLoopDirectionArgument);
@@ -3687,7 +3700,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorLoopTimeArgument = 25U;
+        uint16_t colorLoopTimeArgument;
+        colorLoopTimeArgument = 25U;
 
         return cluster.WriteAttributeColorLoopTime(mOnSuccessCallback_37.Cancel(), mOnFailureCallback_37.Cancel(),
                                                    colorLoopTimeArgument);
@@ -3750,7 +3764,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorLoopStartEnhancedHueArgument = 8960U;
+        uint16_t colorLoopStartEnhancedHueArgument;
+        colorLoopStartEnhancedHueArgument = 8960U;
 
         return cluster.WriteAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_41.Cancel(), mOnFailureCallback_41.Cancel(),
                                                                colorLoopStartEnhancedHueArgument);
@@ -3813,7 +3828,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorLoopStoredEnhancedHueArgument = 0U;
+        uint16_t colorLoopStoredEnhancedHueArgument;
+        colorLoopStoredEnhancedHueArgument = 0U;
 
         return cluster.WriteAttributeColorLoopStoredEnhancedHue(mOnSuccessCallback_45.Cancel(), mOnFailureCallback_45.Cancel(),
                                                                 colorLoopStoredEnhancedHueArgument);
@@ -3877,7 +3893,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorCapabilitiesArgument = 0U;
+        uint16_t colorCapabilitiesArgument;
+        colorCapabilitiesArgument = 0U;
 
         return cluster.WriteAttributeColorCapabilities(mOnSuccessCallback_49.Cancel(), mOnFailureCallback_49.Cancel(),
                                                        colorCapabilitiesArgument);
@@ -3941,7 +3958,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorTempPhysicalMinArgument = 0U;
+        uint16_t colorTempPhysicalMinArgument;
+        colorTempPhysicalMinArgument = 0U;
 
         return cluster.WriteAttributeColorTempPhysicalMin(mOnSuccessCallback_53.Cancel(), mOnFailureCallback_53.Cancel(),
                                                           colorTempPhysicalMinArgument);
@@ -4005,7 +4023,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorTempPhysicalMaxArgument = 65279U;
+        uint16_t colorTempPhysicalMaxArgument;
+        colorTempPhysicalMaxArgument = 65279U;
 
         return cluster.WriteAttributeColorTempPhysicalMax(mOnSuccessCallback_57.Cancel(), mOnFailureCallback_57.Cancel(),
                                                           colorTempPhysicalMaxArgument);
@@ -4052,7 +4071,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t coupleColorTempToLevelMinMiredsArgument = 0U;
+        uint16_t coupleColorTempToLevelMinMiredsArgument;
+        coupleColorTempToLevelMinMiredsArgument = 0U;
 
         return cluster.WriteAttributeCoupleColorTempToLevelMinMireds(mOnSuccessCallback_60.Cancel(), mOnFailureCallback_60.Cancel(),
                                                                      coupleColorTempToLevelMinMiredsArgument);
@@ -4100,7 +4120,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t startUpColorTemperatureMiredsArgument = 0U;
+        uint16_t startUpColorTemperatureMiredsArgument;
+        startUpColorTemperatureMiredsArgument = 0U;
 
         return cluster.WriteAttributeStartUpColorTemperatureMireds(mOnSuccessCallback_63.Cancel(), mOnFailureCallback_63.Cancel(),
                                                                    startUpColorTemperatureMiredsArgument);
@@ -4164,7 +4185,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t remainingTimeArgument = 0U;
+        uint16_t remainingTimeArgument;
+        remainingTimeArgument = 0U;
 
         return cluster.WriteAttributeRemainingTime(mOnSuccessCallback_67.Cancel(), mOnFailureCallback_67.Cancel(),
                                                    remainingTimeArgument);
@@ -4212,7 +4234,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t driftCompensationArgument = static_cast<uint8_t>(0);
+        uint8_t driftCompensationArgument;
+        driftCompensationArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeDriftCompensation(mOnSuccessCallback_70.Cancel(), mOnFailureCallback_70.Cancel(),
                                                        driftCompensationArgument);
@@ -4277,7 +4300,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t numberOfPrimariesArgument = 0;
+        uint8_t numberOfPrimariesArgument;
+        numberOfPrimariesArgument = 0;
 
         return cluster.WriteAttributeNumberOfPrimaries(mOnSuccessCallback_74.Cancel(), mOnFailureCallback_74.Cancel(),
                                                        numberOfPrimariesArgument);
@@ -4325,7 +4349,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary1XArgument = 0U;
+        uint16_t primary1XArgument;
+        primary1XArgument = 0U;
 
         return cluster.WriteAttributePrimary1X(mOnSuccessCallback_77.Cancel(), mOnFailureCallback_77.Cancel(), primary1XArgument);
     }
@@ -4372,7 +4397,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary1YArgument = 0U;
+        uint16_t primary1YArgument;
+        primary1YArgument = 0U;
 
         return cluster.WriteAttributePrimary1Y(mOnSuccessCallback_80.Cancel(), mOnFailureCallback_80.Cancel(), primary1YArgument);
     }
@@ -4435,7 +4461,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary2XArgument = 0U;
+        uint16_t primary2XArgument;
+        primary2XArgument = 0U;
 
         return cluster.WriteAttributePrimary2X(mOnSuccessCallback_84.Cancel(), mOnFailureCallback_84.Cancel(), primary2XArgument);
     }
@@ -4482,7 +4509,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary2YArgument = 0U;
+        uint16_t primary2YArgument;
+        primary2YArgument = 0U;
 
         return cluster.WriteAttributePrimary2Y(mOnSuccessCallback_87.Cancel(), mOnFailureCallback_87.Cancel(), primary2YArgument);
     }
@@ -4545,7 +4573,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary3XArgument = 0U;
+        uint16_t primary3XArgument;
+        primary3XArgument = 0U;
 
         return cluster.WriteAttributePrimary3X(mOnSuccessCallback_91.Cancel(), mOnFailureCallback_91.Cancel(), primary3XArgument);
     }
@@ -4592,7 +4621,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary3YArgument = 0U;
+        uint16_t primary3YArgument;
+        primary3YArgument = 0U;
 
         return cluster.WriteAttributePrimary3Y(mOnSuccessCallback_94.Cancel(), mOnFailureCallback_94.Cancel(), primary3YArgument);
     }
@@ -4655,7 +4685,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary4XArgument = 0U;
+        uint16_t primary4XArgument;
+        primary4XArgument = 0U;
 
         return cluster.WriteAttributePrimary4X(mOnSuccessCallback_98.Cancel(), mOnFailureCallback_98.Cancel(), primary4XArgument);
     }
@@ -4702,7 +4733,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary4YArgument = 0U;
+        uint16_t primary4YArgument;
+        primary4YArgument = 0U;
 
         return cluster.WriteAttributePrimary4Y(mOnSuccessCallback_101.Cancel(), mOnFailureCallback_101.Cancel(), primary4YArgument);
     }
@@ -4765,7 +4797,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary5XArgument = 0U;
+        uint16_t primary5XArgument;
+        primary5XArgument = 0U;
 
         return cluster.WriteAttributePrimary5X(mOnSuccessCallback_105.Cancel(), mOnFailureCallback_105.Cancel(), primary5XArgument);
     }
@@ -4812,7 +4845,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary5YArgument = 0U;
+        uint16_t primary5YArgument;
+        primary5YArgument = 0U;
 
         return cluster.WriteAttributePrimary5Y(mOnSuccessCallback_108.Cancel(), mOnFailureCallback_108.Cancel(), primary5YArgument);
     }
@@ -4875,7 +4909,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary6XArgument = 0U;
+        uint16_t primary6XArgument;
+        primary6XArgument = 0U;
 
         return cluster.WriteAttributePrimary6X(mOnSuccessCallback_112.Cancel(), mOnFailureCallback_112.Cancel(), primary6XArgument);
     }
@@ -4922,7 +4957,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t primary6YArgument = 0U;
+        uint16_t primary6YArgument;
+        primary6YArgument = 0U;
 
         return cluster.WriteAttributePrimary6Y(mOnSuccessCallback_115.Cancel(), mOnFailureCallback_115.Cancel(), primary6YArgument);
     }
@@ -4985,7 +5021,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t whitePointXArgument = 0U;
+        uint16_t whitePointXArgument;
+        whitePointXArgument = 0U;
 
         return cluster.WriteAttributeWhitePointX(mOnSuccessCallback_119.Cancel(), mOnFailureCallback_119.Cancel(),
                                                  whitePointXArgument);
@@ -5033,7 +5070,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t whitePointYArgument = 0U;
+        uint16_t whitePointYArgument;
+        whitePointYArgument = 0U;
 
         return cluster.WriteAttributeWhitePointY(mOnSuccessCallback_122.Cancel(), mOnFailureCallback_122.Cancel(),
                                                  whitePointYArgument);
@@ -5081,7 +5119,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorPointRXArgument = 0U;
+        uint16_t colorPointRXArgument;
+        colorPointRXArgument = 0U;
 
         return cluster.WriteAttributeColorPointRX(mOnSuccessCallback_125.Cancel(), mOnFailureCallback_125.Cancel(),
                                                   colorPointRXArgument);
@@ -5129,7 +5168,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorPointRYArgument = 0U;
+        uint16_t colorPointRYArgument;
+        colorPointRYArgument = 0U;
 
         return cluster.WriteAttributeColorPointRY(mOnSuccessCallback_128.Cancel(), mOnFailureCallback_128.Cancel(),
                                                   colorPointRYArgument);
@@ -5193,7 +5233,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorPointGXArgument = 0U;
+        uint16_t colorPointGXArgument;
+        colorPointGXArgument = 0U;
 
         return cluster.WriteAttributeColorPointGX(mOnSuccessCallback_132.Cancel(), mOnFailureCallback_132.Cancel(),
                                                   colorPointGXArgument);
@@ -5241,7 +5282,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorPointGYArgument = 0U;
+        uint16_t colorPointGYArgument;
+        colorPointGYArgument = 0U;
 
         return cluster.WriteAttributeColorPointGY(mOnSuccessCallback_135.Cancel(), mOnFailureCallback_135.Cancel(),
                                                   colorPointGYArgument);
@@ -5305,7 +5347,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorPointBXArgument = 0U;
+        uint16_t colorPointBXArgument;
+        colorPointBXArgument = 0U;
 
         return cluster.WriteAttributeColorPointBX(mOnSuccessCallback_139.Cancel(), mOnFailureCallback_139.Cancel(),
                                                   colorPointBXArgument);
@@ -5353,7 +5396,8 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t colorPointBYArgument = 0U;
+        uint16_t colorPointBYArgument;
+        colorPointBYArgument = 0U;
 
         return cluster.WriteAttributeColorPointBY(mOnSuccessCallback_142.Cancel(), mOnFailureCallback_142.Cancel(),
                                                   colorPointBYArgument);
@@ -11837,7 +11881,8 @@ private:
         chip::Controller::ElectricalMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 1U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 1U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
                                                      clusterRevisionArgument);
@@ -11934,7 +11979,8 @@ private:
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 2U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 2U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
                                                      clusterRevisionArgument);
@@ -12174,7 +12220,8 @@ private:
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int16_t minMeasuredValueArgument = 0;
+        int16_t minMeasuredValueArgument;
+        minMeasuredValueArgument = 0;
 
         return cluster.WriteAttributeMinMeasuredValue(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel(),
                                                       minMeasuredValueArgument);
@@ -12189,7 +12236,8 @@ private:
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int16_t maxMeasuredValueArgument = 0;
+        int16_t maxMeasuredValueArgument;
+        maxMeasuredValueArgument = 0;
 
         return cluster.WriteAttributeMaxMeasuredValue(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel(),
                                                       maxMeasuredValueArgument);
@@ -12431,7 +12479,8 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 4U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 4U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
                                                      clusterRevisionArgument);
@@ -13149,7 +13198,8 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t defaultMoveRateArgument = 20;
+        uint8_t defaultMoveRateArgument;
+        defaultMoveRateArgument = 20;
 
         return cluster.WriteAttributeDefaultMoveRate(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel(),
                                                      defaultMoveRateArgument);
@@ -13821,7 +13871,8 @@ private:
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 1U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 1U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
                                                      clusterRevisionArgument);
@@ -14538,7 +14589,8 @@ private:
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 2U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 2U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
                                                      clusterRevisionArgument);
@@ -14773,7 +14825,8 @@ private:
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t occupancyArgument = 0;
+        uint8_t occupancyArgument;
+        occupancyArgument = 0;
 
         return cluster.WriteAttributeOccupancy(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(), occupancyArgument);
     }
@@ -14820,7 +14873,8 @@ private:
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t occupancySensorTypeArgument = static_cast<uint8_t>(0);
+        uint8_t occupancySensorTypeArgument;
+        occupancySensorTypeArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeOccupancySensorType(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel(),
                                                          occupancySensorTypeArgument);
@@ -14869,7 +14923,8 @@ private:
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t occupancySensorTypeBitmapArgument = 1;
+        uint8_t occupancySensorTypeBitmapArgument;
+        occupancySensorTypeBitmapArgument = 1;
 
         return cluster.WriteAttributeOccupancySensorTypeBitmap(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel(),
                                                                occupancySensorTypeBitmapArgument);
@@ -15175,7 +15230,8 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 3U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 3U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
                                                      clusterRevisionArgument);
@@ -15222,7 +15278,8 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint32_t featureMapArgument = 0UL;
+        uint32_t featureMapArgument;
+        featureMapArgument = 0UL;
 
         return cluster.WriteAttributeFeatureMap(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel(), featureMapArgument);
     }
@@ -15589,7 +15646,8 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t onTimeArgument = 0U;
+        uint16_t onTimeArgument;
+        onTimeArgument = 0U;
 
         return cluster.WriteAttributeOnTime(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel(), onTimeArgument);
     }
@@ -15603,7 +15661,8 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t offWaitTimeArgument = 0U;
+        uint16_t offWaitTimeArgument;
+        offWaitTimeArgument = 0U;
 
         return cluster.WriteAttributeOffWaitTime(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel(), offWaitTimeArgument);
     }
@@ -15617,7 +15676,8 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t startUpOnOffArgument = static_cast<uint8_t>(0);
+        uint8_t startUpOnOffArgument;
+        startUpOnOffArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeStartUpOnOff(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel(),
                                                   startUpOnOffArgument);
@@ -16295,7 +16355,8 @@ private:
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 2U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 2U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(),
                                                      clusterRevisionArgument);
@@ -16535,7 +16596,8 @@ private:
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int16_t measuredValueArgument = 0;
+        int16_t measuredValueArgument;
+        measuredValueArgument = 0;
 
         return cluster.WriteAttributeMeasuredValue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
                                                    measuredValueArgument);
@@ -16582,7 +16644,8 @@ private:
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int16_t minMeasuredValueArgument = 0;
+        int16_t minMeasuredValueArgument;
+        minMeasuredValueArgument = 0;
 
         return cluster.WriteAttributeMinMeasuredValue(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel(),
                                                       minMeasuredValueArgument);
@@ -16629,7 +16692,8 @@ private:
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int16_t maxMeasuredValueArgument = 0;
+        int16_t maxMeasuredValueArgument;
+        maxMeasuredValueArgument = 0;
 
         return cluster.WriteAttributeMaxMeasuredValue(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel(),
                                                       maxMeasuredValueArgument);
@@ -16726,7 +16790,8 @@ private:
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 3U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 3U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
                                                      clusterRevisionArgument);
@@ -17147,7 +17212,8 @@ private:
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t operationModeArgument = static_cast<uint8_t>(1);
+        uint8_t operationModeArgument;
+        operationModeArgument = static_cast<uint8_t>(1);
 
         return cluster.WriteAttributeOperationMode(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
                                                    operationModeArgument);
@@ -17162,7 +17228,8 @@ private:
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t operationModeArgument = static_cast<uint8_t>(2);
+        uint8_t operationModeArgument;
+        operationModeArgument = static_cast<uint8_t>(2);
 
         return cluster.WriteAttributeOperationMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
                                                    operationModeArgument);
@@ -17177,7 +17244,8 @@ private:
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t operationModeArgument = static_cast<uint8_t>(3);
+        uint8_t operationModeArgument;
+        operationModeArgument = static_cast<uint8_t>(3);
 
         return cluster.WriteAttributeOperationMode(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(),
                                                    operationModeArgument);
@@ -17274,7 +17342,8 @@ private:
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t operationModeArgument = static_cast<uint8_t>(0);
+        uint8_t operationModeArgument;
+        operationModeArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeOperationMode(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
                                                    operationModeArgument);
@@ -17371,7 +17440,8 @@ private:
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 1U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 1U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
                                                      clusterRevisionArgument);
@@ -17727,7 +17797,8 @@ private:
         chip::Controller::TemperatureMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 3U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 3U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
                                                      clusterRevisionArgument);
@@ -18018,7 +18089,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 5U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 5U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
                                                      clusterRevisionArgument);
@@ -18099,7 +18171,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 2U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 2U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
                                                      clusterRevisionArgument);
@@ -18450,7 +18523,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t temperatureDisplayModeArgument = static_cast<uint8_t>(0);
+        uint8_t temperatureDisplayModeArgument;
+        temperatureDisplayModeArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeTemperatureDisplayMode(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(),
                                                             temperatureDisplayModeArgument);
@@ -18529,7 +18603,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t keypadLockoutArgument = static_cast<uint8_t>(0);
+        uint8_t keypadLockoutArgument;
+        keypadLockoutArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeKeypadLockout(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel(),
                                                    keypadLockoutArgument);
@@ -18608,7 +18683,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
+        uint8_t scheduleProgrammingVisibilityArgument;
+        scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeScheduleProgrammingVisibility(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel(),
                                                                    scheduleProgrammingVisibilityArgument);
@@ -18872,7 +18948,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t temperatureDisplayModeArgument = static_cast<uint8_t>(0);
+        uint8_t temperatureDisplayModeArgument;
+        temperatureDisplayModeArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeTemperatureDisplayMode(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(),
                                                             temperatureDisplayModeArgument);
@@ -18887,7 +18964,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t temperatureDisplayModeArgument = static_cast<uint8_t>(1);
+        uint8_t temperatureDisplayModeArgument;
+        temperatureDisplayModeArgument = static_cast<uint8_t>(1);
 
         return cluster.WriteAttributeTemperatureDisplayMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
                                                             temperatureDisplayModeArgument);
@@ -18902,7 +18980,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t keypadLockoutArgument = static_cast<uint8_t>(0);
+        uint8_t keypadLockoutArgument;
+        keypadLockoutArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeKeypadLockout(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(),
                                                    keypadLockoutArgument);
@@ -18917,7 +18996,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t keypadLockoutArgument = static_cast<uint8_t>(1);
+        uint8_t keypadLockoutArgument;
+        keypadLockoutArgument = static_cast<uint8_t>(1);
 
         return cluster.WriteAttributeKeypadLockout(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel(),
                                                    keypadLockoutArgument);
@@ -18932,7 +19012,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t keypadLockoutArgument = static_cast<uint8_t>(2);
+        uint8_t keypadLockoutArgument;
+        keypadLockoutArgument = static_cast<uint8_t>(2);
 
         return cluster.WriteAttributeKeypadLockout(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel(),
                                                    keypadLockoutArgument);
@@ -18947,7 +19028,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t keypadLockoutArgument = static_cast<uint8_t>(3);
+        uint8_t keypadLockoutArgument;
+        keypadLockoutArgument = static_cast<uint8_t>(3);
 
         return cluster.WriteAttributeKeypadLockout(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel(),
                                                    keypadLockoutArgument);
@@ -18962,7 +19044,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t keypadLockoutArgument = static_cast<uint8_t>(4);
+        uint8_t keypadLockoutArgument;
+        keypadLockoutArgument = static_cast<uint8_t>(4);
 
         return cluster.WriteAttributeKeypadLockout(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel(),
                                                    keypadLockoutArgument);
@@ -18977,7 +19060,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t keypadLockoutArgument = static_cast<uint8_t>(5);
+        uint8_t keypadLockoutArgument;
+        keypadLockoutArgument = static_cast<uint8_t>(5);
 
         return cluster.WriteAttributeKeypadLockout(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel(),
                                                    keypadLockoutArgument);
@@ -18992,7 +19076,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
+        uint8_t scheduleProgrammingVisibilityArgument;
+        scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeScheduleProgrammingVisibility(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel(),
                                                                    scheduleProgrammingVisibilityArgument);
@@ -19007,7 +19092,8 @@ private:
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(1);
+        uint8_t scheduleProgrammingVisibilityArgument;
+        scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(1);
 
         return cluster.WriteAttributeScheduleProgrammingVisibility(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel(),
                                                                    scheduleProgrammingVisibilityArgument);
@@ -19136,7 +19222,8 @@ private:
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        uint16_t clusterRevisionArgument = 1U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 1U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
                                                      clusterRevisionArgument);
@@ -19313,7 +19400,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t clusterRevisionArgument = 5U;
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 5U;
 
         return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
                                                      clusterRevisionArgument);
@@ -19745,7 +19833,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t modeArgument = 7;
+        uint8_t modeArgument;
+        modeArgument = 7;
 
         return cluster.WriteAttributeMode(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel(), modeArgument);
     }
@@ -24232,7 +24321,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        bool booleanArgument = 1;
+        bool booleanArgument;
+        booleanArgument = 1;
 
         return cluster.WriteAttributeBoolean(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel(), booleanArgument);
     }
@@ -24262,7 +24352,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        bool booleanArgument = 0;
+        bool booleanArgument;
+        booleanArgument = 0;
 
         return cluster.WriteAttributeBoolean(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel(), booleanArgument);
     }
@@ -24308,7 +24399,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t bitmap8Argument = 255;
+        uint8_t bitmap8Argument;
+        bitmap8Argument = 255;
 
         return cluster.WriteAttributeBitmap8(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel(), bitmap8Argument);
     }
@@ -24338,7 +24430,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t bitmap8Argument = 0;
+        uint8_t bitmap8Argument;
+        bitmap8Argument = 0;
 
         return cluster.WriteAttributeBitmap8(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel(), bitmap8Argument);
     }
@@ -24384,7 +24477,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t bitmap16Argument = 65535U;
+        uint16_t bitmap16Argument;
+        bitmap16Argument = 65535U;
 
         return cluster.WriteAttributeBitmap16(mOnSuccessCallback_16.Cancel(), mOnFailureCallback_16.Cancel(), bitmap16Argument);
     }
@@ -24414,7 +24508,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t bitmap16Argument = 0U;
+        uint16_t bitmap16Argument;
+        bitmap16Argument = 0U;
 
         return cluster.WriteAttributeBitmap16(mOnSuccessCallback_18.Cancel(), mOnFailureCallback_18.Cancel(), bitmap16Argument);
     }
@@ -24460,7 +24555,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint32_t bitmap32Argument = 4294967295UL;
+        uint32_t bitmap32Argument;
+        bitmap32Argument = 4294967295UL;
 
         return cluster.WriteAttributeBitmap32(mOnSuccessCallback_21.Cancel(), mOnFailureCallback_21.Cancel(), bitmap32Argument);
     }
@@ -24490,7 +24586,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint32_t bitmap32Argument = 0UL;
+        uint32_t bitmap32Argument;
+        bitmap32Argument = 0UL;
 
         return cluster.WriteAttributeBitmap32(mOnSuccessCallback_23.Cancel(), mOnFailureCallback_23.Cancel(), bitmap32Argument);
     }
@@ -24536,7 +24633,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint64_t bitmap64Argument = 18446744073709551615ULL;
+        uint64_t bitmap64Argument;
+        bitmap64Argument = 18446744073709551615ULL;
 
         return cluster.WriteAttributeBitmap64(mOnSuccessCallback_26.Cancel(), mOnFailureCallback_26.Cancel(), bitmap64Argument);
     }
@@ -24566,7 +24664,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint64_t bitmap64Argument = 0ULL;
+        uint64_t bitmap64Argument;
+        bitmap64Argument = 0ULL;
 
         return cluster.WriteAttributeBitmap64(mOnSuccessCallback_28.Cancel(), mOnFailureCallback_28.Cancel(), bitmap64Argument);
     }
@@ -24612,7 +24711,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t int8uArgument = 255;
+        uint8_t int8uArgument;
+        int8uArgument = 255;
 
         return cluster.WriteAttributeInt8u(mOnSuccessCallback_31.Cancel(), mOnFailureCallback_31.Cancel(), int8uArgument);
     }
@@ -24642,7 +24742,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t int8uArgument = 0;
+        uint8_t int8uArgument;
+        int8uArgument = 0;
 
         return cluster.WriteAttributeInt8u(mOnSuccessCallback_33.Cancel(), mOnFailureCallback_33.Cancel(), int8uArgument);
     }
@@ -24688,7 +24789,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t int16uArgument = 65535U;
+        uint16_t int16uArgument;
+        int16uArgument = 65535U;
 
         return cluster.WriteAttributeInt16u(mOnSuccessCallback_36.Cancel(), mOnFailureCallback_36.Cancel(), int16uArgument);
     }
@@ -24718,7 +24820,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t int16uArgument = 0U;
+        uint16_t int16uArgument;
+        int16uArgument = 0U;
 
         return cluster.WriteAttributeInt16u(mOnSuccessCallback_38.Cancel(), mOnFailureCallback_38.Cancel(), int16uArgument);
     }
@@ -24764,7 +24867,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint32_t int32uArgument = 4294967295UL;
+        uint32_t int32uArgument;
+        int32uArgument = 4294967295UL;
 
         return cluster.WriteAttributeInt32u(mOnSuccessCallback_41.Cancel(), mOnFailureCallback_41.Cancel(), int32uArgument);
     }
@@ -24794,7 +24898,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint32_t int32uArgument = 0UL;
+        uint32_t int32uArgument;
+        int32uArgument = 0UL;
 
         return cluster.WriteAttributeInt32u(mOnSuccessCallback_43.Cancel(), mOnFailureCallback_43.Cancel(), int32uArgument);
     }
@@ -24840,7 +24945,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint64_t int64uArgument = 18446744073709551615ULL;
+        uint64_t int64uArgument;
+        int64uArgument = 18446744073709551615ULL;
 
         return cluster.WriteAttributeInt64u(mOnSuccessCallback_46.Cancel(), mOnFailureCallback_46.Cancel(), int64uArgument);
     }
@@ -24870,7 +24976,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint64_t int64uArgument = 0ULL;
+        uint64_t int64uArgument;
+        int64uArgument = 0ULL;
 
         return cluster.WriteAttributeInt64u(mOnSuccessCallback_48.Cancel(), mOnFailureCallback_48.Cancel(), int64uArgument);
     }
@@ -24916,7 +25023,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int8_t int8sArgument = 127;
+        int8_t int8sArgument;
+        int8sArgument = 127;
 
         return cluster.WriteAttributeInt8s(mOnSuccessCallback_51.Cancel(), mOnFailureCallback_51.Cancel(), int8sArgument);
     }
@@ -24946,7 +25054,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int8_t int8sArgument = -128;
+        int8_t int8sArgument;
+        int8sArgument = -128;
 
         return cluster.WriteAttributeInt8s(mOnSuccessCallback_53.Cancel(), mOnFailureCallback_53.Cancel(), int8sArgument);
     }
@@ -24976,7 +25085,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int8_t int8sArgument = 0;
+        int8_t int8sArgument;
+        int8sArgument = 0;
 
         return cluster.WriteAttributeInt8s(mOnSuccessCallback_55.Cancel(), mOnFailureCallback_55.Cancel(), int8sArgument);
     }
@@ -25022,7 +25132,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int16_t int16sArgument = 32767;
+        int16_t int16sArgument;
+        int16sArgument = 32767;
 
         return cluster.WriteAttributeInt16s(mOnSuccessCallback_58.Cancel(), mOnFailureCallback_58.Cancel(), int16sArgument);
     }
@@ -25052,7 +25163,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int16_t int16sArgument = -32768;
+        int16_t int16sArgument;
+        int16sArgument = -32768;
 
         return cluster.WriteAttributeInt16s(mOnSuccessCallback_60.Cancel(), mOnFailureCallback_60.Cancel(), int16sArgument);
     }
@@ -25082,7 +25194,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int16_t int16sArgument = 0;
+        int16_t int16sArgument;
+        int16sArgument = 0;
 
         return cluster.WriteAttributeInt16s(mOnSuccessCallback_62.Cancel(), mOnFailureCallback_62.Cancel(), int16sArgument);
     }
@@ -25128,7 +25241,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int32_t int32sArgument = 2147483647L;
+        int32_t int32sArgument;
+        int32sArgument = 2147483647L;
 
         return cluster.WriteAttributeInt32s(mOnSuccessCallback_65.Cancel(), mOnFailureCallback_65.Cancel(), int32sArgument);
     }
@@ -25158,7 +25272,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int32_t int32sArgument = -2147483648L;
+        int32_t int32sArgument;
+        int32sArgument = -2147483648L;
 
         return cluster.WriteAttributeInt32s(mOnSuccessCallback_67.Cancel(), mOnFailureCallback_67.Cancel(), int32sArgument);
     }
@@ -25188,7 +25303,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int32_t int32sArgument = 0L;
+        int32_t int32sArgument;
+        int32sArgument = 0L;
 
         return cluster.WriteAttributeInt32s(mOnSuccessCallback_69.Cancel(), mOnFailureCallback_69.Cancel(), int32sArgument);
     }
@@ -25234,7 +25350,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int64_t int64sArgument = 9223372036854775807LL;
+        int64_t int64sArgument;
+        int64sArgument = 9223372036854775807LL;
 
         return cluster.WriteAttributeInt64s(mOnSuccessCallback_72.Cancel(), mOnFailureCallback_72.Cancel(), int64sArgument);
     }
@@ -25264,7 +25381,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int64_t int64sArgument = -9223372036854775807LL;
+        int64_t int64sArgument;
+        int64sArgument = -9223372036854775807LL;
 
         return cluster.WriteAttributeInt64s(mOnSuccessCallback_74.Cancel(), mOnFailureCallback_74.Cancel(), int64sArgument);
     }
@@ -25294,7 +25412,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        int64_t int64sArgument = 0LL;
+        int64_t int64sArgument;
+        int64sArgument = 0LL;
 
         return cluster.WriteAttributeInt64s(mOnSuccessCallback_76.Cancel(), mOnFailureCallback_76.Cancel(), int64sArgument);
     }
@@ -25340,7 +25459,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t enum8Argument = static_cast<uint8_t>(255);
+        uint8_t enum8Argument;
+        enum8Argument = static_cast<uint8_t>(255);
 
         return cluster.WriteAttributeEnum8(mOnSuccessCallback_79.Cancel(), mOnFailureCallback_79.Cancel(), enum8Argument);
     }
@@ -25370,7 +25490,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint8_t enum8Argument = static_cast<uint8_t>(0);
+        uint8_t enum8Argument;
+        enum8Argument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttributeEnum8(mOnSuccessCallback_81.Cancel(), mOnFailureCallback_81.Cancel(), enum8Argument);
     }
@@ -25416,7 +25537,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t enum16Argument = static_cast<uint16_t>(65535U);
+        uint16_t enum16Argument;
+        enum16Argument = static_cast<uint16_t>(65535);
 
         return cluster.WriteAttributeEnum16(mOnSuccessCallback_84.Cancel(), mOnFailureCallback_84.Cancel(), enum16Argument);
     }
@@ -25446,7 +25568,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t enum16Argument = static_cast<uint16_t>(0U);
+        uint16_t enum16Argument;
+        enum16Argument = static_cast<uint16_t>(0);
 
         return cluster.WriteAttributeEnum16(mOnSuccessCallback_86.Cancel(), mOnFailureCallback_86.Cancel(), enum16Argument);
     }
@@ -25492,7 +25615,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::ByteSpan octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), strlen("TestValue"));
+        chip::ByteSpan octetStringArgument;
+        octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), strlen("TestValue"));
 
         return cluster.WriteAttributeOctetString(mOnSuccessCallback_89.Cancel(), mOnFailureCallback_89.Cancel(),
                                                  octetStringArgument);
@@ -25523,7 +25647,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::ByteSpan octetStringArgument =
+        chip::ByteSpan octetStringArgument;
+        octetStringArgument =
             chip::ByteSpan(chip::Uint8::from_const_char("TestValueLongerThan10"), strlen("TestValueLongerThan10"));
 
         return cluster.WriteAttributeOctetString(mOnSuccessCallback_91.Cancel(), mOnFailureCallback_91.Cancel(),
@@ -25555,7 +25680,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::ByteSpan octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+        chip::ByteSpan octetStringArgument;
+        octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
 
         return cluster.WriteAttributeOctetString(mOnSuccessCallback_93.Cancel(), mOnFailureCallback_93.Cancel(),
                                                  octetStringArgument);
@@ -25586,7 +25712,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::ByteSpan longOctetStringArgument = chip::ByteSpan(
+        chip::ByteSpan longOctetStringArgument;
+        longOctetStringArgument = chip::ByteSpan(
             chip::Uint8::from_const_char(
                 "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
                 "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
@@ -25628,7 +25755,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::ByteSpan longOctetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+        chip::ByteSpan longOctetStringArgument;
+        longOctetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
 
         return cluster.WriteAttributeLongOctetString(mOnSuccessCallback_97.Cancel(), mOnFailureCallback_97.Cancel(),
                                                      longOctetStringArgument);
@@ -25659,7 +25787,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::CharSpan charStringArgument = chip::CharSpan("☉T☉", strlen("☉T☉"));
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("☉T☉", strlen("☉T☉"));
 
         return cluster.WriteAttributeCharString(mOnSuccessCallback_99.Cancel(), mOnFailureCallback_99.Cancel(), charStringArgument);
     }
@@ -25673,7 +25802,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::CharSpan charStringArgument = chip::CharSpan("☉TestValueLongerThan10☉", strlen("☉TestValueLongerThan10☉"));
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("☉TestValueLongerThan10☉", strlen("☉TestValueLongerThan10☉"));
 
         return cluster.WriteAttributeCharString(mOnSuccessCallback_100.Cancel(), mOnFailureCallback_100.Cancel(),
                                                 charStringArgument);
@@ -25688,7 +25818,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::CharSpan charStringArgument = chip::CharSpan("", strlen(""));
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("", strlen(""));
 
         return cluster.WriteAttributeCharString(mOnSuccessCallback_101.Cancel(), mOnFailureCallback_101.Cancel(),
                                                 charStringArgument);
@@ -25719,7 +25850,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::CharSpan longCharStringArgument = chip::CharSpan(
+        chip::CharSpan longCharStringArgument;
+        longCharStringArgument = chip::Span<const char>(
             "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
             "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
             "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉",
@@ -25760,7 +25892,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::CharSpan longCharStringArgument = chip::CharSpan("", strlen(""));
+        chip::CharSpan longCharStringArgument;
+        longCharStringArgument = chip::Span<const char>("", strlen(""));
 
         return cluster.WriteAttributeLongCharString(mOnSuccessCallback_105.Cancel(), mOnFailureCallback_105.Cancel(),
                                                     longCharStringArgument);
@@ -25841,7 +25974,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint64_t epochUsArgument = 18446744073709551615ULL;
+        uint64_t epochUsArgument;
+        epochUsArgument = 18446744073709551615ULL;
 
         return cluster.WriteAttributeEpochUs(mOnSuccessCallback_110.Cancel(), mOnFailureCallback_110.Cancel(), epochUsArgument);
     }
@@ -25871,7 +26005,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint64_t epochUsArgument = 0ULL;
+        uint64_t epochUsArgument;
+        epochUsArgument = 0ULL;
 
         return cluster.WriteAttributeEpochUs(mOnSuccessCallback_112.Cancel(), mOnFailureCallback_112.Cancel(), epochUsArgument);
     }
@@ -25917,7 +26052,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint32_t epochSArgument = 4294967295UL;
+        uint32_t epochSArgument;
+        epochSArgument = 4294967295UL;
 
         return cluster.WriteAttributeEpochS(mOnSuccessCallback_115.Cancel(), mOnFailureCallback_115.Cancel(), epochSArgument);
     }
@@ -25947,7 +26083,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint32_t epochSArgument = 0UL;
+        uint32_t epochSArgument;
+        epochSArgument = 0UL;
 
         return cluster.WriteAttributeEpochS(mOnSuccessCallback_117.Cancel(), mOnFailureCallback_117.Cancel(), epochSArgument);
     }
@@ -25996,7 +26133,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        bool unsupportedArgument = 0;
+        bool unsupportedArgument;
+        unsupportedArgument = 0;
 
         return cluster.WriteAttributeUnsupported(mOnSuccessCallback_120.Cancel(), mOnFailureCallback_120.Cancel(),
                                                  unsupportedArgument);
@@ -26054,7 +26192,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::VendorId vendorIdArgument = static_cast<chip::VendorId>(17U);
+        chip::VendorId vendorIdArgument;
+        vendorIdArgument = static_cast<chip::VendorId>(17);
 
         return cluster.WriteAttributeVendorId(mOnSuccessCallback_123.Cancel(), mOnFailureCallback_123.Cancel(), vendorIdArgument);
     }
@@ -26084,7 +26223,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::VendorId vendorIdArgument = static_cast<chip::VendorId>(0U);
+        chip::VendorId vendorIdArgument;
+        vendorIdArgument = static_cast<chip::VendorId>(0);
 
         return cluster.WriteAttributeVendorId(mOnSuccessCallback_125.Cancel(), mOnFailureCallback_125.Cancel(), vendorIdArgument);
     }
@@ -26726,7 +26866,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint32_t int32uArgument = 5UL;
+        uint32_t int32uArgument;
+        int32uArgument = 5UL;
 
         return cluster.WriteAttributeInt32u(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(), int32uArgument);
     }
@@ -27211,7 +27352,8 @@ private:
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        chip::CharSpan locationArgument = chip::CharSpan("us", strlen("us"));
+        chip::CharSpan locationArgument;
+        locationArgument = chip::Span<const char>("us", strlen("us"));
 
         return cluster.WriteAttributeLocation(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(), locationArgument);
     }
@@ -27241,7 +27383,8 @@ private:
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        chip::CharSpan locationArgument = chip::CharSpan("", strlen(""));
+        chip::CharSpan locationArgument;
+        locationArgument = chip::Span<const char>("", strlen(""));
 
         return cluster.WriteAttributeLocation(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel(), locationArgument);
     }
@@ -28121,8 +28264,10 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        uint16_t minIntervalArgument = 2;
-        uint16_t maxIntervalArgument = 10;
+        uint16_t minIntervalArgument;
+        minIntervalArgument = 2U;
+        uint16_t maxIntervalArgument;
+        maxIntervalArgument = 10U;
 
         return cluster.SubscribeAttributeOnOff(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(), minIntervalArgument,
                                                maxIntervalArgument);
