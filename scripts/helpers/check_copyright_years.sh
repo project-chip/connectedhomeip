@@ -75,8 +75,6 @@ echo "Looking for files with incorrect copyright years..."
 RESULT=0
 COPYRIGHT_REGEX="Copyright \(c\) (([0-9]{4})(-[0-9]{4})?) Project CHIP Authors"
 for SOURCE_FILE in "${SOURCE_FILES[@]}"; do
-    echo "Checking file $SOURCE_FILE"
-
     # Find the year in which the file was most recently modified
     LAST_MODIFIED=$(git log --follow --format=%aD -- "$SOURCE_FILE" | head -1 | awk '{print $4}')
 
@@ -102,7 +100,7 @@ for SOURCE_FILE in "${SOURCE_FILES[@]}"; do
             fi
 
         else
-            echo "Incorrect copyright year in $SOURCE_FILE File Modified Year: $LAST_MODIFIED Copyright Year: $COPYRIGHT_YEAR"
+            echo "Incorrect copyright year in $SOURCE_FILE. Modified Year: $LAST_MODIFIED Copyright Year: $COPYRIGHT_YEAR"
             RESULT=1
         fi
     fi
