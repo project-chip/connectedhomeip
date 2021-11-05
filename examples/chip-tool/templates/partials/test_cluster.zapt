@@ -138,7 +138,11 @@ class {{filename}}: public TestCommand
 
     CHIP_ERROR {{>testCommand}}()
     {
+        {{#if isGroupCommand}}
+        const chip::GroupId groupId = {{groupId}};
+        {{else}}
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : {{endpoint}};
+        {{/if}}
         {{#if isCommand}}
         using RequestType = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
 
@@ -159,7 +163,11 @@ class {{filename}}: public TestCommand
         {{#unless async}}return CHIP_NO_ERROR;{{/unless}}
         {{else}}
         chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
+        {{#if isGroupCommand}}
+        cluster.Associate(groupId, mDevice);
+        {{else}}
         cluster.Associate(mDevice, endpoint);
+        {{/if}}
 
         {{#chip_tests_item_parameters}}
         {{zapTypeToEncodableClusterObjectType type ns=parent.cluster}} {{asLowerCamelCase name}}Argument;
