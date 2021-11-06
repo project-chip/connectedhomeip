@@ -175,7 +175,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ always() }} && ${{ !env.ACT }}
               with:
-                  name: test_suite_app_logs
+                  name: test-suite-app-logs-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: /tmp/test_suites_app_logs/
                   retention-days: 5
             - name: Uploading core files
