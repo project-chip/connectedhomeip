@@ -133,8 +133,6 @@ def _SetCommandStatus(commandHandle: int, val):
 
 def _SetCommandIndexStatus(commandHandle: int, commandIndex: int, status):
     with _commandStatusLock:
-        print("SetCommandIndexStatus commandHandle={} commandIndex={}".format(
-            commandHandle, commandIndex))
         indexDict = _commandIndexStatusDict.get(commandHandle, {})
         indexDict[commandIndex] = status
         _commandIndexStatusDict[commandHandle] = indexDict
