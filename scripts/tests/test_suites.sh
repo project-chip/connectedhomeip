@@ -110,13 +110,14 @@ for j in "${iter_array[@]}"; do
         # tee expeditiously; otherwise it will buffer things up and we
         # will never see the string we want.
 
-        touch /tmp/test_suites_app_logs/"$application"-log
+        application_log_file=/tmp/test_suites_app_logs/"$application-$i-$j"-log
+        touch "$application_log_file"
         rm -rf /tmp/pid
         (
             stdbuf -o0 "${test_case_wrapper[@]}" out/debug/standalone/chip-"$application"-app &
             echo $! >&3
-        ) 3>/tmp/pid | tee /tmp/test_suites_app_logs/"$application"-log &
-        while ! grep -q "Server Listening" /tmp/test_suites_app_logs/"$application"-log; do
+        ) 3>/tmp/pid | tee "$application_log_file" &
+        while ! grep -q "Server Listening" "$application_log_file"; do
             :
         done
         # Now read $background_pid from /tmp/pid; presumably it's
