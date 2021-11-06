@@ -33,8 +33,7 @@ tests:
               type: bool
 
     - label:
-          "Write the default value to mandatory non-global attribute:
-          StateValue"
+          "Write the default value to mandatory non-global attribute: StateValue"
       command: "writeAttribute"
       attribute: "StateValue"
       arguments:
