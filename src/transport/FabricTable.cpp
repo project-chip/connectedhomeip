@@ -161,6 +161,10 @@ CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
     }
     VerifyOrExit(mOperationalKey != nullptr, err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = mOperationalKey->Deserialize(info->mOperationalKey));
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+    // Set provisioned_key = true , so that key is not deleted from HSM.
+    mOperationalKey->provisioned_key = true;
+#endif
 
     ChipLogProgress(Inet, "Loading certs from storage");
     SuccessOrExit(err = SetRootCert(ByteSpan(info->mRootCert, rootCertLen)));
