@@ -320,7 +320,7 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
 
     const MessageType msgType = (mState == TransferState::kReceivedEOF) ? MessageType::BlockAckEOF : MessageType::BlockAck;
     CounterMessage ackMsg(msgType);
-    ackMsg.BlockCounter       = mLastBlockNum;
+    ackMsg.BlockCounter = mLastBlockNum;
 
     ReturnErrorOnFailure(WriteToPacketBuffer(ackMsg, mPendingMsgHandle));
 

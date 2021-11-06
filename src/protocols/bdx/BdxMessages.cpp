@@ -174,14 +174,14 @@ void TransferInit::LogMessage() const
 
     switch (MessageType)
     {
-        case MessageType::SendInit:
-            ChipLogProgress(BDX, "SendInit");
-            break;
-        case MessageType::ReceiveInit:
-            ChipLogProgress(BDX, "ReceiveInit");
-            break;
-        default:
-            break;
+    case MessageType::SendInit:
+        ChipLogProgress(BDX, "SendInit");
+        break;
+    case MessageType::ReceiveInit:
+        ChipLogProgress(BDX, "ReceiveInit");
+        break;
+    default:
+        break;
     }
 
     ChipLogDetail(BDX, "  Proposed Transfer Control: 0x%X", TransferCtlOptions.Raw() | Version);
@@ -469,17 +469,17 @@ void CounterMessage::LogMessage() const
 {
     switch (MessageType)
     {
-        case MessageType::BlockQuery:
-            ChipLogProgress(BDX, "BlockQuery");
-            break;
-        case MessageType::BlockAck:
-            ChipLogProgress(BDX, "BlockAck");
-            break;
-        case MessageType::BlockAckEOF:
-            ChipLogProgress(BDX, "BlockAckEOF");
-            break;
-        default:
-            break;
+    case MessageType::BlockQuery:
+        ChipLogProgress(BDX, "BlockQuery");
+        break;
+    case MessageType::BlockAck:
+        ChipLogProgress(BDX, "BlockAck");
+        break;
+    case MessageType::BlockAckEOF:
+        ChipLogProgress(BDX, "BlockAckEOF");
+        break;
+    default:
+        break;
     }
 
     ChipLogDetail(BDX, "  Block Counter: %d", BlockCounter);
@@ -535,14 +535,14 @@ void DataBlock::LogMessage() const
 {
     switch (MessageType)
     {
-        case MessageType::Block:
-            ChipLogProgress(BDX, "Block");
-            break;
-        case MessageType::BlockEOF:
-            ChipLogProgress(BDX, "BlockEOF");
-            break;
-        default:
-            break;
+    case MessageType::Block:
+        ChipLogProgress(BDX, "Block");
+        break;
+    case MessageType::BlockEOF:
+        ChipLogProgress(BDX, "BlockEOF");
+        break;
+    default:
+        break;
     }
 
     ChipLogDetail(BDX, "  Block Counter: %d", BlockCounter);
