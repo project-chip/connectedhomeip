@@ -84,6 +84,9 @@ echo ""
 
 ulimit -c unlimited || true
 
+rm -rf /tmp/test_suites_app_logs
+mkdir -p /tmp/test_suites_app_logs
+
 declare -a iter_array="($(seq "$iterations"))"
 for j in "${iter_array[@]}"; do
     echo " ===== Iteration $j starting"
@@ -107,16 +110,13 @@ for j in "${iter_array[@]}"; do
         # tee expeditiously; otherwise it will buffer things up and we
         # will never see the string we want.
 
-        # Clear out our temp files so we don't accidentally do a stale
-        # read from them before we write to them.
-        rm -rf /tmp/"$application"-log
-        touch /tmp/"$application"-log
+        touch /tmp/test_suites_app_logs/"$application"-log
         rm -rf /tmp/pid
         (
             stdbuf -o0 "${test_case_wrapper[@]}" out/debug/standalone/chip-"$application"-app &
             echo $! >&3
-        ) 3>/tmp/pid | tee /tmp/"$application"-log &
-        while ! grep -q "Server Listening" /tmp/"$application"-log; do
+        ) 3>/tmp/pid | tee /tmp/test_suites_app_logs/"$application"-log &
+        while ! grep -q "Server Listening" /tmp/test_suites_app_logs/"$application"-log; do
             :
         done
         # Now read $background_pid from /tmp/pid; presumably it's

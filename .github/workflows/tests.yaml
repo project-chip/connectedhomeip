@@ -171,6 +171,13 @@ jobs:
               timeout-minutes: 35
               run: |
                   scripts/tests/test_suites.sh
+            - name: Uploading application log files
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }} && ${{ !env.ACT }}
+              with:
+                  name: test_suite_app_logs
+                  path: /tmp/test_suites_app_logs/
+                  retention-days: 5
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
