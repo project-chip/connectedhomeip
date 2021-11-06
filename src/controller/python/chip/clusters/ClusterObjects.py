@@ -30,7 +30,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
 
         If that is 'None' (not to be confused with NoneType), then it will retrieve
         the 'real' type behind the union, i.e not Nullable && not None
-    ''' 
+    '''
     if (not(typing.get_origin(typeToCheck) == typing.Union)):
         return None
 
