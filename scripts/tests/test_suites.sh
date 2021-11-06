@@ -111,7 +111,11 @@ for j in "${iter_array[@]}"; do
         # will never see the string we want.
 
         application_log_file=/tmp/test_suites_app_logs/"$application-$i-$j"-log
+        pairing_log_file=/tmp/test_suites_app_logs/pairing-"$application-$i-$j"-log
+        chip_tool_log_file=/tmp/test_suites_app_logs/chip-tool-"$application-$i-$j"-log
         touch "$application_log_file"
+        touch "$pairing_log_file"
+        touch "$chip_tool_log_file"
         rm -rf /tmp/pid
         (
             stdbuf -o0 "${test_case_wrapper[@]}" out/debug/standalone/chip-"$application"-app &
@@ -126,9 +130,9 @@ for j in "${iter_array[@]}"; do
         # the data is there yet.
         background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00 | tee "$pairing_log_file"
         echo "          * Starting test run: $i"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay"
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay" | tee "$chip_tool_log_file"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0
