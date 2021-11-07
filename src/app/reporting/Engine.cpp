@@ -121,7 +121,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReports(ReportDataMessage::Buil
                     // need to inject nodeId from subscribed path here.
                     ClusterInfo dirtyPath = *path;
                     dirtyPath.mNodeId     = clusterInfo->mNodeId;
-                    err = RetrieveClusterData(apReadHandler->GetFabricIndex(), AttributeReports, *path);
+                    err                   = RetrieveClusterData(apReadHandler->GetFabricIndex(), AttributeReports, *path);
                 }
                 else if (path->IsAttributePathSupersetOf(*clusterInfo))
                 {
