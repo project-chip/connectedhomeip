@@ -491,15 +491,13 @@ void DnssdServer::StartServer(chip::Dnssd::CommissioningMode mode)
 CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
 {
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
-    size_t serialNumberSize                = 0;
     uint16_t lifetimeCounter               = 0;
     size_t rotatingDeviceIdValueOutputSize = 0;
 
-    ReturnErrorOnFailure(
-        chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
+    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber)));
     ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
     return AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
-        lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+        lifetimeCounter, serialNumber, strlen(serialNumber), rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
         rotatingDeviceIdValueOutputSize);
 }
 #endif

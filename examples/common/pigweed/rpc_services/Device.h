@@ -103,8 +103,8 @@ public:
             response.pairing_info.discriminator = static_cast<uint32_t>(discriminator);
             response.has_pairing_info           = true;
         }
-        size_t serial_size;
-        DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number), serial_size);
+
+        DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number));
 
         return pw::OkStatus();
     }
