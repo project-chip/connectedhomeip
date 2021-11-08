@@ -37,12 +37,12 @@ struct AttributePathParams
         AttributePathParams(aEndpointId, aClusterId, ClusterInfo::kInvalidAttributeId, ClusterInfo::kInvalidListIndex)
     {}
 
-    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aFieldId) :
-        AttributePathParams(aEndpointId, aClusterId, aFieldId, ClusterInfo::kInvalidListIndex)
+    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
+        AttributePathParams(aEndpointId, aClusterId, aAttributeId, ClusterInfo::kInvalidListIndex)
     {}
 
-    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aFieldId, ListIndex aListIndex) :
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex)
+    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListIndex aListIndex) :
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mAttributeId(aAttributeId), mListIndex(aListIndex)
     {}
 
     AttributePathParams() {}
@@ -60,13 +60,13 @@ struct AttributePathParams
 
     inline bool HasWildcardEndpointId() const { return mEndpointId == ClusterInfo::kInvalidEndpointId; }
     inline bool HasWildcardClusterId() const { return mClusterId == ClusterInfo::kInvalidClusterId; }
-    inline bool HasWildcardAttributeId() const { return mFieldId == ClusterInfo::kInvalidAttributeId; }
+    inline bool HasWildcardAttributeId() const { return mAttributeId == ClusterInfo::kInvalidAttributeId; }
     inline bool HasWildcardListIndex() const { return mListIndex == ClusterInfo::kInvalidListIndex; }
 
-    EndpointId mEndpointId = ClusterInfo::kInvalidEndpointId;
-    ClusterId mClusterId   = ClusterInfo::kInvalidClusterId;
-    AttributeId mFieldId   = ClusterInfo::kInvalidAttributeId;
-    ListIndex mListIndex   = ClusterInfo::kInvalidListIndex;
+    EndpointId mEndpointId   = ClusterInfo::kInvalidEndpointId;
+    ClusterId mClusterId     = ClusterInfo::kInvalidClusterId;
+    AttributeId mAttributeId = ClusterInfo::kInvalidAttributeId;
+    ListIndex mListIndex     = ClusterInfo::kInvalidListIndex;
 };
 } // namespace app
 } // namespace chip

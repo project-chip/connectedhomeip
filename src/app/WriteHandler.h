@@ -70,7 +70,7 @@ public:
 
     virtual ~WriteHandler() = default;
 
-    CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
+    CHIP_ERROR ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
 
     CHIP_ERROR AddStatus(const AttributePathParams & aAttributePathParams, const Protocols::InteractionModel::Status aStatus);
 

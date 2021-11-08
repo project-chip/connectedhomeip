@@ -255,26 +255,23 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
 bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
 
 /**
- *  Fetch attribute value and version info and write to the TLVWriter provided.
+ *  Fetch attribute value and version info and write to the AttributeReport provided.
  *  When the endpoint / cluster / attribute / event data specified by aClusterInfo does not exist, corresponding interaction model
- * error code will be put into the writer, and CHIP_NO_ERROR will be returned and apDataExists will be set to false.
- *  If the data exists on the server, the data (with tag kCsTag_Data) and the data version (with tag kCsTag_DataVersion) will be put
- * into the TLVWriter and apDataExists will be set to true. TLVWriter error will be returned if any error occurred during encoding
+ * error code will be put into the writer, and CHIP_NO_ERROR will be returned.
+ *  If the data exists on the server, the data (with tag kData) and the data version (with tag kDataVersion) will be put
+ * into the TLVWriter. TLVWriter error will be returned if any error occurred during encoding
  * these values.
  *  This function is implemented by CHIP as a part of cluster data storage & management.
  * The apWriter and apDataExists can be nullptr.
  *
  *  @param[in]    aAccessingFabricIndex The accessing fabric index for the read.
  *  @param[in]    aPath             The concrete path of the data being read.
- *  @param[in]    apWriter          The TLVWriter for holding cluster data. Can be a nullptr if the caller does not care
- *                                  the exact value of the attribute.
- *  @param[out]   apDataExists      Tell whether the cluster data exist on server. Can be a nullptr if the caller does not care
- *                                  whether the data exists.
+ *  @param[in]    aAttributeReport  The TLV Builder for Cluter attribute builder.
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
-                                 bool * apDataExists);
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+                                 AttributeReportIB::Builder & aAttributeReport);
 
 /**
  * TODO: Document.

@@ -516,8 +516,8 @@ bool InteractionModelEngine::MergeOverlappedAttributePath(ClusterInfo * apAttrib
         }
         if (aAttributePath.IsAttributePathSupersetOf(*runner))
         {
-            runner->mListIndex = aAttributePath.mListIndex;
-            runner->mFieldId   = aAttributePath.mFieldId;
+            runner->mListIndex   = aAttributePath.mListIndex;
+            runner->mAttributeId = aAttributePath.mAttributeId;
             return true;
         }
         runner = runner->mpNext;
