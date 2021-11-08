@@ -73,22 +73,6 @@ static Identify gIdentify1 = {
     chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
 };
 
-Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask,
-                                                                     uint8_t type, uint16_t size, uint8_t * value)
-{
-    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
-    if (attributePath.mClusterId == app::Clusters::Thermostat::Id)
-    {
-        status = MatterThermostatClusterServerPreAttributeChangedCallback(attributePath, type, size, value);
-    }
-    else if (attributePath.mClusterId == app::Clusters::ThermostatUserInterfaceConfiguration::Id)
-    {
-        status =
-            MatterThermostatUserInterfaceConfigurationClusterServerPreAttributeChangedCallback(attributePath, type, size, value);
-    }
-    return status;
-}
-
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
