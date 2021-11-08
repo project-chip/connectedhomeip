@@ -101,15 +101,15 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     uint8_t * bufStart      = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
 
-    SuccessOrExit(bufReader.Read8(&proposedTransferCtl).Read8(RangeCtlFlags.RawStorage()).Read16(&MaxBlockSize).StatusCode());
+    SuccessOrExit(bufReader.Read8(&proposedTransferCtl).Read8(mRangeCtlFlags.RawStorage()).Read16(&MaxBlockSize).StatusCode());
 
     Version = proposedTransferCtl & kVersionMask;
     TransferCtlOptions.SetRaw(static_cast<uint8_t>(proposedTransferCtl & ~kVersionMask));
 
     StartOffset = 0;
-    if (RangeCtlFlags.Has(RangeControlFlags::kStartOffset))
+    if (mRangeCtlFlags.Has(RangeControlFlags::kStartOffset))
     {
-        if (RangeCtlFlags.Has(RangeControlFlags::kWiderange))
+        if (mRangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
             SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
         }
@@ -121,9 +121,9 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     }
 
     MaxLength = 0;
-    if (RangeCtlFlags.Has(RangeControlFlags::kDefLen))
+    if (mRangeCtlFlags.Has(RangeControlFlags::kDefLen))
     {
-        if (RangeCtlFlags.Has(RangeControlFlags::kWiderange))
+        if (mRangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
             SuccessOrExit(bufReader.Read64(&MaxLength).StatusCode());
         }
@@ -166,31 +166,33 @@ size_t TransferInit::MessageSize() const
     return WriteToBuffer(emptyBuf).Needed();
 }
 
+#if CHIP_AUTOMATION_LOGGING
 void TransferInit::LogMessage() const
 {
     char fd[kMaxFileDesignatorLen];
-    snprintf(fd, FileDesLength + 1, "%s", FileDesignator);
+    snprintf(fd, sizeof(fd), "%s", FileDesignator);
 
-    switch (MessageType)
+    switch (mMessageType)
     {
     case MessageType::SendInit:
-        ChipLogProgress(BDX, "SendInit");
+        ChipLogAutomation("SendInit");
         break;
     case MessageType::ReceiveInit:
-        ChipLogProgress(BDX, "ReceiveInit");
+        ChipLogAutomation("ReceiveInit");
         break;
     default:
         break;
     }
 
-    ChipLogDetail(BDX, "  Proposed Transfer Control: 0x%X", TransferCtlOptions.Raw() | Version);
-    ChipLogDetail(BDX, "  Range Control: 0x%X", RangeCtlFlags.Raw());
-    ChipLogDetail(BDX, "  Proposed Max Block Size: %" PRIu16, MaxBlockSize);
-    ChipLogDetail(BDX, "  Start Offset: 0x" ChipLogFormatX64, ChipLogValueX64(StartOffset));
-    ChipLogDetail(BDX, "  Proposed Max Length: 0x" ChipLogFormatX64, ChipLogValueX64(MaxLength));
-    ChipLogDetail(BDX, "  File Designator Length: %" PRIu16, FileDesLength);
-    ChipLogDetail(BDX, "  File Designator: %s", fd);
+    ChipLogAutomation("  Proposed Transfer Control: 0x%X", static_cast<unsigned>(TransferCtlOptions.Raw() | Version));
+    ChipLogAutomation("  Range Control: 0x%X", static_cast<unsigned>(mRangeCtlFlags.Raw()));
+    ChipLogAutomation("  Proposed Max Block Size: %" PRIu16, MaxBlockSize);
+    ChipLogAutomation("  Start Offset: 0x" ChipLogFormatX64, ChipLogValueX64(StartOffset));
+    ChipLogAutomation("  Proposed Max Length: 0x" ChipLogFormatX64, ChipLogValueX64(MaxLength));
+    ChipLogAutomation("  File Designator Length: %" PRIu16, FileDesLength);
+    ChipLogAutomation("  File Designator: %s", fd);
 }
+#endif // CHIP_AUTOMATION_LOGGING
 
 bool TransferInit::operator==(const TransferInit & another) const
 {
@@ -272,12 +274,14 @@ size_t SendAccept::MessageSize() const
     return WriteToBuffer(emptyBuf).Needed();
 }
 
+#if CHIP_AUTOMATION_LOGGING
 void SendAccept::LogMessage() const
 {
-    ChipLogProgress(BDX, "SendAccept");
-    ChipLogDetail(BDX, "  Transfer Control: 0x%X", TransferCtlFlags.Raw() | Version);
-    ChipLogDetail(BDX, "  Max Block Size: %" PRIu16, MaxBlockSize);
+    ChipLogAutomation("SendAccept");
+    ChipLogAutomation("  Transfer Control: 0x%X", static_cast<unsigned>(TransferCtlFlags.Raw() | Version));
+    ChipLogAutomation("  Max Block Size: %" PRIu16, MaxBlockSize);
 }
+#endif // CHIP_AUTOMATION_LOGGING
 
 bool SendAccept::operator==(const SendAccept & another) const
 {
@@ -351,7 +355,7 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     uint8_t * bufStart      = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
 
-    SuccessOrExit(bufReader.Read8(&transferCtl).Read8(RangeCtlFlags.RawStorage()).Read16(&MaxBlockSize).StatusCode());
+    SuccessOrExit(bufReader.Read8(&transferCtl).Read8(mRangeCtlFlags.RawStorage()).Read16(&MaxBlockSize).StatusCode());
 
     Version = transferCtl & kVersionMask;
 
@@ -359,9 +363,9 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     TransferCtlFlags.SetRaw(static_cast<uint8_t>(transferCtl & ~kVersionMask));
 
     StartOffset = 0;
-    if (RangeCtlFlags.Has(RangeControlFlags::kStartOffset))
+    if (mRangeCtlFlags.Has(RangeControlFlags::kStartOffset))
     {
-        if (RangeCtlFlags.Has(RangeControlFlags::kWiderange))
+        if (mRangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
             SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
         }
@@ -373,9 +377,9 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     }
 
     Length = 0;
-    if (RangeCtlFlags.Has(RangeControlFlags::kDefLen))
+    if (mRangeCtlFlags.Has(RangeControlFlags::kDefLen))
     {
-        if (RangeCtlFlags.Has(RangeControlFlags::kWiderange))
+        if (mRangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
             SuccessOrExit(bufReader.Read64(&Length).StatusCode());
         }
@@ -412,14 +416,16 @@ size_t ReceiveAccept::MessageSize() const
     return WriteToBuffer(emptyBuf).Needed();
 }
 
+#if CHIP_AUTOMATION_LOGGING
 void ReceiveAccept::LogMessage() const
 {
-    ChipLogProgress(BDX, "ReceiveAccept");
-    ChipLogDetail(BDX, "  Transfer Control: 0x%X", TransferCtlFlags.Raw() | Version);
-    ChipLogDetail(BDX, "  Range Control: 0x%X", RangeCtlFlags.Raw());
-    ChipLogDetail(BDX, "  Max Block Size: %" PRIu16, MaxBlockSize);
-    ChipLogDetail(BDX, "  Length: 0x" ChipLogFormatX64, ChipLogValueX64(Length));
+    ChipLogAutomation("ReceiveAccept");
+    ChipLogAutomation("  Transfer Control: 0x%X", TransferCtlFlags.Raw() | Version);
+    ChipLogAutomation("  Range Control: 0x%X", mRangeCtlFlags.Raw());
+    ChipLogAutomation("  Max Block Size: %" PRIu16, MaxBlockSize);
+    ChipLogAutomation("  Length: 0x" ChipLogFormatX64, ChipLogValueX64(Length));
 }
+#endif // CHIP_AUTOMATION_LOGGING
 
 bool ReceiveAccept::operator==(const ReceiveAccept & another) const
 {
@@ -464,25 +470,27 @@ bool CounterMessage::operator==(const CounterMessage & another) const
     return (BlockCounter == another.BlockCounter);
 }
 
+#if CHIP_AUTOMATION_LOGGING
 void CounterMessage::LogMessage() const
 {
-    switch (MessageType)
+    switch (mMessageType)
     {
     case MessageType::BlockQuery:
-        ChipLogProgress(BDX, "BlockQuery");
+        ChipLogAutomation("BlockQuery");
         break;
     case MessageType::BlockAck:
-        ChipLogProgress(BDX, "BlockAck");
+        ChipLogAutomation("BlockAck");
         break;
     case MessageType::BlockAckEOF:
-        ChipLogProgress(BDX, "BlockAckEOF");
+        ChipLogAutomation("BlockAckEOF");
         break;
     default:
         break;
     }
 
-    ChipLogDetail(BDX, "  Block Counter: %" PRIu32, BlockCounter);
+    ChipLogAutomation("  Block Counter: %" PRIu32, BlockCounter);
 }
+#endif // CHIP_AUTOMATION_LOGGING
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
@@ -530,23 +538,25 @@ size_t DataBlock::MessageSize() const
     return WriteToBuffer(emptyBuf).Needed();
 }
 
+#if CHIP_AUTOMATION_LOGGING
 void DataBlock::LogMessage() const
 {
-    switch (MessageType)
+    switch (mMessageType)
     {
     case MessageType::Block:
-        ChipLogProgress(BDX, "Block");
+        ChipLogAutomation("Block");
         break;
     case MessageType::BlockEOF:
-        ChipLogProgress(BDX, "BlockEOF");
+        ChipLogAutomation("BlockEOF");
         break;
     default:
         break;
     }
 
-    ChipLogDetail(BDX, "  Block Counter: %" PRIu32, BlockCounter);
-    ChipLogDetail(BDX, "  Data Length: %zu", DataLength);
+    ChipLogAutomation("  Block Counter: %" PRIu32, BlockCounter);
+    ChipLogAutomation("  Data Length: %zu", DataLength);
 }
+#endif // CHIP_AUTOMATION_LOGGING
 
 bool DataBlock::operator==(const DataBlock & another) const
 {
