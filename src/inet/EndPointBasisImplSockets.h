@@ -33,7 +33,9 @@ namespace Inet {
 class DLL_EXPORT EndPointImplSockets : public EndPointBase
 {
 protected:
-    void InitEndPointBasisImpl() override { mSocket = kInvalidSocketFd; }
+    EndPointImplSockets(InetLayer & inetLayer, void * appState = nullptr) :
+        EndPointBase(inetLayer, appState), mSocket(kInvalidSocketFd)
+    {}
 
     static constexpr int kInvalidSocketFd = -1;
     int mSocket;                     /**< Encapsulated socket descriptor. */

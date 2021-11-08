@@ -250,7 +250,7 @@ CHIP_ERROR InetLayer::Shutdown()
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Abort all TCP endpoints owned by this instance.
     TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        if ((lEndPoint != nullptr) && &lEndPoint->Layer() == this)
         {
             lEndPoint->Abort();
         }
@@ -261,7 +261,7 @@ CHIP_ERROR InetLayer::Shutdown()
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     // Close all UDP endpoints owned by this instance.
     UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        if ((lEndPoint != nullptr) && &lEndPoint->Layer() == this)
         {
             lEndPoint->Close();
         }
@@ -429,14 +429,13 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = TCPEndPoint::sPool.CreateObject();
+    *retEndPoint = TCPEndPoint::sPool.CreateObject(*this);
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "TCP");
         return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
 
-    (*retEndPoint)->Init(this);
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumTCPEps);
 
     return CHIP_NO_ERROR;
@@ -469,14 +468,13 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = UDPEndPoint::sPool.CreateObject();
+    *retEndPoint = UDPEndPoint::sPool.CreateObject(*this);
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "UDP");
         return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
 
-    (*retEndPoint)->Init(this);
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumUDPEps);
 
     return CHIP_NO_ERROR;
@@ -558,7 +556,7 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();
 
     TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-        if (!lEndPoint->IsCreatedByInetLayer(lInetLayer))
+        if (&lEndPoint->Layer() != &lInetLayer)
             return true;
         if (!lEndPoint->IsConnected())
             return true;

@@ -74,7 +74,23 @@ class DLL_EXPORT TCPEndPoint : public EndPointBasis, public ReferenceCounted<TCP
     friend class TCPTest;
 
 public:
-    TCPEndPoint() = default;
+    TCPEndPoint(InetLayer & inetLayer, void * appState = nullptr) :
+        EndPointBasis(inetLayer, appState), mState(State::kReady), mReceiveEnabled(true),
+        mConnectTimeoutMsecs(0) // Initialize to zero for using system defaults.
+#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+        ,
+        mUserTimeoutMillis(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC), mUserTimeoutTimerRunning(false)
+#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
+        ,
+        mIsTCPSendIdle(true), mTCPSendQueuePollPeriodMillis(INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC),
+        mTCPSendQueueRemainingPollCount(
+            MaxTCPSendQueuePolls(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC, INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC)),
+        OnTCPSendIdleChanged(nullptr)
+#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
+#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+    {
+        InitImpl();
+    }
 
     /**
      * @brief   Bind the endpoint to an interface IP address.
@@ -644,13 +660,14 @@ private:
     void ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut);
 
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    uint16_t MaxTCPSendQueuePolls(void)
+    static constexpr uint16_t MaxTCPSendQueuePolls(uint16_t userTimeout, uint16_t pollPeriod)
     {
         // If the UserTimeout is configured less than or equal to the poll interval,
         // return 1 to poll at least once instead of returning zero and timing out
         // immediately.
-        return (mUserTimeoutMillis > mTCPSendQueuePollPeriodMillis) ? (mUserTimeoutMillis / mTCPSendQueuePollPeriodMillis) : 1;
+        return (userTimeout > pollPeriod) ? (userTimeout / pollPeriod) : 1;
     }
+    uint16_t MaxTCPSendQueuePolls(void) { return MaxTCPSendQueuePolls(mUserTimeoutMillis, mTCPSendQueuePollPeriodMillis); }
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -666,7 +683,6 @@ private:
 
     TCPEndPoint(const TCPEndPoint &) = delete;
 
-    void Init(InetLayer * inetLayer);
     CHIP_ERROR DriveSending();
     void DriveReceiving();
     void HandleConnectComplete(CHIP_ERROR err);

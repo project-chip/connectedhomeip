@@ -1988,7 +1988,7 @@ CHIP_ERROR UDPEndPoint::Listen(OnMessageReceivedFunct onMessageReceived, OnRecei
 
     OnMessageReceived = onMessageReceived;
     OnReceiveError    = onReceiveError;
-    AppState          = appState;
+    mAppState         = appState;
 
     ReturnErrorOnFailure(ListenImpl());
 
@@ -2026,12 +2026,6 @@ void UDPEndPoint::Close()
         CloseImpl();
         mState = State::kClosed;
     }
-}
-
-void UDPEndPoint::Init(InetLayer * inetLayer)
-{
-    InitEndPointBasis(*inetLayer);
-    InitImpl();
 }
 
 CHIP_ERROR UDPEndPoint::JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
