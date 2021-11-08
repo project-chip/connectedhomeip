@@ -22,6 +22,7 @@
  *
  */
 
+#include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
@@ -29,6 +30,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
+#include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -141,11 +143,40 @@ void TestCommandInteraction::TestNoHandler(nlTestSuite * apSuite, void * apConte
 
     responseDirective = kSendDataResponse;
 
+    ctx.EnableAsyncDispatch();
+
     chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
+
+static const int kDescriptorAttributeArraySize = 254;
+
+// Declare Descriptor cluster attributes
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
+DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::Descriptor::Attributes::DeviceList::Id, ARRAY, kDescriptorAttributeArraySize,
+                          0), /* device list */
+    DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::Descriptor::Attributes::ServerList::Id, ARRAY, kDescriptorAttributeArraySize,
+                              0), /* server list */
+    DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::Descriptor::Attributes::ClientList::Id, ARRAY, kDescriptorAttributeArraySize,
+                              0), /* client list */
+    DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::Descriptor::Attributes::PartsList::Id, ARRAY, kDescriptorAttributeArraySize,
+                              0), /* parts list */
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrs)
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+
+// Declare Cluster List for Bridged Light endpoint
+DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
+DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::TestCluster::Id, testClusterAttrs),
+    DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::Descriptor::Id, descriptorAttrs), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+
+// Declare Bridged Light endpoint
+DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
 void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apContext)
 {
@@ -158,6 +189,8 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
     bool onFailureWasCalled = false;
 
     request.arg1 = true;
+
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -188,8 +221,12 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     responseDirective = kSendDataResponse;
 
+    ctx.EnableAsyncDispatch();
+
     chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
+
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -203,22 +240,6 @@ const nlTest sTests[] =
     NL_TEST_SENTINEL()
 };
 
-int Initialize(void * aContext)
-{
-    TestContext *testContext = static_cast<TestContext *>(aContext);
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(testContext->Init() == CHIP_NO_ERROR, FAILURE);
-    return SUCCESS;
-}
-
-int Finalize(void * aContext)
-{
-    TestContext *testContext = static_cast<TestContext *>(aContext);
-    VerifyOrReturnError(testContext->Shutdown() == CHIP_NO_ERROR, FAILURE);
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
 // clang-format on
 
 // clang-format off
@@ -226,8 +247,8 @@ nlTestSuite sSuite =
 {
     "TestCommands",
     &sTests[0],
-    Initialize,
-    Finalize
+    TestContext::InitializeAsync,
+    TestContext::Finalize
 };
 // clang-format on
 

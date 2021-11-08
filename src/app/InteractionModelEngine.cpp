@@ -61,6 +61,21 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
 void InteractionModelEngine::Shutdown()
 {
+    CommandHandlerInterface * handlerIter = mCommandHandlerList;
+
+    //
+    // Walk our list of command handlers and de-register them, before finally
+    // nulling out the list entirely.
+    //
+    while (handlerIter)
+    {
+        CommandHandlerInterface * next = handlerIter->GetNext();
+        handlerIter->SetNext(nullptr);
+        handlerIter = next;
+    }
+
+    mCommandHandlerList = nullptr;
+
     //
     // Since modifying the pool during iteration is generally frowned upon,
     // I've chosen to just destroy the object but not necessarily de-allocate it.
@@ -569,16 +584,6 @@ void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, cons
 
 bool InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
 {
-    CommandHandlerInterface * handler = FindCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
-    if (handler)
-    {
-        return true;
-    }
-
-    //
-    // If we couldn't find a matching handler, default to querying the application using the following method
-    // to deduce if a command exists.
-    //
     return ServerClusterCommandExists(aCommandPath);
 }
 

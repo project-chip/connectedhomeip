@@ -58,7 +58,7 @@ public:
          * Returns a TLVReader positioned at the TLV struct that contains the payload of the command.
          *
          * If the reader is requested from the context, then we can assume there is an intention
-         * to acccess the payload of this command and consequently, to handle this command.
+         * to access the payload of this command and consequently, to handle this command.
          *
          * If this is not true, the application should call SetCommandNotHandled().
          *
@@ -145,9 +145,9 @@ protected:
      * de-serialization, the provided function is invoked and passed in a reference to the cluster object.
      *
      * Any errors encountered in this function prior to calling func result in the automatic generation of a status response.
-     * However, the responsibility for doing so shifts to `func` to handle any further errors that are encountered.
+     * If `func` is called, the responsibility for doing so shifts to the callee to handle any further errors that are encountered.
      *
-     * Provided function is expected to have the following signature:
+     * The provided function is expected to have the following signature:
      *  void Func(HandlerContext &handlerContext, const RequestT &requestPayload);
      */
     template <typename RequestT, typename FuncT>
