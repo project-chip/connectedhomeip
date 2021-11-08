@@ -34,10 +34,11 @@ executable("chip-tool") {
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
-
     # TODO - enable CommissionedListCommand once DNS Cache is implemented
     #    "commands/pairing/CommissionedListCommand.cpp",
     #    "commands/pairing/CommissionedListCommand.h",
+    "commands/pairing/ConfigureFabricCommand.cpp",
+    "commands/pairing/ConfigureFabricCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",

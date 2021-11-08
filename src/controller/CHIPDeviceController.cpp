@@ -1341,7 +1341,9 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & NOCSRElements, cons
     ChipLogProgress(Controller, "Getting certificate chain for the device from the issuer");
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(device->GetDeviceId());
-    mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(0);
+
+    FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
+    mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(fabric->GetFabricId());
 
     return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, AttestationSignature, ByteSpan(), ByteSpan(),
                                                              ByteSpan(), &mDeviceNOCChainCallback);
