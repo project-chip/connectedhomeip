@@ -106,7 +106,8 @@ protected:
     {
         if (current != expected)
         {
-            Exit(std::string(itemName) + " value mismatch: expected " + std::to_string(expected) + " but got " + std::to_string(current));
+            Exit(std::string(itemName) + " value mismatch: expected " + std::to_string(expected) + " but got " +
+                 std::to_string(current));
             return false;
         }
 
@@ -116,7 +117,7 @@ protected:
     template <typename T, typename U, typename std::enable_if_t<std::is_enum<T>::value, int> = 0>
     bool CheckValue(const char * itemName, T current, U expected)
     {
-        return CheckValue(itemName, to_underlying(current), expected);
+        return CheckValue(itemName, chip::to_underlying(current), expected);
     }
 
     /**

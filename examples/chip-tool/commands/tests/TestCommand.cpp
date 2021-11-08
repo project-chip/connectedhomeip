@@ -127,7 +127,8 @@ bool TestCommand::CheckValueAsString(const char * itemName, const chip::CharSpan
     const chip::CharSpan expectedArgument(expected, strlen(expected));
     if (!current.data_equal(expectedArgument))
     {
-        Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));
+        Exit(std::string(itemName) + " value mismatch, expected '" + expected + "' but got '" +
+             std::string(current.data(), current.size()) + "'");
         return false;
     }
 

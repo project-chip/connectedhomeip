@@ -20532,7 +20532,11 @@ private:
     {
         auto iter = targetNavigatorList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(targetNavigatorList)>("targetNavigatorList", iter, 0));
+        VerifyOrReturn(CheckValue<>("targetNavigatorList[0].identifier", iter.GetValue().identifier, 1));
+        VerifyOrReturn(CheckValueAsString("targetNavigatorList[0].name", iter.GetValue().name, "exampleName"));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(targetNavigatorList)>("targetNavigatorList", iter, 1));
+        VerifyOrReturn(CheckValue<>("targetNavigatorList[1].identifier", iter.GetValue().identifier, 2));
+        VerifyOrReturn(CheckValueAsString("targetNavigatorList[1].name", iter.GetValue().name, "exampleName"));
         VerifyOrReturn(CheckNoMoreListItems<decltype(targetNavigatorList)>("targetNavigatorList", iter, 2));
         NextTest();
     }
@@ -20659,8 +20663,17 @@ private:
     {
         auto iter = audioOutputList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 0));
+        VerifyOrReturn(CheckValue<>("audioOutputList[0].index", iter.GetValue().index, 1));
+        VerifyOrReturn(CheckValue<>("audioOutputList[0].outputType", iter.GetValue().outputType, 0));
+        VerifyOrReturn(CheckValueAsString("audioOutputList[0].name", iter.GetValue().name, "exampleName"));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 1));
+        VerifyOrReturn(CheckValue<>("audioOutputList[1].index", iter.GetValue().index, 2));
+        VerifyOrReturn(CheckValue<>("audioOutputList[1].outputType", iter.GetValue().outputType, 0));
+        VerifyOrReturn(CheckValueAsString("audioOutputList[1].name", iter.GetValue().name, "exampleName"));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 2));
+        VerifyOrReturn(CheckValue<>("audioOutputList[2].index", iter.GetValue().index, 3));
+        VerifyOrReturn(CheckValue<>("audioOutputList[2].outputType", iter.GetValue().outputType, 0));
+        VerifyOrReturn(CheckValueAsString("audioOutputList[2].name", iter.GetValue().name, "exampleName"));
         VerifyOrReturn(CheckNoMoreListItems<decltype(audioOutputList)>("audioOutputList", iter, 3));
         NextTest();
     }
@@ -21842,7 +21855,17 @@ private:
     {
         auto iter = tvChannelList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(tvChannelList)>("tvChannelList", iter, 0));
+        VerifyOrReturn(CheckValue<>("tvChannelList[0].majorNumber", iter.GetValue().majorNumber, 1U));
+        VerifyOrReturn(CheckValue<>("tvChannelList[0].minorNumber", iter.GetValue().minorNumber, 2U));
+        VerifyOrReturn(CheckValueAsString("tvChannelList[0].name", iter.GetValue().name, "exampleName"));
+        VerifyOrReturn(CheckValueAsString("tvChannelList[0].callSign", iter.GetValue().callSign, "exampleCSign"));
+        VerifyOrReturn(CheckValueAsString("tvChannelList[0].affiliateCallSign", iter.GetValue().affiliateCallSign, "exampleASign"));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(tvChannelList)>("tvChannelList", iter, 1));
+        VerifyOrReturn(CheckValue<>("tvChannelList[1].majorNumber", iter.GetValue().majorNumber, 2U));
+        VerifyOrReturn(CheckValue<>("tvChannelList[1].minorNumber", iter.GetValue().minorNumber, 3U));
+        VerifyOrReturn(CheckValueAsString("tvChannelList[1].name", iter.GetValue().name, "exampleName"));
+        VerifyOrReturn(CheckValueAsString("tvChannelList[1].callSign", iter.GetValue().callSign, "exampleCSign"));
+        VerifyOrReturn(CheckValueAsString("tvChannelList[1].affiliateCallSign", iter.GetValue().affiliateCallSign, "exampleASign"));
         VerifyOrReturn(CheckNoMoreListItems<decltype(tvChannelList)>("tvChannelList", iter, 2));
         NextTest();
     }
@@ -22094,7 +22117,15 @@ private:
     {
         auto iter = mediaInputList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(mediaInputList)>("mediaInputList", iter, 0));
+        VerifyOrReturn(CheckValue<>("mediaInputList[0].index", iter.GetValue().index, 1));
+        VerifyOrReturn(CheckValue<>("mediaInputList[0].inputType", iter.GetValue().inputType, 4));
+        VerifyOrReturn(CheckValueAsString("mediaInputList[0].name", iter.GetValue().name, "exampleName"));
+        VerifyOrReturn(CheckValueAsString("mediaInputList[0].description", iter.GetValue().description, "exampleDescription"));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(mediaInputList)>("mediaInputList", iter, 1));
+        VerifyOrReturn(CheckValue<>("mediaInputList[1].index", iter.GetValue().index, 2));
+        VerifyOrReturn(CheckValue<>("mediaInputList[1].inputType", iter.GetValue().inputType, 4));
+        VerifyOrReturn(CheckValueAsString("mediaInputList[1].name", iter.GetValue().name, "exampleName"));
+        VerifyOrReturn(CheckValueAsString("mediaInputList[1].description", iter.GetValue().description, "exampleDescription"));
         VerifyOrReturn(CheckNoMoreListItems<decltype(mediaInputList)>("mediaInputList", iter, 2));
         NextTest();
     }
@@ -25811,9 +25842,17 @@ private:
     {
         auto iter = listStructOctetString.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 0));
+        VerifyOrReturn(CheckValue<>("listStructOctetString[0].fabricIndex", iter.GetValue().fabricIndex, 0ULL));
+        VerifyOrReturn(CheckValueAsString("listStructOctetString[0].operationalCert", iter.GetValue().operationalCert, "Test0"));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 1));
+        VerifyOrReturn(CheckValue<>("listStructOctetString[1].fabricIndex", iter.GetValue().fabricIndex, 1ULL));
+        VerifyOrReturn(CheckValueAsString("listStructOctetString[1].operationalCert", iter.GetValue().operationalCert, "Test1"));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 2));
+        VerifyOrReturn(CheckValue<>("listStructOctetString[2].fabricIndex", iter.GetValue().fabricIndex, 2ULL));
+        VerifyOrReturn(CheckValueAsString("listStructOctetString[2].operationalCert", iter.GetValue().operationalCert, "Test2"));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 3));
+        VerifyOrReturn(CheckValue<>("listStructOctetString[3].fabricIndex", iter.GetValue().fabricIndex, 3ULL));
+        VerifyOrReturn(CheckValueAsString("listStructOctetString[3].operationalCert", iter.GetValue().operationalCert, "Test3"));
         VerifyOrReturn(CheckNoMoreListItems<decltype(listStructOctetString)>("listStructOctetString", iter, 4));
         NextTest();
     }
@@ -27090,6 +27129,7 @@ private:
     {
         auto iter = deviceList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(deviceList)>("deviceList", iter, 0));
+        VerifyOrReturn(CheckValue<>("deviceList[0].revision", iter.GetValue().revision, 1U));
         VerifyOrReturn(CheckNoMoreListItems<decltype(deviceList)>("deviceList", iter, 1));
         NextTest();
     }
@@ -27821,8 +27861,17 @@ private:
     {
         auto iter = supportedModes.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter, 0));
+        VerifyOrReturn(CheckValueAsString("supportedModes[0].label", iter.GetValue().label, "Black"));
+        VerifyOrReturn(CheckValue<>("supportedModes[0].mode", iter.GetValue().mode, 0));
+        VerifyOrReturn(CheckValue<>("supportedModes[0].semanticTag", iter.GetValue().semanticTag, 0UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter, 1));
+        VerifyOrReturn(CheckValueAsString("supportedModes[1].label", iter.GetValue().label, "Cappuccino"));
+        VerifyOrReturn(CheckValue<>("supportedModes[1].mode", iter.GetValue().mode, 4));
+        VerifyOrReturn(CheckValue<>("supportedModes[1].semanticTag", iter.GetValue().semanticTag, 0UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter, 2));
+        VerifyOrReturn(CheckValueAsString("supportedModes[2].label", iter.GetValue().label, "Espresso"));
+        VerifyOrReturn(CheckValue<>("supportedModes[2].mode", iter.GetValue().mode, 7));
+        VerifyOrReturn(CheckValue<>("supportedModes[2].semanticTag", iter.GetValue().semanticTag, 0UL));
         VerifyOrReturn(CheckNoMoreListItems<decltype(supportedModes)>("supportedModes", iter, 3));
         NextTest();
     }
