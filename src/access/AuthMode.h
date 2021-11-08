@@ -18,12 +18,14 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace chip {
 namespace Access {
 
 // Using bitfield values so auth mode and privilege set can be stored together.
 // Auth mode should have only one value expressed, which should not be None.
-enum class AuthMode
+enum class AuthMode : uint8_t
 {
     kNone  = 0,
     kPase  = 1 << 5,

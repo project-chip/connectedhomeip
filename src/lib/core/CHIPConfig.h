@@ -2582,5 +2582,77 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
+ *
+ * Defines the number of access control entries supported per fabric in the
+ * example access control code.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 3
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY
+ *
+ * Defines the number of access control subjects supported per entry in the
+ * example access control code.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY 4
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY
+ *
+ * Defines the number of access control targets supported per entry in the
+ * example access control code.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY 3
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORGAGE_POOL_SIZE
+ *
+ * Defines the entry storage pool size in the example access control code.
+ * It's possible to get by with only one.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORGAGE_POOL_SIZE
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORGAGE_POOL_SIZE 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE
+ *
+ * Defines the entry delegate pool size in the example access control code.
+ * It's possible to get by with only one.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_ITERATOR_DELEGATE_POOL_SIZE
+ *
+ * Defines the entry iterator delegate pool size in the example access control code.
+ * It's possible to get by with only one.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_ITERATOR_DELEGATE_POOL_SIZE
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_ITERATOR_DELEGATE_POOL_SIZE 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FOREIGN_DELEGATE_SUPPORT
+ *
+ * Supports "foreign" delegate implementations in the example access control
+ * code by implementing a less performant copy through the interface. Not needed
+ * unless mixing the example access control code with other entry delegate
+ * implementations.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FOREIGN_DELEGATE_SUPPORT
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FOREIGN_DELEGATE_SUPPORT 0
+#endif
+
+/**
  * @}
  */
