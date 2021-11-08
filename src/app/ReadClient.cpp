@@ -259,24 +259,8 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePaths::Builder & aAttr
 {
     for (size_t index = 0; index < aAttributePathParamsListSize; index++)
     {
-        AttributePathIB::Builder attributePathBuilder = aAttributePathListBuilder.CreateAttributePath();
-        attributePathBuilder.Node(apAttributePathParamsList[index].mNodeId)
-            .Endpoint(apAttributePathParamsList[index].mEndpointId)
-            .Cluster(apAttributePathParamsList[index].mClusterId);
-        if (apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
-        {
-            attributePathBuilder.Attribute(apAttributePathParamsList[index].mFieldId);
-        }
-
-        if (apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kListIndexValid))
-        {
-            VerifyOrReturnError(apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kFieldIdValid),
-                                CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-            attributePathBuilder.ListIndex(apAttributePathParamsList[index].mListIndex);
-        }
-
-        attributePathBuilder.EndOfAttributePathIB();
-        ReturnErrorOnFailure(attributePathBuilder.GetError());
+        VerifyOrReturnError(apAttributePathParamsList[index].IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+        ReturnErrorOnFailure(apAttributePathParamsList[index].BuildAttributePath(aAttributePathListBuilder.CreateAttributePath()));
     }
     aAttributePathListBuilder.EndOfAttributePaths();
     return aAttributePathListBuilder.GetError();

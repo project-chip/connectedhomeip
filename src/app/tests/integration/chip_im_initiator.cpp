@@ -342,12 +342,9 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
 
     printf("\nSend write request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    attributePathParams.mNodeId     = 1;
     attributePathParams.mEndpointId = 2;
     attributePathParams.mClusterId  = 3;
     attributePathParams.mFieldId    = 4;
-    attributePathParams.mListIndex  = 5;
-    attributePathParams.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     SuccessOrExit(err = apWriteClient->PrepareAttribute(attributePathParams));
 
@@ -390,12 +387,9 @@ CHIP_ERROR SendSubscribeRequest()
     readPrepareParams.mEventPathParamsListSize = 2;
 
     readPrepareParams.mpAttributePathParamsList                = attributePathParams;
-    readPrepareParams.mpAttributePathParamsList[0].mNodeId     = chip::kTestDeviceNodeId;
     readPrepareParams.mpAttributePathParamsList[0].mEndpointId = kTestEndpointId;
     readPrepareParams.mpAttributePathParamsList[0].mClusterId  = kTestClusterId;
     readPrepareParams.mpAttributePathParamsList[0].mFieldId    = 1;
-    readPrepareParams.mpAttributePathParamsList[0].mListIndex  = 0;
-    readPrepareParams.mpAttributePathParamsList[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     readPrepareParams.mAttributePathParamsListSize = 1;
 

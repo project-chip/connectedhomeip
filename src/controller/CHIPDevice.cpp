@@ -748,7 +748,6 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
                                             Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter)
 {
     bool loadedSecureSession = false;
-    aPath.mNodeId            = GetDeviceId();
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(mState == ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
@@ -781,7 +780,6 @@ CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath,
                                                  Callback::Cancelable * onFailureCallback)
 {
     bool loadedSecureSession = false;
-    aPath.mNodeId            = GetDeviceId();
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
 

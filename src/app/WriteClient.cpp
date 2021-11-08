@@ -171,23 +171,10 @@ TLV::TLVWriter * WriteClient::GetAttributeDataElementTLVWriter()
 CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
                                                AttributeDataElement::Builder aAttributeDataElement)
 {
-    AttributePathIB::Builder attributePath = aAttributeDataElement.CreateAttributePath();
-    if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
-    {
-        attributePath.Attribute(aAttributePathParams.mFieldId);
-    }
-
-    if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kListIndexValid))
-    {
-        attributePath.ListIndex(aAttributePathParams.mListIndex);
-    }
-
-    attributePath.Node(aAttributePathParams.mNodeId)
-        .Cluster(aAttributePathParams.mClusterId)
-        .Endpoint(aAttributePathParams.mEndpointId)
-        .EndOfAttributePathIB();
-
-    return attributePath.GetError();
+    // We do not support wildcard write now, reject them on client side.
+    VerifyOrReturnError(!aAttributePathParams.HasWildcard() && aAttributePathParams.IsValidAttributePath(),
+                        CHIP_ERROR_INVALID_PATH_LIST);
+    return aAttributePathParams.BuildAttributePath(aAttributeDataElement.CreateAttributePath());
 }
 
 CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
@@ -328,31 +315,21 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
     mAttributeStatusIndex++;
     err = aAttributeStatusIB.GetPath(&attributePath);
     SuccessOrExit(err);
-    err = attributePath.GetNode(&(attributePathParams.mNodeId));
-    SuccessOrExit(err);
     err = attributePath.GetCluster(&(attributePathParams.mClusterId));
     SuccessOrExit(err);
     err = attributePath.GetEndpoint(&(attributePathParams.mEndpointId));
     SuccessOrExit(err);
-
     err = attributePath.GetAttribute(&(attributePathParams.mFieldId));
-    if (CHIP_NO_ERROR == err)
-    {
-        attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
-    }
-    else if (CHIP_END_OF_TLV == err)
+    SuccessOrExit(err);
+    err = attributePath.GetListIndex(&(attributePathParams.mListIndex));
+    if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
-    SuccessOrExit(err);
-
-    err = attributePath.GetListIndex(&(attributePathParams.mListIndex));
-    if (CHIP_NO_ERROR == err)
-    {
-        VerifyOrExit(attributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid),
-                     err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-        attributePathParams.mFlags.Set(AttributePathParams::Flags::kListIndexValid);
-    }
+    // TODO: (#11423) Attribute paths has a pattern of invalid paths, should add a function for checking invalid paths here.
+    // NOTE: We don't support wildcard write for now, reject all wildcard paths.
+    VerifyOrExit(!attributePathParams.HasWildcard() && attributePathParams.IsValidAttributePath(),
+                 err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
     err = aAttributeStatusIB.GetErrorStatus(&(StatusIBParser));
     if (CHIP_NO_ERROR == err)

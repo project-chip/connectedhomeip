@@ -130,12 +130,9 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId     = 1;
     attributePathParams.mEndpointId = 2;
     attributePathParams.mClusterId  = 3;
     attributePathParams.mFieldId    = 4;
-    attributePathParams.mListIndex  = 5;
-    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     err = apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
     return err;
