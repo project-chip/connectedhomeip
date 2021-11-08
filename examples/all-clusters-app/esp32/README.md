@@ -272,7 +272,7 @@ Alternatively, Enable RPCs in the build using menuconfig:
     - Enable the RPC library and Disable ENABLE_CHIP_SHELL
 
         Component config → CHIP Core → General Options → Enable Pigweed PRC library
-        Component config → CHIP Core → General Options → Disabe CHIP Shell
+        Component config → CHIP Core → General Options → Disable CHIP Shell
 
     - Ensure the UART is correctly configured for your board, for m5stack:
 
