@@ -273,7 +273,10 @@ CHIP_ERROR DeviceController::GetOperationalDeviceWithAddress(NodeId deviceId, co
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (addr != Transport::PeerAddress::UDP(Inet::IPAddress::Any))
     {
-        err = device->UpdateAddress(addr);
+        uint32_t idleInterval;
+        uint32_t activeInterval;
+        device->GetMRPIntervals(idleInterval, activeInterval);
+        err = device->UpdateDeviceData(addr, idleInterval, activeInterval);
         if (err != CHIP_NO_ERROR)
         {
             ReleaseOperationalDevice(device);
