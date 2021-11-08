@@ -55,7 +55,7 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
-    AttributePaths::Parser AttributePaths;
+    AttributePathIBs::Parser AttributePathIBs;
     EventPaths::Parser eventPathList;
     AttributeDataVersionList::Parser attributeDataVersionList;
     PRETTY_PRINT("ReadRequestMessage =");
@@ -74,11 +74,11 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             TagPresenceMask |= (1 << kCsTag_AttributePathList);
             VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-            AttributePaths.Init(reader);
+            AttributePathIBs.Init(reader);
 
             PRETTY_PRINT_INCDEPTH();
 
-            err = AttributePaths.CheckSchemaValidity();
+            err = AttributePathIBs.CheckSchemaValidity();
             SuccessOrExit(err);
 
             PRETTY_PRINT_DECDEPTH();
@@ -119,11 +119,11 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             TagPresenceMask |= (1 << kCsTag_AttributePathList);
             VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-            AttributePaths.Init(reader);
+            AttributePathIBs.Init(reader);
 
             PRETTY_PRINT_INCDEPTH();
 
-            err = AttributePaths.CheckSchemaValidity();
+            err = AttributePathIBs.CheckSchemaValidity();
             SuccessOrExit(err);
 
             PRETTY_PRINT_DECDEPTH();
@@ -161,7 +161,7 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR ReadRequestMessage::Parser::GetAttributePathList(AttributePaths::Parser * const apAttributePathList) const
+CHIP_ERROR ReadRequestMessage::Parser::GetPathList(AttributePathIBs::Parser * const apAttributePathList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -229,7 +229,7 @@ CHIP_ERROR ReadRequestMessage::Builder::Init(chip::TLV::TLVWriter * const apWrit
     return InitAnonymousStructure(apWriter);
 }
 
-AttributePaths::Builder & ReadRequestMessage::Builder::CreateAttributePathListBuilder()
+AttributePathIBs::Builder & ReadRequestMessage::Builder::CreateAttributePathListBuilder()
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributePathListBuilder.ResetError(mError));

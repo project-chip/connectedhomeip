@@ -78,8 +78,7 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReadAttribute{{asUpperCamelC
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = {{asHex code 8}};
-    
+    attributePath.mAttributeId    = {{asHex code 8}};
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,{{#if isList}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter{{else}}BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>{{/if}});
 }
 
@@ -99,8 +98,7 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::SubscribeAttribute{{asUpperC
     chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = {{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id;
-    
+    attributePath.mAttributeId    = {{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id;
     return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
 }
 

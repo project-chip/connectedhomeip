@@ -240,9 +240,9 @@ private:
 
     CHIP_ERROR GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
                                   size_t aEventPathParamsListSize);
-    CHIP_ERROR GenerateAttributePathList(AttributePaths::Builder & aAttributeathListBuilder,
+    CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
-    CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
+    CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
 
     void ClearExchangeContext() { mpExchangeCtx = nullptr; }
     static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
@@ -250,6 +250,7 @@ private:
     CHIP_ERROR RefreshLivenessCheckTimer();
     void CancelLivenessCheckTimer();
     void MoveToState(const ClientState aTargetState);
+    CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ClusterInfo & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;

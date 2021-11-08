@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines AttributeDataVersionList parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
 
 #include "ArrayBuilder.h"
 #include "ArrayParser.h"
-#include "AttributeDataIB.h"
+#include "AttributePathIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -36,7 +31,7 @@
 
 namespace chip {
 namespace app {
-namespace AttributeDataVersionList {
+namespace AttributePathIBs {
 class Parser : public ArrayParser
 {
 public:
@@ -56,59 +51,28 @@ public:
      */
     CHIP_ERROR CheckSchemaValidity() const;
 #endif
-
-    /**
-     *  @brief Check if this element is valid
-     *
-     *  @return A Boolean
-     */
-    bool IsElementValid(void);
-
-    /**
-     *  @brief Check if this element is NULL
-     *
-     *  @return A Boolean
-     */
-    bool IsNull(void);
-
-    /**
-     *  @brief Get a value for the DataVersion. Next() must be called before accessing them.
-     *
-     *  @param [in] apVersion    A pointer to apVersion
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetVersion(chip::DataVersion * const apVersion);
 };
 
 class Builder : public ArrayBuilder
 {
 public:
     /**
-     *  @brief Add version in AttributeDataVersionList
+     *  @brief Initialize a AttributePathIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataVersionList::Builder
+     *  @return A reference to AttributePathIB::Builder
      */
-    AttributeDataVersionList::Builder & AddVersion(const uint64_t aVersion);
+    AttributePathIB::Builder & CreateAttributePath();
 
     /**
-     *  @brief Add Null in version list
+     *  @brief Mark the end of this AttributePathIB
      *
      *  @return A reference to *this
      */
-    AttributeDataVersionList::Builder & AddNull(void);
-    /**
-     *  @brief Mark the end of this AttributeDataVersionList
-     *
-     *  @return A reference to *this
-     */
-    AttributeDataVersionList::Builder & EndOfAttributeDataVersionList();
+    AttributePathIBs::Builder & EndOfAttributePathIBs();
 
 private:
-    AttributeDataIB::Builder mAttributeDataIBBuilder;
+    AttributePathIB::Builder mAttributePath;
 };
-}; // namespace AttributeDataVersionList
-}; // namespace app
-}; // namespace chip
+} // namespace AttributePathIBs
+} // namespace app
+} // namespace chip

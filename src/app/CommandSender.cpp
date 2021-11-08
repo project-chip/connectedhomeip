@@ -198,7 +198,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         if (CHIP_NO_ERROR == err)
         {
             CommandPathIB::Parser commandPath;
-            commandStatus.GetPath(&commandPath);
+            ReturnErrorOnFailure(commandStatus.GetPath(&commandPath));
             ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
             ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
             ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));

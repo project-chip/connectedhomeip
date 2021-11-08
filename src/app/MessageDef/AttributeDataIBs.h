@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +15,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/**
+ *    @file
+ *      This file defines AttributeDataIBs parser and builder in CHIP interaction model
+ *
+ */
 
 #pragma once
 
 #include "ArrayBuilder.h"
 #include "ArrayParser.h"
-#include "AttributePathIB.h"
+#include "AttributeDataIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -31,7 +36,7 @@
 
 namespace chip {
 namespace app {
-namespace AttributePaths {
+namespace AttributeDataIBs {
 class Parser : public ArrayParser
 {
 public:
@@ -57,22 +62,25 @@ class Builder : public ArrayBuilder
 {
 public:
     /**
-     *  @brief Initialize a AttributePathIB::Builder for writing into the TLV stream
+     *  @brief Initialize a AttributeDataIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributePathIB::Builder
+     *  @return A reference to AttributeDataIB::Builder
      */
-    AttributePathIB::Builder & CreateAttributePath();
+    AttributeDataIB::Builder & CreateAttributeDataIBBuilder();
+
+    AttributeDataIB::Builder & GetAttributeDataIBBuilder();
 
     /**
-     *  @brief Mark the end of this AttributePathIB
+     *  @brief Mark the end of this AttributeDataIBs
      *
      *  @return A reference to *this
      */
-    AttributePaths::Builder & EndOfAttributePaths();
+    AttributeDataIBs::Builder & EndOfAttributeDataIBs();
 
 private:
-    AttributePathIB::Builder mAttributePath;
+    AttributeDataIB::Builder mAttributeDataIBBuilder;
 };
-} // namespace AttributePaths
-} // namespace app
-} // namespace chip
+}; // namespace AttributeDataIBs
+
+}; // namespace app
+}; // namespace chip

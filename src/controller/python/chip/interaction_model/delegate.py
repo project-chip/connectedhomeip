@@ -46,7 +46,7 @@ IMWriteStatus = Struct(
 )
 
 # AttributePath should not contain padding
-AttributePathStruct = Struct(
+AttributePathIBstruct = Struct(
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "AttributeId" / Int32ul,
@@ -161,7 +161,7 @@ def _OnCommandResponse(commandHandle: int, errorcode: int):
 @ _OnReportDataFunct
 def _OnReportData(nodeId: int, appId: int, subscriptionId: int, attrPathBuf, attrPathBufLen: int, tlvDataBuf, tlvDataBufLen: int, statusCode: int):
     global _onSubscriptionReport
-    attrPath = AttributePathStruct.parse(
+    attrPath = AttributePathIBstruct.parse(
         ctypes.string_at(attrPathBuf, attrPathBufLen))
     tlvData = None
     path = AttributePath(nodeId, attrPath["EndpointId"],
