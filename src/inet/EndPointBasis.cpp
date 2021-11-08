@@ -39,18 +39,6 @@ void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
     mLwIPEndPointType = LwIPEndPointType::Unknown;
 }
 
-void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
-{
-    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || (mVoid != nullptr))
-    {
-        DeferredRelease(static_cast<System::LayerLwIP *>(Layer().SystemLayer()), aTactic);
-    }
-    else
-    {
-        Release();
-    }
-}
-
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -62,11 +50,6 @@ void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
     mSocket    = kInvalidSocketFd;
 }
 
-void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
-{
-    Release();
-}
-
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -75,11 +58,6 @@ void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 {
     AppState   = aAppState;
     mInetLayer = &aInetLayer;
-}
-
-void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
-{
-    Release();
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
