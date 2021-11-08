@@ -385,6 +385,7 @@ FreeRTOS
 FreeRTOSConfig
 fsl
 fsync
+fullclean
 gcloud
 GDB
 GeneralCommissioning
@@ -815,6 +816,7 @@ RUNAS
 RunMain
 runtime
 rw
+RXD
 sbin
 scalability
 scalable
@@ -952,6 +954,7 @@ ttyACMx
 ttymxc
 ttyUSB
 TvChannel
+TXD
 txt
 uart
 UART
