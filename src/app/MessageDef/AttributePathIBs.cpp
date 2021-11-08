@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "AttributePaths.h"
+#include "AttributePathIBs.h"
 #include "MessageDefHelper.h"
 
 #include <inttypes.h>
@@ -28,16 +28,16 @@
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributePaths::Parser::CheckSchemaValidity() const
+CHIP_ERROR AttributePathIBs::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     size_t numAttributePath = 0;
     TLV::TLVReader reader;
 
-    PRETTY_PRINT("AttributePaths =");
+    PRETTY_PRINT("AttributePathIBs =");
     PRETTY_PRINT("[");
 
-    // make a copy of the AttributePaths reader
+    // make a copy of the AttributePathIBs reader
     reader.Init(mReader);
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
@@ -73,7 +73,7 @@ CHIP_ERROR AttributePaths::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-AttributePathIB::Builder & AttributePaths::Builder::CreateAttributePath()
+AttributePathIB::Builder & AttributePathIBs::Builder::CreateAttributePath()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -83,7 +83,7 @@ AttributePathIB::Builder & AttributePaths::Builder::CreateAttributePath()
 }
 
 // Mark the end of this array and recover the type for outer container
-AttributePaths::Builder & AttributePaths::Builder::EndOfAttributePaths()
+AttributePathIBs::Builder & AttributePathIBs::Builder::EndOfAttributePathIBs()
 {
     EndOfContainer();
     return *this;

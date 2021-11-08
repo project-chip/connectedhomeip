@@ -17,11 +17,11 @@
  */
 /**
  *    @file
- *      This file defines AttributeDataList parser and builder in CHIP interaction model
+ *      This file defines AttributeDataIBs parser and builder in CHIP interaction model
  *
  */
 
-#include "AttributeDataList.h"
+#include "AttributeDataIBs.h"
 
 #include "MessageDefHelper.h"
 
@@ -37,13 +37,13 @@ using namespace chip::TLV;
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributeDataList::Parser::CheckSchemaValidity() const
+CHIP_ERROR AttributeDataIBs::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     size_t NumDataElement = 0;
     chip::TLV::TLVReader reader;
 
-    PRETTY_PRINT("AttributeDataList =");
+    PRETTY_PRINT("AttributeDataIBs =");
     PRETTY_PRINT("[");
 
     // make a copy of the reader
@@ -55,7 +55,7 @@ CHIP_ERROR AttributeDataList::Parser::CheckSchemaValidity() const
         VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
         {
-            AttributeDataElement::Parser data;
+            AttributeDataIB::Parser data;
             err = data.Init(reader);
             SuccessOrExit(err);
 
@@ -89,25 +89,25 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-AttributeDataElement::Builder & AttributeDataList::Builder::CreateAttributeDataElementBuilder()
+AttributeDataIB::Builder & AttributeDataIBs::Builder::CreateAttributeDataIBBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeDataElementBuilder.ResetError(mError));
+    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeDataIBBuilder.ResetError(mError));
 
-    mError = mAttributeDataElementBuilder.Init(mpWriter);
+    mError = mAttributeDataIBBuilder.Init(mpWriter);
 
 exit:
 
-    // on error, mAttributeDataElementBuilder would be un-/partial initialized and cannot be used to write anything
-    return mAttributeDataElementBuilder;
+    // on error, mAttributeDataIBBuilder would be un-/partial initialized and cannot be used to write anything
+    return mAttributeDataIBBuilder;
 }
 
-AttributeDataElement::Builder & AttributeDataList::Builder::GetAttributeDataElementBuilder()
+AttributeDataIB::Builder & AttributeDataIBs::Builder::GetAttributeDataIBBuilder()
 {
-    return mAttributeDataElementBuilder;
+    return mAttributeDataIBBuilder;
 }
 
-AttributeDataList::Builder & AttributeDataList::Builder::EndOfAttributeDataList()
+AttributeDataIBs::Builder & AttributeDataIBs::Builder::EndOfAttributeDataIBs()
 {
     EndOfContainer();
 

@@ -22,9 +22,7 @@ chip_test_suite("tests") {
   output_name = "libControllerTests"
 
   test_sources = [ "TestCommissionableNodeController.cpp" ]
-  test_sources += [ "TestDevice.cpp" ]
-  test_sources += [ "TestServerCommandDispatch.cpp" ]
-
+  test_sources = [ "TestServerCommandDispatch.cpp" ]
   cflags = [ "-Wconversion" ]
 
   public_deps = [

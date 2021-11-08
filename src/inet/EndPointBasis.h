@@ -28,7 +28,6 @@
 
 #include <inet/IPAddress.h>
 #include <lib/support/DLLUtil.h>
-#include <system/SystemObject.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <system/SocketEvents.h>
@@ -51,7 +50,7 @@ class InetLayer;
 /**
  * Basis of internet transport endpoint classes.
  */
-class DLL_EXPORT EndPointBasis : public System::Object
+class DLL_EXPORT EndPointBasis
 {
 public:
     /**
@@ -68,12 +67,13 @@ public:
      */
     bool IsCreatedByInetLayer(const InetLayer & aInetLayer) const { return mInetLayer == &aInetLayer; }
 
+    void * AppState;
+
 private:
     InetLayer * mInetLayer; /**< Pointer to the InetLayer object that owns this object. */
 
 protected:
     void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = nullptr);
-    void DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic);
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     nw_parameters_t mParameters;
@@ -91,7 +91,6 @@ protected:
     /** Encapsulated LwIP protocol control block */
     union
     {
-        const void * mVoid; /**< An untyped protocol control buffer reference */
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         udp_pcb * mUDP; /**< User datagram protocol (UDP) control */
 #endif                  // INET_CONFIG_ENABLE_UDP_ENDPOINT

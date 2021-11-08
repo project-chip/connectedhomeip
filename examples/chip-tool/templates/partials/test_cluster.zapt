@@ -139,7 +139,7 @@ class {{filename}}: public TestCommand
 
         chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type request;
         {{#chip_tests_item_parameters}}
-        {{>commandValue ns=parent.cluster container="request" definedValue=definedValue}}
+        {{>commandValue ns=parent.cluster container=(concat "request." (asLowerCamelCase label)) definedValue=definedValue}}
         {{/chip_tests_item_parameters}}
 
         auto success = [](void * context, const responseType & data) {
@@ -153,7 +153,7 @@ class {{filename}}: public TestCommand
         {{else}}
         {{#chip_tests_item_parameters}}
         {{zapTypeToEncodableClusterObjectType type ns=parent.cluster}} {{asLowerCamelCase name}}Argument;
-        {{>commandValue ns=parent.cluster ignore=true container=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue}}
+        {{>commandValue ns=parent.cluster container=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue}}
         {{/chip_tests_item_parameters}}
 
         {{#if isWriteAttribute}}

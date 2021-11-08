@@ -232,7 +232,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
         1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
@@ -297,7 +297,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
         1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
@@ -359,7 +359,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
         1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
@@ -455,7 +455,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
         1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
@@ -592,7 +592,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
         1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
@@ -1146,7 +1146,7 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     // Make sure that we resend our message before the other side does.
     ReliableMessageContext * rc = exchange->GetReliableMessageContext();
     rc->SetConfig({
-        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
         1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
@@ -1182,7 +1182,7 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     // that we are very unlikely to actually trigger the resends on the receiver
     // when we trigger the resends on the sender.
     receiverRc->SetConfig({
-        4, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        4, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
         4, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 

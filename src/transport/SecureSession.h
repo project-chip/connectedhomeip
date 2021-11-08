@@ -67,6 +67,19 @@ public:
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
+
+    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval)
+    {
+        idleInterval   = mMRPIdleInterval;
+        activeInterval = mMRPActiveInterval;
+    }
+
+    void SetMRPIntervals(uint32_t idleInterval, uint32_t activeInterval)
+    {
+        mMRPIdleInterval   = idleInterval;
+        mMRPActiveInterval = activeInterval;
+    }
+
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
@@ -98,6 +111,8 @@ private:
 
     PeerAddress mPeerAddress;
     System::Clock::Timestamp mLastActivityTime = System::Clock::kZero;
+    uint32_t mMRPIdleInterval                  = 0;
+    uint32_t mMRPActiveInterval                = 0;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
 };

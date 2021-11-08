@@ -259,7 +259,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     ReadRequestMessage::Parser readRequestParser;
     EventPaths::Parser eventPathListParser;
 
-    AttributePaths::Parser attributePathListParser;
+    AttributePathIBs::Parser attributePathListParser;
 
     reader.Init(std::move(aPayload));
 
@@ -273,7 +273,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     SuccessOrExit(err);
 #endif
 
-    err = readRequestParser.GetAttributePathList(&attributePathListParser);
+    err = readRequestParser.GetPathList(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
@@ -321,7 +321,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePaths::Parser & aAttributePathListParser)
+CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
@@ -351,7 +351,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePaths::Parser & aAttri
         }
 
         SuccessOrExit(err);
-        err = path.GetAttribute(&(clusterInfo.mFieldId));
+        err = path.GetAttribute(&(clusterInfo.mAttributeId));
         if (CHIP_END_OF_TLV == err)
         {
             err = CHIP_NO_ERROR;
@@ -538,8 +538,8 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnLogErrorOnFailure(subscribeRequestParser.CheckSchemaValidity());
 #endif
 
-    AttributePaths::Parser attributePathListParser;
-    CHIP_ERROR err = subscribeRequestParser.GetAttributePathList(&attributePathListParser);
+    AttributePathIBs::Parser attributePathListParser;
+    CHIP_ERROR err = subscribeRequestParser.GetPathList(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;

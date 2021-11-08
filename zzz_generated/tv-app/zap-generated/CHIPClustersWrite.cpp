@@ -45,7 +45,6 @@ CHIP_ERROR ClusterBase::WriteAttribute(const typename AttributeInfo::Type & requ
                                        WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
 
     auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
         if (successCb != nullptr)

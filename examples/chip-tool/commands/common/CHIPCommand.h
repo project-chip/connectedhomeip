@@ -28,10 +28,9 @@ class PersistentStorage;
 class CHIPCommand : public Command
 {
 public:
-    using ChipDevice             = ::chip::Controller::Device;
+    using ChipDevice             = ::chip::DeviceProxy;
     using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
     using ChipDeviceController   = ::chip::Controller::DeviceController;
-    using ChipSerializedDevice   = ::chip::Controller::SerializedDevice;
     using IPAddress              = ::chip::Inet::IPAddress;
     using NodeId                 = ::chip::NodeId;
     using PeerAddress            = ::chip::Transport::PeerAddress;

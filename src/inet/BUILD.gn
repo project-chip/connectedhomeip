@@ -84,7 +84,6 @@ static_library("inet") {
     "InetInterface.h",
     "InetLayer.cpp",
     "InetLayer.h",
-    "InetLayerEvents.h",
     "arpa-inet-compatibility.h",
   ]
 
