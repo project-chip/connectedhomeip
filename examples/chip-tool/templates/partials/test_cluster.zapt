@@ -193,26 +193,8 @@ class {{filename}}: public TestCommand
           {{/if}}
           {{#chip_tests_item_response_parameters}}
             {{~#*inline "item"}}{{asLowerCamelCase name}}{{#if isOptional}}.Value(){{/if}}{{/inline}}
-            {{~#*inline "itemValue"}}{{>item}}{{#if isNullable}}.Value(){{/if}}{{/inline}}
             {{#if hasExpectedValue}}
-              {{#if isOptional}}
-                {{~#*inline "item"}}{{asLowerCamelCase name}}{{/inline}}
-                VerifyOrReturn(CheckValuePresent("{{> item}}", {{> item}}));
-              {{/if}}
-              {{#if (isLiteralNull expectedValue)}}
-                VerifyOrReturn(CheckValueNull("{{> item}}", {{> item}}));
-              {{else}}
-                {{#if isNullable}}
-                VerifyOrReturn(CheckValueNonNull("{{> item}}", {{> item}}));
-                {{/if}}
-                VerifyOrReturn(CheckValue
-                  {{~#if isList}}AsListLength("{{>itemValue}}", {{>itemValue}}, {{expectedValue.length}})
-                  {{else if isArray}}AsList("{{>itemValue}}", {{>itemValue}}{{#if expectedValue.length}}, {{expectedValue}}{{/if}})
-                  {{else if (isString type)}}AsString("{{>itemValue}}", {{>itemValue}}, "{{expectedValue}}")
-                  {{else}}<{{chipType}}>("{{>itemValue}}", {{>itemValue}}, {{expectedValue}}{{asTypeLiteralSuffix type}})
-                  {{/if}}
-                );
-              {{/if}}
+              {{>valueEquals actual=(asLowerCamelCase name) label=(asLowerCamelCase name) expected=expectedValue}}
             {{/if}}
             {{#if hasExpectedConstraints}}
               {{#if isOptional}}
