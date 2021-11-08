@@ -208,8 +208,9 @@ JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject man
 {
     chip::DeviceLayer::StackLock lock;
     chip::DeviceLayer::ConfigurationManagerImpl * configurationManagerImpl =
-            reinterpret_cast<chip::DeviceLayer::ConfigurationManagerImpl *>(&chip::DeviceLayer::ConfigurationMgr());
-    if (configurationManagerImpl != nullptr) {
+        reinterpret_cast<chip::DeviceLayer::ConfigurationManagerImpl *>(&chip::DeviceLayer::ConfigurationMgr());
+    if (configurationManagerImpl != nullptr)
+    {
         configurationManagerImpl->InitializeWithObject(manager);
     }
 }
