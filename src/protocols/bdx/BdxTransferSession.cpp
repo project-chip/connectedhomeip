@@ -330,7 +330,7 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
     VerifyOrReturnError(mPendingOutput == OutputEventType::kNone, CHIP_ERROR_INCORRECT_STATE);
 
     CounterMessage ackMsg;
-    ackMsg.BlockCounter = mLastBlockNum;
+    ackMsg.BlockCounter       = mLastBlockNum;
     const MessageType msgType = (mState == TransferState::kReceivedEOF) ? MessageType::BlockAckEOF : MessageType::BlockAck;
 
     ReturnErrorOnFailure(WriteToPacketBuffer(ackMsg, mPendingMsgHandle));
