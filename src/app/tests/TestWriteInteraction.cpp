@@ -134,9 +134,9 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     AttributeDataElement::Builder attributeDataElementBuilder = attributeDataListBuilder.CreateAttributeDataElementBuilder();
     NL_TEST_ASSERT(apSuite, attributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributeDataElementBuilder.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePathBuilder = attributeDataElementBuilder.CreateAttributePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -177,18 +177,18 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
     WriteResponseMessage::Builder writeResponseBuilder;
     err = writeResponseBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    AttributeStatusList::Builder attributeStatusListBuilder = writeResponseBuilder.CreateAttributeStatusListBuilder();
-    NL_TEST_ASSERT(apSuite, attributeStatusListBuilder.GetError() == CHIP_NO_ERROR);
-    AttributeStatusIB::Builder attributeStatusIBBuilder = attributeStatusListBuilder.CreateAttributeStatusBuilder();
+    AttributeStatuses::Builder attributeStatusesBuilder = writeResponseBuilder.CreateWriteResponses();
+    NL_TEST_ASSERT(apSuite, attributeStatusesBuilder.GetError() == CHIP_NO_ERROR);
+    AttributeStatusIB::Builder attributeStatusIBBuilder = attributeStatusesBuilder.CreateAttributeStatus();
     NL_TEST_ASSERT(apSuite, attributeStatusIBBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributeStatusIBBuilder.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePathBuilder = attributeStatusIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateStatusIBBuilder();
+    StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
     StatusIB statusIB;
     statusIB.mStatus = chip::Protocols::InteractionModel::Status::InvalidSubscription;
     NL_TEST_ASSERT(apSuite, statusIBBuilder.GetError() == CHIP_NO_ERROR);
@@ -199,8 +199,8 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
     attributeStatusIBBuilder.EndOfAttributeStatusIB();
     NL_TEST_ASSERT(apSuite, attributeStatusIBBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributeStatusListBuilder.EndOfAttributeStatusList();
-    NL_TEST_ASSERT(apSuite, attributeStatusListBuilder.GetError() == CHIP_NO_ERROR);
+    attributeStatusesBuilder.EndOfAttributeStatuses();
+    NL_TEST_ASSERT(apSuite, attributeStatusesBuilder.GetError() == CHIP_NO_ERROR);
     writeResponseBuilder.EndOfWriteResponseMessage();
     NL_TEST_ASSERT(apSuite, writeResponseBuilder.GetError() == CHIP_NO_ERROR);
 

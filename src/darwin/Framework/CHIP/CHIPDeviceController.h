@@ -39,7 +39,6 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
-          csrNonce:(nullable NSData *)csrNonce
              error:(NSError * __autoreleasing *)error;
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -49,10 +48,7 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
 
-- (BOOL)pairDevice:(uint64_t)deviceID
-        onboardingPayload:(NSString *)onboardingPayload
-    onboardingPayloadType:(CHIPOnboardingPayloadType)onboardingPayloadType
-                    error:(NSError * __autoreleasing *)error;
+- (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error;
 
 - (void)setListenPort:(uint16_t)port;
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;

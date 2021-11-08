@@ -24,7 +24,7 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/EventDataElement.h>
+#include <app/MessageDef/EventDataIB.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -156,25 +156,27 @@ void GenerateSubscribeResponse(nlTestSuite * apSuite, void * apContext, chip::Sy
 class MockInteractionModelApp : public chip::app::ReadClient::Callback, public chip::app::InteractionModelDelegate
 {
 public:
-    void OnEventData(const chip::app::ReadClient * apReadClient, chip::TLV::TLVReader & apEventListReader) override
+    void OnEventData(const chip::app::ReadClient * apReadClient, chip::TLV::TLVReader & apEventReportsReader) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         chip::TLV::TLVReader reader;
         int numDataElementIndex = 0;
-        reader.Init(apEventListReader);
+        reader.Init(apEventReportsReader);
         while (CHIP_NO_ERROR == (err = reader.Next()))
         {
             uint8_t priorityLevel = 0;
-            chip::app::EventDataElement::Parser event;
-            VerifyOrReturn(event.Init(reader) == CHIP_NO_ERROR);
-            VerifyOrReturn(event.GetPriorityLevel(&priorityLevel) == CHIP_NO_ERROR);
+            chip::app::EventReportIB::Parser eventReport;
+            chip::app::EventDataIB::Parser eventData;
+            VerifyOrReturn(eventReport.Init(reader) == CHIP_NO_ERROR);
+            VerifyOrReturn(eventReport.GetEventData(&eventData) == CHIP_NO_ERROR);
+            VerifyOrReturn(eventData.GetPriority(&priorityLevel) == CHIP_NO_ERROR);
             if (numDataElementIndex == 0)
             {
-                VerifyOrReturn(priorityLevel == static_cast<uint8_t>(chip::app::PriorityLevel::Critical));
+                VerifyOrReturn(priorityLevel == chip::to_underlying(chip::app::PriorityLevel::Critical));
             }
             else if (numDataElementIndex == 1)
             {
-                VerifyOrReturn(priorityLevel == static_cast<uint8_t>(chip::app::PriorityLevel::Info));
+                VerifyOrReturn(priorityLevel == chip::to_underlying(chip::app::PriorityLevel::Info));
             }
             ++numDataElementIndex;
         }
@@ -293,16 +295,16 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     AttributeDataElement::Builder attributeDataElementBuilder = attributeDataListBuilder.CreateAttributeDataElementBuilder();
     NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributeDataElementBuilder.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePathBuilder = attributeDataElementBuilder.CreateAttributePath();
     NL_TEST_ASSERT(apSuite, attributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
 
     if (aNeedInvalidReport)
     {
-        attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).ListIndex(5).EndOfAttributePath();
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB();
     }
     else
     {
-        attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
     }
 
     err = attributePathBuilder.GetError();
@@ -396,17 +398,17 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathList::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
+    AttributePaths::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    attributePathListBuilder.EndOfAttributePathList();
+    attributePathListBuilder.EndOfAttributePaths();
     err = attributePathListBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -445,7 +447,7 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
     attributePathParams[0].mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
     attributePathParams[1].mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
     attributePathParams[1].mFlags.Set(AttributePathParams::Flags::kListIndexValid);
-    AttributePathList::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
+    AttributePaths::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
     err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
@@ -471,7 +473,7 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
     AttributePathParams attributePathParams[2];
     attributePathParams[0].mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
     attributePathParams[1].mFlags.Set(AttributePathParams::Flags::kListIndexValid);
-    AttributePathList::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
+    AttributePaths::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
     err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 }
@@ -525,13 +527,13 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathList::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
+    AttributePaths::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).ListIndex(5).EndOfAttributePath();
+    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -795,17 +797,17 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     err = subscribeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathList::Builder attributePathListBuilder = subscribeRequestBuilder.CreateAttributePathListBuilder();
+    AttributePaths::Builder attributePathListBuilder = subscribeRequestBuilder.CreateAttributePathListBuilder();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    attributePathListBuilder.EndOfAttributePathList();
+    attributePathListBuilder.EndOfAttributePaths();
     err = attributePathListBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -904,34 +906,28 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     chip::app::ClusterInfo dirtyPath1;
     dirtyPath1.mClusterId  = kTestClusterId;
     dirtyPath1.mEndpointId = kTestEndpointId;
-    dirtyPath1.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath1.mFieldId = 1;
+    dirtyPath1.mFieldId    = 1;
 
     chip::app::ClusterInfo dirtyPath2;
     dirtyPath2.mClusterId  = kTestClusterId;
     dirtyPath2.mEndpointId = kTestEndpointId;
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath2.mFieldId = 2;
+    dirtyPath2.mFieldId    = 2;
 
     chip::app::ClusterInfo dirtyPath3;
-    dirtyPath2.mClusterId  = kTestClusterId;
-    dirtyPath2.mEndpointId = kTestEndpointId;
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath2.mFlags.Set(chip::app::ClusterInfo::Flags::kListIndexValid);
-    dirtyPath2.mFieldId   = 2;
-    dirtyPath2.mListIndex = 1;
+    dirtyPath3.mClusterId  = kTestClusterId;
+    dirtyPath3.mEndpointId = kTestEndpointId;
+    dirtyPath3.mFieldId    = 2;
+    dirtyPath3.mListIndex  = 1;
 
     chip::app::ClusterInfo dirtyPath4;
     dirtyPath4.mClusterId  = kTestClusterId;
     dirtyPath4.mEndpointId = kTestEndpointId;
-    dirtyPath4.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath4.mFieldId = 3;
+    dirtyPath4.mFieldId    = 3;
 
     chip::app::ClusterInfo dirtyPath5;
     dirtyPath5.mClusterId  = kTestClusterId;
     dirtyPath5.mEndpointId = kTestEndpointId;
-    dirtyPath5.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
-    dirtyPath5.mFieldId = 4;
+    dirtyPath5.mFieldId    = 4;
 
     // Test report with 2 different path
     delegate.mpReadHandler->mHoldReport = false;

@@ -207,7 +207,6 @@
                 [cluster
                     subscribeAttributeMeasuredValueWithMinInterval:minIntervalSeconds
                                                        maxInterval:maxIntervalSeconds
-                                                            change:deltaInCelsius
                                                    responseHandler:^(NSError * error, NSDictionary * values) {
                                                        if (error == nil)
                                                            return;

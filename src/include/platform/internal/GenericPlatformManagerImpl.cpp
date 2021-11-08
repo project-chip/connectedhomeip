@@ -64,18 +64,19 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
-    err = ConfigurationMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
-
     // Initialize the CHIP system layer.
     err = SystemLayer().Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+
+    // Initialize the Configuration Manager.
+    err = ConfigurationMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %s", ErrorStr(err));
     }
     SuccessOrExit(err);
 
@@ -133,8 +134,8 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
     err = InetLayer().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    ChipLogError(DeviceLayer, "BLE layer shutdown");
-    err = BLEMgr().GetBleLayer()->Shutdown();
+    ChipLogError(DeviceLayer, "BLE shutdown");
+    err = BLEMgr().Shutdown();
 #endif
 
     ChipLogError(DeviceLayer, "System Layer shutdown");
@@ -226,7 +227,7 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         break;
 
     case DeviceEventType::kChipLambdaEvent:
-        event->LambdaEvent.LambdaProxy(static_cast<const void *>(event->LambdaEvent.LambdaBody));
+        event->LambdaEvent();
         break;
 
     case DeviceEventType::kCallWorkFunct:
@@ -307,10 +308,6 @@ void GenericPlatformManagerImpl<ImplClass>::HandleMessageLayerActivityChanged(bo
     if (messageLayerIsActive != self.mMsgLayerWasActive)
     {
         self.mMsgLayerWasActive = messageLayerIsActive;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ThreadStackMgr().OnMessageLayerActivityChanged(messageLayerIsActive);
-#endif
     }
 }
 

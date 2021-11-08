@@ -35,16 +35,6 @@
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 #define CHIP_CONFIG_REQUIRE_AUTH 0
 
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
- *
- * Enables the use of a hard-coded default CHIP device id and credentials if no device id
- * is found in CHIP NV storage.
- *
- * This option is for testing only and should be disabled in production releases.
- */
-//#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
-
 // Use a default setup PIN code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
@@ -116,7 +106,7 @@
  *
  * Enable support for CHIP-over-BLE (CHIPOBLE).
  */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
@@ -176,9 +166,30 @@
  */
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
 
+/**
+ * CONFIG_CHIP_NFC_COMMISSIONING, CHIP_DEVICE_CONFIG_ENABLE_NFC
+ *
+ * Set these defines to 1 if NFC Commissioning is needed
+ */
 #define CONFIG_CHIP_NFC_COMMISSIONING 0
-
 #define CHIP_DEVICE_CONFIG_ENABLE_NFC 0
+
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_FTD
+ *
+ * Shell Demo Application is a Thread SED (Sleepy End Device)
+ */
+#define CHIP_DEVICE_CONFIG_THREAD_FTD 0
+
+/**
+ *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *
+ *  @brief
+ *    Maximum number of administrators that can provision the device. Each admin
+ *    can provision the device with their unique operational credentials and manage
+ *    their access control lists.
+ */
+#define CHIP_CONFIG_MAX_DEVICE_ADMINS 2 // 1 fabrics + 1 for rotation slack
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE

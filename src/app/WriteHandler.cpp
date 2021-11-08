@@ -37,8 +37,8 @@ CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
     mMessageWriter.Init(std::move(packet));
     ReturnLogErrorOnFailure(mWriteResponseBuilder.Init(&mMessageWriter));
 
-    AttributeStatusList::Builder attributeStatusListBuilder = mWriteResponseBuilder.CreateAttributeStatusListBuilder();
-    ReturnLogErrorOnFailure(attributeStatusListBuilder.GetError());
+    AttributeStatuses::Builder attributeStatusesBuilder = mWriteResponseBuilder.CreateWriteResponses();
+    ReturnLogErrorOnFailure(attributeStatusesBuilder.GetError());
 
     MoveToState(State::Initialized);
 
@@ -70,10 +70,10 @@ exit:
 CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributeStatusList::Builder attributeStatusList;
+    AttributeStatuses::Builder attributeStatuses;
     VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
-    attributeStatusList = mWriteResponseBuilder.GetAttributeStatusListBuilder().EndOfAttributeStatusList();
-    err                 = attributeStatusList.GetError();
+    attributeStatuses = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
+    err               = attributeStatuses.GetError();
     SuccessOrExit(err);
 
     mWriteResponseBuilder.EndOfWriteResponseMessage();
@@ -114,7 +114,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
     {
         chip::TLV::TLVReader dataReader;
         AttributeDataElement::Parser element;
-        AttributePath::Parser attributePath;
+        AttributePathIB::Parser attributePath;
         ClusterInfo clusterInfo;
         TLV::TLVReader reader = aAttributeDataListReader;
         err                   = element.Init(reader);
@@ -123,32 +123,33 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
         err = element.GetAttributePath(&attributePath);
         SuccessOrExit(err);
 
-        err = attributePath.GetNodeId(&(clusterInfo.mNodeId));
-        SuccessOrExit(err);
+        // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
+        // cluster info will be invalid / wildcard, it is safe ignore CHIP_END_OF_TLV directly.
 
-        err = attributePath.GetEndpointId(&(clusterInfo.mEndpointId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetClusterId(&(clusterInfo.mClusterId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetFieldId(&(clusterInfo.mFieldId));
-        if (CHIP_NO_ERROR == err)
-        {
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
-        }
-        else if (CHIP_END_OF_TLV == err)
+        err = attributePath.GetNode(&(clusterInfo.mNodeId));
+        if (CHIP_END_OF_TLV == err)
         {
             err = CHIP_NO_ERROR;
         }
+
+        err = attributePath.GetEndpoint(&(clusterInfo.mEndpointId));
+        SuccessOrExit(err);
+
+        err = attributePath.GetCluster(&(clusterInfo.mClusterId));
+        SuccessOrExit(err);
+
+        err = attributePath.GetAttribute(&(clusterInfo.mFieldId));
         SuccessOrExit(err);
 
         err = attributePath.GetListIndex(&(clusterInfo.mListIndex));
-        if (CHIP_NO_ERROR == err)
+        if (CHIP_END_OF_TLV == err)
         {
-            VerifyOrExit(clusterInfo.mFlags.Has(ClusterInfo::Flags::kFieldIdValid), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-            clusterInfo.mFlags.Set(ClusterInfo::Flags::kListIndexValid);
+            err = CHIP_NO_ERROR;
         }
+
+        // We do not support Wildcard writes for now, reject all wildcard write requests.
+        VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasWildcard(),
+                     err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
@@ -213,10 +214,10 @@ exit:
 CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
                                                 AttributeStatusIB::Builder aAttributeStatusIB)
 {
-    AttributePath::Builder attributePath = aAttributeStatusIB.CreateAttributePathBuilder();
+    AttributePathIB::Builder attributePath = aAttributeStatusIB.CreatePath();
     if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
     {
-        attributePath.FieldId(aAttributePathParams.mFieldId);
+        attributePath.Attribute(aAttributePathParams.mFieldId);
     }
 
     if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kListIndexValid))
@@ -224,10 +225,10 @@ CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAtt
         attributePath.ListIndex(aAttributePathParams.mListIndex);
     }
 
-    attributePath.NodeId(aAttributePathParams.mNodeId)
-        .ClusterId(aAttributePathParams.mClusterId)
-        .EndpointId(aAttributePathParams.mEndpointId)
-        .EndOfAttributePath();
+    attributePath.Node(aAttributePathParams.mNodeId)
+        .Cluster(aAttributePathParams.mClusterId)
+        .Endpoint(aAttributePathParams.mEndpointId)
+        .EndOfAttributePathIB();
 
     return attributePath.GetError();
 }
@@ -238,16 +239,15 @@ CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathPar
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusIB::Builder statusIBBuilder;
     StatusIB statusIB;
-    AttributeStatusIB::Builder attributeStatusIB =
-        mWriteResponseBuilder.GetAttributeStatusListBuilder().CreateAttributeStatusBuilder();
-    err = attributeStatusIB.GetError();
+    AttributeStatusIB::Builder attributeStatusIB = mWriteResponseBuilder.GetWriteResponses().CreateAttributeStatus();
+    err                                          = attributeStatusIB.GetError();
     SuccessOrExit(err);
 
     err = ConstructAttributePath(aAttributePathParams, attributeStatusIB);
     SuccessOrExit(err);
 
     statusIB.mStatus = aStatus;
-    statusIBBuilder  = attributeStatusIB.CreateStatusIBBuilder();
+    statusIBBuilder  = attributeStatusIB.CreateErrorStatus();
     statusIBBuilder.EncodeStatusIB(statusIB);
     err = statusIBBuilder.GetError();
     SuccessOrExit(err);

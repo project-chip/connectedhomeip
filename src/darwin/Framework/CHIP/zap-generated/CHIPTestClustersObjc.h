@@ -687,6 +687,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)writeAttributeNumberOfPositionsWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeCurrentPositionWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMultiPressMaxWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeFeatureMapWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end

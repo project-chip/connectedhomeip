@@ -5,10 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
@@ -17,29 +19,54 @@ import com.jjoe64.graphview.LabelFormatter
 import com.jjoe64.graphview.Viewport
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
-import kotlinx.android.synthetic.main.sensor_client_fragment.*
-import kotlinx.android.synthetic.main.sensor_client_fragment.view.*
-import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import kotlinx.android.synthetic.main.sensor_client_fragment.clusterNameSpinner
+import kotlinx.android.synthetic.main.sensor_client_fragment.deviceIdEd
+import kotlinx.android.synthetic.main.sensor_client_fragment.endpointIdEd
+import kotlinx.android.synthetic.main.sensor_client_fragment.lastValueTv
+import kotlinx.android.synthetic.main.sensor_client_fragment.sensorGraph
+import kotlinx.android.synthetic.main.sensor_client_fragment.view.clusterNameSpinner
+import kotlinx.android.synthetic.main.sensor_client_fragment.view.readSensorBtn
+import kotlinx.android.synthetic.main.sensor_client_fragment.view.sensorGraph
+import kotlinx.android.synthetic.main.sensor_client_fragment.view.watchSensorBtn
+import kotlinx.android.synthetic.main.sensor_client_fragment.watchSensorBtn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 private typealias ReadCallback = ChipClusters.IntegerAttributeCallback
 
 class SensorClientFragment : Fragment() {
-  private val scope = CoroutineScope(Dispatchers.Main + Job())
-
-  // Job for sending periodic sensor read requests
-  private var sensorWatchJob: Job? = null
+  private lateinit var scope: CoroutineScope
 
   // History of sensor values
   private val sensorData = LineGraphSeries<DataPoint>()
+
+  // Device whose attribute is subscribed
+  private var subscribedDevicePtr = 0L
 
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View {
+    scope = viewLifecycleOwner.lifecycleScope
+
     return inflater.inflate(R.layout.sensor_client_fragment, container, false).apply {
+      ChipClient.getDeviceController(requireContext()).setCompletionListener(null)
+      deviceIdEd.setOnEditorActionListener { textView, actionId, _ ->
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+          updateAddress(textView.text.toString())
+          resetSensorGraph() // reset the graph on device change
+        }
+        actionId == EditorInfo.IME_ACTION_DONE
+      }
+      endpointIdEd.setOnEditorActionListener { textView, actionId, _ ->
+        if (actionId == EditorInfo.IME_ACTION_DONE)
+          resetSensorGraph() // reset the graph on endpoint change
+        actionId == EditorInfo.IME_ACTION_DONE
+      }
       clusterNameSpinner.adapter = makeClusterNamesAdapter()
       clusterNameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         override fun onNothingSelected(parent: AdapterView<*>?) = Unit
@@ -47,19 +74,21 @@ class SensorClientFragment : Fragment() {
           resetSensorGraph() // reset the graph on cluster change
         }
       }
-      readSensorBtn.setOnClickListener { scope.launch { readSensorButtonClick() } }
+
+      readSensorBtn.setOnClickListener { scope.launch { readSensorCluster() } }
       watchSensorBtn.setOnCheckedChangeListener { _, isChecked ->
         if (isChecked) {
-          watchSensorButtonChecked()
+          scope.launch { subscribeSensorCluster() }
         } else {
-          watchSensorButtonUnchecked()
+          unsubscribeSensorCluster()
         }
       }
+
       val currentTime = Calendar.getInstance().time.time
       sensorGraph.addSeries(sensorData)
       sensorGraph.viewport.isXAxisBoundsManual = true
       sensorGraph.viewport.setMinX(currentTime.toDouble())
-      sensorGraph.viewport.setMaxX(currentTime.toDouble() + REFRESH_PERIOD_MS * MAX_DATA_POINTS)
+      sensorGraph.viewport.setMaxX(currentTime.toDouble() + MIN_REFRESH_PERIOD_S * 1000 * MAX_DATA_POINTS)
       sensorGraph.gridLabelRenderer.padding = 20
       sensorGraph.gridLabelRenderer.numHorizontalLabels = 4
       sensorGraph.gridLabelRenderer.setHorizontalLabelsAngle(150)
@@ -77,12 +106,23 @@ class SensorClientFragment : Fragment() {
   override fun onStart() {
     super.onStart()
     deviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
+    updateAddress(deviceIdEd.text.toString())
   }
 
   override fun onStop() {
-    super.onStop()
-    scope.cancel()
     resetSensorGraph() // reset the graph on fragment exit
+    super.onStop()
+  }
+
+  private fun updateAddress(deviceId: String) {
+    try {
+      ChipClient.getDeviceController(requireContext()).updateDevice(
+          /* fabric ID */ 5544332211,
+          deviceId.toULong().toLong()
+      )
+    } catch (ex: Exception) {
+      showMessage(R.string.update_device_address_failure, ex.toString())
+    }
   }
 
   private fun resetSensorGraph() {
@@ -101,41 +141,53 @@ class SensorClientFragment : Fragment() {
     }
   }
 
-  private suspend fun readSensorButtonClick() {
+  private suspend fun readSensorCluster() {
     try {
-      readSensorCluster(clusterNameSpinner.selectedItem.toString(), false)
+      val deviceId = deviceIdEd.text.toString().toULong().toLong()
+      val endpointId = endpointIdEd.text.toString().toInt()
+      val clusterName = clusterNameSpinner.selectedItem.toString()
+      val clusterRead = CLUSTERS[clusterName]!!["read"] as (Long, Int, ReadCallback) -> Unit
+      val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
+      val callback = makeReadCallback(clusterName, false)
+
+      clusterRead(device, endpointId, callback)
     } catch (ex: Exception) {
       showMessage(R.string.sensor_client_read_error_text, ex.toString())
     }
   }
 
-  private fun watchSensorButtonChecked() {
-    sensorWatchJob = scope.launch {
-      while (isActive) {
-        try {
-          readSensorCluster(clusterNameSpinner.selectedItem.toString(), true)
-        } catch (ex: Exception) {
-          showMessage(R.string.sensor_client_read_error_text, ex.toString())
-        }
-        delay(REFRESH_PERIOD_MS)
-      }
+  private suspend fun subscribeSensorCluster() {
+    try {
+      val deviceId = deviceIdEd.text.toString().toULong().toLong()
+      val endpointId = endpointIdEd.text.toString().toInt()
+      val clusterName = clusterNameSpinner.selectedItem.toString()
+      val clusterSubscribe = CLUSTERS[clusterName]!!["subscribe"] as (Long, Int, ReadCallback) -> Unit
+      val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
+      val callback = makeReadCallback(clusterName, true)
+
+      clusterSubscribe(device, endpointId, callback)
+      subscribedDevicePtr = device
+    } catch (ex: Exception) {
+      showMessage(R.string.sensor_client_subscribe_error_text, ex.toString())
     }
   }
 
-  private fun watchSensorButtonUnchecked() {
-    sensorWatchJob?.cancel()
-    sensorWatchJob = null
+  private fun unsubscribeSensorCluster() {
+    if (subscribedDevicePtr == 0L)
+      return
+
+    try {
+      ChipClient.getDeviceController(requireContext()).shutdownSubscriptions(subscribedDevicePtr)
+      subscribedDevicePtr = 0
+    } catch (ex: Exception) {
+      showMessage(R.string.sensor_client_unsubscribe_error_text, ex.toString())
+    }
   }
 
-  private suspend fun readSensorCluster(clusterName: String, addToGraph: Boolean) {
-    val deviceId = deviceIdEd.text.toString().toULong().toLong()
-    val endpointId = endpointIdEd.text.toString().toInt()
-    val clusterConfig = CLUSTERS[clusterName]
-    val clusterRead = clusterConfig!!["read"] as (Long, Int, ReadCallback) -> Unit
+  private fun makeReadCallback(clusterName: String, addToGraph: Boolean): ReadCallback {
+    return object : ReadCallback {
+      val clusterConfig = CLUSTERS[clusterName]!!
 
-    val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
-
-    clusterRead(device, endpointId, object : ReadCallback {
       override fun onSuccess(value: Int) {
         val unitValue = clusterConfig["unitValue"] as Double
         val unitSymbol = clusterConfig["unitSymbol"] as String
@@ -145,7 +197,7 @@ class SensorClientFragment : Fragment() {
       override fun onError(ex: Exception) {
         showMessage(R.string.sensor_client_read_error_text, ex.toString())
       }
-    })
+    }
   }
 
   private fun consumeSensorValue(value: Double, unitSymbol: String, addToGraph: Boolean) {
@@ -180,13 +232,24 @@ class SensorClientFragment : Fragment() {
 
   companion object {
     private const val TAG = "SensorClientFragment"
-    private const val REFRESH_PERIOD_MS = 3000L
+    private const val MIN_REFRESH_PERIOD_S = 2
+    private const val MAX_REFRESH_PERIOD_S = 10
     private const val MAX_DATA_POINTS = 60
     private val CLUSTERS = mapOf(
         "Temperature" to mapOf(
             "read" to { device: Long, endpointId: Int, callback: ReadCallback ->
               val cluster = ChipClusters.TemperatureMeasurementCluster(device, endpointId)
               cluster.readMeasuredValueAttribute(callback)
+            },
+            "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
+              val cluster = ChipClusters.TemperatureMeasurementCluster(device, endpointId)
+              cluster.reportMeasuredValueAttribute(callback)
+              cluster.subscribeMeasuredValueAttribute(object : ChipClusters.DefaultClusterCallback {
+                override fun onSuccess() = Unit
+                override fun onError(ex: Exception) {
+                  callback.onError(ex)
+                }
+              }, MIN_REFRESH_PERIOD_S, MAX_REFRESH_PERIOD_S)
             },
             "unitValue" to 0.01,
             "unitSymbol" to "\u00B0C"
@@ -196,6 +259,16 @@ class SensorClientFragment : Fragment() {
               val cluster = ChipClusters.PressureMeasurementCluster(device, endpointId)
               cluster.readMeasuredValueAttribute(callback)
             },
+            "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
+              val cluster = ChipClusters.PressureMeasurementCluster(device, endpointId)
+              cluster.reportMeasuredValueAttribute(callback)
+              cluster.subscribeMeasuredValueAttribute(object : ChipClusters.DefaultClusterCallback {
+                override fun onSuccess() = Unit
+                override fun onError(ex: Exception) {
+                  callback.onError(ex)
+                }
+              }, MIN_REFRESH_PERIOD_S, MAX_REFRESH_PERIOD_S)
+            },
             "unitValue" to 1.0,
             "unitSymbol" to "hPa"
         ),
@@ -203,6 +276,16 @@ class SensorClientFragment : Fragment() {
             "read" to { device: Long, endpointId: Int, callback: ReadCallback ->
               val cluster = ChipClusters.RelativeHumidityMeasurementCluster(device, endpointId)
               cluster.readMeasuredValueAttribute(callback)
+            },
+            "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
+              val cluster = ChipClusters.RelativeHumidityMeasurementCluster(device, endpointId)
+              cluster.reportMeasuredValueAttribute(callback)
+              cluster.subscribeMeasuredValueAttribute(object : ChipClusters.DefaultClusterCallback {
+                override fun onSuccess() = Unit
+                override fun onError(ex: Exception) {
+                  callback.onError(ex)
+                }
+              }, MIN_REFRESH_PERIOD_S, MAX_REFRESH_PERIOD_S)
             },
             "unitValue" to 0.01,
             "unitSymbol" to "%"

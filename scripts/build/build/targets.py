@@ -144,6 +144,7 @@ def Efr32Targets():
 
     yield efr_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
     yield efr_target.Extend('lock', app=Efr32App.LOCK)
+    yield efr_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
 
     rpc_aware_targets = [
         efr_target.Extend('light', app=Efr32App.LIGHT),
@@ -216,6 +217,13 @@ def MbedTargets():
         yield target.Extend('debug', profile=MbedProfile.DEBUG).GlobBlacklist('Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
 
 
+def InfineonTargets():
+    target = Target('infineon', InfineonBuilder)
+
+    yield target.Extend('p6-lock', board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK)
+    yield target.Extend('p6-all-clusters', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS)
+
+
 ALL = []
 
 target_generators = [
@@ -224,7 +232,9 @@ target_generators = [
     Efr32Targets(),
     NrfTargets(),
     AndroidTargets(),
-    MbedTargets()
+    MbedTargets(),
+    InfineonTargets()
+
 ]
 
 for generator in target_generators:
@@ -235,8 +245,6 @@ for generator in target_generators:
 ALL.append(Target('qpg-qpg6100-lock', QpgBuilder))
 ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
-ALL.append(Target('infineon-p6-lock', InfineonBuilder,
-                  board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK))
 ALL.append(Target('tizen-arm-light', TizenBuilder,
                   board=TizenBoard.ARM, app=TizenApp.LIGHT))
 ALL.append(Target('ameba-amebad-all-clusters', AmebaBuilder,

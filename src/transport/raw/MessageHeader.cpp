@@ -145,11 +145,11 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     VerifyOrExit(version == kMsgHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
     SetMessageFlags(msgFlags);
 
+    SuccessOrExit(err = reader.Read16(&mSessionId).StatusCode());
+
     uint8_t securityFlags;
     SuccessOrExit(err = reader.Read8(&securityFlags).StatusCode());
     SetSecurityFlags(securityFlags);
-
-    SuccessOrExit(err = reader.Read16(&mSessionId).StatusCode());
 
     SuccessOrExit(err = reader.Read32(&mMessageCounter).StatusCode());
 
@@ -293,8 +293,8 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
 
     uint8_t * p = data;
     Write8(p, msgFlags);
-    Write8(p, secFlags);
     LittleEndian::Write16(p, mSessionId);
+    Write8(p, secFlags);
     LittleEndian::Write32(p, mMessageCounter);
     if (mSourceNodeId.HasValue())
     {

@@ -27,10 +27,6 @@
 // state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 2000
 
-// ---- Thread Polling Config ----
-#define THREAD_ACTIVE_POLLING_INTERVAL_MS 100
-#define THREAD_INACTIVE_POLLING_INTERVAL_MS 1000
-
 // EFR Logging
 #ifdef __cplusplus
 extern "C" {

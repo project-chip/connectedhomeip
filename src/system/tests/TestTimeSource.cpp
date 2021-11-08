@@ -40,10 +40,11 @@ void TestTimeSourceSetAndGet(nlTestSuite * inSuite, void * inContext)
 
     chip::Time::TimeSource<chip::Time::Source::kTest> source;
 
-    NL_TEST_ASSERT(inSuite, source.GetCurrentMonotonicTimeMs() == 0);
+    NL_TEST_ASSERT(inSuite, source.GetMonotonicTimestamp() == chip::System::Clock::kZero);
 
-    source.SetCurrentMonotonicTimeMs(1234);
-    NL_TEST_ASSERT(inSuite, source.GetCurrentMonotonicTimeMs() == 1234);
+    constexpr chip::System::Clock::Milliseconds64 k1234 = chip::System::Clock::Milliseconds64(1234);
+    source.SetMonotonicTimestamp(k1234);
+    NL_TEST_ASSERT(inSuite, source.GetMonotonicTimestamp() == k1234);
 }
 
 void SystemTimeSourceGet(nlTestSuite * inSuite, void * inContext)
@@ -51,13 +52,13 @@ void SystemTimeSourceGet(nlTestSuite * inSuite, void * inContext)
 
     chip::Time::TimeSource<chip::Time::Source::kSystem> source;
 
-    uint64_t oldValue = source.GetCurrentMonotonicTimeMs();
+    chip::System::Clock::Timestamp oldValue = source.GetMonotonicTimestamp();
 
     // a basic monotonic test. This is likely to take less than 1ms, so the
     // actual test value lies mostly in ensuring things compile.
     for (int i = 0; i < 100; i++)
     {
-        uint64_t newValue = source.GetCurrentMonotonicTimeMs();
+        chip::System::Clock::Timestamp newValue = source.GetMonotonicTimestamp();
         NL_TEST_ASSERT(inSuite, newValue >= oldValue);
         oldValue = newValue;
     }

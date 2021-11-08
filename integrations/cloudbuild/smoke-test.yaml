@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.5.23"
+    - name: "connectedhomeip/chip-build-vscode:0.5.25"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -12,7 +12,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.23"
+    - name: "connectedhomeip/chip-build-vscode:0.5.25"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -28,14 +28,14 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.23"
+    - name: "connectedhomeip/chip-build-vscode:0.5.25"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob '*-nrf52840-{lock,light}' build --create-archives
+              --target-glob '*-nrf52840-{lock,light}*' build --create-archives
               /workspace/artifacts/
       waitFor:
           - Bootstrap
@@ -45,15 +45,15 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.23"
+    - name: "connectedhomeip/chip-build-vscode:0.5.25"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob '*-brd4161a-{lock,light}' build --create-archives
-              /workspace/artifacts/
+              --target-glob '*-brd4161a-{lock,light,unit-test}*' build
+              --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap
           - NRFConnect
@@ -62,7 +62,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.23"
+    - name: "connectedhomeip/chip-build-vscode:0.5.25"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -79,7 +79,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.23"
+    - name: "connectedhomeip/chip-build-vscode:0.5.25"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv

@@ -32,6 +32,21 @@
             "output": "src/controller/java/zap-generated/CHIPClusters-JNI.cpp"
         },
         {
+            "path": "CHIPClustersRead-JNI.zapt",
+            "name": "CHIP ZCL API for Java (native code for reads)",
+            "output": "src/controller/java/zap-generated/CHIPClustersRead-JNI.cpp"
+        },
+        {
+            "path": "CHIPReadCallbacks-src.zapt",
+            "name": "CHIP cluster attribute read callback for Java (native code)",
+            "output": "src/controller/java/zap-generated/CHIPReadCallbacks.cpp"
+        },
+        {
+            "path": "CHIPReadCallbacks.zapt",
+            "name": "CHIP cluster attribute read callback for Java (native code)",
+            "output": "src/controller/java/zap-generated/CHIPReadCallbacks.h"
+        },
+        {
             "path": "ChipClusters-java.zapt",
             "name": "CHIP ZCL API for Java",
             "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipClusters.java"

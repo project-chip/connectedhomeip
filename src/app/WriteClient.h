@@ -25,6 +25,7 @@
 #include <app/MessageDef/AttributeStatusIB.h>
 #include <app/MessageDef/WriteRequestMessage.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/List.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>

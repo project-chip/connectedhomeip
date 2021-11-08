@@ -13,11 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines WriteResponseMessage parser and builder in CHIP interaction model
- *
- */
 
 #include "WriteResponseMessage.h"
 #include "MessageDefHelper.h"
@@ -28,34 +23,15 @@
 
 #include <app/AppBuildConfig.h>
 
-using namespace chip;
-using namespace chip::TLV;
-
 namespace chip {
 namespace app {
-CHIP_ERROR WriteResponseMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // make a copy of the reader here
-    mReader.Init(aReader);
-
-    VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = mReader.EnterContainer(mOuterContainerType);
-
-exit:
-
-    return err;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint16_t TagPresenceMask = 0;
-    chip::TLV::TLVReader reader;
-    AttributeStatusList::Parser attributeStatusList;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    int TagPresenceMask = 0;
+    TLV::TLVReader reader;
+    AttributeStatuses::Parser writeResponses;
     PRETTY_PRINT("WriteResponseMessage =");
     PRETTY_PRINT("{");
 
@@ -64,87 +40,66 @@ CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(chip::TLV::IsContextTag(reader.GetTag()), err = CHIP_ERROR_INVALID_TLV_TAG);
-        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), err = CHIP_ERROR_INVALID_TLV_TAG);
+        uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
+        switch (tagNum)
         {
-        case kCsTag_AttributeStatusList:
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributeStatusList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_AttributeStatusList);
-            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-            attributeStatusList.Init(reader);
+        case to_underlying(Tag::kWriteResponses):
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kWriteResponses))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kWriteResponses));
+            VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            ReturnErrorOnFailure(writeResponses.Init(reader));
 
             PRETTY_PRINT_INCDEPTH();
-
-            err = attributeStatusList.CheckSchemaValidity();
-            SuccessOrExit(err);
-
+            ReturnErrorOnFailure(writeResponses.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
             break;
         default:
-            ExitNow(err = CHIP_ERROR_INVALID_TLV_TAG);
+            PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
+            break;
         }
     }
 
     PRETTY_PRINT("}");
     PRETTY_PRINT("");
 
-    // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        err = CHIP_NO_ERROR;
+        const int RequiredFields = (1 << to_underlying(Tag::kWriteResponses));
+
+        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        {
+            err = CHIP_NO_ERROR;
+        }
     }
-    SuccessOrExit(err);
-    err = reader.ExitContainer(mOuterContainerType);
 
-exit:
-
-    return err;
+    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
+    return CHIP_NO_ERROR;
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR WriteResponseMessage::Parser::GetAttributeStatusList(AttributeStatusList::Parser * const apAttributeStatusList) const
+CHIP_ERROR WriteResponseMessage::Parser::GetWriteResponses(AttributeStatuses::Parser * const apWriteResponses) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributeStatusList), reader);
-    SuccessOrExit(err);
-
-    VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = apAttributeStatusList->Init(reader);
-    SuccessOrExit(err);
-
-exit:
-    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
-
-    return err;
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kWriteResponses)), reader));
+    ReturnErrorOnFailure(apWriteResponses->Init(reader));
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WriteResponseMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
-}
-
-AttributeStatusList::Builder & WriteResponseMessage::Builder::CreateAttributeStatusListBuilder()
+AttributeStatuses::Builder & WriteResponseMessage::Builder::CreateWriteResponses()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mAttributeStatusListBuilder.Init(mpWriter, kCsTag_AttributeStatusList);
+        mError = mWriteResponses.Init(mpWriter, to_underlying(Tag::kWriteResponses));
     }
-    else
-    {
-        mAttributeStatusListBuilder.ResetError(mError);
-    }
-
-    return mAttributeStatusListBuilder;
+    return mWriteResponses;
 }
 
-AttributeStatusList::Builder & WriteResponseMessage::Builder::GetAttributeStatusListBuilder()
+AttributeStatuses::Builder & WriteResponseMessage::Builder::GetWriteResponses()
 {
-    return mAttributeStatusListBuilder;
+    return mWriteResponses;
 }
 
 WriteResponseMessage::Builder & WriteResponseMessage::Builder::EndOfWriteResponseMessage()
@@ -152,5 +107,5 @@ WriteResponseMessage::Builder & WriteResponseMessage::Builder::EndOfWriteRespons
     EndOfContainer();
     return *this;
 }
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

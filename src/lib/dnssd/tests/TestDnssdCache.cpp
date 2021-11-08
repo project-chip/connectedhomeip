@@ -55,7 +55,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
 
     Inet::IPAddress addr;
     Inet::IPAddress addrV6;
-    const int ttl = 2; /* seconds */
+    const System::Clock::Timestamp ttl = System::Clock::Seconds16(2);
     Inet::InterfaceId iface_out;
     Inet::IPAddress addr_out;
     uint16_t port_out;
@@ -71,7 +71,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
 
         // ml -- why doesn't adding 2 uint16_t give a uint16_t?
         peerId.SetNodeId((NodeId) id + i);
-        result = tDnssdCache.Insert(peerId, addr, (uint16_t)(port + i), iface, 1000 * ttl);
+        result = tDnssdCache.Insert(peerId, addr, (uint16_t)(port + i), iface, ttl);
         if (i < sizeOfCache)
         {
             NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
@@ -83,7 +83,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     }
 
     tDnssdCache.DumpCache();
-    usleep(static_cast<useconds_t>((ttl + 1) * 1000 * 1000));
+    usleep(static_cast<useconds_t>(std::chrono::microseconds(ttl + System::Clock::Seconds16(1)).count()));
     id   = 0x200;
     port = 3000;
     for (uint16_t i = 0; i < sizeOfCache; i++)
@@ -91,7 +91,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
         CHIP_ERROR result;
 
         peerId.SetNodeId((NodeId) id + i);
-        result = tDnssdCache.Insert(peerId, addr, (uint16_t)(port + i), iface, 1000 * ttl);
+        result = tDnssdCache.Insert(peerId, addr, (uint16_t)(port + i), iface, ttl);
         NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
     }
     tDnssdCache.DumpCache();
@@ -115,7 +115,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
         CHIP_ERROR result;
 
         peerId.SetNodeId((NodeId) id + i);
-        result = tDnssdCache.Insert(peerId, addrV6, (uint16_t)(port + i), iface, 1000 * ttl);
+        result = tDnssdCache.Insert(peerId, addrV6, (uint16_t)(port + i), iface, ttl);
         NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
     }
 

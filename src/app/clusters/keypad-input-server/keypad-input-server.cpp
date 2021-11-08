@@ -65,3 +65,5 @@ bool emberAfKeypadInputClusterSendKeyCallback(app::CommandHandler * command, con
     sendResponse(command, status);
     return true;
 }
+
+void MatterKeypadInputPluginServerInitCallback() {}

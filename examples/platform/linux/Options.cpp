@@ -45,7 +45,8 @@ enum
     kDeviceOption_Passcode                  = 0x1009,
     kDeviceOption_SecuredDevicePort         = 0x100a,
     kDeviceOption_SecuredCommissionerPort   = 0x100b,
-    kDeviceOption_UnsecuredCommissionerPort = 0x100c
+    kDeviceOption_UnsecuredCommissionerPort = 0x100c,
+    kDeviceOption_Command                   = 0x100d
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -70,6 +71,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "secured-device-port", kArgumentRequired, kDeviceOption_SecuredDevicePort },
     { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
     { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
+    { "command", kArgumentRequired, kDeviceOption_Command },
     {}
 };
 
@@ -119,6 +121,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --unsecured-commissioner-port <port>\n"
     "       A 16-bit unsigned integer specifying the port to use for unsecured commissioner messages (default is 5550).\n"
+    "\n"
+    "  --command <command-name>\n"
+    "       A name for a command to execute during startup.\n"
     "\n";
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -182,6 +187,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_UnsecuredCommissionerPort:
         LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(atoi(aValue));
+        break;
+
+    case kDeviceOption_Command:
+        LinuxDeviceOptions::GetInstance().command = aValue;
         break;
 
     default:

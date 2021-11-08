@@ -199,6 +199,8 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
     chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
@@ -231,6 +233,8 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled && statusCheck);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
@@ -262,6 +266,8 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
+
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onSuccessWasCalled && onFailureWasCalled && statusCheck);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -296,6 +302,8 @@ void TestCommandInteraction::TestSuccessNoDataResponseWithClusterStatus(nlTestSu
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled && statusCheck);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
@@ -329,6 +337,8 @@ void TestCommandInteraction::TestFailureWithClusterStatus(nlTestSuite * apSuite,
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, !onSuccessWasCalled && onFailureWasCalled && statusCheck);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
@@ -350,7 +360,7 @@ nlTestSuite sSuite =
 {
     "TestCommands",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on

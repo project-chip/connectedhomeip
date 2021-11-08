@@ -5904,7 +5904,7 @@ public:
     chip::VendorId vendorId;
     uint16_t productId;
     uint32_t softwareVersion;
-    OTADownloadProtocol protocolsSupported;
+    DataModel::List<const OTADownloadProtocol> protocolsSupported;
     Optional<uint16_t> hardwareVersion;
     Optional<chip::CharSpan> location;
     Optional<bool> requestorCanConsent;
@@ -5922,7 +5922,7 @@ public:
     chip::VendorId vendorId;
     uint16_t productId;
     uint32_t softwareVersion;
-    OTADownloadProtocol protocolsSupported;
+    DataModel::DecodableList<OTADownloadProtocol> protocolsSupported;
     Optional<uint16_t> hardwareVersion;
     Optional<chip::CharSpan> location;
     Optional<bool> requestorCanConsent;
@@ -6013,13 +6013,13 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     OTAQueryStatus status;
-    uint32_t delayedActionTime;
-    chip::CharSpan imageURI;
-    uint32_t softwareVersion;
-    chip::CharSpan softwareVersionString;
-    chip::ByteSpan updateToken;
-    bool userConsentNeeded;
-    chip::ByteSpan metadataForRequestor;
+    Optional<uint32_t> delayedActionTime;
+    Optional<chip::CharSpan> imageURI;
+    Optional<uint32_t> softwareVersion;
+    Optional<chip::CharSpan> softwareVersionString;
+    Optional<chip::ByteSpan> updateToken;
+    Optional<bool> userConsentNeeded;
+    Optional<chip::ByteSpan> metadataForRequestor;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6031,13 +6031,13 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
     OTAQueryStatus status;
-    uint32_t delayedActionTime;
-    chip::CharSpan imageURI;
-    uint32_t softwareVersion;
-    chip::CharSpan softwareVersionString;
-    chip::ByteSpan updateToken;
-    bool userConsentNeeded;
-    chip::ByteSpan metadataForRequestor;
+    Optional<uint32_t> delayedActionTime;
+    Optional<chip::CharSpan> imageURI;
+    Optional<uint32_t> softwareVersion;
+    Optional<chip::CharSpan> softwareVersionString;
+    Optional<chip::ByteSpan> updateToken;
+    Optional<bool> userConsentNeeded;
+    Optional<chip::ByteSpan> metadataForRequestor;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace QueryImageResponse
@@ -23935,6 +23935,34 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestNestedStructArgumentRequest
+namespace BooleanResponse {
+enum class Fields
+{
+    kValue = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::BooleanResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    bool value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::BooleanResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    bool value;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace BooleanResponse
 namespace TestListStructArgumentRequest {
 enum class Fields
 {

@@ -886,6 +886,10 @@ public:
                                                uint8_t value);
     CHIP_ERROR WriteAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint8_t value);
+    CHIP_ERROR WriteAttributeMultiPressMax(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint8_t value);
+    CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint32_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

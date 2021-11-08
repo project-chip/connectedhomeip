@@ -55,9 +55,10 @@ public:
     // return error if cache is full
     // TODO:   have an eviction policy so if the cache is full, an entry may be deleted.
     //         One policy may be Least-time-to-live
-    CHIP_ERROR Insert(PeerId peerId, const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId iface, uint32_t TTLms)
+    CHIP_ERROR Insert(PeerId peerId, const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId iface,
+                      System::Clock::Timestamp TTL)
     {
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        const System::Clock::Timestamp currentTime = mTimeSource.GetMonotonicTimestamp();
 
         DnssdCacheEntry * entry;
 
@@ -65,8 +66,8 @@ public:
         if (entry)
         {
             // update timeout if found entry
-            entry->expiryTime = currentTime + TTLms;
-            entry->TTL        = TTLms; // in case it changes */
+            entry->expiryTime = currentTime + TTL;
+            entry->TTL        = TTL; // in case it changes */
             return CHIP_NO_ERROR;
         }
 
@@ -77,8 +78,8 @@ public:
         entry->ipAddr     = addr;
         entry->port       = port;
         entry->ifaceId    = iface;
-        entry->TTL        = TTLms;
-        entry->expiryTime = currentTime + TTLms;
+        entry->TTL        = TTL;
+        entry->expiryTime = currentTime + TTL;
         elementsUsed++;
 
         return CHIP_NO_ERROR;
@@ -87,7 +88,7 @@ public:
     CHIP_ERROR Delete(PeerId peerId)
     {
         DnssdCacheEntry * pentry;
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        const System::Clock::Timestamp currentTime = mTimeSource.GetMonotonicTimestamp();
 
         VerifyOrReturnError(pentry = FindPeerId(peerId, currentTime), CHIP_ERROR_KEY_NOT_FOUND);
 
@@ -99,7 +100,7 @@ public:
     CHIP_ERROR Lookup(PeerId peerId, Inet::IPAddress & addr, uint16_t & port, Inet::InterfaceId & iface)
     {
         DnssdCacheEntry * pentry;
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        const System::Clock::Timestamp currentTime = mTimeSource.GetMonotonicTimestamp();
 
         VerifyOrReturnError(pentry = FindPeerId(peerId, currentTime), CHIP_ERROR_KEY_NOT_FOUND);
 
@@ -141,8 +142,8 @@ private:
         Inet::IPAddress ipAddr;
         uint16_t port;
         Inet::InterfaceId ifaceId;
-        uint64_t TTL;        // from mdns record -- units?
-        uint64_t expiryTime; // units?
+        System::Clock::Timestamp TTL;
+        System::Clock::Timestamp expiryTime;
     };
     PeerId nullPeerId; // indicates a cache entry is unused
     int elementsUsed;  // running count of how many entries are used -- for a sanity check
@@ -150,7 +151,7 @@ private:
     DnssdCacheEntry mLookupTable[CACHE_SIZE];
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
 
-    DnssdCacheEntry * findSlot(uint64_t currentTime)
+    DnssdCacheEntry * findSlot(System::Clock::Timestamp currentTime)
     {
         for (DnssdCacheEntry & entry : mLookupTable)
         {
@@ -166,7 +167,7 @@ private:
         return nullptr;
     }
 
-    DnssdCacheEntry * FindPeerId(PeerId peerId, uint64_t current_time)
+    DnssdCacheEntry * FindPeerId(PeerId peerId, System::Clock::Timestamp current_time)
     {
         for (DnssdCacheEntry & entry : mLookupTable)
         {

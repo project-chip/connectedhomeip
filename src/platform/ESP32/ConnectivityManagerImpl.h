@@ -124,11 +124,6 @@ private:
     CHIP_ERROR _GetWiFiCurrentMaxRate(uint64_t & currentMaxRate);
     CHIP_ERROR _GetWiFiOverrunCount(uint64_t & overrunCount);
 
-    // ===== Members for internal use by the following friends.
-
-    friend ConnectivityManager & ConnectivityMgr(void);
-    friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
-
     // ===== Private members reserved for use by this class only.
 
     System::Clock::Timestamp mLastStationConnectFailTime;
@@ -161,6 +156,11 @@ private:
     void OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+    // ===== Members for internal use by the following friends.
+
+    friend ConnectivityManager & ConnectivityMgr(void);
+    friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
     static ConnectivityManagerImpl sInstance;
 };

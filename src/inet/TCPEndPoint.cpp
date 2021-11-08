@@ -1086,7 +1086,13 @@ err_t TCPEndPoint::LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, str
         res = ERR_ABRT;
 
     if (res != ERR_OK)
+    {
+        if (p != nullptr)
+        {
+            pbuf_free(p);
+        }
         tcp_abort(tpcb);
+    }
 
     return res;
 }

@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/device/OperationalDeviceProxy.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -43,11 +44,10 @@ using chip::Transport::PeerAddress;
 using namespace chip::ArgParser;
 using namespace chip::Messaging;
 using namespace chip::app::device;
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
-void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, CharSpan imageURI, uint32_t softwareVersion,
-                          CharSpan softwareVersionString, ByteSpan updateToken, bool userConsentNeeded,
-                          ByteSpan metadataForRequestor);
-void OnQueryImageFailure(void * context, uint8_t status);
+void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response);
+void OnQueryImageFailure(void * context, EmberAfStatus status);
 void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy);
 void OnConnectionFailure(void * context, OperationalDeviceProxy * operationalDeviceProxy, CHIP_ERROR error);
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
@@ -56,8 +56,6 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 OperationalDeviceProxy gOperationalDeviceProxy;
 ExchangeContext * exchangeCtx = nullptr;
 BdxDownloader bdxDownloader;
-Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback> mQueryImageResponseCallback(OnQueryImageResponse, nullptr);
-Callback<DefaultFailureCallback> mOnQueryFailureCallback(OnQueryImageFailure, nullptr);
 Callback<OnOperationalDeviceConnected> mOnConnectedCallback(OnConnected, nullptr);
 Callback<OnOperationalDeviceConnectionFailure> mOnConnectionFailureCallback(OnConnectionFailure, nullptr);
 
@@ -108,11 +106,9 @@ HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
-void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, CharSpan imageURI, uint32_t softwareVersion,
-                          CharSpan softwareVersionString, ByteSpan updateToken, bool userConsentNeeded,
-                          ByteSpan metadataForRequestor)
+void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response)
 {
-    ChipLogDetail(SoftwareUpdate, "QueryImageResponse responded with action %" PRIu8, status);
+    ChipLogDetail(SoftwareUpdate, "QueryImageResponse responded with action %" PRIu8, response.status);
 
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = chip::bdx::TransferControlFlags::kReceiverDrive;
@@ -143,7 +139,7 @@ void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedAction
                                    chip::System::Clock::Seconds16(20));
 }
 
-void OnQueryImageFailure(void * context, uint8_t status)
+void OnQueryImageFailure(void * context, EmberAfStatus status)
 {
     ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" PRIu8, status);
 }
@@ -154,17 +150,13 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
     constexpr EndpointId kOtaProviderEndpoint = 0;
 
-    chip::Callback::Cancelable * successCallback = mQueryImageResponseCallback.Cancel();
-    chip::Callback::Cancelable * failureCallback = mOnQueryFailureCallback.Cancel();
-
     // These QueryImage params have been chosen arbitrarily
-    constexpr VendorId kExampleVendorId        = VendorId::Common;
-    constexpr uint16_t kExampleProductId       = 77;
-    constexpr uint16_t kExampleHWVersion       = 3;
-    constexpr uint16_t kExampleSoftwareVersion = 0;
-    constexpr uint8_t kExampleProtocolsSupported =
-        EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS; // TODO: support this as a list once ember adds list support
-    const char locationBuf[] = { 'U', 'S' };
+    constexpr VendorId kExampleVendorId                               = VendorId::Common;
+    constexpr uint16_t kExampleProductId                              = 77;
+    constexpr uint16_t kExampleHWVersion                              = 3;
+    constexpr uint16_t kExampleSoftwareVersion                        = 0;
+    constexpr EmberAfOTADownloadProtocol kExampleProtocolsSupported[] = { EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS };
+    const char locationBuf[]                                          = { 'U', 'S' };
     CharSpan exampleLocation(locationBuf);
     constexpr bool kExampleClientCanConsent = false;
     ByteSpan metadata;
@@ -175,8 +167,16 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
         ChipLogError(SoftwareUpdate, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
-    err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleSoftwareVersion,
-                             kExampleProtocolsSupported, kExampleHWVersion, exampleLocation, kExampleClientCanConsent, metadata);
+    QueryImage::Type args;
+    args.vendorId           = kExampleVendorId;
+    args.productId          = kExampleProductId;
+    args.softwareVersion    = kExampleSoftwareVersion;
+    args.protocolsSupported = kExampleProtocolsSupported;
+    args.hardwareVersion.Emplace(kExampleHWVersion);
+    args.location.Emplace(exampleLocation);
+    args.requestorCanConsent.Emplace(kExampleClientCanConsent);
+    args.metadataForProvider.Emplace(metadata);
+    err = cluster.InvokeCommand(args, /* context = */ nullptr, OnQueryImageResponse, OnQueryImageFailure);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "QueryImage() failed: %" CHIP_ERROR_FORMAT, err.Format());

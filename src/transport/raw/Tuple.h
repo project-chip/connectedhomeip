@@ -239,6 +239,13 @@ private:
     CHIP_ERROR InitImpl(RawTransportDelegate * delegate) { return CHIP_NO_ERROR; }
 
     std::tuple<TransportTypes...> mTransports;
+
+public:
+    template <size_t i>
+    auto GetImplAtIndex() -> decltype(std::get<i>(mTransports)) &
+    {
+        return std::get<i>(mTransports);
+    }
 };
 
 } // namespace Transport

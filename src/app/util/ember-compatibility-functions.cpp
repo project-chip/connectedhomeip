@@ -502,7 +502,6 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     info.mClusterId  = clusterId;
     info.mFieldId    = attributeId;
     info.mEndpointId = endpoint;
-    info.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
 
