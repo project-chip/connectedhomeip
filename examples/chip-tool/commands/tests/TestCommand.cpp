@@ -109,17 +109,6 @@ bool TestCommand::CheckConstraintMaxLength(const char * itemName, uint64_t curre
     return true;
 }
 
-bool TestCommand::CheckValueAsList(const char * itemName, uint64_t current, uint64_t expected)
-{
-    if (current != expected)
-    {
-        Exit(std::string(itemName) + " count mismatch: " + std::to_string(current) + " != " + std::to_string(expected));
-        return false;
-    }
-
-    return true;
-}
-
 bool TestCommand::CheckValueAsString(const char * itemName, const chip::ByteSpan current, const char * expected)
 {
     const chip::ByteSpan expectedArgument = chip::ByteSpan(chip::Uint8::from_const_char(expected), strlen(expected));

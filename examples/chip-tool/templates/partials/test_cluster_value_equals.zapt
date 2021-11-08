@@ -8,12 +8,21 @@
     VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
     {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isNullable=false}}
   {{/if}}
+{{else if isArray}}
+    auto iter = {{actual}}.begin();
+    {{#each expected}}
+      VerifyOrReturn(CheckNextListItemDecodes<decltype({{../actual}})>("{{../label}}", iter, {{@index}}));
+      {{>valueEquals label=(concat ../label "[" @index "]") actual="iter.GetValue()" expected=this isArray=false type=../type chipType=../chipType}}
+    {{/each}}
+    VerifyOrReturn(CheckNoMoreListItems<decltype({{actual}})>("{{label}}", iter, {{expected.length}}));
 {{else}}
-  VerifyOrReturn(CheckValue
-    {{~#if isList}}AsListLength("{{label}}", {{actual}}, {{expected.length}})
-    {{else if isArray}}AsList("{{label}}", {{actual}}{{#if expected.length}}, {{expected}}{{/if}})
-    {{else if (isString type)}}AsString("{{label}}", {{actual}}, "{{expected}}")
-    {{else}}<{{chipType}}>("{{label}}", {{actual}}, {{expected}}{{asTypeLiteralSuffix type}})
-    {{/if}}
-  );
+  {{#if_is_struct type}}
+  {{! NOT SUPPORTED YET }}
+  {{else}}
+    VerifyOrReturn(CheckValue
+      {{~#if (isString type)}}AsString("{{label}}", {{actual}}, "{{expected}}")
+      {{else}}<{{chipType}}>("{{label}}", {{actual}}, {{expected}}{{asTypeLiteralSuffix type}})
+      {{/if}}
+    );
+  {{/if_is_struct}}
 {{/if}}

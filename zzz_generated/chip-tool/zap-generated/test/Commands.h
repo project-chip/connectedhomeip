@@ -13212,7 +13212,9 @@ private:
     void OnSuccessResponse_0(const chip::app::DataModel::DecodableList<
                              chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabricsList)
     {
-        VerifyOrReturn(CheckValueAsListLength("fabricsList", fabricsList, 1));
+        auto iter = fabricsList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(fabricsList)>("fabricsList", iter, 0));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(fabricsList)>("fabricsList", iter, 1));
         NextTest();
     }
 
@@ -13260,7 +13262,7 @@ private:
 
     void OnSuccessResponse_3(const chip::app::DataModel::DecodableList<chip::ByteSpan> & trustedRootCertificates)
     {
-        VerifyOrReturn(CheckValueAsListLength("trustedRootCertificates", trustedRootCertificates, 1));
+        VerifyOrReturn(CheckConstraintType("trustedRootCertificates", "", "list"));
         NextTest();
     }
 };
@@ -23201,7 +23203,10 @@ private:
         const chip::app::DataModel::DecodableList<
             chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & targetNavigatorList)
     {
-        VerifyOrReturn(CheckValueAsListLength("targetNavigatorList", targetNavigatorList, 2));
+        auto iter = targetNavigatorList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(targetNavigatorList)>("targetNavigatorList", iter, 0));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(targetNavigatorList)>("targetNavigatorList", iter, 1));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(targetNavigatorList)>("targetNavigatorList", iter, 2));
         NextTest();
     }
 
@@ -23325,7 +23330,11 @@ private:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
             audioOutputList)
     {
-        VerifyOrReturn(CheckValueAsListLength("audioOutputList", audioOutputList, 3));
+        auto iter = audioOutputList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 0));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 1));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 2));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(audioOutputList)>("audioOutputList", iter, 3));
         NextTest();
     }
 
@@ -23495,7 +23504,12 @@ private:
 
     void OnSuccessResponse_0(const chip::app::DataModel::DecodableList<uint16_t> & applicationLauncherList)
     {
-        VerifyOrReturn(CheckValueAsListLength("applicationLauncherList", applicationLauncherList, 2));
+        auto iter = applicationLauncherList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(applicationLauncherList)>("applicationLauncherList", iter, 0));
+        VerifyOrReturn(CheckValue<uint16_t>("applicationLauncherList[0]", iter.GetValue(), 123U));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(applicationLauncherList)>("applicationLauncherList", iter, 1));
+        VerifyOrReturn(CheckValue<uint16_t>("applicationLauncherList[1]", iter.GetValue(), 456U));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(applicationLauncherList)>("applicationLauncherList", iter, 2));
         NextTest();
     }
 
@@ -24499,7 +24513,10 @@ private:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> &
             tvChannelList)
     {
-        VerifyOrReturn(CheckValueAsListLength("tvChannelList", tvChannelList, 2));
+        auto iter = tvChannelList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(tvChannelList)>("tvChannelList", iter, 0));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(tvChannelList)>("tvChannelList", iter, 1));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(tvChannelList)>("tvChannelList", iter, 2));
         NextTest();
     }
 
@@ -24748,7 +24765,10 @@ private:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> &
             mediaInputList)
     {
-        VerifyOrReturn(CheckValueAsListLength("mediaInputList", mediaInputList, 2));
+        auto iter = mediaInputList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(mediaInputList)>("mediaInputList", iter, 0));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(mediaInputList)>("mediaInputList", iter, 1));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(mediaInputList)>("mediaInputList", iter, 2));
         NextTest();
     }
 
@@ -28410,7 +28430,16 @@ private:
 
     void OnSuccessResponse_106(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
     {
-        VerifyOrReturn(CheckValueAsListLength("listInt8u", listInt8u, 4));
+        auto iter = listInt8u.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 0));
+        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[0]", iter.GetValue(), 1));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 1));
+        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[1]", iter.GetValue(), 2));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 2));
+        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[2]", iter.GetValue(), 3));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 3));
+        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[3]", iter.GetValue(), 4));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(listInt8u)>("listInt8u", iter, 4));
         NextTest();
     }
 
@@ -28426,7 +28455,16 @@ private:
 
     void OnSuccessResponse_107(const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)
     {
-        VerifyOrReturn(CheckValueAsListLength("listOctetString", listOctetString, 4));
+        auto iter = listOctetString.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 0));
+        VerifyOrReturn(CheckValueAsString("listOctetString[0]", iter.GetValue(), "Test0"));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 1));
+        VerifyOrReturn(CheckValueAsString("listOctetString[1]", iter.GetValue(), "Test1"));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 2));
+        VerifyOrReturn(CheckValueAsString("listOctetString[2]", iter.GetValue(), "Test2"));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 3));
+        VerifyOrReturn(CheckValueAsString("listOctetString[3]", iter.GetValue(), "Test3"));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(listOctetString)>("listOctetString", iter, 4));
         NextTest();
     }
 
@@ -28444,7 +28482,12 @@ private:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
             listStructOctetString)
     {
-        VerifyOrReturn(CheckValueAsListLength("listStructOctetString", listStructOctetString, 4));
+        auto iter = listStructOctetString.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 0));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 1));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 2));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 3));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(listStructOctetString)>("listStructOctetString", iter, 4));
         NextTest();
     }
 
@@ -29049,7 +29092,26 @@ private:
 
     void OnSuccessResponse_4(const chip::app::DataModel::DecodableList<uint8_t> & arg1)
     {
-        VerifyOrReturn(CheckValueAsList("arg1", arg1, 9, 8, 7, 6, 5, 4, 3, 2, 1));
+        auto iter = arg1.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(arg1)>("arg1", iter, 0));
+        VerifyOrReturn(CheckValue<uint8_t>("arg1[0]", iter.GetValue(), 9));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(arg1)>("arg1", iter, 1));
+        VerifyOrReturn(CheckValue<uint8_t>("arg1[1]", iter.GetValue(), 8));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(arg1)>("arg1", iter, 2));
+        VerifyOrReturn(CheckValue<uint8_t>("arg1[2]", iter.GetValue(), 7));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(arg1)>("arg1", iter, 3));
+        VerifyOrReturn(CheckValue<uint8_t>("arg1[3]", iter.GetValue(), 6));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(arg1)>("arg1", iter, 4));
+        VerifyOrReturn(CheckValue<uint8_t>("arg1[4]", iter.GetValue(), 5));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(arg1)>("arg1", iter, 5));
+        VerifyOrReturn(CheckValue<uint8_t>("arg1[5]", iter.GetValue(), 4));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(arg1)>("arg1", iter, 6));
+        VerifyOrReturn(CheckValue<uint8_t>("arg1[6]", iter.GetValue(), 3));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(arg1)>("arg1", iter, 7));
+        VerifyOrReturn(CheckValue<uint8_t>("arg1[7]", iter.GetValue(), 2));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(arg1)>("arg1", iter, 8));
+        VerifyOrReturn(CheckValue<uint8_t>("arg1[8]", iter.GetValue(), 1));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(arg1)>("arg1", iter, 9));
         NextTest();
     }
 
@@ -29079,7 +29141,8 @@ private:
 
     void OnSuccessResponse_5(const chip::app::DataModel::DecodableList<uint8_t> & arg1)
     {
-        VerifyOrReturn(CheckValueAsList("arg1", arg1));
+        auto iter = arg1.begin();
+        VerifyOrReturn(CheckNoMoreListItems<decltype(arg1)>("arg1", iter, 0));
         NextTest();
     }
 
@@ -29698,7 +29761,9 @@ private:
     void OnSuccessResponse_0(
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & deviceList)
     {
-        VerifyOrReturn(CheckValueAsListLength("deviceList", deviceList, 1));
+        auto iter = deviceList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(deviceList)>("deviceList", iter, 0));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(deviceList)>("deviceList", iter, 1));
         NextTest();
     }
 
@@ -29714,7 +29779,44 @@ private:
 
     void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<chip::ClusterId> & serverList)
     {
-        VerifyOrReturn(CheckValueAsListLength("serverList", serverList, 18));
+        auto iter = serverList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 0));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[0]", iter.GetValue(), 3UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 1));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[1]", iter.GetValue(), 29UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 2));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[2]", iter.GetValue(), 40UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 3));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[3]", iter.GetValue(), 41UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 4));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[4]", iter.GetValue(), 42UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 5));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[5]", iter.GetValue(), 48UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 6));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[6]", iter.GetValue(), 49UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 7));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[7]", iter.GetValue(), 50UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 8));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[8]", iter.GetValue(), 51UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 9));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[9]", iter.GetValue(), 52UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 10));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[10]", iter.GetValue(), 53UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 11));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[11]", iter.GetValue(), 54UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 12));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[12]", iter.GetValue(), 55UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 13));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[13]", iter.GetValue(), 60UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 14));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[14]", iter.GetValue(), 62UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 15));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[15]", iter.GetValue(), 1029UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 16));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[16]", iter.GetValue(), 61440UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 17));
+        VerifyOrReturn(CheckValue<chip::ClusterId>("serverList[17]", iter.GetValue(), 61444UL));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(serverList)>("serverList", iter, 18));
         NextTest();
     }
 
@@ -29730,7 +29832,8 @@ private:
 
     void OnSuccessResponse_2(const chip::app::DataModel::DecodableList<chip::ClusterId> & clientList)
     {
-        VerifyOrReturn(CheckValueAsListLength("clientList", clientList, 0));
+        auto iter = clientList.begin();
+        VerifyOrReturn(CheckNoMoreListItems<decltype(clientList)>("clientList", iter, 0));
         NextTest();
     }
 
@@ -29746,7 +29849,12 @@ private:
 
     void OnSuccessResponse_3(const chip::app::DataModel::DecodableList<chip::EndpointId> & partsList)
     {
-        VerifyOrReturn(CheckValueAsListLength("partsList", partsList, 2));
+        auto iter = partsList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(partsList)>("partsList", iter, 0));
+        VerifyOrReturn(CheckValue<chip::EndpointId>("partsList[0]", iter.GetValue(), 1U));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(partsList)>("partsList", iter, 1));
+        VerifyOrReturn(CheckValue<chip::EndpointId>("partsList[1]", iter.GetValue(), 2U));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(partsList)>("partsList", iter, 2));
         NextTest();
     }
 };
@@ -30384,7 +30492,11 @@ private:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
             supportedModes)
     {
-        VerifyOrReturn(CheckValueAsListLength("supportedModes", supportedModes, 3));
+        auto iter = supportedModes.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter, 0));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter, 1));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter, 2));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(supportedModes)>("supportedModes", iter, 3));
         NextTest();
     }
 

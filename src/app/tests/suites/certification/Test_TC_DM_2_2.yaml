@@ -80,6 +80,8 @@ tests:
       command: "readAttribute"
       attribute: "TrustedRootCertificates"
       response:
-          value: [237]
+          # Can't check for the expected value here, since we don't know it.
+          # TODO: Check the length, at least?
+          # value: [237]
           constraints:
               type: list
