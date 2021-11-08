@@ -268,12 +268,15 @@ void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::Fabri
         new chip::OperationalDeviceProxy(initParams, PeerId().SetNodeId(providerNodeId));
     server->SetOperationalDeviceProxy(operationalDeviceProxy);
 
-    // Explicitly calling UpdateAddress() should not be needed once OperationalDeviceProxy can resolve IP address from node ID and
-    // fabric index
+    // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node ID
+    // and fabric index
     IPAddress ipAddr;
     IPAddress::FromString(ipAddress, ipAddr);
     PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
-    operationalDeviceProxy->UpdateAddress(addr);
+    uint32_t idleInterval;
+    uint32_t activeInterval;
+    operationalDeviceProxy->GetMRPIntervals(idleInterval, activeInterval);
+    operationalDeviceProxy->UpdateDeviceData(addr, idleInterval, activeInterval);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
