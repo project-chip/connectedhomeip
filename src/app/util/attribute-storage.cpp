@@ -1153,7 +1153,7 @@ EmberAfCluster * emberAfGetNthCluster(EndpointId endpoint, uint8_t n, bool serve
 
 // Returns the cluster id of Nth server or client cluster,
 // depending on server toggle.
-// Returns EMBER_AF_INVALID_CLUSTER_ID if cluster does not exist.
+// Returns Optional<ClusterId>::Missing() if cluster does not exist.
 Optional<ClusterId> emberAfGetNthClusterId(EndpointId endpoint, uint8_t n, bool server)
 {
     EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, n, server);

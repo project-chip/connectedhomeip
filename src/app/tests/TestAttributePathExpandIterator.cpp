@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *     This file defines read handler for a CHIP Interaction Data model
- *
- */
-
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/ClusterInfo.h>
@@ -50,21 +44,21 @@ void TestAllWildcard(nlTestSuite * apSuite, void * apContext)
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        P(0xFFFE, 0xFFF1'0001, 0x0000'FFFD), P(0xFFFE, 0xFFF1'0001, 0x0000'FFFC), P(0xFFFE, 0xFFF1'0002, 0x0000'FFFD),
-        P(0xFFFE, 0xFFF1'0002, 0x0000'FFFC), P(0xFFFE, 0xFFF1'0002, 0xFFF1'0001), P(0xFFFD, 0xFFF1'0001, 0x0000'FFFD),
-        P(0xFFFD, 0xFFF1'0001, 0x0000'FFFC), P(0xFFFD, 0xFFF1'0002, 0x0000'FFFD), P(0xFFFD, 0xFFF1'0002, 0x0000'FFFC),
-        P(0xFFFD, 0xFFF1'0002, 0xFFF1'0001), P(0xFFFD, 0xFFF1'0002, 0xFFF1'0002), P(0xFFFD, 0xFFF1'0003, 0x0000'FFFD),
-        P(0xFFFD, 0xFFF1'0003, 0x0000'FFFC), P(0xFFFD, 0xFFF1'0003, 0xFFF1'0001), P(0xFFFD, 0xFFF1'0003, 0xFFF1'0002),
-        P(0xFFFD, 0xFFF1'0003, 0xFFF1'0003), P(0xFFFC, 0xFFF1'0001, 0x0000'FFFD), P(0xFFFC, 0xFFF1'0001, 0x0000'FFFC),
-        P(0xFFFC, 0xFFF1'0001, 0xFFF1'0001), P(0xFFFC, 0xFFF1'0002, 0x0000'FFFD), P(0xFFFC, 0xFFF1'0002, 0x0000'FFFC),
-        P(0xFFFC, 0xFFF1'0002, 0xFFF1'0001), P(0xFFFC, 0xFFF1'0002, 0xFFF1'0002), P(0xFFFC, 0xFFF1'0002, 0xFFF1'0003),
-        P(0xFFFC, 0xFFF1'0002, 0xFFF1'0004), P(0xFFFC, 0xFFF1'0003, 0x0000'FFFD), P(0xFFFC, 0xFFF1'0003, 0x0000'FFFC),
-        P(0xFFFC, 0xFFF1'0004, 0x0000'FFFD), P(0xFFFC, 0xFFF1'0004, 0x0000'FFFC),
+        { 0xFFFE, 0xFFF1'0001, 0x0000'FFFD }, { 0xFFFE, 0xFFF1'0001, 0x0000'FFFC }, { 0xFFFE, 0xFFF1'0002, 0x0000'FFFD },
+        { 0xFFFE, 0xFFF1'0002, 0x0000'FFFC }, { 0xFFFE, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0001, 0x0000'FFFD },
+        { 0xFFFD, 0xFFF1'0001, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0002, 0x0000'FFFD }, { 0xFFFD, 0xFFF1'0002, 0x0000'FFFC },
+        { 0xFFFD, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0002, 0xFFF1'0002 }, { 0xFFFD, 0xFFF1'0003, 0x0000'FFFD },
+        { 0xFFFD, 0xFFF1'0003, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0002 },
+        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 }, { 0xFFFC, 0xFFF1'0001, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0001, 0x0000'FFFC },
+        { 0xFFFC, 0xFFF1'0001, 0xFFF1'0001 }, { 0xFFFC, 0xFFF1'0002, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0002, 0x0000'FFFC },
+        { 0xFFFC, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFC, 0xFFF1'0002, 0xFFF1'0002 }, { 0xFFFC, 0xFFF1'0002, 0xFFF1'0003 },
+        { 0xFFFC, 0xFFF1'0002, 0xFFF1'0004 }, { 0xFFFC, 0xFFF1'0003, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0003, 0x0000'FFFC },
+        { 0xFFFC, 0xFFF1'0004, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0004, 0x0000'FFFC },
     };
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Proceed())
+    for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
@@ -82,12 +76,12 @@ void TestWildcardEndpoint(nlTestSuite * apSuite, void * apContext)
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        P(0xFFFD, 0xFFF1'0003, 0xFFF1'0003),
+        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
     };
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Proceed())
+    for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
@@ -105,15 +99,15 @@ void TestWildcardCluster(nlTestSuite * apSuite, void * apContext)
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        P(0xFFFC, 0xFFF1'0001, 0x0000'FFFD),
-        P(0xFFFC, 0xFFF1'0002, 0x0000'FFFD),
-        P(0xFFFC, 0xFFF1'0003, 0x0000'FFFD),
-        P(0xFFFC, 0xFFF1'0004, 0x0000'FFFD),
+        { 0xFFFC, 0xFFF1'0001, 0x0000'FFFD },
+        { 0xFFFC, 0xFFF1'0002, 0x0000'FFFD },
+        { 0xFFFC, 0xFFF1'0003, 0x0000'FFFD },
+        { 0xFFFC, 0xFFF1'0004, 0x0000'FFFD },
     };
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Proceed())
+    for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
@@ -131,13 +125,13 @@ void TestWildcardAttribute(nlTestSuite * apSuite, void * apContext)
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        P(0xFFFD, 0xFFF1'0003, 0x0000'FFFD), P(0xFFFD, 0xFFF1'0003, 0x0000'FFFC), P(0xFFFD, 0xFFF1'0003, 0xFFF1'0001),
-        P(0xFFFD, 0xFFF1'0003, 0xFFF1'0002), P(0xFFFD, 0xFFF1'0003, 0xFFF1'0003),
+        { 0xFFFD, 0xFFF1'0003, 0x0000'FFFD }, { 0xFFFD, 0xFFF1'0003, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0001 },
+        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0002 }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
     };
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Proceed())
+    for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
@@ -156,12 +150,12 @@ void TestNoWildcard(nlTestSuite * apSuite, void * apContext)
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        P(0xFFFD, 0xFFF1'0003, 0xFFF1'0003),
+        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
     };
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Proceed())
+    for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
@@ -200,25 +194,25 @@ void TestMultipleClusInfo(nlTestSuite * apSuite, void * apContext)
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        P(0xFFFE, 0xFFF1'0001, 0x0000'FFFD), P(0xFFFE, 0xFFF1'0001, 0x0000'FFFC), P(0xFFFE, 0xFFF1'0002, 0x0000'FFFD),
-        P(0xFFFE, 0xFFF1'0002, 0x0000'FFFC), P(0xFFFE, 0xFFF1'0002, 0xFFF1'0001), P(0xFFFD, 0xFFF1'0001, 0x0000'FFFD),
-        P(0xFFFD, 0xFFF1'0001, 0x0000'FFFC), P(0xFFFD, 0xFFF1'0002, 0x0000'FFFD), P(0xFFFD, 0xFFF1'0002, 0x0000'FFFC),
-        P(0xFFFD, 0xFFF1'0002, 0xFFF1'0001), P(0xFFFD, 0xFFF1'0002, 0xFFF1'0002), P(0xFFFD, 0xFFF1'0003, 0x0000'FFFD),
-        P(0xFFFD, 0xFFF1'0003, 0x0000'FFFC), P(0xFFFD, 0xFFF1'0003, 0xFFF1'0001), P(0xFFFD, 0xFFF1'0003, 0xFFF1'0002),
-        P(0xFFFD, 0xFFF1'0003, 0xFFF1'0003), P(0xFFFC, 0xFFF1'0001, 0x0000'FFFD), P(0xFFFC, 0xFFF1'0001, 0x0000'FFFC),
-        P(0xFFFC, 0xFFF1'0001, 0xFFF1'0001), P(0xFFFC, 0xFFF1'0002, 0x0000'FFFD), P(0xFFFC, 0xFFF1'0002, 0x0000'FFFC),
-        P(0xFFFC, 0xFFF1'0002, 0xFFF1'0001), P(0xFFFC, 0xFFF1'0002, 0xFFF1'0002), P(0xFFFC, 0xFFF1'0002, 0xFFF1'0003),
-        P(0xFFFC, 0xFFF1'0002, 0xFFF1'0004), P(0xFFFC, 0xFFF1'0003, 0x0000'FFFD), P(0xFFFC, 0xFFF1'0003, 0x0000'FFFC),
-        P(0xFFFC, 0xFFF1'0004, 0x0000'FFFD), P(0xFFFC, 0xFFF1'0004, 0x0000'FFFC), P(0xFFFD, 0xFFF1'0003, 0xFFF1'0003),
-        P(0xFFFC, 0xFFF1'0001, 0x0000'FFFD), P(0xFFFC, 0xFFF1'0002, 0x0000'FFFD), P(0xFFFC, 0xFFF1'0003, 0x0000'FFFD),
-        P(0xFFFC, 0xFFF1'0004, 0x0000'FFFD), P(0xFFFD, 0xFFF1'0003, 0x0000'FFFD), P(0xFFFD, 0xFFF1'0003, 0x0000'FFFC),
-        P(0xFFFD, 0xFFF1'0003, 0xFFF1'0001), P(0xFFFD, 0xFFF1'0003, 0xFFF1'0002), P(0xFFFD, 0xFFF1'0003, 0xFFF1'0003),
-        P(0xFFFD, 0xFFF1'0003, 0xFFF1'0003),
+        { 0xFFFE, 0xFFF1'0001, 0x0000'FFFD }, { 0xFFFE, 0xFFF1'0001, 0x0000'FFFC }, { 0xFFFE, 0xFFF1'0002, 0x0000'FFFD },
+        { 0xFFFE, 0xFFF1'0002, 0x0000'FFFC }, { 0xFFFE, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0001, 0x0000'FFFD },
+        { 0xFFFD, 0xFFF1'0001, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0002, 0x0000'FFFD }, { 0xFFFD, 0xFFF1'0002, 0x0000'FFFC },
+        { 0xFFFD, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0002, 0xFFF1'0002 }, { 0xFFFD, 0xFFF1'0003, 0x0000'FFFD },
+        { 0xFFFD, 0xFFF1'0003, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0002 },
+        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 }, { 0xFFFC, 0xFFF1'0001, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0001, 0x0000'FFFC },
+        { 0xFFFC, 0xFFF1'0001, 0xFFF1'0001 }, { 0xFFFC, 0xFFF1'0002, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0002, 0x0000'FFFC },
+        { 0xFFFC, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFC, 0xFFF1'0002, 0xFFF1'0002 }, { 0xFFFC, 0xFFF1'0002, 0xFFF1'0003 },
+        { 0xFFFC, 0xFFF1'0002, 0xFFF1'0004 }, { 0xFFFC, 0xFFF1'0003, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0003, 0x0000'FFFC },
+        { 0xFFFC, 0xFFF1'0004, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0004, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
+        { 0xFFFC, 0xFFF1'0001, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0002, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0003, 0x0000'FFFD },
+        { 0xFFFC, 0xFFF1'0004, 0x0000'FFFD }, { 0xFFFD, 0xFFF1'0003, 0x0000'FFFD }, { 0xFFFD, 0xFFF1'0003, 0x0000'FFFC },
+        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0002 }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
+        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
     };
 
     size_t index = 0;
 
-    for (app::AttributePathExpandIterator iter(&clusInfo1); iter.Get(path); iter.Proceed())
+    for (app::AttributePathExpandIterator iter(&clusInfo1); iter.Get(path); iter.Next())
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));

@@ -23,8 +23,12 @@
  *     - It contains four clusters: 0xFFF1'0001 to 0xFFF1'0004
  *     - All cluster has two global attribute (0x0000'FFFC, 0x0000'FFFD)
  *     - Some clusters has some cluster-specific attributes, with 0xFFF1 prefix.
+ *
+ *    Note: The ember's attribute-storage.cpp will include some app specific generated files. So we cannot use it directly. This
+ *    might be fixed with a mock endpoint-config.h
  */
 
+#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/util/mock/Constants.h>
 
@@ -39,9 +43,7 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-// Mock Functions
 typedef uint8_t EmberAfClusterMask;
-#define CLUSTER_MASK_SERVER (0x40)
 
 using namespace chip;
 using namespace chip::Test;
@@ -112,7 +114,7 @@ uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::Cluster
             return attributeCount[i + clusterIndex[endpointIndex]];
         }
     }
-    return UINT16_MAX;
+    return 0;
 }
 
 uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, chip::ClusterId cluster,
@@ -140,7 +142,8 @@ uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, 
 
 chip::EndpointId emberAfEndpointFromIndex(uint16_t index)
 {
-    return index < ArraySize(endpoints) ? endpoints[index] : app::ConcreteAttributePath::kInvalidEndpointId;
+    VerifyOrDie(index < ArraySize(endpoints));
+    return endpoints[index];
 }
 
 chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint, uint8_t n, bool server)

@@ -18,8 +18,8 @@
 
 #pragma once
 
+#include <app/ClusterInfo.h>
 #include <app/util/basic-types.h>
-
 namespace chip {
 namespace app {
 
@@ -28,10 +28,6 @@ namespace app {
  */
 struct ConcreteAttributePath
 {
-    static constexpr EndpointId kInvalidEndpointId   = 0xFFFF;
-    static constexpr ClusterId kInvalidClusterId     = 0xFFFF'FFFF;
-    static constexpr AttributeId kInvalidAttributeId = 0xFFFF'FFFF;
-
     ConcreteAttributePath() {}
     ConcreteAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         mEndpointId(aEndpointId), mClusterId(aClusterId), mAttributeId(aAttributeId)
@@ -43,8 +39,8 @@ struct ConcreteAttributePath
     }
 
     EndpointId mEndpointId   = kInvalidEndpointId;
-    ClusterId mClusterId     = kInvalidClusterId;
-    AttributeId mAttributeId = kInvalidAttributeId;
+    ClusterId mClusterId     = ClusterInfo::kInvalidClusterId;
+    AttributeId mAttributeId = ClusterInfo::kInvalidAttributeId;
 };
 } // namespace app
 } // namespace chip

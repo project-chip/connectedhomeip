@@ -247,7 +247,7 @@ bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
 // and those indexes may be DIFFERENT than the indexes returned from
 // emberAfGetNthCluster().  In other words:
 //
-//  - Use emberAfGetClustersFromEndpoint()  with emberAfGetNthCluster() amberAfGetNthClusterId()
+//  - Use emberAfGetClustersFromEndpoint()  with emberAfGetNthCluster() emberAfGetNthClusterId()
 //  - Use emberAfGetClusterCountForEndpoint() with emberAfGetClusterByIndex()
 //
 // Don't mix them.
@@ -260,13 +260,11 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, Emb
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 
-// Get the number of attributs of the specific cluster under the endpoint. Is useful for the application to get the basic infomation
-// of or iterate over the attributes.
+// Get the number of attributes of the specific cluster under the endpoint.
 // Returns 0 if the cluster does not exist.
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster);
 
-// Get the index of attribut of the specific cluster under the endpoint. Is useful for the application to get the basic infomation
-// of or iterate over the attributes.
+// Get the index of the given attribute of the specific cluster under the endpoint.
 // Returns UINT16_MAX if the attribute does not exist.
 uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                      chip::AttributeId attributeId);
