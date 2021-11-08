@@ -271,6 +271,9 @@ void Device::OnNewConnection(SessionHandle session)
     // we need to restore the session counters along with the session information.
     Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
     VerifyOrReturn(secureSession != nullptr);
+
+    secureSession->SetMRPIntervals(mMrpIdleInterval, mMrpActiveInterval);
+
     MessageCounter & localCounter = secureSession->GetSessionMessageCounter().GetLocalMessageCounter();
     if (localCounter.SetCounter(mLocalMessageCounter) != CHIP_NO_ERROR)
     {
@@ -420,11 +423,13 @@ CHIP_ERROR Device::CloseSession()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
+CHIP_ERROR Device::UpdateDeviceData(const Transport::PeerAddress & addr, uint32_t mrpIdleInterval, uint32_t mrpActiveInterval)
 {
     bool didLoad;
 
-    mDeviceAddress = addr;
+    mDeviceAddress     = addr;
+    mMrpIdleInterval   = mrpIdleInterval;
+    mMrpActiveInterval = mrpActiveInterval;
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
@@ -439,6 +444,7 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
 
     Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
     secureSession->SetPeerAddress(addr);
+    secureSession->SetMRPIntervals(mrpIdleInterval, mrpActiveInterval);
 
     return CHIP_NO_ERROR;
 }
@@ -552,6 +558,9 @@ CHIP_ERROR Device::WarmupCASESession()
     {
         return CHIP_ERROR_NO_MEMORY;
     }
+
+    session.Value().GetUnauthenticatedSession()->SetMRPIntervals(mMrpIdleInterval, mMrpActiveInterval);
+
     Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(session.Value(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
