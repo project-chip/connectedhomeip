@@ -28,13 +28,12 @@ jobs:
         name: Build Doxygen
         timeout-minutes: 5
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         if: github.actor != 'restyled-io[bot]'
 
-        container:
-            image: connectedhomeip/chip-build-doxygen:0.5.27
-
         steps:
+            - name: "Print Actor"
+              run: echo ${{github.actor}}
             - name: Checkout
               uses: actions/checkout@v2
               with:
