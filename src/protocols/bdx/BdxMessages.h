@@ -120,11 +120,13 @@ struct BdxMessage
      */
     virtual size_t MessageSize() const = 0;
 
+#if CHIP_AUTOMATION_LOGGING
     /**
      * @brief
      * Log all parameters for this message.
      */
     virtual void LogMessage() const = 0;
+#endif // CHIP_AUTOMATION_LOGGING
 
     virtual ~BdxMessage() = default;
 };
@@ -136,7 +138,7 @@ struct BdxMessage
 struct TransferInit : public BdxMessage
 {
     TransferInit() {}
-    TransferInit(bdx::MessageType messageType) { MessageType = messageType; }
+    TransferInit(bdx::MessageType messageType) { mMessageType = messageType; }
 
     /**
      * @brief
@@ -167,12 +169,14 @@ struct TransferInit : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
     void LogMessage() const override;
+#endif // CHIP_AUTOMATION_LOGGING
 
 private:
     // These are only needed for logging purpose
-    bdx::MessageType MessageType;
-    BitFlags<RangeControlFlags> RangeCtlFlags;
+    bdx::MessageType mMessageType;
+    BitFlags<RangeControlFlags> mRangeCtlFlags;
 };
 
 using SendInit    = TransferInit;
@@ -207,7 +211,9 @@ struct SendAccept : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
     void LogMessage() const override;
+#endif // CHIP_AUTOMATION_LOGGING
 };
 
 /**
@@ -242,11 +248,13 @@ struct ReceiveAccept : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
     void LogMessage() const override;
+#endif // CHIP_AUTOMATION_LOGGING
 
 private:
     // This is only needed for logging purpose
-    BitFlags<RangeControlFlags> RangeCtlFlags;
+    BitFlags<RangeControlFlags> mRangeCtlFlags;
 };
 
 /**
@@ -256,7 +264,7 @@ private:
 struct CounterMessage : public BdxMessage
 {
     CounterMessage() {}
-    CounterMessage(bdx::MessageType messageType) { MessageType = messageType; }
+    CounterMessage(bdx::MessageType messageType) { mMessageType = messageType; }
 
     /**
      * @brief
@@ -269,11 +277,13 @@ struct CounterMessage : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
     void LogMessage() const override;
+#endif // CHIP_AUTOMATION_LOGGING
 
 private:
     // This is only needed for logging purpose
-    bdx::MessageType MessageType;
+    bdx::MessageType mMessageType;
 };
 
 using BlockQuery  = CounterMessage;
@@ -286,7 +296,7 @@ using BlockAckEOF = CounterMessage;
 struct DataBlock : public BdxMessage
 {
     DataBlock() {}
-    DataBlock(bdx::MessageType messageType) { MessageType = messageType; }
+    DataBlock(bdx::MessageType messageType) { mMessageType = messageType; }
 
     /**
      * @brief
@@ -307,11 +317,13 @@ struct DataBlock : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
     void LogMessage() const override;
+#endif // CHIP_AUTOMATION_LOGGING
 
 private:
     // This is only needed for logging purpose
-    bdx::MessageType MessageType;
+    bdx::MessageType mMessageType;
 };
 
 using Block    = DataBlock;
