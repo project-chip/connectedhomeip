@@ -5,16 +5,16 @@ control.
 
 ---
 
-- [CHIP ESP32 All Clusters Example](#chip-esp32-all-clusters-example)
-  - [Supported Devices](#supported-devices)
-  - [Building the Example Application](#building-the-example-application)
-  - [Commissioning and cluster control](#commissioning-and-cluster-control)
-    - [Setting up Python Controller](#setting-up-python-controller)
-    - [Commissioning over BLE](#commissioning-over-ble)
-    - [Cluster control](#cluster-control)
-    - [Flashing app using script](#flashing-app-using-script)
-    - [Note](#note)
-  - [Using the RPC console](#using-the-rpc-console)
+-   [CHIP ESP32 All Clusters Example](#chip-esp32-all-clusters-example)
+    -   [Supported Devices](#supported-devices)
+    -   [Building the Example Application](#building-the-example-application)
+    -   [Commissioning and cluster control](#commissioning-and-cluster-control)
+        -   [Setting up Python Controller](#setting-up-python-controller)
+        -   [Commissioning over BLE](#commissioning-over-ble)
+        -   [Cluster control](#cluster-control)
+        -   [Flashing app using script](#flashing-app-using-script)
+        -   [Note](#note)
+    -   [Using the RPC console](#using-the-rpc-console)
 
 ---
 
