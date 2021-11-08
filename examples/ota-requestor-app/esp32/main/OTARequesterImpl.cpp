@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/device/OperationalDeviceProxy.h>
 #include <app/server/Server.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
@@ -32,10 +32,10 @@
 
 using chip::ByteSpan;
 using chip::CharSpan;
-using chip::Optional;
 using chip::EndpointId;
 using chip::FabricIndex;
 using chip::NodeId;
+using chip::Optional;
 using chip::Server;
 using chip::VendorId;
 using chip::bdx::TransferSession;
@@ -72,7 +72,7 @@ ExchangeContext * exchangeCtx = nullptr;
 BdxDownloader bdxDownloader;
 enum OTARequestorCommands operationalDeviceContext;
 
-constexpr uint8_t kMaxUpdateTokenLen        = 32;   // must be between 8 and 32
+constexpr uint8_t kMaxUpdateTokenLen        = 32; // must be between 8 and 32
 uint8_t mOtaUpdateToken[kMaxUpdateTokenLen] = { 0 };
 uint8_t mOtaUpdateTokenLen                  = 0;
 
