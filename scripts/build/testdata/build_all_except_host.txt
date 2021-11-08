@@ -168,9 +168,7 @@ cp examples/all-clusters-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-cl
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo -e "
-CONFIG_DISABLE_IPV4=y
-" >>{out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
@@ -238,9 +236,7 @@ cp examples/all-clusters-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stac
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo -e "
-CONFIG_DISABLE_IPV4=y
-" >>{out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
@@ -264,9 +260,7 @@ cp examples/all-clusters-app/esp32/sdkconfig_m5stack_rpc.defaults {out}/esp32-m5
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo -e "
-CONFIG_DISABLE_IPV4=y
-" >>{out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
