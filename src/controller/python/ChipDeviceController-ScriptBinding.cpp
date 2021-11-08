@@ -47,9 +47,9 @@
 #include "chip/interaction_model/Delegate.h"
 
 #include <app/CommandSender.h>
+#include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
-#include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -77,7 +77,7 @@ static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python ass
 extern "C" {
 typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataLen);
 typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
-typedef void (*DeviceAvailableFunc)(Device * device, ChipError::StorageType err);
+typedef void (*DeviceAvailableFunc)(DeviceProxy * device, ChipError::StorageType err);
 typedef void (*ChipThreadTaskRunnerFunct)(intptr_t context);
 }
 
@@ -163,7 +163,7 @@ void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 
 ChipError::StorageType pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                                          DeviceAvailableFunc callback);
-uint64_t pychip_GetCommandSenderHandle(chip::Controller::Device * device);
+uint64_t pychip_GetCommandSenderHandle(chip::DeviceProxy * device);
 // CHIP Stack objects
 ChipError::StorageType pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
 
@@ -326,11 +326,11 @@ ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::Devic
     return devCtrl->PairDevice(nodeid, params).AsInteger();
 }
 
-void CloseSessionCallback(Device * device, ChipError::StorageType err)
+void CloseSessionCallback(DeviceProxy * device, ChipError::StorageType err)
 {
     if (device != nullptr)
     {
-        device->CloseSession();
+        device->Disconnect();
     }
     if (!ChipError::IsSuccess(err))
     {
@@ -390,7 +390,8 @@ ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Con
                                                                        chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
                                                                        uint16_t discriminator, uint8_t option)
 {
-    return devCtrl->OpenCommissioningWindow(nodeid, timeout, iteration, discriminator, option).AsInteger();
+    SetupPayload payload;
+    return devCtrl->OpenCommissioningWindow(nodeid, timeout, iteration, discriminator, option, payload).AsInteger();
 }
 
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl)
@@ -530,7 +531,7 @@ struct GetDeviceCallbacks
         mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnConnectionFailureFn, this), mCallback(callback)
     {}
 
-    static void OnDeviceConnectedFn(void * context, Device * device)
+    static void OnDeviceConnectedFn(void * context, DeviceProxy * device)
     {
         auto * self = static_cast<GetDeviceCallbacks *>(context);
         self->mCallback(device, CHIP_NO_ERROR.AsInteger());
@@ -567,7 +568,7 @@ ChipError::StorageType pychip_DeviceCommissioner_CloseBleConnection(chip::Contro
 #endif
 }
 
-uint64_t pychip_GetCommandSenderHandle(chip::Controller::Device * device)
+uint64_t pychip_GetCommandSenderHandle(chip::DeviceProxy * device)
 {
     return 0;
 }
