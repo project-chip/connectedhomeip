@@ -36165,7 +36165,7 @@ private:
 
     void OnSuccessResponse_11(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
     {
-        VerifyOrReturn(CheckValue<uint8_t>("capacity", capacity, 255));
+        VerifyOrReturn(CheckValue<uint8_t>("capacity", capacity, 5));
 
         VerifyOrReturn(CheckValueAsList("groupList", groupList, 1, 32767));
         NextTest();
@@ -36427,7 +36427,7 @@ private:
 
     void OnSuccessResponse_19(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
     {
-        VerifyOrReturn(CheckValue<uint8_t>("capacity", capacity, 255));
+        VerifyOrReturn(CheckValue<uint8_t>("capacity", capacity, 6));
 
         VerifyOrReturn(CheckValueAsList("groupList", groupList, 1, 32767));
         NextTest();

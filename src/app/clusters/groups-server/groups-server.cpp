@@ -77,20 +77,20 @@ static FabricIndex GetFabricIndex(app::CommandHandler * commandObj)
 
 static bool GroupExists(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
 {
-    GroupDataProvider * groups = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != groups, false);
+    GroupDataProvider * provider = GetGroupDataProvider();
+    VerifyOrReturnError(nullptr != provider, false);
 
     GroupDataProvider::GroupMapping mapping(endpointId, groupId);
 
-    return groups->GroupMappingExists(fabricIndex, mapping);
+    return provider->GroupMappingExists(fabricIndex, mapping);
 }
 
 static bool GroupFind(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, CharSpan & name)
 {
-    GroupDataProvider * groups = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != groups, false);
+    GroupDataProvider * provider = GetGroupDataProvider();
+    VerifyOrReturnError(nullptr != provider, false);
 
-    auto * groupIt = groups->IterateGroupMappings(fabricIndex, endpointId);
+    auto * groupIt = provider->IterateGroupMappings(fabricIndex, endpointId);
     VerifyOrReturnError(nullptr != groupIt, false);
 
     GroupDataProvider::GroupMapping mapping;
@@ -119,11 +119,11 @@ static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, Gr
         return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
     }
 
-    GroupDataProvider * groups = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != groups, EMBER_ZCL_STATUS_NOT_FOUND);
+    GroupDataProvider * provider = GetGroupDataProvider();
+    VerifyOrReturnError(nullptr != provider, EMBER_ZCL_STATUS_NOT_FOUND);
     GroupDataProvider::GroupMapping mapping(endpointId, groupId, groupName);
 
-    CHIP_ERROR err = groups->AddGroupMapping(fabricIndex, mapping);
+    CHIP_ERROR err = provider->AddGroupMapping(fabricIndex, mapping);
     if (CHIP_NO_ERROR == err)
     {
         return EMBER_ZCL_STATUS_SUCCESS;
@@ -142,11 +142,11 @@ static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId,
 
     if (GroupExists(fabricIndex, endpointId, groupId))
     {
-        GroupDataProvider * groups = GetGroupDataProvider();
-        VerifyOrReturnError(nullptr != groups, EMBER_ZCL_STATUS_NOT_FOUND);
+        GroupDataProvider * provider = GetGroupDataProvider();
+        VerifyOrReturnError(nullptr != provider, EMBER_ZCL_STATUS_NOT_FOUND);
         GroupDataProvider::GroupMapping mapping(endpointId, groupId);
 
-        CHIP_ERROR err = groups->RemoveGroupMapping(fabricIndex, mapping);
+        CHIP_ERROR err = provider->RemoveGroupMapping(fabricIndex, mapping);
         if (CHIP_NO_ERROR == err)
         {
             return EMBER_ZCL_STATUS_SUCCESS;
@@ -163,8 +163,8 @@ static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId,
 
 void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
 {
-    GroupDataProvider * groups = GetGroupDataProvider();
-    uint8_t nameSupport        = (groups && groups->HasGroupNamesSupport()) ? 0x80 : 0x00;
+    GroupDataProvider * provider = GetGroupDataProvider();
+    uint8_t nameSupport          = (provider && provider->HasGroupNamesSupport()) ? 0x80 : 0x00;
 
     EmberAfStatus status = Attributes::NameSupport::Set(endpointId, nameSupport);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -269,24 +269,20 @@ public:
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
 
     GetGroupMembershipResponse(const Commands::GetGroupMembership::DecodableType & data,
-                               GroupDataProvider::GroupMappingIterator * iter) :
+                               GroupDataProvider::GroupMappingIterator * iter, uint8_t capacity) :
         mCommandData(data),
-        mIterator(iter)
+        mIterator(iter), mCapacity(capacity)
     {}
 
     const Commands::GetGroupMembership::DecodableType & mCommandData;
     GroupDataProvider::GroupMappingIterator * mIterator = nullptr;
-
-    uint8_t mCapacity = 0xff;
+    uint8_t mCapacity                                   = 0;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     {
         TLV::TLVType outer;
         ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-        // A capacity of 0xFF means that it is unknown if any further groups may be
-        // added.  Each group requires a binding and, because the binding table is
-        // used for other purposes besides groups, we can't be sure what the
-        // capacity will be in the future.
+
         ReturnErrorOnFailure(app::DataModel::Encode(
             writer, TLV::ContextTag(to_underlying(Commands::GetGroupMembershipResponse::Fields::kCapacity)), mCapacity));
         {
@@ -331,12 +327,6 @@ public:
                     }
                 }
                 emberAfGroupsClusterPrintln("]");
-
-                // 1.3.6.3.1: If the GroupList field contains one or more group-id’s but does not contain any group
-                // of which the entity is a member, the entity SHALL only respond if the command is unicast
-                VerifyOrReturnError((0 == requestedCount) || (matchCount > 0) ||
-                                        (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST),
-                                    CHIP_ERROR_INVALID_DATA_LIST);
             }
             ReturnErrorOnFailure(writer.EndContainer(type));
         }
@@ -349,20 +339,21 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
                                                     const Commands::GetGroupMembership::DecodableType & commandData)
 {
     auto fabricIndex   = GetFabricIndex(commandObj);
-    auto * groups      = GetGroupDataProvider();
+    auto * provider    = GetGroupDataProvider();
     EmberStatus status = EMBER_ZCL_STATUS_FAILURE;
     CHIP_ERROR err     = CHIP_NO_ERROR;
 
-    if (nullptr == groups)
+    if (nullptr == provider)
     {
         status = emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
     else
     {
-        auto iter = groups->IterateGroupMappings(fabricIndex, commandPath.mEndpointId);
+        auto capacity = provider->GetGroupCapacity(fabricIndex, commandPath.mEndpointId);
+        auto iter     = provider->IterateGroupMappings(fabricIndex, commandPath.mEndpointId);
         VerifyOrExit(nullptr != iter, err = CHIP_ERROR_NO_MEMORY);
 
-        err = commandObj->AddResponseData(commandPath, GetGroupMembershipResponse(commandData, iter));
+        err = commandObj->AddResponseData(commandPath, GetGroupMembershipResponse(commandData, iter, capacity));
         iter->Release();
         if (CHIP_NO_ERROR == err)
         {
@@ -397,9 +388,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
         return true;
     }
 #ifdef EMBER_AF_PLUGIN_SCENES
-    // EMAPPFWKV2-1414: if we remove a group, we should remove any scene
-    // associated with it. ZCL6: 3.6.2.3.5: "Note that if a group is
-    // removed the scenes associated with that group SHOULD be removed."
+    // If a group is, removed the scenes associated with that group SHOULD be removed.
     emberAfScenesClusterRemoveScenesInGroupCallback(endpointId, groupId);
 #endif
     {
@@ -423,34 +412,32 @@ exit:
 bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::RemoveAllGroups::DecodableType & commandData)
 {
-    FabricIndex fabricIndex    = GetFabricIndex(commandObj);
-    GroupDataProvider * groups = GetGroupDataProvider();
-    EndpointId endpointId      = commandPath.mEndpointId;
-    EmberStatus sendStatus     = EMBER_SUCCESS;
-    CHIP_ERROR err             = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    FabricIndex fabricIndex      = GetFabricIndex(commandObj);
+    GroupDataProvider * provider = GetGroupDataProvider();
+    EndpointId endpointId        = commandPath.mEndpointId;
+    EmberStatus sendStatus       = EMBER_SUCCESS;
+    CHIP_ERROR err               = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
 
     emberAfGroupsClusterPrintln("RX: RemoveAllGroups");
+    VerifyOrReturnError(nullptr != provider, true);
 
-    if (groups)
-    {
 #ifdef EMBER_AF_PLUGIN_SCENES
-        auto groupIter = groups->IterateGroupMappings(fabricIndex, endpointId);
-        if (nullptr != groupIter)
-        {
-            GroupDataProvider::GroupMapping mapping;
-            while (groupIter->Next(mapping))
-            {
-                // EMAPPFWKV2-1414: if we remove a group, we should remove any scene
-                // associated with it. ZCL6: 3.6.2.3.5: "Note that if a group is
-                // removed the scenes associated with that group SHOULD be removed."
-                emberAfScenesClusterRemoveScenesInGroupCallback(endpointId, mapping.group);
-            }
-            groupIter->Release();
-        }
-        emberAfScenesClusterRemoveScenesInGroupCallback(endpointId, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
-#endif
-        err = groups->RemoveAllGroupMappings(fabricIndex, endpointId);
+    auto groupIter = provider->IterateGroupMappings(fabricIndex, endpointId);
+    VerifyOrReturnError(nullptr != groupIter, true);
+
+    GroupDataProvider::GroupMapping mapping;
+    while (groupIter->Next(mapping))
+    {
+        // EMAPPFWKV2-1414: if we remove a group, we should remove any scene
+        // associated with it. ZCL6: 3.6.2.3.5: "Note that if a group is
+        // removed the scenes associated with that group SHOULD be removed."
+        emberAfScenesClusterRemoveScenesInGroupCallback(endpointId, mapping.group);
     }
+    groupIter->Release();
+
+    emberAfScenesClusterRemoveScenesInGroupCallback(endpointId, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
+#endif
+    err = provider->RemoveAllGroupMappings(fabricIndex, endpointId);
 
     sendStatus = emberAfSendImmediateDefaultResponse(CHIP_NO_ERROR == err ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
     if (EMBER_SUCCESS != sendStatus)
@@ -496,11 +483,6 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
 bool emberAfGroupsClusterEndpointInGroupCallback(chip::FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
 {
     return GroupExists(fabricIndex, endpointId, groupId);
-}
-
-bool emberAfPluginGroupsServerGroupNamesSupportedCallback(EndpointId endpointId)
-{
-    return false;
 }
 
 void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, const CharSpan & groupName) {}

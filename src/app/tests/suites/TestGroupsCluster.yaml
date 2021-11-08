@@ -185,7 +185,7 @@ tests:
       response:
           values:
               - name: "capacity"
-                value: 0xff
+                value: 5
               - name: "groupList"
                 value: [0x01, 0x7fff]
 
@@ -199,7 +199,7 @@ tests:
       response:
           values:
               - name: "capacity"
-                value: 0xff
+                value: 5
               - name: "groupList"
                 value: [0x01, 0x1111, 0x7fff]
 
@@ -309,7 +309,7 @@ tests:
       response:
           values:
               - name: "capacity"
-                value: 0xff
+                value: 6
               - name: "groupList"
                 value: [0x01, 0x7fff]
 
@@ -367,6 +367,6 @@ tests:
       response:
           values:
               - name: "capacity"
-                value: 0xff
+                value: 8
               - name: "groupList"
                 value: []

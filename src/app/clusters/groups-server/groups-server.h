@@ -20,14 +20,6 @@
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
 
-/** @brief Group Names Supported
- *
- * This function returns whether or not group names are supported.
- *
- * @param endpoint Endpoint Ver.: always
- */
-bool emberAfPluginGroupsServerGroupNamesSupportedCallback(chip::EndpointId endpoint);
-
 /** @brief Groups Cluster Endpoint In Group
  *
  * This function is called by the framework when it needs to determine if an

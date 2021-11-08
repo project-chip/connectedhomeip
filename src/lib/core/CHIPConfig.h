@@ -2596,8 +2596,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_CONFIG_MAX_GROUP_NAME_LENGTH
  *
  * @brief Defines the maximum length of the group names
- *
- * Number of iterator instances that can be allocated at any one time
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_NAME_LENGTH
 #define CHIP_CONFIG_MAX_GROUP_NAME_LENGTH 16

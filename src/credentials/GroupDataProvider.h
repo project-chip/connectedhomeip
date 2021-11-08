@@ -187,6 +187,7 @@ public:
 
     // Endpoints
     virtual bool HasGroupNamesSupport()                                                                 = 0;
+    virtual uint8_t GetGroupCapacity(chip::FabricIndex fabric_index, chip::GroupId group_id)            = 0;
     virtual bool GroupMappingExists(chip::FabricIndex fabric_index, const GroupMapping & mapping)       = 0;
     virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping)    = 0;
     virtual CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping) = 0;
@@ -223,7 +224,7 @@ public:
     virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, KeySet & keys)       = 0;
     virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index)                   = 0;
     /**
-     *  Returns an iterator that may be used to obtain the KeySets associated with the givn fabric. The number
+     *  Returns an iterator that may be used to obtain the KeySets associated with the given fabric. The number
      *  of concurrent iterator instances is limited, and must be released using their own Release() method.
      *  @retval An instance of KeySetIterator on success
      *  @retval nullptr if no iterator instances are available.
