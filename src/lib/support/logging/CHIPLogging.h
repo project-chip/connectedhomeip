@@ -190,7 +190,7 @@ void SetLogFilter(uint8_t category);
  *
  */
 #ifndef ChipLogAutomation
-#define ChipLogAutomation(MSG, ...)                                                                                               \
+#define ChipLogAutomation(MSG, ...)                                                                                                \
     chip::Logging::Log(chip::Logging::kLogModule_Automation, chip::Logging::kLogCategory_Automation, MSG, ##__VA_ARGS__)
 #endif
 #else
