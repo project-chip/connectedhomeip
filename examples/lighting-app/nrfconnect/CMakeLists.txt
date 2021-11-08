@@ -84,7 +84,7 @@ chip_configure_data_model(app
     INCLUDE_CLIENT_CALLBACKS
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
-    GEN_DIR ${GEN_DIR}/lock-app/zap-generated
+    GEN_DIR ${GEN_DIR}/lighting-app/zap-generated
 )
 
 if(BUILD_WITH_DFU)
