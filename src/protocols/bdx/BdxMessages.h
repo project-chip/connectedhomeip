@@ -125,7 +125,7 @@ struct BdxMessage
      * @brief
      * Log all parameters for this message.
      */
-    virtual void LogMessage() const = 0;
+    virtual void LogMessage(bdx::MessageType messageType) const = 0;
 #endif // CHIP_AUTOMATION_LOGGING
 
     virtual ~BdxMessage() = default;
@@ -137,9 +137,6 @@ struct BdxMessage
  */
 struct TransferInit : public BdxMessage
 {
-    TransferInit() {}
-    TransferInit(bdx::MessageType messageType) { mMessageType = messageType; }
-
     /**
      * @brief
      *  Equality check method.
@@ -149,6 +146,9 @@ struct TransferInit : public BdxMessage
     // Proposed Transfer Control (required)
     BitFlags<TransferControlFlags> TransferCtlOptions;
     uint8_t Version = 0; ///< The highest version supported by the sender
+
+    // Range Control
+    BitFlags<RangeControlFlags> mRangeCtlFlags;
 
     // All required
     uint16_t MaxBlockSize = 0; ///< Proposed max block size to use in transfer
@@ -170,13 +170,8 @@ struct TransferInit : public BdxMessage
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
 #if CHIP_AUTOMATION_LOGGING
-    void LogMessage() const override;
+    void LogMessage(bdx::MessageType messageType) const override;
 #endif // CHIP_AUTOMATION_LOGGING
-
-private:
-    // These are only needed for logging purpose
-    bdx::MessageType mMessageType;
-    BitFlags<RangeControlFlags> mRangeCtlFlags;
 };
 
 using SendInit    = TransferInit;
@@ -212,7 +207,7 @@ struct SendAccept : public BdxMessage
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
 #if CHIP_AUTOMATION_LOGGING
-    void LogMessage() const override;
+    void LogMessage(bdx::MessageType messageType) const override;
 #endif // CHIP_AUTOMATION_LOGGING
 };
 
@@ -229,6 +224,9 @@ struct ReceiveAccept : public BdxMessage
 
     // Transfer Control (required, only one should be set)
     BitFlags<TransferControlFlags> TransferCtlFlags;
+
+    // Range Control
+    BitFlags<RangeControlFlags> mRangeCtlFlags;
 
     // All required
     uint8_t Version       = 0; ///< The agreed upon version for the transfer
@@ -249,12 +247,8 @@ struct ReceiveAccept : public BdxMessage
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
 #if CHIP_AUTOMATION_LOGGING
-    void LogMessage() const override;
+    void LogMessage(bdx::MessageType messageType) const override;
 #endif // CHIP_AUTOMATION_LOGGING
-
-private:
-    // This is only needed for logging purpose
-    BitFlags<RangeControlFlags> mRangeCtlFlags;
 };
 
 /**
@@ -263,9 +257,6 @@ private:
  */
 struct CounterMessage : public BdxMessage
 {
-    CounterMessage() {}
-    CounterMessage(bdx::MessageType messageType) { mMessageType = messageType; }
-
     /**
      * @brief
      *  Equality check method.
@@ -278,12 +269,8 @@ struct CounterMessage : public BdxMessage
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
 #if CHIP_AUTOMATION_LOGGING
-    void LogMessage() const override;
+    void LogMessage(bdx::MessageType messageType) const override;
 #endif // CHIP_AUTOMATION_LOGGING
-
-private:
-    // This is only needed for logging purpose
-    bdx::MessageType mMessageType;
 };
 
 using BlockQuery  = CounterMessage;
@@ -295,9 +282,6 @@ using BlockAckEOF = CounterMessage;
  */
 struct DataBlock : public BdxMessage
 {
-    DataBlock() {}
-    DataBlock(bdx::MessageType messageType) { mMessageType = messageType; }
-
     /**
      * @brief
      *  Equality check method.
@@ -318,12 +302,8 @@ struct DataBlock : public BdxMessage
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
 #if CHIP_AUTOMATION_LOGGING
-    void LogMessage() const override;
+    void LogMessage(bdx::MessageType messageType) const override;
 #endif // CHIP_AUTOMATION_LOGGING
-
-private:
-    // This is only needed for logging purpose
-    bdx::MessageType mMessageType;
 };
 
 using Block    = DataBlock;

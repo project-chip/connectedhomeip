@@ -167,12 +167,12 @@ size_t TransferInit::MessageSize() const
 }
 
 #if CHIP_AUTOMATION_LOGGING
-void TransferInit::LogMessage() const
+void TransferInit::LogMessage(bdx::MessageType messageType) const
 {
     char fd[kMaxFileDesignatorLen];
     snprintf(fd, sizeof(fd), "%s", FileDesignator);
 
-    switch (mMessageType)
+    switch (messageType)
     {
     case MessageType::SendInit:
         ChipLogAutomation("SendInit");
@@ -275,8 +275,9 @@ size_t SendAccept::MessageSize() const
 }
 
 #if CHIP_AUTOMATION_LOGGING
-void SendAccept::LogMessage() const
+void SendAccept::LogMessage(bdx::MessageType messageType) const
 {
+    (void) messageType;
     ChipLogAutomation("SendAccept");
     ChipLogAutomation("  Transfer Control: 0x%X", static_cast<unsigned>(TransferCtlFlags.Raw() | Version));
     ChipLogAutomation("  Max Block Size: %" PRIu16, MaxBlockSize);
@@ -417,8 +418,9 @@ size_t ReceiveAccept::MessageSize() const
 }
 
 #if CHIP_AUTOMATION_LOGGING
-void ReceiveAccept::LogMessage() const
+void ReceiveAccept::LogMessage(bdx::MessageType messageType) const
 {
+    (void) messageType;
     ChipLogAutomation("ReceiveAccept");
     ChipLogAutomation("  Transfer Control: 0x%X", TransferCtlFlags.Raw() | Version);
     ChipLogAutomation("  Range Control: 0x%X", mRangeCtlFlags.Raw());
@@ -471,9 +473,9 @@ bool CounterMessage::operator==(const CounterMessage & another) const
 }
 
 #if CHIP_AUTOMATION_LOGGING
-void CounterMessage::LogMessage() const
+void CounterMessage::LogMessage(bdx::MessageType messageType) const
 {
-    switch (mMessageType)
+    switch (messageType)
     {
     case MessageType::BlockQuery:
         ChipLogAutomation("BlockQuery");
@@ -539,9 +541,9 @@ size_t DataBlock::MessageSize() const
 }
 
 #if CHIP_AUTOMATION_LOGGING
-void DataBlock::LogMessage() const
+void DataBlock::LogMessage(bdx::MessageType messageType) const
 {
-    switch (mMessageType)
+    switch (messageType)
     {
     case MessageType::Block:
         ChipLogAutomation("Block");
