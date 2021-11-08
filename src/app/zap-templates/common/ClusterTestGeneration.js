@@ -591,6 +591,11 @@ function isLiteralNull(value, options)
   return (value === null) || (value instanceof NullObject);
 }
 
+function expectedValueHasProp(value, name)
+{
+  return name in value;
+}
+
 //
 // Module exports
 //
@@ -602,3 +607,4 @@ exports.chip_tests_item_response_parameters = chip_tests_item_response_parameter
 exports.chip_tests_pics                     = chip_tests_pics;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
+exports.expectedValueHasProp                = expectedValueHasProp;
