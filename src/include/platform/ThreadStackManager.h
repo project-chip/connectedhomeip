@@ -153,7 +153,22 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     CHIP_ERROR GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
+
+    /**
+     * Sets Sleepy End Device polling configuration and posts kSEDPollingIntervalChange event to inform other software
+     * modules about the change.
+     *
+     * @param[in]  pollingConfig  polling intervals configuration to be set
+     */
     CHIP_ERROR SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
+
+    /**
+     * Requests setting Sleepy End Device fast polling interval on or off.
+     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the fast polling
+     * consumers counter. Fast polling mode is set if the consumers counter is bigger than 0.
+     *
+     * @param[in]  onOff  true if fast polling should be enabled and false otherwise.
+     */
     CHIP_ERROR RequestSEDFastPollingMode(bool onOff);
 #endif
 
