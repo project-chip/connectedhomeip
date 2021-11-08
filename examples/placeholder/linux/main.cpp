@@ -23,28 +23,29 @@
 
 #include "MatterCallbacks.h"
 
-void RunTestCommand()
+std::unique_ptr<TestCommand> RunTestCommand()
 {
     const char * command = LinuxDeviceOptions::GetInstance().command;
     if (command == nullptr)
     {
-        return;
+        return nullptr;
     }
 
     auto test = GetTestCommand(command);
     if (test.get() == nullptr)
     {
         ChipLogError(chipTool, "Specified test command does not exists: %s", command);
-        return;
+        return nullptr;
     }
 
     chip::DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(test.get()));
+    return test;
 }
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-    RunTestCommand();
+    auto test = RunTestCommand();
     ChipLinuxAppMainLoop();
     return 0;
 }
