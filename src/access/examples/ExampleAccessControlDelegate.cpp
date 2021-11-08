@@ -41,11 +41,6 @@ using Entry = chip::Access::AccessControl::Entry;
 using EntryIterator = chip::Access::AccessControl::EntryIterator;
 using Target = Entry::Target;
 
-constexpr int kNumberOfFabrics = 4; // TODO: get from config
-constexpr int kEntriesPerFabric = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
-constexpr int kSubjectsPerEntry = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
-constexpr int kTargetsPerEntry = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
-
 // Pool sizes
 constexpr int kEntryStoragePoolSize = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORGAGE_POOL_SIZE;
 constexpr int kEntryDelegatePoolSize = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE;
@@ -365,6 +360,8 @@ class EntryStorage
 {
 public:
     // ACL support
+    static constexpr int kNumberOfFabrics = 4; // TODO: get from config
+    static constexpr int kEntriesPerFabric = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
     static EntryStorage acl[kNumberOfFabrics * kEntriesPerFabric];
 
     static EntryStorage * FindUnusedInAcl(size_t * index, const FabricIndex * fabricIndex)
@@ -512,8 +509,8 @@ private:
     }
 
 public:
-    static constexpr int kMaxSubjects = 4;
-    static constexpr int kMaxTargets = 3;
+    static constexpr int kMaxSubjects = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
+    static constexpr int kMaxTargets = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
 
 private:
     bool mInUse;
