@@ -31,9 +31,8 @@ const StaticSupportedModesManager StaticSupportedModesManager::instance = Static
 
 const SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
 {
-    for (size_t i = 0; i < EMBER_AF_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT; ++i)
+    for (auto & endpointSpanPair : supportedOptionsByEndpoints)
     {
-        const EndpointSpanPair & endpointSpanPair = supportedOptionsByEndpoints[i];
         if (endpointSpanPair.mEndpointId == endpointId)
         {
             return ModeOptionsProvider(endpointSpanPair.mSpan.data(), endpointSpanPair.mSpan.end());

@@ -70,6 +70,7 @@ static_library("static-supported-modes-manager") {
     "${chip_root}",
     "${chip_root}/src",
     "${chip_root}/zzz_generated/all-clusters-app",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -84,6 +85,7 @@ p6_executable("clusters_app") {
 
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/init_p6Platform.cpp",
     "src/AppTask.cpp",
@@ -91,7 +93,6 @@ p6_executable("clusters_app") {
     "src/ClusterManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
-    "src/static-supported-modes-manager.cpp",
   ]
 
   deps = [
