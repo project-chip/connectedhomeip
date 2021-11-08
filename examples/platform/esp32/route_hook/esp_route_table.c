@@ -117,7 +117,8 @@ static inline bool is_better_route(const esp_route_entry_t * lhs, const esp_rout
     {
         return false;
     }
-    return lhs->preference > rhs->preference || (lhs->preference == rhs->preference && lhs->prefix_length > rhs->prefix_length);
+    return (lhs->prefix_length > rhs->prefix_length) ||
+        (lhs->prefix_length == rhs->prefix_length && lhs->preference > rhs->preference);
 }
 
 static inline bool route_match(const esp_route_entry_t * route, const ip6_addr_t * dest)

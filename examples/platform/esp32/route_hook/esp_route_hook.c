@@ -6,6 +6,7 @@
 
 #include "esp_route_hook.h"
 
+#include <stdint.h>
 #include <string.h>
 
 #include "esp_check.h"
@@ -64,27 +65,35 @@ static bool is_self_address(struct netif * netif, const ip6_addr_t * addr)
 
 static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, uint16_t payload_len, const ip6_addr_t * src_addr)
 {
-    uint16_t offset = sizeof(struct ra_header);
-
-    while (payload_len >= offset + 2)
+    if (payload_len < sizeof(struct ra_header))
     {
-        uint8_t opt_type = icmp_payload[offset];
-        uint8_t opt_len  = icmp_payload[offset + 1] << 3;
+        return;
+    }
+    icmp_payload += sizeof(struct ra_header);
+    payload_len -= sizeof(struct ra_header);
 
-        if (opt_type == ND6_OPTION_TYPE_ROUTE_INFO && !is_self_address(netif, src_addr) && payload_len >= offset + opt_len)
+    while (payload_len >= 2)
+    {
+        uint8_t opt_type = icmp_payload[0];
+        uint8_t opt_len  = icmp_payload[1] << 3;
+
+        if (opt_type == ND6_OPTION_TYPE_ROUTE_INFO && opt_len >= sizeof(rio_header_t) && !is_self_address(netif, src_addr) &&
+            payload_len >= opt_len)
         {
-            rio_header_t * rio_header = (rio_header_t *) &icmp_payload[offset];
-            uint8_t prefix_len_bytes  = rio_header->prefix_length / 8;
+            rio_header_t * rio_header = (rio_header_t *) icmp_payload;
+            uint8_t prefix_len_bytes  = (rio_header->prefix_length + 7) / 8;
             int8_t preference         = -2 * ((rio_header->preference >> 4) & 1) + (((rio_header->preference) >> 3) & 1);
+            const uint8_t * rio_data  = &icmp_payload[sizeof(rio_header_t)];
+            uint8_t rio_data_len      = opt_len - sizeof(rio_header_t);
 
             ESP_LOGI(TAG, "Received RIO");
-            for (uint16_t prefix_offset = sizeof(struct rio_header_t); prefix_offset < opt_len; prefix_offset += prefix_len_bytes)
+            for (; rio_data_len >= prefix_len_bytes; rio_data_len -= prefix_len_bytes, rio_data += prefix_len_bytes)
             {
                 ip6_addr_t prefix;
                 esp_route_entry_t route;
 
                 memset(&prefix, 0, sizeof(prefix));
-                memcpy(&prefix.addr, &icmp_payload[prefix_offset + offset], prefix_len_bytes);
+                memcpy(&prefix.addr, rio_data, prefix_len_bytes);
                 route.netif            = netif;
                 route.gateway          = *src_addr;
                 route.prefix_length    = rio_header->prefix_length;
@@ -98,7 +107,8 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
                 }
             }
         }
-        offset += opt_len;
+        icmp_payload += opt_len;
+        payload_len -= opt_len;
     }
 }
 
