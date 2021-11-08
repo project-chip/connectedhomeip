@@ -118,8 +118,10 @@ void CommandHandler::Close()
 {
     mSuppressResponse = false;
     MoveToState(CommandState::AwaitingDestruction);
-    // We must finish all async work before we can shut down a CommandHandler. The actual CommandHandler MUST finish their work in
-    // reasonable time or there is a bug.
+
+    // We must finish all async work before we can shut down a CommandHandler. The actual CommandHandler MUST finish their work
+    // in reasonable time or there is a bug. The only case for releasing CommandHandler without CommandHandler::Handle releasing its
+    // reference is the stack shutting down, in which case Close() is not called. So the below check should always pass.
     VerifyOrDieWithMsg(mRefCount == 0, DataManagement, "CommandHandler::Close() called with %zu unfinished async work items",
                        mRefCount);
 
@@ -365,6 +367,34 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
     else
     {
         return mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetCommand().GetWriter();
+    }
+}
+
+CommandHandler * CommandHandler::Handle::Get()
+{
+    return (mMagic == InteractionModelEngine::GetInstance()->GetMagicNumber()) ? mpHandler : nullptr;
+}
+
+void CommandHandler::Handle::Release()
+{
+    if (mpHandler != nullptr)
+    {
+        if (mMagic == InteractionModelEngine::GetInstance()->GetMagicNumber())
+        {
+            mpHandler->DecRef();
+        }
+        mpHandler = nullptr;
+        mMagic    = 0;
+    }
+}
+
+CommandHandler::Handle::Handle(CommandHandler * handle)
+{
+    if (handle != nullptr)
+    {
+        handle->IncRef();
+        mpHandler = handle;
+        mMagic    = InteractionModelEngine::GetInstance()->GetMagicNumber();
     }
 }
 

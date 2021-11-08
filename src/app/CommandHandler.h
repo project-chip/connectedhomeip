@@ -79,21 +79,21 @@ public:
         Handle(Handle && handle)
         {
             mpHandler        = handle.mpHandler;
+            mMagic           = handle.mMagic;
             handle.mpHandler = nullptr;
+            handle.mMagic    = 0;
         }
         Handle(decltype(nullptr)) {}
-        Handle(CommandHandler * handle)
-        {
-            handle->IncRef();
-            mpHandler = handle;
-        }
+        Handle(CommandHandler * handle);
         ~Handle() { Release(); }
 
         Handle & operator=(Handle && handle)
         {
             Release();
             mpHandler        = handle.mpHandler;
+            mMagic           = handle.mMagic;
             handle.mpHandler = nullptr;
+            handle.mMagic    = 0;
             return *this;
         }
 
@@ -103,19 +103,13 @@ public:
             return *this;
         }
 
-        CommandHandler * operator->() { return mpHandler; }
+        CommandHandler * Get();
 
-        void Release()
-        {
-            if (mpHandler != nullptr)
-            {
-                mpHandler->DecRef();
-                mpHandler = nullptr;
-            }
-        }
+        void Release();
 
     private:
         CommandHandler * mpHandler = nullptr;
+        uint32_t mMagic            = 0;
     };
 
     /*
@@ -195,11 +189,11 @@ private:
      */
     CHIP_ERROR AllocateBuffer();
 
-    //
-    // Called internally to signal the completion of all work on this object, gracefully close the
-    // exchange (by calling into the base class) and finally, signal to a registerd callback that it's
-    // safe to release this object.
-    //
+    /**
+     * Called internally to signal the completion of all work on this object, gracefully close the
+     * exchange (by calling into the base class) and finally, signal to a registerd callback that it's
+     * safe to release this object.
+     */
     void Close();
 
     CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
