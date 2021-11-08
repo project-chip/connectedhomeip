@@ -55,7 +55,7 @@ p6_sdk_sources("all_clusters_app_sdk_sources") {
 }
 
 static_library("static-supported-modes-manager") {
-  sources = [ "src/static-supported-modes-manager.cpp" ]
+  sources = [ "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp" ]
 
   #zap_pregenerated_dir = "${chip_root}/zzz_generated"
 
@@ -70,6 +70,7 @@ static_library("static-supported-modes-manager") {
     "${chip_root}",
     "${chip_root}/src",
     "${chip_root}/zzz_generated/all-clusters-app",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -91,7 +92,6 @@ p6_executable("clusters_app") {
     "src/ClusterManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
-    "src/static-supported-modes-manager.cpp",
   ]
 
   deps = [

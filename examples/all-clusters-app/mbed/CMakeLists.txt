@@ -37,6 +37,7 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
                            ${CMAKE_CURRENT_SOURCE_DIR}/main/include/
                            ${APP_ROOT}/all-clusters-common
+                           ${APP_ROOT}/all-clusters-common/include
                            ${APP_CLUSTERS}
                            ${MBED_COMMON}/util/include
                            ${CHIP_ROOT}/src/app
@@ -50,7 +51,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/LowPowerManager.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/main/static-supported-modes-manager.cpp
 
                ${MBED_COMMON}/util/LEDWidget.cpp
 
@@ -69,6 +69,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
 
                ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+               ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
                ${APP_UTIL}/DataModelHandler.cpp
                ${APP_UTIL}/af-event.cpp

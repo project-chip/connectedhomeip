@@ -16,7 +16,9 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 static_library("static-supported-modes-manager") {
-  sources = [ "include/static-supported-modes-manager.cpp" ]
+  sources = [ 
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+  ]
 
   #zap_pregenerated_dir = "${chip_root}/zzz_generated"
 
@@ -29,13 +31,13 @@ static_library("static-supported-modes-manager") {
   ]
   include_dirs = [
     "include",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
     "${chip_root}/src",
     "${chip_root}/zzz_generated/all-clusters-app",
   ]
 
   cflags = [ "-Wconversion" ]
 
-  print("include_dirs = ")
 }
 
 executable("chip-all-clusters-app") {
