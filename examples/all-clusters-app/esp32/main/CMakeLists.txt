@@ -19,6 +19,7 @@
 # The list of src and include dirs must be in sync with that in all-clusters-app/esp32/main/component.mk
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/all-clusters-app"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/include"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
 )
 set(SRC_DIRS_LIST
