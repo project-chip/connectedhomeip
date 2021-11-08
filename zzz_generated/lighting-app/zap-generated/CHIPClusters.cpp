@@ -39,10 +39,9 @@ namespace Controller {
 CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000000;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<BooleanAttributeCallback>);
 }
@@ -51,10 +50,9 @@ CHIP_ERROR OnOffCluster::SubscribeAttributeOnOff(Callback::Cancelable * onSucces
                                                  uint16_t minInterval, uint16_t maxInterval)
 {
     chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OnOff::Attributes::OnOff::Id;
-
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = OnOff::Attributes::OnOff::Id;
     return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
 }
 
@@ -68,10 +66,9 @@ CHIP_ERROR OnOffCluster::ReadAttributeGlobalSceneControl(Callback::Cancelable * 
                                                          Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004000;
-
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00004000;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<BooleanAttributeCallback>);
 }
@@ -79,10 +76,9 @@ CHIP_ERROR OnOffCluster::ReadAttributeGlobalSceneControl(Callback::Cancelable * 
 CHIP_ERROR OnOffCluster::ReadAttributeOnTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004001;
-
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00004001;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
@@ -102,10 +98,9 @@ CHIP_ERROR OnOffCluster::ReadAttributeOffWaitTime(Callback::Cancelable * onSucce
                                                   Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004002;
-
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00004002;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
@@ -125,10 +120,9 @@ CHIP_ERROR OnOffCluster::ReadAttributeStartUpOnOff(Callback::Cancelable * onSucc
                                                    Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004003;
-
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00004003;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
@@ -147,10 +141,9 @@ CHIP_ERROR OnOffCluster::WriteAttributeStartUpOnOff(Callback::Cancelable * onSuc
 CHIP_ERROR OnOffCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFC;
-
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000FFFC;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int32uAttributeCallback>);
 }
@@ -159,10 +152,9 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
                                                       Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000FFFD;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
