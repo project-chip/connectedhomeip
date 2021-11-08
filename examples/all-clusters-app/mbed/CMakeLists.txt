@@ -120,6 +120,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/scenes/scenes.cpp
                ${APP_CLUSTERS}/target-navigator-server/target-navigator-server.cpp
                ${APP_CLUSTERS}/thermostat-server/thermostat-server.cpp
+               ${APP_CLUSTERS}/thermostat-user-interface-configuration-server/thermostat-user-interface-configuration-server.cpp
                ${APP_CLUSTERS}/tv-channel-server/tv-channel-server.cpp
                ${APP_CLUSTERS}/operational-credentials-server/operational-credentials-server.cpp
                ${APP_CLUSTERS}/test-cluster-server/test-cluster-server.cpp
