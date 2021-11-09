@@ -17,7 +17,9 @@
 
 function getTests()
 {
-  const tests = [];
+  const tests = [
+    "Test_TC_DM_1_3",
+  ];
 
   return tests.join(', ');
 }

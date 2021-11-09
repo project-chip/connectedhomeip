@@ -55,6 +55,7 @@ function getTests()
   const DeviceManagement = [
     'Test_TC_DM_1_1',
     'Test_TC_DM_3_1',
+    'Test_TC_DM_2_2',
   ];
 
   const ElectricalMeasurement = [

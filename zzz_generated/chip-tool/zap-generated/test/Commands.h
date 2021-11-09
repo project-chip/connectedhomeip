@@ -11856,6 +11856,195 @@ private:
     //
 };
 
+class Test_TC_DM_2_2 : public TestCommand
+{
+public:
+    Test_TC_DM_2_2() : TestCommand("Test_TC_DM_2_2"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DM_2_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DM_2_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Query fabrics list\n");
+            err = TestQueryFabricsList_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Query Supported Fabrics\n");
+            err = TestQuerySupportedFabrics_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Query Commissioned Fabrics\n");
+            err = TestQueryCommissionedFabrics_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Query User Trusted Root Certificates\n");
+            err = TestQueryUserTrustedRootCertificates_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(
+        void * context,
+        const chip::app::DataModel::DecodableList<
+            chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabricsList)>
+        mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t supportedFabrics)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t commissionedFabrics)> mOnSuccessCallback_2{ OnSuccessCallback_2,
+                                                                                                          this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
+    chip::Callback::Callback<void (*)(void * context,
+                                      const chip::app::DataModel::DecodableList<chip::ByteSpan> & trustedRootCertificates)>
+        mOnSuccessCallback_3{ OnSuccessCallback_3, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_DM_2_2 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void
+    OnSuccessCallback_0(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabricsList)
+    {
+        (static_cast<Test_TC_DM_2_2 *>(context))->OnSuccessResponse_0(fabricsList);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_DM_2_2 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t supportedFabrics)
+    {
+        (static_cast<Test_TC_DM_2_2 *>(context))->OnSuccessResponse_1(supportedFabrics);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_DM_2_2 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint8_t commissionedFabrics)
+    {
+        (static_cast<Test_TC_DM_2_2 *>(context))->OnSuccessResponse_2(commissionedFabrics);
+    }
+
+    static void OnFailureCallback_3(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_DM_2_2 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context,
+                                    const chip::app::DataModel::DecodableList<chip::ByteSpan> & trustedRootCertificates)
+    {
+        (static_cast<Test_TC_DM_2_2 *>(context))->OnSuccessResponse_3(trustedRootCertificates);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestQueryFabricsList_0()
+    {
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeFabricsList(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(const chip::app::DataModel::DecodableList<
+                             chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabricsList)
+    {
+        VerifyOrReturn(CheckValueAsListLength("fabricsList", fabricsList, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestQuerySupportedFabrics_1()
+    {
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeSupportedFabrics(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t supportedFabrics)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("supportedFabrics", supportedFabrics, 16));
+        NextTest();
+    }
+
+    CHIP_ERROR TestQueryCommissionedFabrics_2()
+    {
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeCommissionedFabrics(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint8_t commissionedFabrics)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("commissionedFabrics", commissionedFabrics, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestQueryUserTrustedRootCertificates_3()
+    {
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevice, 0);
+
+        return cluster.ReadAttributeTrustedRootCertificates(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(const chip::app::DataModel::DecodableList<chip::ByteSpan> & trustedRootCertificates)
+    {
+        VerifyOrReturn(CheckValueAsListLength("trustedRootCertificates", trustedRootCertificates, 1));
+        NextTest();
+    }
+};
+
 class Test_TC_EMR_1_1 : public TestCommand
 {
 public:
@@ -28067,6 +28256,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_CC_9_3>(),
         make_unique<Test_TC_DM_1_1>(),
         make_unique<Test_TC_DM_3_1>(),
+        make_unique<Test_TC_DM_2_2>(),
         make_unique<Test_TC_EMR_1_1>(),
         make_unique<Test_TC_FLW_1_1>(),
         make_unique<Test_TC_FLW_2_1>(),
