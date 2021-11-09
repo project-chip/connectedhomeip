@@ -40,8 +40,8 @@
 
 #include <lib/support/ErrorStr.h>
 
-#include <app/clusters/ota-provider/ota-provider.h>
 #include <BdxOtaSender.h>
+#include <app/clusters/ota-provider/ota-provider.h>
 #include <ota-provider-common/OTAProviderExample.h>
 
 using chip::BitFlags;
