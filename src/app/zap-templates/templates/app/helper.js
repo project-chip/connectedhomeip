@@ -16,14 +16,14 @@
  */
 
 // Import helpers from zap core
-const zapPath = '../../../../../third_party/zap/repo/dist/src-electron/';
+const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper = require(zapPath + 'generator/helper-zcl.js')
-const zclQuery = require(zapPath + 'db/query-zcl.js')
-const cHelper = require(zapPath + 'generator/helper-c.js')
-const string = require(zapPath + 'util/string.js')
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const zclQuery     = require(zapPath + 'db/query-zcl.js')
+const cHelper      = require(zapPath + 'generator/helper-c.js')
+const string       = require(zapPath + 'util/string.js')
 
-const StringHelper = require('../../common/StringHelper.js');
+const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 
 // This list of attributes is taken from section '11.2. Global Attributes' of the
@@ -35,7 +35,8 @@ const kGlobalAttributes = [
 
 // TODO Expose the readType as an additional member field of {{asUnderlyingZclType}} instead
 //      of having to call this method separately.
-function asReadType(type) {
+function asReadType(type)
+{
   if (StringHelper.isShortString(type)) {
     return 'String';
   }
@@ -44,36 +45,37 @@ function asReadType(type) {
     return 'LongString';
   }
 
-  function fn(pkgId) {
-    const options = { 'hash': {} };
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
-        case 'bool':
-          return 'Int8u';
-        case 'int8_t':
-          return 'Int8s';
-        case 'uint8_t':
-          return 'Int8u';
-        case 'int16_t':
-          return 'Int16s';
-        case 'uint16_t':
-          return 'Int16u';
-        case 'int24_t':
-          return 'Int24s';
-        case 'uint24_t':
-          return 'Int24u';
-        case 'int32_t':
-          return 'Int32s';
-        case 'uint32_t':
-          return 'Int32u';
-        case 'int64_t':
-          return 'Int64s';
-        case 'uint64_t':
-          return 'Int64u';
-        default:
-          error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
-          throw error;
+      case 'bool':
+        return 'Int8u';
+      case 'int8_t':
+        return 'Int8s';
+      case 'uint8_t':
+        return 'Int8u';
+      case 'int16_t':
+        return 'Int16s';
+      case 'uint16_t':
+        return 'Int16u';
+      case 'int24_t':
+        return 'Int24s';
+      case 'uint24_t':
+        return 'Int24u';
+      case 'int32_t':
+        return 'Int32s';
+      case 'uint32_t':
+        return 'Int32u';
+      case 'int64_t':
+        return 'Int64s';
+      case 'uint64_t':
+        return 'Int64u';
+      default:
+        error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
+        throw error;
       }
     })
   }
@@ -104,18 +106,19 @@ var endpointClusterWithInit = [
   'Pump Configuration and Control',
   'Time Sync',
 ];
-var endpointClusterWithAttributeChanged = ['Identify', 'Door Lock', 'Pump Configuration and Control'];
-var endpointClusterWithPreAttribute = ['IAS Zone', 'Thermostat User Interface Configuration'];
-var endpointClusterWithMessageSent = ['IAS Zone'];
+var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
+var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Thermostat User Interface Configuration' ];
+var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
 /**
  * Populate the GENERATED_FUNCTIONS field
  */
-function chip_endpoint_generated_functions() {
+function chip_endpoint_generated_functions()
+{
   let alreadySetCluster = [];
-  let ret = '\\\n';
+  let ret               = '\\\n';
   this.clusterList.forEach((c) => {
-    let clusterName = c.clusterName;
+    let clusterName  = c.clusterName;
     let functionList = '';
     if (alreadySetCluster.includes(clusterName)) {
       // Only one array of Generated functions per cluster across all endpoints
@@ -123,30 +126,34 @@ function chip_endpoint_generated_functions() {
     }
     if (c.comment.includes('server')) {
       let hasFunctionArray = false
-      if (endpointClusterWithInit.includes(clusterName)) {
+      if (endpointClusterWithInit.includes(clusterName))
+      {
         hasFunctionArray = true
-        functionList = functionList.concat(
-          `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
+        functionList     = functionList.concat(
+            `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
-        functionList = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
+            cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
 
       if (endpointClusterWithMessageSent.includes(clusterName)) {
-        functionList = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+            cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
         hasFunctionArray = true
       }
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
-        functionList = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
+            cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
 
       if (hasFunctionArray) {
         ret = ret.concat(
-          `const EmberAfGenericClusterFunction chipFuncArray${cHelper.asCamelCased(clusterName, false)}Server[] = {\\\n`)
+            `const EmberAfGenericClusterFunction chipFuncArray${cHelper.asCamelCased(clusterName, false)}Server[] = {\\\n`)
         ret = ret.concat(functionList)
         ret = ret.concat(`};\\\n`)
         alreadySetCluster.push(clusterName)
@@ -161,12 +168,13 @@ function chip_endpoint_generated_functions() {
  * To be used as a replacement of endpoint_cluster_list since this one
  * includes the GENERATED_FUNCTIONS array
  */
-function chip_endpoint_cluster_list() {
+function chip_endpoint_cluster_list()
+{
   let ret = '{ \\\n';
   this.clusterList.forEach((c) => {
-    let mask = '';
+    let mask          = '';
     let functionArray = c.functions;
-    let clusterName = c.clusterName;
+    let clusterName   = c.clusterName;
 
     if (c.comment.includes('server')) {
       let hasFunctionArray = false;
@@ -200,47 +208,50 @@ function chip_endpoint_cluster_list() {
     } else {
       mask = c.mask.map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`).join(' | ')
     }
-    ret = ret.concat(`  { ${c.clusterId}, ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), ${c.attributeCount}, ${c.attributeSize}, ${mask}, ${functionArray} }, /* ${c.comment} */ \\\n`)
+    ret = ret.concat(`  { ${c.clusterId}, ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), ${c.attributeCount}, ${c.attributeSize}, ${
+        mask}, ${functionArray} }, /* ${c.comment} */ \\\n`)
   })
   return ret.concat('}\n');
 }
 
 //  End of Endpoint-config specific helpers
 
-function asPrintFormat(type) {
+function asPrintFormat(type)
+{
   if (StringHelper.isString(type)) {
     return '%s';
   }
 
-  function fn(pkgId) {
-    const options = { 'hash': {} };
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
-        case 'bool':
-          return '%d';
-        case 'int8_t':
-          return '%" PRId8 "';
-        case 'uint8_t':
-          return '%" PRIu8 "';
-        case 'int16_t':
-          return '%" PRId16 "';
-        case 'uint16_t':
-          return '%" PRIu16 "';
-        case 'int24_t':
-          return '%" PRId32 "';
-        case 'uint24_t':
-          return '%" PRIu32 "';
-        case 'int32_t':
-          return '%" PRId32 "';
-        case 'uint32_t':
-          return '%" PRIu32 "';
-        case 'int64_t':
-          return '%" PRId64 "';
-        case 'uint64_t':
-          return '%" PRIu64 "';
-        default:
-          return '%p';
+      case 'bool':
+        return '%d';
+      case 'int8_t':
+        return '%" PRId8 "';
+      case 'uint8_t':
+        return '%" PRIu8 "';
+      case 'int16_t':
+        return '%" PRId16 "';
+      case 'uint16_t':
+        return '%" PRIu16 "';
+      case 'int24_t':
+        return '%" PRId32 "';
+      case 'uint24_t':
+        return '%" PRIu32 "';
+      case 'int32_t':
+        return '%" PRId32 "';
+      case 'uint32_t':
+        return '%" PRIu32 "';
+      case 'int64_t':
+        return '%" PRId64 "';
+      case 'uint64_t':
+        return '%" PRIu64 "';
+      default:
+        return '%p';
       }
     })
   }
@@ -252,24 +263,26 @@ function asPrintFormat(type) {
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asTypeLiteralSuffix(type) {
-  function fn(pkgId) {
-    const options = { 'hash': {} };
+function asTypeLiteralSuffix(type)
+{
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
-        case 'int32_t':
-          return 'L';
-        case 'int64_t':
-          return 'LL';
-        case 'uint16_t':
-          return 'U';
-        case 'uint32_t':
-          return 'UL';
-        case 'uint64_t':
-          return 'ULL';
-        default:
-          return '';
+      case 'int32_t':
+        return 'L';
+      case 'int64_t':
+        return 'LL';
+      case 'uint16_t':
+        return 'U';
+      case 'uint32_t':
+        return 'UL';
+      case 'uint64_t':
+        return 'ULL';
+      default:
+        return '';
       }
     })
   }
@@ -281,11 +294,13 @@ function asTypeLiteralSuffix(type) {
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function hasSpecificAttributes(options) {
+function hasSpecificAttributes(options)
+{
   return this.count > kGlobalAttributes.length;
 }
 
-function asLowerCamelCase(label) {
+function asLowerCamelCase(label)
+{
   let str = string.toCamelCase(label, true);
   // Check for the case when were:
   // 1. A single word (that's the regexp at the beginning, which matches the
@@ -297,18 +312,20 @@ function asLowerCamelCase(label) {
   // and if all those conditions hold, preserve the leading capital letters by
   // uppercasing the first one, which got lowercased.
   if (!/ |_|-|\//.test(label) && label.length > 1 && label.substring(0, 2).toUpperCase() == label.substring(0, 2)
-    && label.toUpperCase() != label) {
+      && label.toUpperCase() != label) {
     str = str[0].toUpperCase() + str.substring(1);
   }
   return str.replace(/[\.:]/g, '');
 }
 
-function asUpperCamelCase(label) {
+function asUpperCamelCase(label)
+{
   let str = string.toCamelCase(label, false);
   return str.replace(/[\.:]/g, '');
 }
 
-function asMEI(prefix, suffix) {
+function asMEI(prefix, suffix)
+{
   return cHelper.asHex((prefix << 16) + suffix, 8);
 }
 
@@ -327,10 +344,12 @@ function asMEI(prefix, suffix) {
  * These types can be found in src/app/data-model/.
  *
  */
-async function zapTypeToClusterObjectType(type, isDecodable, options) {
+async function zapTypeToClusterObjectType(type, isDecodable, options)
+{
   let passByReference = false;
-  async function fn(pkgId) {
-    const ns = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
+  async function fn(pkgId)
+  {
+    const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
     const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
     if (await typeChecker('isEnum')) {
@@ -346,7 +365,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options) {
       return ns + 'Structs::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
     }
 
-    return zclHelper.asUnderlyingZclType.call({ global: this.global }, type, options);
+    return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
   }
 
   let typeStr = await templateUtil.ensureZclPackageId(this).then(fn.bind(this));
@@ -355,10 +374,12 @@ async function zapTypeToClusterObjectType(type, isDecodable, options) {
     // If we did not have a namespace provided, we can assume we're inside
     // chip::app.
     let listNamespace = options.hash.ns ? "chip::app::" : ""
-    if (isDecodable) {
+    if (isDecodable)
+    {
       typeStr = `${listNamespace}DataModel::DecodableList<${typeStr}>`;
     }
-    else {
+    else
+    {
       // Use const ${typeStr} so that consumers don't have to create non-const
       // data to encode.
       typeStr = `${listNamespace}DataModel::List<const ${typeStr}>`;
@@ -368,14 +389,14 @@ async function zapTypeToClusterObjectType(type, isDecodable, options) {
     passByReference = true;
     // If we did not have a namespace provided, we can assume we're inside
     // chip::app::.
-    let ns = options.hash.ns ? "chip::app::" : ""
+    let ns  = options.hash.ns ? "chip::app::" : ""
     typeStr = `${ns}DataModel::Nullable<${typeStr}>`;
   }
   if (this.isOptional && !options.hash.forceNotOptional) {
     passByReference = true;
     // If we did not have a namespace provided, we can assume we're inside
     // chip::.
-    let ns = options.hash.ns ? "chip::" : ""
+    let ns  = options.hash.ns ? "chip::" : ""
     typeStr = `${ns}Optional<${typeStr}>`;
   }
   if (options.hash.isArgument && passByReference) {
@@ -384,15 +405,18 @@ async function zapTypeToClusterObjectType(type, isDecodable, options) {
   return templateUtil.templatePromise(this.global, Promise.resolve(typeStr))
 }
 
-function zapTypeToEncodableClusterObjectType(type, options) {
+function zapTypeToEncodableClusterObjectType(type, options)
+{
   return zapTypeToClusterObjectType.call(this, type, false, options)
 }
 
-function zapTypeToDecodableClusterObjectType(type, options) {
+function zapTypeToDecodableClusterObjectType(type, options)
+{
   return zapTypeToClusterObjectType.call(this, type, true, options)
 }
 
-function zapTypeToPythonClusterObjectType(type, options) {
+function zapTypeToPythonClusterObjectType(type, options)
+{
   if (StringHelper.isCharString(type)) {
     return 'str';
   }
@@ -401,7 +425,7 @@ function zapTypeToPythonClusterObjectType(type, options) {
     return 'bytes';
   }
 
-  if (['single', 'double'].includes(type.toLowerCase())) {
+  if ([ 'single', 'double' ].includes(type.toLowerCase())) {
     return 'float';
   }
 
@@ -418,8 +442,9 @@ function zapTypeToPythonClusterObjectType(type, options) {
     return 'uint'
   }
 
-  async function fn(pkgId) {
-    const ns = asUpperCamelCase(options.hash.ns);
+  async function fn(pkgId)
+  {
+    const ns          = asUpperCamelCase(options.hash.ns);
     const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
     if (await typeChecker('isEnum')) {
@@ -434,7 +459,7 @@ function zapTypeToPythonClusterObjectType(type, options) {
       return ns + '.Structs.' + type;
     }
 
-    resolvedType = await zclHelper.asUnderlyingZclType.call({ global: this.global }, type, options);
+    resolvedType = await zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
     {
       basicType = ChipTypesHelper.asBasicType(resolvedType);
       if (basicType.match(/^int\d+_t$/)) {
@@ -455,15 +480,15 @@ function zapTypeToPythonClusterObjectType(type, options) {
 //
 // Module exports
 //
-exports.asPrintFormat = asPrintFormat;
-exports.asReadType = asReadType;
-exports.chip_endpoint_generated_functions = chip_endpoint_generated_functions
-exports.chip_endpoint_cluster_list = chip_endpoint_cluster_list
-exports.asTypeLiteralSuffix = asTypeLiteralSuffix;
-exports.asLowerCamelCase = asLowerCamelCase;
-exports.asUpperCamelCase = asUpperCamelCase;
-exports.hasSpecificAttributes = hasSpecificAttributes;
-exports.asMEI = asMEI;
+exports.asPrintFormat                       = asPrintFormat;
+exports.asReadType                          = asReadType;
+exports.chip_endpoint_generated_functions   = chip_endpoint_generated_functions
+exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
+exports.asTypeLiteralSuffix                 = asTypeLiteralSuffix;
+exports.asLowerCamelCase                    = asLowerCamelCase;
+exports.asUpperCamelCase                    = asUpperCamelCase;
+exports.hasSpecificAttributes               = hasSpecificAttributes;
+exports.asMEI                               = asMEI;
 exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
 exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;
-exports.zapTypeToPythonClusterObjectType = zapTypeToPythonClusterObjectType;
+exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
