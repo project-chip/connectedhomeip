@@ -16,7 +16,12 @@
 # limitations under the License.
 #
 
+# Fail if one of our sub-commands fails.
 set -e
+
+# Fail if anything in a pipeline fails, not just the last command (which for
+# us tends to be 'tee').
+set -o pipefail
 
 declare -i iterations=2
 declare -i delay=0
