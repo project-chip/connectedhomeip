@@ -22,25 +22,37 @@
 
 namespace chip {
 namespace app {
-struct EventPathParams
+
+/**
+ * A representation of a concrete event path.
+ */
+struct ConcreteEventPath
 {
-    EventPathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId, bool aIsUrgent) :
-        mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mIsUrgent(aIsUrgent)
+    ConcreteEventPath(EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId) :
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId)
     {}
-    EventPathParams(EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId) :
-        EventPathParams(0, aEndpointId, aClusterId, aEventId, false)
-    {}
-    EventPathParams() {}
-    bool IsSamePath(const EventPathParams & other) const
+
+    ConcreteEventPath() {}
+
+    ConcreteEventPath & operator=(ConcreteEventPath && other)
     {
-        return other.mNodeId == mNodeId && other.mEndpointId == mEndpointId && other.mClusterId == mClusterId &&
-            other.mEventId == mEventId;
+        if (&other == this)
+            return *this;
+
+        mEndpointId = other.mEndpointId;
+        mClusterId  = other.mClusterId;
+        mEventId    = other.mEventId;
+        return *this;
     }
-    NodeId mNodeId         = 0;
+
+    bool operator==(const ConcreteEventPath & other) const
+    {
+        return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mEventId == other.mEventId;
+    }
+
     EndpointId mEndpointId = 0;
     ClusterId mClusterId   = 0;
     EventId mEventId       = 0;
-    bool mIsUrgent         = false;
 };
 } // namespace app
 } // namespace chip

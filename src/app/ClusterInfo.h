@@ -66,6 +66,8 @@ public:
      */
     bool IsValidAttributePath() const { return HasWildcardListIndex() || !HasWildcardAttributeId(); }
 
+    bool IsValidEventPath() const { return !HasWildcardEventId(); }
+
     inline bool HasWildcardNodeId() const { return mNodeId == kUndefinedNodeId; }
     inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
     inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }

@@ -132,7 +132,9 @@ class MockInteractionModelApp : public chip::app::InteractionModelDelegate,
                                 public ::chip::app::ReadClient::Callback
 {
 public:
-    void OnEventData(const chip::app::ReadClient * apReadClient, chip::TLV::TLVReader & apEventReportsReader) override {}
+    void OnEventData(const chip::app::ReadClient * apReadClient, const chip::app::EventHeader & aEventHeader,
+                     chip::TLV::TLVReader * apData, const chip::app::StatusIB & aStatus) override
+    {}
     void OnSubscriptionEstablished(const chip::app::ReadClient * apReadClient) override
     {
         if (apReadClient->IsSubscriptionType())

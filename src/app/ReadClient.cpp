@@ -400,7 +400,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     {
         chip::TLV::TLVReader EventReportsReader;
         EventReports.GetReader(&EventReportsReader);
-        mpCallback->OnEventData(this, EventReportsReader);
+        err = ProcessEventReportIBs(EventReportsReader);
+        SuccessOrExit(err);
     }
 
     err                         = report.GetAttributeReportIBs(&attributeReportIBs);
@@ -470,6 +471,29 @@ CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttribute
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ReadClient::ProcessEventPath(EventPathIB::Parser & aEventPath, ClusterInfo & aClusterInfo)
+{
+    CHIP_ERROR err = aEventPath.GetNode(&(aClusterInfo.mNodeId));
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+
+    // The ReportData must contain a concrete event path
+    err = aEventPath.GetEndpoint(&(aClusterInfo.mEndpointId));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+
+    err = aEventPath.GetCluster(&(aClusterInfo.mClusterId));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+
+    err = aEventPath.GetEvent(&(aClusterInfo.mEventId));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+
+    VerifyOrReturnError(aClusterInfo.IsValidEventPath(), CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeReportIBsReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -508,6 +532,118 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
                 this, ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId), &dataReader,
                 statusIB);
         }
+    }
+
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
+CHIP_ERROR ReadClient::ProcessEventTimestamp(EventDataIB::Parser & aEventData, EventHeader & aEventHeader)
+{
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    uint64_t timeStampVal        = 0;
+    bool hasSystemTimestamp      = false;
+    bool hasEpochTimestamp       = false;
+    bool hasDeltaSystemTimestamp = false;
+    bool hasDeltaEpochTimestamp  = false;
+    err                          = aEventData.GetDeltaSystemTimestamp(&timeStampVal);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else if (err == CHIP_NO_ERROR)
+    {
+        aEventHeader.mDeltaTimestamp.mType  = Timestamp::Type::kSystem;
+        aEventHeader.mDeltaTimestamp.mValue = timeStampVal;
+        hasDeltaSystemTimestamp             = true;
+    }
+
+    err = aEventData.GetDeltaEpochTimestamp(&timeStampVal);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else if (err == CHIP_NO_ERROR)
+    {
+        aEventHeader.mDeltaTimestamp.mType  = Timestamp::Type::kEpoch;
+        aEventHeader.mDeltaTimestamp.mValue = timeStampVal;
+        hasDeltaEpochTimestamp              = true;
+    }
+
+    err = aEventData.GetSystemTimestamp(&timeStampVal);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else if (err == CHIP_NO_ERROR)
+    {
+        aEventHeader.mTimestamp.mType  = Timestamp::Type::kSystem;
+        aEventHeader.mTimestamp.mValue = timeStampVal;
+        hasSystemTimestamp             = true;
+    }
+
+    err = aEventData.GetEpochTimestamp(&timeStampVal);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else if (err == CHIP_NO_ERROR)
+    {
+        aEventHeader.mDeltaTimestamp.mType  = Timestamp::Type::kEpoch;
+        aEventHeader.mDeltaTimestamp.mValue = timeStampVal;
+        hasEpochTimestamp                   = true;
+    }
+
+    if ((hasSystemTimestamp && !hasEpochTimestamp && !hasDeltaSystemTimestamp && !hasDeltaEpochTimestamp) ||
+        (!hasSystemTimestamp && hasEpochTimestamp && !hasDeltaSystemTimestamp && !hasDeltaEpochTimestamp) ||
+        (!hasSystemTimestamp && !hasEpochTimestamp && hasDeltaSystemTimestamp && !hasDeltaEpochTimestamp) ||
+        (!hasSystemTimestamp && !hasEpochTimestamp && !hasDeltaSystemTimestamp && hasDeltaEpochTimestamp))
+    {
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT;
+}
+
+CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while (CHIP_NO_ERROR == (err = aEventReportIBsReader.Next()))
+    {
+        TLV::TLVReader dataReader;
+        EventReportIB::Parser report;
+        EventDataIB::Parser data;
+        EventStatusIB::Parser status;
+        EventPathIB::Parser path;
+        ClusterInfo clusterInfo;
+        StatusIB statusIB;
+        EventHeader header;
+        uint8_t priorityLevel = 0;
+
+        TLV::TLVReader reader = aEventReportIBsReader;
+        ReturnErrorOnFailure(report.Init(reader));
+        // EventStatus and EventData would coexist
+        err = report.GetEventStatus(&status);
+        ReturnErrorOnFailure(err);
+        StatusIB::Parser errorStatus;
+        ReturnErrorOnFailure(status.GetPath(&path));
+        ReturnErrorOnFailure(ProcessEventPath(path, clusterInfo));
+        ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
+        ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
+
+        ReturnErrorOnFailure(report.GetEventData(&data));
+        ReturnErrorOnFailure(data.GetPath(&path));
+        ReturnErrorOnFailure(ProcessEventPath(path, clusterInfo));
+        header.mPath = ConcreteEventPath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mEventId);
+        ReturnErrorOnFailure(data.GetEventNumber(&(header.mEventNumber)));
+        ReturnErrorOnFailure(data.GetPriority(&priorityLevel));
+        header.mPriorityLevel = static_cast<PriorityLevel>(priorityLevel);
+        ReturnErrorOnFailure(ProcessEventTimestamp(data, header));
+        ReturnErrorOnFailure(data.GetData(&dataReader));
+
+        mpCallback->OnEventData(this, header, &dataReader, statusIB);
     }
 
     if (CHIP_END_OF_TLV == err)

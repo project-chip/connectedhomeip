@@ -156,34 +156,22 @@ void GenerateSubscribeResponse(nlTestSuite * apSuite, void * apContext, chip::Sy
 class MockInteractionModelApp : public chip::app::ReadClient::Callback, public chip::app::InteractionModelDelegate
 {
 public:
-    void OnEventData(const chip::app::ReadClient * apReadClient, chip::TLV::TLVReader & apEventReportsReader) override
+    void OnEventData(const chip::app::ReadClient * apReadClient, const chip::app::EventHeader & aEventHeader,
+                     chip::TLV::TLVReader * apData, const chip::app::StatusIB & aStatus) override
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        chip::TLV::TLVReader reader;
-        int numDataElementIndex = 0;
-        reader.Init(apEventReportsReader);
-        while (CHIP_NO_ERROR == (err = reader.Next()))
+        static int numDataElementIndex = 0;
+
+        if (numDataElementIndex == 0)
         {
-            uint8_t priorityLevel = 0;
-            chip::app::EventReportIB::Parser eventReport;
-            chip::app::EventDataIB::Parser eventData;
-            VerifyOrReturn(eventReport.Init(reader) == CHIP_NO_ERROR);
-            VerifyOrReturn(eventReport.GetEventData(&eventData) == CHIP_NO_ERROR);
-            VerifyOrReturn(eventData.GetPriority(&priorityLevel) == CHIP_NO_ERROR);
-            if (numDataElementIndex == 0)
-            {
-                VerifyOrReturn(priorityLevel == chip::to_underlying(chip::app::PriorityLevel::Critical));
-            }
-            else if (numDataElementIndex == 1)
-            {
-                VerifyOrReturn(priorityLevel == chip::to_underlying(chip::app::PriorityLevel::Info));
-            }
-            ++numDataElementIndex;
+            VerifyOrReturn(aEventHeader.mPriorityLevel == chip::app::PriorityLevel::Critical);
         }
-        if (CHIP_END_OF_TLV == err)
+        else if (numDataElementIndex == 1)
         {
-            mGotEventResponse = true;
+            VerifyOrReturn(aEventHeader.mPriorityLevel == chip::app::PriorityLevel::Info);
         }
+
+        ++numDataElementIndex;
+        mGotEventResponse = true;
     }
 
     void OnAttributeData(const chip::app::ReadClient * apReadClient, const chip::app::ConcreteAttributePath & aPath,

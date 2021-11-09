@@ -25,6 +25,7 @@
 #pragma once
 
 #include <app/AttributePathParams.h>
+#include <app/EventHeader.h>
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequestMessage.h>
@@ -59,17 +60,26 @@ public:
     {
     public:
         virtual ~Callback() = default;
+
         /**
-         * Notification that a list of events is received on the given read client.
+         * OnResponse will be called when a report data response has been received and processed for the given path.
+         *
          * The ReadClient object MUST continue to exist after this call is completed.
          *
-         * @param[in]  apReadClient         The read client which initialized the read transaction.
-         * @param[in]  aEventReports        TLV reader positioned at the list that contains the events.  The
-         *                                  implementation of EventStreamReceived is expected to call Next() on the reader to
-         *                                  advance it to the first element of the list, then process the elements from beginning to
-         *                                  the end. The callee is expected to consume all events.
+         * This callback will be called when:
+         *   - Receiving event data as response of Read interactions
+         *   - Receiving event data as reports of subscriptions
+         *   - Receiving event data as initial reports of subscriptions
+         *
+         * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
+         * @param[in] aEventHeader: The event header in report response.
+         * @param[in] apData: The event data of the given path, will be a nullptr if status is not Success.
+         * @param[in] aStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
+         *                     cluster-specific status code.
          */
-        virtual void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventReports) {}
+        virtual void OnEventData(const ReadClient * apReadClient, const EventHeader & aEventHeader, TLV::TLVReader * apData,
+                                 const StatusIB & aStatus)
+        {}
 
         /**
          * OnResponse will be called when a report data response has been received and processed for the given path.
@@ -243,6 +253,7 @@ private:
     CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
+    CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
     void ClearExchangeContext() { mpExchangeCtx = nullptr; }
     static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
@@ -251,6 +262,8 @@ private:
     void CancelLivenessCheckTimer();
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ClusterInfo & aClusterInfo);
+    CHIP_ERROR ProcessEventPath(EventPathIB::Parser & aEventPath, ClusterInfo & aClusterInfo);
+    CHIP_ERROR ProcessEventTimestamp(EventDataIB::Parser & aEventData, EventHeader & aEventHeader);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;
