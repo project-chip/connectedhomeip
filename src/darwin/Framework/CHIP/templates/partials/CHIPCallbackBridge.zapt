@@ -1,14 +1,15 @@
 {{#if header}}
-class CHIP{{> @partial-block}}Bridge : public CHIPCallbackBridge<{{> @partial-block}}>
+{{#*inline "callbackType"}}{{#if (isStrEqual partial-type "Command")}}CHIP{{> @partial-block}}Type{{else}}{{> @partial-block}}{{/if}}{{/inline}}
+class CHIP{{> @partial-block}}Bridge : public CHIPCallbackBridge<{{>callbackType}}>
 {
 public:
     CHIP{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action, bool keepAlive = false)
-      : CHIPCallbackBridge<{{> @partial-block}}>(queue, handler, action, OnSuccessFn, keepAlive)
+      : CHIPCallbackBridge<{{>callbackType}}>(queue, handler, action, OnSuccessFn, keepAlive)
       {};
     
     static void OnSuccessFn(void * context
       {{#if (isStrEqual partial-type "Command")}}
-      {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
+      , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
       {{else if (isStrEqual partial-type "List")}}
       , {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list
       {{else if partial-type}}
@@ -20,7 +21,7 @@ public:
 {{else}}
 void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
   {{#if (isStrEqual partial-type "Command")}}
-  {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
+  , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
   {{else if (isStrEqual partial-type "List")}}
   , {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list
   {{else if partial-type}}
@@ -30,20 +31,8 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
 )
 {
     {{#if (isStrEqual partial-type "Command")}}
-    DispatchSuccess(context, @{
-      {{#chip_cluster_response_arguments}}
-      {{#if isArray}}
-      // {{asSymbol label}} : {{asUnderlyingZclType type}}
-      // Conversion from this type to Objc is not properly implemented yet
-      {{else if (isOctetString type)}}
-      @"{{asSymbol label}}" : [NSData dataWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size()],
-      {{else if (isCharString type)}}
-      @"{{asSymbol label}}" : [[NSString alloc] initWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size() encoding:NSUTF8StringEncoding],
-      {{else}}
-      @"{{asSymbol label}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:{{asSymbol label}}],
-      {{/if}}
-      {{/chip_cluster_response_arguments}}
-    });
+    {{>decode_response}}
+    DispatchSuccess(context, response);
     {{else if (isStrEqual partial-type "List")}}
     id array = [[NSMutableArray alloc] init];
     auto iter = list.begin();

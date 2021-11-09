@@ -22,6 +22,7 @@
 #import "zap-generated/CHIPClustersObjc.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <app/data-model/NullObject.h>
 
 typedef CHIP_ERROR (^CHIPActionBlock)(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
 
