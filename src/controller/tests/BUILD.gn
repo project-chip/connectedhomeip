@@ -22,7 +22,10 @@ chip_test_suite("tests") {
   output_name = "libControllerTests"
 
   test_sources = [ "TestCommissionableNodeController.cpp" ]
-  test_sources += [ "TestServerCommandDispatch.cpp" ]
+
+  if (chip_device_platform != "mbed" && chip_device_platform != "efr32") {
+    test_sources += [ "TestServerCommandDispatch.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 

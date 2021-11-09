@@ -19,15 +19,9 @@
 #pragma once
 
 #include <app/CommandHandler.h>
-#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/MessageDef/AttributeDataElement.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/List.h> // So we can encode lists
-#include <app/data-model/TagBoundEncoder.h>
-#include <app/util/basic-types.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {

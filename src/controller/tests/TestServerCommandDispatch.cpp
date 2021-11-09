@@ -32,9 +32,6 @@
 #include <app/tests/AppTestContext.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
-#include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -170,12 +167,10 @@ DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::Descriptor::Attributes::DeviceLis
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
-// Declare Cluster List for Bridged Light endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
 DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::TestCluster::Id, testClusterAttrs),
     DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::Descriptor::Id, descriptorAttrs), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
-// Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
 void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apContext)
@@ -190,6 +185,10 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     request.arg1 = true;
 
+    //
+    // Register descriptors for this endpoint since they are needed
+    // at command validation time to ensure the command actually exists on that endpoint.
+    //
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
@@ -220,8 +219,6 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
     auto onFailureCb = [&onFailureWasCalled](const app::StatusIB & aStatus, CHIP_ERROR aError) { onFailureWasCalled = true; };
 
     responseDirective = kSendDataResponse;
-
-    ctx.EnableAsyncDispatch();
 
     chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
