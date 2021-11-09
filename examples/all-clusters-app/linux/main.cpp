@@ -16,11 +16,16 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/Command.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/util/af.h>
 
 #include "AppMain.h"
+
+using namespace chip;
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 {

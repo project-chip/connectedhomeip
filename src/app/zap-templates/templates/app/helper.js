@@ -106,7 +106,7 @@ var endpointClusterWithInit = [
   'Pump Configuration and Control',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
-var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
+var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Thermostat User Interface Configuration' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
 /**
