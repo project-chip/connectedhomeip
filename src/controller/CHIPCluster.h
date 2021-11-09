@@ -62,9 +62,45 @@ public:
     CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
                              CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb);
 
+    /**
+     * Functions for writing attributes.  We have lots of different
+     * AttributeInfo but a fairly small set of types that get written.  So we
+     * want to keep the template on AttributeInfo very small, and put all the
+     * work in the template with a small number of instantiations (one per
+     * type).
+     */
+    template <typename AttrType>
+    CHIP_ERROR WriteAttribute(const AttrType & requestData, void * context, ClusterId clusterId, AttributeId attributeId,
+                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
+            if (successCb != nullptr)
+            {
+                successCb(context);
+            }
+        };
+
+        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
+                                                CHIP_ERROR aError) {
+            if (failureCb != nullptr)
+            {
+                failureCb(context, app::ToEmberAfStatus(status.mStatus));
+            }
+        };
+
+        return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId,
+                                                          requestData, onSuccessCb, onFailureCb);
+    }
+
     template <typename AttributeInfo>
     CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
-                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
+                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
+    {
+        return WriteAttribute(requestData, context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb,
+                              failureCb);
+    }
 
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}
