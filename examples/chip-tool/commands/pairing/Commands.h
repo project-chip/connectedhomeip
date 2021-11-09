@@ -19,6 +19,7 @@
 #pragma once
 
 #include "CommissionedListCommand.h"
+#include "ConfigureFabricCommand.h"
 #include "PairingCommand.h"
 
 class Unpair : public PairingCommand
@@ -172,6 +173,7 @@ void registerCommandsPairing(Commands & commands)
         make_unique<OpenCommissioningWindow>(),
         // TODO - enable CommissionedListCommand once DNS Cache is implemented
         //        make_unique<CommissionedListCommand>(),
+        make_unique<ConfigureFabricCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);
