@@ -57,7 +57,7 @@ public:
      *
      *  @return The current value of the counter.
      */
-    virtual uint32_t GetValue() = 0;
+    virtual uint32_t GetValue() const = 0;
 };
 
 /**
@@ -97,7 +97,7 @@ public:
      *
      *  @return The current value of the counter.
      */
-    uint32_t GetValue() override;
+    uint32_t GetValue() const override;
 
 protected:
     uint32_t mCounterValue;

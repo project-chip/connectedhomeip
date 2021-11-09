@@ -251,6 +251,23 @@ public:
      */
     void Shutdown();
 
+    /* Seal all session, so the state of the session will not be changed any more, no message can be send/received any
+     * more. Removing session is allowed.
+     */
+    void Seal();
+
+    CHIP_ERROR Load(const Span<const char> & storage);
+
+    /*
+     * @brief
+     *   Save live sessoins to the storage. The session manager muse be sealed before calling Save
+     *   Returns
+     *     CHIP_NO_ERROR               if successful.
+     *     CHIP_ERROR_INCORRECT_STATE  if the session manager is not sealed.
+     *     CHIP_ERROR_BUFFER_TOO_SMALL if the storage size isn't enough, the space required will be stored in byte_used.
+     */
+    CHIP_ERROR Save(const Span<char> & storage, size_t & byte_used);
+
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 
     /**
@@ -279,6 +296,8 @@ private:
     {
         kNotReady,    /**< State before initialization. */
         kInitialized, /**< State when the object is ready connect to other peers. */
+        kSealed,      /**< State when the manager is sealed, all states are immutable when sealed. */
+        kShutdown,    /**< State when the manager is shutdown. */
     };
 
     enum class EncryptionState

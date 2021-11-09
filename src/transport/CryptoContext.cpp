@@ -62,7 +62,7 @@ CryptoContext::~CryptoContext()
 {
     for (auto & key : mKeys)
     {
-        ClearSecretData(key, sizeof(CryptoKey));
+        ClearSecretData(key.data(), key.size());
     }
 }
 
@@ -191,8 +191,8 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
         usage = kI2RKey;
     }
 
-    ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], Crypto::kAES_CCM128_Key_Length, IV,
-                                         sizeof(IV), output, tag, taglen));
+    ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage].data(), mKeys[usage].size(), IV, sizeof(IV),
+                                         output, tag, taglen));
 
     mac.SetTag(&header, tag, taglen);
 
@@ -226,8 +226,8 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
         usage = kR2IKey;
     }
 
-    return AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage], Crypto::kAES_CCM128_Key_Length, IV,
-                           sizeof(IV), output);
+    return AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage].data(), mKeys[usage].size(), IV, sizeof(IV),
+                           output);
 }
 
 } // namespace chip

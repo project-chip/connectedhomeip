@@ -456,6 +456,84 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
 }
 
+void TestSessionPersistant(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    TransportMgr<LoopbackTransport> transportMgr;
+    secure_channel::MessageCounterManager gMessageCounterManager;
+
+    err = transportMgr.Init("LOOPBACK");
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    char * storage = nullptr;
+    size_t bytes   = 0;
+    CryptoContext crypto1;
+    CryptoContext crypto2;
+
+    {
+        // Create several sessions and save them into storage.
+        SessionManager sessionManager;
+        err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        // First pairing
+        SecurePairingUsingTestSecret pairing1(1, 2);
+        err = sessionManager.NewPairing(peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        SecurePairingUsingTestSecret pairing2(3, 4);
+        err = sessionManager.NewPairing(peer, kDestinationNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 1);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        SessionHandle sessionHandle1        = sessionManager.FindSecureSessionForNode(kSourceNodeId);
+        Transport::SecureSession * session1 = sessionManager.GetSecureSession(sessionHandle1);
+        crypto1                             = session1->GetCryptoContext();
+
+        SessionHandle sessionHandle2        = sessionManager.FindSecureSessionForNode(kDestinationNodeId);
+        Transport::SecureSession * session2 = sessionManager.GetSecureSession(sessionHandle2);
+        crypto2                             = session2->GetCryptoContext();
+
+        sessionManager.Seal();
+
+        err = sessionManager.Save(Span<char>(), bytes);
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        storage = new char[bytes];
+
+        err = sessionManager.Save(Span<char>(storage, bytes), bytes);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+
+    {
+        // Load sessions and check their integrity.
+        SessionManager sessionManager;
+        err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = sessionManager.Load(Span<const char>(storage, bytes));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        SessionHandle sessionHandle1        = sessionManager.FindSecureSessionForNode(kSourceNodeId);
+        Transport::SecureSession * session1 = sessionManager.GetSecureSession(sessionHandle1);
+        NL_TEST_ASSERT(inSuite, session1->GetPeerNodeId() == kSourceNodeId);
+        NL_TEST_ASSERT(inSuite, session1->GetPeerSessionId() == 1);
+        NL_TEST_ASSERT(inSuite, session1->GetLocalSessionId() == 2);
+        NL_TEST_ASSERT(inSuite, session1->GetCryptoContext() == crypto1);
+
+        SessionHandle sessionHandle2        = sessionManager.FindSecureSessionForNode(kDestinationNodeId);
+        Transport::SecureSession * session2 = sessionManager.GetSecureSession(sessionHandle2);
+        NL_TEST_ASSERT(inSuite, session2->GetPeerNodeId() == kDestinationNodeId);
+        NL_TEST_ASSERT(inSuite, session2->GetPeerSessionId() == 3);
+        NL_TEST_ASSERT(inSuite, session2->GetLocalSessionId() == 4);
+        NL_TEST_ASSERT(inSuite, session2->GetCryptoContext() == crypto2);
+    }
+}
 // Test Suite
 
 /**
@@ -469,6 +547,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Send Encrypted Packet Test",     SendEncryptedPacketTest),
     NL_TEST_DEF("Send Bad Encrypted Packet Test", SendBadEncryptedPacketTest),
     NL_TEST_DEF("Drop stale connection Test",     StaleConnectionDropTest),
+    NL_TEST_DEF("Test Session Persistent",        TestSessionPersistant),
 
     NL_TEST_SENTINEL()
 };

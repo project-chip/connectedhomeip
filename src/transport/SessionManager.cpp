@@ -97,15 +97,63 @@ void SessionManager::Shutdown()
 
     mMessageCounterManager = nullptr;
 
-    mState        = State::kNotReady;
+    mState        = State::kShutdown;
     mSystemLayer  = nullptr;
     mTransportMgr = nullptr;
     mCB           = nullptr;
 }
 
+void SessionManager::Seal()
+{
+    mState = State::kSealed;
+}
+
+CHIP_ERROR SessionManager::Load(const Span<const char> & storage)
+{
+    using Serializer = Transport::SecureSession::Serializable::Serializer;
+    VerifyOrReturnError(storage.size() % Serializer::Space == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    for (size_t i = 0; i * Serializer::Space < storage.size(); ++i)
+    {
+        Transport::SecureSession::Serializable serializable;
+        Serializer::LoadObject(serializable, storage.subspan<Serializer::Space>(i * Serializer::Space));
+        SecureSession * session = mSecureSessions.InstallSession(Transport::SecureSession::Load(serializable));
+        if (session == nullptr)
+            return CHIP_ERROR_NO_MEMORY;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SessionManager::Save(const Span<char> & storage, size_t & byte_used)
+{
+    VerifyOrReturnError(mState == State::kSealed, CHIP_ERROR_INCORRECT_STATE);
+    using Serializer = Transport::SecureSession::Serializable::Serializer;
+
+    size_t count = 0;
+    mSecureSessions.ForEachSession([&](auto session) {
+        ++count;
+        return true;
+    });
+    byte_used = count * Serializer::Space;
+
+    if (storage.size() < byte_used)
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+
+    count = 0;
+    mSecureSessions.ForEachSession([&](auto session) {
+        const Transport::SecureSession::Serializable serializable = session->Save();
+        Serializer::SaveObject(serializable, storage.subspan<Serializer::Space>(count * Serializer::Space));
+        ++count;
+        return true;
+    });
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
 {
+    VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     PacketHeader packetHeader;
     if (IsControlMessage(payloadHeader))
     {
@@ -253,6 +301,7 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
 CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
                                       PairingSession * pairing, CryptoContext::SessionRole direction, FabricIndex fabric)
 {
+    VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     uint16_t peerSessionId  = pairing->GetPeerSessionId();
     uint16_t localSessionId = pairing->GetLocalSessionId();
     SecureSession * session = mSecureSessions.FindSecureSessionByLocalKey(localSessionId);
@@ -316,6 +365,9 @@ void SessionManager::CancelExpiryTimer()
 
 void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
+    if (mState != State::kInitialized)
+        return;
+
     PacketHeader packetHeader;
 
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));

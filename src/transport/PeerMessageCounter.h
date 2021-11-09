@@ -175,7 +175,7 @@ public:
         mSynced.mWindow.reset();
     }
 
-    uint32_t GetCounter() { return mSynced.mMaxCounter; }
+    uint32_t GetCounter() const { return mSynced.mMaxCounter; }
 
 private:
     enum class Status

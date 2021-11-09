@@ -22,6 +22,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <lib/support/Serializer.h>
 #include <transport/CryptoContext.h>
 #include <transport/SessionMessageCounter.h>
 #include <transport/raw/Base.h>
@@ -34,17 +35,13 @@ namespace Transport {
 static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
 
 /**
- * Defines state of a peer connection at a transport layer.
+ * Defines state of a secure session at a transport layer.
  *
  * Information contained within the state:
  *   - PeerAddress represents how to talk to the peer
  *   - PeerNodeId is the unique ID of the peer
- *   - SendMessageIndex is an ever increasing index for sending messages
- *   - LastActivityTime is a monotonic timestamp of when this connection was
- *     last used. Inactive connections can expire.
+ *   - LastActivityTime is a monotonic timestamp of when this connection was last used. Inactive connections can expire.
  *   - CryptoContext contains the encryption context of a connection
- *
- * TODO: to add any message ACK information
  */
 class SecureSession
 {
@@ -57,7 +54,17 @@ public:
         SetLastActivityTime(currentTime);
     }
 
-    SecureSession(SecureSession &&)      = delete;
+    SecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric,
+                  CryptoContext && cryptoContext, uint32_t localSessionMessageCounterValue,
+                  uint32_t peerSessionMessageCounterValue) :
+        mPeerNodeId(peerNodeId),
+        mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mFabric(fabric), mCryptoContext(std::move(cryptoContext)),
+        mSessionMessageCounter(localSessionMessageCounterValue, peerSessionMessageCounterValue)
+    {
+        SetLastActivityTime(System::Clock::kZero);
+    }
+
+    SecureSession(SecureSession &&)      = default;
     SecureSession(const SecureSession &) = delete;
     SecureSession & operator=(const SecureSession &) = delete;
     SecureSession & operator=(SecureSession &&) = delete;
@@ -102,6 +109,52 @@ public:
     }
 
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
+
+    class Serializable
+    {
+    public:
+        NodeId mPeerNodeId;
+        uint16_t mLocalSessionId;
+        uint16_t mPeerSessionId;
+        FabricIndex mFabric;
+
+        CryptoContext::Serializable mCryptoContext;
+        uint32_t mLocalSessionMessageCounterValue;
+        uint32_t mPeerSessionMessageCounterValue;
+
+        using Serializer =
+            chip::Serializer<Serializable, FieldSerializer<Serializable, NodeId, &Serializable::mPeerNodeId>,
+                             FieldSerializer<Serializable, uint16_t, &Serializable::mLocalSessionId>,
+                             FieldSerializer<Serializable, uint16_t, &Serializable::mPeerSessionId>,
+                             FieldSerializer<Serializable, FabricIndex, &Serializable::mFabric>,
+                             FieldSerializer<Serializable, CryptoContext::Serializable, &Serializable::mCryptoContext>,
+                             FieldSerializer<Serializable, uint32_t, &Serializable::mLocalSessionMessageCounterValue>,
+                             FieldSerializer<Serializable, uint32_t, &Serializable::mPeerSessionMessageCounterValue>>;
+    };
+
+    static_assert(std::is_pod<Serializable>::value, "SecureSession::Serializable is not a POD");
+
+    Serializable Save() const
+    {
+        Serializable result;
+        result.mPeerNodeId     = mPeerNodeId;
+        result.mPeerSessionId  = mPeerSessionId;
+        result.mLocalSessionId = mLocalSessionId;
+        result.mFabric         = mFabric;
+
+        result.mCryptoContext                   = mCryptoContext.Save();
+        result.mLocalSessionMessageCounterValue = mSessionMessageCounter.GetLocalMessageCounter().Value();
+        result.mPeerSessionMessageCounterValue  = mSessionMessageCounter.GetPeerMessageCounter().GetCounter();
+
+        return result;
+    }
+
+    static SecureSession Load(const Serializable & from)
+    {
+        return SecureSession(from.mLocalSessionId, from.mPeerNodeId, from.mPeerSessionId, from.mFabric,
+                             CryptoContext::Load(from.mCryptoContext), from.mLocalSessionMessageCounterValue,
+                             from.mPeerSessionMessageCounterValue);
+    }
 
 private:
     const NodeId mPeerNodeId;

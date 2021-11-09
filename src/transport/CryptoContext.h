@@ -25,8 +25,11 @@
 
 #pragma once
 
+#include <array>
+
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/support/Serializer.h>
 #include <lib/support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -41,6 +44,18 @@ public:
     CryptoContext(const CryptoContext &) = default;
     CryptoContext & operator=(const CryptoContext &) = default;
     CryptoContext & operator=(CryptoContext &&) = default;
+
+    bool operator==(const CryptoContext & that)
+    {
+        if (mKeyAvailable)
+        {
+            return that.mKeyAvailable && mSessionRole == that.mSessionRole && mKeys == that.mKeys;
+        }
+        else
+        {
+            return !that.mKeyAvailable;
+        }
+    }
 
     /**
      *    Whether the current node initiated the session, or it is responded to a session request.
@@ -114,19 +129,13 @@ public:
     CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                        const MessageAuthenticationCode & mac) const;
 
-    ByteSpan GetAttestationChallenge() const { return ByteSpan(mKeys[kAttestationChallengeKey], Crypto::kAES_CCM128_Key_Length); }
-
-    /**
-     * @brief
-     *   Memory overhead of encrypting data. The overhead is independent of size of
-     *   the data being encrypted. The extra space is used for storing the common header.
-     *
-     * @return number of bytes.
-     */
-    size_t EncryptionOverhead();
+    ByteSpan GetAttestationChallenge() const
+    {
+        return ByteSpan(mKeys[kAttestationChallengeKey].data(), mKeys[kAttestationChallengeKey].size());
+    }
 
 private:
-    typedef uint8_t CryptoKey[Crypto::kAES_CCM128_Key_Length];
+    using CryptoKey = std::array<uint8_t, Crypto::kAES_CCM128_Key_Length>;
 
     enum KeyUsage
     {
@@ -139,7 +148,7 @@ private:
     SessionRole mSessionRole;
 
     bool mKeyAvailable;
-    CryptoKey mKeys[KeyUsage::kNumCryptoKeys];
+    std::array<CryptoKey, KeyUsage::kNumCryptoKeys> mKeys;
 
     static CHIP_ERROR GetIV(const PacketHeader & header, uint8_t * iv, size_t len);
 
@@ -147,6 +156,58 @@ private:
     // The encryption operations includes AAD when message authentication tag is generated. This tag
     // is used at the time of decryption to integrity check the received data.
     static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, uint8_t * aad, uint16_t & len);
+
+    // Private constructor which is used to load from a save
+    CryptoContext(SessionRole role, std::array<CryptoKey, KeyUsage::kNumCryptoKeys> keys) :
+        mSessionRole(role), mKeyAvailable(true), mKeys(keys)
+    {}
+
+public:
+    class Serializable
+    {
+    public:
+        SessionRole mSessionRole;
+        std::array<CryptoKey, KeyUsage::kNumCryptoKeys> mKeys;
+
+        using Serializer = typename chip::Serializer<
+            Serializable, FieldSerializer<Serializable, SessionRole, &Serializable::mSessionRole>,
+            FieldSerializer<Serializable, std::array<CryptoKey, KeyUsage::kNumCryptoKeys>, &Serializable::mKeys>>;
+    };
+
+    static_assert(std::is_pod<Serializable>::value, "CryptoContext::Serializable is not a POD");
+
+    Serializable Save() const
+    {
+        Serializable result;
+        result.mSessionRole = mSessionRole;
+        result.mKeys        = mKeys;
+        return result;
+    }
+
+    static CryptoContext Load(const Serializable & from) { return CryptoContext(from.mSessionRole, from.mKeys); }
+};
+
+// Specialization for serialize CryptoContext::Serializable
+template <>
+class TypeSerializer<CryptoContext::Serializable>
+{
+private:
+    using Serializer = CryptoContext::Serializable::Serializer;
+
+public:
+    static constexpr const size_t Space = Serializer::Space;
+
+    static CryptoContext::Serializable LoadValue(FixedSpan<const char, Space> bytes)
+    {
+        CryptoContext::Serializable res;
+        Serializer::LoadObject(res, bytes);
+        return res;
+    }
+
+    static void SaveValue(FixedSpan<char, Space> bytes, const CryptoContext::Serializable & data)
+    {
+        Serializer::SaveObject(data, bytes);
+    }
 };
 
 } // namespace chip

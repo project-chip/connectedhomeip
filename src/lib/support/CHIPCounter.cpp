@@ -45,7 +45,7 @@ MonotonicallyIncreasingCounter::Advance()
     return err;
 }
 
-uint32_t MonotonicallyIncreasingCounter::GetValue()
+uint32_t MonotonicallyIncreasingCounter::GetValue() const
 {
     return mCounterValue;
 }

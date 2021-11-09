@@ -89,6 +89,13 @@ public:
         return Span(mDataBuf + offset, length);
     }
 
+    template <size_t N>
+    FixedSpan<T, N> subspan(size_t offset) const
+    {
+        VerifyOrDie(offset + N <= mDataLen);
+        return FixedSpan<T, N>(mDataBuf + offset);
+    }
+
     // Allow reducing the size of a span.
     void reduce_size(size_t new_size)
     {
@@ -178,6 +185,20 @@ public:
     bool data_equal(const Span<U> & other) const
     {
         return (size() == other.size() && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0)));
+    }
+
+    template <std::size_t Offset, std::size_t Count>
+    constexpr FixedSpan<T, Count> subspan() const
+    {
+        static_assert(Offset + Count <= N, "subspan overflow");
+        return FixedSpan<T, Count>(mDataBuf + Offset);
+    }
+
+    template <std::size_t Count>
+    constexpr FixedSpan<T, Count> subspan(std::size_t offset) const
+    {
+        VerifyOrDie(offset + Count <= N);
+        return FixedSpan<T, Count>(mDataBuf + offset);
     }
 
 private:

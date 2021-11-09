@@ -33,8 +33,17 @@ namespace Transport {
 class SessionMessageCounter
 {
 public:
+    SessionMessageCounter() {}
+    SessionMessageCounter(uint32_t localSessionMessageCounterValue, uint32_t peerMessageCounterValue) :
+        mLocalMessageCounter(localSessionMessageCounterValue)
+    {
+        mPeerMessageCounter.SetCounter(peerMessageCounterValue);
+    }
+
     MessageCounter & GetLocalMessageCounter() { return mLocalMessageCounter; }
+    const MessageCounter & GetLocalMessageCounter() const { return mLocalMessageCounter; }
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
+    const PeerMessageCounter & GetPeerMessageCounter() const { return mPeerMessageCounter; }
 
 private:
     LocalSessionMessageCounter mLocalMessageCounter;

@@ -60,6 +60,9 @@ public:
         return mEntries.CreateObject(localSessionId, peerNodeId, peerSessionId, fabric, mTimeSource.GetMonotonicTimestamp());
     }
 
+    CHECK_RETURN_VALUE
+    SecureSession * InstallSession(SecureSession && session) { return mEntries.CreateObject(std::move(session)); }
+
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
 
     template <typename Function>
