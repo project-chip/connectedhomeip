@@ -35,9 +35,9 @@ public:
     public:
         struct Target
         {
-            using Flags = int;
-            static constexpr Flags kCluster = 1 << 0;
-            static constexpr Flags kEndpoint = 1 << 1;
+            using Flags                        = int;
+            static constexpr Flags kCluster    = 1 << 0;
+            static constexpr Flags kEndpoint   = 1 << 1;
             static constexpr Flags kDeviceType = 1 << 2;
             Flags flags;
             ClusterId cluster;
@@ -87,10 +87,7 @@ public:
         Entry(const Entry &) = delete;
         Entry & operator=(const Entry &) = delete;
 
-        ~Entry()
-        {
-            mDelegate->Release();
-        }
+        ~Entry() { mDelegate->Release(); }
 
         // Simple getters
         CHIP_ERROR GetAuthMode(AuthMode & authMode) const { return mDelegate->GetAuthMode(authMode); }
@@ -117,15 +114,9 @@ public:
         CHIP_ERROR RemoveTarget(size_t index) { return mDelegate->RemoveTarget(index); }
 
     public:
-        const Delegate & GetDelegate() const
-        {
-            return *mDelegate;
-        }
+        const Delegate & GetDelegate() const { return *mDelegate; }
 
-        Delegate & GetDelegate()
-        {
-            return *mDelegate;
-        }
+        Delegate & GetDelegate() { return *mDelegate; }
 
         void SetDelegate(Delegate & delegate)
         {
@@ -167,23 +158,14 @@ public:
         EntryIterator(const EntryIterator &) = delete;
         EntryIterator & operator=(const EntryIterator &) = delete;
 
-        ~EntryIterator()
-        {
-            mDelegate->Release();
-        }
+        ~EntryIterator() { mDelegate->Release(); }
 
         CHIP_ERROR Next(Entry & entry) { return mDelegate->Next(entry); }
 
     public:
-        const Delegate & GetDelegate() const
-        {
-            return *mDelegate;
-        }
+        const Delegate & GetDelegate() const { return *mDelegate; }
 
-        Delegate & GetDelegate()
-        {
-            return *mDelegate;
-        }
+        Delegate & GetDelegate() { return *mDelegate; }
 
         void SetDelegate(Delegate & delegate)
         {
@@ -218,7 +200,7 @@ public:
         virtual ~Listener() = default;
 
         // TODO: add entry/extension to listener interface
-        virtual void OnEntryChanged() = 0;
+        virtual void OnEntryChanged()     = 0;
         virtual void OnExtensionChanged() = 0;
     };
 
@@ -245,13 +227,25 @@ public:
         virtual CHIP_ERROR PrepareEntry(Entry & entry) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
         // CRUD
-        virtual CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, const FabricIndex * fabricIndex) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-        virtual CHIP_ERROR ReadEntry(size_t index, Entry & entry, const FabricIndex * fabricIndex) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
-        virtual CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+        virtual CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, const FabricIndex * fabricIndex)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+        virtual CHIP_ERROR ReadEntry(size_t index, Entry & entry, const FabricIndex * fabricIndex) const
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+        virtual CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
         virtual CHIP_ERROR DeleteEntry(size_t index, const FabricIndex * fabricIndex) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
         // Iteration
-        virtual CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+        virtual CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex) const
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
 
         // Listening
         virtual void SetListener(Listener & listener) { mListener = &listener; }
@@ -263,18 +257,12 @@ public:
 
     AccessControl() = default;
 
-    AccessControl(Delegate & delegate)
-        : mDelegate(delegate)
-    {
-    }
+    AccessControl(Delegate & delegate) : mDelegate(delegate) {}
 
     AccessControl(const AccessControl &) = delete;
     AccessControl & operator=(const AccessControl &) = delete;
 
-    ~AccessControl()
-    {
-        mDelegate.Release();
-    }
+    ~AccessControl() { mDelegate.Release(); }
 
     /**
      * Initialize the access control module. Must be called before first use.
@@ -295,13 +283,28 @@ public:
     CHIP_ERROR PrepareEntry(Entry & entry) { return mDelegate.PrepareEntry(entry); }
 
     // CRUD
-    CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, const FabricIndex * fabricIndex = nullptr) { return mDelegate.CreateEntry(index, entry, fabricIndex); }
-    CHIP_ERROR ReadEntry(size_t index, Entry & entry, const FabricIndex * fabricIndex = nullptr) const { return mDelegate.ReadEntry(index, entry, fabricIndex); }
-    CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex = nullptr) { return mDelegate.UpdateEntry(index, entry, fabricIndex); }
-    CHIP_ERROR DeleteEntry(size_t index, const FabricIndex * fabricIndex = nullptr) { return mDelegate.DeleteEntry(index, fabricIndex); }
+    CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, const FabricIndex * fabricIndex = nullptr)
+    {
+        return mDelegate.CreateEntry(index, entry, fabricIndex);
+    }
+    CHIP_ERROR ReadEntry(size_t index, Entry & entry, const FabricIndex * fabricIndex = nullptr) const
+    {
+        return mDelegate.ReadEntry(index, entry, fabricIndex);
+    }
+    CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex = nullptr)
+    {
+        return mDelegate.UpdateEntry(index, entry, fabricIndex);
+    }
+    CHIP_ERROR DeleteEntry(size_t index, const FabricIndex * fabricIndex = nullptr)
+    {
+        return mDelegate.DeleteEntry(index, fabricIndex);
+    }
 
     // Iteration
-    CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex = nullptr) const { return mDelegate.Entries(iterator, fabricIndex); }
+    CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex = nullptr) const
+    {
+        return mDelegate.Entries(iterator, fabricIndex);
+    }
 
     /**
      * Check whether access (by a subject descriptor, to a request path,

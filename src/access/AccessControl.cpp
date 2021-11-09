@@ -41,16 +41,19 @@ bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Priv
 {
     switch (entryPrivilege)
     {
-        case Privilege::kView:
-            return requestPrivilege == Privilege::kView;
-        case Privilege::kProxyView:
-            return requestPrivilege == Privilege::kProxyView || requestPrivilege == Privilege::kView;
-        case Privilege::kOperate:
-            return requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView;
-        case Privilege::kManage:
-            return requestPrivilege == Privilege::kManage || requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView;
-        case Privilege::kAdminister:
-            return requestPrivilege == Privilege::kAdminister || requestPrivilege == Privilege::kManage || requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView || requestPrivilege == Privilege::kProxyView;
+    case Privilege::kView:
+        return requestPrivilege == Privilege::kView;
+    case Privilege::kProxyView:
+        return requestPrivilege == Privilege::kProxyView || requestPrivilege == Privilege::kView;
+    case Privilege::kOperate:
+        return requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView;
+    case Privilege::kManage:
+        return requestPrivilege == Privilege::kManage || requestPrivilege == Privilege::kOperate ||
+            requestPrivilege == Privilege::kView;
+    case Privilege::kAdminister:
+        return requestPrivilege == Privilege::kAdminister || requestPrivilege == Privilege::kManage ||
+            requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView ||
+            requestPrivilege == Privilege::kProxyView;
     }
     return false;
 }
@@ -76,7 +79,8 @@ CHIP_ERROR AccessControl::Finish()
     return mDelegate.Finish();
 }
 
-CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege)
+CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                                Privilege requestPrivilege)
 {
     EntryIterator iterator;
     ReturnErrorOnFailure(Entries(iterator, &subjectDescriptor.fabricIndex));

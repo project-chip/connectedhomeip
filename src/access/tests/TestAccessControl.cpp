@@ -29,16 +29,16 @@ namespace {
 using namespace chip;
 using namespace chip::Access;
 
-using Entry = AccessControl::Entry;
+using Entry         = AccessControl::Entry;
 using EntryIterator = AccessControl::EntryIterator;
-using Target = Entry::Target;
+using Target        = Entry::Target;
 
 AccessControl accessControl(Examples::GetAccessControlDelegate());
 
-constexpr ClusterId kOnOffCluster = 0x0006;
-constexpr ClusterId kLevelControlCluster = 0x0008;
+constexpr ClusterId kOnOffCluster         = 0x0006;
+constexpr ClusterId kLevelControlCluster  = 0x0008;
 constexpr ClusterId kAccessControlCluster = 0x001F;
-constexpr ClusterId kColorControlCluster = 0x0300;
+constexpr ClusterId kColorControlCluster  = 0x0300;
 
 constexpr DeviceTypeId kColorLightDeviceType = 0x0102;
 
@@ -52,56 +52,36 @@ constexpr NodeId kGroup4 = 0xFFFFFFFFFFFF'0004;
 constexpr NodeId kGroup6 = 0xFFFFFFFFFFFF'0006;
 constexpr NodeId kGroup8 = 0xFFFFFFFFFFFF'0008;
 
-constexpr AuthMode authModes[] =
-{
-    AuthMode::kPase,
-    AuthMode::kCase,
-    AuthMode::kGroup
-};
+constexpr AuthMode authModes[] = { AuthMode::kPase, AuthMode::kCase, AuthMode::kGroup };
 
-constexpr FabricIndex fabricIndexes[] =
-{
-    kUndefinedFabricIndex,
-    1,
-    2
-};
+constexpr FabricIndex fabricIndexes[] = { kUndefinedFabricIndex, 1, 2 };
 
-constexpr Privilege privileges[] =
-{
-    Privilege::kView,
-    Privilege::kProxyView,
-    Privilege::kOperate,
-    Privilege::kManage,
-    Privilege::kAdminister
-};
+constexpr Privilege privileges[] = { Privilege::kView, Privilege::kProxyView, Privilege::kOperate, Privilege::kManage,
+                                     Privilege::kAdminister };
 
-constexpr NodeId subjects[][3] =
-{
-    {
-        kPaseVerifier0,
-        kPaseVerifier3,
-        kPaseVerifier5,
-    },
-    {
-        0x0123456789ABCDEF,  // CASE node
-        0xFFFFFFFD'00000001, // CAT1
-        0xFFFFFFFC'00000002, // CAT2
-    },
-    {
-        kGroup4,
-        kGroup6,
-        kGroup8,
-    }
-};
+constexpr NodeId subjects[][3] = { {
+                                       kPaseVerifier0,
+                                       kPaseVerifier3,
+                                       kPaseVerifier5,
+                                   },
+                                   {
+                                       0x0123456789ABCDEF,  // CASE node
+                                       0xFFFFFFFD'00000001, // CAT1
+                                       0xFFFFFFFC'00000002, // CAT2
+                                   },
+                                   {
+                                       kGroup4,
+                                       kGroup6,
+                                       kGroup8,
+                                   } };
 
-constexpr Target targets[] =
-{
+constexpr Target targets[] = {
     { .flags = Target::kCluster, .cluster = kOnOffCluster },
     { .flags = Target::kEndpoint, .endpoint = 3 },
     { .flags = Target::kDeviceType, .deviceType = kColorLightDeviceType },
 };
 
-bool operator == (const Target & a, const Target & b)
+bool operator==(const Target & a, const Target & b)
 {
     if (a.flags != b.flags)
         return false;
@@ -114,7 +94,7 @@ bool operator == (const Target & a, const Target & b)
     return true;
 }
 
-bool operator != (const Target & a, const Target & b)
+bool operator!=(const Target & a, const Target & b)
 {
     return !(a == b);
 }
@@ -122,23 +102,17 @@ bool operator != (const Target & a, const Target & b)
 struct EntryData
 {
     static constexpr int kMaxSubjects = 3;
-    static constexpr int kMaxTargets = 3;
+    static constexpr int kMaxTargets  = 3;
 
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    Privilege privilege = Privilege::kView;
-    AuthMode authMode = AuthMode::kNone;
+    FabricIndex fabricIndex       = kUndefinedFabricIndex;
+    Privilege privilege           = Privilege::kView;
+    AuthMode authMode             = AuthMode::kNone;
     NodeId subjects[kMaxSubjects] = { 0 };
-    Target targets[kMaxTargets] = { 0 };
+    Target targets[kMaxTargets]   = { 0 };
 
-    void Clear()
-    {
-        memset(this, 0, sizeof(*this));
-    }
+    void Clear() { memset(this, 0, sizeof(*this)); }
 
-    bool IsEmpty() const
-    {
-        return authMode == AuthMode::kNone;
-    }
+    bool IsEmpty() const { return authMode == AuthMode::kNone; }
 
     size_t GetSubjectCount() const
     {
@@ -303,21 +277,46 @@ CHIP_ERROR LoadAccessControl(AccessControl & ac, const EntryData * entryData, si
     return CHIP_NO_ERROR;
 }
 
-constexpr EntryData entryData1[] =
-{
-    { .fabricIndex = 1, .privilege = Privilege::kAdminister, .authMode = AuthMode::kCase,
-        .subjects = { 0x1111111111111111 }, },
-    { .fabricIndex = 1, .privilege = Privilege::kView, .authMode = AuthMode::kCase, },
-    { .fabricIndex = 2, .privilege = Privilege::kAdminister, .authMode = AuthMode::kCase,
-        .subjects = { 0x2222222222222222 }, },
-    { .fabricIndex = 1, .privilege = Privilege::kOperate, .authMode = AuthMode::kCase,
-        .targets = { { .flags = Target::kCluster, .cluster = kOnOffCluster } }, },
-    { .fabricIndex = 2, .privilege = Privilege::kManage, .authMode = AuthMode::kPase,
-        .subjects = { kPaseVerifier1 },
-        .targets = { { .flags = Target::kCluster | Target::kEndpoint, .cluster = kOnOffCluster, .endpoint = 2 } }, },
-    { .fabricIndex = 2, .privilege = Privilege::kProxyView, .authMode = AuthMode::kGroup,
-        .subjects = { kGroup2 },
-        .targets = { { .flags = Target::kCluster | Target::kEndpoint, .cluster = kLevelControlCluster, .endpoint = 1 }, { .flags = Target::kCluster, .cluster = kOnOffCluster }, { .flags = Target::kEndpoint, .endpoint = 2 } }, },
+constexpr EntryData entryData1[] = {
+    {
+        .fabricIndex = 1,
+        .privilege   = Privilege::kAdminister,
+        .authMode    = AuthMode::kCase,
+        .subjects    = { 0x1111111111111111 },
+    },
+    {
+        .fabricIndex = 1,
+        .privilege   = Privilege::kView,
+        .authMode    = AuthMode::kCase,
+    },
+    {
+        .fabricIndex = 2,
+        .privilege   = Privilege::kAdminister,
+        .authMode    = AuthMode::kCase,
+        .subjects    = { 0x2222222222222222 },
+    },
+    {
+        .fabricIndex = 1,
+        .privilege   = Privilege::kOperate,
+        .authMode    = AuthMode::kCase,
+        .targets     = { { .flags = Target::kCluster, .cluster = kOnOffCluster } },
+    },
+    {
+        .fabricIndex = 2,
+        .privilege   = Privilege::kManage,
+        .authMode    = AuthMode::kPase,
+        .subjects    = { kPaseVerifier1 },
+        .targets     = { { .flags = Target::kCluster | Target::kEndpoint, .cluster = kOnOffCluster, .endpoint = 2 } },
+    },
+    {
+        .fabricIndex = 2,
+        .privilege   = Privilege::kProxyView,
+        .authMode    = AuthMode::kGroup,
+        .subjects    = { kGroup2 },
+        .targets     = { { .flags = Target::kCluster | Target::kEndpoint, .cluster = kLevelControlCluster, .endpoint = 1 },
+                     { .flags = Target::kCluster, .cluster = kOnOffCluster },
+                     { .flags = Target::kEndpoint, .endpoint = 2 } },
+    },
 };
 
 struct CheckData
@@ -646,7 +645,9 @@ void TestCheck(nlTestSuite * inSuite, void * inContext)
     for (const auto & checkData : checkData1)
     {
         CHIP_ERROR expectedResult = checkData.allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
-        NL_TEST_ASSERT(inSuite, accessControl.Check(checkData.subjectDescriptor, checkData.requestPath, checkData.privilege) == expectedResult);
+        NL_TEST_ASSERT(inSuite,
+                       accessControl.Check(checkData.subjectDescriptor, checkData.requestPath, checkData.privilege) ==
+                           expectedResult);
     }
 }
 
@@ -707,7 +708,7 @@ void TestIterator(nlTestSuite * inSuite, void * inContext)
     fabricIndex = 1;
     NL_TEST_ASSERT(inSuite, accessControl.Entries(iterator, &fabricIndex) == CHIP_NO_ERROR);
     size_t fabric1[] = { 0, 1, 3 };
-    count = 0;
+    count            = 0;
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
         NL_TEST_ASSERT(inSuite, CompareEntry(entry, entryData1[fabric1[count]]) == CHIP_NO_ERROR);
@@ -718,7 +719,7 @@ void TestIterator(nlTestSuite * inSuite, void * inContext)
     fabricIndex = 2;
     NL_TEST_ASSERT(inSuite, accessControl.Entries(iterator, &fabricIndex) == CHIP_NO_ERROR);
     size_t fabric2[] = { 2, 4, 5 };
-    count = 0;
+    count            = 0;
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
         NL_TEST_ASSERT(inSuite, CompareEntry(entry, entryData1[fabric2[count]]) == CHIP_NO_ERROR);
@@ -754,17 +755,17 @@ void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
                 int subjectIndex;
                 switch (authMode)
                 {
-                    case AuthMode::kPase:
-                        subjectIndex = 0;
-                        break;
-                    case AuthMode::kCase:
-                        subjectIndex = 1;
-                        break;
-                    case AuthMode::kGroup:
-                        subjectIndex = 2;
-                        break;
-                    default:
-                        break;
+                case AuthMode::kPase:
+                    subjectIndex = 0;
+                    break;
+                case AuthMode::kCase:
+                    subjectIndex = 1;
+                    break;
+                case AuthMode::kGroup:
+                    subjectIndex = 2;
+                    break;
+                default:
+                    break;
                 }
 
                 for (auto subject : subjects[subjectIndex])
@@ -822,7 +823,7 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kAdminister) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, {Target::kCluster, 1, 0, 0}) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster, 1, 0, 0 }) == CHIP_NO_ERROR);
 
     size_t index = 999;
     NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
@@ -832,7 +833,7 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kManage) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kPase) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, 0x0000000011111111) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, {Target::kEndpoint, 0, 2, 0}) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kEndpoint, 0, 2, 0 }) == CHIP_NO_ERROR);
 
     index = 999;
     NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
@@ -842,7 +843,7 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kOperate) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, 0x0000000022222222) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, {Target::kDeviceType, 0, 0, 3}) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kDeviceType, 0, 0, 3 }) == CHIP_NO_ERROR);
 
     index = 999;
     NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
@@ -919,9 +920,10 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, 0x22222222BBBBBBBB) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, 0x33333333CCCCCCCC) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, {Target::kCluster | Target::kEndpoint, 11, 22, 0}) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, {Target::kCluster | Target::kDeviceType, 33, 0, 44}) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, {Target::kCluster | Target::kDeviceType, 0xAAAA5555, 0, 0xBBBB6666}) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster | Target::kEndpoint, 11, 22, 0 }) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster | Target::kDeviceType, 33, 0, 44 }) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(
+        inSuite, entry.AddTarget(nullptr, { Target::kCluster | Target::kDeviceType, 0xAAAA5555, 0, 0xBBBB6666 }) == CHIP_NO_ERROR);
 
     index = 999;
     NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
@@ -945,11 +947,15 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, entry.GetTargetCount(count) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, count == 3);
     NL_TEST_ASSERT(inSuite, entry.GetTarget(0, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 11 && target.endpoint == 22);
+    NL_TEST_ASSERT(inSuite,
+                   target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 11 && target.endpoint == 22);
     NL_TEST_ASSERT(inSuite, entry.GetTarget(1, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, target.flags == (Target::kCluster | Target::kDeviceType) && target.cluster == 33 && target.deviceType == 44);
+    NL_TEST_ASSERT(inSuite,
+                   target.flags == (Target::kCluster | Target::kDeviceType) && target.cluster == 33 && target.deviceType == 44);
     NL_TEST_ASSERT(inSuite, entry.GetTarget(2, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, target.flags == (Target::kCluster | Target::kDeviceType) && target.cluster == 0xAAAA5555 && target.deviceType == 0xBBBB6666);
+    NL_TEST_ASSERT(inSuite,
+                   target.flags == (Target::kCluster | Target::kDeviceType) && target.cluster == 0xAAAA5555 &&
+                       target.deviceType == 0xBBBB6666);
 }
 
 void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
@@ -961,9 +967,9 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
     EntryData updateData;
     for (int i = 0; i < 6; ++i)
     {
-        updateData.authMode = authModes[i % 3];
+        updateData.authMode    = authModes[i % 3];
         updateData.fabricIndex = fabricIndexes[i % 3];
-        updateData.privilege = privileges[i % 3];
+        updateData.privilege   = privileges[i % 3];
 
         if (i < 3)
         {

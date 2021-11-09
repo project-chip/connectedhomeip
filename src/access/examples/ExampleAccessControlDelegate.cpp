@@ -38,13 +38,13 @@ using chip::Access::AccessControl;
 using chip::Access::AuthMode;
 using chip::Access::Privilege;
 
-using Entry = chip::Access::AccessControl::Entry;
+using Entry         = chip::Access::AccessControl::Entry;
 using EntryIterator = chip::Access::AccessControl::EntryIterator;
-using Target = Entry::Target;
+using Target        = Entry::Target;
 
 // Pool sizes
-constexpr int kEntryStoragePoolSize = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORGAGE_POOL_SIZE;
-constexpr int kEntryDelegatePoolSize = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE;
+constexpr int kEntryStoragePoolSize          = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORGAGE_POOL_SIZE;
+constexpr int kEntryDelegatePoolSize         = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE;
 constexpr int kEntryIteratorDelegatePoolSize = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_ITERATOR_DELEGATE_POOL_SIZE;
 
 /*
@@ -139,14 +139,11 @@ private:
 class TargetStorage
 {
 public:
-    bool IsEmpty() const
-    {
-        return mCluster == kClusterEmpty && mDeviceType == kDeviceTypeEmpty;
-    }
+    bool IsEmpty() const { return mCluster == kClusterEmpty && mDeviceType == kDeviceTypeEmpty; }
 
     void Clear()
     {
-        mCluster = kClusterEmpty;
+        mCluster    = kClusterEmpty;
         mDeviceType = kDeviceTypeEmpty;
     }
 
@@ -188,49 +185,45 @@ public:
 private:
     static bool IsValidCluster(ClusterId cluster)
     {
-        const auto & id = cluster & kClusterIdMask;
+        const auto & id     = cluster & kClusterIdMask;
         const auto & vendor = cluster & kClusterVendorMask;
-        return ((kClusterIdMinStd <= id && id <= kClusterIdMaxStd)
-            || (kClusterIdMinMs <= id && id <= kClusterIdMaxMs))
-            && (kClusterVendorMin <= vendor && vendor <= kClusterVendorMax);
+        return ((kClusterIdMinStd <= id && id <= kClusterIdMaxStd) || (kClusterIdMinMs <= id && id <= kClusterIdMaxMs)) &&
+            (kClusterVendorMin <= vendor && vendor <= kClusterVendorMax);
     }
 
-    static constexpr bool IsValidEndpoint(EndpointId endpoint)
-    {
-        return true;
-    }
+    static constexpr bool IsValidEndpoint(EndpointId endpoint) { return true; }
 
     static bool IsValidDeviceType(DeviceTypeId deviceType)
     {
-        const auto & id = deviceType & kDeviceTypeIdMask;
+        const auto & id     = deviceType & kDeviceTypeIdMask;
         const auto & vendor = deviceType & kDeviceTypeVendorMask;
-        return (kDeviceTypeIdMin <= id && id <= kDeviceTypeIdMax)
-            && (kDeviceTypeVendorMin <= vendor && vendor <= kDeviceTypeVendorMax);
+        return (kDeviceTypeIdMin <= id && id <= kDeviceTypeIdMax) &&
+            (kDeviceTypeVendorMin <= vendor && vendor <= kDeviceTypeVendorMax);
     }
 
     static bool IsValid(const Target & target)
     {
-        constexpr Target::Flags kNotAll = Target::kEndpoint | Target::kDeviceType;
+        constexpr Target::Flags kNotAll     = Target::kEndpoint | Target::kDeviceType;
         constexpr Target::Flags kAtLeastOne = kNotAll | Target::kCluster;
-        constexpr Target::Flags kNone = ~kAtLeastOne;
-        const auto & flags = target.flags;
-        const auto & cluster = target.cluster;
-        const auto & endpoint = target.endpoint;
-        const auto & deviceType = target.deviceType;
-        return ((flags & kNone) == 0) && ((flags & kAtLeastOne) != 0) && ((flags & kNotAll) != kNotAll)
-            && !((flags & Target::kCluster) && !IsValidCluster(cluster))
-            && !((flags & Target::kEndpoint) && !IsValidEndpoint(endpoint))
-            && !((flags & Target::kDeviceType) && !IsValidDeviceType(deviceType));
+        constexpr Target::Flags kNone       = ~kAtLeastOne;
+        const auto & flags                  = target.flags;
+        const auto & cluster                = target.cluster;
+        const auto & endpoint               = target.endpoint;
+        const auto & deviceType             = target.deviceType;
+        return ((flags & kNone) == 0) && ((flags & kAtLeastOne) != 0) && ((flags & kNotAll) != kNotAll) &&
+            !((flags & Target::kCluster) && !IsValidCluster(cluster)) &&
+            !((flags & Target::kEndpoint) && !IsValidEndpoint(endpoint)) &&
+            !((flags & Target::kDeviceType) && !IsValidDeviceType(deviceType));
     }
 
 private:
     void Decode(Target & target) const
     {
-        auto & flags = target.flags;
-        auto & cluster = target.cluster;
-        auto & endpoint = target.endpoint;
+        auto & flags      = target.flags;
+        auto & cluster    = target.cluster;
+        auto & endpoint   = target.endpoint;
         auto & deviceType = target.deviceType;
-        flags = 0;
+        flags             = 0;
         if (mCluster != kClusterEmpty)
         {
             cluster = mCluster;
@@ -253,9 +246,9 @@ private:
 
     void Encode(const Target & target)
     {
-        const auto & flags = target.flags;
-        const auto & cluster = target.cluster;
-        const auto & endpoint = target.endpoint;
+        const auto & flags      = target.flags;
+        const auto & cluster    = target.cluster;
+        const auto & endpoint   = target.endpoint;
         const auto & deviceType = target.deviceType;
         assert(IsValid(target));
         if (flags & Target::kCluster)
@@ -348,7 +341,7 @@ class EntryStorage
 {
 public:
     // ACL support
-    static constexpr int kNumberOfFabrics = 4; // TODO: get from config
+    static constexpr int kNumberOfFabrics  = 4; // TODO: get from config
     static constexpr int kEntriesPerFabric = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
     static EntryStorage acl[kNumberOfFabrics * kEntriesPerFabric];
 
@@ -450,10 +443,10 @@ public:
 
     void Clear()
     {
-        mInUse = false;
+        mInUse       = false;
         mFabricIndex = chip::kUndefinedFabricIndex;
-        mAuthMode = AuthMode::kPase;
-        mPrivilege = Privilege::kView;
+        mAuthMode    = AuthMode::kPase;
+        mPrivilege   = Privilege::kView;
         for (auto & subject : mSubjects)
         {
             subject.Clear();
@@ -470,7 +463,7 @@ private:
         if (fabricIndex != nullptr)
         {
             size_t unfiltered = 0;
-            size_t filtered = 0;
+            size_t filtered   = 0;
             for (auto & storage : acl)
             {
                 if (storage.InUse())
@@ -494,7 +487,7 @@ private:
 
 public:
     static constexpr int kMaxSubjects = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
-    static constexpr int kMaxTargets = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
+    static constexpr int kMaxTargets  = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
 
     bool mInUse;
     FabricIndex mFabricIndex;
@@ -637,8 +630,8 @@ public:
         if (index < count)
         {
             const auto & dest = mStorage->mSubjects + index;
-            const auto & src = dest + 1;
-            auto bytes = (count - index - 1) * sizeof(*dest);
+            const auto & src  = dest + 1;
+            auto bytes        = (count - index - 1) * sizeof(*dest);
             memmove(dest, src, bytes);
             if (count == EntryStorage::kMaxSubjects)
             {
@@ -706,8 +699,8 @@ public:
         if (index < count)
         {
             const auto & dest = mStorage->mTargets + index;
-            const auto & src = dest + 1;
-            auto bytes = (count - index - 1) * sizeof(*dest);
+            const auto & src  = dest + 1;
+            auto bytes        = (count - index - 1) * sizeof(*dest);
             memmove(dest, src, bytes);
             if (count == EntryStorage::kMaxTargets)
             {
@@ -722,7 +715,7 @@ public:
     {
         entry.SetDelegate(*this);
         storage.Init();
-        mEntry = &entry;
+        mEntry   = &entry;
         mStorage = &storage;
     }
 
@@ -735,7 +728,7 @@ public:
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
-        constexpr auto end = acl + ArraySize(acl);
+        constexpr auto end   = acl + ArraySize(acl);
         if (mStorage == &storage)
         {
             mEntry->ResetDelegate();
@@ -751,7 +744,8 @@ public:
         if (mStorage->InPool())
         {
             return false;
-        } else if (auto storage = EntryStorage::Find(nullptr))
+        }
+        else if (auto storage = EntryStorage::Find(nullptr))
         {
             *storage = *mStorage;
             mStorage = storage;
@@ -761,7 +755,7 @@ public:
     }
 
 private:
-    Entry * mEntry = nullptr;
+    Entry * mEntry          = nullptr;
     EntryStorage * mStorage = nullptr;
 };
 
@@ -799,7 +793,7 @@ public:
     CHIP_ERROR Next(Entry & entry) override
     {
         constexpr auto & acl = EntryStorage::acl;
-        constexpr auto end = acl + ArraySize(acl);
+        constexpr auto end   = acl + ArraySize(acl);
         while (true)
         {
             if (mStorage == nullptr)
@@ -833,7 +827,7 @@ public:
     void Init(EntryIterator & iterator, const FabricIndex * fabricIndex)
     {
         iterator.SetDelegate(*this);
-        mInUse = true;
+        mInUse          = true;
         mFabricFiltered = fabricIndex != nullptr;
         if (mFabricFiltered)
         {
@@ -847,7 +841,7 @@ public:
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
-        constexpr auto end = acl + ArraySize(acl);
+        constexpr auto end   = acl + ArraySize(acl);
         if (&storage <= mStorage && mStorage < end)
         {
             if (mStorage == acl)
@@ -1009,7 +1003,7 @@ public:
         if (auto storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
         {
             constexpr auto & acl = EntryStorage::acl;
-            constexpr auto end = acl + ArraySize(acl);
+            constexpr auto end   = acl + ArraySize(acl);
             for (auto next = storage + 1; storage < end; ++storage, ++next)
             {
                 if (next < end && next->InUse())
@@ -1047,15 +1041,9 @@ public:
     }
 
 private:
-    CHIP_ERROR LoadFromFlash()
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR LoadFromFlash() { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SaveToFlash()
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR SaveToFlash() { return CHIP_NO_ERROR; }
 };
 
 static_assert(std::is_pod<SubjectStorage>());
