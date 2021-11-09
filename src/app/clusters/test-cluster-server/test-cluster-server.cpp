@@ -129,10 +129,10 @@ EmberAfStatus writeTestListInt8uAttribute(EndpointId endpoint)
 CHIP_ERROR TestAttrAccess::ReadListInt8uAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-        constexpr uint16_t attributeCount = 4;
-        for (uint8_t index = 0; index < attributeCount; index++)
+        constexpr uint8_t maxValue = 4;
+        for (uint8_t value = 1; value <= maxValue; value++)
         {
-            ReturnErrorOnFailure(encoder.Encode(index));
+            ReturnErrorOnFailure(encoder.Encode(value));
         }
         return CHIP_NO_ERROR;
     });
