@@ -61,6 +61,7 @@ public:
 
     uint16_t GetBobKeyId() const { return mBobKeyId; }
     uint16_t GetAliceKeyId() const { return mAliceKeyId; }
+    uint16_t GetFriendsGroupId() const { return mFriendsGroupId; }
 
     void SetBobKeyId(uint16_t id) { mBobKeyId = id; }
     void SetAliceKeyId(uint16_t id) { mAliceKeyId = id; }
@@ -78,6 +79,7 @@ public:
 
     SessionHandle GetSessionBobToAlice();
     SessionHandle GetSessionAliceToBob();
+    SessionHandle GetSessionBobToFriends();
 
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
@@ -94,10 +96,11 @@ private:
     secure_channel::MessageCounterManager mMessageCounterManager;
     IOContext * mIOContext;
 
-    NodeId mBobNodeId    = 123654;
-    NodeId mAliceNodeId  = 111222333;
-    uint16_t mBobKeyId   = 1;
-    uint16_t mAliceKeyId = 2;
+    NodeId mBobNodeId        = 123654;
+    NodeId mAliceNodeId      = 111222333;
+    uint16_t mBobKeyId       = 1;
+    uint16_t mAliceKeyId     = 2;
+    uint16_t mFriendsGroupId = 3;
     Transport::PeerAddress mAliceAddress;
     Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;
