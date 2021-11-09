@@ -22,6 +22,7 @@
  *
  */
 
+#include "lib/core/CHIPTLVTypes.h"
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
@@ -414,8 +415,13 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     {
         TLV::TLVReader attributeReportIBsReader;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
+
+        mpCallback->OnReportBegin();
+
         err = ProcessAttributeReportIBs(attributeReportIBsReader);
         SuccessOrExit(err);
+
+        mpCallback->OnReportEnd();
     }
 
     if (!suppressResponse)
@@ -504,9 +510,15 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(data.GetPath(&path));
             ReturnErrorOnFailure(ProcessAttributePath(path, clusterInfo));
             ReturnErrorOnFailure(data.GetData(&dataReader));
-            mpCallback->OnAttributeData(
-                this, ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId), &dataReader,
-                statusIB);
+
+            ConcreteAttributePath attributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
+
+            if (dataReader.GetType() == TLV::kTLVType_Array)
+            {
+                attributePath.mListOp = ConcreteAttributePath::ListOperation::ReplaceAll;
+            }
+
+            mpCallback->OnAttributeData(this, attributePath, &dataReader, statusIB);
         }
     }
 

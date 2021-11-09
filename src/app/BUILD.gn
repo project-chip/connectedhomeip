@@ -36,6 +36,7 @@ static_library("app") {
 
   sources = [
     "AttributePathParams.cpp",
+    "BufferedReadCallback.cpp",
     "Command.cpp",
     "Command.h",
     "CommandHandler.cpp",

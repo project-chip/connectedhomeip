@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/BufferedReadCallback.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/data-model/Decode.h>
@@ -48,7 +49,7 @@ public:
     TypedReadCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
                       OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
         mClusterId(aClusterId),
-        mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
+        mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone), mBufferedReadAdapter(*this)
     {}
 
 private:
@@ -95,6 +96,7 @@ private:
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
+    app::BufferedReadCallback mBufferedReadAdapter;
 };
 
 } // namespace Controller

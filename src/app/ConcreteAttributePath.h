@@ -28,6 +28,8 @@ namespace app {
  */
 struct ConcreteAttributePath
 {
+    ConcreteAttributePath() {}
+
     ConcreteAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         mEndpointId(aEndpointId), mClusterId(aClusterId), mAttributeId(aAttributeId)
     {}
@@ -37,9 +39,22 @@ struct ConcreteAttributePath
         return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mAttributeId == other.mAttributeId;
     }
 
+    enum class ListOperation
+    {
+        NotList,
+        ReplaceAll,
+        UpdateItem,
+        DeleteItem,
+        AppendItem
+    };
+
+    bool IsListOperation() const { return mListOp != ListOperation::NotList; }
+
     EndpointId mEndpointId   = 0;
     ClusterId mClusterId     = 0;
     AttributeId mAttributeId = 0;
+    uint16_t mListIndex      = 0;
+    ListOperation mListOp    = ListOperation::NotList;
 };
 } // namespace app
 } // namespace chip

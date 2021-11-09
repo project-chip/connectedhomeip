@@ -25,6 +25,7 @@
 #pragma once
 
 #include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequestMessage.h>
@@ -59,6 +60,17 @@ public:
     {
     public:
         virtual ~Callback() = default;
+
+        /**
+         * Used to signal the commencement of processing of the first attribute report received in a given exchange.
+         */
+        virtual void OnReportBegin() {}
+
+        /**
+         * Used to signal the completion of processing of the last attribute report in a given exchange.
+         */
+        virtual void OnReportEnd() {}
+
         /**
          * Notification that a list of events is received on the given read client.
          * The ReadClient object MUST continue to exist after this call is completed.
