@@ -779,7 +779,8 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
 CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                   Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
-    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == deviceId)
+    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == deviceId &&
+        mDeviceBeingCommissioned->IsSecureConnected())
     {
         onConnection->mCall(onConnection->mContext, mDeviceBeingCommissioned);
         return CHIP_NO_ERROR;
@@ -1878,6 +1879,11 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
             mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
         }
         RendezvousCleanup(CHIP_NO_ERROR);
+        if (mDeviceBeingCommissioned != nullptr)
+        {
+            ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
+            mDeviceBeingCommissioned = nullptr;
+        }
         break;
     case CommissioningStage::kSecurePairing:
     case CommissioningStage::kError:
