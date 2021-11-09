@@ -45,7 +45,7 @@ using TestTransportMgr = TransportMgr<Transport::UDP>;
 void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext)
 {
     Platform::MemoryInit();
-    chip::DeviceLayer::SetConfigurationMgr(chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
+    chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
     DeviceTransportMgr transportMgr;
     SessionManager sessionManager;
     ExchangeManager exchangeMgr;

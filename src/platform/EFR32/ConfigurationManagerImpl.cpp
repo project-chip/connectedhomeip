@@ -34,20 +34,6 @@ namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
 
-/** Singleton pointer to the ConfigurationManager implementation.
- */
-ConfigurationManager * gInstance;
-
-ConfigurationManager & ConfigurationMgr()
-{
-    return *gInstance;
-}
-
-void SetConfigurationMgr(ConfigurationManager & configurationManager)
-{
-    gInstance = &configurationManager;
-}
-
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
     static ConfigurationManagerImpl sInstance;

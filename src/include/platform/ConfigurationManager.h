@@ -166,9 +166,10 @@ extern ConfigurationManager & ConfigurationMgr();
 /**
  * Sets a reference to a ConfigurationManager object.
  *
- * This must be called before any calls to ConfigurationMgr.
+ * This must be called before any calls to ConfigurationMgr. If a nullptr is passed in,
+ * no changes will be made.
  */
-extern void SetConfigurationMgr(ConfigurationManager & configurationManager);
+extern void SetConfigurationMgr(ConfigurationManager * configurationManager);
 
 } // namespace DeviceLayer
 } // namespace chip

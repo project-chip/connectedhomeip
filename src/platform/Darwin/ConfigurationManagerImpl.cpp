@@ -128,20 +128,6 @@ exit:
 }
 #endif // TARGET_OS_OSX
 
-/** Singleton pointer to the ConfigurationManager implementation.
- */
-ConfigurationManager * gInstance;
-
-ConfigurationManager & ConfigurationMgr()
-{
-    return *gInstance;
-}
-
-void SetConfigurationMgr(ConfigurationManager & configurationManager)
-{
-    gInstance = &configurationManager;
-}
-
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
     static ConfigurationManagerImpl sInstance;

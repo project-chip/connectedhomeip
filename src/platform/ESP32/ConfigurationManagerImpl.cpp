@@ -50,20 +50,6 @@ enum
 
 // TODO: Define a Singleton instance of CHIP Group Key Store here (#1266)
 
-/** Singleton pointer to the ConfigurationManager implementation.
- */
-ConfigurationManager * gInstance;
-
-ConfigurationManager & ConfigurationMgr()
-{
-    return *gInstance;
-}
-
-void SetConfigurationMgr(ConfigurationManager & configurationManager)
-{
-    gInstance = &configurationManager;
-}
-
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
     static ConfigurationManagerImpl sInstance;

@@ -209,7 +209,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
-    SetConfigurationMgr(ConfigurationManagerImpl::GetDefaultInstance());
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();

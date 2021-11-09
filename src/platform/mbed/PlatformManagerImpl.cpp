@@ -91,7 +91,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     tcpip_init(NULL, NULL);
 #endif
 
-    SetConfigurationMgr(ConfigurationManagerImpl::GetDefaultInstance());
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     auto err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();

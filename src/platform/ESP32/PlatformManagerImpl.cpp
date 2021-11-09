@@ -57,7 +57,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    SetConfigurationMgr(ConfigurationManagerImpl::GetDefaultInstance());
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
 
     esp_err_t err;
     // Arrange for CHIP-encapsulated ESP32 errors to be translated to text

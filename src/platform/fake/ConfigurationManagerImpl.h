@@ -111,7 +111,7 @@ ConfigurationManager & ConfigurationMgr()
     return sInstance;
 }
 
-void SetConfigurationMgr(ConfigurationManagerImpl & configurationManager) {}
+void SetConfigurationMgr(ConfigurationManagerImpl * configurationManager) {}
 
 } // namespace DeviceLayer
 } // namespace chip

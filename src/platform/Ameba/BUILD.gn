@@ -21,6 +21,7 @@ assert(chip_device_platform == "ameba")
 static_library("Ameba") {
   sources = [
     "../FreeRTOS/SystemTimeSupport.cpp",
+    "../SingletonConfigurationManager.cpp",
     "AmebaConfig.cpp",
     "AmebaConfig.h",
     "BLEManagerImpl.cpp",

@@ -106,7 +106,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize the configuration system.
     err = Internal::CC13X2_26X2Config::Init();
     SuccessOrExit(err);
-    SetConfigurationMgr(ConfigurationManagerImpl::GetDefaultInstance());
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
 
     // DMM Addition
     DMMPolicy_Params dmmPolicyParams;
