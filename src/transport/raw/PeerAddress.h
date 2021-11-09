@@ -201,6 +201,26 @@ public:
         return TCP(addr).SetPort(port).SetInterface(interface);
     }
 
+    static PeerAddress Multicast(chip::FabricId fabric, chip::NodeId node)
+    {
+        return Multicast(fabric, static_cast<uint16_t>(node & 0xffff));
+    }
+    static PeerAddress Multicast(chip::FabricId fabric, chip::GroupId group)
+    {
+        constexpr uint8_t scope        = 0x05; // Site-Local
+        constexpr uint8_t prefixLength = 0x40; // 64-bit long network prefix field
+        // The network prefix portion of the Multicast Address is the 64-bit bitstring formed by concatenating:
+        // * 0xFD to designate a locally assigned ULA prefix
+        // * The upper 56-bits of the Fabric ID for the network in big-endian order
+        const uint64_t prefix = 0xfd00000000000000 | ((fabric >> 8) & 0x00ffffffffffffff);
+        // The 32-bit group identifier portion of the Multicast Address is the 32-bits formed by:
+        // * The lower 8-bits of the Fabric ID
+        // * 0x00
+        // * The 16-bits Group Identifier in big-endian order
+        uint32_t groupId = static_cast<uint32_t>((fabric << 24) & 0xff000000) | static_cast<uint32_t>(group & 0x0000ffff);
+        return UDP(Inet::IPAddress::MakeIPv6PrefixMulticast(scope, prefixLength, prefix, groupId));
+    }
+
 private:
     Inet::IPAddress mIPAddress   = {};
     Type mTransportType          = Type::kUndefined;
