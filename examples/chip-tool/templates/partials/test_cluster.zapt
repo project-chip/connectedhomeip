@@ -61,8 +61,10 @@ class {{filename}}: public TestCommand
     {{#unless isWait}}
     {{#unless isCommand}}
     {{#unless isWriteAttribute}}
+    {{#unless isReadAttribute}}
     chip::Callback::Callback<void (*) ({{>failureArguments}})> {{>failureCallback}} { {{>failureResponse}}, this };
     chip::Callback::Callback<void (*) ({{>successArguments}})> {{>successCallback}} { {{>successResponse}}, this };
+    {{/unless}}
     {{/unless}}
     {{/unless}}
     {{/unless}}
@@ -74,6 +76,11 @@ class {{filename}}: public TestCommand
     {{#unless isWait}}
     {{#unless isCommand}}
     {{#if isWriteAttribute}}
+    static void {{>failureResponse}}(void * context, EmberAfStatus status)
+    {
+        (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(chip::to_underlying(status));
+    }
+    {{else if isReadAttribute}}
     static void {{>failureResponse}}(void * context, EmberAfStatus status)
     {
         (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(chip::to_underlying(status));
@@ -160,6 +167,10 @@ class {{filename}}: public TestCommand
           {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
           {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}
           {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>successResponse}}, {{>failureResponse}}){{#if async}}){{/if}};
+        {{else if isReadAttribute}}
+          {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
+          {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}
+          {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.ReadAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>successResponse}}, {{>failureResponse}}){{#if async}}){{/if}};
         {{else}}
           {{~#*inline "commandName"}}{{asUpperCamelCase commandName}}{{#if isAttribute}}Attribute{{asUpperCamelCase attribute}}{{/if}}{{/inline}}
           {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.{{>commandName}}({{>successCallback}}.Cancel(){{#unless isWaitForReport}}, {{>failureCallback}}.Cancel(){{/unless}}{{#chip_tests_item_parameters}}, {{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}}){{#if async}}){{/if}};

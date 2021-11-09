@@ -35,18 +35,20 @@ namespace Controller {
  *  2. Automatic decoding of attribute data provided in the TLVReader by InteractionModelDelegate::OnReportData into a decoded
  *     cluster object.
  */
-template <typename AttributeTypeInfo>
+template <typename DecodableAttributeType>
 class TypedReadCallback final : public app::ReadClient::Callback
 {
 public:
     using OnSuccessCallbackType =
-        std::function<void(const app::ConcreteAttributePath & aPath, const typename AttributeTypeInfo::DecodableType & aData)>;
+        std::function<void(const app::ConcreteAttributePath & aPath, const DecodableAttributeType & aData)>;
     using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * aPath,
                                                    Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void(app::ReadClient * client, TypedReadCallback * callback)>;
 
-    TypedReadCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
-        mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
+    TypedReadCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
+                      OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
+        mClusterId(aClusterId),
+        mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
     {}
 
 private:
@@ -54,12 +56,10 @@ private:
                          const app::StatusIB & status) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        typename AttributeTypeInfo::DecodableType value;
+        DecodableAttributeType value;
 
         VerifyOrExit(status.mStatus == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
-        VerifyOrExit(aPath.mClusterId == AttributeTypeInfo::GetClusterId() &&
-                         aPath.mAttributeId == AttributeTypeInfo::GetAttributeId(),
-                     CHIP_ERROR_SCHEMA_MISMATCH);
+        VerifyOrExit(aPath.mClusterId == mClusterId && aPath.mAttributeId == mAttributeId, err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         err = app::DataModel::Decode(*apData, value);
@@ -90,6 +90,8 @@ private:
 
     void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
 
+    ClusterId mClusterId;
+    AttributeId mAttributeId;
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
