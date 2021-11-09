@@ -254,18 +254,21 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::FabricIndex peerFabricIndex = providerFabricIndex)
 {
-    Server * server                        = &(Server::GetInstance());
+    Server * server           = &(Server::GetInstance());
+    chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(providerFabricIndex);
+
     chip::DeviceProxyInitParams initParams = {
         .sessionManager = &(server->GetSecureSessionManager()),
         .exchangeMgr    = &(server->GetExchangeManager()),
         .idAllocator    = &(server->GetSessionIDAllocator()),
-        .fabricInfo     = server->GetFabricTable().FindFabricWithIndex(providerFabricIndex),
+        .fabricInfo     = fabric,
         // TODO: Determine where this should be instantiated
         .imDelegate = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
     };
 
-    chip::OperationalDeviceProxy * operationalDeviceProxy =
-        new chip::OperationalDeviceProxy(initParams, PeerId().SetNodeId(providerNodeId));
+    PeerId peerID = fabric->GetPeerId();
+    peerID.SetNodeId(peerNodeId);
+    chip::OperationalDeviceProxy * operationalDeviceProxy = new chip::OperationalDeviceProxy(initParams, peerID);
     server->SetOperationalDeviceProxy(operationalDeviceProxy);
 
     // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node ID
