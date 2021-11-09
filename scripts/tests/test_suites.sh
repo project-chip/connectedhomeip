@@ -40,12 +40,12 @@ usage() {
 # read shell arguments
 while getopts a:d:i:hs:w: flag; do
     case "$flag" in
-    a) application=$OPTARG ;;
-    d) delay=$OPTARG ;;
-    h) usage ;;
-    i) iterations=$OPTARG ;;
-    s) single_case=$OPTARG ;;
-    w) test_case_wrapper=("$OPTARG") ;;
+        a) application=$OPTARG ;;
+        d) delay=$OPTARG ;;
+        h) usage ;;
+        i) iterations=$OPTARG ;;
+        s) single_case=$OPTARG ;;
+        w) test_case_wrapper=("$OPTARG") ;;
     esac
 done
 
