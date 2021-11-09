@@ -255,7 +255,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::FabricIndex peerFabricIndex = providerFabricIndex)
 {
     Server * server           = &(Server::GetInstance());
-    chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(providerFabricIndex);
+    chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(peerFabricIndex);
 
     chip::DeviceProxyInitParams initParams = {
         .sessionManager = &(server->GetSecureSessionManager()),
