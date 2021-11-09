@@ -28,12 +28,12 @@
 
 #define TAG "ROUTE_HOOK"
 
-typedef struct esp_route_hook
+typedef struct esp_route_hook_t
 {
     struct netif * netif;
     struct raw_pcb * pcb;
-    struct esp_route_hook * next;
-} esp_route_hook;
+    struct esp_route_hook_t * next;
+} esp_route_hook_t;
 
 PACK_STRUCT_BEGIN
 struct rio_header_t
@@ -48,7 +48,7 @@ PACK_STRUCT_END
 
 typedef struct rio_header_t rio_header_t;
 
-static esp_route_hook * s_hooks;
+static esp_route_hook_t * s_hooks;
 
 static bool is_self_address(struct netif * netif, const ip6_addr_t * addr)
 {
@@ -80,11 +80,18 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
         if (opt_type == ND6_OPTION_TYPE_ROUTE_INFO && opt_len >= sizeof(rio_header_t) && !is_self_address(netif, src_addr) &&
             payload_len >= opt_len)
         {
-            rio_header_t * rio_header = (rio_header_t *) icmp_payload;
-            uint8_t prefix_len_bytes  = (rio_header->prefix_length + 7) / 8;
-            int8_t preference         = -2 * ((rio_header->preference >> 4) & 1) + (((rio_header->preference) >> 3) & 1);
-            const uint8_t * rio_data  = &icmp_payload[sizeof(rio_header_t)];
-            uint8_t rio_data_len      = opt_len - sizeof(rio_header_t);
+            rio_header_t rio_header;
+            memcpy(&rio_header, icmp_payload, sizeof(rio_header));
+
+            // skip if prefix is longer than IPv6 address.
+            if (rio_header.prefix_length > 128)
+            {
+                break;
+            }
+            uint8_t prefix_len_bytes = (rio_header.prefix_length + 7) / 8;
+            int8_t preference        = -2 * ((rio_header.preference >> 4) & 1) + (((rio_header.preference) >> 3) & 1);
+            const uint8_t * rio_data = &icmp_payload[sizeof(rio_header_t)];
+            uint8_t rio_data_len     = opt_len - sizeof(rio_header_t);
 
             ESP_LOGI(TAG, "Received RIO");
             for (; rio_data_len >= prefix_len_bytes; rio_data_len -= prefix_len_bytes, rio_data += prefix_len_bytes)
@@ -96,10 +103,10 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
                 memcpy(&prefix.addr, rio_data, prefix_len_bytes);
                 route.netif            = netif;
                 route.gateway          = *src_addr;
-                route.prefix_length    = rio_header->prefix_length;
+                route.prefix_length    = rio_header.prefix_length;
                 route.prefix           = prefix;
                 route.preference       = preference;
-                route.lifetime_seconds = lwip_ntohl(rio_header->route_lifetime);
+                route.lifetime_seconds = lwip_ntohl(rio_header.route_lifetime);
                 ESP_LOGI(TAG, "prefix %s lifetime %u\n", ip6addr_ntoa(&prefix), route.lifetime_seconds);
                 if (esp_route_table_add_route_entry(&route) == NULL)
                 {
@@ -120,7 +127,7 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
     struct icmp6_hdr * icmp6_header;
     ip6_addr_t src;
     ip6_addr_t dest;
-    esp_route_hook * hook = (esp_route_hook *) arg;
+    esp_route_hook_t * hook = (esp_route_hook_t *) arg;
 
     memcpy(src.addr, ip6_header->src.addr, sizeof(src.addr));
     memcpy(dest.addr, ip6_header->dest.addr, sizeof(dest.addr));
@@ -157,15 +164,15 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
 esp_err_t esp_route_hook_init(esp_netif_t * netif)
 {
     struct netif * lwip_netif;
-    ip_addr_t router_group = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0x02);
-    esp_route_hook * hook  = NULL;
-    esp_err_t ret          = ESP_OK;
+    ip_addr_t router_group  = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0x02);
+    esp_route_hook_t * hook = NULL;
+    esp_err_t ret           = ESP_OK;
 
     ESP_RETURN_ON_FALSE(netif != NULL, ESP_ERR_INVALID_ARG, TAG, "Invalid network interface");
     lwip_netif = netif_get_by_index(esp_netif_get_netif_impl_index(netif));
     ESP_RETURN_ON_FALSE(lwip_netif != NULL, ESP_ERR_INVALID_ARG, TAG, "Invalid network interface");
 
-    for (esp_route_hook * iter = s_hooks; iter != NULL; iter++)
+    for (esp_route_hook_t * iter = s_hooks; iter != NULL; iter++)
     {
         if (iter->netif == lwip_netif)
         {
@@ -174,7 +181,7 @@ esp_err_t esp_route_hook_init(esp_netif_t * netif)
         }
     }
 
-    hook = (esp_route_hook *) malloc(sizeof(esp_route_hook));
+    hook = (esp_route_hook_t *) malloc(sizeof(esp_route_hook_t));
     ESP_RETURN_ON_FALSE(hook != NULL, ESP_ERR_NO_MEM, TAG, "Cannot allocate hook");
 
     ESP_GOTO_ON_FALSE(mld6_joingroup_netif(lwip_netif, ip_2_ip6(&router_group)) == ESP_OK, ESP_FAIL, exit, TAG,
