@@ -973,6 +973,12 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
     }
 
     RendezvousCleanup(err);
+
+    if (mDeviceBeingCommissioned != nullptr)
+    {
+        ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
+        mDeviceBeingCommissioned = nullptr;
+    }
 }
 
 void DeviceCommissioner::OnSessionEstablished()
