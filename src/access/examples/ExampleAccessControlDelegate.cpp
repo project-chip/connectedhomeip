@@ -22,6 +22,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <type_traits>
 
 namespace {
 
@@ -128,14 +129,8 @@ public:
 private:
     static bool IsValid(NodeId node) { return node != kUndefinedNodeId; }
 
-public:
-    // Set all bytes to this empty value to clear
-    static constexpr uint8_t kEmptyByte = 0x00;
-
 private:
     static_assert(sizeof(NodeId) == 8);
-    static_assert(kUndefinedNodeId == 0);
-    static_assert(kUndefinedNodeId == kEmptyByte);
 
 private:
     NodeId mNode;
@@ -285,10 +280,6 @@ private:
         }
     }
 
-public:
-    // Set all bytes to this empty value to clear
-    static constexpr uint8_t kEmptyByte = 0xFF;
-
 private:
     static_assert(sizeof(ClusterId) == 4);
     static_assert(sizeof(EndpointId) == 2);
@@ -347,9 +338,6 @@ private:
 
     // (mDeviceType >> kEndpointShift) --> extract endpoint from mDeviceType
     static constexpr int kEndpointShift = 16;
-
-    static_assert(kClusterEmpty == kDeviceTypeEmpty);
-    static_assert(int(kClusterEmpty) == (kEmptyByte | kEmptyByte << 8 | kEmptyByte << 16 | kEmptyByte << 24));
 
 private:
     ClusterId mCluster;
@@ -466,18 +454,14 @@ public:
         mFabricIndex = chip::kUndefinedFabricIndex;
         mAuthMode = AuthMode::kPase;
         mPrivilege = Privilege::kView;
-        memset(mSubjects, SubjectStorage::kEmptyByte, sizeof(mSubjects));
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wclass-memaccess"
-        memset(mTargets, TargetStorage::kEmptyByte, sizeof(mTargets));
-#pragma GCC diagnostic pop
-#else
+        for (auto & subject : mSubjects)
+        {
+            subject.Clear();
+        }
         for (auto & target : mTargets)
         {
             target.Clear();
         }
-#endif
     }
 
 private:
@@ -512,10 +496,7 @@ public:
     static constexpr int kMaxSubjects = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
     static constexpr int kMaxTargets = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
 
-private:
     bool mInUse;
-
-public:
     FabricIndex mFabricIndex;
     AuthMode mAuthMode;
     Privilege mPrivilege;
@@ -890,8 +871,9 @@ private:
 CHIP_ERROR CopyViaInterface(const Entry & entry, EntryStorage & storage)
 {
 #if CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FOREIGN_DELEGATE_SUPPORT
-    // NOTE: function uses a fair amount of stack
-    //       and is only necessary if using foreign delegates
+    // NOTE: function uses sizeof(EntryStorage) on stack as a temporary
+    //       and is only necessary if using foreign delegates (i.e. not
+    //       EntryDelegate from this file)
     EntryStorage temp;
     temp.Clear();
 
@@ -1075,6 +1057,10 @@ private:
         return CHIP_NO_ERROR;
     }
 };
+
+static_assert(std::is_pod<SubjectStorage>());
+static_assert(std::is_pod<TargetStorage>());
+static_assert(std::is_pod<EntryStorage>());
 
 EntryStorage EntryStorage::acl[];
 EntryStorage EntryStorage::pool[];

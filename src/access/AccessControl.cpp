@@ -37,22 +37,22 @@ static_assert((int(Privilege::kOperate) & int(Privilege::kView)) == 0);
 static_assert((int(Privilege::kOperate) & int(Privilege::kProxyView)) == 0);
 static_assert((int(Privilege::kView) & int(Privilege::kProxyView)) == 0);
 
-int GetGrantedPrivileges(Privilege privilege)
+bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Privilege entryPrivilege)
 {
-    switch (privilege)
+    switch (entryPrivilege)
     {
         case Privilege::kView:
-            return int(Privilege::kView);
+            return requestPrivilege == Privilege::kView;
         case Privilege::kProxyView:
-            return int(Privilege::kProxyView) | int(Privilege::kView);
+            return requestPrivilege == Privilege::kProxyView || requestPrivilege == Privilege::kView;
         case Privilege::kOperate:
-            return int(Privilege::kOperate) | int(Privilege::kView);
+            return requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView;
         case Privilege::kManage:
-            return int(Privilege::kManage) | int(Privilege::kOperate) | int(Privilege::kView);
+            return requestPrivilege == Privilege::kManage || requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView;
         case Privilege::kAdminister:
-            return int(Privilege::kAdminister) | int(Privilege::kManage) | int(Privilege::kOperate) | int(Privilege::kView) | int(Privilege::kProxyView);
+            return requestPrivilege == Privilege::kAdminister || requestPrivilege == Privilege::kManage || requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView || requestPrivilege == Privilege::kProxyView;
     }
-    return 0;
+    return false;
 }
 
 } // namespace
@@ -84,8 +84,6 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     Entry entry;
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
-        ChipLogDetail(DataManagement, "got an entry");
-
         AuthMode authMode;
         ReturnErrorOnFailure(entry.GetAuthMode(authMode));
         if (authMode != subjectDescriptor.authMode)
@@ -95,35 +93,39 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 
         Privilege privilege;
         ReturnErrorOnFailure(entry.GetPrivilege(privilege));
-        int grantedPrivileges = GetGrantedPrivileges(privilege);
-        if ((grantedPrivileges & int(requestPrivilege)) == 0)
+        if (!CheckRequestPrivilegeAgainstEntryPrivilege(requestPrivilege, privilege))
         {
             continue;
         }
 
         size_t subjectCount;
-        NodeId subject;
         ReturnErrorOnFailure(entry.GetSubjectCount(subjectCount));
         if (subjectCount > 0)
         {
+            bool subjectMatched = false;
+            NodeId subject;
             for (size_t i = 0; i < subjectCount; ++i)
             {
                 ReturnErrorOnFailure(entry.GetSubject(i, subject));
                 if (subject == subjectDescriptor.subjects[0])
                 {
-                    goto subjectMatched;
+                    subjectMatched = true;
+                    break;
                 }
                 // TODO: check against CATs in subject descriptor
             }
-            continue;
+            if (!subjectMatched)
+            {
+                continue;
+            }
         }
-        subjectMatched:
 
         size_t targetCount;
-        Entry::Target target;
         ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
         if (targetCount > 0)
         {
+            bool targetMatched = false;
+            Entry::Target target;
             for (size_t i = 0; i < targetCount; ++i)
             {
                 ReturnErrorOnFailure(entry.GetTarget(i, target));
@@ -136,11 +138,14 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                     continue;
                 }
                 // TODO: check against target.deviceType (requires lookup)
-                goto targetMatched;
+                targetMatched = true;
+                break;
             }
-            continue;
+            if (!targetMatched)
+            {
+                continue;
+            }
         }
-        targetMatched:
 
         return CHIP_NO_ERROR;
     }

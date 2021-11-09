@@ -139,7 +139,7 @@ public:
             mDelegate = &mDefaultDelegate;
         }
 
-    protected:
+    private:
         static Delegate mDefaultDelegate;
         Delegate * mDelegate = &mDefaultDelegate;
     };
