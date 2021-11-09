@@ -109,13 +109,12 @@ static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inCo
     const VendorReservedElement * constructionElement = vendorReservedConstructor.cbegin();
     VendorReservedElement deconstructionElement;
 
-    while (constructionElement && vendorReservedDeconstructor.GetNextVendorReservedElement(deconstructionElement) == CHIP_NO_ERROR)
+    while ((constructionElement = vendorReservedConstructor.Next()) != nullptr &&
+           vendorReservedDeconstructor.GetNextVendorReservedElement(deconstructionElement) == CHIP_NO_ERROR)
     {
         NL_TEST_ASSERT(inSuite, constructionElement->vendorId == deconstructionElement.vendorId);
         NL_TEST_ASSERT(inSuite, constructionElement->profileNum == deconstructionElement.profileNum);
         NL_TEST_ASSERT(inSuite, constructionElement->vendorReservedData.data_equal(deconstructionElement.vendorReservedData));
-
-        constructionElement = vendorReservedConstructor.Next();
     }
 }
 
@@ -283,13 +282,17 @@ static void TestVendorReservedData(nlTestSuite * inSuite, void * inContext)
         &inputArray[2], &inputArray[3], &inputArray[1], &inputArray[5], &inputArray[0], &inputArray[4],
     };
 
-    const struct VendorReservedElement * element;
-    for (element = vendorReserved.cbegin(), i = 0; element; element = vendorReserved.Next(), i++)
+    const struct VendorReservedElement * element = vendorReserved.cbegin();
+    NL_TEST_ASSERT(inSuite, element);
+    NL_TEST_ASSERT(inSuite, element = vendorReserved.Next());
+
+    for (i = 0; element && i < ArraySize(desiredOrder); element = vendorReserved.Next(), i++)
     {
         NL_TEST_ASSERT(inSuite,
                        element->vendorId == desiredOrder[i]->vendorId && element->profileNum == desiredOrder[i]->profileNum &&
                            element->tagNum == desiredOrder[i]->tagNum);
     }
+    NL_TEST_ASSERT(inSuite, i == ArraySize(desiredOrder)); // check if previous loop matched for every array entry.
 
     // add another element, it should fail
     uint8_t testByteSpan[] = { 0x1, 0x2, 0x3 };
