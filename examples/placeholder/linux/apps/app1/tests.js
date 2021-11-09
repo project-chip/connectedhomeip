@@ -18,7 +18,7 @@
 function getTests()
 {
   const tests = [
-    "Test_TC_DM_1_3",
+    "Test_TC_DM_1_3_Simulated",
   ];
 
   return tests.join(', ');

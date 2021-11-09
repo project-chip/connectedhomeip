@@ -58,7 +58,7 @@ else
     application="all-clusters"
     declare test_filenames="${single_case-Test*}.yaml"
 fi
-declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
+declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -not -name "*Simulated*" -exec basename {} .yaml \;))"
 
 if [[ $iterations == 0 ]]; then
     echo "Invalid iteration count: '$1'"
