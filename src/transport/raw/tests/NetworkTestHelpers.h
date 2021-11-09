@@ -27,6 +27,7 @@
 #include <transport/raw/PeerAddress.h>
 
 #include <nlbyteorder.h>
+#include <queue>
 
 namespace chip {
 namespace Test {
@@ -63,6 +64,32 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char *) { return CHIP_NO_ERROR; }
 
+    /*
+     * For unit-tests that simulate end-to-end transmission and reception of messages in loopback mode,
+     * this mode better replicates a real-functioning stack that correctly handles the processing
+     * of a transmitted message as an asynchronous, bottom half handler dispatched after the current execution context has
+     * completed. This is achieved using SystemLayer::ScheduleWork.
+     */
+    void EnableAsyncDispatch(System::Layer * aSystemLayer)
+    {
+        mSystemLayer          = aSystemLayer;
+        mAsyncMessageDispatch = true;
+    }
+
+    bool HasPendingMessages() { return !mPendingMessageQueue.empty(); }
+
+    static void OnMessageReceived(System::Layer * aSystemLayer, void * aAppState)
+    {
+        LoopbackTransport * _this = static_cast<LoopbackTransport *>(aAppState);
+
+        while (!_this->mPendingMessageQueue.empty())
+        {
+            auto item = std::move(_this->mPendingMessageQueue.front());
+            _this->mPendingMessageQueue.pop();
+            _this->HandleMessageReceived(item.mDestinationAddress, std::move(item.mPendingMessage));
+        }
+    }
+
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
         ReturnErrorOnFailure(mMessageSendError);
@@ -71,7 +98,16 @@ public:
         if (mNumMessagesToDrop == 0)
         {
             System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-            HandleMessageReceived(address, std::move(receivedMessage));
+
+            if (mAsyncMessageDispatch)
+            {
+                mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
+                mSystemLayer->ScheduleWork(OnMessageReceived, this);
+            }
+            else
+            {
+                HandleMessageReceived(address, std::move(receivedMessage));
+            }
         }
         else
         {
@@ -93,9 +129,23 @@ public:
         mMessageSendError    = CHIP_NO_ERROR;
     }
 
+    struct PendingMessageItem
+    {
+        PendingMessageItem(const Transport::PeerAddress destinationAddress, System::PacketBufferHandle && pendingMessage) :
+            mDestinationAddress(destinationAddress), mPendingMessage(std::move(pendingMessage))
+        {}
+
+        const Transport::PeerAddress mDestinationAddress;
+        System::PacketBufferHandle mPendingMessage;
+    };
+
     // Hook for subclasses to perform custom logic on message drops.
     virtual void MessageDropped() {}
 
+    System::Layer * mSystemLayer = nullptr;
+    bool mAsyncMessageDispatch   = false;
+    std::queue<PendingMessageItem> mPendingMessageQueue;
+    Transport::PeerAddress mTxAddress;
     uint32_t mNumMessagesToDrop   = 0;
     uint32_t mDroppedMessageCount = 0;
     uint32_t mSentMessageCount    = 0;

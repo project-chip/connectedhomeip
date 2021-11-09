@@ -23,7 +23,7 @@
 
 void LEDWidget::Init(LED_t led)
 {
-    mLastChangeTimeUS = 0;
+    mLastChangeTimeMS = 0;
     mBlinkOnTimeMS    = 0;
     mBlinkOffTimeMS   = 0;
     mGPIONum          = led;
@@ -39,7 +39,7 @@ void LEDWidget::Invert(void)
 
 void LEDWidget::Set(bool state)
 {
-    mLastChangeTimeUS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
+    mLastChangeTimeMS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
     DoSet(state);
 }
 
@@ -59,14 +59,14 @@ void LEDWidget::Animate()
 {
     if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
     {
-        chip::System::Clock::MonotonicMicroseconds nowUS            = chip::System::SystemClock().GetMonotonicMicroseconds();
-        chip::System::Clock::MonotonicMicroseconds stateDurUS       = ((mState) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
-        chip::System::Clock::MonotonicMicroseconds nextChangeTimeUS = mLastChangeTimeUS + stateDurUS;
+        uint64_t nowMS            = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+        uint64_t stateDurMS       = mState ? mBlinkOnTimeMS : mBlinkOffTimeMS;
+        uint64_t nextChangeTimeMS = mLastChangeTimeMS + stateDurMS;
 
-        if (nextChangeTimeUS < nowUS)
+        if (nextChangeTimeMS < nowMS)
         {
             DoSet(!mState);
-            mLastChangeTimeUS = nowUS;
+            mLastChangeTimeMS = nowMS;
         }
     }
 }

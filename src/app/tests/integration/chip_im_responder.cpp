@@ -110,33 +110,28 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     (void) apCommandObj;
 }
 
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+                                 AttributeReportIB::Builder & aAttributeReport)
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    uint64_t version = 0;
-    VerifyOrExit(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(apWriter != nullptr, /* no op */);
-
-    err = AttributeValueEncoder(apWriter).Encode(kTestFieldValue1);
-    SuccessOrExit(err);
-    err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
-
-exit:
-    return err;
+    AttributeDataIB::Builder attributeData = aAttributeReport.CreateAttributeData();
+    AttributePathIB::Builder attributePath = attributeData.CreatePath();
+    VerifyOrReturnError(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+    ReturnErrorOnFailure(attributePath.GetError());
+    ReturnErrorOnFailure(AttributeValueEncoder(attributeData.GetWriter(), 0).Encode(kTestFieldValue1));
+    attributeData.DataVersion(0).EndOfAttributeDataIB();
+    ReturnErrorOnFailure(attributeData.GetError());
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId     = 1;
-    attributePathParams.mEndpointId = 2;
-    attributePathParams.mClusterId  = 3;
-    attributePathParams.mFieldId    = 4;
-    attributePathParams.mListIndex  = 5;
-    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
-
-    err = apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+    attributePathParams.mEndpointId  = 2;
+    attributePathParams.mClusterId   = 3;
+    attributePathParams.mAttributeId = 4;
+    err                              = apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
     return err;
 }
 } // namespace app
@@ -170,12 +165,11 @@ void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
     chip::app::ClusterInfo dirtyPath;
     dirtyPath.mClusterId  = kTestClusterId;
     dirtyPath.mEndpointId = kTestEndpointId;
-    dirtyPath.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
     printf("MutateClusterHandler is triggered...");
     // send dirty change
     if (!testSyncReport)
     {
-        dirtyPath.mFieldId = 1;
+        dirtyPath.mAttributeId = 1;
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), MutateClusterHandler, NULL);
@@ -183,7 +177,7 @@ void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
     }
     else
     {
-        dirtyPath.mFieldId = 10; // unknown field
+        dirtyPath.mAttributeId = 10; // unknown field
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
         // send sync message(empty report)
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
@@ -211,7 +205,7 @@ int main(int argc, char * argv[])
     InitializeChip();
 
     err = gTransportManager.Init(
-        chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::IPAddressType::kIPv6));
+        chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer()).SetAddressType(chip::Inet::IPAddressType::kIPv6));
     SuccessOrExit(err);
 
     err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager);
@@ -248,7 +242,7 @@ exit:
     }
 
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-
+    gTransportManager.Close();
     ShutdownChip();
 
     return EXIT_SUCCESS;

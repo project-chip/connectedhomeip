@@ -142,6 +142,11 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}-ember.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
         ]
+      } else if (cluster == "mode-select-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/supported-modes-manager.h",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
@@ -151,6 +156,8 @@ template("chip_data_model") {
       sources += [
         "${invoker.zap_pregenerated_dir}/CHIPClusters.cpp",
         "${invoker.zap_pregenerated_dir}/CHIPClusters.h",
+        "${invoker.zap_pregenerated_dir}/CHIPClustersInvoke.cpp",
+        "${invoker.zap_pregenerated_dir}/CHIPClustersWrite.cpp",
         "${invoker.zap_pregenerated_dir}/attribute-size.cpp",
         "${invoker.zap_pregenerated_dir}/callback-stub.cpp",
       ]
@@ -171,6 +178,7 @@ template("chip_data_model") {
         sources += [
           "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.cpp",
           "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h",
+          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTestWrite.cpp",
         ]
       }
     }

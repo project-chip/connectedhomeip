@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/PlatformManager.h>
@@ -30,6 +31,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 using chip::DeviceLayer::ConnectivityMgr;
 using chip::DeviceLayer::PlatformManager;
+using chip::DeviceLayer::PlatformMgr;
 
 namespace {
 
@@ -52,7 +54,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMana
                                                         AttributeValueEncoder & aEncoder)
 {
     T data;
-    CHIP_ERROR err = (DeviceLayer::PlatformMgr().*getter)(data);
+    CHIP_ERROR err = (PlatformMgr().*getter)(data);
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         data = 0;
@@ -124,9 +126,63 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath
     }
     return CHIP_NO_ERROR;
 }
+
+class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegate, public DeviceLayer::PlatformManagerDelegate
+{
+
+    // Gets called when any network interface on the Node is updated.
+    void OnNetworkInfoChanged() override
+    {
+        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnNetworkInfoChanged");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::NetworkInterfaces::Id);
+                }
+            }
+        }
+    }
+
+    // Gets called when the device has been rebooted.
+    void OnDeviceRebooted() override
+    {
+        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnDeviceRebooted");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::RebootCount::Id);
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::BootReasons::Id);
+                }
+            }
+        }
+    }
+};
+
+GeneralDiagnosticDelegate gDiagnosticDelegate;
+
 } // anonymous namespace
 
 void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
+
+    PlatformMgr().SetDelegate(&gDiagnosticDelegate);
+    ConnectivityMgr().SetDelegate(&gDiagnosticDelegate);
 }

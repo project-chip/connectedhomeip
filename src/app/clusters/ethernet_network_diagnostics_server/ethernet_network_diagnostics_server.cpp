@@ -144,7 +144,7 @@ exit:
     return true;
 }
 
-void MatterEthernetNetworkDiagnosticsClusterServerInitCallback()
+void MatterEthernetNetworkDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

@@ -22,6 +22,7 @@ class Efr32App(Enum):
     LIGHT = auto()
     LOCK = auto()
     WINDOW_COVERING = auto()
+    UNIT_TEST = auto()
 
     def ExampleName(self):
         if self == Efr32App.LIGHT:
@@ -40,6 +41,8 @@ class Efr32App(Enum):
             return 'chip-efr32-lock-example'
         elif self == Efr32App.WINDOW_COVERING:
             return 'chip-efr32-window-example'
+        elif self == Efr32App.UNIT_TEST:
+            return 'chip-efr32-device_tests'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -50,8 +53,16 @@ class Efr32App(Enum):
             return 'lock_app.flashbundle.txt'
         elif self == Efr32App.WINDOW_COVERING:
             return 'window_app.flashbundle.txt'
+        elif self == Efr32App.UNIT_TEST:
+            return 'efr32_device_tests.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
+
+    def BuildRoot(self, root):
+        if self == Efr32App.UNIT_TEST:
+            return os.path.join(root, 'src', 'test_driver', 'efr32')
+        else:
+            return os.path.join(root, 'examples', self.ExampleName(), 'efr32')
 
 
 class Efr32Board(Enum):
@@ -71,7 +82,7 @@ class Efr32Builder(GnBuilder):
                  board: Efr32Board = Efr32Board.BRD4161A,
                  enable_rpcs: bool = False):
         super(Efr32Builder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExampleName(), 'efr32'),
+            root=app.BuildRoot(root),
             runner=runner)
         self.app = app
         self.board = board
@@ -92,6 +103,11 @@ class Efr32Builder(GnBuilder):
                 os.path.join(self.output_dir,
                              '%s.out.map' % self.app.AppNamePrefix()),
         }
+
+        if self.app == Efr32App.UNIT_TEST:
+            # Include test runner python wheels
+            items["chip_nl_test_runner_wheels"] = os.path.join(
+                self.output_dir, 'chip_nl_test_runner_wheels')
 
         # Figure out flash bundle files and build accordingly
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:

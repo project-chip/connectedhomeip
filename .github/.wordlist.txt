@@ -47,6 +47,7 @@ argc
 args
 argv
 armeabi
+ARMmbed
 armv
 asdk
 ASYNC
@@ -69,6 +70,7 @@ autotools
 avL
 AwaitNextAction
 AXXXF
+AYNJV
 babaf
 backend
 backticks
@@ -118,6 +120,7 @@ CACACACA
 cacerts
 CAfile
 cancelled
+capacitive
 CBB
 cbd
 CCMP
@@ -148,6 +151,7 @@ ChipImResponder
 ChipLight
 ChipMessageLayer
 CHIPOBLE
+CHIPProjectConfig
 CHIPTest
 CHIPTool
 chmod
@@ -169,6 +173,7 @@ clusterListName
 ClusterRevision
 ClusterTestGeneration
 cmake
+CMakeLists
 CMD
 CMSIS
 CMVH
@@ -207,6 +212,7 @@ cp
 cpio
 cpp
 cppreference
+CPROTO
 cpuapp
 cpython
 crypto
@@ -304,6 +310,7 @@ eabi
 EB
 ECC
 ECD
+EchoMessage
 EchoRequests
 EchoResponse
 EchoService
@@ -378,6 +385,7 @@ FreeRTOS
 FreeRTOSConfig
 fsl
 fsync
+fullclean
 gcloud
 GDB
 GeneralCommissioning
@@ -394,6 +402,7 @@ GetDeviceInfo
 GetDns
 GetIP
 getstarted
+githubusercontent
 gitignore
 glibc
 gn
@@ -426,6 +435,7 @@ hciconfig
 hdlc
 HKDF
 hoc
+homebrew
 hostapd
 hostname
 href
@@ -524,10 +534,12 @@ lifecycle
 lightbulb
 lightin
 LightingColor
+LightingState
 LinkSoftwareAndDocumentationPack
 LocalConfigDisabled
 localhost
 localstatedir
+LockingState
 loopback
 LowPower
 LPC
@@ -553,10 +565,16 @@ matterc
 matterd
 MatterLock
 matterSdkSourceBuild
+matterSourceBuildAbiFilters
 matterUTestLib
 MaxInterval
 MaxIntervalCeilingSeconds
 MaxRtrAdvInterval
+mbed
+MbedCommissioning
+MbedNewTarget
+mbedos
+mbedTarget
 mbedTLS
 mcu
 MCUboot
@@ -581,6 +599,7 @@ MfrDeviceCert
 MfrDeviceId
 mgmt
 microcontroller
+microcontrollers
 MicroSD
 middleware
 Minicom
@@ -606,6 +625,8 @@ Multiband
 Multicast
 multilib
 Multiprotocol
+multithreaded
+mutexes
 MX
 mydir
 MyPASSWORD
@@ -652,6 +673,7 @@ OnOff
 OnOffClusterTest
 OnPlatformEvent
 OO
+OpenOCD
 OpenSSL
 OpenThread
 OpenThreadDemo
@@ -689,6 +711,7 @@ peerAddrStr
 pem
 percentageLiftValue
 pexpect
+pickString
 PID
 Pigweed
 PinCode
@@ -713,15 +736,18 @@ productrev
 ProductRevision
 ProductURL
 proto
+protobuf
 protos
 Prover
 PRs
 PSCAN
 PSK
+PSoC
 PTR
 pts
 PumpConfigurationAndControl
 pwd
+PWM
 PXXXF
 py
 pychip
@@ -767,6 +793,7 @@ repo
 req
 Requestor
 responder
+retargeting
 reusability
 rfid
 rfids
@@ -790,6 +817,7 @@ RUNAS
 RunMain
 runtime
 rw
+RXD
 sbin
 scalability
 scalable
@@ -801,8 +829,8 @@ SDC
 SDHC
 SDK
 sdkconfig
-SDKs
 SDK's
+SDKs
 SDKTARGETSYSROOT
 sdl
 segger
@@ -836,6 +864,7 @@ softmmu
 SoftwareDiagnostics
 SoftwareVersion
 SoftwareVersionString
+SPI
 spinel
 src
 SRP
@@ -845,6 +874,7 @@ startoffset
 StartScan
 stderr
 stdout
+sterm
 str
 strcpy
 su
@@ -876,6 +906,7 @@ systemduserunitdir
 sysv
 TargetNavigator
 TBD
+tcl
 TCP
 teardown
 Telink
@@ -924,6 +955,7 @@ ttyACMx
 ttymxc
 ttyUSB
 TvChannel
+TXD
 txt
 uart
 UART

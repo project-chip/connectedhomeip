@@ -145,11 +145,11 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     VerifyOrExit(version == kMsgHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
     SetMessageFlags(msgFlags);
 
+    SuccessOrExit(err = reader.Read16(&mSessionId).StatusCode());
+
     uint8_t securityFlags;
     SuccessOrExit(err = reader.Read8(&securityFlags).StatusCode());
     SetSecurityFlags(securityFlags);
-
-    SuccessOrExit(err = reader.Read16(&mSessionId).StatusCode());
 
     SuccessOrExit(err = reader.Read32(&mMessageCounter).StatusCode());
 
@@ -177,10 +177,9 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     }
     else if (mMsgFlags.Has(Header::MsgFlagValues::kDestinationNodeIdPresent))
     {
-        if (mSessionType != Header::SessionType::kUnicastSession)
-        {
-            SuccessOrExit(err = CHIP_ERROR_INTERNAL);
-        }
+        // No need to check if session is Unicast because for MCSP
+        // a destination node ID is present with a group session ID.
+        // Spec 4.9.2.4
         uint64_t destinationNodeId;
         SuccessOrExit(err = reader.Read64(&destinationNodeId).StatusCode());
         mDestinationNodeId.SetValue(destinationNodeId);
@@ -282,7 +281,6 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     VerifyOrReturnError(!(mDestinationNodeId.HasValue() && mDestinationGroupId.HasValue()), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(encode_size != nullptr, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(IsSessionTypeValid(), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(!(IsGroupSession() && !mDestinationGroupId.HasValue()), CHIP_ERROR_INTERNAL);
 
     Header::MsgFlags messageFlags = mMsgFlags;
     messageFlags.Set(Header::MsgFlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
@@ -295,8 +293,8 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
 
     uint8_t * p = data;
     Write8(p, msgFlags);
-    Write8(p, secFlags);
     LittleEndian::Write16(p, mSessionId);
+    Write8(p, secFlags);
     LittleEndian::Write32(p, mMessageCounter);
     if (mSourceNodeId.HasValue())
     {
@@ -306,8 +304,7 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     {
         LittleEndian::Write64(p, mDestinationNodeId.Value());
     }
-
-    if (mDestinationGroupId.HasValue())
+    else if (mDestinationGroupId.HasValue())
     {
         LittleEndian::Write16(p, mDestinationGroupId.Value());
     }

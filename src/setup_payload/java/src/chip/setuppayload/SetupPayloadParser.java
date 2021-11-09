@@ -14,6 +14,13 @@ public class SetupPayloadParser {
     return fetchPayloadFromManualEntryCode(entryCodeString);
   }
 
+  /** Get QR code string from {@link SetupPayload}. */
+  public native String getQrCodeFromPayload(SetupPayload payload) throws SetupPayloadException;
+
+  /** Get manual entry code string from {@link SetupPayload}. */
+  public native String getManualEntryCodeFromPayload(SetupPayload payload)
+      throws SetupPayloadException;
+
   private native SetupPayload fetchPayloadFromQrCode(String qrCodeString)
       throws UnrecognizedQrCodeException;
 
@@ -37,6 +44,16 @@ public class SetupPayloadParser {
 
     public InvalidEntryCodeFormatException(String entryCode) {
       super(String.format("Invalid format for entry code string: %s", entryCode), null);
+    }
+  }
+
+  public static class SetupPayloadException extends Exception {
+    private static final long serialVersionUID = 1L;
+    public int errorCode;
+
+    public SetupPayloadException(int errorCode, String message) {
+      super(message != null ? message : String.format("Error Code %d", errorCode));
+      this.errorCode = errorCode;
     }
   }
 }

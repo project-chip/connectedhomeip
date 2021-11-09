@@ -88,8 +88,8 @@ bool PumpManager::InitiateAction(int32_t aActor, Action_t aAction)
     else if (mState == kState_StopCompleted && aAction == START_ACTION)
     {
         action_initiated = true;
-
-        new_state = kState_StartInitiated;
+        mCurrentActor    = aActor;
+        new_state        = kState_StartInitiated;
     }
 
     if (action_initiated)
@@ -188,7 +188,7 @@ void PumpManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
     {
         if (pump->mActionCompleted_CB)
         {
-            pump->mActionCompleted_CB(actionCompleted);
+            pump->mActionCompleted_CB(actionCompleted, pump->mCurrentActor);
         }
 
         if (pump->mAutoRestart && actionCompleted == STOP_ACTION)

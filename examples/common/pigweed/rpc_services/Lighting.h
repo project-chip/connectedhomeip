@@ -39,8 +39,7 @@ public:
     {
         uint8_t on = request.on;
         RETURN_STATUS_IF_NOT_OK(
-            emberAfWriteServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &on, ZCL_BOOLEAN_ATTRIBUTE_ID));
-
+            emberAfWriteServerAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &on, ZCL_BOOLEAN_ATTRIBUTE_ID));
         if (mSupportLevel && request.has_level)
         {
             // Clip level to max
@@ -61,7 +60,6 @@ public:
                                                                 ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID, &saturation,
                                                                 ZCL_INT8U_ATTRIBUTE_TYPE));
         }
-
         return pw::OkStatus();
     }
 
@@ -71,8 +69,7 @@ public:
         uint8_t level;
         uint8_t hue;
         uint8_t saturation;
-        RETURN_STATUS_IF_NOT_OK(
-            emberAfReadServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &on, sizeof(on)));
+        RETURN_STATUS_IF_NOT_OK(emberAfReadServerAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &on, sizeof(on)));
         response.on = on;
 
         if (mSupportLevel)

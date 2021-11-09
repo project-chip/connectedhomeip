@@ -121,14 +121,8 @@ void InteractionModelEngine::Shutdown()
 }
 
 CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
-                                                 uint64_t aAppIdentifier, InteractionModelDelegate * apDelegateOverride)
+                                                 ReadClient::Callback * aCallback)
 {
-
-    if (apDelegateOverride == nullptr)
-    {
-        apDelegateOverride = mpDelegate;
-    }
-
     *apReadClient = nullptr;
 
     for (auto & readClient : mReadClients)
@@ -138,7 +132,7 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
             CHIP_ERROR err;
 
             *apReadClient = &readClient;
-            err           = readClient.Init(mpExchangeMgr, apDelegateOverride, aInteractionType, aAppIdentifier);
+            err           = readClient.Init(mpExchangeMgr, aCallback, aInteractionType);
             if (CHIP_NO_ERROR != err)
             {
                 *apReadClient = nullptr;
@@ -226,6 +220,23 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId
     return err;
 }
 
+CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
+{
+    CHIP_ERROR err = CHIP_ERROR_KEY_NOT_FOUND;
+
+    for (ReadClient & readClient : mReadClients)
+    {
+        if (!readClient.IsFree() && readClient.IsSubscriptionType() && readClient.GetFabricIndex() == aFabricIndex &&
+            readClient.GetPeerNodeId() == aPeerNodeId)
+        {
+            readClient.Shutdown();
+            err = CHIP_NO_ERROR;
+        }
+    }
+
+    return err;
+}
+
 CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * apCallback)
 {
     apWriteClient.SetWriteClient(nullptr);
@@ -303,7 +314,7 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
             System::PacketBufferTLVReader reader;
             reader.Init(aPayload.Retain());
             SuccessOrExit(err = reader.Next());
-            SubscribeRequest::Parser subscribeRequestParser;
+            SubscribeRequestMessage::Parser subscribeRequestParser;
             SuccessOrExit(err = subscribeRequestParser.Init(reader));
             err = subscribeRequestParser.GetKeepSubscriptions(&keepSubscriptions);
             if (err == CHIP_NO_ERROR && !keepSubscriptions)
@@ -370,7 +381,7 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
     reader.Init(aPayload.Retain());
     ReturnLogErrorOnFailure(reader.Next());
 
-    ReportData::Parser report;
+    ReportDataMessage::Parser report;
     ReturnLogErrorOnFailure(report.Init(reader));
 
     uint64_t subscriptionId = 0;
@@ -428,11 +439,11 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
                     ChipLogValueExchange(ec));
 }
 
-CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier)
+CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
 {
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aAppIdentifier));
+    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aCallback));
     err = client->SendReadRequest(aReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
@@ -441,10 +452,10 @@ CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrep
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier)
+CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
 {
     ReadClient * client = nullptr;
-    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aAppIdentifier));
+    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aCallback));
     ReturnErrorOnFailure(client->SendSubscribeRequest(aReadPrepareParams));
     return CHIP_NO_ERROR;
 }
@@ -471,7 +482,6 @@ void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
     {
         lastClusterInfo = lastClusterInfo->mpNext;
     }
-    lastClusterInfo->mFlags.ClearAll();
     lastClusterInfo->mpNext    = mpNextAvailableClusterInfo;
     mpNextAvailableClusterInfo = aClusterInfo;
     aClusterInfo               = nullptr;
@@ -506,9 +516,8 @@ bool InteractionModelEngine::MergeOverlappedAttributePath(ClusterInfo * apAttrib
         }
         if (aAttributePath.IsAttributePathSupersetOf(*runner))
         {
-            runner->mListIndex = aAttributePath.mListIndex;
-            runner->mFieldId   = aAttributePath.mFieldId;
-            runner->mFlags     = aAttributePath.mFlags;
+            runner->mListIndex   = aAttributePath.mListIndex;
+            runner->mAttributeId = aAttributePath.mAttributeId;
             return true;
         }
         runner = runner->mpNext;

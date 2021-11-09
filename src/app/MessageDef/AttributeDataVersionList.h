@@ -23,9 +23,9 @@
 
 #pragma once
 
-#include "AttributeDataElement.h"
-#include "ListBuilder.h"
-#include "ListParser.h"
+#include "ArrayBuilder.h"
+#include "ArrayParser.h"
+#include "AttributeDataIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -37,7 +37,7 @@
 namespace chip {
 namespace app {
 namespace AttributeDataVersionList {
-class Parser : public ListParser
+class Parser : public ArrayParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -83,7 +83,7 @@ public:
     CHIP_ERROR GetVersion(chip::DataVersion * const apVersion);
 };
 
-class Builder : public ListBuilder
+class Builder : public ArrayBuilder
 {
 public:
     /**
@@ -107,7 +107,7 @@ public:
     AttributeDataVersionList::Builder & EndOfAttributeDataVersionList();
 
 private:
-    AttributeDataElement::Builder mAttributeDataElementBuilder;
+    AttributeDataIB::Builder mAttributeDataIBBuilder;
 };
 }; // namespace AttributeDataVersionList
 }; // namespace app

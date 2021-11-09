@@ -27,9 +27,11 @@
 #include "pw_log/log.h"
 #include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
+#include "rpc_services/Attributes.h"
 #include "rpc_services/Button.h"
 #include "rpc_services/Device.h"
 #include "rpc_services/Lighting.h"
+#include "rpc_services/Locking.h"
 
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -41,16 +43,30 @@
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
+#include "freertos/timers.h"
 #include "pw_containers/flat_map.h"
 #include "pw_status/status.h"
 #include "pw_status/try.h"
+#include "pw_trace_tokenized/trace_rpc_service_nanopb.h"
 #include "wifi_service/wifi_service.rpc.pb.h"
+#include <pw_trace/trace.h>
 
 #include "WiFiProvisioning.h"
 
 #include "ESP32Utils.h"
 
 static const char * TAG = "RPC";
+
+// Define trace time for pw_trace
+PW_TRACE_TIME_TYPE pw_trace_GetTraceTime()
+{
+    return (PW_TRACE_TIME_TYPE) chip::System::SystemClock().GetMonotonicMicroseconds64().count();
+}
+// Microsecond time source
+size_t pw_trace_GetTraceTimeTicksPerSecond()
+{
+    return 1000000;
+}
 
 namespace chip {
 namespace rpc {
@@ -96,10 +112,17 @@ class Esp32Device final : public Device
 public:
     pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
-        esp_restart();
-        // WILL NOT RETURN
+        mRebootTimer = xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
+        xTimerStart(mRebootTimer, 0);
         return pw::OkStatus();
     }
+
+private:
+    static constexpr TickType_t kRebootTimerPeriodTicks = 1000;
+    TimerHandle_t mRebootTimer;
+    StaticTimer_t mRebootTimerBuffer;
+
+    static void RebootHandler(TimerHandle_t) { esp_restart(); }
 };
 
 class Wifi final : public generated::Wifi<Wifi>
@@ -287,17 +310,24 @@ constexpr uint8_t kRpcTaskPriority  = 5;
 
 TaskHandle_t rpcTaskHandle;
 
+Attributes attributes_service;
 Esp32Button button_service;
 Esp32Device device_service;
 Lighting lighting_service;
+Locking locking_service;
 Wifi wifi_service;
+pw::trace::TraceService trace_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
+    server.RegisterService(attributes_service);
     server.RegisterService(button_service);
     server.RegisterService(device_service);
     server.RegisterService(lighting_service);
+    server.RegisterService(locking_service);
     server.RegisterService(wifi_service);
+    server.RegisterService(trace_service);
+    PW_TRACE_SET_ENABLED(true);
 }
 
 void RunRpcService(void *)

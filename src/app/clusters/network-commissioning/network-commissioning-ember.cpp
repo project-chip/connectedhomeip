@@ -91,13 +91,6 @@ bool emberAfNetworkCommissioningClusterDisableNetworkCallback(app::CommandHandle
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Commands::GetLastNetworkCommissioningResult::DecodableType & commandData)
-{
-    return false;
-}
-
 bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(app::CommandHandler * commandObj,
                                                              const app::ConcreteCommandPath & commandPath,
                                                              const Commands::RemoveNetwork::DecodableType & commandData)
@@ -124,3 +117,5 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(app::CommandHan
 {
     return false;
 }
+
+void MatterNetworkCommissioningPluginServerInitCallback() {}

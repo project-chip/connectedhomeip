@@ -1088,6 +1088,33 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Mode Select
+ *
+ */
+@interface CHIPModeSelect : CHIPCluster
+
+- (void)changeToMode:(uint8_t)newMode responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCurrentModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)subscribeAttributeCurrentModeWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentModeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeSupportedModesWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeOnModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOnModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeStartUpModeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Network Commissioning
  *
  */
@@ -1110,7 +1137,6 @@ NS_ASSUME_NONNULL_BEGIN
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
       responseHandler:(ResponseHandler)responseHandler;
-- (void)getLastNetworkCommissioningResult:(uint32_t)timeoutMs responseHandler:(ResponseHandler)responseHandler;
 - (void)removeNetwork:(NSData *)networkID
            breadcrumb:(uint64_t)breadcrumb
             timeoutMs:(uint32_t)timeoutMs
@@ -1147,9 +1173,9 @@ NS_ASSUME_NONNULL_BEGIN
             responseHandler:(ResponseHandler)responseHandler;
 - (void)queryImage:(uint16_t)vendorId
               productId:(uint16_t)productId
-        hardwareVersion:(uint16_t)hardwareVersion
         softwareVersion:(uint32_t)softwareVersion
      protocolsSupported:(uint8_t)protocolsSupported
+        hardwareVersion:(uint16_t)hardwareVersion
                location:(NSString *)location
     requestorCanConsent:(bool)requestorCanConsent
     metadataForProvider:(NSData *)metadataForProvider
@@ -1282,6 +1308,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeTrustedRootCertificatesWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCurrentFabricIndexWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -1499,6 +1527,10 @@ NS_ASSUME_NONNULL_BEGIN
                                          responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentPositionWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeMultiPressMaxWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1666,6 +1698,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeVendorIdWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeListNullablesAndOptionalsStructWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;

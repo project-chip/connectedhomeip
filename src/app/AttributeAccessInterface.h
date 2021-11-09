@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
-#include <app/MessageDef/AttributeDataElement.h>
+#include <app/MessageDef/AttributeDataIB.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h> // So we can encode lists
 #include <app/data-model/TagBoundEncoder.h>
@@ -43,7 +43,9 @@ namespace app {
 class AttributeValueEncoder : protected TagBoundEncoder
 {
 public:
-    AttributeValueEncoder(TLV::TLVWriter * aWriter) : TagBoundEncoder(aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data))
+    AttributeValueEncoder(TLV::TLVWriter * aWriter, FabricIndex aAccessingFabricIndex) :
+        TagBoundEncoder(aWriter, TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData))),
+        mAccessingFabricIndex(aAccessingFabricIndex)
     {}
 
     template <typename... Ts>
@@ -80,6 +82,11 @@ public:
 
     bool TriedEncode() const { return mTriedEncode; }
 
+    /**
+     * The accessing fabric index for this read or subscribe interaction.
+     */
+    FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
+
     // For consumers that can't just do a single Encode call for some reason
     // (e.g. they're encoding a list a bit at a time).
     TLV::TLVWriter * PrepareManualEncode()
@@ -91,6 +98,7 @@ public:
 
 private:
     bool mTriedEncode = false;
+    const FabricIndex mAccessingFabricIndex;
 };
 
 class AttributeAccessInterface

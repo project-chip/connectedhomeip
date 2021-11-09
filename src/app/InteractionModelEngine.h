@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <app/MessageDef/ReportData.h>
+#include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -39,7 +39,6 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/ClusterInfo.h>
-#include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
@@ -101,7 +100,7 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
+    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
 
     /**
      *  Creates a new read client and sends SubscribeRequest message to the node using the read client.
@@ -110,7 +109,7 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
+    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
 
     /**
      * Tears down an active subscription.
@@ -119,6 +118,15 @@ public:
      * @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR ShutdownSubscription(uint64_t aSubscriptionId);
+
+    /**
+     * Tears down active subscriptions for a given peer node ID.
+     *
+     * @retval #CHIP_ERROR_KEY_NOT_FOUND If no active subscription is found.
+     * @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
+
     /**
      *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
      *  see WriteClient documentation for lifetime handling.
@@ -151,7 +159,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
-                             uint64_t aAppIdentifier, InteractionModelDelegate * apDelegateOverride = nullptr);
+                             ReadClient::Callback * aCallback);
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadClients() const;
@@ -247,24 +255,23 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
 bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
 
 /**
- *  Fetch attribute value and version info and write to the TLVWriter provided.
+ *  Fetch attribute value and version info and write to the AttributeReport provided.
  *  When the endpoint / cluster / attribute / event data specified by aClusterInfo does not exist, corresponding interaction model
- * error code will be put into the writer, and CHIP_NO_ERROR will be returned and apDataExists will be set to false.
- *  If the data exists on the server, the data (with tag kCsTag_Data) and the data version (with tag kCsTag_DataVersion) will be put
- * into the TLVWriter and apDataExists will be set to true. TLVWriter error will be returned if any error occurred during encoding
+ * error code will be put into the writer, and CHIP_NO_ERROR will be returned.
+ *  If the data exists on the server, the data (with tag kData) and the data version (with tag kDataVersion) will be put
+ * into the TLVWriter. TLVWriter error will be returned if any error occurred during encoding
  * these values.
  *  This function is implemented by CHIP as a part of cluster data storage & management.
  * The apWriter and apDataExists can be nullptr.
  *
+ *  @param[in]    aAccessingFabricIndex The accessing fabric index for the read.
  *  @param[in]    aPath             The concrete path of the data being read.
- *  @param[in]    apWriter          The TLVWriter for holding cluster data. Can be a nullptr if the caller does not care
- *                                  the exact value of the attribute.
- *  @param[out]   apDataExists      Tell whether the cluster data exist on server. Can be a nullptr if the caller does not care
- *                                  whether the data exists.
+ *  @param[in]    aAttributeReport  The TLV Builder for Cluter attribute builder.
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists);
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+                                 AttributeReportIB::Builder & aAttributeReport);
 
 /**
  * TODO: Document.

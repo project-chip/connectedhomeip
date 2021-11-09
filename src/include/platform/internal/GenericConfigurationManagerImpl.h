@@ -63,7 +63,7 @@ public:
     CHIP_ERROR StoreProductRevision(uint16_t productRev) override;
     CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev) override;
-    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen) override;
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;

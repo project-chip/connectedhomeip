@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 
 executable("chip-all-clusters-app") {
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "include/tv-callbacks.cpp",
     "main.cpp",
   ]
@@ -26,6 +28,9 @@ executable("chip-all-clusters-app") {
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
   ]
+
+  include_dirs =
+      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
   cflags = [ "-Wconversion" ]
 

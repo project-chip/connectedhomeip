@@ -21,10 +21,11 @@
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegate.h>
-#include <app/MessageDef/AttributeDataList.h>
+#include <app/MessageDef/AttributeDataIBs.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/MessageDef/WriteRequest.h>
+#include <app/MessageDef/WriteRequestMessage.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/List.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -35,6 +36,7 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
 namespace app {
@@ -64,10 +66,10 @@ public:
          * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call before it shuts down the object.
          *
-         * @param[in] apWriteClient: The write client object that initiated the write transaction.
-         * @param[in] aPath: The attribute path field in write response.
-         * @param[in] attributeStatus: Attribute-specific status, containing an InteractionModel::Status code as well as
-         *                             an optional cluster-specific status code.
+         * @param[in] apWriteClient   The write client object that initiated the write transaction.
+         * @param[in] aPath           The attribute path field in write response.
+         * @param[in] attributeStatus Attribute-specific status, containing an InteractionModel::Status code as well as
+         *                            an optional cluster-specific status code.
          */
         virtual void OnResponse(const WriteClient * apWriteClient, const ConcreteAttributePath & aPath, StatusIB attributeStatus) {}
 
@@ -82,8 +84,8 @@ public:
          * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call before it shuts down the object.
          *
-         * @param[in] apWriteClient: The write client object that initiated the attribute write transaction.
-         * @param[in] aError: A system error code that conveys the overall error code.
+         * @param[in] apWriteClient The write client object that initiated the attribute write transaction.
+         * @param[in] aError        A system error code that conveys the overall error code.
          */
         virtual void OnError(const WriteClient * apWriteClient, CHIP_ERROR aError) {}
 
@@ -96,7 +98,7 @@ public:
          *      - Be called even in error circumstances.
          *      - Only be called after a successful call to SendWriteRequest as been made.
          *
-         * @param[in] apWriteClient: The write client object of the terminated write transaction.
+         * @param[in] apWriteClient The write client object of the terminated write transaction.
          */
         virtual void OnDone(WriteClient * apWriteClient) = 0;
     };
@@ -109,7 +111,7 @@ public:
 
     CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
     CHIP_ERROR FinishAttribute();
-    TLV::TLVWriter * GetAttributeDataElementTLVWriter();
+    TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 
     NodeId GetSourceNodeId() const
     {
@@ -172,8 +174,7 @@ private:
     void MoveToState(const State aTargetState);
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB);
-    CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                      AttributeDataElement::Builder aAttributeDataElement);
+    CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams, AttributeDataIB::Builder aAttributeDataIB);
     void ClearExistingExchangeContext();
     const char * GetStateStr() const;
     void ClearState();
@@ -189,7 +190,7 @@ private:
     Callback * mpCallback                      = nullptr;
     State mState                               = State::Uninitialized;
     System::PacketBufferTLVWriter mMessageWriter;
-    WriteRequest::Builder mWriteRequestBuilder;
+    WriteRequestMessage::Builder mWriteRequestBuilder;
     uint8_t mAttributeStatusIndex = 0;
 };
 
@@ -236,9 +237,9 @@ public:
 
         VerifyOrReturnError(mpWriteClient != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(mpWriteClient->PrepareAttribute(attributePath));
-        VerifyOrReturnError((writer = mpWriteClient->GetAttributeDataElementTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError((writer = mpWriteClient->GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(
-            DataModel::Encode(*writer, chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), value));
+            DataModel::Encode(*writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
         ReturnErrorOnFailure(mpWriteClient->FinishAttribute());
 
         return CHIP_NO_ERROR;

@@ -18,19 +18,8 @@
 
 #include <ExampleOTARequestor.h>
 
-#include <app-common/zap-generated/enums.h>
-#include <app/util/af-enums.h>
 #include <app/util/util.h>
-#include <controller/CHIPDevice.h>
-#include <lib/core/NodeId.h>
-#include <lib/support/BufferReader.h>
-#include <lib/support/Span.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <system/SystemClock.h>
-#include <transport/FabricTable.h>
-
-using chip::FabricInfo;
 
 ExampleOTARequestor ExampleOTARequestor::sInstance;
 
@@ -53,9 +42,8 @@ ExampleOTARequestor::ExampleOTARequestor()
     mProviderFabricIndex = chip::kUndefinedFabricIndex;
 }
 
-void ExampleOTARequestor::Init(chip::Controller::ControllerDeviceInitParams connectParams, uint32_t startDelayMs)
+void ExampleOTARequestor::Init(uint32_t startDelayMs)
 {
-    mConnectParams   = connectParams;
     mOtaStartDelayMs = startDelayMs;
 }
 
@@ -91,8 +79,15 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
     mProviderNodeId      = providerLocation;
     mProviderFabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
 
-    ChipLogProgress(SoftwareUpdate, "Notified of Provider at NodeID: 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8,
-                    ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
+    ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
+    ChipLogDetail(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
+    ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(mProviderNodeId));
+    ChipLogDetail(SoftwareUpdate, "  VendorID: 0x%" PRIx16, commandData.vendorId);
+    ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %" PRIu8, announcementReason);
+    if (commandData.metadataForNode.HasValue())
+    {
+        ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %zu", commandData.metadataForNode.Value().size());
+    }
 
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
@@ -120,15 +115,4 @@ void ExampleOTARequestor::StartDelayTimerHandler(chip::System::Layer * systemLay
 {
     VerifyOrReturn(appState != nullptr);
     static_cast<ExampleOTARequestor *>(appState)->ConnectToProvider();
-}
-
-chip::FabricInfo * ExampleOTARequestor::GetProviderFabricInfo()
-{
-    if (mConnectParams.fabricsTable == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "FabricTable is null!");
-        return nullptr;
-    }
-
-    return mConnectParams.fabricsTable->FindFabricWithIndex(mProviderFabricIndex);
 }

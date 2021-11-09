@@ -18,6 +18,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/ConnectivityManager.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
 #endif
@@ -26,7 +28,10 @@
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
 #endif
 
-#include <platform/ConnectivityManager.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
+#endif
+
 #include <platform/internal/BLEManager.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -49,6 +54,100 @@ namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
+// ==================== ConnectivityManager Platform Internal Methods ====================
+
+CHIP_ERROR ConnectivityManagerImpl::_Init()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    mLastStationConnectFailTime   = System::Clock::kZero;
+    mLastAPDemandTime             = System::Clock::kZero;
+    mWiFiStationMode              = kWiFiStationMode_Disabled;
+    mWiFiStationState             = kWiFiStationState_NotConnected;
+    mWiFiAPMode                   = kWiFiAPMode_Disabled;
+    mWiFiAPState                  = kWiFiAPState_NotActive;
+    mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
+    mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
+    mFlags.SetRaw(0);
+
+    // Ensure that station mode is enabled.
+    wifi_on(RTW_MODE_STA);
+
+    // Ensure that station mode is enabled in the WiFi layer.
+    wifi_set_mode(RTW_MODE_STA);
+    ;
+
+    // If there is no persistent station provision...
+    if (!IsWiFiStationProvisioned())
+    {
+        // If the code has been compiled with a default WiFi station provision, configure that now.
+#if !defined(CONFIG_DEFAULT_WIFI_SSID)
+        printf("%s %d pls define CONFIG_DEFAULT_WIFI_SSID\r\n", __func__, __LINE__);
+#else
+        if (CONFIG_DEFAULT_WIFI_SSID[0] != 0)
+        {
+            ChipLogProgress(DeviceLayer, "Setting default WiFi station configuration (SSID: %s)", CONFIG_DEFAULT_WIFI_SSID);
+
+            // Set a default station configuration.
+            rtw_wifi_setting_t wifiConfig;
+
+            // Set the wifi configuration
+            memset(&wifiConfig, 0, sizeof(wifiConfig));
+            memcpy(wifiConfig.ssid, CONFIG_DEFAULT_WIFI_SSID, strlen(CONFIG_DEFAULT_WIFI_SSID) + 1);
+            memcpy(wifiConfig.password, CONFIG_DEFAULT_WIFI_PASSWORD, strlen(CONFIG_DEFAULT_WIFI_PASSWORD) + 1);
+            wifiConfig.mode = RTW_MODE_STA;
+
+            // Configure the WiFi interface.
+            int err = CHIP_SetWiFiConfig(&wifiConfig);
+            if (err != 0)
+            {
+                ChipLogError(DeviceLayer, "_Init _SetWiFiConfig() failed: %d", err);
+            }
+
+            // Enable WiFi station mode.
+            ReturnErrorOnFailure(SetWiFiStationMode(kWiFiStationMode_Enabled));
+        }
+
+        // Otherwise, ensure WiFi station mode is disabled.
+        else
+        {
+            ReturnErrorOnFailure(SetWiFiStationMode(kWiFiStationMode_Disabled));
+        }
+#endif
+    }
+
+    // Force AP mode off for now.
+
+    // Queue work items to bootstrap the AP and station state machines once the Chip event loop is running.
+    ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
+    ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL));
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+    return CHIP_NO_ERROR;
+}
+
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
+{
+    // Forward the event to the generic base classes as needed.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (event->Type == DeviceEventType::kRtkWiFiStationConnectedEvent)
+    {
+        ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_CONNECTED");
+        if (mWiFiStationState == kWiFiStationState_Connecting)
+        {
+            ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
+        }
+        DriveStationState();
+        DHCPProcess();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
@@ -120,7 +219,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
 {
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
-        mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
+        mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
@@ -129,7 +228,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
 {
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
-        mLastAPDemandTime = 0;
+        mLastAPDemandTime = System::Clock::kZero;
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
@@ -140,14 +239,14 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void)
     {
         if (mWiFiAPState == kWiFiAPState_Activating || mWiFiAPState == kWiFiAPState_Active)
         {
-            mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
+            mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
         }
     }
 }
 
-void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
+void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
-    mWiFiAPIdleTimeoutMS = val;
+    mWiFiAPIdleTimeout = val;
     DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
@@ -330,94 +429,6 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
     return CHIP_NO_ERROR;
 }
 
-// ==================== ConnectivityManager Platform Internal Methods ====================
-
-CHIP_ERROR ConnectivityManagerImpl::_Init()
-{
-    mLastStationConnectFailTime     = 0;
-    mLastAPDemandTime               = 0;
-    mWiFiStationMode                = kWiFiStationMode_Disabled;
-    mWiFiStationState               = kWiFiStationState_NotConnected;
-    mWiFiAPMode                     = kWiFiAPMode_Disabled;
-    mWiFiAPState                    = kWiFiAPState_NotActive;
-    mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
-    mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
-    mFlags.SetRaw(0);
-
-    // Ensure that station mode is enabled.
-    wifi_on(RTW_MODE_STA);
-
-    // Ensure that station mode is enabled in the WiFi layer.
-    wifi_set_mode(RTW_MODE_STA);
-    ;
-
-    // If there is no persistent station provision...
-    if (!IsWiFiStationProvisioned())
-    {
-        // If the code has been compiled with a default WiFi station provision, configure that now.
-#if !defined(CONFIG_DEFAULT_WIFI_SSID)
-        printf("%s %d pls define CONFIG_DEFAULT_WIFI_SSID\r\n", __func__, __LINE__);
-#else
-        if (CONFIG_DEFAULT_WIFI_SSID[0] != 0)
-        {
-            ChipLogProgress(DeviceLayer, "Setting default WiFi station configuration (SSID: %s)", CONFIG_DEFAULT_WIFI_SSID);
-
-            // Set a default station configuration.
-            rtw_wifi_setting_t wifiConfig;
-
-            // Set the wifi configuration
-            memset(&wifiConfig, 0, sizeof(wifiConfig));
-            memcpy(wifiConfig.ssid, CONFIG_DEFAULT_WIFI_SSID, strlen(CONFIG_DEFAULT_WIFI_SSID) + 1);
-            memcpy(wifiConfig.password, CONFIG_DEFAULT_WIFI_PASSWORD, strlen(CONFIG_DEFAULT_WIFI_PASSWORD) + 1);
-            wifiConfig.mode = RTW_MODE_STA;
-
-            // Configure the WiFi interface.
-            int err = CHIP_SetWiFiConfig(&wifiConfig);
-            if (err != 0)
-            {
-                ChipLogError(DeviceLayer, "_Init _SetWiFiConfig() failed: %d", err);
-            }
-
-            // Enable WiFi station mode.
-            ReturnErrorOnFailure(SetWiFiStationMode(kWiFiStationMode_Enabled));
-        }
-
-        // Otherwise, ensure WiFi station mode is disabled.
-        else
-        {
-            ReturnErrorOnFailure(SetWiFiStationMode(kWiFiStationMode_Disabled));
-        }
-#endif
-    }
-
-    // Force AP mode off for now.
-
-    // Queue work items to bootstrap the AP and station state machines once the Chip event loop is running.
-    ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
-    ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL));
-
-    return CHIP_NO_ERROR;
-}
-
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-    // Forward the event to the generic base classes as needed.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
-#else
-    if (event->Type == DeviceEventType::kRtkWiFiStationConnectedEvent)
-    {
-        ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_CONNECTED");
-        if (mWiFiStationState == kWiFiStationState_Connecting)
-        {
-            ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
-        }
-        DriveStationState();
-        DHCPProcess();
-    }
-#endif
-}
-
 void ConnectivityManagerImpl::_OnWiFiScanDone()
 {
     // Schedule a call to DriveStationState method in case a station connect attempt was
@@ -462,7 +473,7 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             ChangeWiFiStationState(kWiFiStationState_Connected);
             ChipLogProgress(DeviceLayer, "WiFi station interface connected");
-            mLastStationConnectFailTime = 0;
+            mLastStationConnectFailTime = System::Clock::kZero;
             OnStationConnected();
         }
 
@@ -487,7 +498,7 @@ void ConnectivityManagerImpl::DriveStationState()
     // Otherwise the station interface is NOT connected to an AP, so...
     else
     {
-        uint64_t now = System::SystemClock().GetMonotonicMilliseconds();
+        System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
         // Advance the station state to NotConnected if it was previously Connected or Disconnecting,
         // or if a previous initiated connect attempt failed.
@@ -499,7 +510,7 @@ void ConnectivityManagerImpl::DriveStationState()
             if (prevState != kWiFiStationState_Connecting_Failed)
             {
                 ChipLogProgress(DeviceLayer, "WiFi station interface disconnected");
-                mLastStationConnectFailTime = 0;
+                mLastStationConnectFailTime = System::Clock::kZero;
                 OnStationDisconnected();
             }
             else
@@ -514,7 +525,8 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             // Initiate a connection to the AP if we haven't done so before, or if enough
             // time has passed since the last attempt.
-            if (mLastStationConnectFailTime == 0 || now >= mLastStationConnectFailTime + mWiFiStationReconnectIntervalMS)
+            if (mLastStationConnectFailTime == System::Clock::kZero ||
+                now >= mLastStationConnectFailTime + mWiFiStationReconnectInterval)
             {
                 ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
                 rtw_wifi_setting_t wifi_info;
@@ -528,12 +540,12 @@ void ConnectivityManagerImpl::DriveStationState()
             // Otherwise arrange another connection attempt at a suitable point in the future.
             else
             {
-                uint32_t timeToNextConnect = (uint32_t)((mLastStationConnectFailTime + mWiFiStationReconnectIntervalMS) - now);
+                System::Clock::Timeout timeToNextConnect = (mLastStationConnectFailTime + mWiFiStationReconnectInterval) - now;
 
-                ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRIu32 " ms", timeToNextConnect);
+                ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRIu32 " ms",
+                                System::Clock::Milliseconds32(timeToNextConnect).count());
 
-                ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(timeToNextConnect),
-                                                                      DriveStationState, NULL));
+                ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(timeToNextConnect, DriveStationState, nullptr));
             }
         }
     }
@@ -785,6 +797,67 @@ void ConnectivityManagerImpl::DHCPProcess(void)
 {
     xTaskCreate(DHCPProcessThread, "DHCPProcess", 4096 / sizeof(StackType_t), this, 1, NULL);
 }
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiSecurityType(uint8_t & securityType)
+{
+    securityType = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiChannelNumber(uint16_t & channelNumber)
+{
+    channelNumber = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiRssi(int8_t & rssi)
+{
+    rssi = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
+{
+    beaconLostCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
+{
+    currentMaxRate = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
+{
+    packetMulticastRxCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
+{
+    packetMulticastTxCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
+{
+    packetUnicastRxCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
+{
+    packetUnicastTxCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiOverrunCount(uint64_t & overrunCount)
+{
+    overrunCount = 0;
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace DeviceLayer
 } // namespace chip

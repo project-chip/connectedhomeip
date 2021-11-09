@@ -116,7 +116,19 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
 {
-    return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
+    ExchangeContext * context = mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
+
+    uint32_t mrpIdleInterval   = CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL;
+    uint32_t mrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
+
+    session.GetMRPIntervals(GetSessionManager(), mrpIdleInterval, mrpActiveInterval);
+
+    ReliableMessageProtocolConfig mrpConfig;
+    mrpConfig.mIdleRetransTimeoutTick   = mrpIdleInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
+    mrpConfig.mActiveRetransTimeoutTick = mrpActiveInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
+    context->GetReliableMessageContext()->SetConfig(mrpConfig);
+
+    return context;
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
@@ -213,29 +225,34 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         msgFlags.Set(MessageFlagValues::kDuplicateMessage);
     }
 
-    // Search for an existing exchange that the message applies to. If a match is found...
-    bool found = false;
-    mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->MatchExchange(session, packetHeader, payloadHeader))
-        {
-            // Found a matching exchange. Set flag for correct subsequent MRP
-            // retransmission timeout selection.
-            if (!ec->HasRcvdMsgFromPeer())
-            {
-                ec->SetMsgRcvdFromPeer(true);
-            }
-
-            // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
-            found = true;
-            return false;
-        }
-        return true;
-    });
-
-    if (found)
+    // Skip retrieval of exchange for group message since no exchange is stored
+    // for group msg (optimization)
+    if (!packetHeader.IsGroupSession())
     {
-        return;
+        // Search for an existing exchange that the message applies to. If a match is found...
+        bool found = false;
+        mContextPool.ForEachActiveObject([&](auto * ec) {
+            if (ec->MatchExchange(session, packetHeader, payloadHeader))
+            {
+                // Found a matching exchange. Set flag for correct subsequent MRP
+                // retransmission timeout selection.
+                if (!ec->HasRcvdMsgFromPeer())
+                {
+                    ec->SetMsgRcvdFromPeer(true);
+                }
+
+                // Matched ExchangeContext; send to message handler.
+                ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
+                found = true;
+                return false;
+            }
+            return true;
+        });
+
+        if (found)
+        {
+            return;
+        }
     }
 
     // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.

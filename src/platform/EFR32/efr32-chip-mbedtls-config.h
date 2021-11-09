@@ -35,8 +35,6 @@
 #include "em_device.h"
 #include "em_se.h"
 
-#define SL_CATALOG_FREERTOS_KERNEL_PRESENT
-
 /**
  * Enable H Crypto and Entropy modules
  */

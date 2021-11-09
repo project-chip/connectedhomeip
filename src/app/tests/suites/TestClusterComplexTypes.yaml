@@ -35,6 +35,10 @@ tests:
                         e: "char_string",
                         f: 1,
                     }
+      response:
+          values:
+              - name: "value"
+                value: true
 
     - label: "Send Test Command With Struct Argument and arg1.b is false"
       command: "testStructArgumentRequest"
@@ -51,7 +55,9 @@ tests:
                         f: 1,
                     }
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     - label:
           "Send Test Command With Nested Struct Argument and arg1.c.b is true"
@@ -74,6 +80,10 @@ tests:
                                 f: 1,
                             },
                     }
+      response:
+          values:
+              - name: "value"
+                value: true
 
     - label: "Send Test Command With Nested Struct Argument arg1.c.b is false"
       disabled: true
@@ -96,7 +106,9 @@ tests:
                             },
                     }
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     - label:
           "Send Test Command With Nested Struct List Argument and all fields b
@@ -147,6 +159,10 @@ tests:
                             ],
                         g: [0, 255],
                     }
+      response:
+          values:
+              - name: "value"
+                value: false
 
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
@@ -198,7 +214,9 @@ tests:
                         g: [0, 255],
                     }
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     # Tests for List
 
@@ -208,6 +226,10 @@ tests:
           values:
               - name: "arg1"
                 value: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      response:
+          values:
+              - name: "value"
+                value: true
 
     - label: "Send Test Command With List of INT8U and one of them is set to 0"
       command: "testListInt8UArgumentRequest"
@@ -216,7 +238,9 @@ tests:
               - name: "arg1"
                 value: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     - label: "Send Test Command With List of INT8U and get it reversed"
       command: "testListInt8UReverseRequest"
@@ -228,6 +252,18 @@ tests:
           values:
               - name: "arg1"
                 value: [9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+    - label:
+          "Send Test Command With empty List of INT8U and get an empty list back"
+      command: "testListInt8UReverseRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: []
+      response:
+          values:
+              - name: "arg1"
+                value: []
 
     - label:
           "Send Test Command With List of Struct Argument and arg1.b of first
@@ -255,6 +291,10 @@ tests:
                             f: 1,
                         },
                     ]
+      response:
+          values:
+              - name: "value"
+                value: true
 
     - label:
           "Send Test Command With List of Struct Argument and arg1.b of first
@@ -283,7 +323,9 @@ tests:
                         },
                     ]
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     - label:
           "Send Test Command With List of Nested Struct List Argument and all
@@ -336,6 +378,10 @@ tests:
                             g: [0, 255],
                         },
                     ]
+      response:
+          values:
+              - name: "value"
+                value: true
 
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
@@ -389,7 +435,9 @@ tests:
                         },
                     ]
       response:
-          error: 1
+          values:
+              - name: "value"
+                value: false
 
     # Tests for Nullables and Optionals
 
@@ -407,6 +455,8 @@ tests:
                 value: false
               - name: "value"
                 value: 5
+              - name: "originalValue"
+                value: 5
 
     - label: "Send Test Command without its optional arg."
       command: "testNullableOptionalRequest"
@@ -416,7 +466,6 @@ tests:
                 value: false
 
     - label: "Send Test Command with optional arg set to null."
-      disabled: true
       command: "testNullableOptionalRequest"
       arguments:
           values:
@@ -427,4 +476,6 @@ tests:
               - name: "wasPresent"
                 value: true
               - name: "wasNull"
-                value: false
+                value: true
+              - name: "originalValue"
+                value: null

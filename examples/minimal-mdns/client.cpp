@@ -317,7 +317,7 @@ int main(int argc, char ** args)
 
         MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
 
-        err = mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort);
+        err = mdnsServer.Listen(&chip::DeviceLayer::InetLayer(), &allInterfaces, gOptions.listenPort);
         if (err != CHIP_NO_ERROR)
         {
             printf("Server failed to listen on all interfaces: %s\n", chip::ErrorStr(err));

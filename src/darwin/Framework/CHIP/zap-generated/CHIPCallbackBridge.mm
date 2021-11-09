@@ -84,6 +84,7 @@ void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:[NSNumber numberWithUnsignedShort:entry]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -101,6 +102,7 @@ void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"index" : [NSNumber numberWithUnsignedChar:entry.index],
             @"outputType" : [NSNumber numberWithUnsignedChar:entry.outputType],
@@ -122,6 +124,7 @@ void CHIPBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void *
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"ActionID" : [NSNumber numberWithUnsignedShort:entry.actionID],
             @"Name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
@@ -147,6 +150,7 @@ void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"EndpointListID" : [NSNumber numberWithUnsignedShort:entry.endpointListID],
             @"Name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
@@ -169,6 +173,7 @@ void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessF
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:[NSData dataWithBytes:entry.data() length:entry.size()]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -186,6 +191,7 @@ void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge::OnSu
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:[NSNumber numberWithUnsignedChar:entry]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -203,6 +209,7 @@ void CHIPDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * con
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"type" : [NSNumber numberWithUnsignedLong:entry.type],
             @"revision" : [NSNumber numberWithUnsignedShort:entry.revision],
@@ -223,6 +230,7 @@ void CHIPDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:[NSNumber numberWithUnsignedLong:entry]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -240,6 +248,7 @@ void CHIPDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:[NSNumber numberWithUnsignedLong:entry]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -257,6 +266,7 @@ void CHIPDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:[NSNumber numberWithUnsignedShort:entry]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -274,6 +284,7 @@ void CHIPFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * cont
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"label" : [[NSString alloc] initWithBytes:entry.label.data() length:entry.label.size() encoding:NSUTF8StringEncoding],
             @"value" : [[NSString alloc] initWithBytes:entry.value.data() length:entry.value.size() encoding:NSUTF8StringEncoding],
@@ -295,6 +306,7 @@ void CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBrid
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"FailSafeExpiryLengthMs" : [NSNumber numberWithUnsignedLong:entry.failSafeExpiryLengthMs],
         }];
@@ -315,6 +327,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"Name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
             @"FabricConnected" : [NSNumber numberWithBool:entry.fabricConnected],
@@ -339,6 +352,7 @@ void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void *
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"VendorId" : [NSNumber numberWithUnsignedShort:entry.vendorId],
             @"VendorGroupId" : [NSNumber numberWithUnsignedShort:entry.vendorGroupId],
@@ -360,6 +374,7 @@ void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(voi
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"VendorId" : [NSNumber numberWithUnsignedShort:entry.vendorId],
             @"GroupKeyIndex" : [NSNumber numberWithUnsignedShort:entry.groupKeyIndex],
@@ -383,6 +398,7 @@ void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void *
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"index" : [NSNumber numberWithUnsignedChar:entry.index],
             @"inputType" : [NSNumber numberWithUnsignedChar:entry.inputType],
@@ -390,6 +406,28 @@ void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void *
             @"description" : [[NSString alloc] initWithBytes:entry.description.data()
                                                       length:entry.description.size()
                                                     encoding:NSUTF8StringEncoding],
+        }];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
+void CHIPModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
+        [array addObject:@ {
+            @"Label" : [[NSString alloc] initWithBytes:entry.label.data() length:entry.label.size() encoding:NSUTF8StringEncoding],
+            @"Mode" : [NSNumber numberWithUnsignedChar:entry.mode],
+            @"SemanticTag" : [NSNumber numberWithUnsignedLong:entry.semanticTag],
         }];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -408,6 +446,7 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"FabricIndex" : [NSNumber numberWithUnsignedChar:entry.fabricIndex],
             @"RootPublicKey" : [NSData dataWithBytes:entry.rootPublicKey.data() length:entry.rootPublicKey.size()],
@@ -432,6 +471,7 @@ void CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridg
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:[NSData dataWithBytes:entry.data() length:entry.size()]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -449,6 +489,7 @@ void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:[NSNumber numberWithUnsignedChar:entry]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -466,6 +507,7 @@ void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * c
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"majorNumber" : [NSNumber numberWithUnsignedShort:entry.majorNumber],
             @"minorNumber" : [NSNumber numberWithUnsignedShort:entry.minorNumber],
@@ -494,6 +536,7 @@ void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSucces
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"identifier" : [NSNumber numberWithUnsignedChar:entry.identifier],
             @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
@@ -514,6 +557,7 @@ void CHIPTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:[NSNumber numberWithUnsignedChar:entry]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -531,6 +575,7 @@ void CHIPTestClusterListOctetStringListAttributeCallbackBridge::OnSuccessFn(
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:[NSData dataWithBytes:entry.data() length:entry.size()]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -548,10 +593,30 @@ void CHIPTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessF
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"fabricIndex" : [NSNumber numberWithUnsignedLongLong:entry.fabricIndex],
             @"operationalCert" : [NSData dataWithBytes:entry.operationalCert.data() length:entry.operationalCert.size()],
         }];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
+void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
+        [array addObject:@ {}];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
@@ -569,6 +634,7 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::O
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"ExtAddress" : [NSNumber numberWithUnsignedLongLong:entry.extAddress],
             @"Age" : [NSNumber numberWithUnsignedLong:entry.age],
@@ -602,6 +668,7 @@ void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSu
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"ExtAddress" : [NSNumber numberWithUnsignedLongLong:entry.extAddress],
             @"Rloc16" : [NSNumber numberWithUnsignedShort:entry.rloc16],
@@ -631,6 +698,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSu
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"RotationTime" : [NSNumber numberWithUnsignedShort:entry.rotationTime],
             @"Flags" : [NSNumber numberWithUnsignedShort:entry.flags],
@@ -652,6 +720,7 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallba
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"ActiveTimestampPresent" : [NSNumber numberWithBool:entry.activeTimestampPresent],
             @"PendingTimestampPresent" : [NSNumber numberWithBool:entry.pendingTimestampPresent],
@@ -682,6 +751,7 @@ void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBri
     auto iter = list.begin();
     while (iter.Next()) {
         auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
         [array addObject:[NSNumber numberWithUnsignedChar:entry]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -1163,7 +1233,7 @@ void CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge::OnS
     });
 };
 
-void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge::OnSuccessFn(
+void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSuccessFn(
     void * context, uint8_t action, uint32_t delayedActionTime)
 {
     DispatchSuccess(context, @ {
@@ -1310,6 +1380,13 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn
     });
 };
 
+void CHIPTestClusterClusterBooleanResponseCallbackBridge::OnSuccessFn(void * context, bool value)
+{
+    DispatchSuccess(context, @ {
+        @"value" : [NSNumber numberWithBool:value],
+    });
+};
+
 void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(void * context, uint8_t returnValue)
 {
     DispatchSuccess(context, @ {
@@ -1336,12 +1413,13 @@ void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccess
 };
 
 void CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge::OnSuccessFn(
-    void * context, bool wasPresent, bool wasNull, uint8_t value)
+    void * context, bool wasPresent, bool wasNull, uint8_t value, uint8_t originalValue)
 {
     DispatchSuccess(context, @ {
         @"wasPresent" : [NSNumber numberWithBool:wasPresent],
         @"wasNull" : [NSNumber numberWithBool:wasNull],
         @"value" : [NSNumber numberWithUnsignedChar:value],
+        @"originalValue" : [NSNumber numberWithUnsignedChar:originalValue],
     });
 };
 

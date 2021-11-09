@@ -53,7 +53,7 @@ public:
      *    such that the values do not entail a restart upon wake.
      *  - This function is expected to be thread-safe on any platform that employs threading.
      */
-    uint64_t GetCurrentMonotonicTimeMs();
+    System::Clock::Timestamp GetMonotonicTimestamp();
 };
 
 /**
@@ -63,7 +63,7 @@ template <>
 class TimeSource<Source::kSystem>
 {
 public:
-    uint64_t GetCurrentMonotonicTimeMs() { return System::SystemClock().GetMonotonicMilliseconds(); }
+    System::Clock::Timestamp GetMonotonicTimestamp() { return System::SystemClock().GetMonotonicTimestamp(); }
 };
 
 /**
@@ -73,19 +73,19 @@ template <>
 class TimeSource<Source::kTest>
 {
 public:
-    uint64_t GetCurrentMonotonicTimeMs() { return mCurrentTimeMs; }
+    System::Clock::Timestamp GetMonotonicTimestamp() { return mCurrentTime; }
 
-    void SetCurrentMonotonicTimeMs(uint64_t value)
+    void SetMonotonicTimestamp(System::Clock::Timestamp value)
     {
-        if (value < mCurrentTimeMs)
+        if (value < mCurrentTime)
         {
             abort();
         }
-        mCurrentTimeMs = value;
+        mCurrentTime = value;
     }
 
 private:
-    uint64_t mCurrentTimeMs = 0;
+    System::Clock::Timestamp mCurrentTime = System::Clock::kZero;
 };
 
 } // namespace Time

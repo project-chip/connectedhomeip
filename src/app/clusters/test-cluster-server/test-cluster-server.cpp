@@ -58,6 +58,7 @@ private:
     CHIP_ERROR ReadListInt8uAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadListStructOctetStringAttribute(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder);
 };
 
 TestAttrAccess gAttrAccess;
@@ -74,6 +75,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeVa
     }
     case ListStructOctetString::Id: {
         return ReadListStructOctetStringAttribute(aEncoder);
+    }
+    case ListNullablesAndOptionalsStruct::Id: {
+        return ReadListNullablesAndOptionalsStructAttribute(aEncoder);
     }
     default: {
         break;
@@ -125,10 +129,10 @@ EmberAfStatus writeTestListInt8uAttribute(EndpointId endpoint)
 CHIP_ERROR TestAttrAccess::ReadListInt8uAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-        constexpr uint16_t attributeCount = 4;
-        for (uint8_t index = 0; index < attributeCount; index++)
+        constexpr uint8_t maxValue = 4;
+        for (uint8_t value = 1; value <= maxValue; value++)
         {
-            ReturnErrorOnFailure(encoder.Encode(index));
+            ReturnErrorOnFailure(encoder.Encode(value));
         }
         return CHIP_NO_ERROR;
     });
@@ -221,6 +225,18 @@ CHIP_ERROR TestAttrAccess::ReadListStructOctetStringAttribute(AttributeValueEnco
         return CHIP_NO_ERROR;
     });
 }
+
+CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        // Just encode a single default-initialized
+        // entry for now.
+        Structs::NullablesAndOptionalsStruct::Type entry;
+        ReturnErrorOnFailure(encoder.Encode(entry));
+        return CHIP_NO_ERROR;
+    });
+}
+
 } // namespace
 
 bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
@@ -267,20 +283,30 @@ bool emberAfTestClusterClusterTestAddArgumentsCallback(CommandHandler * apComman
     return true;
 }
 
+static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool value)
+{
+    Commands::BooleanResponse::Type response;
+    response.value = value;
+    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
+    if (err != CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
+    }
+    return true;
+}
+
 bool emberAfTestClusterClusterTestStructArgumentRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestStructArgumentRequest::DecodableType & commandData)
 {
-    emberAfSendImmediateDefaultResponse(commandData.arg1.b ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, commandData.arg1.b);
 }
 
 bool emberAfTestClusterClusterTestNestedStructArgumentRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestNestedStructArgumentRequest::DecodableType & commandData)
 {
-    emberAfSendImmediateDefaultResponse(commandData.arg1.c.b ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, commandData.arg1.c.b);
 }
 
 bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
@@ -298,11 +324,11 @@ bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        shouldReturnTrue = false;
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
     }
 
-    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
 bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
@@ -320,11 +346,11 @@ bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != uint8Iterator.GetStatus())
     {
-        shouldReturnTrue = false;
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
     }
 
-    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
 bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
@@ -342,11 +368,11 @@ bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        shouldReturnTrue = false;
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
     }
 
-    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
 bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
@@ -370,18 +396,18 @@ bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
 
         if (CHIP_NO_ERROR != subStructIterator.GetStatus())
         {
-            shouldReturnTrue = false;
-            break;
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            return true;
         }
     }
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        shouldReturnTrue = false;
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
     }
 
-    emberAfSendImmediateDefaultResponse(shouldReturnTrue ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    return true;
+    return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
 bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
@@ -444,6 +470,8 @@ bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
         {
             response.value.SetValue(commandData.arg1.Value().Value());
         }
+
+        response.originalValue.Emplace(commandData.arg1.Value());
     }
 
     CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);

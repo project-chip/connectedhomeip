@@ -29,7 +29,7 @@
 #include "EventLoggingDelegate.h"
 #include "EventLoggingTypes.h"
 #include <app/ClusterInfo.h>
-#include <app/MessageDef/EventDataElement.h>
+#include <app/MessageDef/EventDataIB.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCircularTLVBuffer.h>
 #include <lib/support/PersistedCounter.h>
@@ -41,8 +41,8 @@
 namespace chip {
 namespace app {
 constexpr size_t kMaxEventSizeReserve  = 512;
-constexpr uint16_t kRequiredEventField = (1 << EventDataElement::kCsTag_PriorityLevel) |
-    (1 << EventDataElement::kCsTag_DeltaSystemTimestamp) | (1 << EventDataElement::kCsTag_EventPath);
+constexpr uint16_t kRequiredEventField = (1 << to_underlying(EventDataIB::Tag::kPriority)) |
+    (1 << to_underlying(EventDataIB::Tag::kDeltaSystemTimestamp)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
 /**
  * @brief
@@ -126,7 +126,7 @@ public:
         mFirstEventNumber    = mpEventNumberCounter->GetValue();
     }
 
-    PriorityLevel GetPriorityLevel() { return mPriority; }
+    PriorityLevel GetPriority() { return mPriority; }
 
     CircularEventBuffer * GetPreviousCircularEventBuffer() { return mpPrev; }
     CircularEventBuffer * GetNextCircularEventBuffer() { return mpNext; }

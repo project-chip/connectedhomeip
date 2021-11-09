@@ -68,31 +68,14 @@ int main()
 
 #ifdef CONFIG_OPENTHREAD_MTD_SED
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
-        goto exit;
-    }
-
-    ConnectivityManager::ThreadPollingConfig pollingConfig;
-    pollingConfig.Clear();
-    pollingConfig.ActivePollingIntervalMS   = CONFIG_OPENTHREAD_POLL_PERIOD;
-    pollingConfig.InactivePollingIntervalMS = CONFIG_OPENTHREAD_POLL_PERIOD;
-
-    err = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("ConnectivityMgr().SetThreadPollingConfig() failed");
-        goto exit;
-    }
 #else
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#endif
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
         goto exit;
     }
-#endif
 
     ret = GetAppTask().StartApp();
     if (ret != 0)

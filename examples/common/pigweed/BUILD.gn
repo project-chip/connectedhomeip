@@ -36,6 +36,14 @@ if (chip_enable_pw_rpc) {
     prefix = "echo_service"
   }
 
+  pw_proto_library("attributes_service") {
+    sources = [ "protos/attributes_service.proto" ]
+    inputs = [ "protos/attributes_service.options" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
+    strip_prefix = "protos"
+    prefix = "attributes_service"
+  }
+
   pw_proto_library("device_service") {
     sources = [ "protos/device_service.proto" ]
     inputs = [ "protos/device_service.options" ]
@@ -74,11 +82,14 @@ pw_source_set("system_rpc_server") {
   sources = [ "system_rpc_server.cc" ]
 
   deps = [
+    "$dir_pw_rpc/system_server:facade",
+    dir_pw_log,
+  ]
+
+  public_deps = [
     "$dir_pw_hdlc:pw_rpc",
     "$dir_pw_hdlc:rpc_channel_output",
-    "$dir_pw_rpc/system_server:facade",
     "$dir_pw_stream:sys_io_stream",
-    dir_pw_log,
   ]
 
   public_configs = [ ":default_config" ]

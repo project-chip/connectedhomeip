@@ -47,26 +47,38 @@ public:
 class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
-    UnauthenticatedSession(const PeerAddress & address) : mPeerAddress(address) { mLocalMessageCounter.Init(); }
+    UnauthenticatedSession(const PeerAddress & address) : mPeerAddress(address) {}
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession & operator=(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession(UnauthenticatedSession &&)                  = delete;
     UnauthenticatedSession & operator=(UnauthenticatedSession &&) = delete;
 
-    uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
-    void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
+    System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
+    void SetLastActivityTime(System::Clock::Timestamp value) { mLastActivityTime = value; }
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
-    MessageCounter & GetLocalMessageCounter() { return mLocalMessageCounter; }
+    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval)
+    {
+        idleInterval   = mMRPIdleInterval;
+        activeInterval = mMRPActiveInterval;
+    }
+
+    void SetMRPIntervals(uint32_t idleInterval, uint32_t activeInterval)
+    {
+        mMRPIdleInterval   = idleInterval;
+        mMRPActiveInterval = activeInterval;
+    }
+
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
-    uint64_t mLastActivityTimeMs = 0;
+    System::Clock::Timestamp mLastActivityTime = System::Clock::kZero;
 
     const PeerAddress mPeerAddress;
-    GlobalUnencryptedMessageCounter mLocalMessageCounter;
+    uint32_t mMRPIdleInterval   = 0;
+    uint32_t mMRPActiveInterval = 0;
     PeerMessageCounter mPeerMessageCounter;
 };
 
@@ -108,7 +120,7 @@ public:
     /// Mark a session as active
     void MarkSessionActive(UnauthenticatedSessionHandle session)
     {
-        session->SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
+        session->SetLastActivityTime(mTimeSource.GetMonotonicTimestamp());
     }
 
     /// Allows access to the underlying time source used for keeping track of session active time
@@ -160,19 +172,34 @@ private:
 
     UnauthenticatedSession * FindLeastRecentUsedEntry()
     {
-        UnauthenticatedSession * result = nullptr;
-        uint64_t oldestTimeMs           = std::numeric_limits<uint64_t>::max();
+        UnauthenticatedSession * result     = nullptr;
+        System::Clock::Timestamp oldestTime = System::Clock::Timestamp(std::numeric_limits<System::Clock::Timestamp::rep>::max());
 
         mEntries.ForEachActiveObject([&](UnauthenticatedSession * entry) {
-            if (entry->GetReferenceCount() == 0 && entry->GetLastActivityTimeMs() < oldestTimeMs)
+            if (entry->GetReferenceCount() == 0 && entry->GetLastActivityTime() < oldestTime)
             {
-                result       = entry;
-                oldestTimeMs = entry->GetLastActivityTimeMs();
+                result     = entry;
+                oldestTime = entry->GetLastActivityTime();
             }
             return true;
         });
 
         return result;
+    }
+
+    // A temporary solution for #11120
+    // Enforce interface match if not null
+    static bool MatchInterface(Inet::InterfaceId i1, Inet::InterfaceId i2)
+    {
+        if (i1.IsPresent() && i2.IsPresent())
+        {
+            return i1 == i2;
+        }
+        else
+        {
+            // One of the interfaces is null.
+            return true;
+        }
     }
 
     static bool MatchPeerAddress(const PeerAddress & a1, const PeerAddress & a2)
@@ -188,7 +215,9 @@ private:
         case Transport::Type::kTcp:
             return a1.GetIPAddress() == a2.GetIPAddress() && a1.GetPort() == a2.GetPort() &&
                 // Enforce interface equal-ness if the address is link-local, otherwise ignore interface
-                (a1.GetIPAddress().IsIPv6LinkLocal() ? a1.GetInterface() == a2.GetInterface() : true);
+                // Use MatchInterface for a temporary solution for #11120
+                (a1.GetIPAddress().IsIPv6LinkLocal() ? a1.GetInterface() == a2.GetInterface()
+                                                     : MatchInterface(a1.GetInterface(), a2.GetInterface()));
         case Transport::Type::kBle:
             // TODO: complete BLE address comparation
             return true;

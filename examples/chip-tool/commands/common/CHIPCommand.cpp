@@ -23,6 +23,7 @@
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 
@@ -60,8 +61,8 @@ CHIP_ERROR CHIPCommand::Run()
     // TODO - OpCreds should only be generated for pairing command
     //        store the credentials in persistent storage, and
     //        generate when not available in the storage.
-    ReturnLogErrorOnFailure(mOpCredsIssuer.GenerateNOCChainAfterValidation(mStorage.GetLocalNodeId(), 0, ephemeralKey.Pubkey(),
-                                                                           rcacSpan, icacSpan, nocSpan));
+    ReturnLogErrorOnFailure(mOpCredsIssuer.GenerateNOCChainAfterValidation(mStorage.GetLocalNodeId(), mStorage.GetFabricId(),
+                                                                           ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     chip::Controller::FactoryInitParams factoryInitParams;
     factoryInitParams.fabricStorage = &mFabricStorage;
@@ -74,6 +75,7 @@ CHIP_ERROR CHIPCommand::Run()
     commissionerParams.controllerRCAC                 = rcacSpan;
     commissionerParams.controllerICAC                 = icacSpan;
     commissionerParams.controllerNOC                  = nocSpan;
+    commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
 
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, mController));

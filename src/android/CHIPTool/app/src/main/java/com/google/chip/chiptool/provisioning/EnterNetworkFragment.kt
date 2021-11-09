@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters.NetworkCommissioningCluster
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
@@ -37,8 +38,6 @@ import kotlinx.android.synthetic.main.enter_wifi_network_fragment.pwdEd
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.ssidEd
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.view.saveNetworkBtn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 /**
@@ -46,7 +45,7 @@ import kotlinx.coroutines.launch
  */
 class EnterNetworkFragment : Fragment() {
 
-  private val scope = CoroutineScope(Dispatchers.Main + Job())
+  private lateinit var scope: CoroutineScope
 
   private val networkType: ProvisionNetworkType
     get() = requireNotNull(
@@ -58,6 +57,8 @@ class EnterNetworkFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
+    scope = viewLifecycleOwner.lifecycleScope
+
     val layoutRes = when (networkType) {
       ProvisionNetworkType.WIFI -> R.layout.enter_wifi_network_fragment
       ProvisionNetworkType.THREAD -> R.layout.enter_thread_network_fragment

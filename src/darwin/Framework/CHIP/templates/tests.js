@@ -19,6 +19,12 @@ function getTests()
 {
   const BinaryInput = [
     'Test_TC_BI_1_1',
+    'Test_TC_BI_2_1',
+  ];
+
+  const BooleanState = [
+    'Test_TC_BOOL_1_1',
+    'Test_TC_BOOL_2_1',
   ];
 
   const ColorControl = [
@@ -42,11 +48,18 @@ function getTests()
     'Test_TC_CC_7_3',
     'Test_TC_CC_7_4',
     'Test_TC_CC_8_1',
+    'Test_TC_CC_9_1',
+    'Test_TC_CC_9_2',
+    'Test_TC_CC_9_3',
   ];
 
   const DeviceManagement = [
     'Test_TC_DM_1_1',
     'Test_TC_DM_3_1',
+  ];
+
+  const ElectricalMeasurement = [
+    'Test_TC_EMR_1_1',
   ];
 
   const FlowMeasurement = [
@@ -58,16 +71,25 @@ function getTests()
   const OccupancySensing = [
     'Test_TC_OCC_1_1',
     'Test_TC_OCC_2_1',
+    'Test_TC_OCC_2_2',
   ];
 
   const LevelControl = [
     'Test_TC_LVL_1_1',
     'Test_TC_LVL_2_1',
     'Test_TC_LVL_3_1',
+    'Test_TC_LVL_4_1',
+    'Test_TC_LVL_5_1',
   ];
 
   const MediaControl = [
     'Test_TC_MC_1_1',
+    'Test_TC_MC_2_1',
+    'Test_TC_MC_3_1',
+    'Test_TC_MC_3_2',
+    'Test_TC_MC_3_3',
+    'Test_TC_MC_3_4',
+    'Test_TC_MC_3_5',
     'Test_TC_MC_3_6',
     'Test_TC_MC_3_7',
     'Test_TC_MC_3_8',
@@ -80,6 +102,12 @@ function getTests()
     'Test_TC_OO_1_1',
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
+    'Test_TC_OO_2_3',
+  ];
+
+  const PressureMeasurement = [
+    'Test_TC_PRS_1_1',
+    'Test_TC_PRS_2_1',
   ];
 
   const PumpConfigurationControl = [
@@ -92,11 +120,13 @@ function getTests()
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
     'Test_TC_RH_2_1',
+    'Test_TC_RH_2_2',
   ];
 
   const TemperatureMeasurement = [
     'Test_TC_TM_1_1',
     'Test_TC_TM_2_1',
+    'Test_TC_TM_2_2',
   ];
 
   const Thermostat = [
@@ -106,6 +136,7 @@ function getTests()
   const ThermostatUserConfiguration = [
     'Test_TC_TSUIC_1_1',
     'Test_TC_TSUIC_2_1',
+    'Test_TC_TSUIC_2_2',
   ];
 
   const ThreadNetworkDiagnostics = [
@@ -115,6 +146,8 @@ function getTests()
   const WindowCovering = [
     'Test_TC_WNCV_1_1',
     'Test_TC_WNCV_2_1',
+    'Test_TC_WNCV_2_2',
+    'Test_TC_WNCV_2_5',
     'Test_TC_WNCV_3_1',
     'Test_TC_WNCV_3_2',
     'Test_TC_WNCV_3_3',
@@ -128,6 +161,11 @@ function getTests()
     'TestBasicInformation',
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
+    'TestModeSelectCluster',
+  ];
+
+  const SoftwareDiagnostics = [
+    'Test_TC_DIAGSW_1_1',
   ];
 
   const Subscriptions = [
@@ -136,13 +174,16 @@ function getTests()
 
   const tests = [
     BinaryInput, //
+    BooleanState, //
     ColorControl, //
     DeviceManagement, //
+    ElectricalMeasurement, //
     FlowMeasurement, //
     LevelControl, //
     MediaControl, //
     OccupancySensing, //
     OnOff, //
+    PressureMeasurement, //
     PumpConfigurationControl, //
     RelativeHumidityMeasurement, //
     TemperatureMeasurement, //
@@ -151,6 +192,7 @@ function getTests()
     ThreadNetworkDiagnostics, //
     WindowCovering, //
     Others, //
+    SoftwareDiagnostics, //
     Subscriptions, //
   ];
   return tests.flat(1);

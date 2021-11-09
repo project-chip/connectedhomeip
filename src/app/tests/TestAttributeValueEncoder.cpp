@@ -23,7 +23,7 @@
  */
 
 #include <app/AttributeAccessInterface.h>
-#include <app/MessageDef/AttributeDataElement.h>
+#include <app/MessageDef/AttributeDataIB.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -36,7 +36,7 @@ namespace {
 
 struct TestSetup
 {
-    TestSetup(nlTestSuite * aSuite) : encoder(&writer)
+    TestSetup(nlTestSuite * aSuite) : encoder(&writer, 0)
     {
         writer.Init(buf);
         TLVType ignored;
@@ -73,7 +73,7 @@ void TestEncodeBool(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
     // Anonymous tagged struct.
     // Control tag for boolean true with context tag.
-    // Context tag with value AttributeDataElement::kCsTag_Data.
+    // Context tag with value AttributeDataIB::Tag::kData.
     const uint8_t expected[] = { 0x15, 0x29, 0x02 };
     VERIFY_BUFFER_STATE(aSuite, test, expected);
 }
@@ -86,7 +86,7 @@ void TestEncodeListOfBools1(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
     // Anonymous tagged struct.
     // Control tag for array with context tag.
-    // Context tag with value AttributeDataElement::kCsTag_Data.
+    // Context tag with value AttributeDataIB::Tag::kData.
     // Control tag for boolean true with anonymous tag.
     // Control tag for boolean false with anonymous tag.
     // End of list marker.
@@ -108,7 +108,7 @@ void TestEncodeListOfBools2(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
     // Anonymous tagged struct.
     // Control tag for array with context tag.
-    // Context tag with value AttributeDataElement::kCsTag_Data.
+    // Context tag with value AttributeDataIB::Tag::kData.
     // Control tag for boolean true with anonymous tag.
     // Control tag for boolean false with anonymous tag.
     // End of list marker.

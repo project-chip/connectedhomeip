@@ -27,6 +27,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -60,7 +61,24 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 
+class ConnectivityManager;
 class ConnectivityManagerImpl;
+
+/**
+ * Defines the delegate class of Connectivity Manager to notify connectivity updates.
+ */
+class ConnectivityManagerDelegate
+{
+public:
+    virtual ~ConnectivityManagerDelegate() {}
+
+    /**
+     * @brief
+     *   Called when any network interface on the Node is changed
+     *
+     */
+    virtual void OnNetworkInfoChanged() {}
+};
 
 /**
  * Provides control of network connectivity for a chip device.
@@ -138,7 +156,16 @@ public:
         kSlowAdvertising = 1,
     };
 
-    struct ThreadPollingConfig;
+    enum class SEDPollingMode
+    {
+        Idle   = 0,
+        Active = 1,
+    };
+
+    struct SEDPollingConfig;
+
+    void SetDelegate(ConnectivityManagerDelegate * delegate) { mDelegate = delegate; }
+    ConnectivityManagerDelegate * GetDelegate() const { return mDelegate; }
 
     // WiFi station methods
     WiFiStationMode GetWiFiStationMode();
@@ -146,8 +173,8 @@ public:
     bool IsWiFiStationEnabled();
     bool IsWiFiStationApplicationControlled();
     bool IsWiFiStationConnected();
-    uint32_t GetWiFiStationReconnectIntervalMS();
-    CHIP_ERROR SetWiFiStationReconnectIntervalMS(uint32_t val);
+    System::Clock::Timeout GetWiFiStationReconnectInterval();
+    CHIP_ERROR SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool IsWiFiStationProvisioned();
     void ClearWiFiStationProvision();
     CHIP_ERROR GetAndLogWifiStatsCounters();
@@ -160,8 +187,8 @@ public:
     void DemandStartWiFiAP();
     void StopOnDemandWiFiAP();
     void MaintainOnDemandWiFiAP();
-    uint32_t GetWiFiAPIdleTimeoutMS();
-    void SetWiFiAPIdleTimeoutMS(uint32_t val);
+    System::Clock::Timeout GetWiFiAPIdleTimeout();
+    void SetWiFiAPIdleTimeout(System::Clock::Timeout val);
 
     // Thread Methods
     ThreadMode GetThreadMode();
@@ -170,8 +197,6 @@ public:
     bool IsThreadApplicationControlled();
     ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ThreadDeviceType deviceType);
-    void GetThreadPollingConfig(ThreadPollingConfig & pollingConfig);
-    CHIP_ERROR SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig);
     bool IsThreadAttached();
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
@@ -187,6 +212,13 @@ public:
      */
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp);
     void ReleaseNetworkInterfaces(NetworkInterface * netifp);
+
+// Sleepy end device methods
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR GetSEDPollingConfig(SEDPollingConfig & pollingConfig);
+    CHIP_ERROR SetSEDPollingConfig(const SEDPollingConfig & pollingConfig);
+    CHIP_ERROR RequestSEDFastPollingMode(bool onOff);
+#endif
 
     // Ethernet network diagnostics methods
     CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
@@ -241,6 +273,8 @@ public:
     static const char * CHIPoBLEServiceModeToStr(CHIPoBLEServiceMode mode);
 
 private:
+    ConnectivityManagerDelegate * mDelegate = nullptr;
+
     // ===== Members for internal use by the following friends.
 
     friend class PlatformManagerImpl;
@@ -269,15 +303,15 @@ protected:
 };
 
 /**
- * Information describing the desired Thread polling behavior of a device.
+ * Information describing the desired polling behavior of a sleepy end device (SED).
  */
-struct ConnectivityManager::ThreadPollingConfig
+struct ConnectivityManager::SEDPollingConfig
 {
-    uint32_t ActivePollingIntervalMS; /**< Interval at which the device polls its parent Thread router when
+    uint32_t FastPollingIntervalMS; /**< Interval at which the device polls its parent
                                            when there are active chip exchanges in progress. Only meaningful
                                            when the device is acting as a sleepy end node. */
 
-    uint32_t InactivePollingIntervalMS; /**< Interval at which the device polls its parent Thread router when
+    uint32_t SlowPollingIntervalMS; /**< Interval at which the device polls its parent
                                              when there are NO active chip exchanges in progress. Only meaningful
                                              when the device is acting as a sleepy end node. */
 
@@ -341,14 +375,14 @@ inline bool ConnectivityManager::IsWiFiStationConnected()
     return static_cast<ImplClass *>(this)->_IsWiFiStationConnected();
 }
 
-inline uint32_t ConnectivityManager::GetWiFiStationReconnectIntervalMS()
+inline System::Clock::Timeout ConnectivityManager::GetWiFiStationReconnectInterval()
 {
-    return static_cast<ImplClass *>(this)->_GetWiFiStationReconnectIntervalMS();
+    return static_cast<ImplClass *>(this)->_GetWiFiStationReconnectInterval();
 }
 
-inline CHIP_ERROR ConnectivityManager::SetWiFiStationReconnectIntervalMS(uint32_t val)
+inline CHIP_ERROR ConnectivityManager::SetWiFiStationReconnectInterval(System::Clock::Timeout val)
 {
-    return static_cast<ImplClass *>(this)->_SetWiFiStationReconnectIntervalMS(val);
+    return static_cast<ImplClass *>(this)->_SetWiFiStationReconnectInterval(val);
 }
 
 inline bool ConnectivityManager::IsWiFiStationProvisioned()
@@ -396,14 +430,14 @@ inline void ConnectivityManager::MaintainOnDemandWiFiAP()
     static_cast<ImplClass *>(this)->_MaintainOnDemandWiFiAP();
 }
 
-inline uint32_t ConnectivityManager::GetWiFiAPIdleTimeoutMS()
+inline System::Clock::Timeout ConnectivityManager::GetWiFiAPIdleTimeout()
 {
-    return static_cast<ImplClass *>(this)->_GetWiFiAPIdleTimeoutMS();
+    return static_cast<ImplClass *>(this)->_GetWiFiAPIdleTimeout();
 }
 
-inline void ConnectivityManager::SetWiFiAPIdleTimeoutMS(uint32_t val)
+inline void ConnectivityManager::SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
-    static_cast<ImplClass *>(this)->_SetWiFiAPIdleTimeoutMS(val);
+    static_cast<ImplClass *>(this)->_SetWiFiAPIdleTimeout(val);
 }
 
 inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
@@ -566,15 +600,22 @@ inline CHIP_ERROR ConnectivityManager::SetThreadDeviceType(ThreadDeviceType devi
     return static_cast<ImplClass *>(this)->_SetThreadDeviceType(deviceType);
 }
 
-inline void ConnectivityManager::GetThreadPollingConfig(ThreadPollingConfig & pollingConfig)
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+inline CHIP_ERROR ConnectivityManager::GetSEDPollingConfig(SEDPollingConfig & pollingConfig)
 {
-    return static_cast<ImplClass *>(this)->_GetThreadPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_GetSEDPollingConfig(pollingConfig);
 }
 
-inline CHIP_ERROR ConnectivityManager::SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig)
+inline CHIP_ERROR ConnectivityManager::SetSEDPollingConfig(const SEDPollingConfig & pollingConfig)
 {
-    return static_cast<ImplClass *>(this)->_SetThreadPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_SetSEDPollingConfig(pollingConfig);
 }
+
+inline CHIP_ERROR ConnectivityManager::RequestSEDFastPollingMode(bool onOff)
+{
+    return static_cast<ImplClass *>(this)->_RequestSEDFastPollingMode(onOff);
+}
+#endif
 
 inline bool ConnectivityManager::IsThreadAttached()
 {

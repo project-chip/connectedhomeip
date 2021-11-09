@@ -460,7 +460,7 @@
     });
 }
 
-- (void)showPayload:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
+- (void)showPayload:(CHIPSetupPayload *)payload rawPayload:(NSString *)rawPayload isManualCode:(BOOL)isManualCode
 {
     [self->_activityIndicator stopAnimating];
     self->_activityIndicator.hidden = YES;
@@ -469,9 +469,9 @@
     self->_setupPayloadView.hidden = NO;
     self->_resetButton.hidden = NO;
 
-    [self updateUIFields:payload decimalString:decimalString];
+    [self updateUIFields:payload rawPayload:rawPayload isManualCode:isManualCode];
     [self parseOptionalData:payload];
-    [self handleRendezVous:payload];
+    [self handleRendezVous:payload rawPayload:rawPayload];
 }
 
 - (void)retrieveAndSendWifiCredentials
@@ -638,11 +638,11 @@
     [self setVendorIDOnAccessory];
 }
 
-- (void)updateUIFields:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
+- (void)updateUIFields:(CHIPSetupPayload *)payload rawPayload:(nullable NSString *)rawPayload isManualCode:(BOOL)isManualCode
 {
-    if (decimalString) {
+    if (isManualCode) {
         _manualCodeLabel.hidden = NO;
-        _manualCodeLabel.text = decimalString;
+        _manualCodeLabel.text = rawPayload;
         _versionLabel.text = NOT_APPLICABLE_STRING;
         _rendezVousInformation.text = NOT_APPLICABLE_STRING;
         _serialNumber.text = NOT_APPLICABLE_STRING;
@@ -697,21 +697,19 @@
 
 // MARK: Rendez Vous
 
-- (void)handleRendezVous:(CHIPSetupPayload *)payload
+- (void)handleRendezVous:(CHIPSetupPayload *)payload rawPayload:(NSString *)rawPayload
 {
     switch (payload.rendezvousInformation) {
+    case kRendezvousInformationNone:
     case kRendezvousInformationOnNetwork:
+    case kRendezvousInformationBLE:
     case kRendezvousInformationAllMask:
-        NSLog(@"Rendezvous Unknown");
+        NSLog(@"Rendezvous Default");
+        [self handleRendezVousDefault:rawPayload];
         break;
     case kRendezvousInformationSoftAP:
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
-        break;
-    case kRendezvousInformationNone:
-    case kRendezvousInformationBLE:
-        NSLog(@"Rendezvous BLE");
-        [self handleRendezVousBLE:payload.discriminator.unsignedShortValue setupPINCode:payload.setUpPINCode.unsignedIntValue];
         break;
     }
 }
@@ -723,11 +721,12 @@
     return peripheralFullName;
 }
 
-- (void)handleRendezVousBLE:(uint16_t)discriminator setupPINCode:(uint32_t)setupPINCode
+- (void)handleRendezVousDefault:(NSString *)payload
 {
     NSError * error;
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
-    if ([self.chipController pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode csrNonce:nil error:&error]) {
+
+    if ([self.chipController pairDevice:deviceID onboardingPayload:payload error:&error]) {
         deviceID++;
         CHIPSetNextAvailableDeviceID(deviceID);
     }
@@ -780,12 +779,12 @@
     return YES;
 }
 
-- (void)displayQRCodeInSetupPayloadView:(CHIPSetupPayload *)payload withError:(NSError *)error
+- (void)displayQRCodeInSetupPayloadView:(CHIPSetupPayload *)payload rawPayload:(NSString *)rawPayload error:(NSError *)error
 {
     if (error) {
         [self showError:error];
     } else {
-        [self showPayload:payload decimalString:nil];
+        [self showPayload:payload rawPayload:rawPayload isManualCode:NO];
     }
 }
 
@@ -802,7 +801,7 @@
         [self postScanningQRCodeState];
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
-            [self displayQRCodeInSetupPayloadView:self->_setupPayload withError:error];
+            [self displayQRCodeInSetupPayloadView:self->_setupPayload rawPayload:qrCode error:error];
         });
     });
 }
@@ -829,7 +828,7 @@
     if (error) {
         [self showError:error];
     } else {
-        [self showPayload:payload decimalString:decimalString];
+        [self showPayload:payload rawPayload:decimalString isManualCode:YES];
     }
 }
 

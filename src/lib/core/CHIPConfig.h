@@ -1833,6 +1833,18 @@
 #endif // CHIP_DETAIL_LOGGING
 
 /**
+ *  @def CHIP_AUTOMATION_LOGGING
+ *
+ *  @brief
+ *    If asserted (1), enable logging of all messages in the
+ *    chip::Logging::kLogCategory_Automation category.
+ *
+ */
+#ifndef CHIP_AUTOMATION_LOGGING
+#define CHIP_AUTOMATION_LOGGING 1
+#endif // CHIP_AUTOMATION_LOGGING
+
+/**
  * CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
  *
  * The maximum size (in bytes) of a log message

@@ -1,39 +1,34 @@
 {{#if isOptional}}
-  {{#if ignore}}
-    {{>commandValue ns=ns container=(concat container ".Emplace()") definedValue=definedValue type=type isOptional=false ignore=true}}
-  {{else}}
-    {{>commandValue ns=ns container=(concat container "." label ".Emplace()") definedValue=definedValue type=type isOptional=false ignore=true}}
-  {{/if}}
+  {{>commandValue ns=ns container=(concat container ".Emplace()") definedValue=definedValue type=type isOptional=false}}
 {{else if isNullable}}
-  {{#if ignore}}
-    {{>commandValue ns=ns container=(concat container ".SetNonNull()") definedValue=definedValue type=type isNullable=false ignore=true}}
+  {{#if (isLiteralNull definedValue)}}
+    {{container}}.SetNull();
   {{else}}
-    {{>commandValue ns=ns container=(concat container "." label ".SetNonNull()") definedValue=definedValue type=type isNullable=false ignore=true}}
+    {{>commandValue ns=ns container=(concat container ".SetNonNull()") definedValue=definedValue type=type isNullable=false}}
   {{/if}}
 {{else if isArray}}
 
   {{! forceNotList=true because we really want the type of a single item here.
       Similarly, forceNotOptional=true and forceNotNullable=true because we
       have accounted for those already. }}
+  {{#if definedValue.length}}
   {{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}} {{asLowerCamelCase label}}List[{{definedValue.length}}];
   {{#each definedValue}}
-  {{>commandValue ns=../ns container=(concat (asLowerCamelCase ../label) "List[" @index "]") definedValue=. type=../type ignore=true}}
+  {{>commandValue ns=../ns container=(concat (asLowerCamelCase ../label) "List[" @index "]") definedValue=. type=../type}}
   {{/each}}
-  {{container}}{{#unless ignore}}.{{asLowerCamelCase label}}{{/unless}} = {{asLowerCamelCase label}}List;
-
+  {{container}} = {{asLowerCamelCase label}}List;
+  {{else}}
+  {{container}} = chip::app::DataModel::List<{{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}}>();
+  {{/if}}
 {{else}}
   {{#if_is_struct type}}
 
     {{#zcl_struct_items_by_struct_name type}}
-      {{#if ../ignore}}
-      {{>commandValue ns=parent.ns container=(concat parent.container "." label) definedValue=(lookup parent.definedValue name) ignore=../ignore}}
-      {{else}}
-      {{>commandValue ns=parent.ns container=(concat parent.container "." parent.label) definedValue=(lookup parent.definedValue name) ignore=../ignore}}
-      {{/if}}
+      {{>commandValue ns=parent.ns container=(concat parent.container "." (asLowerCamelCase label)) definedValue=(lookup parent.definedValue name)}}
     {{/zcl_struct_items_by_struct_name}}
 
   {{else}}
-    {{container}}{{#unless ignore}}.{{asLowerCamelCase label}}{{/unless}} =
+    {{container}} =
     {{#if_chip_enum type}}
       static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});
     {{else if (isCharString type)}}

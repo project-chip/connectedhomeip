@@ -45,9 +45,12 @@ public:
     CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
+    static constexpr uint16_t ClusterRevision = 1;
+
     CHIP_ERROR ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server);
+    CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
 
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -111,6 +114,11 @@ CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, 
     return err;
 }
 
+CHIP_ERROR DescriptorAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(ClusterRevision);
+}
+
 DescriptorAttrAccess gAttrAccess;
 
 CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -130,6 +138,9 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
     }
     case PartsList::Id: {
         return ReadPartsAttribute(aPath.mEndpointId, aEncoder);
+    }
+    case ClusterRevision::Id: {
+        return ReadClusterRevision(aPath.mEndpointId, aEncoder);
     }
     default: {
         break;

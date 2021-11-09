@@ -188,7 +188,7 @@ void MockEventGeneratorImpl::SetEventGeneratorStop()
     // This helps quit the standalone app in an orderly way without
     // spurious leaked timers.
     if (mTimeBetweenEvents != 0)
-        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(chip::System::Clock::Zero, HandleNextEvent, this);
+        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(chip::System::Clock::kZero, HandleNextEvent, this);
 }
 
 bool MockEventGeneratorImpl::IsEventGeneratorStopped()

@@ -118,9 +118,9 @@ namespace {
     }
 
 
-// TODO: These IM related callbacks contains small or no generated code, should be put into seperate file to reduce the size of template.
-// Singleton instance of the callbacks manager
+{{! TODO: These IM related callbacks contains small or no generated code, should be put into seperate file to reduce the size of template. }}
 
+// Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
 {{#chip_client_clusters}}
@@ -144,10 +144,6 @@ void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttribu
     Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback> * cb = Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-{{! TODO: This stack usage bit is not OK.  See https://github.com/project-chip/connectedhomeip/issues/8558 }}
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
