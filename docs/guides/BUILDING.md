@@ -61,6 +61,7 @@ However, that does not expose the package to `pkg-config`. To fix that, one
 needs to run something like the following:
 
 Intel:
+
 ```
 cd /usr/local/lib/pkgconfig
 ln -s ../../Cellar/openssl@1.1/1.1.1g/lib/pkgconfig/* .
@@ -70,6 +71,7 @@ where `openssl@1.1/1.1.1g` may need to be replaced with the actual version of
 OpenSSL installed by Brew.
 
 Apple Silicon:
+
 ```
 export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:"/opt/homebrew/opt/openssl@3/lib/pkgconfig"
 ```
