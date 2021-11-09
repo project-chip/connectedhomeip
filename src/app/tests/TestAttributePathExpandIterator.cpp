@@ -183,7 +183,7 @@ void TestNoWildcard(nlTestSuite * apSuite, void * apContext)
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        // NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
+        NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
         index++;
     }
     NL_TEST_ASSERT(apSuite, index == ArraySize(paths));
@@ -266,7 +266,7 @@ void TestMultipleClusInfo(nlTestSuite * apSuite, void * apContext)
     {
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        // NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
+        NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
         index++;
     }
     NL_TEST_ASSERT(apSuite, index == ArraySize(paths));
