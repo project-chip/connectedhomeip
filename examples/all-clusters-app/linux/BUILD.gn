@@ -19,6 +19,7 @@ executable("chip-all-clusters-app") {
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "${chip_root}/src/credentials/examples/GroupDataProviderExample.cpp",
     "include/tv-callbacks.cpp",
     "main.cpp",
   ]
@@ -33,6 +34,11 @@ executable("chip-all-clusters-app") {
       [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
   cflags = [ "-Wconversion" ]
+
+  defines = [
+    "CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC=8",
+    "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=6",
+  ]
 
   output_dir = root_out_dir
 }

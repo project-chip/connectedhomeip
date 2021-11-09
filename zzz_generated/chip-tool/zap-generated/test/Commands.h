@@ -36167,7 +36167,12 @@ private:
     {
         VerifyOrReturn(CheckValue<uint8_t>("capacity", capacity, 5));
 
-        VerifyOrReturn(CheckValueAsList("groupList", groupList, 1, 32767));
+        auto iter = groupList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(groupList)>("groupList", iter, 0));
+        VerifyOrReturn(CheckValue<uint16_t>("groupList[0]", iter.GetValue(), 1U));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(groupList)>("groupList", iter, 1));
+        VerifyOrReturn(CheckValue<uint16_t>("groupList[1]", iter.GetValue(), 32767U));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(groupList)>("groupList", iter, 2));
         NextTest();
     }
 
@@ -36429,7 +36434,12 @@ private:
     {
         VerifyOrReturn(CheckValue<uint8_t>("capacity", capacity, 6));
 
-        VerifyOrReturn(CheckValueAsList("groupList", groupList, 1, 32767));
+        auto iter = groupList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(groupList)>("groupList", iter, 0));
+        VerifyOrReturn(CheckValue<uint16_t>("groupList[0]", iter.GetValue(), 1U));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(groupList)>("groupList", iter, 1));
+        VerifyOrReturn(CheckValue<uint16_t>("groupList[1]", iter.GetValue(), 32767U));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(groupList)>("groupList", iter, 2));
         NextTest();
     }
 

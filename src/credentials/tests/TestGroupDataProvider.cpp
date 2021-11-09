@@ -873,4 +873,6 @@ int TestGroups()
     return (nlTestRunnerStats(&theSuite));
 }
 
+#if (CHIP_CONFIG_MAX_GROUPS_PER_FABRIC >= 5) and (CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC >= 8)
 CHIP_REGISTER_TEST_SUITE(TestGroups)
+#endif
