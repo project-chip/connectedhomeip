@@ -83,7 +83,6 @@ int AppTask::Init()
 {
     LED_Params ledParams;
     Button_Params buttionParams;
-    ConnectivityManager::ThreadPollingConfig pollingConfig;
 
     cc13x2_26x2LogInit();
 
@@ -110,18 +109,6 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
-        while (1)
-            ;
-    }
-
-    pollingConfig.Clear();
-    pollingConfig.ActivePollingIntervalMS   = 5000; // ms
-    pollingConfig.InactivePollingIntervalMS = 5000; // ms
-
-    ret = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
-    if (ret != CHIP_NO_ERROR)
-    {
-        PLAT_LOG("ConnectivityMgr().SetThreadPollingConfig() failed");
         while (1)
             ;
     }

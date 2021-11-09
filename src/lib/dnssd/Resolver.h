@@ -76,7 +76,7 @@ struct ResolvedNodeData
     bool mSupportsTcp                      = false;
     uint32_t mMrpRetryIntervalIdle         = kUndefinedRetryInterval;
     uint32_t mMrpRetryIntervalActive       = kUndefinedRetryInterval;
-    uint64_t mExpiryTime                   = 0;
+    System::Clock::Timestamp mExpiryTime;
 };
 
 constexpr size_t kMaxDeviceNameLen         = 32;

@@ -98,7 +98,8 @@ void emAfPluginDoorLockServerWriteAttributes(const EmAfPluginDoorLockServerAttri
                                                            (uint8_t *) &data[i].value, ZCL_INT16U_ATTRIBUTE_TYPE);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
-            emberAfDoorLockClusterPrintln("Failed to write %s attribute 0x%2X: 0x%X", description, data[i].id, status);
+            emberAfDoorLockClusterPrintln("Failed to write %s attribute " ChipLogFormatMEI ": 0x%X", description,
+                                          ChipLogValueMEI(data[i].id), status);
         }
     }
 }
@@ -136,3 +137,5 @@ EmberAfStatus emAfPluginDoorLockServerNoteDoorStateChanged(EmberAfDoorState stat
 
     return status;
 }
+
+void MatterDoorLockPluginServerInitCallback() {}

@@ -87,7 +87,7 @@
 namespace chip {
 namespace Inet {
 
-chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPoint::sPool;
+BitMapObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPoint::sPool;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 namespace {
@@ -964,9 +964,8 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, 
 
     if (arg != NULL)
     {
-        CHIP_ERROR conErr;
-        TCPEndPoint * ep                 = static_cast<TCPEndPoint *>(arg);
-        System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
+        TCPEndPoint * ep             = static_cast<TCPEndPoint *>(arg);
+        System::Layer * lSystemLayer = ep->Layer().SystemLayer();
 
         if (lwipErr == ERR_OK)
         {
@@ -976,10 +975,16 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, 
         }
 
         // Post callback to HandleConnectComplete.
-        conErr = chip::System::MapErrorLwIP(lwipErr);
-        if (lSystemLayer->PostEvent(*ep, kInetEvent_TCPConnectComplete, static_cast<uintptr_t>(conErr.AsInteger())) !=
-            CHIP_NO_ERROR)
+        ep->Retain();
+        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, conErr = System::MapErrorLwIP(lwipErr)] {
+            ep->HandleConnectComplete(conErr);
+            ep->Release();
+        });
+        if (err != CHIP_NO_ERROR)
+        {
+            ep->Release();
             res = ERR_ABRT;
+        }
     }
     else
         res = ERR_ABRT;
@@ -996,9 +1001,9 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
 
     if (arg != NULL)
     {
-        TCPEndPoint * listenEP           = static_cast<TCPEndPoint *>(arg);
-        TCPEndPoint * conEP              = NULL;
-        System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(listenEP->Layer().SystemLayer());
+        TCPEndPoint * listenEP       = static_cast<TCPEndPoint *>(arg);
+        TCPEndPoint * conEP          = NULL;
+        System::Layer * lSystemLayer = listenEP->Layer().SystemLayer();
 
         // Tell LwIP we've accepted the connection so it can decrement the listen PCB's pending_accepts counter.
         tcp_accepted(listenEP->mTCP);
@@ -1043,8 +1048,17 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
             tcp_err(tpcb, LwIPHandleError);
 
             // Post a callback to the HandleConnectionReceived() function, passing it the new end point.
-            if (lSystemLayer->PostEvent(*listenEP, kInetEvent_TCPConnectionReceived, (uintptr_t) conEP) != CHIP_NO_ERROR)
+            listenEP->Retain();
+            conEP->Retain();
+            err = lSystemLayer->ScheduleLambda([listenEP, conEP] {
+                listenEP->HandleIncomingConnection(conEP);
+                conEP->Release();
+                listenEP->Release();
+            });
+            if (err != CHIP_NO_ERROR)
             {
+                conEP->Release(); // for the Ref in ScheduleLambda
+                listenEP->Release();
                 err = CHIP_ERROR_CONNECTION_ABORTED;
                 conEP->Release(); // for the Retain() above
                 conEP->Release(); // for the Retain() in NewTCPEndPoint()
@@ -1053,7 +1067,17 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
 
         // Otherwise, there was an error accepting the connection, so post a callback to the HandleError function.
         else
-            lSystemLayer->PostEvent(*listenEP, kInetEvent_TCPError, static_cast<uintptr_t>(err.AsInteger()));
+        {
+            listenEP->Retain();
+            err = lSystemLayer->ScheduleLambda([listenEP, err] {
+                listenEP->HandleError(err);
+                listenEP->Release();
+            });
+            if (err != CHIP_NO_ERROR)
+            {
+                listenEP->Release();
+            }
+        }
     }
     else
         err = CHIP_ERROR_CONNECTION_ABORTED;
@@ -1069,24 +1093,38 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
     }
 }
 
-err_t TCPEndPoint::LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, struct pbuf * p, err_t err)
+err_t TCPEndPoint::LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, struct pbuf * p, err_t _err)
 {
     err_t res = ERR_OK;
 
     if (arg != NULL)
     {
-        TCPEndPoint * ep                 = static_cast<TCPEndPoint *>(arg);
-        System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
+        TCPEndPoint * ep             = static_cast<TCPEndPoint *>(arg);
+        System::Layer * lSystemLayer = ep->Layer().SystemLayer();
 
         // Post callback to HandleDataReceived.
-        if (lSystemLayer->PostEvent(*ep, kInetEvent_TCPDataReceived, (uintptr_t) p) != CHIP_NO_ERROR)
+        ep->Retain();
+        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, p] {
+            ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
+            ep->Release();
+        });
+        if (err != CHIP_NO_ERROR)
+        {
+            ep->Release();
             res = ERR_ABRT;
+        }
     }
     else
         res = ERR_ABRT;
 
     if (res != ERR_OK)
+    {
+        if (p != nullptr)
+        {
+            pbuf_free(p);
+        }
         tcp_abort(tpcb);
+    }
 
     return res;
 }
@@ -1097,12 +1135,20 @@ err_t TCPEndPoint::LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb, u16_t l
 
     if (arg != NULL)
     {
-        TCPEndPoint * ep                 = static_cast<TCPEndPoint *>(arg);
-        System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
+        TCPEndPoint * ep             = static_cast<TCPEndPoint *>(arg);
+        System::Layer * lSystemLayer = ep->Layer().SystemLayer();
 
         // Post callback to HandleDataReceived.
-        if (lSystemLayer->PostEvent(*ep, kInetEvent_TCPDataSent, (uintptr_t) len) != CHIP_NO_ERROR)
+        ep->Retain();
+        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, len] {
+            ep->HandleDataSent(len);
+            ep->Release();
+        });
+        if (err != CHIP_NO_ERROR)
+        {
+            ep->Release();
             res = ERR_ABRT;
+        }
     }
     else
         res = ERR_ABRT;
@@ -1129,8 +1175,13 @@ void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
         ep->mLwIPEndPointType = LwIPEndPointType::Unknown;
 
         // Post callback to HandleError.
-        CHIP_ERROR err = chip::System::MapErrorLwIP(lwipErr);
-        lSystemLayer->PostEvent(*ep, kInetEvent_TCPError, static_cast<uintptr_t>(err.AsInteger()));
+        ep->Retain();
+        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, conErr = System::MapErrorLwIP(lwipErr)] {
+            ep->HandleError(conErr);
+            ep->Release();
+        });
+        if (err != CHIP_NO_ERROR)
+            ep->Release();
     }
 }
 
@@ -1356,8 +1407,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
     ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())
                              ->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
 
-    // Once Connecting or Connected, bump the reference count.  The corresponding Release()
-    // [or on LwIP, DeferredRelease()] will happen in DoClose().
+    // Once Connecting or Connected, bump the reference count.  The corresponding Release() will happen in DoClose().
     Retain();
 
     if (conRes == 0)
@@ -2333,8 +2383,7 @@ CHIP_ERROR TCPEndPoint::Listen(uint16_t backlog)
 
     if (res == CHIP_NO_ERROR)
     {
-        // Once Listening, bump the reference count.  The corresponding call to Release()
-        // [or on LwIP, DeferredRelease()] will happen in DoClose().
+        // Once Listening, bump the reference count.  The corresponding call to Release() will happen in DoClose().
         Retain();
         mState = State::kListening;
     }
@@ -2471,9 +2520,7 @@ void TCPEndPoint::Free()
         Abort();
     }
 
-    // Release the Retain() that happened when the end point was allocated
-    // [on LwIP, the object may still be alive if DoClose() used the
-    // EndPointBasis::DeferredFree() method.]
+    // Release the Retain() that happened when the end point was allocated.
     Release();
 }
 
@@ -2707,16 +2754,9 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
         }
 
         // Decrement the ref count that was added when the connection started (in Connect()) or listening started (in Listen()).
-        //
-        // When using LwIP, post a callback to Release() rather than calling it directly. Since up-calls
-        // from LwIP are delivered as events (via the LwIP* methods), we must ensure that all events have been
-        // cleared from the queue before the end point gets freed, otherwise we'll end up accessing freed memory.
-        // We achieve this by first preventing further up-calls from LwIP (via the call to tcp_abort() above)
-        // and then queuing the Release() call to happen after all existing events have been processed.
-        //
         if (oldState != State::kReady && oldState != State::kBound)
         {
-            DeferredFree(kReleaseDeferralErrorTactic_Ignore);
+            Release();
         }
     }
 

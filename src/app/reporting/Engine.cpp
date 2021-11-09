@@ -26,6 +26,7 @@
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
+#include <app/util/MatterCallbacks.h>
 
 namespace chip {
 namespace app {
@@ -62,29 +63,23 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 }
 
 CHIP_ERROR
-Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeDataList::Builder & aAttributeDataList,
+Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
                             ClusterInfo & aClusterInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId);
-    AttributeDataElement::Builder attributeDataElementBuilder = aAttributeDataList.CreateAttributeDataElementBuilder();
-    AttributePath::Builder attributePathBuilder               = attributeDataElementBuilder.CreateAttributePathBuilder();
-    attributePathBuilder.NodeId(aClusterInfo.mNodeId)
-        .EndpointId(aClusterInfo.mEndpointId)
-        .ClusterId(aClusterInfo.mClusterId)
-        .FieldId(aClusterInfo.mFieldId)
-        .EndOfAttributePath();
-    err = attributePathBuilder.GetError();
-    SuccessOrExit(err);
+    ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
 
-    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId,
-                  aClusterInfo.mFieldId);
+    AttributeReportIB::Builder attributeReport = aAttributeReportIBs.CreateAttributeReport();
 
-    err = ReadSingleClusterData(aAccessingFabricIndex, path, attributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
+    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aClusterInfo.mClusterId,
+                  aClusterInfo.mAttributeId);
+
+    MatterPreAttributeReadCallback(path);
+    err = ReadSingleClusterData(aAccessingFabricIndex, path, attributeReport);
+    MatterPostAttributeReadCallback(path);
     SuccessOrExit(err);
-    attributeDataElementBuilder.MoreClusterData(false);
-    attributeDataElementBuilder.EndOfAttributeDataElement();
-    err = attributeDataElementBuilder.GetError();
+    attributeReport.EndOfAttributeReportIB();
+    err = attributeReport.GetError();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -96,14 +91,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Builder & aReportDataBuilder,
-                                                          ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & aReportDataBuilder,
+                                                           ReadHandler * apReadHandler)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     bool attributeClean = true;
     TLV::TLVWriter backup;
     aReportDataBuilder.Checkpoint(backup);
-    AttributeDataList::Builder attributeDataList = aReportDataBuilder.CreateAttributeDataListBuilder();
+    AttributeReportIBs::Builder AttributeReportIBs = aReportDataBuilder.CreateAttributeReportIBs();
     SuccessOrExit(err = aReportDataBuilder.GetError());
     // TODO: Need to handle multiple chunk of message
     for (auto clusterInfo = apReadHandler->GetAttributeClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
@@ -111,7 +106,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Bui
         if (apReadHandler->IsInitialReport())
         {
             // Retrieve data for this cluster instance and clear its dirty flag.
-            err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, *clusterInfo);
+            err = RetrieveClusterData(apReadHandler->GetFabricIndex(), AttributeReportIBs, *clusterInfo);
             VerifyOrExit(err == CHIP_NO_ERROR,
                          ChipLogError(DataManagement, "<RE:Run> Error retrieving data from cluster, aborting"));
             attributeClean = false;
@@ -122,11 +117,15 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Bui
             {
                 if (clusterInfo->IsAttributePathSupersetOf(*path))
                 {
-                    err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, *path);
+                    // SetDirty injects path into GlobalDirtySet path that don't have the particular nodeId,
+                    // need to inject nodeId from subscribed path here.
+                    ClusterInfo dirtyPath = *path;
+                    dirtyPath.mNodeId     = clusterInfo->mNodeId;
+                    err                   = RetrieveClusterData(apReadHandler->GetFabricIndex(), AttributeReportIBs, dirtyPath);
                 }
                 else if (path->IsAttributePathSupersetOf(*clusterInfo))
                 {
-                    err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, *clusterInfo);
+                    err = RetrieveClusterData(apReadHandler->GetFabricIndex(), AttributeReportIBs, *clusterInfo);
                 }
                 else
                 {
@@ -140,8 +139,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Bui
             }
         }
     }
-    attributeDataList.EndOfAttributeDataList();
-    err = attributeDataList.GetError();
+    AttributeReportIBs.EndOfAttributeReportIBs();
+    err = AttributeReportIBs.GetError();
 
 exit:
     if (attributeClean || err != CHIP_NO_ERROR)
@@ -151,7 +150,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
@@ -161,15 +160,15 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & a
     ClusterInfo * clusterInfoList  = apReadHandler->GetEventClusterInfolist();
     EventNumber * eventNumberList  = apReadHandler->GetVendedEventNumberList();
     EventManagement & eventManager = EventManagement::GetInstance();
-    EventList::Builder eventList;
+    EventReports::Builder EventReports;
 
     aReportDataBuilder.Checkpoint(backup);
 
     VerifyOrExit(clusterInfoList != nullptr, );
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    eventList = aReportDataBuilder.CreateEventDataListBuilder();
-    SuccessOrExit(err = eventList.GetError());
+    EventReports = aReportDataBuilder.CreateEventReports();
+    SuccessOrExit(err = EventReports.GetError());
 
     memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
     // If the eventManager is not valid or has not been initialized,
@@ -196,7 +195,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & a
     while (apReadHandler->GetCurrentPriority() != PriorityLevel::Invalid)
     {
         uint8_t priorityIndex = static_cast<uint8_t>(apReadHandler->GetCurrentPriority());
-        err = eventManager.FetchEventsSince(*(eventList.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
+        err = eventManager.FetchEventsSince(*(EventReports.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
                                             eventNumberList[priorityIndex], eventCount);
 
         if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
@@ -241,8 +240,8 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportDataMessage::Builder & a
         }
     }
 
-    eventList.EndOfEventList();
-    SuccessOrExit(err = eventList.GetError());
+    EventReports.EndOfEventReports();
+    SuccessOrExit(err = EventReports.GetError());
 
     ChipLogDetail(DataManagement, "Fetched %zu events", eventCount);
 
@@ -276,10 +275,10 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         reportDataBuilder.SubscriptionId(subscriptionId);
     }
 
-    err = BuildSingleReportDataAttributeDataList(reportDataBuilder, apReadHandler);
+    err = BuildSingleReportDataAttributeReportIBs(reportDataBuilder, apReadHandler);
     SuccessOrExit(err);
 
-    err = BuildSingleReportDataEventList(reportDataBuilder, apReadHandler);
+    err = BuildSingleReportDataEventReports(reportDataBuilder, apReadHandler);
     SuccessOrExit(err);
 
     // TODO: Add mechanism to set mSuppressResponse to handle status reports for multiple reports
@@ -459,3 +458,6 @@ void Engine::OnReportConfirm()
 }; // namespace reporting
 }; // namespace app
 }; // namespace chip
+
+void __attribute__((weak)) MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+void __attribute__((weak)) MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}

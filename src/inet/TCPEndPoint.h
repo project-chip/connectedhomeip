@@ -30,7 +30,9 @@
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
-
+#include <lib/core/ReferenceCounted.h>
+#include <lib/support/Pool.h>
+#include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <utility>
@@ -50,6 +52,13 @@ namespace Inet {
 class InetLayer;
 class TCPTest;
 
+class TCPEndPoint;
+class TCPEndPointDeletor
+{
+public:
+    static void Release(TCPEndPoint * obj);
+};
+
 /**
  * @brief   Objects of this class represent TCP transport endpoints.
  *
@@ -58,7 +67,7 @@ class TCPTest;
  *  endpoints (SOCK_STREAM sockets on Linux and BSD-derived systems) or LwIP
  *  TCP protocol control blocks, as the system is configured accordingly.
  */
-class DLL_EXPORT TCPEndPoint : public EndPointBasis
+class DLL_EXPORT TCPEndPoint : public EndPointBasis, public ReferenceCounted<TCPEndPoint, TCPEndPointDeletor>
 {
     friend class InetLayer;
     friend class ::chip::Transport::TCPTest;
@@ -571,7 +580,8 @@ public:
     constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxSizeWithoutReserve;
 
 private:
-    static chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
+    friend class TCPEndPointDeletor;
+    static BitMapObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
 
     /**
      * Basic dynamic state of the underlying endpoint.
@@ -727,6 +737,11 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
+
+inline void TCPEndPointDeletor::Release(TCPEndPoint * obj)
+{
+    TCPEndPoint::sPool.ReleaseObject(obj);
+}
 
 } // namespace Inet
 } // namespace chip

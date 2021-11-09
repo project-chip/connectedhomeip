@@ -48,7 +48,7 @@ limitations under the License.
             <arg name="vendorId" type="vendor_id"/>
             <arg name="productId" type="INT16U"/>
             <arg name="softwareVersion" type="INT32U"/>
-            <arg name="protocolsSupported" type="OTADownloadProtocol"/> <!-- TODO(#8605): add array="true" when lists are supported -->
+            <arg name="protocolsSupported" type="OTADownloadProtocol" array="true"/>
             <arg name="hardwareVersion" type="INT16U" optional="true"/>
             <arg name="location" type="CHAR_STRING" length="2" optional="true"/>
             <arg name="requestorCanConsent" type="BOOLEAN" optional="true"/>
@@ -67,13 +67,13 @@ limitations under the License.
         <command source="server" code="0x03" name="QueryImageResponse" optional="false" cli="chip ota queryimageresponse">
             <description>Response to QueryImage command</description>
             <arg name="status" type="OTAQueryStatus"/>
-            <arg name="delayedActionTime" type="INT32U"/>
-            <arg name="imageURI" type="CHAR_STRING"/>
-            <arg name="softwareVersion" type="INT32U"/>
-            <arg name="softwareVersionString" type="CHAR_STRING"/>
-            <arg name="updateToken" type="OCTET_STRING" length="32"/>
-            <arg name="userConsentNeeded" type="BOOLEAN" default="false"/>
-            <arg name="metadataForRequestor" type="OCTET_STRING" length="512"/>
+            <arg name="delayedActionTime" type="INT32U" optional="true"/>
+            <arg name="imageURI" type="CHAR_STRING" optional="true"/>
+            <arg name="softwareVersion" type="INT32U" optional="true"/>
+            <arg name="softwareVersionString" type="CHAR_STRING" optional="true"/>
+            <arg name="updateToken" type="OCTET_STRING" length="32" optional="true"/>
+            <arg name="userConsentNeeded" type="BOOLEAN" default="false" optional="true"/>
+            <arg name="metadataForRequestor" type="OCTET_STRING" length="512" optional="true"/>
         </command>
         <command source="server" code="0x04" name="ApplyUpdateResponse" optional="false" cli="chip ota applyupdateresponse">
             <description>Reponse to ApplyUpdateRequest command</description>

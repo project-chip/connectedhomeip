@@ -57,7 +57,7 @@ public:
     //         One policy may be Least-time-to-live
     CHIP_ERROR Insert(const ResolvedNodeData & nodeData)
     {
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
         ResolvedNodeData * entry;
 
@@ -80,7 +80,7 @@ public:
     CHIP_ERROR Delete(PeerId peerId)
     {
         ResolvedNodeData * pentry;
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
         VerifyOrReturnError(pentry = FindPeerId(peerId, currentTime), CHIP_ERROR_KEY_NOT_FOUND);
 
@@ -92,7 +92,7 @@ public:
     CHIP_ERROR Lookup(PeerId peerId, ResolvedNodeData & nodeData)
     {
         ResolvedNodeData * pentry;
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
         VerifyOrReturnError(pentry = FindPeerId(peerId, currentTime), CHIP_ERROR_KEY_NOT_FOUND);
 
@@ -127,29 +127,20 @@ public:
             i++;
         }
     }
-#if CHIP_CONFIG_TEST
-    Time::TimeSource<Time::Source::kTest> & GetTimeSource() { return mTimeSource; }
-#endif
 
 private:
     PeerId nullPeerId; // indicates a cache entry is unused
     int elementsUsed;  // running count of how many entries are used -- for a sanity check
 
     ResolvedNodeData mLookupTable[CACHE_SIZE];
-#if CHIP_CONFIG_TEST
-    Time::TimeSource<Time::Source::kTest> mTimeSource;
-#else
-    Time::TimeSource<Time::Source::kSystem> mTimeSource;
-#endif // CHIP_CONFIG_TEST
 
-    ResolvedNodeData * findSlot(uint64_t currentTime)
+    ResolvedNodeData * findSlot(System::Clock::Timestamp currentTime)
     {
         for (ResolvedNodeData & entry : mLookupTable)
         {
             if (entry.mPeerId == nullPeerId)
                 return &entry;
 
-            printf("exp = %d, curr = %d\n", (int) entry.mExpiryTime, (int) currentTime);
             if (entry.mExpiryTime <= currentTime)
             {
                 MarkEntryUnused(entry);
@@ -159,7 +150,7 @@ private:
         return nullptr;
     }
 
-    ResolvedNodeData * FindPeerId(PeerId peerId, uint64_t current_time)
+    ResolvedNodeData * FindPeerId(PeerId peerId, System::Clock::Timestamp current_time)
     {
         for (ResolvedNodeData & entry : mLookupTable)
         {

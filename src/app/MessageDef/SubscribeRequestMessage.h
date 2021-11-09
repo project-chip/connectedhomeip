@@ -18,7 +18,7 @@
 #pragma once
 
 #include "AttributeDataVersionList.h"
-#include "AttributePathList.h"
+#include "AttributePathIBs.h"
 #include "Builder.h"
 #include "EventPaths.h"
 #include "Parser.h"
@@ -67,12 +67,12 @@ public:
 #endif
 
     /**
-     *  @brief Get a TLVReader for the AttributePathList. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the AttributePathIBs. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const;
+    CHIP_ERROR GetPathList(AttributePathIBs::Parser * const apAttributePathList) const;
 
     /**
      *  @brief Get a TLVReader for the EventPaths. Next() must be called before accessing them.
@@ -133,7 +133,7 @@ class Builder : public chip::app::Builder
 public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
-    AttributePathList::Builder & CreateAttributePathListBuilder();
+    AttributePathIBs::Builder & CreateAttributePathListBuilder();
 
     /**
      *  @brief Initialize a EventPaths::Builder for writing into the TLV stream
@@ -174,7 +174,7 @@ public:
     SubscribeRequestMessage::Builder & EndOfSubscribeRequestMessage();
 
 private:
-    AttributePathList::Builder mAttributePathListBuilder;
+    AttributePathIBs::Builder mAttributePathListBuilder;
     EventPaths::Builder mEventPathsBuilder;
     AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
 };

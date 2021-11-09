@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 // Include configuration headers
 #include <system/SystemConfig.h>
 
@@ -180,60 +178,6 @@ private:
 
 class LayerLwIP : public Layer
 {
-protected:
-    struct LwIPEventHandlerDelegate;
-
-public:
-    class EventHandlerDelegate
-    {
-    public:
-        typedef CHIP_ERROR (*EventHandlerFunction)(Object & aTarget, EventType aEventType, uintptr_t aArgument);
-
-        bool IsInitialized(void) const;
-        void Init(EventHandlerFunction aFunction);
-        void Prepend(const EventHandlerDelegate *& aDelegateList);
-
-    private:
-        friend class LayerLwIP::LwIPEventHandlerDelegate;
-        EventHandlerFunction mFunction;
-        const EventHandlerDelegate * mNextDelegate;
-    };
-
-    /**
-     * This adds an event handler delegate to the system layer to extend its ability to handle LwIP events.
-     *
-     *  @param[in]  aDelegate   An uninitialied LwIP event handler delegate structure
-     *
-     *  @retval     CHIP_NO_ERROR                 On success.
-     *  @retval     CHIP_ERROR_INVALID_ARGUMENT   If the function pointer contained in aDelegate is NULL
-     */
-    virtual CHIP_ERROR AddEventHandlerDelegate(LayerLwIP::EventHandlerDelegate & aDelegate) = 0;
-
-    /**
-     * This posts an event / message of the specified type with the provided argument to this instance's platform-specific event
-     * queue.
-     *
-     *  @param[in,out]  aTarget     A pointer to the CHIP System Layer object making the post request.
-     *  @param[in]      aEventType  The type of event to post.
-     *  @param[in,out]  aArgument   The argument associated with the event to post.
-     *
-     *  @retval    CHIP_NO_ERROR                  On success.
-     *  @retval    CHIP_ERROR_INCORRECT_STATE     If the state of the Layer object is incorrect.
-     *  @retval    CHIP_ERROR_NO_MEMORY           If the event queue is already full.
-     *  @retval    other Platform-specific errors generated indicating the reason for failure.
-     */
-    virtual CHIP_ERROR PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument) = 0;
-
-protected:
-    // Provide access to private members of EventHandlerDelegate.
-    struct LwIPEventHandlerDelegate : public EventHandlerDelegate
-    {
-        const EventHandlerFunction & GetFunction() const { return mFunction; }
-        const LwIPEventHandlerDelegate * GetNextDelegate() const
-        {
-            return static_cast<const LwIPEventHandlerDelegate *>(mNextDelegate);
-        }
-    };
 };
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

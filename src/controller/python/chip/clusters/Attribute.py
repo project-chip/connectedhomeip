@@ -125,12 +125,12 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
 
     writeargs = []
     for attr in attributes:
-        path = chip.interaction_model.AttributePathStruct.parse(
-            b'\x00' * chip.interaction_model.AttributePathStruct.sizeof())
+        path = chip.interaction_model.AttributePathIBstruct.parse(
+            b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
         path.EndpointId = attr.EndpointId
         path.ClusterId = attr.Attribute.cluster_id
         path.AttributeId = attr.Attribute.attribute_id
-        path = chip.interaction_model.AttributePathStruct.build(path)
+        path = chip.interaction_model.AttributePathIBstruct.build(path)
         tlv = attr.Attribute.ToTLV(None, attr.Data)
         writeargs.append(ctypes.c_char_p(path))
         writeargs.append(ctypes.c_char_p(bytes(tlv)))

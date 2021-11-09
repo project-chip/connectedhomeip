@@ -32,7 +32,7 @@ public:
     /////////// DiscoverCommand Interface /////////
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
-        ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(&chip::DeviceLayer::InetLayer));
+        ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(&chip::DeviceLayer::InetLayer()));
         chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
         ChipLogProgress(chipTool, "Dnssd: Searching for NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
         return chip::Dnssd::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(remoteId).SetCompressedFabricId(fabricId),

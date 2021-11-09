@@ -824,7 +824,7 @@
             /* Endpoint: 1, Cluster: Thermostat (server), little-endian */                                                         \
                                                                                                                                    \
             /* 2526 - FeatureMap, */                                                                                               \
-            0x00, 0x00, 0x00, 0x0B,                                                                                                \
+            0x0B, 0x00, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU

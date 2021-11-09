@@ -106,6 +106,10 @@
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 
+// TODO - Fine tune MRP default parameters for Darwin platform
+#define CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL (15000)
+#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (2000)
+
 // ==================== Security Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_APPLICATION_GROUPS

@@ -491,9 +491,10 @@ def gh_send_change_report(db: SizeDatabase, df: pd.DataFrame) -> bool:
     # Check the most recent commit on the PR, so that we don't comment on
     # builds that are already outdated.
     commit = df.attrs['commit']
-    commits = sorted(gh_get_commits_for_pr(db.gh, pr),
-                     key=lambda c: c.commit.committer.date,
-                     reverse=True)
+    commits = sorted(
+        gh_get_commits_for_pr(db.gh, pr),
+        key=lambda c: f'{c.commit.committer.date}{c.commit.author.date}',
+        reverse=True)
     if commits and commit != commits[0].sha:
         logging.info('SCS: PR #%s: not commenting for stale %s; newest is %s',
                      pr, commit, commits[0].sha)

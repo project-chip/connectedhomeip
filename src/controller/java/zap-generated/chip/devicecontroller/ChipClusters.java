@@ -5765,6 +5765,14 @@ public class ChipClusters {
       reportCurrentPositionAttribute(chipClusterPtr, callback);
     }
 
+    public void readMultiPressMaxAttribute(IntegerAttributeCallback callback) {
+      readMultiPressMaxAttribute(chipClusterPtr, callback);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -5780,6 +5788,12 @@ public class ChipClusters {
 
     private native void reportCurrentPositionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readMultiPressMaxAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -6042,7 +6056,7 @@ public class ChipClusters {
       testEnumsRequest(chipClusterPtr, callback, arg1, arg2);
     }
 
-    public void testListInt8UArgumentRequest(DefaultClusterCallback callback, int arg1) {
+    public void testListInt8UArgumentRequest(BooleanResponseCallback callback, int arg1) {
       testListInt8UArgumentRequest(chipClusterPtr, callback, arg1);
     }
 
@@ -6052,7 +6066,7 @@ public class ChipClusters {
     }
 
     public void testListStructArgumentRequest(
-        DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
+        BooleanResponseCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
       testListStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
     }
 
@@ -6070,7 +6084,7 @@ public class ChipClusters {
     }
 
     public void testStructArgumentRequest(
-        DefaultClusterCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
+        BooleanResponseCallback callback, int a, boolean b, int c, byte[] d, String e, int f) {
       testStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
     }
 
@@ -6087,14 +6101,14 @@ public class ChipClusters {
         long chipClusterPtr, TestEnumsResponseCallback callback, int arg1, int arg2);
 
     private native void testListInt8UArgumentRequest(
-        long chipClusterPtr, DefaultClusterCallback callback, int arg1);
+        long chipClusterPtr, BooleanResponseCallback callback, int arg1);
 
     private native void testListInt8UReverseRequest(
         long chipClusterPtr, TestListInt8UReverseResponseCallback callback, int arg1);
 
     private native void testListStructArgumentRequest(
         long chipClusterPtr,
-        DefaultClusterCallback callback,
+        BooleanResponseCallback callback,
         int a,
         boolean b,
         int c,
@@ -6111,7 +6125,7 @@ public class ChipClusters {
 
     private native void testStructArgumentRequest(
         long chipClusterPtr,
-        DefaultClusterCallback callback,
+        BooleanResponseCallback callback,
         int a,
         boolean b,
         int c,
@@ -6120,6 +6134,12 @@ public class ChipClusters {
         int f);
 
     private native void testUnknownCommand(long chipClusterPtr, DefaultClusterCallback callback);
+
+    public interface BooleanResponseCallback {
+      void onSuccess(boolean value);
+
+      void onError(Exception error);
+    }
 
     public interface TestAddArgumentsResponseCallback {
       void onSuccess(int returnValue);

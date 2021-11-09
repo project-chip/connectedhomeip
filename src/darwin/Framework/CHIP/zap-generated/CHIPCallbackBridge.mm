@@ -1380,6 +1380,13 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn
     });
 };
 
+void CHIPTestClusterClusterBooleanResponseCallbackBridge::OnSuccessFn(void * context, bool value)
+{
+    DispatchSuccess(context, @ {
+        @"value" : [NSNumber numberWithBool:value],
+    });
+};
+
 void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(void * context, uint8_t returnValue)
 {
     DispatchSuccess(context, @ {

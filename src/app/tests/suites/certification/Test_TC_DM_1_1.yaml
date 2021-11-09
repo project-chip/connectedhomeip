@@ -109,6 +109,7 @@ tests:
     - label: "Query ManufacturingDate"
       command: "readAttribute"
       attribute: "ManufacturingDate"
+      PICS: MANF_DATE
       optional: true
       response:
           constraints:
@@ -120,6 +121,7 @@ tests:
     - label: "Query PartNumber"
       command: "readAttribute"
       attribute: "PartNumber"
+      PICS: PART_NUM
       optional: true
       response:
           constraints:

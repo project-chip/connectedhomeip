@@ -40,3 +40,5 @@ bool emberAfLowPowerClusterSleepCallback(app::CommandHandler * command, const ap
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
+
+void MatterLowPowerPluginServerInitCallback() {}

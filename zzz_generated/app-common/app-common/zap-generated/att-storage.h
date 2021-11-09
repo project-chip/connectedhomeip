@@ -36,6 +36,8 @@
 #define ATTRIBUTE_MASK_SINGLETON (0x20)
 // Attribute is a client attribute
 #define ATTRIBUTE_MASK_CLIENT (0x40)
+// Attribute is nullable
+#define ATTRIBUTE_MASK_NULLABLE (0x80)
 
 // Cluster masks modify how clusters are used by the framework
 //

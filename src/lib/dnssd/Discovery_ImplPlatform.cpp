@@ -135,22 +135,19 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
     // change or device type change.
     // TODO: Is this really the best place to set these? Seems like it should be passed
     // in with the correct values and set one level up from here.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (chip::DeviceLayer::ConnectivityMgr().GetThreadDeviceType() ==
-        chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_SleepyEndDevice)
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
+    sedPollingConfig.Clear();
+    ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
+    // Increment default MRP retry intervals by SED poll period to be on the safe side
+    // and avoid unnecessary retransmissions.
+    if (mrpRetryIntervalIdle.HasValue())
     {
-        uint32_t sedPollPeriod;
-        ReturnErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().GetPollPeriod(sedPollPeriod));
-        // Increment default MRP retry intervals by SED poll period to be on the safe side
-        // and avoid unnecessary retransmissions.
-        if (mrpRetryIntervalIdle.HasValue())
-        {
-            mrpRetryIntervalIdle.SetValue(mrpRetryIntervalIdle.Value() + sedPollPeriod);
-        }
-        if (mrpRetryIntervalActive.HasValue())
-        {
-            mrpRetryIntervalActive.SetValue(mrpRetryIntervalActive.Value() + sedPollPeriod);
-        }
+        mrpRetryIntervalIdle.SetValue(mrpRetryIntervalIdle.Value() + sedPollingConfig.SlowPollingIntervalMS);
+    }
+    if (mrpRetryIntervalActive.HasValue())
+    {
+        mrpRetryIntervalActive.SetValue(mrpRetryIntervalActive.Value() + sedPollingConfig.FastPollingIntervalMS);
     }
 #endif
     if (mrpRetryIntervalIdle.HasValue())
@@ -583,8 +580,10 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     nodeData.mAddress[0]  = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
     nodeData.mNumIPs      = 1;
-    Time::TimeSource<Time::Source::kSystem> timeSource;
-    nodeData.mExpiryTime = timeSource.GetCurrentMonotonicTimeMs() + result->mTtlSeconds * 1000;
+    // TODO: Use seconds?
+    const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
+
+    nodeData.mExpiryTime = currentTime + System::Clock::Seconds16(result->mTtlSeconds);
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {

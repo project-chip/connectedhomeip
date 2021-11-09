@@ -131,9 +131,9 @@ bool ReliableMessageContext::HasPiggybackAckPending() const
     return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
 }
 
-uint64_t ReliableMessageContext::GetInitialRetransmitTimeoutTick()
+uint64_t ReliableMessageContext::GetIdleRetransmitTimeoutTick()
 {
-    return mConfig.mInitialRetransTimeoutTick;
+    return mConfig.mIdleRetransTimeoutTick;
 }
 
 uint64_t ReliableMessageContext::GetActiveRetransmitTimeoutTick()

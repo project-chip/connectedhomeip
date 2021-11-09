@@ -30,7 +30,6 @@
 #include "InetInterface.h"
 
 #include "InetLayer.h"
-#include "InetLayerEvents.h"
 
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>

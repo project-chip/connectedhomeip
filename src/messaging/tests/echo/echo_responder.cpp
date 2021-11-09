@@ -83,7 +83,7 @@ int main(int argc, char * argv[])
 
     if (useTCP)
     {
-        err = gTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer)
+        err = gTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer())
 #if INET_CONFIG_ENABLE_IPV4
                                    .SetAddressType(chip::Inet::IPAddressType::kIPv4)
 #else
@@ -98,7 +98,7 @@ int main(int argc, char * argv[])
     else
     {
         err = gUDPManager.Init(
-            chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::IPAddressType::kIPv6));
+            chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer()).SetAddressType(chip::Inet::IPAddressType::kIPv6));
         SuccessOrExit(err);
 
         err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
@@ -142,6 +142,8 @@ exit:
     {
         gEchoServer.Shutdown();
     }
+
+    gUDPManager.Close();
 
     ShutdownChip();
 

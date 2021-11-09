@@ -25,10 +25,17 @@ shared_library("jni") {
     "AndroidCallbacks-JNI.cpp",
     "AndroidCallbacks.cpp",
     "AndroidCallbacks.h",
+    "AndroidClusterExceptions.cpp",
+    "AndroidClusterExceptions.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
+    "CHIPDefaultCallbacks.cpp",
+    "CHIPDefaultCallbacks.h",
     "CHIPDeviceController-JNI.cpp",
     "zap-generated/CHIPClusters-JNI.cpp",
+    "zap-generated/CHIPClustersRead-JNI.cpp",
+    "zap-generated/CHIPReadCallbacks.cpp",
+    "zap-generated/CHIPReadCallbacks.h",
   ]
 
   deps = [
@@ -64,6 +71,7 @@ android_library("java") {
     "src/chip/clusterinfo/ClusterInfo.java",
     "src/chip/clusterinfo/CommandInfo.java",
     "src/chip/clusterinfo/CommandParameterInfo.java",
+    "src/chip/clusterinfo/CommandResponseInfo.java",
     "src/chip/clusterinfo/DelegatedClusterCallback.java",
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",

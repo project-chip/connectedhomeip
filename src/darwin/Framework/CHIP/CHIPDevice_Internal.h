@@ -21,14 +21,14 @@
 #import "CHIPDevice.h"
 #import <Foundation/Foundation.h>
 
-#include <controller/CHIPDevice.h>
+#include <app/DeviceProxy.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPDevice ()
 
-- (instancetype)initWithDevice:(chip::Controller::Device *)device;
-- (chip::Controller::Device *)internalDevice;
+- (instancetype)initWithDevice:(chip::DeviceProxy *)device;
+- (chip::DeviceProxy *)internalDevice;
 
 @end
 

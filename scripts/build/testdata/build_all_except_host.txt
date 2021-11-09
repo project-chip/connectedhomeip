@@ -133,6 +133,9 @@ gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '
 # Generating efr32-brd4161a-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-lock
 
+# Generating efr32-brd4161a-unit-test
+gn gen --check --fail-on-unused-args --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-unit-test
+
 # Generating efr32-brd4161a-window-covering
 gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
 
@@ -165,7 +168,7 @@ cp examples/all-clusters-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-cl
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo CONFIG_DISABLE_IPV4=y >>{out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
@@ -233,7 +236,7 @@ cp examples/all-clusters-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stac
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo CONFIG_DISABLE_IPV4=y >>{out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
@@ -257,11 +260,14 @@ cp examples/all-clusters-app/esp32/sdkconfig_m5stack_rpc.defaults {out}/esp32-m5
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo CONFIG_DISABLE_IPV4=y >>{out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only reconfigure'
+
+# Generating infineon-p6-all-clusters
+gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters
 
 # Generating infineon-p6-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
@@ -603,6 +609,9 @@ ninja -C {out}/efr32-brd4161a-light-rpc
 # Building efr32-brd4161a-lock
 ninja -C {out}/efr32-brd4161a-lock
 
+# Building efr32-brd4161a-unit-test
+ninja -C {out}/efr32-brd4161a-unit-test
+
 # Building efr32-brd4161a-window-covering
 ninja -C {out}/efr32-brd4161a-window-covering
 
@@ -682,6 +691,9 @@ rm -f examples/all-clusters-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only build'
+
+# Building infineon-p6-all-clusters
+ninja -C {out}/infineon-p6-all-clusters
 
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock

@@ -43,6 +43,11 @@ public:
         mPeerSessionId.SetValue(peerSessionId);
     }
 
+    SessionHandle(NodeId peerNodeId, GroupId groupId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric)
+    {
+        mGroupId.SetValue(groupId);
+    }
+
     bool IsSecure() const { return !mUnauthenticatedSessionHandle.HasValue(); }
 
     bool HasFabricIndex() const { return (mFabric != kUndefinedFabricIndex); }
@@ -68,6 +73,7 @@ public:
     }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    bool IsGroupSession() const { return mGroupId.HasValue(); }
     const Optional<uint16_t> & GetPeerSessionId() const { return mPeerSessionId; }
     const Optional<uint16_t> & GetLocalSessionId() const { return mLocalSessionId; }
 
@@ -75,6 +81,8 @@ public:
     // address is not known.  This can happen for secure sessions that have been
     // torn down, at the very least.
     const Transport::PeerAddress * GetPeerAddress(SessionManager * sessionManager) const;
+
+    CHIP_ERROR GetMRPIntervals(SessionManager * sessionManager, uint32_t & mrpIdleInterval, uint32_t & mrpActiveInterval);
 
     Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession() const { return mUnauthenticatedSessionHandle.Value(); }
 
@@ -85,6 +93,7 @@ private:
     NodeId mPeerNodeId;
     Optional<uint16_t> mLocalSessionId;
     Optional<uint16_t> mPeerSessionId;
+    Optional<GroupId> mGroupId;
     // TODO: Re-evaluate the storing of Fabric ID in SessionHandle
     //       The Fabric ID will not be available for PASE and group sessions. So need
     //       to identify an approach that'll allow looking up the corresponding information for

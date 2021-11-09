@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 
 executable("chip-all-clusters-app") {
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "include/tv-callbacks.cpp",
     "main.cpp",
   ]

@@ -28,6 +28,13 @@ chip_data_model("configuration") {
   is_server = true
 }
 
+config("includes") {
+  include_dirs = [
+    ".",
+    "include",
+  ]
+}
+
 executable("chip-${chip_tests_zap_config}") {
   sources = [ "main.cpp" ]
 
@@ -36,6 +43,8 @@ executable("chip-${chip_tests_zap_config}") {
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
   ]
+
+  include_dirs = [ "include" ]
 
   cflags = [ "-Wconversion" ]
 

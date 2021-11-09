@@ -1321,6 +1321,16 @@ public:
     static void OnSuccessFn(void * context, uint8_t status, chip::CharSpan data);
 };
 
+class CHIPTestClusterClusterBooleanResponseCallbackBridge : public CHIPCallbackBridge<TestClusterClusterBooleanResponseCallback>
+{
+public:
+    CHIPTestClusterClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                        bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterClusterBooleanResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, bool value);
+};
+
 class CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge
     : public CHIPCallbackBridge<TestClusterClusterTestAddArgumentsResponseCallback>
 {

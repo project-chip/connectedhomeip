@@ -1,0 +1,46 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+#include <zap-generated/CHIPClientCallbacks.h>
+
+#include <jni.h>
+
+{{#chip_server_global_responses}}
+class CHIP{{chipCallback.name}}AttributeCallback : public chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> {
+public:
+    CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    static void maybeDestroy(CHIP{{chipCallback.name}}AttributeCallback * callback) {
+        if (!callback->keepAlive) {
+            callback->Cancel();
+            delete callback;
+        }
+    }
+
+    static void CallbackFn(void * context, {{chipCallback.type}} value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+{{/chip_server_global_responses}}
+
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if isList}}
+class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback : public chip::Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>
+{
+public:
+    CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback);
+
+    static void CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list);
+
+private:
+    jobject javaCallbackRef;
+};
+
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
+{{/if}}

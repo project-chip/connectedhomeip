@@ -895,9 +895,10 @@ template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster:
     CommandResponseFailureCallback);
 
 template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type,
-                                               chip::app::DataModel::NullObjectType>(
+                                               chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>(
     const chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>,
+    CommandResponseFailureCallback);
 
 template CHIP_ERROR
 ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type,
@@ -907,9 +908,10 @@ ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListI
     CommandResponseFailureCallback);
 
 template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type,
-                                               chip::app::DataModel::NullObjectType>(
+                                               chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>(
     const chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>,
+    CommandResponseFailureCallback);
 
 template CHIP_ERROR
 ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type, chip::app::DataModel::NullObjectType>(
@@ -930,9 +932,10 @@ template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster:
     CommandResponseFailureCallback);
 
 template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type,
-                                               chip::app::DataModel::NullObjectType>(
+                                               chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>(
     const chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>,
+    CommandResponseFailureCallback);
 
 template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type,
                                                chip::app::DataModel::NullObjectType>(
@@ -1015,7 +1018,6 @@ CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * c
                                       CommandResponseFailureCallback failureCb)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
 
     auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
                                             const ResponseDataT & responseData) { successCb(context, responseData); };

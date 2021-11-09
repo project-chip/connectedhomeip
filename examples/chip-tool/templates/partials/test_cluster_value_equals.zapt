@@ -1,0 +1,19 @@
+{{#if isOptional}}
+  VerifyOrReturn(CheckValuePresent("{{label}}", {{actual}}));
+  {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isOptional=false}}
+{{else if isNullable}}
+  {{#if (isLiteralNull expected)}}
+    VerifyOrReturn(CheckValueNull("{{label}}", {{actual}}));
+  {{else}}
+    VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
+    {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isNullable=false}}
+  {{/if}}
+{{else}}
+  VerifyOrReturn(CheckValue
+    {{~#if isList}}AsListLength("{{label}}", {{actual}}, {{expected.length}})
+    {{else if isArray}}AsList("{{label}}", {{actual}}{{#if expected.length}}, {{expected}}{{/if}})
+    {{else if (isString type)}}AsString("{{label}}", {{actual}}, "{{expected}}")
+    {{else}}<{{chipType}}>("{{label}}", {{actual}}, {{expected}}{{asTypeLiteralSuffix type}})
+    {{/if}}
+  );
+{{/if}}

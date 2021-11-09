@@ -159,6 +159,13 @@ enum PublicEventTypes
     kTimeSyncChange,
 
     /**
+     * SED Polling Interval Change
+     *
+     * Signals a change to the sleepy end device polling interval.
+     */
+    kSEDPollingIntervalChange,
+
+    /**
      * Security Session Established
      *
      * Signals that an external entity has established a new security session with the device.
@@ -308,6 +315,9 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #include <ble/BleConfig.h>
 #include <inet/InetLayer.h>
 #include <lib/support/LambdaBridge.h>
+#include <system/SystemEvent.h>
+#include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -323,12 +333,6 @@ struct ChipDeviceEvent final
     {
         ChipDevicePlatformEvent Platform;
         LambdaBridge LambdaEvent;
-        struct
-        {
-            ::chip::System::EventType Type;
-            ::chip::System::Object * Target;
-            uintptr_t Argument;
-        } ChipSystemLayerEvent;
         struct
         {
             AsyncWorkFunct WorkFunct;

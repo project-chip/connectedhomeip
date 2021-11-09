@@ -38,6 +38,18 @@
 using namespace chip;
 using namespace chip::Dnssd;
 
+namespace {
+class FakeClock : public System::Clock::ClockBase
+{
+public:
+    System::Clock::Microseconds64 GetMonotonicMicroseconds64() override { return mTime; }
+    System::Clock::Milliseconds64 GetMonotonicMilliseconds64() override { return mTime; }
+    System::Clock::Milliseconds64 mTime = System::Clock::kZero;
+};
+FakeClock fakeClock;
+System::Clock::ClockBase * realClock;
+} // namespace
+
 void TestCreate(nlTestSuite * inSuite, void * inContext)
 {
     DnssdCache<10> tDnssdCache;
@@ -49,17 +61,17 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     const int sizeOfCache = 5;
     DnssdCache<sizeOfCache> tDnssdCache;
     PeerId peerId;
-    int64_t id                  = 0x100;
-    uint16_t port               = 2000;
-    const int ttl               = 2; /* seconds */
-    const uint64_t KNOWN_FABRIC = 0x100;
+    int64_t id                         = 0x100;
+    uint16_t port                      = 2000;
+    const System::Clock::Timestamp ttl = System::Clock::Seconds16(2);
+    const uint64_t KNOWN_FABRIC        = 0x100;
     ResolvedNodeData nodeData;
     ResolvedNodeData nodeDataOut;
 
     Inet::IPAddress::FromString("1.0.0.1", nodeData.mAddress[nodeData.mNumIPs++]);
 
     nodeData.mInterfaceId = Inet::InterfaceId::Null();
-    nodeData.mExpiryTime  = tDnssdCache.GetTimeSource().GetCurrentMonotonicTimeMs() + ttl * 1000;
+    nodeData.mExpiryTime  = fakeClock.mTime + ttl;
 
     peerId.SetCompressedFabricId(KNOWN_FABRIC);
     nodeData.mPeerId.SetCompressedFabricId(KNOWN_FABRIC);
@@ -82,9 +94,8 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     }
 
     tDnssdCache.DumpCache();
-    tDnssdCache.GetTimeSource().SetCurrentMonotonicTimeMs(nodeData.mExpiryTime + (ttl + 1) * 1000);
-
-    nodeData.mExpiryTime = tDnssdCache.GetTimeSource().GetCurrentMonotonicTimeMs() + ttl * 1000;
+    fakeClock.mTime      = nodeData.mExpiryTime + ttl + System::Clock::Seconds16(1);
+    nodeData.mExpiryTime = fakeClock.mTime + ttl;
 
     id   = 0x200;
     port = 3000;
@@ -132,9 +143,22 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
 
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCreate), NL_TEST_DEF_FN(TestInsert), NL_TEST_SENTINEL() };
 
+static int TestSetup(void * inContext)
+{
+    realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&fakeClock);
+    return SUCCESS;
+}
+
+static int TestTeardown(void * inContext)
+{
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+    return SUCCESS;
+}
+
 int TestDnssdCache(void)
 {
-    nlTestSuite theSuite = { "MDNS Cache Creation", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "MDNS Cache Creation", &sTests[0], TestSetup, TestTeardown };
 
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);

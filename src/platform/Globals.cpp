@@ -25,14 +25,43 @@
 namespace chip {
 namespace DeviceLayer {
 
-chip::Inet::InetLayer InetLayer;
+chip::Inet::InetLayer & InetLayer()
+{
+    static chip::Inet::InetLayer gInetLayer;
+    return gInetLayer;
+}
+
+chip::System::LayerImpl * gMockedSystemLayer = nullptr;
+
+void SetSystemLayerForTesting(System::LayerImpl * layer)
+{
+    gMockedSystemLayer = layer;
+}
+
+chip::System::LayerImpl & SystemLayerImpl()
+{
+    if (gMockedSystemLayer != nullptr)
+        return *gMockedSystemLayer;
+
+    static chip::System::LayerImpl gSystemLayerImpl;
+    return gSystemLayerImpl;
+}
+
+chip::System::Layer & SystemLayer()
+{
+    return SystemLayerImpl();
+}
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+chip::System::LayerSockets & SystemLayerSockets()
+{
+    return SystemLayerImpl();
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 namespace Internal {
-
-chip::System::Layer * gSystemLayer = nullptr;
-chip::System::LayerImpl gSystemLayerImpl;
 const char * const TAG = "CHIP[DL]";
-
 } // namespace Internal
+
 } // namespace DeviceLayer
 } // namespace chip

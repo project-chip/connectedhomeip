@@ -33,3 +33,9 @@ pw_python_package("nl_test_runner") {
     "${chip_root}/src/test_driver/efr32:nl_test_service.python",
   ]
 }
+
+pw_mirror_tree("nl_test_runner_wheel") {
+  path_data_keys = [ "pw_python_package_wheels" ]
+  deps = [ ":nl_test_runner.wheel" ]
+  directory = "$root_out_dir/chip_nl_test_runner_wheels"
+}
