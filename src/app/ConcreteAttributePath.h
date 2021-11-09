@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <app/ClusterInfo.h>
 #include <app/util/basic-types.h>
 namespace chip {
 namespace app {
@@ -38,9 +37,9 @@ struct ConcreteAttributePath
         return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mAttributeId == other.mAttributeId;
     }
 
-    EndpointId mEndpointId   = kInvalidEndpointId;
-    ClusterId mClusterId     = ClusterInfo::kInvalidClusterId;
-    AttributeId mAttributeId = ClusterInfo::kInvalidAttributeId;
+    EndpointId mEndpointId   = 0;
+    ClusterId mClusterId     = 0;
+    AttributeId mAttributeId = 0;
 };
 } // namespace app
 } // namespace chip

@@ -31,9 +31,9 @@
 
 using namespace chip;
 
-// TODO: Here we use forward declaration for these symbols used, there should be some reorganize for code in app/util so they can be
-// used with generated files or some mock files.
-// Note: including headers from app/util does not work since it will include some app specific generged files.
+// TODO: Need to make it so that declarations of things that don't depend on generated files are not intermixed in af.h with
+// dependencies on generated files, so we don't have to re-declare things here.
+// Note: Some of the generated files that depended by af.h are gen_config.h and gen_tokens.h
 typedef uint8_t EmberAfClusterMask;
 
 extern uint16_t emberAfEndpointCount(void);
@@ -68,15 +68,15 @@ void AttributePathExpandIterator::PrepareEndpointIndexRange(const ClusterInfo & 
 {
     if (aClusterInfo.HasWildcardEndpointId())
     {
-        mBeginEndpointIndex = 0;
-        mEndEndpointIndex   = emberAfEndpointCount();
+        mEndpointIndex    = 0;
+        mEndEndpointIndex = emberAfEndpointCount();
     }
     else
     {
-        mBeginEndpointIndex = emberAfIndexFromEndpoint(aClusterInfo.mEndpointId);
+        mEndpointIndex = emberAfIndexFromEndpoint(aClusterInfo.mEndpointId);
         // If the given cluster id does not exist on the given endpoint, it will return uint16(0xFFFF), then endEndpointIndex
         // will be 0, means we should iterate a null endpoint set (skip it).
-        mEndEndpointIndex = static_cast<uint16_t>(mBeginEndpointIndex + 1);
+        mEndEndpointIndex = static_cast<uint16_t>(mEndpointIndex + 1);
     }
 }
 
@@ -84,15 +84,15 @@ void AttributePathExpandIterator::PrepareClusterIndexRange(const ClusterInfo & a
 {
     if (aClusterInfo.HasWildcardClusterId())
     {
-        mBeginClusterIndex = 0;
-        mEndClusterIndex   = emberAfClusterCount(aEndpointId, true /* server */);
+        mClusterIndex    = 0;
+        mEndClusterIndex = emberAfClusterCount(aEndpointId, true /* server */);
     }
     else
     {
-        mBeginClusterIndex = emberAfClusterIndex(aEndpointId, aClusterInfo.mClusterId, CLUSTER_MASK_SERVER);
+        mClusterIndex = emberAfClusterIndex(aEndpointId, aClusterInfo.mClusterId, CLUSTER_MASK_SERVER);
         // If the given cluster id does not exist on the given endpoint, it will return uint8(0xFF), then endClusterIndex
         // will be 0, means we should iterate a null cluster set (skip it).
-        mEndClusterIndex = static_cast<uint8_t>(mBeginClusterIndex + 1);
+        mEndClusterIndex = static_cast<uint8_t>(mClusterIndex + 1);
     }
 }
 
@@ -101,15 +101,15 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const ClusterInfo &
 {
     if (aClusterInfo.HasWildcardAttributeId())
     {
-        mBeginAttributeIndex = 0;
-        mEndAttributeIndex   = emberAfGetServerAttributeCount(aEndpointId, aClusterId);
+        mAttributeIndex    = 0;
+        mEndAttributeIndex = emberAfGetServerAttributeCount(aEndpointId, aClusterId);
     }
     else
     {
-        mBeginAttributeIndex = emberAfGetServerAttributeIndexByAttributeId(aEndpointId, aClusterId, aClusterInfo.mAttributeId);
+        mAttributeIndex = emberAfGetServerAttributeIndexByAttributeId(aEndpointId, aClusterId, aClusterInfo.mAttributeId);
         // If the given attribute id does not exist on the given endpoint, it will return uint16(0xFFFF), then endAttributeIndex
         // will be 0, means we should iterate a null attribute set (skip it).
-        mEndAttributeIndex = static_cast<uint16_t>(mBeginAttributeIndex + 1);
+        mEndAttributeIndex = static_cast<uint16_t>(mAttributeIndex + 1);
     }
 }
 
@@ -117,24 +117,22 @@ bool AttributePathExpandIterator::Next()
 {
     for (; mpClusterInfo != nullptr; (mpClusterInfo = mpClusterInfo->mpNext, mEndpointIndex = UINT16_MAX))
     {
-        // Special case: If this is a concrete path, we just return its value as-is.
-        if (!mpClusterInfo->HasWildcard())
-        {
-            mOutputPath.mEndpointId  = mpClusterInfo->mEndpointId;
-            mOutputPath.mClusterId   = mpClusterInfo->mClusterId;
-            mOutputPath.mAttributeId = mpClusterInfo->mAttributeId;
-
-            // Prepare for next iteration
-            (mpClusterInfo = mpClusterInfo->mpNext, mEndpointIndex = UINT16_MAX);
-            return true;
-        }
-
         if (mEndpointIndex == UINT16_MAX)
         {
+            // Special case: If this is a concrete path, we just return its value as-is.
+            if (!mpClusterInfo->HasWildcard())
+            {
+                mOutputPath.mEndpointId  = mpClusterInfo->mEndpointId;
+                mOutputPath.mClusterId   = mpClusterInfo->mClusterId;
+                mOutputPath.mAttributeId = mpClusterInfo->mAttributeId;
+
+                // Prepare for next iteration
+                mEndpointIndex = mEndEndpointIndex = 0;
+                return true;
+            }
+
             PrepareEndpointIndexRange(*mpClusterInfo);
-            // If we have not started iterating over the endpoints yet.
-            mEndpointIndex = mBeginEndpointIndex;
-            mClusterIndex  = UINT8_MAX;
+            mClusterIndex = UINT8_MAX;
         }
 
         for (; mEndpointIndex < mEndEndpointIndex; (mEndpointIndex++, mClusterIndex = UINT8_MAX, mAttributeIndex = UINT16_MAX))
@@ -144,8 +142,6 @@ bool AttributePathExpandIterator::Next()
             if (mClusterIndex == UINT8_MAX)
             {
                 PrepareClusterIndexRange(*mpClusterInfo, endpointId);
-                // If we have not started iterating over the clusters yet.
-                mClusterIndex   = mBeginClusterIndex;
                 mAttributeIndex = UINT16_MAX;
             }
 
@@ -157,8 +153,6 @@ bool AttributePathExpandIterator::Next()
                 if (mAttributeIndex == UINT16_MAX)
                 {
                     PrepareAttributeIndexRange(*mpClusterInfo, endpointId, clusterId);
-                    // If we have not started iterating over the attributes yet.
-                    mAttributeIndex = mBeginAttributeIndex;
                 }
 
                 if (mAttributeIndex < mEndAttributeIndex)

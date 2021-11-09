@@ -37,8 +37,6 @@ struct ClusterInfo
 private:
     // Allow AttributePathParams access these constants.
     friend struct AttributePathParams;
-    // Allow ConcreteAttributePath access these constants.
-    friend struct ConcreteAttributePath;
 
     // The ClusterId, AttributeId and EventId are MEIs,
     // 0xFFFF is not a valid manufacturer code, thus 0xFFFF'FFFF is not a valid MEI

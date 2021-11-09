@@ -46,7 +46,7 @@ namespace app {
  * AttributePathExpandIterator is used to iterate over a linked list of ClusterInfo-s.
  * The AttributePathExpandIterator is copiable, however, the given cluster info must be valid when calling Next().
  *
- * AttributePathExpandIterator will expand attribute paths with wildcards, and only emit exist paths for ClusterInfo with
+ * AttributePathExpandIterator will expand attribute paths with wildcards, and only emit existing paths for ClusterInfo with
  * wildcards. For ClusterInfo with a concrete path (i.e. does not contain wildcards), AttributePathExpandIterator will emit them
  * as-is.
  *
@@ -55,7 +55,7 @@ namespace app {
  * for (AttributePathExpandIterator iterator(clusterInfo); iterator.Get(path); iterator.Next()) {...}
  *
  * The iterator does not copy the given ClusterInfo, The given ClusterInfo must be valid when using the iterator.
- * If there are new endpoints, clusters or attributes adds, AttributePathExpandIterator must be reinitialized.
+ * If the set of endpoints, clusters, or attributes that are supported changes, AttributePathExpandIterator must be reinitialized.
  *
  * A initialized iterator will return the first valid path, no need to call Next() before calling Get() for the first time.
  *
@@ -74,7 +74,7 @@ public:
     /**
      * Proceed the iterator to the next attribute path in the given cluster info.
      *
-     * Feturns false if AttributePathExpandIterator has exhausted all paths in the given ClusterInfo list.
+     * Returns false if AttributePathExpandIterator has exhausted all paths in the given ClusterInfo list.
      */
     bool Next();
 
@@ -93,20 +93,15 @@ public:
      * - Next() is called after iterating last path.
      * - Iterator is initialized wirh a null ClusterInfo.
      */
-    inline bool Valid() const
-    {
-        // Check if we can emitting a valid path, we are not checking mpClusterInfo since we may just visited a ClusterInfo with
-        // concrete attribute path, and it is the last one in the linked list.
-        return mOutputPath.mEndpointId != kInvalidEndpointId;
-    }
+    inline bool Valid() const { return mpClusterInfo != nullptr; }
 
 private:
     ClusterInfo * mpClusterInfo;
 
-    uint16_t mEndpointIndex, mBeginEndpointIndex, mEndEndpointIndex;
+    uint16_t mEndpointIndex, mEndEndpointIndex;
     // Note: should use decltype(EmberAfEndpointType::clusterCount) here, but af-types is including app specific generated files.
-    uint8_t mClusterIndex, mBeginClusterIndex, mEndClusterIndex;
-    uint16_t mAttributeIndex, mBeginAttributeIndex, mEndAttributeIndex;
+    uint8_t mClusterIndex, mEndClusterIndex;
+    uint16_t mAttributeIndex, mEndAttributeIndex;
 
     ConcreteAttributePath mOutputPath;
 
