@@ -435,6 +435,7 @@ hciconfig
 hdlc
 HKDF
 hoc
+homebrew
 hostapd
 hostname
 href
