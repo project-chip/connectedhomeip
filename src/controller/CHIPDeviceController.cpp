@@ -957,17 +957,6 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
     FreeRendezvousSession();
 
-    if (mDeviceBeingCommissioned != nullptr)
-    {
-        // Let's release the device that's being paired.
-        // If pairing was successful, its information is
-        // already persisted. The application will use GetDevice()
-        // method to get access to the device, which will fetch
-        // the device information from the persistent storage.
-        ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
-        mDeviceBeingCommissioned = nullptr;
-    }
-
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnPairingComplete(status);
@@ -1626,6 +1615,14 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
     ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID 0x" ChipLogFormatX64,
                     ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
     VerifyOrReturn(mState == State::Initialized);
+
+    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == nodeData.mPeerId.GetNodeId())
+    {
+        // Let's release the device that's being paired, if pairing was successful,
+        // and the device is available on the operational network.
+        ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
+        mDeviceBeingCommissioned = nullptr;
+    }
 
     GetOperationalDeviceWithAddress(nodeData.mPeerId.GetNodeId(), ToPeerAddress(nodeData), &mOnDeviceConnectedCallback,
                                     &mOnDeviceConnectionFailureCallback);
