@@ -63,11 +63,11 @@ public:
          * Notification that a list of events is received on the given read client.
          * The ReadClient object MUST continue to exist after this call is completed.
          *
-         * @param[in]  apReadClient The read client which initialized the read transaction.
-         * @param[in]  apEventReportsReader  TLV reader positioned at the list that contains the events.  The
-         *                                implementation of EventStreamReceived is expected to call Next() on the reader to
-         *                                advance it to the first element of the list, then process the elements from beginning to
-         *                                the end. The callee is expected to consume all events.
+         * @param[in]  apReadClient         The read client which initialized the read transaction.
+         * @param[in]  apEventReportsReader TLV reader positioned at the list that contains the events.  The
+         *                                  implementation of EventStreamReceived is expected to call Next() on the reader to
+         *                                  advance it to the first element of the list, then process the elements from beginning to
+         *                                  the end. The callee is expected to consume all events.
          */
         virtual void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventReports) {}
 
@@ -81,11 +81,11 @@ public:
          *   - Receiving attribute data as reports of subscriptions
          *   - Receiving attribute data as initial reports of subscriptions
          *
-         * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
-         * @param[in] aPath: The attribute path field in report response.
-         * @param[in] apData: The attribute data of the given path, will be a nullptr if status is not Success.
-         * @param[in] aStatus: Attribute-specific status, containing an InteractionModel::Status code as well as an optional
-         *                     cluster-specific status code.
+         * @param[in] apReadClient The read client object that initiated the read or subscribe transaction.
+         * @param[in] aPath        The attribute path field in report response.
+         * @param[in] apData       The attribute data of the given path, will be a nullptr if status is not Success.
+         * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
+         *                         optional cluster-specific status code.
          */
         virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
                                      const StatusIB & aStatus)
@@ -97,7 +97,7 @@ public:
          * The ReadClient object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call before it shuts down the object.
          *
-         * @param[in] apReadClient: The read client object that initiated the read transaction.
+         * @param[in] apReadClient The read client object that initiated the read transaction.
          */
         virtual void OnSubscriptionEstablished(const ReadClient * apReadClient) {}
 
@@ -112,8 +112,8 @@ public:
          * The ReadClient object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call before it shuts down the object.
          *
-         * @param[in] apReadClient: The read client object that initiated the attribute read transaction.
-         * @param[in] aError: A system error code that conveys the overall error code.
+         * @param[in] apReadClient The read client object that initiated the attribute read transaction.
+         * @param[in] aError       A system error code that conveys the overall error code.
          */
         virtual void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) {}
 
@@ -126,7 +126,7 @@ public:
          *      - Be called even in error circumstances.
          *      - Only be called after a successful call to SendWriteRequest as been made.
          *
-         * @param[in] apReadClient: The read client object of the terminated read transaction.
+         * @param[in] apReadClient The read client object of the terminated read transaction.
          */
         virtual void OnDone(ReadClient * apReadClient) = 0;
     };

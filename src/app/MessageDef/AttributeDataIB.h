@@ -79,7 +79,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetPath(AttributePathIB::Parser * const apPath) const;
+    CHIP_ERROR GetPath(AttributePathIB::Parser * const apAttributePath) const;
 
     /**
      *  @brief Get a TLVReader for the Data. Next() must be called before accessing them.
