@@ -250,7 +250,7 @@ public:
      *
      * @param[in] aStartIndex      The index to start counting from; pass 0 to count over
      *                             the whole pool.
-     * @param[in/out] aNumInUse    The number of objects in use. If aStartIndex is not 0,
+     * @param[in,out] aNumInUse    The number of objects in use. If aStartIndex is not 0,
      *                             the function adds to the counter without resetting it first.
      */
     void GetNumObjectsInUse(size_t aStartIndex, size_t & aNumInUse)
