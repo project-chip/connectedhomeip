@@ -106,7 +106,7 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const ClusterInfo &
     }
     else
     {
-        mBeginAttributeIndex = emberAfGetServerAttributeIndexByAttributeId(aEndpointId, aClusterId, aClusterInfo.mFieldId);
+        mBeginAttributeIndex = emberAfGetServerAttributeIndexByAttributeId(aEndpointId, aClusterId, aClusterInfo.mAttributeId);
         // If the given attribute id does not exist on the given endpoint, it will return uint16(0xFFFF), then endAttributeIndex
         // will be 0, means we should iterate a null attribute set (skip it).
         mEndAttributeIndex = static_cast<uint16_t>(mBeginAttributeIndex + 1);
@@ -122,7 +122,7 @@ bool AttributePathExpandIterator::Next()
         {
             mOutputPath.mEndpointId  = mpClusterInfo->mEndpointId;
             mOutputPath.mClusterId   = mpClusterInfo->mClusterId;
-            mOutputPath.mAttributeId = mpClusterInfo->mFieldId;
+            mOutputPath.mAttributeId = mpClusterInfo->mAttributeId;
 
             // Prepare for next iteration
             (mpClusterInfo = mpClusterInfo->mpNext, mEndpointIndex = UINT16_MAX);

@@ -33,6 +33,8 @@
 #include <nlunit-test.h>
 
 using namespace chip;
+using namespace chip::Test;
+using namespace chip::app;
 
 namespace {
 
@@ -44,16 +46,35 @@ void TestAllWildcard(nlTestSuite * apSuite, void * apContext)
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        { 0xFFFE, 0xFFF1'0001, 0x0000'FFFD }, { 0xFFFE, 0xFFF1'0001, 0x0000'FFFC }, { 0xFFFE, 0xFFF1'0002, 0x0000'FFFD },
-        { 0xFFFE, 0xFFF1'0002, 0x0000'FFFC }, { 0xFFFE, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0001, 0x0000'FFFD },
-        { 0xFFFD, 0xFFF1'0001, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0002, 0x0000'FFFD }, { 0xFFFD, 0xFFF1'0002, 0x0000'FFFC },
-        { 0xFFFD, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0002, 0xFFF1'0002 }, { 0xFFFD, 0xFFF1'0003, 0x0000'FFFD },
-        { 0xFFFD, 0xFFF1'0003, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0002 },
-        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 }, { 0xFFFC, 0xFFF1'0001, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0001, 0x0000'FFFC },
-        { 0xFFFC, 0xFFF1'0001, 0xFFF1'0001 }, { 0xFFFC, 0xFFF1'0002, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0002, 0x0000'FFFC },
-        { 0xFFFC, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFC, 0xFFF1'0002, 0xFFF1'0002 }, { 0xFFFC, 0xFFF1'0002, 0xFFF1'0003 },
-        { 0xFFFC, 0xFFF1'0002, 0xFFF1'0004 }, { 0xFFFC, 0xFFF1'0003, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0003, 0x0000'FFFC },
-        { 0xFFFC, 0xFFF1'0004, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0004, 0x0000'FFFC },
+        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint1, MockClusterId(2), MockAttributeId(1) },
+        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint2, MockClusterId(2), MockAttributeId(1) },
+        { kMockEndpoint2, MockClusterId(2), MockAttributeId(2) },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(1) },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(2) },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
+        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint3, MockClusterId(1), MockAttributeId(1) },
+        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint3, MockClusterId(2), MockAttributeId(1) },
+        { kMockEndpoint3, MockClusterId(2), MockAttributeId(2) },
+        { kMockEndpoint3, MockClusterId(2), MockAttributeId(3) },
+        { kMockEndpoint3, MockClusterId(2), MockAttributeId(4) },
+        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::FeatureMap::Id },
     };
 
     size_t index = 0;
@@ -71,12 +92,12 @@ void TestAllWildcard(nlTestSuite * apSuite, void * apContext)
 void TestWildcardEndpoint(nlTestSuite * apSuite, void * apContext)
 {
     app::ClusterInfo clusInfo;
-    clusInfo.mClusterId = Test::MockClusterId(3);
-    clusInfo.mFieldId   = Test::MockAttributeId(3);
+    clusInfo.mClusterId   = Test::MockClusterId(3);
+    clusInfo.mAttributeId = Test::MockAttributeId(3);
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
     };
 
     size_t index = 0;
@@ -94,15 +115,15 @@ void TestWildcardEndpoint(nlTestSuite * apSuite, void * apContext)
 void TestWildcardCluster(nlTestSuite * apSuite, void * apContext)
 {
     app::ClusterInfo clusInfo;
-    clusInfo.mEndpointId = Test::kMockEndpoint3;
-    clusInfo.mFieldId    = app::Clusters::Globals::Attributes::ClusterRevision::Id;
+    clusInfo.mEndpointId  = Test::kMockEndpoint3;
+    clusInfo.mAttributeId = app::Clusters::Globals::Attributes::ClusterRevision::Id;
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        { 0xFFFC, 0xFFF1'0001, 0x0000'FFFD },
-        { 0xFFFC, 0xFFF1'0002, 0x0000'FFFD },
-        { 0xFFFC, 0xFFF1'0003, 0x0000'FFFD },
-        { 0xFFFC, 0xFFF1'0004, 0x0000'FFFD },
+        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ClusterRevision::Id },
     };
 
     size_t index = 0;
@@ -125,8 +146,11 @@ void TestWildcardAttribute(nlTestSuite * apSuite, void * apContext)
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        { 0xFFFD, 0xFFF1'0003, 0x0000'FFFD }, { 0xFFFD, 0xFFF1'0003, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0001 },
-        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0002 }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(1) },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(2) },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
     };
 
     size_t index = 0;
@@ -144,13 +168,13 @@ void TestWildcardAttribute(nlTestSuite * apSuite, void * apContext)
 void TestNoWildcard(nlTestSuite * apSuite, void * apContext)
 {
     app::ClusterInfo clusInfo;
-    clusInfo.mEndpointId = Test::kMockEndpoint2;
-    clusInfo.mClusterId  = Test::MockClusterId(3);
-    clusInfo.mFieldId    = Test::MockAttributeId(3);
+    clusInfo.mEndpointId  = Test::kMockEndpoint2;
+    clusInfo.mClusterId   = Test::MockClusterId(3);
+    clusInfo.mAttributeId = Test::MockAttributeId(3);
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
     };
 
     size_t index = 0;
@@ -171,21 +195,21 @@ void TestMultipleClusInfo(nlTestSuite * apSuite, void * apContext)
     app::ClusterInfo clusInfo1;
 
     app::ClusterInfo clusInfo2;
-    clusInfo2.mClusterId = Test::MockClusterId(3);
-    clusInfo2.mFieldId   = Test::MockAttributeId(3);
+    clusInfo2.mClusterId   = Test::MockClusterId(3);
+    clusInfo2.mAttributeId = Test::MockAttributeId(3);
 
     app::ClusterInfo clusInfo3;
-    clusInfo3.mEndpointId = Test::kMockEndpoint3;
-    clusInfo3.mFieldId    = app::Clusters::Globals::Attributes::ClusterRevision::Id;
+    clusInfo3.mEndpointId  = Test::kMockEndpoint3;
+    clusInfo3.mAttributeId = app::Clusters::Globals::Attributes::ClusterRevision::Id;
 
     app::ClusterInfo clusInfo4;
     clusInfo4.mEndpointId = Test::kMockEndpoint2;
     clusInfo4.mClusterId  = Test::MockClusterId(3);
 
     app::ClusterInfo clusInfo5;
-    clusInfo5.mEndpointId = Test::kMockEndpoint2;
-    clusInfo5.mClusterId  = Test::MockClusterId(3);
-    clusInfo5.mFieldId    = Test::MockAttributeId(3);
+    clusInfo5.mEndpointId  = Test::kMockEndpoint2;
+    clusInfo5.mClusterId   = Test::MockClusterId(3);
+    clusInfo5.mAttributeId = Test::MockAttributeId(3);
 
     clusInfo1.mpNext = &clusInfo2;
     clusInfo2.mpNext = &clusInfo3;
@@ -194,20 +218,46 @@ void TestMultipleClusInfo(nlTestSuite * apSuite, void * apContext)
 
     app::ConcreteAttributePath path;
     P paths[] = {
-        { 0xFFFE, 0xFFF1'0001, 0x0000'FFFD }, { 0xFFFE, 0xFFF1'0001, 0x0000'FFFC }, { 0xFFFE, 0xFFF1'0002, 0x0000'FFFD },
-        { 0xFFFE, 0xFFF1'0002, 0x0000'FFFC }, { 0xFFFE, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0001, 0x0000'FFFD },
-        { 0xFFFD, 0xFFF1'0001, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0002, 0x0000'FFFD }, { 0xFFFD, 0xFFF1'0002, 0x0000'FFFC },
-        { 0xFFFD, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0002, 0xFFF1'0002 }, { 0xFFFD, 0xFFF1'0003, 0x0000'FFFD },
-        { 0xFFFD, 0xFFF1'0003, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0002 },
-        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 }, { 0xFFFC, 0xFFF1'0001, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0001, 0x0000'FFFC },
-        { 0xFFFC, 0xFFF1'0001, 0xFFF1'0001 }, { 0xFFFC, 0xFFF1'0002, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0002, 0x0000'FFFC },
-        { 0xFFFC, 0xFFF1'0002, 0xFFF1'0001 }, { 0xFFFC, 0xFFF1'0002, 0xFFF1'0002 }, { 0xFFFC, 0xFFF1'0002, 0xFFF1'0003 },
-        { 0xFFFC, 0xFFF1'0002, 0xFFF1'0004 }, { 0xFFFC, 0xFFF1'0003, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0003, 0x0000'FFFC },
-        { 0xFFFC, 0xFFF1'0004, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0004, 0x0000'FFFC }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
-        { 0xFFFC, 0xFFF1'0001, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0002, 0x0000'FFFD }, { 0xFFFC, 0xFFF1'0003, 0x0000'FFFD },
-        { 0xFFFC, 0xFFF1'0004, 0x0000'FFFD }, { 0xFFFD, 0xFFF1'0003, 0x0000'FFFD }, { 0xFFFD, 0xFFF1'0003, 0x0000'FFFC },
-        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0001 }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0002 }, { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
-        { 0xFFFD, 0xFFF1'0003, 0xFFF1'0003 },
+        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint1, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint1, MockClusterId(2), MockAttributeId(1) },
+        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint2, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint2, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint2, MockClusterId(2), MockAttributeId(1) },
+        { kMockEndpoint2, MockClusterId(2), MockAttributeId(2) },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(1) },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(2) },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
+        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint3, MockClusterId(1), MockAttributeId(1) },
+        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint3, MockClusterId(2), MockAttributeId(1) },
+        { kMockEndpoint3, MockClusterId(2), MockAttributeId(2) },
+        { kMockEndpoint3, MockClusterId(2), MockAttributeId(3) },
+        { kMockEndpoint3, MockClusterId(2), MockAttributeId(4) },
+        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
+        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::ClusterRevision::Id },
+        { kMockEndpoint2, MockClusterId(3), Clusters::Globals::Attributes::FeatureMap::Id },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(1) },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(2) },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
+        { kMockEndpoint2, MockClusterId(3), MockAttributeId(3) },
     };
 
     size_t index = 0;
