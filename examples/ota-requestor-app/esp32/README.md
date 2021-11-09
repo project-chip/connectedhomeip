@@ -4,8 +4,8 @@ A prototype application that demonstrates OTA Requestor capabilities.
 
 ## Prerequisite
 
-Before moving ahead, make sure you have [OTA Provider](../../ota-provider-app/esp32)
-is commissioned and running.
+Before moving ahead, make sure you have
+[OTA Provider](../../ota-provider-app/esp32) is commissioned and running.
 
 ## Supported Devices
 
@@ -46,8 +46,8 @@ esp32> QueryImage <OTAProviderIpAddress> <OTAProviderNodeId>
 
 ## Apply update request
 
-Once transfer is complete OTA Requestor should take permission from the OTA Provider
-for applying the OTA image.
+Once transfer is complete OTA Requestor should take permission from the OTA
+Provider for applying the OTA image.
 
 ```
 esp32> ApplyUpdateRequest <OTAProviderIpAddress> <OTAProviderNodeId>
