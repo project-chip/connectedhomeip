@@ -30,7 +30,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
 
         If that is 'None' (not to be confused with NoneType), then it will retrieve
         the 'real' type behind the union, i.e not Nullable && not None
-    ''' 
+    '''
     if (not(typing.get_origin(typeToCheck) == typing.Union)):
         return None
 
@@ -152,7 +152,7 @@ class ClusterObjectDescriptor:
                 realType = GetUnionUnderlyingType(descriptor.Type)
                 if (realType == None):
                     raise ValueError(
-                        f"Field {debugPath}.{self.Label} has no real type")
+                        f"Field {debugPath}.{self.Label} has no valid underlying data model type")
 
                 valueType = realType
             else:
@@ -170,7 +170,6 @@ class ClusterObjectDescriptor:
         return ret
 
     def TLVToDict(self, tlvBuf: bytes) -> Dict[str, Any]:
-        # ipdb.set_trace(context=15)
         tlvData = tlv.TLVReader(tlvBuf).get().get('Any', {})
         return self.TagDictToLabelDict([], tlvData)
 
@@ -257,8 +256,8 @@ class ClusterAttributeDescriptor:
     def _cluster_object(cls) -> ClusterObject:
         return make_dataclass('InternalClass',
                               [
-                                  ('Value', List[cls.attribute_type.Type]
-                                   if isinstance(cls.attribute_type.Type, List) else cls.attribute_type.Type, field(default=None)),
+                                  ('Value', cls.attribute_type.Type,
+                                   field(default=None)),
                                   ('descriptor', ClassVar[ClusterObjectDescriptor],
                                    field(
                                       default=ClusterObjectDescriptor(
