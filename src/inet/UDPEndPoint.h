@@ -81,7 +81,8 @@ public:
      *  member to process message text reception events on \c endPoint where
      *  \c msg is the message text received from the sender at \c senderAddr.
      */
-    using OnMessageReceivedFunct = void (*)(UDPEndPoint * endPoint, chip::System::PacketBufferHandle && msg, const IPPacketInfo * pktInfo);
+    using OnMessageReceivedFunct = void (*)(UDPEndPoint * endPoint, chip::System::PacketBufferHandle && msg,
+                                            const IPPacketInfo * pktInfo);
 
     /**
      * Type of reception error event handling function.
