@@ -81,19 +81,21 @@ public:
      *  member to process message text reception events on \c endPoint where
      *  \c msg is the message text received from the sender at \c senderAddr.
      */
-    using OnMessageReceivedFunct = void (*)(UDPEndPoint *, chip::System::PacketBufferHandle &&, const IPPacketInfo *);
+    using OnMessageReceivedFunct = void (*)(UDPEndPoint * endPoint, chip::System::PacketBufferHandle && msg,
+                                            const IPPacketInfo * pktInfo);
 
     /**
      * Type of reception error event handling function.
      *
      * @param[in]   endPoint    The endpoint associated with the event.
      * @param[in]   err         The reason for the error.
+     * @param[in]   pktInfo     The packet's IP information.
      *
      *  Provide a function of this type to the \c OnReceiveError delegate
      *  member to process reception error events on \c endPoint. The \c err
      *  argument provides specific detail about the type of the error.
      */
-    using OnReceiveErrorFunct = void (*)(UDPEndPoint *, CHIP_ERROR, const IPPacketInfo *);
+    using OnReceiveErrorFunct = void (*)(UDPEndPoint * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo);
 
     /**
      * Set whether IP multicast traffic should be looped back.
