@@ -16,7 +16,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/device/OperationalDeviceProxy.h>
+#include <app/OperationalDeviceProxy.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
@@ -32,9 +32,13 @@
 
 using chip::ByteSpan;
 using chip::CharSpan;
+using chip::DeviceProxy;
 using chip::EndpointId;
 using chip::FabricIndex;
 using chip::NodeId;
+using chip::OnDeviceConnected;
+using chip::OnDeviceConnectionFailure;
+using chip::PeerId;
 using chip::Optional;
 using chip::Server;
 using chip::VendorId;
@@ -44,7 +48,6 @@ using chip::Inet::IPAddress;
 using chip::System::Layer;
 using chip::Transport::PeerAddress;
 using namespace chip::Messaging;
-using namespace chip::app::device;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response);
@@ -52,8 +55,8 @@ void OnQueryImageFailure(void * context, EmberAfStatus status);
 void OnApplyUpdateResponse(void * context, const ApplyUpdateResponse::DecodableType & response);
 void OnApplyUpdateRequestFailure(void * context, EmberAfStatus status);
 
-void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy);
-void OnConnectionFailure(void * context, OperationalDeviceProxy * operationalDeviceProxy, CHIP_ERROR error);
+void OnConnected(void * context, chip::DeviceProxy * deviceProxy);
+void OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error);
 
 void OnBlockReceived(void * context, const chip::bdx::TransferSession::BlockData & blockdata);
 void OnTransferComplete(void * context);
@@ -67,7 +70,6 @@ enum OTARequestorCommands
 };
 
 // TODO: Encapsulate these globals and the callbacks in some class
-OperationalDeviceProxy gOperationalDeviceProxy;
 ExchangeContext * exchangeCtx = nullptr;
 BdxDownloader bdxDownloader;
 enum OTARequestorCommands operationalDeviceContext;
@@ -77,8 +79,8 @@ uint8_t mOtaUpdateToken[kMaxUpdateTokenLen] = { 0 };
 uint8_t mOtaUpdateTokenLen                  = 0;
 
 /* Callbacks for operational device proxy connect response */
-Callback<OnOperationalDeviceConnected> mOnConnectedCallback(OnConnected, &operationalDeviceContext);
-Callback<OnOperationalDeviceConnectionFailure> mOnConnectionFailureCallback(OnConnectionFailure, nullptr);
+Callback<OnDeviceConnected> mOnConnectedCallback(OnConnected, &operationalDeviceContext);
+Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback(OnConnectionFailure, nullptr);
 
 /* Callbacks for BDX data transfer */
 Callback<OnBdxBlockReceived> mOnBlockReceived(OnBlockReceived, nullptr);
@@ -105,15 +107,24 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
     initOptions.FileDesLength    = static_cast<uint16_t>(strlen(fileDesignator));
     initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(fileDesignator);
 
-    chip::Messaging::ExchangeManager * exchangeMgr = gOperationalDeviceProxy.GetDevice().GetExchangeManager();
-    chip::Optional<chip::SessionHandle> session    = gOperationalDeviceProxy.GetDevice().GetSecureSession();
-    if (exchangeMgr != nullptr && session.HasValue())
+    chip::OperationalDeviceProxy * operationalDeviceProxy = Server::GetInstance().GetOperationalDeviceProxy();
+    if (operationalDeviceProxy != nullptr)
     {
-        exchangeCtx = exchangeMgr->NewContext(session.Value(), &bdxDownloader);
+        chip::Messaging::ExchangeManager * exchangeMgr = operationalDeviceProxy->GetExchangeManager();
+        chip::Optional<chip::SessionHandle> session    = operationalDeviceProxy->GetSecureSession();
+        if (exchangeMgr != nullptr && session.HasValue())
+        {
+            exchangeCtx = exchangeMgr->NewContext(session.Value(), &bdxDownloader);
+        }
+        if (exchangeCtx == nullptr)
+        {
+            ChipLogError(BDX, "unable to allocate ec: exchangeMgr=%p sessionExists? %u", exchangeMgr, session.HasValue());
+            return;
+        }
     }
-    if (exchangeCtx == nullptr)
+    else
     {
-        ChipLogError(BDX, "unable to allocate ec: exchangeMgr=%p sessionExists? %u", exchangeMgr, session.HasValue());
+        ChipLogError(BDX, "Failed to get OperationalDeviceProxy");
         return;
     }
 
@@ -133,7 +144,8 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
 void OnApplyUpdateResponse(void * context, const ApplyUpdateResponse::DecodableType & response)
 {
     ChipLogDetail(SoftwareUpdate, "ApplyUpdateResponse responded with action %" PRIu8, response.action);
-    OTAUpdater::GetInstance().Apply(0);
+    // Providing arbitrary value
+    OTAUpdater::GetInstance().Apply(3);
 }
 
 void OnQueryImageFailure(void * context, EmberAfStatus status)
@@ -146,7 +158,7 @@ void OnApplyUpdateRequestFailure(void * context, EmberAfStatus status)
     ChipLogDetail(SoftwareUpdate, "ApplyUpdateRequest failure response %" PRIu8, status);
 }
 
-void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy)
+void OnConnected(void * context, chip::DeviceProxy * deviceProxy)
 {
     ChipLogDetail(SoftwareUpdate, "Callback OnConnected");
     uint8_t * command = reinterpret_cast<uint8_t *>(context);
@@ -154,7 +166,7 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
     constexpr EndpointId kOtaProviderEndpoint = 0;
 
-    CHIP_ERROR err = cluster.Associate(&(operationalDeviceProxy->GetDevice()), kOtaProviderEndpoint);
+    CHIP_ERROR err = cluster.Associate(deviceProxy, kOtaProviderEndpoint);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Associate() failed: %s", chip::ErrorStr(err));
@@ -211,9 +223,9 @@ void OnConnected(void * context, OperationalDeviceProxy * operationalDeviceProxy
     }
 }
 
-void OnConnectionFailure(void * context, OperationalDeviceProxy * operationalDeviceProxy, CHIP_ERROR error)
+void OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error)
 {
-    ChipLogError(SoftwareUpdate, "failed to connect to: %s", chip::ErrorStr(error));
+    ChipLogError(SoftwareUpdate, "failed to connect to 0x%" PRIX64 ": %" CHIP_ERROR_FORMAT, deviceId, error.Format());
 }
 
 void OnBlockReceived(void * context, const chip::bdx::TransferSession::BlockData & blockdata)
@@ -240,26 +252,46 @@ void OnTransferFailed(void * context, BdxDownloaderErrorTypes status)
 
 void ConnectToProvider(const char * ipAddress, uint32_t nodeId)
 {
-    // Explicitly calling UpdateAddress() should not be needed once OperationalDeviceProxy can resolve IP address from node ID and
-    // fabric index
     NodeId providerNodeId = nodeId;
-    IPAddress ipAddr;
-    IPAddress::FromString(ipAddress, ipAddr);
-    PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
-    gOperationalDeviceProxy.UpdateAddress(addr);
 
-    Server * server                             = &(Server::GetInstance());
-    OperationalDeviceProxyInitParams initParams = {
-        .sessionManager = &(server->GetSecureSessionManager()),
-        .exchangeMgr    = &(server->GetExchangeManager()),
-        .idAllocator    = &(server->GetSessionIDAllocator()),
-        .fabricsTable   = &(server->GetFabricTable()),
-    };
+    chip::OperationalDeviceProxy * operationalDeviceProxy = Server::GetInstance().GetOperationalDeviceProxy();
+    if (operationalDeviceProxy != nullptr && operationalDeviceProxy->GetDeviceId() != providerNodeId)
+    {
+        operationalDeviceProxy->Disconnect();
+        operationalDeviceProxy = nullptr;
+    }
 
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    FabricIndex peerFabricIndex = providerFabricIndex;
-    gOperationalDeviceProxy.Init(providerNodeId, peerFabricIndex, initParams);
-    err = gOperationalDeviceProxy.Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
+    if (operationalDeviceProxy == nullptr)
+    {
+        Server * server           = &(Server::GetInstance());
+        chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(providerFabricIndex);
+
+        chip::DeviceProxyInitParams initParams = {
+            .sessionManager = &(server->GetSecureSessionManager()),
+            .exchangeMgr    = &(server->GetExchangeManager()),
+            .idAllocator    = &(server->GetSessionIDAllocator()),
+            .fabricInfo     = fabric,
+            // TODO: Determine where this should be instantiated
+            .imDelegate = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
+        };
+
+        PeerId peerID = fabric->GetPeerId();
+        peerID.SetNodeId(providerNodeId);
+        operationalDeviceProxy = new chip::OperationalDeviceProxy(initParams, peerID);
+        server->SetOperationalDeviceProxy(operationalDeviceProxy);
+
+        // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node ID
+        // and fabric index
+        IPAddress ipAddr;
+        IPAddress::FromString(ipAddress, ipAddr);
+        PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
+        uint32_t idleInterval;
+        uint32_t activeInterval;
+        operationalDeviceProxy->GetMRPIntervals(idleInterval, activeInterval);
+        operationalDeviceProxy->UpdateDeviceData(addr, idleInterval, activeInterval);
+    }
+
+    CHIP_ERROR err = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot establish connection to peer device: %" CHIP_ERROR_FORMAT, err.Format());
