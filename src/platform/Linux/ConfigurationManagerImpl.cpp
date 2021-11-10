@@ -56,18 +56,18 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
-    err = EnsureNamespace(PosixConfig::kConfigNamespace_ChipFactory);
+    err = PosixConfig::EnsureNamespace(PosixConfig::kConfigNamespace_ChipFactory);
     SuccessOrExit(err);
-    err = EnsureNamespace(PosixConfig::kConfigNamespace_ChipConfig);
+    err = PosixConfig::EnsureNamespace(PosixConfig::kConfigNamespace_ChipConfig);
     SuccessOrExit(err);
-    err = EnsureNamespace(PosixConfig::kConfigNamespace_ChipCounters);
+    err = PosixConfig::EnsureNamespace(PosixConfig::kConfigNamespace_ChipCounters);
     SuccessOrExit(err);
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
     SuccessOrExit(err);
 
-    if (ConfigValueExists(PosixConfig::kCounterKey_RebootCount))
+    if (PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_RebootCount))
     {
         err = GetRebootCount(rebootCount);
         SuccessOrExit(err);
@@ -82,13 +82,13 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!ConfigValueExists(PosixConfig::kCounterKey_TotalOperationalHours))
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_TotalOperationalHours))
     {
         err = StoreTotalOperationalHours(0);
         SuccessOrExit(err);
     }
 
-    if (!ConfigValueExists(PosixConfig::kCounterKey_BootReason))
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
         err = StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
         SuccessOrExit(err);
@@ -194,7 +194,7 @@ CHIP_ERROR ConfigurationManagerImpl::UpdateWiFiStationSecurityType(WiFiAuthSecur
     }
     else
     {
-        err = ClearConfigValue(PosixConfig::kConfigKey_WiFiStationSecType);
+        err = PosixConfig::ClearConfigValue(PosixConfig::kConfigKey_WiFiStationSecType);
         SuccessOrExit(err);
     }
 
@@ -275,7 +275,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
         ChipLogError(DeviceLayer, "Failed to factory reset configurations: %s", ErrorStr(err));
     }
 
-    err = FactoryResetCounters();
+    err = PosixConfig::FactoryResetCounters();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to factory reset counters: %s", ErrorStr(err));
