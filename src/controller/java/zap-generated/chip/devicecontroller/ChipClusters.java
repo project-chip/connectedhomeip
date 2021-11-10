@@ -371,6 +371,24 @@ public class ChipClusters {
         this.outputType = outputType;
         this.name = name;
       }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int index: ");
+        output.append(this.index);
+        output.append("\n");
+
+        output.append("int outputType: ");
+        output.append(this.outputType);
+        output.append("\n");
+
+        output.append("String name: ");
+        output.append(this.name);
+        output.append("\n");
+
+        return output.toString();
+      }
     }
 
     public interface AudioOutputListAttributeCallback {
@@ -951,6 +969,36 @@ public class ChipClusters {
         this.supportedCommands = supportedCommands;
         this.status = status;
       }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int actionID: ");
+        output.append(this.actionID);
+        output.append("\n");
+
+        output.append("String name: ");
+        output.append(this.name);
+        output.append("\n");
+
+        output.append("int type: ");
+        output.append(this.type);
+        output.append("\n");
+
+        output.append("int endpointListID: ");
+        output.append(this.endpointListID);
+        output.append("\n");
+
+        output.append("int supportedCommands: ");
+        output.append(this.supportedCommands);
+        output.append("\n");
+
+        output.append("int status: ");
+        output.append(this.status);
+        output.append("\n");
+
+        return output.toString();
+      }
     }
 
     public interface ActionListAttributeCallback {
@@ -970,6 +1018,36 @@ public class ChipClusters {
         this.name = name;
         this.type = type;
         this.endpoints = endpoints;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int endpointListID: ");
+        output.append(this.endpointListID);
+        output.append("\n");
+
+        output.append("String name: ");
+        output.append(this.name);
+        output.append("\n");
+
+        output.append("int type: ");
+        output.append(this.type);
+        output.append("\n");
+
+        output.append("byte[] endpoints: [");
+        for (int i = 0; i < endpoints.length; i++) {
+          if (i != endpoints.length - 1) {
+            output.append(endpoints[i]);
+            output.append(", ");
+          } else {
+            output.append(endpoints[i]);
+            output.append("]");
+            output.append("\n");
+          }
+        }
+
+        return output.toString();
       }
     }
 
@@ -2197,6 +2275,20 @@ public class ChipClusters {
         this.type = type;
         this.revision = revision;
       }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("long type: ");
+        output.append(this.type);
+        output.append("\n");
+
+        output.append("int revision: ");
+        output.append(this.revision);
+        output.append("\n");
+
+        return output.toString();
+      }
     }
 
     public interface DeviceListAttributeCallback {
@@ -2957,6 +3049,20 @@ public class ChipClusters {
         this.label = label;
         this.value = value;
       }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("String label: ");
+        output.append(this.label);
+        output.append("\n");
+
+        output.append("String value: ");
+        output.append(this.value);
+        output.append("\n");
+
+        return output.toString();
+      }
     }
 
     public interface LabelListAttributeCallback {
@@ -3103,6 +3209,16 @@ public class ChipClusters {
       public BasicCommissioningInfoListAttribute(long failSafeExpiryLengthMs) {
         this.failSafeExpiryLengthMs = failSafeExpiryLengthMs;
       }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("long failSafeExpiryLengthMs: ");
+        output.append(this.failSafeExpiryLengthMs);
+        output.append("\n");
+
+        return output.toString();
+      }
     }
 
     public interface BasicCommissioningInfoListAttributeCallback {
@@ -3174,6 +3290,44 @@ public class ChipClusters {
         this.offPremiseServicesReachableIPv6 = offPremiseServicesReachableIPv6;
         this.hardwareAddress = hardwareAddress;
         this.type = type;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("String name: ");
+        output.append(this.name);
+        output.append("\n");
+
+        output.append("boolean fabricConnected: ");
+        output.append(this.fabricConnected);
+        output.append("\n");
+
+        output.append("boolean offPremiseServicesReachableIPv4: ");
+        output.append(this.offPremiseServicesReachableIPv4);
+        output.append("\n");
+
+        output.append("boolean offPremiseServicesReachableIPv6: ");
+        output.append(this.offPremiseServicesReachableIPv6);
+        output.append("\n");
+
+        output.append("byte[] hardwareAddress: [");
+        for (int i = 0; i < hardwareAddress.length; i++) {
+          if (i != hardwareAddress.length - 1) {
+            output.append(hardwareAddress[i]);
+            output.append(", ");
+          } else {
+            output.append(hardwareAddress[i]);
+            output.append("]");
+            output.append("\n");
+          }
+        }
+
+        output.append("int type: ");
+        output.append(this.type);
+        output.append("\n");
+
+        return output.toString();
       }
     }
 
@@ -3247,6 +3401,24 @@ public class ChipClusters {
         this.vendorGroupId = vendorGroupId;
         this.groupKeySetIndex = groupKeySetIndex;
       }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int vendorId: ");
+        output.append(this.vendorId);
+        output.append("\n");
+
+        output.append("int vendorGroupId: ");
+        output.append(this.vendorGroupId);
+        output.append("\n");
+
+        output.append("int groupKeySetIndex: ");
+        output.append(this.groupKeySetIndex);
+        output.append("\n");
+
+        return output.toString();
+      }
     }
 
     public interface GroupsAttributeCallback {
@@ -3273,6 +3445,40 @@ public class ChipClusters {
         this.groupKeyRoot = groupKeyRoot;
         this.groupKeyEpochStartTime = groupKeyEpochStartTime;
         this.groupKeySecurityPolicy = groupKeySecurityPolicy;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int vendorId: ");
+        output.append(this.vendorId);
+        output.append("\n");
+
+        output.append("int groupKeyIndex: ");
+        output.append(this.groupKeyIndex);
+        output.append("\n");
+
+        output.append("byte[] groupKeyRoot: [");
+        for (int i = 0; i < groupKeyRoot.length; i++) {
+          if (i != groupKeyRoot.length - 1) {
+            output.append(groupKeyRoot[i]);
+            output.append(", ");
+          } else {
+            output.append(groupKeyRoot[i]);
+            output.append("]");
+            output.append("\n");
+          }
+        }
+
+        output.append("long groupKeyEpochStartTime: ");
+        output.append(this.groupKeyEpochStartTime);
+        output.append("\n");
+
+        output.append("int groupKeySecurityPolicy: ");
+        output.append(this.groupKeySecurityPolicy);
+        output.append("\n");
+
+        return output.toString();
       }
     }
 
@@ -3928,6 +4134,28 @@ public class ChipClusters {
         this.name = name;
         this.description = description;
       }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int index: ");
+        output.append(this.index);
+        output.append("\n");
+
+        output.append("int inputType: ");
+        output.append(this.inputType);
+        output.append("\n");
+
+        output.append("String name: ");
+        output.append(this.name);
+        output.append("\n");
+
+        output.append("String description: ");
+        output.append(this.description);
+        output.append("\n");
+
+        return output.toString();
+      }
     }
 
     public interface MediaInputListAttributeCallback {
@@ -4202,6 +4430,24 @@ public class ChipClusters {
         this.label = label;
         this.mode = mode;
         this.semanticTag = semanticTag;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("String label: ");
+        output.append(this.label);
+        output.append("\n");
+
+        output.append("int mode: ");
+        output.append(this.mode);
+        output.append("\n");
+
+        output.append("long semanticTag: ");
+        output.append(this.semanticTag);
+        output.append("\n");
+
+        return output.toString();
       }
     }
 
@@ -5002,6 +5248,44 @@ public class ChipClusters {
         this.fabricId = fabricId;
         this.nodeId = nodeId;
         this.label = label;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int fabricIndex: ");
+        output.append(this.fabricIndex);
+        output.append("\n");
+
+        output.append("byte[] rootPublicKey: [");
+        for (int i = 0; i < rootPublicKey.length; i++) {
+          if (i != rootPublicKey.length - 1) {
+            output.append(rootPublicKey[i]);
+            output.append(", ");
+          } else {
+            output.append(rootPublicKey[i]);
+            output.append("]");
+            output.append("\n");
+          }
+        }
+
+        output.append("int vendorId: ");
+        output.append(this.vendorId);
+        output.append("\n");
+
+        output.append("long fabricId: ");
+        output.append(this.fabricId);
+        output.append("\n");
+
+        output.append("long nodeId: ");
+        output.append(this.nodeId);
+        output.append("\n");
+
+        output.append("String label: ");
+        output.append(this.label);
+        output.append("\n");
+
+        return output.toString();
       }
     }
 
@@ -5861,6 +6145,32 @@ public class ChipClusters {
         this.callSign = callSign;
         this.affiliateCallSign = affiliateCallSign;
       }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int majorNumber: ");
+        output.append(this.majorNumber);
+        output.append("\n");
+
+        output.append("int minorNumber: ");
+        output.append(this.minorNumber);
+        output.append("\n");
+
+        output.append("String name: ");
+        output.append(this.name);
+        output.append("\n");
+
+        output.append("String callSign: ");
+        output.append(this.callSign);
+        output.append("\n");
+
+        output.append("String affiliateCallSign: ");
+        output.append(this.affiliateCallSign);
+        output.append("\n");
+
+        return output.toString();
+      }
     }
 
     public interface TvChannelListAttributeCallback {
@@ -5930,6 +6240,20 @@ public class ChipClusters {
       public TargetNavigatorListAttribute(int identifier, String name) {
         this.identifier = identifier;
         this.name = name;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int identifier: ");
+        output.append(this.identifier);
+        output.append("\n");
+
+        output.append("String name: ");
+        output.append(this.name);
+        output.append("\n");
+
+        return output.toString();
       }
     }
 
@@ -6194,6 +6518,28 @@ public class ChipClusters {
         this.fabricIndex = fabricIndex;
         this.operationalCert = operationalCert;
       }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("long fabricIndex: ");
+        output.append(this.fabricIndex);
+        output.append("\n");
+
+        output.append("byte[] operationalCert: [");
+        for (int i = 0; i < operationalCert.length; i++) {
+          if (i != operationalCert.length - 1) {
+            output.append(operationalCert[i]);
+            output.append(", ");
+          } else {
+            output.append(operationalCert[i]);
+            output.append("]");
+            output.append("\n");
+          }
+        }
+
+        return output.toString();
+      }
     }
 
     public interface ListStructOctetStringAttributeCallback {
@@ -6205,6 +6551,13 @@ public class ChipClusters {
     public static class ListNullablesAndOptionalsStructAttribute {
 
       public ListNullablesAndOptionalsStructAttribute() {}
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+
+        return output.toString();
+      }
     }
 
     public interface ListNullablesAndOptionalsStructAttributeCallback {
@@ -6961,6 +7314,68 @@ public class ChipClusters {
         this.fullNetworkData = fullNetworkData;
         this.isChild = isChild;
       }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("long extAddress: ");
+        output.append(this.extAddress);
+        output.append("\n");
+
+        output.append("long age: ");
+        output.append(this.age);
+        output.append("\n");
+
+        output.append("int rloc16: ");
+        output.append(this.rloc16);
+        output.append("\n");
+
+        output.append("long linkFrameCounter: ");
+        output.append(this.linkFrameCounter);
+        output.append("\n");
+
+        output.append("long mleFrameCounter: ");
+        output.append(this.mleFrameCounter);
+        output.append("\n");
+
+        output.append("int lqi: ");
+        output.append(this.lqi);
+        output.append("\n");
+
+        output.append("int averageRssi: ");
+        output.append(this.averageRssi);
+        output.append("\n");
+
+        output.append("int lastRssi: ");
+        output.append(this.lastRssi);
+        output.append("\n");
+
+        output.append("int frameErrorRate: ");
+        output.append(this.frameErrorRate);
+        output.append("\n");
+
+        output.append("int messageErrorRate: ");
+        output.append(this.messageErrorRate);
+        output.append("\n");
+
+        output.append("boolean rxOnWhenIdle: ");
+        output.append(this.rxOnWhenIdle);
+        output.append("\n");
+
+        output.append("boolean fullThreadDevice: ");
+        output.append(this.fullThreadDevice);
+        output.append("\n");
+
+        output.append("boolean fullNetworkData: ");
+        output.append(this.fullNetworkData);
+        output.append("\n");
+
+        output.append("boolean isChild: ");
+        output.append(this.isChild);
+        output.append("\n");
+
+        return output.toString();
+      }
     }
 
     public interface NeighborTableListAttributeCallback {
@@ -7003,6 +7418,52 @@ public class ChipClusters {
         this.allocated = allocated;
         this.linkEstablished = linkEstablished;
       }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("long extAddress: ");
+        output.append(this.extAddress);
+        output.append("\n");
+
+        output.append("int rloc16: ");
+        output.append(this.rloc16);
+        output.append("\n");
+
+        output.append("int routerId: ");
+        output.append(this.routerId);
+        output.append("\n");
+
+        output.append("int nextHop: ");
+        output.append(this.nextHop);
+        output.append("\n");
+
+        output.append("int pathCost: ");
+        output.append(this.pathCost);
+        output.append("\n");
+
+        output.append("int LQIIn: ");
+        output.append(this.LQIIn);
+        output.append("\n");
+
+        output.append("int LQIOut: ");
+        output.append(this.LQIOut);
+        output.append("\n");
+
+        output.append("int age: ");
+        output.append(this.age);
+        output.append("\n");
+
+        output.append("boolean allocated: ");
+        output.append(this.allocated);
+        output.append("\n");
+
+        output.append("boolean linkEstablished: ");
+        output.append(this.linkEstablished);
+        output.append("\n");
+
+        return output.toString();
+      }
     }
 
     public interface RouteTableListAttributeCallback {
@@ -7018,6 +7479,20 @@ public class ChipClusters {
       public SecurityPolicyAttribute(int rotationTime, int flags) {
         this.rotationTime = rotationTime;
         this.flags = flags;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int rotationTime: ");
+        output.append(this.rotationTime);
+        output.append("\n");
+
+        output.append("int flags: ");
+        output.append(this.flags);
+        output.append("\n");
+
+        return output.toString();
       }
     }
 
@@ -7066,6 +7541,60 @@ public class ChipClusters {
         this.pskcPresent = pskcPresent;
         this.securityPolicyPresent = securityPolicyPresent;
         this.channelMaskPresent = channelMaskPresent;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("boolean activeTimestampPresent: ");
+        output.append(this.activeTimestampPresent);
+        output.append("\n");
+
+        output.append("boolean pendingTimestampPresent: ");
+        output.append(this.pendingTimestampPresent);
+        output.append("\n");
+
+        output.append("boolean masterKeyPresent: ");
+        output.append(this.masterKeyPresent);
+        output.append("\n");
+
+        output.append("boolean networkNamePresent: ");
+        output.append(this.networkNamePresent);
+        output.append("\n");
+
+        output.append("boolean extendedPanIdPresent: ");
+        output.append(this.extendedPanIdPresent);
+        output.append("\n");
+
+        output.append("boolean meshLocalPrefixPresent: ");
+        output.append(this.meshLocalPrefixPresent);
+        output.append("\n");
+
+        output.append("boolean delayPresent: ");
+        output.append(this.delayPresent);
+        output.append("\n");
+
+        output.append("boolean panIdPresent: ");
+        output.append(this.panIdPresent);
+        output.append("\n");
+
+        output.append("boolean channelPresent: ");
+        output.append(this.channelPresent);
+        output.append("\n");
+
+        output.append("boolean pskcPresent: ");
+        output.append(this.pskcPresent);
+        output.append("\n");
+
+        output.append("boolean securityPolicyPresent: ");
+        output.append(this.securityPolicyPresent);
+        output.append("\n");
+
+        output.append("boolean channelMaskPresent: ");
+        output.append(this.channelMaskPresent);
+        output.append("\n");
+
+        return output.toString();
       }
     }
 

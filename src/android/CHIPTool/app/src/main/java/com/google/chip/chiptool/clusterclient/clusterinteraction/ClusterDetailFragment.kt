@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
@@ -71,6 +72,7 @@ class ClusterDetailFragment : Fragment() {
       clusterAutoCompleteSetup(clusterAutoCompleteTv, commandAutoCompleteTv, parameterList)
       commandAutoCompleteSetup(commandAutoCompleteTv, inflater, parameterList, callbackList)
       invokeCommand.setOnClickListener {
+        callbackList.removeAllViews()
         val commandArguments = HashMap<String, Any>()
         parameterList.forEach {
           val type =
@@ -174,13 +176,38 @@ class ClusterDetailFragment : Fragment() {
     callbackList: LinearLayout
   ) {
     responseValues.forEach { (variableNameType, response) ->
-      val callback =
-        inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-      callback.clusterCallbackNameTv.text = variableNameType.name
-      // TODO deserialize the response object and display it dynamically
-      callback.clusterCallbackDataTv.text = response.toString()
-      callback.clusterCallbackTypeTv.text = variableNameType.type
-      callbackList.addView(callback)
+      if (response.javaClass.isPrimitive) {
+        val callback =
+          inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
+        callback.clusterCallbackNameTv.text = variableNameType.name
+        callback.clusterCallbackDataTv.text = response.toString()
+        callback.clusterCallbackTypeTv.text = variableNameType.type
+        callbackList.addView(callback)
+      } else if (response is List<*>) {
+        if (response.size == 0) {
+          val emptyCallback =
+            inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
+          emptyCallback.clusterCallbackNameTv.text = "Result is empty"
+          callbackList.addView(emptyCallback)
+        } else {
+          response.forEach {
+            val objectCallback =
+              inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
+            objectCallback.clusterCallbackNameTv.text = variableNameType.name
+            val objectString = it.toString()
+            objectCallback.clusterCallbackDataTv.text = it!!.javaClass.toString().split('$').last()
+            objectCallback.clusterCallbackDataTv.setOnClickListener {
+              AlertDialog.Builder(requireContext())
+                .setTitle(variableNameType.name)
+                .setMessage(objectString)
+                .create()
+                .show()
+            }
+            objectCallback.clusterCallbackTypeTv.text = variableNameType.type
+            callbackList.addView(objectCallback)
+          }
+        }
+      }
     }
   }
 
