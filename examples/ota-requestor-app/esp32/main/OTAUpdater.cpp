@@ -149,6 +149,7 @@ esp_err_t OTAUpdater::Apply(uint32_t delayedActionTime)
 
     ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%x", mOTAUpdatePartition->address);
     // Allow requestor to send the Ack for the previous message
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayedActionTime * 1000), RestartTimerHandler, nullptr);
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayedActionTime * 1000), RestartTimerHandler,
+                                                nullptr);
     return ESP_OK;
 }
