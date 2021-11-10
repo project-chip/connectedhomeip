@@ -4004,7 +4004,7 @@ class AccountLoginGetSetupPIN : public ModelCommand
 public:
     AccountLoginGetSetupPIN() : ModelCommand("get-setup-pin")
     {
-        AddArgument("TempAccountIdentifier", &mRequest.tempAccountIdentifier);
+        AddArgument("TempAccountIdentifier", &mRequest.tempAccountIdentifier, false);
         ModelCommand::AddArguments();
     }
 
@@ -4029,8 +4029,8 @@ class AccountLoginLogin : public ModelCommand
 public:
     AccountLoginLogin() : ModelCommand("login")
     {
-        AddArgument("TempAccountIdentifier", &mRequest.tempAccountIdentifier);
-        AddArgument("SetupPIN", &mRequest.setupPIN);
+        AddArgument("TempAccountIdentifier", &mRequest.tempAccountIdentifier, false);
+        AddArgument("SetupPIN", &mRequest.setupPIN, false);
         ModelCommand::AddArguments();
     }
 
@@ -4055,7 +4055,7 @@ class ReadAccountLoginClusterRevision : public ModelCommand
 public:
     ReadAccountLoginClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -4101,7 +4101,7 @@ class AdministratorCommissioningOpenBasicCommissioningWindow : public ModelComma
 public:
     AdministratorCommissioningOpenBasicCommissioningWindow() : ModelCommand("open-basic-commissioning-window")
     {
-        AddArgument("CommissioningTimeout", 0, UINT16_MAX, &mRequest.commissioningTimeout);
+        AddArgument("CommissioningTimeout", 0, UINT16_MAX, &mRequest.commissioningTimeout, false);
         ModelCommand::AddArguments();
     }
 
@@ -4126,12 +4126,12 @@ class AdministratorCommissioningOpenCommissioningWindow : public ModelCommand
 public:
     AdministratorCommissioningOpenCommissioningWindow() : ModelCommand("open-commissioning-window")
     {
-        AddArgument("CommissioningTimeout", 0, UINT16_MAX, &mRequest.commissioningTimeout);
-        AddArgument("PAKEVerifier", &mRequest.PAKEVerifier);
-        AddArgument("Discriminator", 0, UINT16_MAX, &mRequest.discriminator);
-        AddArgument("Iterations", 0, UINT32_MAX, &mRequest.iterations);
-        AddArgument("Salt", &mRequest.salt);
-        AddArgument("PasscodeID", 0, UINT16_MAX, &mRequest.passcodeID);
+        AddArgument("CommissioningTimeout", 0, UINT16_MAX, &mRequest.commissioningTimeout, false);
+        AddArgument("PAKEVerifier", &mRequest.PAKEVerifier, false);
+        AddArgument("Discriminator", 0, UINT16_MAX, &mRequest.discriminator, false);
+        AddArgument("Iterations", 0, UINT32_MAX, &mRequest.iterations, false);
+        AddArgument("Salt", &mRequest.salt, false);
+        AddArgument("PasscodeID", 0, UINT16_MAX, &mRequest.passcodeID, false);
         ModelCommand::AddArguments();
     }
 
@@ -4177,7 +4177,7 @@ class ReadAdministratorCommissioningClusterRevision : public ModelCommand
 public:
     ReadAdministratorCommissioningClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -4228,8 +4228,8 @@ class ApplicationBasicChangeStatus : public ModelCommand
 public:
     ApplicationBasicChangeStatus() : ModelCommand("change-status")
     {
-        AddArgument("Status", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.status)> *>(&mRequest.status));
+        AddArgument("Status", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.status)> *>(&mRequest.status),
+                    false);
         ModelCommand::AddArguments();
     }
 
@@ -4254,7 +4254,7 @@ class ReadApplicationBasicVendorName : public ModelCommand
 public:
     ReadApplicationBasicVendorName() : ModelCommand("read")
     {
-        AddArgument("attr-name", "vendor-name");
+        AddArgument("attr-name", "vendor-name", false);
         ModelCommand::AddArguments();
     }
 
@@ -4288,7 +4288,7 @@ class ReadApplicationBasicVendorId : public ModelCommand
 public:
     ReadApplicationBasicVendorId() : ModelCommand("read")
     {
-        AddArgument("attr-name", "vendor-id");
+        AddArgument("attr-name", "vendor-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -4322,7 +4322,7 @@ class ReadApplicationBasicApplicationName : public ModelCommand
 public:
     ReadApplicationBasicApplicationName() : ModelCommand("read")
     {
-        AddArgument("attr-name", "application-name");
+        AddArgument("attr-name", "application-name", false);
         ModelCommand::AddArguments();
     }
 
@@ -4356,7 +4356,7 @@ class ReadApplicationBasicProductId : public ModelCommand
 public:
     ReadApplicationBasicProductId() : ModelCommand("read")
     {
-        AddArgument("attr-name", "product-id");
+        AddArgument("attr-name", "product-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -4390,7 +4390,7 @@ class ReadApplicationBasicApplicationId : public ModelCommand
 public:
     ReadApplicationBasicApplicationId() : ModelCommand("read")
     {
-        AddArgument("attr-name", "application-id");
+        AddArgument("attr-name", "application-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -4424,7 +4424,7 @@ class ReadApplicationBasicCatalogVendorId : public ModelCommand
 public:
     ReadApplicationBasicCatalogVendorId() : ModelCommand("read")
     {
-        AddArgument("attr-name", "catalog-vendor-id");
+        AddArgument("attr-name", "catalog-vendor-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -4458,7 +4458,7 @@ class ReadApplicationBasicApplicationStatus : public ModelCommand
 public:
     ReadApplicationBasicApplicationStatus() : ModelCommand("read")
     {
-        AddArgument("attr-name", "application-status");
+        AddArgument("attr-name", "application-status", false);
         ModelCommand::AddArguments();
     }
 
@@ -4492,7 +4492,7 @@ class ReadApplicationBasicClusterRevision : public ModelCommand
 public:
     ReadApplicationBasicClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -4539,9 +4539,9 @@ class ApplicationLauncherLaunchApp : public ModelCommand
 public:
     ApplicationLauncherLaunchApp() : ModelCommand("launch-app")
     {
-        AddArgument("Data", &mRequest.data);
-        AddArgument("CatalogVendorId", 0, UINT16_MAX, &mRequest.catalogVendorId);
-        AddArgument("ApplicationId", &mRequest.applicationId);
+        AddArgument("Data", &mRequest.data, false);
+        AddArgument("CatalogVendorId", 0, UINT16_MAX, &mRequest.catalogVendorId, false);
+        AddArgument("ApplicationId", &mRequest.applicationId, false);
         ModelCommand::AddArguments();
     }
 
@@ -4566,7 +4566,7 @@ class ReadApplicationLauncherApplicationLauncherList : public ModelCommand
 public:
     ReadApplicationLauncherApplicationLauncherList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "application-launcher-list");
+        AddArgument("attr-name", "application-launcher-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -4601,7 +4601,7 @@ class ReadApplicationLauncherCatalogVendorId : public ModelCommand
 public:
     ReadApplicationLauncherCatalogVendorId() : ModelCommand("read")
     {
-        AddArgument("attr-name", "catalog-vendor-id");
+        AddArgument("attr-name", "catalog-vendor-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -4635,7 +4635,7 @@ class ReadApplicationLauncherApplicationId : public ModelCommand
 public:
     ReadApplicationLauncherApplicationId() : ModelCommand("read")
     {
-        AddArgument("attr-name", "application-id");
+        AddArgument("attr-name", "application-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -4669,7 +4669,7 @@ class ReadApplicationLauncherClusterRevision : public ModelCommand
 public:
     ReadApplicationLauncherClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -4716,8 +4716,8 @@ class AudioOutputRenameOutput : public ModelCommand
 public:
     AudioOutputRenameOutput() : ModelCommand("rename-output")
     {
-        AddArgument("Index", 0, UINT8_MAX, &mRequest.index);
-        AddArgument("Name", &mRequest.name);
+        AddArgument("Index", 0, UINT8_MAX, &mRequest.index, false);
+        AddArgument("Name", &mRequest.name, false);
         ModelCommand::AddArguments();
     }
 
@@ -4742,7 +4742,7 @@ class AudioOutputSelectOutput : public ModelCommand
 public:
     AudioOutputSelectOutput() : ModelCommand("select-output")
     {
-        AddArgument("Index", 0, UINT8_MAX, &mRequest.index);
+        AddArgument("Index", 0, UINT8_MAX, &mRequest.index, false);
         ModelCommand::AddArguments();
     }
 
@@ -4767,7 +4767,7 @@ class ReadAudioOutputAudioOutputList : public ModelCommand
 public:
     ReadAudioOutputAudioOutputList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "audio-output-list");
+        AddArgument("attr-name", "audio-output-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -4802,7 +4802,7 @@ class ReadAudioOutputCurrentAudioOutput : public ModelCommand
 public:
     ReadAudioOutputCurrentAudioOutput() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-audio-output");
+        AddArgument("attr-name", "current-audio-output", false);
         ModelCommand::AddArguments();
     }
 
@@ -4836,7 +4836,7 @@ class ReadAudioOutputClusterRevision : public ModelCommand
 public:
     ReadAudioOutputClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -4885,7 +4885,7 @@ class BarrierControlBarrierControlGoToPercent : public ModelCommand
 public:
     BarrierControlBarrierControlGoToPercent() : ModelCommand("barrier-control-go-to-percent")
     {
-        AddArgument("PercentOpen", 0, UINT8_MAX, &mRequest.percentOpen);
+        AddArgument("PercentOpen", 0, UINT8_MAX, &mRequest.percentOpen, false);
         ModelCommand::AddArguments();
     }
 
@@ -4931,7 +4931,7 @@ class ReadBarrierControlBarrierMovingState : public ModelCommand
 public:
     ReadBarrierControlBarrierMovingState() : ModelCommand("read")
     {
-        AddArgument("attr-name", "barrier-moving-state");
+        AddArgument("attr-name", "barrier-moving-state", false);
         ModelCommand::AddArguments();
     }
 
@@ -4965,7 +4965,7 @@ class ReadBarrierControlBarrierSafetyStatus : public ModelCommand
 public:
     ReadBarrierControlBarrierSafetyStatus() : ModelCommand("read")
     {
-        AddArgument("attr-name", "barrier-safety-status");
+        AddArgument("attr-name", "barrier-safety-status", false);
         ModelCommand::AddArguments();
     }
 
@@ -4999,7 +4999,7 @@ class ReadBarrierControlBarrierCapabilities : public ModelCommand
 public:
     ReadBarrierControlBarrierCapabilities() : ModelCommand("read")
     {
-        AddArgument("attr-name", "barrier-capabilities");
+        AddArgument("attr-name", "barrier-capabilities", false);
         ModelCommand::AddArguments();
     }
 
@@ -5033,7 +5033,7 @@ class ReadBarrierControlBarrierPosition : public ModelCommand
 public:
     ReadBarrierControlBarrierPosition() : ModelCommand("read")
     {
-        AddArgument("attr-name", "barrier-position");
+        AddArgument("attr-name", "barrier-position", false);
         ModelCommand::AddArguments();
     }
 
@@ -5067,7 +5067,7 @@ class ReadBarrierControlClusterRevision : public ModelCommand
 public:
     ReadBarrierControlClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -5150,7 +5150,7 @@ class ReadBasicInteractionModelVersion : public ModelCommand
 public:
     ReadBasicInteractionModelVersion() : ModelCommand("read")
     {
-        AddArgument("attr-name", "interaction-model-version");
+        AddArgument("attr-name", "interaction-model-version", false);
         ModelCommand::AddArguments();
     }
 
@@ -5184,7 +5184,7 @@ class ReadBasicVendorName : public ModelCommand
 public:
     ReadBasicVendorName() : ModelCommand("read")
     {
-        AddArgument("attr-name", "vendor-name");
+        AddArgument("attr-name", "vendor-name", false);
         ModelCommand::AddArguments();
     }
 
@@ -5218,7 +5218,7 @@ class ReadBasicVendorID : public ModelCommand
 public:
     ReadBasicVendorID() : ModelCommand("read")
     {
-        AddArgument("attr-name", "vendor-id");
+        AddArgument("attr-name", "vendor-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -5252,7 +5252,7 @@ class ReadBasicProductName : public ModelCommand
 public:
     ReadBasicProductName() : ModelCommand("read")
     {
-        AddArgument("attr-name", "product-name");
+        AddArgument("attr-name", "product-name", false);
         ModelCommand::AddArguments();
     }
 
@@ -5286,7 +5286,7 @@ class ReadBasicProductID : public ModelCommand
 public:
     ReadBasicProductID() : ModelCommand("read")
     {
-        AddArgument("attr-name", "product-id");
+        AddArgument("attr-name", "product-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -5320,7 +5320,7 @@ class ReadBasicUserLabel : public ModelCommand
 public:
     ReadBasicUserLabel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "user-label");
+        AddArgument("attr-name", "user-label", false);
         ModelCommand::AddArguments();
     }
 
@@ -5351,8 +5351,8 @@ class WriteBasicUserLabel : public ModelCommand
 public:
     WriteBasicUserLabel() : ModelCommand("write")
     {
-        AddArgument("attr-name", "user-label");
-        AddArgument("attr-value", &mValue);
+        AddArgument("attr-name", "user-label", false);
+        AddArgument("attr-value", &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -5387,7 +5387,7 @@ class ReadBasicLocation : public ModelCommand
 public:
     ReadBasicLocation() : ModelCommand("read")
     {
-        AddArgument("attr-name", "location");
+        AddArgument("attr-name", "location", false);
         ModelCommand::AddArguments();
     }
 
@@ -5418,8 +5418,8 @@ class WriteBasicLocation : public ModelCommand
 public:
     WriteBasicLocation() : ModelCommand("write")
     {
-        AddArgument("attr-name", "location");
-        AddArgument("attr-value", &mValue);
+        AddArgument("attr-name", "location", false);
+        AddArgument("attr-value", &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -5454,7 +5454,7 @@ class ReadBasicHardwareVersion : public ModelCommand
 public:
     ReadBasicHardwareVersion() : ModelCommand("read")
     {
-        AddArgument("attr-name", "hardware-version");
+        AddArgument("attr-name", "hardware-version", false);
         ModelCommand::AddArguments();
     }
 
@@ -5488,7 +5488,7 @@ class ReadBasicHardwareVersionString : public ModelCommand
 public:
     ReadBasicHardwareVersionString() : ModelCommand("read")
     {
-        AddArgument("attr-name", "hardware-version-string");
+        AddArgument("attr-name", "hardware-version-string", false);
         ModelCommand::AddArguments();
     }
 
@@ -5522,7 +5522,7 @@ class ReadBasicSoftwareVersion : public ModelCommand
 public:
     ReadBasicSoftwareVersion() : ModelCommand("read")
     {
-        AddArgument("attr-name", "software-version");
+        AddArgument("attr-name", "software-version", false);
         ModelCommand::AddArguments();
     }
 
@@ -5556,7 +5556,7 @@ class ReadBasicSoftwareVersionString : public ModelCommand
 public:
     ReadBasicSoftwareVersionString() : ModelCommand("read")
     {
-        AddArgument("attr-name", "software-version-string");
+        AddArgument("attr-name", "software-version-string", false);
         ModelCommand::AddArguments();
     }
 
@@ -5590,7 +5590,7 @@ class ReadBasicManufacturingDate : public ModelCommand
 public:
     ReadBasicManufacturingDate() : ModelCommand("read")
     {
-        AddArgument("attr-name", "manufacturing-date");
+        AddArgument("attr-name", "manufacturing-date", false);
         ModelCommand::AddArguments();
     }
 
@@ -5624,7 +5624,7 @@ class ReadBasicPartNumber : public ModelCommand
 public:
     ReadBasicPartNumber() : ModelCommand("read")
     {
-        AddArgument("attr-name", "part-number");
+        AddArgument("attr-name", "part-number", false);
         ModelCommand::AddArguments();
     }
 
@@ -5658,7 +5658,7 @@ class ReadBasicProductURL : public ModelCommand
 public:
     ReadBasicProductURL() : ModelCommand("read")
     {
-        AddArgument("attr-name", "product-url");
+        AddArgument("attr-name", "product-url", false);
         ModelCommand::AddArguments();
     }
 
@@ -5692,7 +5692,7 @@ class ReadBasicProductLabel : public ModelCommand
 public:
     ReadBasicProductLabel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "product-label");
+        AddArgument("attr-name", "product-label", false);
         ModelCommand::AddArguments();
     }
 
@@ -5726,7 +5726,7 @@ class ReadBasicSerialNumber : public ModelCommand
 public:
     ReadBasicSerialNumber() : ModelCommand("read")
     {
-        AddArgument("attr-name", "serial-number");
+        AddArgument("attr-name", "serial-number", false);
         ModelCommand::AddArguments();
     }
 
@@ -5760,7 +5760,7 @@ class ReadBasicLocalConfigDisabled : public ModelCommand
 public:
     ReadBasicLocalConfigDisabled() : ModelCommand("read")
     {
-        AddArgument("attr-name", "local-config-disabled");
+        AddArgument("attr-name", "local-config-disabled", false);
         ModelCommand::AddArguments();
     }
 
@@ -5791,8 +5791,8 @@ class WriteBasicLocalConfigDisabled : public ModelCommand
 public:
     WriteBasicLocalConfigDisabled() : ModelCommand("write")
     {
-        AddArgument("attr-name", "local-config-disabled");
-        AddArgument("attr-value", 0, 1, &mValue);
+        AddArgument("attr-name", "local-config-disabled", false);
+        AddArgument("attr-value", 0, 1, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -5827,7 +5827,7 @@ class ReadBasicReachable : public ModelCommand
 public:
     ReadBasicReachable() : ModelCommand("read")
     {
-        AddArgument("attr-name", "reachable");
+        AddArgument("attr-name", "reachable", false);
         ModelCommand::AddArguments();
     }
 
@@ -5861,7 +5861,7 @@ class ReadBasicClusterRevision : public ModelCommand
 public:
     ReadBasicClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -5907,7 +5907,7 @@ class ReadBinaryInputBasicOutOfService : public ModelCommand
 public:
     ReadBinaryInputBasicOutOfService() : ModelCommand("read")
     {
-        AddArgument("attr-name", "out-of-service");
+        AddArgument("attr-name", "out-of-service", false);
         ModelCommand::AddArguments();
     }
 
@@ -5938,8 +5938,8 @@ class WriteBinaryInputBasicOutOfService : public ModelCommand
 public:
     WriteBinaryInputBasicOutOfService() : ModelCommand("write")
     {
-        AddArgument("attr-name", "out-of-service");
-        AddArgument("attr-value", 0, 1, &mValue);
+        AddArgument("attr-name", "out-of-service", false);
+        AddArgument("attr-value", 0, 1, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -5974,7 +5974,7 @@ class ReadBinaryInputBasicPresentValue : public ModelCommand
 public:
     ReadBinaryInputBasicPresentValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "present-value");
+        AddArgument("attr-name", "present-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -6005,8 +6005,8 @@ class WriteBinaryInputBasicPresentValue : public ModelCommand
 public:
     WriteBinaryInputBasicPresentValue() : ModelCommand("write")
     {
-        AddArgument("attr-name", "present-value");
-        AddArgument("attr-value", 0, 1, &mValue);
+        AddArgument("attr-name", "present-value", false);
+        AddArgument("attr-value", 0, 1, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -6038,10 +6038,10 @@ class ReportBinaryInputBasicPresentValue : public ModelCommand
 public:
     ReportBinaryInputBasicPresentValue() : ModelCommand("report")
     {
-        AddArgument("attr-name", "present-value");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "present-value", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -6093,7 +6093,7 @@ class ReadBinaryInputBasicStatusFlags : public ModelCommand
 public:
     ReadBinaryInputBasicStatusFlags() : ModelCommand("read")
     {
-        AddArgument("attr-name", "status-flags");
+        AddArgument("attr-name", "status-flags", false);
         ModelCommand::AddArguments();
     }
 
@@ -6124,10 +6124,10 @@ class ReportBinaryInputBasicStatusFlags : public ModelCommand
 public:
     ReportBinaryInputBasicStatusFlags() : ModelCommand("report")
     {
-        AddArgument("attr-name", "status-flags");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "status-flags", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -6179,7 +6179,7 @@ class ReadBinaryInputBasicClusterRevision : public ModelCommand
 public:
     ReadBinaryInputBasicClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -6224,10 +6224,10 @@ class BindingBind : public ModelCommand
 public:
     BindingBind() : ModelCommand("bind")
     {
-        AddArgument("NodeId", 0, UINT64_MAX, &mRequest.nodeId);
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("EndpointId", 0, UINT16_MAX, &mRequest.endpointId);
-        AddArgument("ClusterId", 0, UINT32_MAX, &mRequest.clusterId);
+        AddArgument("NodeId", 0, UINT64_MAX, &mRequest.nodeId, false);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
+        AddArgument("EndpointId", 0, UINT16_MAX, &mRequest.endpointId, false);
+        AddArgument("ClusterId", 0, UINT32_MAX, &mRequest.clusterId, false);
         ModelCommand::AddArguments();
     }
 
@@ -6252,10 +6252,10 @@ class BindingUnbind : public ModelCommand
 public:
     BindingUnbind() : ModelCommand("unbind")
     {
-        AddArgument("NodeId", 0, UINT64_MAX, &mRequest.nodeId);
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("EndpointId", 0, UINT16_MAX, &mRequest.endpointId);
-        AddArgument("ClusterId", 0, UINT32_MAX, &mRequest.clusterId);
+        AddArgument("NodeId", 0, UINT64_MAX, &mRequest.nodeId, false);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
+        AddArgument("EndpointId", 0, UINT16_MAX, &mRequest.endpointId, false);
+        AddArgument("ClusterId", 0, UINT32_MAX, &mRequest.clusterId, false);
         ModelCommand::AddArguments();
     }
 
@@ -6280,7 +6280,7 @@ class ReadBindingClusterRevision : public ModelCommand
 public:
     ReadBindingClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -6324,7 +6324,7 @@ class ReadBooleanStateStateValue : public ModelCommand
 public:
     ReadBooleanStateStateValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "state-value");
+        AddArgument("attr-name", "state-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -6355,10 +6355,10 @@ class ReportBooleanStateStateValue : public ModelCommand
 public:
     ReportBooleanStateStateValue() : ModelCommand("report")
     {
-        AddArgument("attr-name", "state-value");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "state-value", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -6410,7 +6410,7 @@ class ReadBooleanStateClusterRevision : public ModelCommand
 public:
     ReadBooleanStateClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -6468,8 +6468,8 @@ class BridgedActionsDisableAction : public ModelCommand
 public:
     BridgedActionsDisableAction() : ModelCommand("disable-action")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
         ModelCommand::AddArguments();
     }
 
@@ -6494,9 +6494,9 @@ class BridgedActionsDisableActionWithDuration : public ModelCommand
 public:
     BridgedActionsDisableActionWithDuration() : ModelCommand("disable-action-with-duration")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
-        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration, false);
         ModelCommand::AddArguments();
     }
 
@@ -6521,8 +6521,8 @@ class BridgedActionsEnableAction : public ModelCommand
 public:
     BridgedActionsEnableAction() : ModelCommand("enable-action")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
         ModelCommand::AddArguments();
     }
 
@@ -6547,9 +6547,9 @@ class BridgedActionsEnableActionWithDuration : public ModelCommand
 public:
     BridgedActionsEnableActionWithDuration() : ModelCommand("enable-action-with-duration")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
-        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration, false);
         ModelCommand::AddArguments();
     }
 
@@ -6574,8 +6574,8 @@ class BridgedActionsInstantAction : public ModelCommand
 public:
     BridgedActionsInstantAction() : ModelCommand("instant-action")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
         ModelCommand::AddArguments();
     }
 
@@ -6600,9 +6600,9 @@ class BridgedActionsInstantActionWithTransition : public ModelCommand
 public:
     BridgedActionsInstantActionWithTransition() : ModelCommand("instant-action-with-transition")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
         ModelCommand::AddArguments();
     }
 
@@ -6627,8 +6627,8 @@ class BridgedActionsPauseAction : public ModelCommand
 public:
     BridgedActionsPauseAction() : ModelCommand("pause-action")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
         ModelCommand::AddArguments();
     }
 
@@ -6653,9 +6653,9 @@ class BridgedActionsPauseActionWithDuration : public ModelCommand
 public:
     BridgedActionsPauseActionWithDuration() : ModelCommand("pause-action-with-duration")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
-        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration, false);
         ModelCommand::AddArguments();
     }
 
@@ -6680,8 +6680,8 @@ class BridgedActionsResumeAction : public ModelCommand
 public:
     BridgedActionsResumeAction() : ModelCommand("resume-action")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
         ModelCommand::AddArguments();
     }
 
@@ -6706,8 +6706,8 @@ class BridgedActionsStartAction : public ModelCommand
 public:
     BridgedActionsStartAction() : ModelCommand("start-action")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
         ModelCommand::AddArguments();
     }
 
@@ -6732,9 +6732,9 @@ class BridgedActionsStartActionWithDuration : public ModelCommand
 public:
     BridgedActionsStartActionWithDuration() : ModelCommand("start-action-with-duration")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
-        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration, false);
         ModelCommand::AddArguments();
     }
 
@@ -6759,8 +6759,8 @@ class BridgedActionsStopAction : public ModelCommand
 public:
     BridgedActionsStopAction() : ModelCommand("stop-action")
     {
-        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
-        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
+        AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID, false);
+        AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID, false);
         ModelCommand::AddArguments();
     }
 
@@ -6785,7 +6785,7 @@ class ReadBridgedActionsActionList : public ModelCommand
 public:
     ReadBridgedActionsActionList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "action-list");
+        AddArgument("attr-name", "action-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -6820,7 +6820,7 @@ class ReadBridgedActionsEndpointList : public ModelCommand
 public:
     ReadBridgedActionsEndpointList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "endpoint-list");
+        AddArgument("attr-name", "endpoint-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -6855,7 +6855,7 @@ class ReadBridgedActionsSetupUrl : public ModelCommand
 public:
     ReadBridgedActionsSetupUrl() : ModelCommand("read")
     {
-        AddArgument("attr-name", "setup-url");
+        AddArgument("attr-name", "setup-url", false);
         ModelCommand::AddArguments();
     }
 
@@ -6889,7 +6889,7 @@ class ReadBridgedActionsClusterRevision : public ModelCommand
 public:
     ReadBridgedActionsClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -6946,7 +6946,7 @@ class ReadBridgedDeviceBasicVendorName : public ModelCommand
 public:
     ReadBridgedDeviceBasicVendorName() : ModelCommand("read")
     {
-        AddArgument("attr-name", "vendor-name");
+        AddArgument("attr-name", "vendor-name", false);
         ModelCommand::AddArguments();
     }
 
@@ -6980,7 +6980,7 @@ class ReadBridgedDeviceBasicVendorID : public ModelCommand
 public:
     ReadBridgedDeviceBasicVendorID() : ModelCommand("read")
     {
-        AddArgument("attr-name", "vendor-id");
+        AddArgument("attr-name", "vendor-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -7014,7 +7014,7 @@ class ReadBridgedDeviceBasicProductName : public ModelCommand
 public:
     ReadBridgedDeviceBasicProductName() : ModelCommand("read")
     {
-        AddArgument("attr-name", "product-name");
+        AddArgument("attr-name", "product-name", false);
         ModelCommand::AddArguments();
     }
 
@@ -7048,7 +7048,7 @@ class ReadBridgedDeviceBasicUserLabel : public ModelCommand
 public:
     ReadBridgedDeviceBasicUserLabel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "user-label");
+        AddArgument("attr-name", "user-label", false);
         ModelCommand::AddArguments();
     }
 
@@ -7079,8 +7079,8 @@ class WriteBridgedDeviceBasicUserLabel : public ModelCommand
 public:
     WriteBridgedDeviceBasicUserLabel() : ModelCommand("write")
     {
-        AddArgument("attr-name", "user-label");
-        AddArgument("attr-value", &mValue);
+        AddArgument("attr-name", "user-label", false);
+        AddArgument("attr-value", &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -7115,7 +7115,7 @@ class ReadBridgedDeviceBasicHardwareVersion : public ModelCommand
 public:
     ReadBridgedDeviceBasicHardwareVersion() : ModelCommand("read")
     {
-        AddArgument("attr-name", "hardware-version");
+        AddArgument("attr-name", "hardware-version", false);
         ModelCommand::AddArguments();
     }
 
@@ -7149,7 +7149,7 @@ class ReadBridgedDeviceBasicHardwareVersionString : public ModelCommand
 public:
     ReadBridgedDeviceBasicHardwareVersionString() : ModelCommand("read")
     {
-        AddArgument("attr-name", "hardware-version-string");
+        AddArgument("attr-name", "hardware-version-string", false);
         ModelCommand::AddArguments();
     }
 
@@ -7183,7 +7183,7 @@ class ReadBridgedDeviceBasicSoftwareVersion : public ModelCommand
 public:
     ReadBridgedDeviceBasicSoftwareVersion() : ModelCommand("read")
     {
-        AddArgument("attr-name", "software-version");
+        AddArgument("attr-name", "software-version", false);
         ModelCommand::AddArguments();
     }
 
@@ -7217,7 +7217,7 @@ class ReadBridgedDeviceBasicSoftwareVersionString : public ModelCommand
 public:
     ReadBridgedDeviceBasicSoftwareVersionString() : ModelCommand("read")
     {
-        AddArgument("attr-name", "software-version-string");
+        AddArgument("attr-name", "software-version-string", false);
         ModelCommand::AddArguments();
     }
 
@@ -7251,7 +7251,7 @@ class ReadBridgedDeviceBasicManufacturingDate : public ModelCommand
 public:
     ReadBridgedDeviceBasicManufacturingDate() : ModelCommand("read")
     {
-        AddArgument("attr-name", "manufacturing-date");
+        AddArgument("attr-name", "manufacturing-date", false);
         ModelCommand::AddArguments();
     }
 
@@ -7285,7 +7285,7 @@ class ReadBridgedDeviceBasicPartNumber : public ModelCommand
 public:
     ReadBridgedDeviceBasicPartNumber() : ModelCommand("read")
     {
-        AddArgument("attr-name", "part-number");
+        AddArgument("attr-name", "part-number", false);
         ModelCommand::AddArguments();
     }
 
@@ -7319,7 +7319,7 @@ class ReadBridgedDeviceBasicProductURL : public ModelCommand
 public:
     ReadBridgedDeviceBasicProductURL() : ModelCommand("read")
     {
-        AddArgument("attr-name", "product-url");
+        AddArgument("attr-name", "product-url", false);
         ModelCommand::AddArguments();
     }
 
@@ -7353,7 +7353,7 @@ class ReadBridgedDeviceBasicProductLabel : public ModelCommand
 public:
     ReadBridgedDeviceBasicProductLabel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "product-label");
+        AddArgument("attr-name", "product-label", false);
         ModelCommand::AddArguments();
     }
 
@@ -7387,7 +7387,7 @@ class ReadBridgedDeviceBasicSerialNumber : public ModelCommand
 public:
     ReadBridgedDeviceBasicSerialNumber() : ModelCommand("read")
     {
-        AddArgument("attr-name", "serial-number");
+        AddArgument("attr-name", "serial-number", false);
         ModelCommand::AddArguments();
     }
 
@@ -7421,7 +7421,7 @@ class ReadBridgedDeviceBasicReachable : public ModelCommand
 public:
     ReadBridgedDeviceBasicReachable() : ModelCommand("read")
     {
-        AddArgument("attr-name", "reachable");
+        AddArgument("attr-name", "reachable", false);
         ModelCommand::AddArguments();
     }
 
@@ -7455,7 +7455,7 @@ class ReadBridgedDeviceBasicClusterRevision : public ModelCommand
 public:
     ReadBridgedDeviceBasicClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -7571,15 +7571,16 @@ public:
     {
         AddArgument("UpdateFlags", 0, UINT8_MAX,
                     reinterpret_cast<std::underlying_type_t<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags> *>(
-                        &mRequest.updateFlags));
-        AddArgument("Action", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.action)> *>(&mRequest.action));
+                        &mRequest.updateFlags),
+                    false);
+        AddArgument("Action", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.action)> *>(&mRequest.action),
+                    false);
         AddArgument("Direction", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction));
-        AddArgument("Time", 0, UINT16_MAX, &mRequest.time);
-        AddArgument("StartHue", 0, UINT16_MAX, &mRequest.startHue);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction), false);
+        AddArgument("Time", 0, UINT16_MAX, &mRequest.time, false);
+        AddArgument("StartHue", 0, UINT16_MAX, &mRequest.startHue, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7605,10 +7606,10 @@ public:
     ColorControlEnhancedMoveHue() : ModelCommand("enhanced-move-hue")
     {
         AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
-        AddArgument("Rate", 0, UINT16_MAX, &mRequest.rate);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode), false);
+        AddArgument("Rate", 0, UINT16_MAX, &mRequest.rate, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7633,12 +7634,12 @@ class ColorControlEnhancedMoveToHue : public ModelCommand
 public:
     ColorControlEnhancedMoveToHue() : ModelCommand("enhanced-move-to-hue")
     {
-        AddArgument("EnhancedHue", 0, UINT16_MAX, &mRequest.enhancedHue);
+        AddArgument("EnhancedHue", 0, UINT16_MAX, &mRequest.enhancedHue, false);
         AddArgument("Direction", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction));
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction), false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7663,11 +7664,11 @@ class ColorControlEnhancedMoveToHueAndSaturation : public ModelCommand
 public:
     ColorControlEnhancedMoveToHueAndSaturation() : ModelCommand("enhanced-move-to-hue-and-saturation")
     {
-        AddArgument("EnhancedHue", 0, UINT16_MAX, &mRequest.enhancedHue);
-        AddArgument("Saturation", 0, UINT8_MAX, &mRequest.saturation);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+        AddArgument("EnhancedHue", 0, UINT16_MAX, &mRequest.enhancedHue, false);
+        AddArgument("Saturation", 0, UINT8_MAX, &mRequest.saturation, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7693,11 +7694,11 @@ public:
     ColorControlEnhancedStepHue() : ModelCommand("enhanced-step-hue")
     {
         AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
-        AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode), false);
+        AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7722,10 +7723,10 @@ class ColorControlMoveColor : public ModelCommand
 public:
     ColorControlMoveColor() : ModelCommand("move-color")
     {
-        AddArgument("RateX", INT16_MIN, INT16_MAX, &mRequest.rateX);
-        AddArgument("RateY", INT16_MIN, INT16_MAX, &mRequest.rateY);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+        AddArgument("RateX", INT16_MIN, INT16_MAX, &mRequest.rateX, false);
+        AddArgument("RateY", INT16_MIN, INT16_MAX, &mRequest.rateY, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7751,12 +7752,12 @@ public:
     ColorControlMoveColorTemperature() : ModelCommand("move-color-temperature")
     {
         AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
-        AddArgument("Rate", 0, UINT16_MAX, &mRequest.rate);
-        AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum);
-        AddArgument("ColorTemperatureMaximum", 0, UINT16_MAX, &mRequest.colorTemperatureMaximum);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode), false);
+        AddArgument("Rate", 0, UINT16_MAX, &mRequest.rate, false);
+        AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum, false);
+        AddArgument("ColorTemperatureMaximum", 0, UINT16_MAX, &mRequest.colorTemperatureMaximum, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7782,10 +7783,10 @@ public:
     ColorControlMoveHue() : ModelCommand("move-hue")
     {
         AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
-        AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode), false);
+        AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7811,10 +7812,10 @@ public:
     ColorControlMoveSaturation() : ModelCommand("move-saturation")
     {
         AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
-        AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode), false);
+        AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7839,11 +7840,11 @@ class ColorControlMoveToColor : public ModelCommand
 public:
     ColorControlMoveToColor() : ModelCommand("move-to-color")
     {
-        AddArgument("ColorX", 0, UINT16_MAX, &mRequest.colorX);
-        AddArgument("ColorY", 0, UINT16_MAX, &mRequest.colorY);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+        AddArgument("ColorX", 0, UINT16_MAX, &mRequest.colorX, false);
+        AddArgument("ColorY", 0, UINT16_MAX, &mRequest.colorY, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7868,10 +7869,10 @@ class ColorControlMoveToColorTemperature : public ModelCommand
 public:
     ColorControlMoveToColorTemperature() : ModelCommand("move-to-color-temperature")
     {
-        AddArgument("ColorTemperature", 0, UINT16_MAX, &mRequest.colorTemperature);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+        AddArgument("ColorTemperature", 0, UINT16_MAX, &mRequest.colorTemperature, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7896,12 +7897,12 @@ class ColorControlMoveToHue : public ModelCommand
 public:
     ColorControlMoveToHue() : ModelCommand("move-to-hue")
     {
-        AddArgument("Hue", 0, UINT8_MAX, &mRequest.hue);
+        AddArgument("Hue", 0, UINT8_MAX, &mRequest.hue, false);
         AddArgument("Direction", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction));
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.direction)> *>(&mRequest.direction), false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7926,11 +7927,11 @@ class ColorControlMoveToHueAndSaturation : public ModelCommand
 public:
     ColorControlMoveToHueAndSaturation() : ModelCommand("move-to-hue-and-saturation")
     {
-        AddArgument("Hue", 0, UINT8_MAX, &mRequest.hue);
-        AddArgument("Saturation", 0, UINT8_MAX, &mRequest.saturation);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+        AddArgument("Hue", 0, UINT8_MAX, &mRequest.hue, false);
+        AddArgument("Saturation", 0, UINT8_MAX, &mRequest.saturation, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7955,10 +7956,10 @@ class ColorControlMoveToSaturation : public ModelCommand
 public:
     ColorControlMoveToSaturation() : ModelCommand("move-to-saturation")
     {
-        AddArgument("Saturation", 0, UINT8_MAX, &mRequest.saturation);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+        AddArgument("Saturation", 0, UINT8_MAX, &mRequest.saturation, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -7983,11 +7984,11 @@ class ColorControlStepColor : public ModelCommand
 public:
     ColorControlStepColor() : ModelCommand("step-color")
     {
-        AddArgument("StepX", INT16_MIN, INT16_MAX, &mRequest.stepX);
-        AddArgument("StepY", INT16_MIN, INT16_MAX, &mRequest.stepY);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+        AddArgument("StepX", INT16_MIN, INT16_MAX, &mRequest.stepX, false);
+        AddArgument("StepY", INT16_MIN, INT16_MAX, &mRequest.stepY, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -8013,13 +8014,13 @@ public:
     ColorControlStepColorTemperature() : ModelCommand("step-color-temperature")
     {
         AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
-        AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum);
-        AddArgument("ColorTemperatureMaximum", 0, UINT16_MAX, &mRequest.colorTemperatureMaximum);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode), false);
+        AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("ColorTemperatureMinimum", 0, UINT16_MAX, &mRequest.colorTemperatureMinimum, false);
+        AddArgument("ColorTemperatureMaximum", 0, UINT16_MAX, &mRequest.colorTemperatureMaximum, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -8045,11 +8046,11 @@ public:
     ColorControlStepHue() : ModelCommand("step-hue")
     {
         AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
-        AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
-        AddArgument("TransitionTime", 0, UINT8_MAX, &mRequest.transitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode), false);
+        AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize, false);
+        AddArgument("TransitionTime", 0, UINT8_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -8075,11 +8076,11 @@ public:
     ColorControlStepSaturation() : ModelCommand("step-saturation")
     {
         AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
-        AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
-        AddArgument("TransitionTime", 0, UINT8_MAX, &mRequest.transitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode), false);
+        AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize, false);
+        AddArgument("TransitionTime", 0, UINT8_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -8104,8 +8105,8 @@ class ColorControlStopMoveStep : public ModelCommand
 public:
     ColorControlStopMoveStep() : ModelCommand("stop-move-step")
     {
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask, false);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -8130,7 +8131,7 @@ class ReadColorControlCurrentHue : public ModelCommand
 public:
     ReadColorControlCurrentHue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-hue");
+        AddArgument("attr-name", "current-hue", false);
         ModelCommand::AddArguments();
     }
 
@@ -8161,10 +8162,10 @@ class ReportColorControlCurrentHue : public ModelCommand
 public:
     ReportColorControlCurrentHue() : ModelCommand("report")
     {
-        AddArgument("attr-name", "current-hue");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "current-hue", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -8216,7 +8217,7 @@ class ReadColorControlCurrentSaturation : public ModelCommand
 public:
     ReadColorControlCurrentSaturation() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-saturation");
+        AddArgument("attr-name", "current-saturation", false);
         ModelCommand::AddArguments();
     }
 
@@ -8247,10 +8248,10 @@ class ReportColorControlCurrentSaturation : public ModelCommand
 public:
     ReportColorControlCurrentSaturation() : ModelCommand("report")
     {
-        AddArgument("attr-name", "current-saturation");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "current-saturation", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -8303,7 +8304,7 @@ class ReadColorControlRemainingTime : public ModelCommand
 public:
     ReadColorControlRemainingTime() : ModelCommand("read")
     {
-        AddArgument("attr-name", "remaining-time");
+        AddArgument("attr-name", "remaining-time", false);
         ModelCommand::AddArguments();
     }
 
@@ -8337,7 +8338,7 @@ class ReadColorControlCurrentX : public ModelCommand
 public:
     ReadColorControlCurrentX() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-x");
+        AddArgument("attr-name", "current-x", false);
         ModelCommand::AddArguments();
     }
 
@@ -8368,10 +8369,10 @@ class ReportColorControlCurrentX : public ModelCommand
 public:
     ReportColorControlCurrentX() : ModelCommand("report")
     {
-        AddArgument("attr-name", "current-x");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "current-x", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -8423,7 +8424,7 @@ class ReadColorControlCurrentY : public ModelCommand
 public:
     ReadColorControlCurrentY() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-y");
+        AddArgument("attr-name", "current-y", false);
         ModelCommand::AddArguments();
     }
 
@@ -8454,10 +8455,10 @@ class ReportColorControlCurrentY : public ModelCommand
 public:
     ReportColorControlCurrentY() : ModelCommand("report")
     {
-        AddArgument("attr-name", "current-y");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "current-y", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -8509,7 +8510,7 @@ class ReadColorControlDriftCompensation : public ModelCommand
 public:
     ReadColorControlDriftCompensation() : ModelCommand("read")
     {
-        AddArgument("attr-name", "drift-compensation");
+        AddArgument("attr-name", "drift-compensation", false);
         ModelCommand::AddArguments();
     }
 
@@ -8543,7 +8544,7 @@ class ReadColorControlCompensationText : public ModelCommand
 public:
     ReadColorControlCompensationText() : ModelCommand("read")
     {
-        AddArgument("attr-name", "compensation-text");
+        AddArgument("attr-name", "compensation-text", false);
         ModelCommand::AddArguments();
     }
 
@@ -8577,7 +8578,7 @@ class ReadColorControlColorTemperature : public ModelCommand
 public:
     ReadColorControlColorTemperature() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-temperature");
+        AddArgument("attr-name", "color-temperature", false);
         ModelCommand::AddArguments();
     }
 
@@ -8608,10 +8609,10 @@ class ReportColorControlColorTemperature : public ModelCommand
 public:
     ReportColorControlColorTemperature() : ModelCommand("report")
     {
-        AddArgument("attr-name", "color-temperature");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "color-temperature", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -8663,7 +8664,7 @@ class ReadColorControlColorMode : public ModelCommand
 public:
     ReadColorControlColorMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-mode");
+        AddArgument("attr-name", "color-mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -8697,7 +8698,7 @@ class ReadColorControlColorControlOptions : public ModelCommand
 public:
     ReadColorControlColorControlOptions() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-control-options");
+        AddArgument("attr-name", "color-control-options", false);
         ModelCommand::AddArguments();
     }
 
@@ -8728,8 +8729,8 @@ class WriteColorControlColorControlOptions : public ModelCommand
 public:
     WriteColorControlColorControlOptions() : ModelCommand("write")
     {
-        AddArgument("attr-name", "color-control-options");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "color-control-options", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -8764,7 +8765,7 @@ class ReadColorControlNumberOfPrimaries : public ModelCommand
 public:
     ReadColorControlNumberOfPrimaries() : ModelCommand("read")
     {
-        AddArgument("attr-name", "number-of-primaries");
+        AddArgument("attr-name", "number-of-primaries", false);
         ModelCommand::AddArguments();
     }
 
@@ -8798,7 +8799,7 @@ class ReadColorControlPrimary1X : public ModelCommand
 public:
     ReadColorControlPrimary1X() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary1x");
+        AddArgument("attr-name", "primary1x", false);
         ModelCommand::AddArguments();
     }
 
@@ -8832,7 +8833,7 @@ class ReadColorControlPrimary1Y : public ModelCommand
 public:
     ReadColorControlPrimary1Y() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary1y");
+        AddArgument("attr-name", "primary1y", false);
         ModelCommand::AddArguments();
     }
 
@@ -8866,7 +8867,7 @@ class ReadColorControlPrimary1Intensity : public ModelCommand
 public:
     ReadColorControlPrimary1Intensity() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary1intensity");
+        AddArgument("attr-name", "primary1intensity", false);
         ModelCommand::AddArguments();
     }
 
@@ -8900,7 +8901,7 @@ class ReadColorControlPrimary2X : public ModelCommand
 public:
     ReadColorControlPrimary2X() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary2x");
+        AddArgument("attr-name", "primary2x", false);
         ModelCommand::AddArguments();
     }
 
@@ -8934,7 +8935,7 @@ class ReadColorControlPrimary2Y : public ModelCommand
 public:
     ReadColorControlPrimary2Y() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary2y");
+        AddArgument("attr-name", "primary2y", false);
         ModelCommand::AddArguments();
     }
 
@@ -8968,7 +8969,7 @@ class ReadColorControlPrimary2Intensity : public ModelCommand
 public:
     ReadColorControlPrimary2Intensity() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary2intensity");
+        AddArgument("attr-name", "primary2intensity", false);
         ModelCommand::AddArguments();
     }
 
@@ -9002,7 +9003,7 @@ class ReadColorControlPrimary3X : public ModelCommand
 public:
     ReadColorControlPrimary3X() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary3x");
+        AddArgument("attr-name", "primary3x", false);
         ModelCommand::AddArguments();
     }
 
@@ -9036,7 +9037,7 @@ class ReadColorControlPrimary3Y : public ModelCommand
 public:
     ReadColorControlPrimary3Y() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary3y");
+        AddArgument("attr-name", "primary3y", false);
         ModelCommand::AddArguments();
     }
 
@@ -9070,7 +9071,7 @@ class ReadColorControlPrimary3Intensity : public ModelCommand
 public:
     ReadColorControlPrimary3Intensity() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary3intensity");
+        AddArgument("attr-name", "primary3intensity", false);
         ModelCommand::AddArguments();
     }
 
@@ -9104,7 +9105,7 @@ class ReadColorControlPrimary4X : public ModelCommand
 public:
     ReadColorControlPrimary4X() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary4x");
+        AddArgument("attr-name", "primary4x", false);
         ModelCommand::AddArguments();
     }
 
@@ -9138,7 +9139,7 @@ class ReadColorControlPrimary4Y : public ModelCommand
 public:
     ReadColorControlPrimary4Y() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary4y");
+        AddArgument("attr-name", "primary4y", false);
         ModelCommand::AddArguments();
     }
 
@@ -9172,7 +9173,7 @@ class ReadColorControlPrimary4Intensity : public ModelCommand
 public:
     ReadColorControlPrimary4Intensity() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary4intensity");
+        AddArgument("attr-name", "primary4intensity", false);
         ModelCommand::AddArguments();
     }
 
@@ -9206,7 +9207,7 @@ class ReadColorControlPrimary5X : public ModelCommand
 public:
     ReadColorControlPrimary5X() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary5x");
+        AddArgument("attr-name", "primary5x", false);
         ModelCommand::AddArguments();
     }
 
@@ -9240,7 +9241,7 @@ class ReadColorControlPrimary5Y : public ModelCommand
 public:
     ReadColorControlPrimary5Y() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary5y");
+        AddArgument("attr-name", "primary5y", false);
         ModelCommand::AddArguments();
     }
 
@@ -9274,7 +9275,7 @@ class ReadColorControlPrimary5Intensity : public ModelCommand
 public:
     ReadColorControlPrimary5Intensity() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary5intensity");
+        AddArgument("attr-name", "primary5intensity", false);
         ModelCommand::AddArguments();
     }
 
@@ -9308,7 +9309,7 @@ class ReadColorControlPrimary6X : public ModelCommand
 public:
     ReadColorControlPrimary6X() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary6x");
+        AddArgument("attr-name", "primary6x", false);
         ModelCommand::AddArguments();
     }
 
@@ -9342,7 +9343,7 @@ class ReadColorControlPrimary6Y : public ModelCommand
 public:
     ReadColorControlPrimary6Y() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary6y");
+        AddArgument("attr-name", "primary6y", false);
         ModelCommand::AddArguments();
     }
 
@@ -9376,7 +9377,7 @@ class ReadColorControlPrimary6Intensity : public ModelCommand
 public:
     ReadColorControlPrimary6Intensity() : ModelCommand("read")
     {
-        AddArgument("attr-name", "primary6intensity");
+        AddArgument("attr-name", "primary6intensity", false);
         ModelCommand::AddArguments();
     }
 
@@ -9410,7 +9411,7 @@ class ReadColorControlWhitePointX : public ModelCommand
 public:
     ReadColorControlWhitePointX() : ModelCommand("read")
     {
-        AddArgument("attr-name", "white-point-x");
+        AddArgument("attr-name", "white-point-x", false);
         ModelCommand::AddArguments();
     }
 
@@ -9441,8 +9442,8 @@ class WriteColorControlWhitePointX : public ModelCommand
 public:
     WriteColorControlWhitePointX() : ModelCommand("write")
     {
-        AddArgument("attr-name", "white-point-x");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "white-point-x", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -9477,7 +9478,7 @@ class ReadColorControlWhitePointY : public ModelCommand
 public:
     ReadColorControlWhitePointY() : ModelCommand("read")
     {
-        AddArgument("attr-name", "white-point-y");
+        AddArgument("attr-name", "white-point-y", false);
         ModelCommand::AddArguments();
     }
 
@@ -9508,8 +9509,8 @@ class WriteColorControlWhitePointY : public ModelCommand
 public:
     WriteColorControlWhitePointY() : ModelCommand("write")
     {
-        AddArgument("attr-name", "white-point-y");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "white-point-y", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -9544,7 +9545,7 @@ class ReadColorControlColorPointRX : public ModelCommand
 public:
     ReadColorControlColorPointRX() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-point-rx");
+        AddArgument("attr-name", "color-point-rx", false);
         ModelCommand::AddArguments();
     }
 
@@ -9575,8 +9576,8 @@ class WriteColorControlColorPointRX : public ModelCommand
 public:
     WriteColorControlColorPointRX() : ModelCommand("write")
     {
-        AddArgument("attr-name", "color-point-rx");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "color-point-rx", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -9611,7 +9612,7 @@ class ReadColorControlColorPointRY : public ModelCommand
 public:
     ReadColorControlColorPointRY() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-point-ry");
+        AddArgument("attr-name", "color-point-ry", false);
         ModelCommand::AddArguments();
     }
 
@@ -9642,8 +9643,8 @@ class WriteColorControlColorPointRY : public ModelCommand
 public:
     WriteColorControlColorPointRY() : ModelCommand("write")
     {
-        AddArgument("attr-name", "color-point-ry");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "color-point-ry", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -9678,7 +9679,7 @@ class ReadColorControlColorPointRIntensity : public ModelCommand
 public:
     ReadColorControlColorPointRIntensity() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-point-rintensity");
+        AddArgument("attr-name", "color-point-rintensity", false);
         ModelCommand::AddArguments();
     }
 
@@ -9709,8 +9710,8 @@ class WriteColorControlColorPointRIntensity : public ModelCommand
 public:
     WriteColorControlColorPointRIntensity() : ModelCommand("write")
     {
-        AddArgument("attr-name", "color-point-rintensity");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "color-point-rintensity", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -9745,7 +9746,7 @@ class ReadColorControlColorPointGX : public ModelCommand
 public:
     ReadColorControlColorPointGX() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-point-gx");
+        AddArgument("attr-name", "color-point-gx", false);
         ModelCommand::AddArguments();
     }
 
@@ -9776,8 +9777,8 @@ class WriteColorControlColorPointGX : public ModelCommand
 public:
     WriteColorControlColorPointGX() : ModelCommand("write")
     {
-        AddArgument("attr-name", "color-point-gx");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "color-point-gx", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -9812,7 +9813,7 @@ class ReadColorControlColorPointGY : public ModelCommand
 public:
     ReadColorControlColorPointGY() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-point-gy");
+        AddArgument("attr-name", "color-point-gy", false);
         ModelCommand::AddArguments();
     }
 
@@ -9843,8 +9844,8 @@ class WriteColorControlColorPointGY : public ModelCommand
 public:
     WriteColorControlColorPointGY() : ModelCommand("write")
     {
-        AddArgument("attr-name", "color-point-gy");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "color-point-gy", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -9879,7 +9880,7 @@ class ReadColorControlColorPointGIntensity : public ModelCommand
 public:
     ReadColorControlColorPointGIntensity() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-point-gintensity");
+        AddArgument("attr-name", "color-point-gintensity", false);
         ModelCommand::AddArguments();
     }
 
@@ -9910,8 +9911,8 @@ class WriteColorControlColorPointGIntensity : public ModelCommand
 public:
     WriteColorControlColorPointGIntensity() : ModelCommand("write")
     {
-        AddArgument("attr-name", "color-point-gintensity");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "color-point-gintensity", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -9946,7 +9947,7 @@ class ReadColorControlColorPointBX : public ModelCommand
 public:
     ReadColorControlColorPointBX() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-point-bx");
+        AddArgument("attr-name", "color-point-bx", false);
         ModelCommand::AddArguments();
     }
 
@@ -9977,8 +9978,8 @@ class WriteColorControlColorPointBX : public ModelCommand
 public:
     WriteColorControlColorPointBX() : ModelCommand("write")
     {
-        AddArgument("attr-name", "color-point-bx");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "color-point-bx", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -10013,7 +10014,7 @@ class ReadColorControlColorPointBY : public ModelCommand
 public:
     ReadColorControlColorPointBY() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-point-by");
+        AddArgument("attr-name", "color-point-by", false);
         ModelCommand::AddArguments();
     }
 
@@ -10044,8 +10045,8 @@ class WriteColorControlColorPointBY : public ModelCommand
 public:
     WriteColorControlColorPointBY() : ModelCommand("write")
     {
-        AddArgument("attr-name", "color-point-by");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "color-point-by", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -10080,7 +10081,7 @@ class ReadColorControlColorPointBIntensity : public ModelCommand
 public:
     ReadColorControlColorPointBIntensity() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-point-bintensity");
+        AddArgument("attr-name", "color-point-bintensity", false);
         ModelCommand::AddArguments();
     }
 
@@ -10111,8 +10112,8 @@ class WriteColorControlColorPointBIntensity : public ModelCommand
 public:
     WriteColorControlColorPointBIntensity() : ModelCommand("write")
     {
-        AddArgument("attr-name", "color-point-bintensity");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "color-point-bintensity", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -10147,7 +10148,7 @@ class ReadColorControlEnhancedCurrentHue : public ModelCommand
 public:
     ReadColorControlEnhancedCurrentHue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "enhanced-current-hue");
+        AddArgument("attr-name", "enhanced-current-hue", false);
         ModelCommand::AddArguments();
     }
 
@@ -10181,7 +10182,7 @@ class ReadColorControlEnhancedColorMode : public ModelCommand
 public:
     ReadColorControlEnhancedColorMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "enhanced-color-mode");
+        AddArgument("attr-name", "enhanced-color-mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -10215,7 +10216,7 @@ class ReadColorControlColorLoopActive : public ModelCommand
 public:
     ReadColorControlColorLoopActive() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-loop-active");
+        AddArgument("attr-name", "color-loop-active", false);
         ModelCommand::AddArguments();
     }
 
@@ -10249,7 +10250,7 @@ class ReadColorControlColorLoopDirection : public ModelCommand
 public:
     ReadColorControlColorLoopDirection() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-loop-direction");
+        AddArgument("attr-name", "color-loop-direction", false);
         ModelCommand::AddArguments();
     }
 
@@ -10283,7 +10284,7 @@ class ReadColorControlColorLoopTime : public ModelCommand
 public:
     ReadColorControlColorLoopTime() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-loop-time");
+        AddArgument("attr-name", "color-loop-time", false);
         ModelCommand::AddArguments();
     }
 
@@ -10317,7 +10318,7 @@ class ReadColorControlColorLoopStartEnhancedHue : public ModelCommand
 public:
     ReadColorControlColorLoopStartEnhancedHue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-loop-start-enhanced-hue");
+        AddArgument("attr-name", "color-loop-start-enhanced-hue", false);
         ModelCommand::AddArguments();
     }
 
@@ -10351,7 +10352,7 @@ class ReadColorControlColorLoopStoredEnhancedHue : public ModelCommand
 public:
     ReadColorControlColorLoopStoredEnhancedHue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-loop-stored-enhanced-hue");
+        AddArgument("attr-name", "color-loop-stored-enhanced-hue", false);
         ModelCommand::AddArguments();
     }
 
@@ -10385,7 +10386,7 @@ class ReadColorControlColorCapabilities : public ModelCommand
 public:
     ReadColorControlColorCapabilities() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-capabilities");
+        AddArgument("attr-name", "color-capabilities", false);
         ModelCommand::AddArguments();
     }
 
@@ -10419,7 +10420,7 @@ class ReadColorControlColorTempPhysicalMin : public ModelCommand
 public:
     ReadColorControlColorTempPhysicalMin() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-temp-physical-min");
+        AddArgument("attr-name", "color-temp-physical-min", false);
         ModelCommand::AddArguments();
     }
 
@@ -10453,7 +10454,7 @@ class ReadColorControlColorTempPhysicalMax : public ModelCommand
 public:
     ReadColorControlColorTempPhysicalMax() : ModelCommand("read")
     {
-        AddArgument("attr-name", "color-temp-physical-max");
+        AddArgument("attr-name", "color-temp-physical-max", false);
         ModelCommand::AddArguments();
     }
 
@@ -10487,7 +10488,7 @@ class ReadColorControlCoupleColorTempToLevelMinMireds : public ModelCommand
 public:
     ReadColorControlCoupleColorTempToLevelMinMireds() : ModelCommand("read")
     {
-        AddArgument("attr-name", "couple-color-temp-to-level-min-mireds");
+        AddArgument("attr-name", "couple-color-temp-to-level-min-mireds", false);
         ModelCommand::AddArguments();
     }
 
@@ -10521,7 +10522,7 @@ class ReadColorControlStartUpColorTemperatureMireds : public ModelCommand
 public:
     ReadColorControlStartUpColorTemperatureMireds() : ModelCommand("read")
     {
-        AddArgument("attr-name", "start-up-color-temperature-mireds");
+        AddArgument("attr-name", "start-up-color-temperature-mireds", false);
         ModelCommand::AddArguments();
     }
 
@@ -10552,8 +10553,8 @@ class WriteColorControlStartUpColorTemperatureMireds : public ModelCommand
 public:
     WriteColorControlStartUpColorTemperatureMireds() : ModelCommand("write")
     {
-        AddArgument("attr-name", "start-up-color-temperature-mireds");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "start-up-color-temperature-mireds", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -10589,7 +10590,7 @@ class ReadColorControlClusterRevision : public ModelCommand
 public:
     ReadColorControlClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -10636,8 +10637,8 @@ class ContentLauncherLaunchContent : public ModelCommand
 public:
     ContentLauncherLaunchContent() : ModelCommand("launch-content")
     {
-        AddArgument("AutoPlay", 0, 1, &mRequest.autoPlay);
-        AddArgument("Data", &mRequest.data);
+        AddArgument("AutoPlay", 0, 1, &mRequest.autoPlay, false);
+        AddArgument("Data", &mRequest.data, false);
         ModelCommand::AddArguments();
     }
 
@@ -10662,8 +10663,8 @@ class ContentLauncherLaunchURL : public ModelCommand
 public:
     ContentLauncherLaunchURL() : ModelCommand("launch-url")
     {
-        AddArgument("ContentURL", &mRequest.contentURL);
-        AddArgument("DisplayString", &mRequest.displayString);
+        AddArgument("ContentURL", &mRequest.contentURL, false);
+        AddArgument("DisplayString", &mRequest.displayString, false);
         ModelCommand::AddArguments();
     }
 
@@ -10688,7 +10689,7 @@ class ReadContentLauncherAcceptsHeaderList : public ModelCommand
 public:
     ReadContentLauncherAcceptsHeaderList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "accepts-header-list");
+        AddArgument("attr-name", "accepts-header-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -10723,7 +10724,7 @@ class ReadContentLauncherSupportedStreamingTypes : public ModelCommand
 public:
     ReadContentLauncherSupportedStreamingTypes() : ModelCommand("read")
     {
-        AddArgument("attr-name", "supported-streaming-types");
+        AddArgument("attr-name", "supported-streaming-types", false);
         ModelCommand::AddArguments();
     }
 
@@ -10758,7 +10759,7 @@ class ReadContentLauncherClusterRevision : public ModelCommand
 public:
     ReadContentLauncherClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -10805,7 +10806,7 @@ class ReadDescriptorDeviceList : public ModelCommand
 public:
     ReadDescriptorDeviceList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "device-list");
+        AddArgument("attr-name", "device-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -10839,7 +10840,7 @@ class ReadDescriptorServerList : public ModelCommand
 public:
     ReadDescriptorServerList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "server-list");
+        AddArgument("attr-name", "server-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -10873,7 +10874,7 @@ class ReadDescriptorClientList : public ModelCommand
 public:
     ReadDescriptorClientList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "client-list");
+        AddArgument("attr-name", "client-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -10907,7 +10908,7 @@ class ReadDescriptorPartsList : public ModelCommand
 public:
     ReadDescriptorPartsList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "parts-list");
+        AddArgument("attr-name", "parts-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -10941,7 +10942,7 @@ class ReadDescriptorClusterRevision : public ModelCommand
 public:
     ReadDescriptorClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -10984,11 +10985,12 @@ class DiagnosticLogsRetrieveLogsRequest : public ModelCommand
 public:
     DiagnosticLogsRetrieveLogsRequest() : ModelCommand("retrieve-logs-request")
     {
-        AddArgument("Intent", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.intent)> *>(&mRequest.intent));
+        AddArgument("Intent", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.intent)> *>(&mRequest.intent),
+                    false);
         AddArgument("RequestedProtocol", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.requestedProtocol)> *>(&mRequest.requestedProtocol));
-        AddArgument("TransferFileDesignator", &mRequest.transferFileDesignator);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.requestedProtocol)> *>(&mRequest.requestedProtocol),
+                    false);
+        AddArgument("TransferFileDesignator", &mRequest.transferFileDesignator, false);
         ModelCommand::AddArguments();
     }
 
@@ -11090,7 +11092,7 @@ class DoorLockClearHolidaySchedule : public ModelCommand
 public:
     DoorLockClearHolidaySchedule() : ModelCommand("clear-holiday-schedule")
     {
-        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId);
+        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId, false);
         ModelCommand::AddArguments();
     }
 
@@ -11115,7 +11117,7 @@ class DoorLockClearPin : public ModelCommand
 public:
     DoorLockClearPin() : ModelCommand("clear-pin")
     {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         ModelCommand::AddArguments();
     }
 
@@ -11140,7 +11142,7 @@ class DoorLockClearRfid : public ModelCommand
 public:
     DoorLockClearRfid() : ModelCommand("clear-rfid")
     {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         ModelCommand::AddArguments();
     }
 
@@ -11165,8 +11167,8 @@ class DoorLockClearWeekdaySchedule : public ModelCommand
 public:
     DoorLockClearWeekdaySchedule() : ModelCommand("clear-weekday-schedule")
     {
-        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId);
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId, false);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         ModelCommand::AddArguments();
     }
 
@@ -11191,8 +11193,8 @@ class DoorLockClearYeardaySchedule : public ModelCommand
 public:
     DoorLockClearYeardaySchedule() : ModelCommand("clear-yearday-schedule")
     {
-        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId);
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId, false);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         ModelCommand::AddArguments();
     }
 
@@ -11217,7 +11219,7 @@ class DoorLockGetHolidaySchedule : public ModelCommand
 public:
     DoorLockGetHolidaySchedule() : ModelCommand("get-holiday-schedule")
     {
-        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId);
+        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId, false);
         ModelCommand::AddArguments();
     }
 
@@ -11242,7 +11244,7 @@ class DoorLockGetLogRecord : public ModelCommand
 public:
     DoorLockGetLogRecord() : ModelCommand("get-log-record")
     {
-        AddArgument("LogIndex", 0, UINT16_MAX, &mRequest.logIndex);
+        AddArgument("LogIndex", 0, UINT16_MAX, &mRequest.logIndex, false);
         ModelCommand::AddArguments();
     }
 
@@ -11267,7 +11269,7 @@ class DoorLockGetPin : public ModelCommand
 public:
     DoorLockGetPin() : ModelCommand("get-pin")
     {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         ModelCommand::AddArguments();
     }
 
@@ -11292,7 +11294,7 @@ class DoorLockGetRfid : public ModelCommand
 public:
     DoorLockGetRfid() : ModelCommand("get-rfid")
     {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         ModelCommand::AddArguments();
     }
 
@@ -11317,7 +11319,7 @@ class DoorLockGetUserType : public ModelCommand
 public:
     DoorLockGetUserType() : ModelCommand("get-user-type")
     {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         ModelCommand::AddArguments();
     }
 
@@ -11342,8 +11344,8 @@ class DoorLockGetWeekdaySchedule : public ModelCommand
 public:
     DoorLockGetWeekdaySchedule() : ModelCommand("get-weekday-schedule")
     {
-        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId);
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId, false);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         ModelCommand::AddArguments();
     }
 
@@ -11368,8 +11370,8 @@ class DoorLockGetYeardaySchedule : public ModelCommand
 public:
     DoorLockGetYeardaySchedule() : ModelCommand("get-yearday-schedule")
     {
-        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId);
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId, false);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         ModelCommand::AddArguments();
     }
 
@@ -11394,7 +11396,7 @@ class DoorLockLockDoor : public ModelCommand
 public:
     DoorLockLockDoor() : ModelCommand("lock-door")
     {
-        AddArgument("Pin", &mRequest.pin);
+        AddArgument("Pin", &mRequest.pin, false);
         ModelCommand::AddArguments();
     }
 
@@ -11419,10 +11421,10 @@ class DoorLockSetHolidaySchedule : public ModelCommand
 public:
     DoorLockSetHolidaySchedule() : ModelCommand("set-holiday-schedule")
     {
-        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId);
-        AddArgument("LocalStartTime", 0, UINT32_MAX, &mRequest.localStartTime);
-        AddArgument("LocalEndTime", 0, UINT32_MAX, &mRequest.localEndTime);
-        AddArgument("OperatingModeDuringHoliday", 0, UINT8_MAX, &mRequest.operatingModeDuringHoliday);
+        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId, false);
+        AddArgument("LocalStartTime", 0, UINT32_MAX, &mRequest.localStartTime, false);
+        AddArgument("LocalEndTime", 0, UINT32_MAX, &mRequest.localEndTime, false);
+        AddArgument("OperatingModeDuringHoliday", 0, UINT8_MAX, &mRequest.operatingModeDuringHoliday, false);
         ModelCommand::AddArguments();
     }
 
@@ -11447,12 +11449,12 @@ class DoorLockSetPin : public ModelCommand
 public:
     DoorLockSetPin() : ModelCommand("set-pin")
     {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         AddArgument("UserStatus", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus), false);
         AddArgument("UserType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
-        AddArgument("Pin", &mRequest.pin);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType), false);
+        AddArgument("Pin", &mRequest.pin, false);
         ModelCommand::AddArguments();
     }
 
@@ -11477,12 +11479,12 @@ class DoorLockSetRfid : public ModelCommand
 public:
     DoorLockSetRfid() : ModelCommand("set-rfid")
     {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         AddArgument("UserStatus", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus), false);
         AddArgument("UserType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
-        AddArgument("Id", &mRequest.id);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType), false);
+        AddArgument("Id", &mRequest.id, false);
         ModelCommand::AddArguments();
     }
 
@@ -11507,9 +11509,9 @@ class DoorLockSetUserType : public ModelCommand
 public:
     DoorLockSetUserType() : ModelCommand("set-user-type")
     {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         AddArgument("UserType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType), false);
         ModelCommand::AddArguments();
     }
 
@@ -11534,15 +11536,16 @@ class DoorLockSetWeekdaySchedule : public ModelCommand
 public:
     DoorLockSetWeekdaySchedule() : ModelCommand("set-weekday-schedule")
     {
-        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId);
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId, false);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
         AddArgument(
             "DaysMask", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<chip::app::Clusters::DoorLock::DoorLockDayOfWeek> *>(&mRequest.daysMask));
-        AddArgument("StartHour", 0, UINT8_MAX, &mRequest.startHour);
-        AddArgument("StartMinute", 0, UINT8_MAX, &mRequest.startMinute);
-        AddArgument("EndHour", 0, UINT8_MAX, &mRequest.endHour);
-        AddArgument("EndMinute", 0, UINT8_MAX, &mRequest.endMinute);
+            reinterpret_cast<std::underlying_type_t<chip::app::Clusters::DoorLock::DoorLockDayOfWeek> *>(&mRequest.daysMask),
+            false);
+        AddArgument("StartHour", 0, UINT8_MAX, &mRequest.startHour, false);
+        AddArgument("StartMinute", 0, UINT8_MAX, &mRequest.startMinute, false);
+        AddArgument("EndHour", 0, UINT8_MAX, &mRequest.endHour, false);
+        AddArgument("EndMinute", 0, UINT8_MAX, &mRequest.endMinute, false);
         ModelCommand::AddArguments();
     }
 
@@ -11567,10 +11570,10 @@ class DoorLockSetYeardaySchedule : public ModelCommand
 public:
     DoorLockSetYeardaySchedule() : ModelCommand("set-yearday-schedule")
     {
-        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId);
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("LocalStartTime", 0, UINT32_MAX, &mRequest.localStartTime);
-        AddArgument("LocalEndTime", 0, UINT32_MAX, &mRequest.localEndTime);
+        AddArgument("ScheduleId", 0, UINT8_MAX, &mRequest.scheduleId, false);
+        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId, false);
+        AddArgument("LocalStartTime", 0, UINT32_MAX, &mRequest.localStartTime, false);
+        AddArgument("LocalEndTime", 0, UINT32_MAX, &mRequest.localEndTime, false);
         ModelCommand::AddArguments();
     }
 
@@ -11595,7 +11598,7 @@ class DoorLockUnlockDoor : public ModelCommand
 public:
     DoorLockUnlockDoor() : ModelCommand("unlock-door")
     {
-        AddArgument("Pin", &mRequest.pin);
+        AddArgument("Pin", &mRequest.pin, false);
         ModelCommand::AddArguments();
     }
 
@@ -11620,8 +11623,8 @@ class DoorLockUnlockWithTimeout : public ModelCommand
 public:
     DoorLockUnlockWithTimeout() : ModelCommand("unlock-with-timeout")
     {
-        AddArgument("TimeoutInSeconds", 0, UINT16_MAX, &mRequest.timeoutInSeconds);
-        AddArgument("Pin", &mRequest.pin);
+        AddArgument("TimeoutInSeconds", 0, UINT16_MAX, &mRequest.timeoutInSeconds, false);
+        AddArgument("Pin", &mRequest.pin, false);
         ModelCommand::AddArguments();
     }
 
@@ -11646,7 +11649,7 @@ class ReadDoorLockLockState : public ModelCommand
 public:
     ReadDoorLockLockState() : ModelCommand("read")
     {
-        AddArgument("attr-name", "lock-state");
+        AddArgument("attr-name", "lock-state", false);
         ModelCommand::AddArguments();
     }
 
@@ -11677,10 +11680,10 @@ class ReportDoorLockLockState : public ModelCommand
 public:
     ReportDoorLockLockState() : ModelCommand("report")
     {
-        AddArgument("attr-name", "lock-state");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "lock-state", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -11732,7 +11735,7 @@ class ReadDoorLockLockType : public ModelCommand
 public:
     ReadDoorLockLockType() : ModelCommand("read")
     {
-        AddArgument("attr-name", "lock-type");
+        AddArgument("attr-name", "lock-type", false);
         ModelCommand::AddArguments();
     }
 
@@ -11766,7 +11769,7 @@ class ReadDoorLockActuatorEnabled : public ModelCommand
 public:
     ReadDoorLockActuatorEnabled() : ModelCommand("read")
     {
-        AddArgument("attr-name", "actuator-enabled");
+        AddArgument("attr-name", "actuator-enabled", false);
         ModelCommand::AddArguments();
     }
 
@@ -11800,7 +11803,7 @@ class ReadDoorLockClusterRevision : public ModelCommand
 public:
     ReadDoorLockClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -11854,7 +11857,7 @@ class ReadElectricalMeasurementMeasurementType : public ModelCommand
 public:
     ReadElectricalMeasurementMeasurementType() : ModelCommand("read")
     {
-        AddArgument("attr-name", "measurement-type");
+        AddArgument("attr-name", "measurement-type", false);
         ModelCommand::AddArguments();
     }
 
@@ -11888,7 +11891,7 @@ class ReadElectricalMeasurementTotalActivePower : public ModelCommand
 public:
     ReadElectricalMeasurementTotalActivePower() : ModelCommand("read")
     {
-        AddArgument("attr-name", "total-active-power");
+        AddArgument("attr-name", "total-active-power", false);
         ModelCommand::AddArguments();
     }
 
@@ -11922,7 +11925,7 @@ class ReadElectricalMeasurementRmsVoltage : public ModelCommand
 public:
     ReadElectricalMeasurementRmsVoltage() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rms-voltage");
+        AddArgument("attr-name", "rms-voltage", false);
         ModelCommand::AddArguments();
     }
 
@@ -11956,7 +11959,7 @@ class ReadElectricalMeasurementRmsVoltageMin : public ModelCommand
 public:
     ReadElectricalMeasurementRmsVoltageMin() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rms-voltage-min");
+        AddArgument("attr-name", "rms-voltage-min", false);
         ModelCommand::AddArguments();
     }
 
@@ -11990,7 +11993,7 @@ class ReadElectricalMeasurementRmsVoltageMax : public ModelCommand
 public:
     ReadElectricalMeasurementRmsVoltageMax() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rms-voltage-max");
+        AddArgument("attr-name", "rms-voltage-max", false);
         ModelCommand::AddArguments();
     }
 
@@ -12024,7 +12027,7 @@ class ReadElectricalMeasurementRmsCurrent : public ModelCommand
 public:
     ReadElectricalMeasurementRmsCurrent() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rms-current");
+        AddArgument("attr-name", "rms-current", false);
         ModelCommand::AddArguments();
     }
 
@@ -12058,7 +12061,7 @@ class ReadElectricalMeasurementRmsCurrentMin : public ModelCommand
 public:
     ReadElectricalMeasurementRmsCurrentMin() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rms-current-min");
+        AddArgument("attr-name", "rms-current-min", false);
         ModelCommand::AddArguments();
     }
 
@@ -12092,7 +12095,7 @@ class ReadElectricalMeasurementRmsCurrentMax : public ModelCommand
 public:
     ReadElectricalMeasurementRmsCurrentMax() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rms-current-max");
+        AddArgument("attr-name", "rms-current-max", false);
         ModelCommand::AddArguments();
     }
 
@@ -12126,7 +12129,7 @@ class ReadElectricalMeasurementActivePower : public ModelCommand
 public:
     ReadElectricalMeasurementActivePower() : ModelCommand("read")
     {
-        AddArgument("attr-name", "active-power");
+        AddArgument("attr-name", "active-power", false);
         ModelCommand::AddArguments();
     }
 
@@ -12160,7 +12163,7 @@ class ReadElectricalMeasurementActivePowerMin : public ModelCommand
 public:
     ReadElectricalMeasurementActivePowerMin() : ModelCommand("read")
     {
-        AddArgument("attr-name", "active-power-min");
+        AddArgument("attr-name", "active-power-min", false);
         ModelCommand::AddArguments();
     }
 
@@ -12194,7 +12197,7 @@ class ReadElectricalMeasurementActivePowerMax : public ModelCommand
 public:
     ReadElectricalMeasurementActivePowerMax() : ModelCommand("read")
     {
-        AddArgument("attr-name", "active-power-max");
+        AddArgument("attr-name", "active-power-max", false);
         ModelCommand::AddArguments();
     }
 
@@ -12228,7 +12231,7 @@ class ReadElectricalMeasurementClusterRevision : public ModelCommand
 public:
     ReadElectricalMeasurementClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -12302,7 +12305,7 @@ class ReadEthernetNetworkDiagnosticsPHYRate : public ModelCommand
 public:
     ReadEthernetNetworkDiagnosticsPHYRate() : ModelCommand("read")
     {
-        AddArgument("attr-name", "phyrate");
+        AddArgument("attr-name", "phyrate", false);
         ModelCommand::AddArguments();
     }
 
@@ -12336,7 +12339,7 @@ class ReadEthernetNetworkDiagnosticsFullDuplex : public ModelCommand
 public:
     ReadEthernetNetworkDiagnosticsFullDuplex() : ModelCommand("read")
     {
-        AddArgument("attr-name", "full-duplex");
+        AddArgument("attr-name", "full-duplex", false);
         ModelCommand::AddArguments();
     }
 
@@ -12370,7 +12373,7 @@ class ReadEthernetNetworkDiagnosticsPacketRxCount : public ModelCommand
 public:
     ReadEthernetNetworkDiagnosticsPacketRxCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "packet-rx-count");
+        AddArgument("attr-name", "packet-rx-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -12404,7 +12407,7 @@ class ReadEthernetNetworkDiagnosticsPacketTxCount : public ModelCommand
 public:
     ReadEthernetNetworkDiagnosticsPacketTxCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "packet-tx-count");
+        AddArgument("attr-name", "packet-tx-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -12438,7 +12441,7 @@ class ReadEthernetNetworkDiagnosticsTxErrCount : public ModelCommand
 public:
     ReadEthernetNetworkDiagnosticsTxErrCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-err-count");
+        AddArgument("attr-name", "tx-err-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -12472,7 +12475,7 @@ class ReadEthernetNetworkDiagnosticsCollisionCount : public ModelCommand
 public:
     ReadEthernetNetworkDiagnosticsCollisionCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "collision-count");
+        AddArgument("attr-name", "collision-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -12506,7 +12509,7 @@ class ReadEthernetNetworkDiagnosticsOverrunCount : public ModelCommand
 public:
     ReadEthernetNetworkDiagnosticsOverrunCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "overrun-count");
+        AddArgument("attr-name", "overrun-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -12540,7 +12543,7 @@ class ReadEthernetNetworkDiagnosticsCarrierDetect : public ModelCommand
 public:
     ReadEthernetNetworkDiagnosticsCarrierDetect() : ModelCommand("read")
     {
-        AddArgument("attr-name", "carrier-detect");
+        AddArgument("attr-name", "carrier-detect", false);
         ModelCommand::AddArguments();
     }
 
@@ -12574,7 +12577,7 @@ class ReadEthernetNetworkDiagnosticsTimeSinceReset : public ModelCommand
 public:
     ReadEthernetNetworkDiagnosticsTimeSinceReset() : ModelCommand("read")
     {
-        AddArgument("attr-name", "time-since-reset");
+        AddArgument("attr-name", "time-since-reset", false);
         ModelCommand::AddArguments();
     }
 
@@ -12608,7 +12611,7 @@ class ReadEthernetNetworkDiagnosticsClusterRevision : public ModelCommand
 public:
     ReadEthernetNetworkDiagnosticsClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -12652,7 +12655,7 @@ class ReadFixedLabelLabelList : public ModelCommand
 public:
     ReadFixedLabelLabelList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "label-list");
+        AddArgument("attr-name", "label-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -12686,7 +12689,7 @@ class ReadFixedLabelClusterRevision : public ModelCommand
 public:
     ReadFixedLabelClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -12733,7 +12736,7 @@ class ReadFlowMeasurementMeasuredValue : public ModelCommand
 public:
     ReadFlowMeasurementMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "measured-value");
+        AddArgument("attr-name", "measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -12767,7 +12770,7 @@ class ReadFlowMeasurementMinMeasuredValue : public ModelCommand
 public:
     ReadFlowMeasurementMinMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-measured-value");
+        AddArgument("attr-name", "min-measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -12801,7 +12804,7 @@ class ReadFlowMeasurementMaxMeasuredValue : public ModelCommand
 public:
     ReadFlowMeasurementMaxMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-measured-value");
+        AddArgument("attr-name", "max-measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -12835,7 +12838,7 @@ class ReadFlowMeasurementTolerance : public ModelCommand
 public:
     ReadFlowMeasurementTolerance() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tolerance");
+        AddArgument("attr-name", "tolerance", false);
         ModelCommand::AddArguments();
     }
 
@@ -12869,7 +12872,7 @@ class ReadFlowMeasurementClusterRevision : public ModelCommand
 public:
     ReadFlowMeasurementClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -12917,9 +12920,9 @@ class GeneralCommissioningArmFailSafe : public ModelCommand
 public:
     GeneralCommissioningArmFailSafe() : ModelCommand("arm-fail-safe")
     {
-        AddArgument("ExpiryLengthSeconds", 0, UINT16_MAX, &mRequest.expiryLengthSeconds);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
+        AddArgument("ExpiryLengthSeconds", 0, UINT16_MAX, &mRequest.expiryLengthSeconds, false);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb, false);
+        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs, false);
         ModelCommand::AddArguments();
     }
 
@@ -12966,10 +12969,10 @@ public:
     GeneralCommissioningSetRegulatoryConfig() : ModelCommand("set-regulatory-config")
     {
         AddArgument("Location", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.location)> *>(&mRequest.location));
-        AddArgument("CountryCode", &mRequest.countryCode);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.location)> *>(&mRequest.location), false);
+        AddArgument("CountryCode", &mRequest.countryCode, false);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb, false);
+        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs, false);
         ModelCommand::AddArguments();
     }
 
@@ -12994,7 +12997,7 @@ class ReadGeneralCommissioningBreadcrumb : public ModelCommand
 public:
     ReadGeneralCommissioningBreadcrumb() : ModelCommand("read")
     {
-        AddArgument("attr-name", "breadcrumb");
+        AddArgument("attr-name", "breadcrumb", false);
         ModelCommand::AddArguments();
     }
 
@@ -13025,8 +13028,8 @@ class WriteGeneralCommissioningBreadcrumb : public ModelCommand
 public:
     WriteGeneralCommissioningBreadcrumb() : ModelCommand("write")
     {
-        AddArgument("attr-name", "breadcrumb");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        AddArgument("attr-name", "breadcrumb", false);
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -13061,7 +13064,7 @@ class ReadGeneralCommissioningBasicCommissioningInfoList : public ModelCommand
 public:
     ReadGeneralCommissioningBasicCommissioningInfoList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "basic-commissioning-info-list");
+        AddArgument("attr-name", "basic-commissioning-info-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -13096,7 +13099,7 @@ class ReadGeneralCommissioningClusterRevision : public ModelCommand
 public:
     ReadGeneralCommissioningClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -13144,7 +13147,7 @@ class ReadGeneralDiagnosticsNetworkInterfaces : public ModelCommand
 public:
     ReadGeneralDiagnosticsNetworkInterfaces() : ModelCommand("read")
     {
-        AddArgument("attr-name", "network-interfaces");
+        AddArgument("attr-name", "network-interfaces", false);
         ModelCommand::AddArguments();
     }
 
@@ -13179,7 +13182,7 @@ class ReadGeneralDiagnosticsRebootCount : public ModelCommand
 public:
     ReadGeneralDiagnosticsRebootCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "reboot-count");
+        AddArgument("attr-name", "reboot-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -13213,7 +13216,7 @@ class ReadGeneralDiagnosticsUpTime : public ModelCommand
 public:
     ReadGeneralDiagnosticsUpTime() : ModelCommand("read")
     {
-        AddArgument("attr-name", "up-time");
+        AddArgument("attr-name", "up-time", false);
         ModelCommand::AddArguments();
     }
 
@@ -13247,7 +13250,7 @@ class ReadGeneralDiagnosticsTotalOperationalHours : public ModelCommand
 public:
     ReadGeneralDiagnosticsTotalOperationalHours() : ModelCommand("read")
     {
-        AddArgument("attr-name", "total-operational-hours");
+        AddArgument("attr-name", "total-operational-hours", false);
         ModelCommand::AddArguments();
     }
 
@@ -13281,7 +13284,7 @@ class ReadGeneralDiagnosticsBootReasons : public ModelCommand
 public:
     ReadGeneralDiagnosticsBootReasons() : ModelCommand("read")
     {
-        AddArgument("attr-name", "boot-reasons");
+        AddArgument("attr-name", "boot-reasons", false);
         ModelCommand::AddArguments();
     }
 
@@ -13315,7 +13318,7 @@ class ReadGeneralDiagnosticsClusterRevision : public ModelCommand
 public:
     ReadGeneralDiagnosticsClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -13360,7 +13363,7 @@ class ReadGroupKeyManagementGroups : public ModelCommand
 public:
     ReadGroupKeyManagementGroups() : ModelCommand("read")
     {
-        AddArgument("attr-name", "groups");
+        AddArgument("attr-name", "groups", false);
         ModelCommand::AddArguments();
     }
 
@@ -13395,7 +13398,7 @@ class ReadGroupKeyManagementGroupKeys : public ModelCommand
 public:
     ReadGroupKeyManagementGroupKeys() : ModelCommand("read")
     {
-        AddArgument("attr-name", "group-keys");
+        AddArgument("attr-name", "group-keys", false);
         ModelCommand::AddArguments();
     }
 
@@ -13430,7 +13433,7 @@ class ReadGroupKeyManagementClusterRevision : public ModelCommand
 public:
     ReadGroupKeyManagementClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -13480,8 +13483,8 @@ class GroupsAddGroup : public ModelCommand
 public:
     GroupsAddGroup() : ModelCommand("add-group")
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("GroupName", &mRequest.groupName);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
+        AddArgument("GroupName", &mRequest.groupName, false);
         ModelCommand::AddArguments();
     }
 
@@ -13506,8 +13509,8 @@ class GroupsAddGroupIfIdentifying : public ModelCommand
 public:
     GroupsAddGroupIfIdentifying() : ModelCommand("add-group-if-identifying")
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("GroupName", &mRequest.groupName);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
+        AddArgument("GroupName", &mRequest.groupName, false);
         ModelCommand::AddArguments();
     }
 
@@ -13532,7 +13535,7 @@ class GroupsGetGroupMembership : public ModelCommand
 public:
     GroupsGetGroupMembership() : ModelCommand("get-group-membership")
     {
-        AddArgument("GroupCount", 0, UINT8_MAX, &mRequest.groupCount);
+        AddArgument("GroupCount", 0, UINT8_MAX, &mRequest.groupCount, false);
         // groupList Array parsing is not supported yet
         ModelCommand::AddArguments();
     }
@@ -13579,7 +13582,7 @@ class GroupsRemoveGroup : public ModelCommand
 public:
     GroupsRemoveGroup() : ModelCommand("remove-group")
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
         ModelCommand::AddArguments();
     }
 
@@ -13604,7 +13607,7 @@ class GroupsViewGroup : public ModelCommand
 public:
     GroupsViewGroup() : ModelCommand("view-group")
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
         ModelCommand::AddArguments();
     }
 
@@ -13629,7 +13632,7 @@ class ReadGroupsNameSupport : public ModelCommand
 public:
     ReadGroupsNameSupport() : ModelCommand("read")
     {
-        AddArgument("attr-name", "name-support");
+        AddArgument("attr-name", "name-support", false);
         ModelCommand::AddArguments();
     }
 
@@ -13663,7 +13666,7 @@ class ReadGroupsClusterRevision : public ModelCommand
 public:
     ReadGroupsClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -13711,7 +13714,7 @@ class IdentifyIdentify : public ModelCommand
 public:
     IdentifyIdentify() : ModelCommand("identify")
     {
-        AddArgument("IdentifyTime", 0, UINT16_MAX, &mRequest.identifyTime);
+        AddArgument("IdentifyTime", 0, UINT16_MAX, &mRequest.identifyTime, false);
         ModelCommand::AddArguments();
     }
 
@@ -13758,9 +13761,10 @@ public:
     IdentifyTriggerEffect() : ModelCommand("trigger-effect")
     {
         AddArgument("EffectIdentifier", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectIdentifier)> *>(&mRequest.effectIdentifier));
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectIdentifier)> *>(&mRequest.effectIdentifier),
+                    false);
         AddArgument("EffectVariant", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectVariant)> *>(&mRequest.effectVariant));
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectVariant)> *>(&mRequest.effectVariant), false);
         ModelCommand::AddArguments();
     }
 
@@ -13785,7 +13789,7 @@ class ReadIdentifyIdentifyTime : public ModelCommand
 public:
     ReadIdentifyIdentifyTime() : ModelCommand("read")
     {
-        AddArgument("attr-name", "identify-time");
+        AddArgument("attr-name", "identify-time", false);
         ModelCommand::AddArguments();
     }
 
@@ -13816,8 +13820,8 @@ class WriteIdentifyIdentifyTime : public ModelCommand
 public:
     WriteIdentifyIdentifyTime() : ModelCommand("write")
     {
-        AddArgument("attr-name", "identify-time");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "identify-time", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -13852,7 +13856,7 @@ class ReadIdentifyIdentifyType : public ModelCommand
 public:
     ReadIdentifyIdentifyType() : ModelCommand("read")
     {
-        AddArgument("attr-name", "identify-type");
+        AddArgument("attr-name", "identify-type", false);
         ModelCommand::AddArguments();
     }
 
@@ -13886,7 +13890,7 @@ class ReadIdentifyClusterRevision : public ModelCommand
 public:
     ReadIdentifyClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -13934,7 +13938,7 @@ class ReadIlluminanceMeasurementMeasuredValue : public ModelCommand
 public:
     ReadIlluminanceMeasurementMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "measured-value");
+        AddArgument("attr-name", "measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -13965,10 +13969,10 @@ class ReportIlluminanceMeasurementMeasuredValue : public ModelCommand
 public:
     ReportIlluminanceMeasurementMeasuredValue() : ModelCommand("report")
     {
-        AddArgument("attr-name", "measured-value");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "measured-value", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -14020,7 +14024,7 @@ class ReadIlluminanceMeasurementMinMeasuredValue : public ModelCommand
 public:
     ReadIlluminanceMeasurementMinMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-measured-value");
+        AddArgument("attr-name", "min-measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -14054,7 +14058,7 @@ class ReadIlluminanceMeasurementMaxMeasuredValue : public ModelCommand
 public:
     ReadIlluminanceMeasurementMaxMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-measured-value");
+        AddArgument("attr-name", "max-measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -14088,7 +14092,7 @@ class ReadIlluminanceMeasurementTolerance : public ModelCommand
 public:
     ReadIlluminanceMeasurementTolerance() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tolerance");
+        AddArgument("attr-name", "tolerance", false);
         ModelCommand::AddArguments();
     }
 
@@ -14122,7 +14126,7 @@ class ReadIlluminanceMeasurementLightSensorType : public ModelCommand
 public:
     ReadIlluminanceMeasurementLightSensorType() : ModelCommand("read")
     {
-        AddArgument("attr-name", "light-sensor-type");
+        AddArgument("attr-name", "light-sensor-type", false);
         ModelCommand::AddArguments();
     }
 
@@ -14156,7 +14160,7 @@ class ReadIlluminanceMeasurementClusterRevision : public ModelCommand
 public:
     ReadIlluminanceMeasurementClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -14201,7 +14205,7 @@ public:
     KeypadInputSendKey() : ModelCommand("send-key")
     {
         AddArgument("KeyCode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.keyCode)> *>(&mRequest.keyCode));
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.keyCode)> *>(&mRequest.keyCode), false);
         ModelCommand::AddArguments();
     }
 
@@ -14226,7 +14230,7 @@ class ReadKeypadInputClusterRevision : public ModelCommand
 public:
     ReadKeypadInputClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -14292,10 +14296,10 @@ public:
     LevelControlMove() : ModelCommand("move")
     {
         AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
-        AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
-        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
-        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode), false);
+        AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate, false);
+        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask, false);
+        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -14320,10 +14324,10 @@ class LevelControlMoveToLevel : public ModelCommand
 public:
     LevelControlMoveToLevel() : ModelCommand("move-to-level")
     {
-        AddArgument("Level", 0, UINT8_MAX, &mRequest.level);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
-        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride);
+        AddArgument("Level", 0, UINT8_MAX, &mRequest.level, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask, false);
+        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -14348,8 +14352,8 @@ class LevelControlMoveToLevelWithOnOff : public ModelCommand
 public:
     LevelControlMoveToLevelWithOnOff() : ModelCommand("move-to-level-with-on-off")
     {
-        AddArgument("Level", 0, UINT8_MAX, &mRequest.level);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
+        AddArgument("Level", 0, UINT8_MAX, &mRequest.level, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
         ModelCommand::AddArguments();
     }
 
@@ -14375,8 +14379,8 @@ public:
     LevelControlMoveWithOnOff() : ModelCommand("move-with-on-off")
     {
         AddArgument("MoveMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode));
-        AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.moveMode)> *>(&mRequest.moveMode), false);
+        AddArgument("Rate", 0, UINT8_MAX, &mRequest.rate, false);
         ModelCommand::AddArguments();
     }
 
@@ -14402,11 +14406,11 @@ public:
     LevelControlStep() : ModelCommand("step")
     {
         AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
-        AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
-        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode), false);
+        AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask, false);
+        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -14432,9 +14436,9 @@ public:
     LevelControlStepWithOnOff() : ModelCommand("step-with-on-off")
     {
         AddArgument("StepMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode));
-        AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.stepMode)> *>(&mRequest.stepMode), false);
+        AddArgument("StepSize", 0, UINT8_MAX, &mRequest.stepSize, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
         ModelCommand::AddArguments();
     }
 
@@ -14459,8 +14463,8 @@ class LevelControlStop : public ModelCommand
 public:
     LevelControlStop() : ModelCommand("stop")
     {
-        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask);
-        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride);
+        AddArgument("OptionMask", 0, UINT8_MAX, &mRequest.optionMask, false);
+        AddArgument("OptionOverride", 0, UINT8_MAX, &mRequest.optionOverride, false);
         ModelCommand::AddArguments();
     }
 
@@ -14506,7 +14510,7 @@ class ReadLevelControlCurrentLevel : public ModelCommand
 public:
     ReadLevelControlCurrentLevel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-level");
+        AddArgument("attr-name", "current-level", false);
         ModelCommand::AddArguments();
     }
 
@@ -14537,10 +14541,10 @@ class ReportLevelControlCurrentLevel : public ModelCommand
 public:
     ReportLevelControlCurrentLevel() : ModelCommand("report")
     {
-        AddArgument("attr-name", "current-level");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "current-level", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -14592,7 +14596,7 @@ class ReadLevelControlRemainingTime : public ModelCommand
 public:
     ReadLevelControlRemainingTime() : ModelCommand("read")
     {
-        AddArgument("attr-name", "remaining-time");
+        AddArgument("attr-name", "remaining-time", false);
         ModelCommand::AddArguments();
     }
 
@@ -14626,7 +14630,7 @@ class ReadLevelControlMinLevel : public ModelCommand
 public:
     ReadLevelControlMinLevel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-level");
+        AddArgument("attr-name", "min-level", false);
         ModelCommand::AddArguments();
     }
 
@@ -14660,7 +14664,7 @@ class ReadLevelControlMaxLevel : public ModelCommand
 public:
     ReadLevelControlMaxLevel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-level");
+        AddArgument("attr-name", "max-level", false);
         ModelCommand::AddArguments();
     }
 
@@ -14694,7 +14698,7 @@ class ReadLevelControlCurrentFrequency : public ModelCommand
 public:
     ReadLevelControlCurrentFrequency() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-frequency");
+        AddArgument("attr-name", "current-frequency", false);
         ModelCommand::AddArguments();
     }
 
@@ -14728,7 +14732,7 @@ class ReadLevelControlMinFrequency : public ModelCommand
 public:
     ReadLevelControlMinFrequency() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-frequency");
+        AddArgument("attr-name", "min-frequency", false);
         ModelCommand::AddArguments();
     }
 
@@ -14762,7 +14766,7 @@ class ReadLevelControlMaxFrequency : public ModelCommand
 public:
     ReadLevelControlMaxFrequency() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-frequency");
+        AddArgument("attr-name", "max-frequency", false);
         ModelCommand::AddArguments();
     }
 
@@ -14796,7 +14800,7 @@ class ReadLevelControlOptions : public ModelCommand
 public:
     ReadLevelControlOptions() : ModelCommand("read")
     {
-        AddArgument("attr-name", "options");
+        AddArgument("attr-name", "options", false);
         ModelCommand::AddArguments();
     }
 
@@ -14827,8 +14831,8 @@ class WriteLevelControlOptions : public ModelCommand
 public:
     WriteLevelControlOptions() : ModelCommand("write")
     {
-        AddArgument("attr-name", "options");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "options", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -14863,7 +14867,7 @@ class ReadLevelControlOnOffTransitionTime : public ModelCommand
 public:
     ReadLevelControlOnOffTransitionTime() : ModelCommand("read")
     {
-        AddArgument("attr-name", "on-off-transition-time");
+        AddArgument("attr-name", "on-off-transition-time", false);
         ModelCommand::AddArguments();
     }
 
@@ -14894,8 +14898,8 @@ class WriteLevelControlOnOffTransitionTime : public ModelCommand
 public:
     WriteLevelControlOnOffTransitionTime() : ModelCommand("write")
     {
-        AddArgument("attr-name", "on-off-transition-time");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "on-off-transition-time", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -14930,7 +14934,7 @@ class ReadLevelControlOnLevel : public ModelCommand
 public:
     ReadLevelControlOnLevel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "on-level");
+        AddArgument("attr-name", "on-level", false);
         ModelCommand::AddArguments();
     }
 
@@ -14961,8 +14965,8 @@ class WriteLevelControlOnLevel : public ModelCommand
 public:
     WriteLevelControlOnLevel() : ModelCommand("write")
     {
-        AddArgument("attr-name", "on-level");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "on-level", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -14997,7 +15001,7 @@ class ReadLevelControlOnTransitionTime : public ModelCommand
 public:
     ReadLevelControlOnTransitionTime() : ModelCommand("read")
     {
-        AddArgument("attr-name", "on-transition-time");
+        AddArgument("attr-name", "on-transition-time", false);
         ModelCommand::AddArguments();
     }
 
@@ -15028,8 +15032,8 @@ class WriteLevelControlOnTransitionTime : public ModelCommand
 public:
     WriteLevelControlOnTransitionTime() : ModelCommand("write")
     {
-        AddArgument("attr-name", "on-transition-time");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "on-transition-time", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -15064,7 +15068,7 @@ class ReadLevelControlOffTransitionTime : public ModelCommand
 public:
     ReadLevelControlOffTransitionTime() : ModelCommand("read")
     {
-        AddArgument("attr-name", "off-transition-time");
+        AddArgument("attr-name", "off-transition-time", false);
         ModelCommand::AddArguments();
     }
 
@@ -15095,8 +15099,8 @@ class WriteLevelControlOffTransitionTime : public ModelCommand
 public:
     WriteLevelControlOffTransitionTime() : ModelCommand("write")
     {
-        AddArgument("attr-name", "off-transition-time");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "off-transition-time", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -15131,7 +15135,7 @@ class ReadLevelControlDefaultMoveRate : public ModelCommand
 public:
     ReadLevelControlDefaultMoveRate() : ModelCommand("read")
     {
-        AddArgument("attr-name", "default-move-rate");
+        AddArgument("attr-name", "default-move-rate", false);
         ModelCommand::AddArguments();
     }
 
@@ -15162,8 +15166,8 @@ class WriteLevelControlDefaultMoveRate : public ModelCommand
 public:
     WriteLevelControlDefaultMoveRate() : ModelCommand("write")
     {
-        AddArgument("attr-name", "default-move-rate");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "default-move-rate", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -15198,7 +15202,7 @@ class ReadLevelControlStartUpCurrentLevel : public ModelCommand
 public:
     ReadLevelControlStartUpCurrentLevel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "start-up-current-level");
+        AddArgument("attr-name", "start-up-current-level", false);
         ModelCommand::AddArguments();
     }
 
@@ -15229,8 +15233,8 @@ class WriteLevelControlStartUpCurrentLevel : public ModelCommand
 public:
     WriteLevelControlStartUpCurrentLevel() : ModelCommand("write")
     {
-        AddArgument("attr-name", "start-up-current-level");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "start-up-current-level", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -15265,7 +15269,7 @@ class ReadLevelControlClusterRevision : public ModelCommand
 public:
     ReadLevelControlClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -15330,7 +15334,7 @@ class ReadLowPowerClusterRevision : public ModelCommand
 public:
     ReadLowPowerClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -15400,8 +15404,8 @@ class MediaInputRenameInput : public ModelCommand
 public:
     MediaInputRenameInput() : ModelCommand("rename-input")
     {
-        AddArgument("Index", 0, UINT8_MAX, &mRequest.index);
-        AddArgument("Name", &mRequest.name);
+        AddArgument("Index", 0, UINT8_MAX, &mRequest.index, false);
+        AddArgument("Name", &mRequest.name, false);
         ModelCommand::AddArguments();
     }
 
@@ -15426,7 +15430,7 @@ class MediaInputSelectInput : public ModelCommand
 public:
     MediaInputSelectInput() : ModelCommand("select-input")
     {
-        AddArgument("Index", 0, UINT8_MAX, &mRequest.index);
+        AddArgument("Index", 0, UINT8_MAX, &mRequest.index, false);
         ModelCommand::AddArguments();
     }
 
@@ -15472,7 +15476,7 @@ class ReadMediaInputMediaInputList : public ModelCommand
 public:
     ReadMediaInputMediaInputList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "media-input-list");
+        AddArgument("attr-name", "media-input-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -15507,7 +15511,7 @@ class ReadMediaInputCurrentMediaInput : public ModelCommand
 public:
     ReadMediaInputCurrentMediaInput() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-media-input");
+        AddArgument("attr-name", "current-media-input", false);
         ModelCommand::AddArguments();
     }
 
@@ -15541,7 +15545,7 @@ class ReadMediaInputClusterRevision : public ModelCommand
 public:
     ReadMediaInputClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -15729,7 +15733,7 @@ class MediaPlaybackMediaSeek : public ModelCommand
 public:
     MediaPlaybackMediaSeek() : ModelCommand("media-seek")
     {
-        AddArgument("Position", 0, UINT64_MAX, &mRequest.position);
+        AddArgument("Position", 0, UINT64_MAX, &mRequest.position, false);
         ModelCommand::AddArguments();
     }
 
@@ -15754,7 +15758,7 @@ class MediaPlaybackMediaSkipBackward : public ModelCommand
 public:
     MediaPlaybackMediaSkipBackward() : ModelCommand("media-skip-backward")
     {
-        AddArgument("DeltaPositionMilliseconds", 0, UINT64_MAX, &mRequest.deltaPositionMilliseconds);
+        AddArgument("DeltaPositionMilliseconds", 0, UINT64_MAX, &mRequest.deltaPositionMilliseconds, false);
         ModelCommand::AddArguments();
     }
 
@@ -15779,7 +15783,7 @@ class MediaPlaybackMediaSkipForward : public ModelCommand
 public:
     MediaPlaybackMediaSkipForward() : ModelCommand("media-skip-forward")
     {
-        AddArgument("DeltaPositionMilliseconds", 0, UINT64_MAX, &mRequest.deltaPositionMilliseconds);
+        AddArgument("DeltaPositionMilliseconds", 0, UINT64_MAX, &mRequest.deltaPositionMilliseconds, false);
         ModelCommand::AddArguments();
     }
 
@@ -15846,7 +15850,7 @@ class ReadMediaPlaybackPlaybackState : public ModelCommand
 public:
     ReadMediaPlaybackPlaybackState() : ModelCommand("read")
     {
-        AddArgument("attr-name", "playback-state");
+        AddArgument("attr-name", "playback-state", false);
         ModelCommand::AddArguments();
     }
 
@@ -15880,7 +15884,7 @@ class ReadMediaPlaybackStartTime : public ModelCommand
 public:
     ReadMediaPlaybackStartTime() : ModelCommand("read")
     {
-        AddArgument("attr-name", "start-time");
+        AddArgument("attr-name", "start-time", false);
         ModelCommand::AddArguments();
     }
 
@@ -15914,7 +15918,7 @@ class ReadMediaPlaybackDuration : public ModelCommand
 public:
     ReadMediaPlaybackDuration() : ModelCommand("read")
     {
-        AddArgument("attr-name", "duration");
+        AddArgument("attr-name", "duration", false);
         ModelCommand::AddArguments();
     }
 
@@ -15948,7 +15952,7 @@ class ReadMediaPlaybackPositionUpdatedAt : public ModelCommand
 public:
     ReadMediaPlaybackPositionUpdatedAt() : ModelCommand("read")
     {
-        AddArgument("attr-name", "position-updated-at");
+        AddArgument("attr-name", "position-updated-at", false);
         ModelCommand::AddArguments();
     }
 
@@ -15982,7 +15986,7 @@ class ReadMediaPlaybackPosition : public ModelCommand
 public:
     ReadMediaPlaybackPosition() : ModelCommand("read")
     {
-        AddArgument("attr-name", "position");
+        AddArgument("attr-name", "position", false);
         ModelCommand::AddArguments();
     }
 
@@ -16016,7 +16020,7 @@ class ReadMediaPlaybackPlaybackSpeed : public ModelCommand
 public:
     ReadMediaPlaybackPlaybackSpeed() : ModelCommand("read")
     {
-        AddArgument("attr-name", "playback-speed");
+        AddArgument("attr-name", "playback-speed", false);
         ModelCommand::AddArguments();
     }
 
@@ -16050,7 +16054,7 @@ class ReadMediaPlaybackSeekRangeEnd : public ModelCommand
 public:
     ReadMediaPlaybackSeekRangeEnd() : ModelCommand("read")
     {
-        AddArgument("attr-name", "seek-range-end");
+        AddArgument("attr-name", "seek-range-end", false);
         ModelCommand::AddArguments();
     }
 
@@ -16084,7 +16088,7 @@ class ReadMediaPlaybackSeekRangeStart : public ModelCommand
 public:
     ReadMediaPlaybackSeekRangeStart() : ModelCommand("read")
     {
-        AddArgument("attr-name", "seek-range-start");
+        AddArgument("attr-name", "seek-range-start", false);
         ModelCommand::AddArguments();
     }
 
@@ -16118,7 +16122,7 @@ class ReadMediaPlaybackClusterRevision : public ModelCommand
 public:
     ReadMediaPlaybackClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -16167,7 +16171,7 @@ class ModeSelectChangeToMode : public ModelCommand
 public:
     ModeSelectChangeToMode() : ModelCommand("change-to-mode")
     {
-        AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
+        AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode, false);
         ModelCommand::AddArguments();
     }
 
@@ -16192,7 +16196,7 @@ class ReadModeSelectCurrentMode : public ModelCommand
 public:
     ReadModeSelectCurrentMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-mode");
+        AddArgument("attr-name", "current-mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -16223,10 +16227,10 @@ class ReportModeSelectCurrentMode : public ModelCommand
 public:
     ReportModeSelectCurrentMode() : ModelCommand("report")
     {
-        AddArgument("attr-name", "current-mode");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "current-mode", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -16278,7 +16282,7 @@ class ReadModeSelectSupportedModes : public ModelCommand
 public:
     ReadModeSelectSupportedModes() : ModelCommand("read")
     {
-        AddArgument("attr-name", "supported-modes");
+        AddArgument("attr-name", "supported-modes", false);
         ModelCommand::AddArguments();
     }
 
@@ -16313,7 +16317,7 @@ class ReadModeSelectOnMode : public ModelCommand
 public:
     ReadModeSelectOnMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "on-mode");
+        AddArgument("attr-name", "on-mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -16344,8 +16348,8 @@ class WriteModeSelectOnMode : public ModelCommand
 public:
     WriteModeSelectOnMode() : ModelCommand("write")
     {
-        AddArgument("attr-name", "on-mode");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "on-mode", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -16380,7 +16384,7 @@ class ReadModeSelectStartUpMode : public ModelCommand
 public:
     ReadModeSelectStartUpMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "start-up-mode");
+        AddArgument("attr-name", "start-up-mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -16414,7 +16418,7 @@ class ReadModeSelectDescription : public ModelCommand
 public:
     ReadModeSelectDescription() : ModelCommand("read")
     {
-        AddArgument("attr-name", "description");
+        AddArgument("attr-name", "description", false);
         ModelCommand::AddArguments();
     }
 
@@ -16448,7 +16452,7 @@ class ReadModeSelectClusterRevision : public ModelCommand
 public:
     ReadModeSelectClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -16500,9 +16504,9 @@ class NetworkCommissioningAddThreadNetwork : public ModelCommand
 public:
     NetworkCommissioningAddThreadNetwork() : ModelCommand("add-thread-network")
     {
-        AddArgument("OperationalDataset", &mRequest.operationalDataset);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
+        AddArgument("OperationalDataset", &mRequest.operationalDataset, false);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb, false);
+        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs, false);
         ModelCommand::AddArguments();
     }
 
@@ -16527,10 +16531,10 @@ class NetworkCommissioningAddWiFiNetwork : public ModelCommand
 public:
     NetworkCommissioningAddWiFiNetwork() : ModelCommand("add-wi-fi-network")
     {
-        AddArgument("Ssid", &mRequest.ssid);
-        AddArgument("Credentials", &mRequest.credentials);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
+        AddArgument("Ssid", &mRequest.ssid, false);
+        AddArgument("Credentials", &mRequest.credentials, false);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb, false);
+        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs, false);
         ModelCommand::AddArguments();
     }
 
@@ -16555,9 +16559,9 @@ class NetworkCommissioningDisableNetwork : public ModelCommand
 public:
     NetworkCommissioningDisableNetwork() : ModelCommand("disable-network")
     {
-        AddArgument("NetworkID", &mRequest.networkID);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
+        AddArgument("NetworkID", &mRequest.networkID, false);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb, false);
+        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs, false);
         ModelCommand::AddArguments();
     }
 
@@ -16582,9 +16586,9 @@ class NetworkCommissioningEnableNetwork : public ModelCommand
 public:
     NetworkCommissioningEnableNetwork() : ModelCommand("enable-network")
     {
-        AddArgument("NetworkID", &mRequest.networkID);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
+        AddArgument("NetworkID", &mRequest.networkID, false);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb, false);
+        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs, false);
         ModelCommand::AddArguments();
     }
 
@@ -16609,9 +16613,9 @@ class NetworkCommissioningRemoveNetwork : public ModelCommand
 public:
     NetworkCommissioningRemoveNetwork() : ModelCommand("remove-network")
     {
-        AddArgument("NetworkID", &mRequest.networkID);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
+        AddArgument("NetworkID", &mRequest.networkID, false);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb, false);
+        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs, false);
         ModelCommand::AddArguments();
     }
 
@@ -16636,9 +16640,9 @@ class NetworkCommissioningScanNetworks : public ModelCommand
 public:
     NetworkCommissioningScanNetworks() : ModelCommand("scan-networks")
     {
-        AddArgument("Ssid", &mRequest.ssid);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
+        AddArgument("Ssid", &mRequest.ssid, false);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb, false);
+        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs, false);
         ModelCommand::AddArguments();
     }
 
@@ -16663,9 +16667,9 @@ class NetworkCommissioningUpdateThreadNetwork : public ModelCommand
 public:
     NetworkCommissioningUpdateThreadNetwork() : ModelCommand("update-thread-network")
     {
-        AddArgument("OperationalDataset", &mRequest.operationalDataset);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
+        AddArgument("OperationalDataset", &mRequest.operationalDataset, false);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb, false);
+        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs, false);
         ModelCommand::AddArguments();
     }
 
@@ -16690,10 +16694,10 @@ class NetworkCommissioningUpdateWiFiNetwork : public ModelCommand
 public:
     NetworkCommissioningUpdateWiFiNetwork() : ModelCommand("update-wi-fi-network")
     {
-        AddArgument("Ssid", &mRequest.ssid);
-        AddArgument("Credentials", &mRequest.credentials);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
+        AddArgument("Ssid", &mRequest.ssid, false);
+        AddArgument("Credentials", &mRequest.credentials, false);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb, false);
+        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs, false);
         ModelCommand::AddArguments();
     }
 
@@ -16718,7 +16722,7 @@ class ReadNetworkCommissioningFeatureMap : public ModelCommand
 public:
     ReadNetworkCommissioningFeatureMap() : ModelCommand("read")
     {
-        AddArgument("attr-name", "feature-map");
+        AddArgument("attr-name", "feature-map", false);
         ModelCommand::AddArguments();
     }
 
@@ -16752,7 +16756,7 @@ class ReadNetworkCommissioningClusterRevision : public ModelCommand
 public:
     ReadNetworkCommissioningClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -16798,8 +16802,8 @@ class OtaSoftwareUpdateProviderApplyUpdateRequest : public ModelCommand
 public:
     OtaSoftwareUpdateProviderApplyUpdateRequest() : ModelCommand("apply-update-request")
     {
-        AddArgument("UpdateToken", &mRequest.updateToken);
-        AddArgument("NewVersion", 0, UINT32_MAX, &mRequest.newVersion);
+        AddArgument("UpdateToken", &mRequest.updateToken, false);
+        AddArgument("NewVersion", 0, UINT32_MAX, &mRequest.newVersion, false);
         ModelCommand::AddArguments();
     }
 
@@ -16824,8 +16828,8 @@ class OtaSoftwareUpdateProviderNotifyUpdateApplied : public ModelCommand
 public:
     OtaSoftwareUpdateProviderNotifyUpdateApplied() : ModelCommand("notify-update-applied")
     {
-        AddArgument("UpdateToken", &mRequest.updateToken);
-        AddArgument("SoftwareVersion", 0, UINT32_MAX, &mRequest.softwareVersion);
+        AddArgument("UpdateToken", &mRequest.updateToken, false);
+        AddArgument("SoftwareVersion", 0, UINT32_MAX, &mRequest.softwareVersion, false);
         ModelCommand::AddArguments();
     }
 
@@ -16850,14 +16854,14 @@ class OtaSoftwareUpdateProviderQueryImage : public ModelCommand
 public:
     OtaSoftwareUpdateProviderQueryImage() : ModelCommand("query-image")
     {
-        AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
-        AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId);
-        AddArgument("SoftwareVersion", 0, UINT32_MAX, &mRequest.softwareVersion);
+        AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId, false);
+        AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId, false);
+        AddArgument("SoftwareVersion", 0, UINT32_MAX, &mRequest.softwareVersion, false);
         // protocolsSupported Array parsing is not supported yet
-        AddArgument("HardwareVersion", 0, UINT16_MAX, &mRequest.hardwareVersion);
-        AddArgument("Location", &mRequest.location);
-        AddArgument("RequestorCanConsent", 0, 1, &mRequest.requestorCanConsent);
-        AddArgument("MetadataForProvider", &mRequest.metadataForProvider);
+        AddArgument("HardwareVersion", 0, UINT16_MAX, &mRequest.hardwareVersion, false);
+        AddArgument("Location", &mRequest.location, false);
+        AddArgument("RequestorCanConsent", 0, 1, &mRequest.requestorCanConsent, false);
+        AddArgument("MetadataForProvider", &mRequest.metadataForProvider, false);
         ModelCommand::AddArguments();
     }
 
@@ -16882,7 +16886,7 @@ class ReadOtaSoftwareUpdateProviderClusterRevision : public ModelCommand
 public:
     ReadOtaSoftwareUpdateProviderClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -16928,12 +16932,12 @@ class OtaSoftwareUpdateRequestorAnnounceOtaProvider : public ModelCommand
 public:
     OtaSoftwareUpdateRequestorAnnounceOtaProvider() : ModelCommand("announce-ota-provider")
     {
-        AddArgument("ProviderLocation", 0, UINT64_MAX, &mRequest.providerLocation);
-        AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
-        AddArgument(
-            "AnnouncementReason", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<decltype(mRequest.announcementReason)> *>(&mRequest.announcementReason));
-        AddArgument("MetadataForNode", &mRequest.metadataForNode);
+        AddArgument("ProviderLocation", 0, UINT64_MAX, &mRequest.providerLocation, false);
+        AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId, false);
+        AddArgument("AnnouncementReason", 0, UINT8_MAX,
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.announcementReason)> *>(&mRequest.announcementReason),
+                    false);
+        AddArgument("MetadataForNode", &mRequest.metadataForNode, false);
         ModelCommand::AddArguments();
     }
 
@@ -16958,7 +16962,7 @@ class ReadOtaSoftwareUpdateRequestorDefaultOtaProvider : public ModelCommand
 public:
     ReadOtaSoftwareUpdateRequestorDefaultOtaProvider() : ModelCommand("read")
     {
-        AddArgument("attr-name", "default-ota-provider");
+        AddArgument("attr-name", "default-ota-provider", false);
         ModelCommand::AddArguments();
     }
 
@@ -16989,8 +16993,8 @@ class WriteOtaSoftwareUpdateRequestorDefaultOtaProvider : public ModelCommand
 public:
     WriteOtaSoftwareUpdateRequestorDefaultOtaProvider() : ModelCommand("write")
     {
-        AddArgument("attr-name", "default-ota-provider");
-        AddArgument("attr-value", &mValue);
+        AddArgument("attr-name", "default-ota-provider", false);
+        AddArgument("attr-value", &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -17025,7 +17029,7 @@ class ReadOtaSoftwareUpdateRequestorUpdatePossible : public ModelCommand
 public:
     ReadOtaSoftwareUpdateRequestorUpdatePossible() : ModelCommand("read")
     {
-        AddArgument("attr-name", "update-possible");
+        AddArgument("attr-name", "update-possible", false);
         ModelCommand::AddArguments();
     }
 
@@ -17059,7 +17063,7 @@ class ReadOtaSoftwareUpdateRequestorClusterRevision : public ModelCommand
 public:
     ReadOtaSoftwareUpdateRequestorClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -17105,7 +17109,7 @@ class ReadOccupancySensingOccupancy : public ModelCommand
 public:
     ReadOccupancySensingOccupancy() : ModelCommand("read")
     {
-        AddArgument("attr-name", "occupancy");
+        AddArgument("attr-name", "occupancy", false);
         ModelCommand::AddArguments();
     }
 
@@ -17136,10 +17140,10 @@ class ReportOccupancySensingOccupancy : public ModelCommand
 public:
     ReportOccupancySensingOccupancy() : ModelCommand("report")
     {
-        AddArgument("attr-name", "occupancy");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "occupancy", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -17191,7 +17195,7 @@ class ReadOccupancySensingOccupancySensorType : public ModelCommand
 public:
     ReadOccupancySensingOccupancySensorType() : ModelCommand("read")
     {
-        AddArgument("attr-name", "occupancy-sensor-type");
+        AddArgument("attr-name", "occupancy-sensor-type", false);
         ModelCommand::AddArguments();
     }
 
@@ -17225,7 +17229,7 @@ class ReadOccupancySensingOccupancySensorTypeBitmap : public ModelCommand
 public:
     ReadOccupancySensingOccupancySensorTypeBitmap() : ModelCommand("read")
     {
-        AddArgument("attr-name", "occupancy-sensor-type-bitmap");
+        AddArgument("attr-name", "occupancy-sensor-type-bitmap", false);
         ModelCommand::AddArguments();
     }
 
@@ -17259,7 +17263,7 @@ class ReadOccupancySensingClusterRevision : public ModelCommand
 public:
     ReadOccupancySensingClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -17336,9 +17340,9 @@ public:
     OnOffOffWithEffect() : ModelCommand("off-with-effect")
     {
         AddArgument("EffectId", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectId)> *>(&mRequest.effectId));
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectId)> *>(&mRequest.effectId), false);
         AddArgument("EffectVariant", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectVariant)> *>(&mRequest.effectVariant));
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.effectVariant)> *>(&mRequest.effectVariant), false);
         ModelCommand::AddArguments();
     }
 
@@ -17406,9 +17410,10 @@ public:
     OnOffOnWithTimedOff() : ModelCommand("on-with-timed-off")
     {
         AddArgument("OnOffControl", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::OnOff::OnOffControl> *>(&mRequest.onOffControl));
-        AddArgument("OnTime", 0, UINT16_MAX, &mRequest.onTime);
-        AddArgument("OffWaitTime", 0, UINT16_MAX, &mRequest.offWaitTime);
+                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::OnOff::OnOffControl> *>(&mRequest.onOffControl),
+                    false);
+        AddArgument("OnTime", 0, UINT16_MAX, &mRequest.onTime, false);
+        AddArgument("OffWaitTime", 0, UINT16_MAX, &mRequest.offWaitTime, false);
         ModelCommand::AddArguments();
     }
 
@@ -17454,7 +17459,7 @@ class ReadOnOffOnOff : public ModelCommand
 public:
     ReadOnOffOnOff() : ModelCommand("read")
     {
-        AddArgument("attr-name", "on-off");
+        AddArgument("attr-name", "on-off", false);
         ModelCommand::AddArguments();
     }
 
@@ -17485,10 +17490,10 @@ class ReportOnOffOnOff : public ModelCommand
 public:
     ReportOnOffOnOff() : ModelCommand("report")
     {
-        AddArgument("attr-name", "on-off");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "on-off", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -17540,7 +17545,7 @@ class ReadOnOffGlobalSceneControl : public ModelCommand
 public:
     ReadOnOffGlobalSceneControl() : ModelCommand("read")
     {
-        AddArgument("attr-name", "global-scene-control");
+        AddArgument("attr-name", "global-scene-control", false);
         ModelCommand::AddArguments();
     }
 
@@ -17574,7 +17579,7 @@ class ReadOnOffOnTime : public ModelCommand
 public:
     ReadOnOffOnTime() : ModelCommand("read")
     {
-        AddArgument("attr-name", "on-time");
+        AddArgument("attr-name", "on-time", false);
         ModelCommand::AddArguments();
     }
 
@@ -17605,8 +17610,8 @@ class WriteOnOffOnTime : public ModelCommand
 public:
     WriteOnOffOnTime() : ModelCommand("write")
     {
-        AddArgument("attr-name", "on-time");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "on-time", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -17641,7 +17646,7 @@ class ReadOnOffOffWaitTime : public ModelCommand
 public:
     ReadOnOffOffWaitTime() : ModelCommand("read")
     {
-        AddArgument("attr-name", "off-wait-time");
+        AddArgument("attr-name", "off-wait-time", false);
         ModelCommand::AddArguments();
     }
 
@@ -17672,8 +17677,8 @@ class WriteOnOffOffWaitTime : public ModelCommand
 public:
     WriteOnOffOffWaitTime() : ModelCommand("write")
     {
-        AddArgument("attr-name", "off-wait-time");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "off-wait-time", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -17708,7 +17713,7 @@ class ReadOnOffStartUpOnOff : public ModelCommand
 public:
     ReadOnOffStartUpOnOff() : ModelCommand("read")
     {
-        AddArgument("attr-name", "start-up-on-off");
+        AddArgument("attr-name", "start-up-on-off", false);
         ModelCommand::AddArguments();
     }
 
@@ -17739,8 +17744,8 @@ class WriteOnOffStartUpOnOff : public ModelCommand
 public:
     WriteOnOffStartUpOnOff() : ModelCommand("write")
     {
-        AddArgument("attr-name", "start-up-on-off");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "start-up-on-off", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -17775,7 +17780,7 @@ class ReadOnOffFeatureMap : public ModelCommand
 public:
     ReadOnOffFeatureMap() : ModelCommand("read")
     {
-        AddArgument("attr-name", "feature-map");
+        AddArgument("attr-name", "feature-map", false);
         ModelCommand::AddArguments();
     }
 
@@ -17809,7 +17814,7 @@ class ReadOnOffClusterRevision : public ModelCommand
 public:
     ReadOnOffClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -17854,7 +17859,7 @@ class ReadOnOffSwitchConfigurationSwitchType : public ModelCommand
 public:
     ReadOnOffSwitchConfigurationSwitchType() : ModelCommand("read")
     {
-        AddArgument("attr-name", "switch-type");
+        AddArgument("attr-name", "switch-type", false);
         ModelCommand::AddArguments();
     }
 
@@ -17888,7 +17893,7 @@ class ReadOnOffSwitchConfigurationSwitchActions : public ModelCommand
 public:
     ReadOnOffSwitchConfigurationSwitchActions() : ModelCommand("read")
     {
-        AddArgument("attr-name", "switch-actions");
+        AddArgument("attr-name", "switch-actions", false);
         ModelCommand::AddArguments();
     }
 
@@ -17919,8 +17924,8 @@ class WriteOnOffSwitchConfigurationSwitchActions : public ModelCommand
 public:
     WriteOnOffSwitchConfigurationSwitchActions() : ModelCommand("write")
     {
-        AddArgument("attr-name", "switch-actions");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "switch-actions", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -17955,7 +17960,7 @@ class ReadOnOffSwitchConfigurationClusterRevision : public ModelCommand
 public:
     ReadOnOffSwitchConfigurationClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -18012,11 +18017,11 @@ class OperationalCredentialsAddNOC : public ModelCommand
 public:
     OperationalCredentialsAddNOC() : ModelCommand("add-noc")
     {
-        AddArgument("NOCValue", &mRequest.NOCValue);
-        AddArgument("ICACValue", &mRequest.ICACValue);
-        AddArgument("IPKValue", &mRequest.IPKValue);
-        AddArgument("CaseAdminNode", 0, UINT64_MAX, &mRequest.caseAdminNode);
-        AddArgument("AdminVendorId", 0, UINT16_MAX, &mRequest.adminVendorId);
+        AddArgument("NOCValue", &mRequest.NOCValue, false);
+        AddArgument("ICACValue", &mRequest.ICACValue, false);
+        AddArgument("IPKValue", &mRequest.IPKValue, false);
+        AddArgument("CaseAdminNode", 0, UINT64_MAX, &mRequest.caseAdminNode, false);
+        AddArgument("AdminVendorId", 0, UINT16_MAX, &mRequest.adminVendorId, false);
         ModelCommand::AddArguments();
     }
 
@@ -18041,7 +18046,7 @@ class OperationalCredentialsAddTrustedRootCertificate : public ModelCommand
 public:
     OperationalCredentialsAddTrustedRootCertificate() : ModelCommand("add-trusted-root-certificate")
     {
-        AddArgument("RootCertificate", &mRequest.rootCertificate);
+        AddArgument("RootCertificate", &mRequest.rootCertificate, false);
         ModelCommand::AddArguments();
     }
 
@@ -18066,7 +18071,7 @@ class OperationalCredentialsAttestationRequest : public ModelCommand
 public:
     OperationalCredentialsAttestationRequest() : ModelCommand("attestation-request")
     {
-        AddArgument("AttestationNonce", &mRequest.attestationNonce);
+        AddArgument("AttestationNonce", &mRequest.attestationNonce, false);
         ModelCommand::AddArguments();
     }
 
@@ -18091,7 +18096,7 @@ class OperationalCredentialsCertificateChainRequest : public ModelCommand
 public:
     OperationalCredentialsCertificateChainRequest() : ModelCommand("certificate-chain-request")
     {
-        AddArgument("CertificateType", 0, UINT8_MAX, &mRequest.certificateType);
+        AddArgument("CertificateType", 0, UINT8_MAX, &mRequest.certificateType, false);
         ModelCommand::AddArguments();
     }
 
@@ -18116,7 +18121,7 @@ class OperationalCredentialsOpCSRRequest : public ModelCommand
 public:
     OperationalCredentialsOpCSRRequest() : ModelCommand("op-csrrequest")
     {
-        AddArgument("CSRNonce", &mRequest.CSRNonce);
+        AddArgument("CSRNonce", &mRequest.CSRNonce, false);
         ModelCommand::AddArguments();
     }
 
@@ -18141,7 +18146,7 @@ class OperationalCredentialsRemoveFabric : public ModelCommand
 public:
     OperationalCredentialsRemoveFabric() : ModelCommand("remove-fabric")
     {
-        AddArgument("FabricIndex", 0, UINT8_MAX, &mRequest.fabricIndex);
+        AddArgument("FabricIndex", 0, UINT8_MAX, &mRequest.fabricIndex, false);
         ModelCommand::AddArguments();
     }
 
@@ -18166,7 +18171,7 @@ class OperationalCredentialsRemoveTrustedRootCertificate : public ModelCommand
 public:
     OperationalCredentialsRemoveTrustedRootCertificate() : ModelCommand("remove-trusted-root-certificate")
     {
-        AddArgument("TrustedRootIdentifier", &mRequest.trustedRootIdentifier);
+        AddArgument("TrustedRootIdentifier", &mRequest.trustedRootIdentifier, false);
         ModelCommand::AddArguments();
     }
 
@@ -18191,7 +18196,7 @@ class OperationalCredentialsUpdateFabricLabel : public ModelCommand
 public:
     OperationalCredentialsUpdateFabricLabel() : ModelCommand("update-fabric-label")
     {
-        AddArgument("Label", &mRequest.label);
+        AddArgument("Label", &mRequest.label, false);
         ModelCommand::AddArguments();
     }
 
@@ -18216,8 +18221,8 @@ class OperationalCredentialsUpdateNOC : public ModelCommand
 public:
     OperationalCredentialsUpdateNOC() : ModelCommand("update-noc")
     {
-        AddArgument("NOCValue", &mRequest.NOCValue);
-        AddArgument("ICACValue", &mRequest.ICACValue);
+        AddArgument("NOCValue", &mRequest.NOCValue, false);
+        AddArgument("ICACValue", &mRequest.ICACValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -18242,7 +18247,7 @@ class ReadOperationalCredentialsFabricsList : public ModelCommand
 public:
     ReadOperationalCredentialsFabricsList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "fabrics-list");
+        AddArgument("attr-name", "fabrics-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -18277,7 +18282,7 @@ class ReadOperationalCredentialsSupportedFabrics : public ModelCommand
 public:
     ReadOperationalCredentialsSupportedFabrics() : ModelCommand("read")
     {
-        AddArgument("attr-name", "supported-fabrics");
+        AddArgument("attr-name", "supported-fabrics", false);
         ModelCommand::AddArguments();
     }
 
@@ -18311,7 +18316,7 @@ class ReadOperationalCredentialsCommissionedFabrics : public ModelCommand
 public:
     ReadOperationalCredentialsCommissionedFabrics() : ModelCommand("read")
     {
-        AddArgument("attr-name", "commissioned-fabrics");
+        AddArgument("attr-name", "commissioned-fabrics", false);
         ModelCommand::AddArguments();
     }
 
@@ -18345,7 +18350,7 @@ class ReadOperationalCredentialsTrustedRootCertificates : public ModelCommand
 public:
     ReadOperationalCredentialsTrustedRootCertificates() : ModelCommand("read")
     {
-        AddArgument("attr-name", "trusted-root-certificates");
+        AddArgument("attr-name", "trusted-root-certificates", false);
         ModelCommand::AddArguments();
     }
 
@@ -18380,7 +18385,7 @@ class ReadOperationalCredentialsCurrentFabricIndex : public ModelCommand
 public:
     ReadOperationalCredentialsCurrentFabricIndex() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-fabric-index");
+        AddArgument("attr-name", "current-fabric-index", false);
         ModelCommand::AddArguments();
     }
 
@@ -18414,7 +18419,7 @@ class ReadOperationalCredentialsClusterRevision : public ModelCommand
 public:
     ReadOperationalCredentialsClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -18467,7 +18472,7 @@ class ReadPowerSourceStatus : public ModelCommand
 public:
     ReadPowerSourceStatus() : ModelCommand("read")
     {
-        AddArgument("attr-name", "status");
+        AddArgument("attr-name", "status", false);
         ModelCommand::AddArguments();
     }
 
@@ -18501,7 +18506,7 @@ class ReadPowerSourceOrder : public ModelCommand
 public:
     ReadPowerSourceOrder() : ModelCommand("read")
     {
-        AddArgument("attr-name", "order");
+        AddArgument("attr-name", "order", false);
         ModelCommand::AddArguments();
     }
 
@@ -18535,7 +18540,7 @@ class ReadPowerSourceDescription : public ModelCommand
 public:
     ReadPowerSourceDescription() : ModelCommand("read")
     {
-        AddArgument("attr-name", "description");
+        AddArgument("attr-name", "description", false);
         ModelCommand::AddArguments();
     }
 
@@ -18569,7 +18574,7 @@ class ReadPowerSourceBatteryVoltage : public ModelCommand
 public:
     ReadPowerSourceBatteryVoltage() : ModelCommand("read")
     {
-        AddArgument("attr-name", "battery-voltage");
+        AddArgument("attr-name", "battery-voltage", false);
         ModelCommand::AddArguments();
     }
 
@@ -18603,7 +18608,7 @@ class ReadPowerSourceBatteryPercentRemaining : public ModelCommand
 public:
     ReadPowerSourceBatteryPercentRemaining() : ModelCommand("read")
     {
-        AddArgument("attr-name", "battery-percent-remaining");
+        AddArgument("attr-name", "battery-percent-remaining", false);
         ModelCommand::AddArguments();
     }
 
@@ -18637,7 +18642,7 @@ class ReadPowerSourceBatteryTimeRemaining : public ModelCommand
 public:
     ReadPowerSourceBatteryTimeRemaining() : ModelCommand("read")
     {
-        AddArgument("attr-name", "battery-time-remaining");
+        AddArgument("attr-name", "battery-time-remaining", false);
         ModelCommand::AddArguments();
     }
 
@@ -18671,7 +18676,7 @@ class ReadPowerSourceBatteryChargeLevel : public ModelCommand
 public:
     ReadPowerSourceBatteryChargeLevel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "battery-charge-level");
+        AddArgument("attr-name", "battery-charge-level", false);
         ModelCommand::AddArguments();
     }
 
@@ -18705,7 +18710,7 @@ class ReadPowerSourceActiveBatteryFaults : public ModelCommand
 public:
     ReadPowerSourceActiveBatteryFaults() : ModelCommand("read")
     {
-        AddArgument("attr-name", "active-battery-faults");
+        AddArgument("attr-name", "active-battery-faults", false);
         ModelCommand::AddArguments();
     }
 
@@ -18740,7 +18745,7 @@ class ReadPowerSourceBatteryChargeState : public ModelCommand
 public:
     ReadPowerSourceBatteryChargeState() : ModelCommand("read")
     {
-        AddArgument("attr-name", "battery-charge-state");
+        AddArgument("attr-name", "battery-charge-state", false);
         ModelCommand::AddArguments();
     }
 
@@ -18774,7 +18779,7 @@ class ReadPowerSourceFeatureMap : public ModelCommand
 public:
     ReadPowerSourceFeatureMap() : ModelCommand("read")
     {
-        AddArgument("attr-name", "feature-map");
+        AddArgument("attr-name", "feature-map", false);
         ModelCommand::AddArguments();
     }
 
@@ -18808,7 +18813,7 @@ class ReadPowerSourceClusterRevision : public ModelCommand
 public:
     ReadPowerSourceClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -18854,7 +18859,7 @@ class ReadPressureMeasurementMeasuredValue : public ModelCommand
 public:
     ReadPressureMeasurementMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "measured-value");
+        AddArgument("attr-name", "measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -18885,10 +18890,10 @@ class ReportPressureMeasurementMeasuredValue : public ModelCommand
 public:
     ReportPressureMeasurementMeasuredValue() : ModelCommand("report")
     {
-        AddArgument("attr-name", "measured-value");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "measured-value", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -18940,7 +18945,7 @@ class ReadPressureMeasurementMinMeasuredValue : public ModelCommand
 public:
     ReadPressureMeasurementMinMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-measured-value");
+        AddArgument("attr-name", "min-measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -18974,7 +18979,7 @@ class ReadPressureMeasurementMaxMeasuredValue : public ModelCommand
 public:
     ReadPressureMeasurementMaxMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-measured-value");
+        AddArgument("attr-name", "max-measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -19008,7 +19013,7 @@ class ReadPressureMeasurementClusterRevision : public ModelCommand
 public:
     ReadPressureMeasurementClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -19074,7 +19079,7 @@ class ReadPumpConfigurationAndControlMaxPressure : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMaxPressure() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-pressure");
+        AddArgument("attr-name", "max-pressure", false);
         ModelCommand::AddArguments();
     }
 
@@ -19108,7 +19113,7 @@ class ReadPumpConfigurationAndControlMaxSpeed : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMaxSpeed() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-speed");
+        AddArgument("attr-name", "max-speed", false);
         ModelCommand::AddArguments();
     }
 
@@ -19142,7 +19147,7 @@ class ReadPumpConfigurationAndControlMaxFlow : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMaxFlow() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-flow");
+        AddArgument("attr-name", "max-flow", false);
         ModelCommand::AddArguments();
     }
 
@@ -19176,7 +19181,7 @@ class ReadPumpConfigurationAndControlMinConstPressure : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMinConstPressure() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-const-pressure");
+        AddArgument("attr-name", "min-const-pressure", false);
         ModelCommand::AddArguments();
     }
 
@@ -19210,7 +19215,7 @@ class ReadPumpConfigurationAndControlMaxConstPressure : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMaxConstPressure() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-const-pressure");
+        AddArgument("attr-name", "max-const-pressure", false);
         ModelCommand::AddArguments();
     }
 
@@ -19244,7 +19249,7 @@ class ReadPumpConfigurationAndControlMinCompPressure : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMinCompPressure() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-comp-pressure");
+        AddArgument("attr-name", "min-comp-pressure", false);
         ModelCommand::AddArguments();
     }
 
@@ -19278,7 +19283,7 @@ class ReadPumpConfigurationAndControlMaxCompPressure : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMaxCompPressure() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-comp-pressure");
+        AddArgument("attr-name", "max-comp-pressure", false);
         ModelCommand::AddArguments();
     }
 
@@ -19312,7 +19317,7 @@ class ReadPumpConfigurationAndControlMinConstSpeed : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMinConstSpeed() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-const-speed");
+        AddArgument("attr-name", "min-const-speed", false);
         ModelCommand::AddArguments();
     }
 
@@ -19346,7 +19351,7 @@ class ReadPumpConfigurationAndControlMaxConstSpeed : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMaxConstSpeed() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-const-speed");
+        AddArgument("attr-name", "max-const-speed", false);
         ModelCommand::AddArguments();
     }
 
@@ -19380,7 +19385,7 @@ class ReadPumpConfigurationAndControlMinConstFlow : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMinConstFlow() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-const-flow");
+        AddArgument("attr-name", "min-const-flow", false);
         ModelCommand::AddArguments();
     }
 
@@ -19414,7 +19419,7 @@ class ReadPumpConfigurationAndControlMaxConstFlow : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMaxConstFlow() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-const-flow");
+        AddArgument("attr-name", "max-const-flow", false);
         ModelCommand::AddArguments();
     }
 
@@ -19448,7 +19453,7 @@ class ReadPumpConfigurationAndControlMinConstTemp : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMinConstTemp() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-const-temp");
+        AddArgument("attr-name", "min-const-temp", false);
         ModelCommand::AddArguments();
     }
 
@@ -19482,7 +19487,7 @@ class ReadPumpConfigurationAndControlMaxConstTemp : public ModelCommand
 public:
     ReadPumpConfigurationAndControlMaxConstTemp() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-const-temp");
+        AddArgument("attr-name", "max-const-temp", false);
         ModelCommand::AddArguments();
     }
 
@@ -19516,7 +19521,7 @@ class ReadPumpConfigurationAndControlPumpStatus : public ModelCommand
 public:
     ReadPumpConfigurationAndControlPumpStatus() : ModelCommand("read")
     {
-        AddArgument("attr-name", "pump-status");
+        AddArgument("attr-name", "pump-status", false);
         ModelCommand::AddArguments();
     }
 
@@ -19547,10 +19552,10 @@ class ReportPumpConfigurationAndControlPumpStatus : public ModelCommand
 public:
     ReportPumpConfigurationAndControlPumpStatus() : ModelCommand("report")
     {
-        AddArgument("attr-name", "pump-status");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "pump-status", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -19602,7 +19607,7 @@ class ReadPumpConfigurationAndControlEffectiveOperationMode : public ModelComman
 public:
     ReadPumpConfigurationAndControlEffectiveOperationMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "effective-operation-mode");
+        AddArgument("attr-name", "effective-operation-mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -19636,7 +19641,7 @@ class ReadPumpConfigurationAndControlEffectiveControlMode : public ModelCommand
 public:
     ReadPumpConfigurationAndControlEffectiveControlMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "effective-control-mode");
+        AddArgument("attr-name", "effective-control-mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -19670,7 +19675,7 @@ class ReadPumpConfigurationAndControlCapacity : public ModelCommand
 public:
     ReadPumpConfigurationAndControlCapacity() : ModelCommand("read")
     {
-        AddArgument("attr-name", "capacity");
+        AddArgument("attr-name", "capacity", false);
         ModelCommand::AddArguments();
     }
 
@@ -19701,10 +19706,10 @@ class ReportPumpConfigurationAndControlCapacity : public ModelCommand
 public:
     ReportPumpConfigurationAndControlCapacity() : ModelCommand("report")
     {
-        AddArgument("attr-name", "capacity");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "capacity", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -19756,7 +19761,7 @@ class ReadPumpConfigurationAndControlSpeed : public ModelCommand
 public:
     ReadPumpConfigurationAndControlSpeed() : ModelCommand("read")
     {
-        AddArgument("attr-name", "speed");
+        AddArgument("attr-name", "speed", false);
         ModelCommand::AddArguments();
     }
 
@@ -19790,7 +19795,7 @@ class ReadPumpConfigurationAndControlLifetimeEnergyConsumed : public ModelComman
 public:
     ReadPumpConfigurationAndControlLifetimeEnergyConsumed() : ModelCommand("read")
     {
-        AddArgument("attr-name", "lifetime-energy-consumed");
+        AddArgument("attr-name", "lifetime-energy-consumed", false);
         ModelCommand::AddArguments();
     }
 
@@ -19824,7 +19829,7 @@ class ReadPumpConfigurationAndControlOperationMode : public ModelCommand
 public:
     ReadPumpConfigurationAndControlOperationMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "operation-mode");
+        AddArgument("attr-name", "operation-mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -19855,8 +19860,8 @@ class WritePumpConfigurationAndControlOperationMode : public ModelCommand
 public:
     WritePumpConfigurationAndControlOperationMode() : ModelCommand("write")
     {
-        AddArgument("attr-name", "operation-mode");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "operation-mode", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -19891,7 +19896,7 @@ class ReadPumpConfigurationAndControlControlMode : public ModelCommand
 public:
     ReadPumpConfigurationAndControlControlMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "control-mode");
+        AddArgument("attr-name", "control-mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -19922,8 +19927,8 @@ class WritePumpConfigurationAndControlControlMode : public ModelCommand
 public:
     WritePumpConfigurationAndControlControlMode() : ModelCommand("write")
     {
-        AddArgument("attr-name", "control-mode");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "control-mode", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -19958,7 +19963,7 @@ class ReadPumpConfigurationAndControlAlarmMask : public ModelCommand
 public:
     ReadPumpConfigurationAndControlAlarmMask() : ModelCommand("read")
     {
-        AddArgument("attr-name", "alarm-mask");
+        AddArgument("attr-name", "alarm-mask", false);
         ModelCommand::AddArguments();
     }
 
@@ -19992,7 +19997,7 @@ class ReadPumpConfigurationAndControlFeatureMap : public ModelCommand
 public:
     ReadPumpConfigurationAndControlFeatureMap() : ModelCommand("read")
     {
-        AddArgument("attr-name", "feature-map");
+        AddArgument("attr-name", "feature-map", false);
         ModelCommand::AddArguments();
     }
 
@@ -20026,7 +20031,7 @@ class ReadPumpConfigurationAndControlClusterRevision : public ModelCommand
 public:
     ReadPumpConfigurationAndControlClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -20073,7 +20078,7 @@ class ReadRelativeHumidityMeasurementMeasuredValue : public ModelCommand
 public:
     ReadRelativeHumidityMeasurementMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "measured-value");
+        AddArgument("attr-name", "measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -20104,10 +20109,10 @@ class ReportRelativeHumidityMeasurementMeasuredValue : public ModelCommand
 public:
     ReportRelativeHumidityMeasurementMeasuredValue() : ModelCommand("report")
     {
-        AddArgument("attr-name", "measured-value");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "measured-value", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -20159,7 +20164,7 @@ class ReadRelativeHumidityMeasurementMinMeasuredValue : public ModelCommand
 public:
     ReadRelativeHumidityMeasurementMinMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-measured-value");
+        AddArgument("attr-name", "min-measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -20193,7 +20198,7 @@ class ReadRelativeHumidityMeasurementMaxMeasuredValue : public ModelCommand
 public:
     ReadRelativeHumidityMeasurementMaxMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-measured-value");
+        AddArgument("attr-name", "max-measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -20227,7 +20232,7 @@ class ReadRelativeHumidityMeasurementTolerance : public ModelCommand
 public:
     ReadRelativeHumidityMeasurementTolerance() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tolerance");
+        AddArgument("attr-name", "tolerance", false);
         ModelCommand::AddArguments();
     }
 
@@ -20258,10 +20263,10 @@ class ReportRelativeHumidityMeasurementTolerance : public ModelCommand
 public:
     ReportRelativeHumidityMeasurementTolerance() : ModelCommand("report")
     {
-        AddArgument("attr-name", "tolerance");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "tolerance", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -20313,7 +20318,7 @@ class ReadRelativeHumidityMeasurementClusterRevision : public ModelCommand
 public:
     ReadRelativeHumidityMeasurementClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -20368,10 +20373,10 @@ class ScenesAddScene : public ModelCommand
 public:
     ScenesAddScene() : ModelCommand("add-scene")
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
-        AddArgument("SceneName", &mRequest.sceneName);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
+        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
+        AddArgument("SceneName", &mRequest.sceneName, false);
         // extensionFieldSets Array parsing is not supported yet
         ModelCommand::AddArguments();
     }
@@ -20397,7 +20402,7 @@ class ScenesGetSceneMembership : public ModelCommand
 public:
     ScenesGetSceneMembership() : ModelCommand("get-scene-membership")
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
         ModelCommand::AddArguments();
     }
 
@@ -20422,9 +20427,9 @@ class ScenesRecallScene : public ModelCommand
 public:
     ScenesRecallScene() : ModelCommand("recall-scene")
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
+        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId, false);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime, false);
         ModelCommand::AddArguments();
     }
 
@@ -20449,7 +20454,7 @@ class ScenesRemoveAllScenes : public ModelCommand
 public:
     ScenesRemoveAllScenes() : ModelCommand("remove-all-scenes")
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
         ModelCommand::AddArguments();
     }
 
@@ -20474,8 +20479,8 @@ class ScenesRemoveScene : public ModelCommand
 public:
     ScenesRemoveScene() : ModelCommand("remove-scene")
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
+        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId, false);
         ModelCommand::AddArguments();
     }
 
@@ -20500,8 +20505,8 @@ class ScenesStoreScene : public ModelCommand
 public:
     ScenesStoreScene() : ModelCommand("store-scene")
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
+        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId, false);
         ModelCommand::AddArguments();
     }
 
@@ -20526,8 +20531,8 @@ class ScenesViewScene : public ModelCommand
 public:
     ScenesViewScene() : ModelCommand("view-scene")
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId);
+        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId, false);
+        AddArgument("SceneId", 0, UINT8_MAX, &mRequest.sceneId, false);
         ModelCommand::AddArguments();
     }
 
@@ -20552,7 +20557,7 @@ class ReadScenesSceneCount : public ModelCommand
 public:
     ReadScenesSceneCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "scene-count");
+        AddArgument("attr-name", "scene-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -20586,7 +20591,7 @@ class ReadScenesCurrentScene : public ModelCommand
 public:
     ReadScenesCurrentScene() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-scene");
+        AddArgument("attr-name", "current-scene", false);
         ModelCommand::AddArguments();
     }
 
@@ -20620,7 +20625,7 @@ class ReadScenesCurrentGroup : public ModelCommand
 public:
     ReadScenesCurrentGroup() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-group");
+        AddArgument("attr-name", "current-group", false);
         ModelCommand::AddArguments();
     }
 
@@ -20654,7 +20659,7 @@ class ReadScenesSceneValid : public ModelCommand
 public:
     ReadScenesSceneValid() : ModelCommand("read")
     {
-        AddArgument("attr-name", "scene-valid");
+        AddArgument("attr-name", "scene-valid", false);
         ModelCommand::AddArguments();
     }
 
@@ -20688,7 +20693,7 @@ class ReadScenesNameSupport : public ModelCommand
 public:
     ReadScenesNameSupport() : ModelCommand("read")
     {
-        AddArgument("attr-name", "name-support");
+        AddArgument("attr-name", "name-support", false);
         ModelCommand::AddArguments();
     }
 
@@ -20722,7 +20727,7 @@ class ReadScenesClusterRevision : public ModelCommand
 public:
     ReadScenesClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -20790,7 +20795,7 @@ class ReadSoftwareDiagnosticsCurrentHeapFree : public ModelCommand
 public:
     ReadSoftwareDiagnosticsCurrentHeapFree() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-heap-free");
+        AddArgument("attr-name", "current-heap-free", false);
         ModelCommand::AddArguments();
     }
 
@@ -20824,7 +20829,7 @@ class ReadSoftwareDiagnosticsCurrentHeapUsed : public ModelCommand
 public:
     ReadSoftwareDiagnosticsCurrentHeapUsed() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-heap-used");
+        AddArgument("attr-name", "current-heap-used", false);
         ModelCommand::AddArguments();
     }
 
@@ -20858,7 +20863,7 @@ class ReadSoftwareDiagnosticsCurrentHeapHighWatermark : public ModelCommand
 public:
     ReadSoftwareDiagnosticsCurrentHeapHighWatermark() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-heap-high-watermark");
+        AddArgument("attr-name", "current-heap-high-watermark", false);
         ModelCommand::AddArguments();
     }
 
@@ -20892,7 +20897,7 @@ class ReadSoftwareDiagnosticsClusterRevision : public ModelCommand
 public:
     ReadSoftwareDiagnosticsClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -20939,7 +20944,7 @@ class ReadSwitchNumberOfPositions : public ModelCommand
 public:
     ReadSwitchNumberOfPositions() : ModelCommand("read")
     {
-        AddArgument("attr-name", "number-of-positions");
+        AddArgument("attr-name", "number-of-positions", false);
         ModelCommand::AddArguments();
     }
 
@@ -20973,7 +20978,7 @@ class ReadSwitchCurrentPosition : public ModelCommand
 public:
     ReadSwitchCurrentPosition() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-position");
+        AddArgument("attr-name", "current-position", false);
         ModelCommand::AddArguments();
     }
 
@@ -21004,10 +21009,10 @@ class ReportSwitchCurrentPosition : public ModelCommand
 public:
     ReportSwitchCurrentPosition() : ModelCommand("report")
     {
-        AddArgument("attr-name", "current-position");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "current-position", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -21059,7 +21064,7 @@ class ReadSwitchMultiPressMax : public ModelCommand
 public:
     ReadSwitchMultiPressMax() : ModelCommand("read")
     {
-        AddArgument("attr-name", "multi-press-max");
+        AddArgument("attr-name", "multi-press-max", false);
         ModelCommand::AddArguments();
     }
 
@@ -21093,7 +21098,7 @@ class ReadSwitchFeatureMap : public ModelCommand
 public:
     ReadSwitchFeatureMap() : ModelCommand("read")
     {
-        AddArgument("attr-name", "feature-map");
+        AddArgument("attr-name", "feature-map", false);
         ModelCommand::AddArguments();
     }
 
@@ -21127,7 +21132,7 @@ class ReadSwitchClusterRevision : public ModelCommand
 public:
     ReadSwitchClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -21176,7 +21181,7 @@ class TvChannelChangeChannel : public ModelCommand
 public:
     TvChannelChangeChannel() : ModelCommand("change-channel")
     {
-        AddArgument("Match", &mRequest.match);
+        AddArgument("Match", &mRequest.match, false);
         ModelCommand::AddArguments();
     }
 
@@ -21201,8 +21206,8 @@ class TvChannelChangeChannelByNumber : public ModelCommand
 public:
     TvChannelChangeChannelByNumber() : ModelCommand("change-channel-by-number")
     {
-        AddArgument("MajorNumber", 0, UINT16_MAX, &mRequest.majorNumber);
-        AddArgument("MinorNumber", 0, UINT16_MAX, &mRequest.minorNumber);
+        AddArgument("MajorNumber", 0, UINT16_MAX, &mRequest.majorNumber, false);
+        AddArgument("MinorNumber", 0, UINT16_MAX, &mRequest.minorNumber, false);
         ModelCommand::AddArguments();
     }
 
@@ -21227,7 +21232,7 @@ class TvChannelSkipChannel : public ModelCommand
 public:
     TvChannelSkipChannel() : ModelCommand("skip-channel")
     {
-        AddArgument("Count", 0, UINT16_MAX, &mRequest.count);
+        AddArgument("Count", 0, UINT16_MAX, &mRequest.count, false);
         ModelCommand::AddArguments();
     }
 
@@ -21252,7 +21257,7 @@ class ReadTvChannelTvChannelList : public ModelCommand
 public:
     ReadTvChannelTvChannelList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tv-channel-list");
+        AddArgument("attr-name", "tv-channel-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -21287,7 +21292,7 @@ class ReadTvChannelTvChannelLineup : public ModelCommand
 public:
     ReadTvChannelTvChannelLineup() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tv-channel-lineup");
+        AddArgument("attr-name", "tv-channel-lineup", false);
         ModelCommand::AddArguments();
     }
 
@@ -21321,7 +21326,7 @@ class ReadTvChannelCurrentTvChannel : public ModelCommand
 public:
     ReadTvChannelCurrentTvChannel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-tv-channel");
+        AddArgument("attr-name", "current-tv-channel", false);
         ModelCommand::AddArguments();
     }
 
@@ -21355,7 +21360,7 @@ class ReadTvChannelClusterRevision : public ModelCommand
 public:
     ReadTvChannelClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -21400,8 +21405,8 @@ class TargetNavigatorNavigateTarget : public ModelCommand
 public:
     TargetNavigatorNavigateTarget() : ModelCommand("navigate-target")
     {
-        AddArgument("Target", 0, UINT8_MAX, &mRequest.target);
-        AddArgument("Data", &mRequest.data);
+        AddArgument("Target", 0, UINT8_MAX, &mRequest.target, false);
+        AddArgument("Data", &mRequest.data, false);
         ModelCommand::AddArguments();
     }
 
@@ -21426,7 +21431,7 @@ class ReadTargetNavigatorTargetNavigatorList : public ModelCommand
 public:
     ReadTargetNavigatorTargetNavigatorList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "target-navigator-list");
+        AddArgument("attr-name", "target-navigator-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -21461,7 +21466,7 @@ class ReadTargetNavigatorClusterRevision : public ModelCommand
 public:
     ReadTargetNavigatorClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -21508,7 +21513,7 @@ class ReadTemperatureMeasurementMeasuredValue : public ModelCommand
 public:
     ReadTemperatureMeasurementMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "measured-value");
+        AddArgument("attr-name", "measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -21539,10 +21544,10 @@ class ReportTemperatureMeasurementMeasuredValue : public ModelCommand
 public:
     ReportTemperatureMeasurementMeasuredValue() : ModelCommand("report")
     {
-        AddArgument("attr-name", "measured-value");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "measured-value", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -21594,7 +21599,7 @@ class ReadTemperatureMeasurementMinMeasuredValue : public ModelCommand
 public:
     ReadTemperatureMeasurementMinMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-measured-value");
+        AddArgument("attr-name", "min-measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -21628,7 +21633,7 @@ class ReadTemperatureMeasurementMaxMeasuredValue : public ModelCommand
 public:
     ReadTemperatureMeasurementMaxMeasuredValue() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-measured-value");
+        AddArgument("attr-name", "max-measured-value", false);
         ModelCommand::AddArguments();
     }
 
@@ -21662,7 +21667,7 @@ class ReadTemperatureMeasurementTolerance : public ModelCommand
 public:
     ReadTemperatureMeasurementTolerance() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tolerance");
+        AddArgument("attr-name", "tolerance", false);
         ModelCommand::AddArguments();
     }
 
@@ -21693,10 +21698,10 @@ class ReportTemperatureMeasurementTolerance : public ModelCommand
 public:
     ReportTemperatureMeasurementTolerance() : ModelCommand("report")
     {
-        AddArgument("attr-name", "tolerance");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "tolerance", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -21748,7 +21753,7 @@ class ReadTemperatureMeasurementClusterRevision : public ModelCommand
 public:
     ReadTemperatureMeasurementClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -21850,8 +21855,8 @@ class TestClusterTestAddArguments : public ModelCommand
 public:
     TestClusterTestAddArguments() : ModelCommand("test-add-arguments")
     {
-        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
-        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
+        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1, false);
+        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2, false);
         ModelCommand::AddArguments();
     }
 
@@ -21876,8 +21881,9 @@ class TestClusterTestEnumsRequest : public ModelCommand
 public:
     TestClusterTestEnumsRequest() : ModelCommand("test-enums-request")
     {
-        AddArgument("Arg1", 0, UINT16_MAX, &mRequest.arg1);
-        AddArgument("Arg2", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.arg2)> *>(&mRequest.arg2));
+        AddArgument("Arg1", 0, UINT16_MAX, &mRequest.arg1, false);
+        AddArgument("Arg2", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.arg2)> *>(&mRequest.arg2),
+                    false);
         ModelCommand::AddArguments();
     }
 
@@ -21998,7 +22004,7 @@ class TestClusterTestNullableOptionalRequest : public ModelCommand
 public:
     TestClusterTestNullableOptionalRequest() : ModelCommand("test-nullable-optional-request")
     {
-        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
+        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1, false);
         ModelCommand::AddArguments();
     }
 
@@ -22090,7 +22096,7 @@ class ReadTestClusterBoolean : public ModelCommand
 public:
     ReadTestClusterBoolean() : ModelCommand("read")
     {
-        AddArgument("attr-name", "boolean");
+        AddArgument("attr-name", "boolean", false);
         ModelCommand::AddArguments();
     }
 
@@ -22121,8 +22127,8 @@ class WriteTestClusterBoolean : public ModelCommand
 public:
     WriteTestClusterBoolean() : ModelCommand("write")
     {
-        AddArgument("attr-name", "boolean");
-        AddArgument("attr-value", 0, 1, &mValue);
+        AddArgument("attr-name", "boolean", false);
+        AddArgument("attr-value", 0, 1, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22157,7 +22163,7 @@ class ReadTestClusterBitmap8 : public ModelCommand
 public:
     ReadTestClusterBitmap8() : ModelCommand("read")
     {
-        AddArgument("attr-name", "bitmap8");
+        AddArgument("attr-name", "bitmap8", false);
         ModelCommand::AddArguments();
     }
 
@@ -22188,8 +22194,8 @@ class WriteTestClusterBitmap8 : public ModelCommand
 public:
     WriteTestClusterBitmap8() : ModelCommand("write")
     {
-        AddArgument("attr-name", "bitmap8");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "bitmap8", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22224,7 +22230,7 @@ class ReadTestClusterBitmap16 : public ModelCommand
 public:
     ReadTestClusterBitmap16() : ModelCommand("read")
     {
-        AddArgument("attr-name", "bitmap16");
+        AddArgument("attr-name", "bitmap16", false);
         ModelCommand::AddArguments();
     }
 
@@ -22255,8 +22261,8 @@ class WriteTestClusterBitmap16 : public ModelCommand
 public:
     WriteTestClusterBitmap16() : ModelCommand("write")
     {
-        AddArgument("attr-name", "bitmap16");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "bitmap16", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22291,7 +22297,7 @@ class ReadTestClusterBitmap32 : public ModelCommand
 public:
     ReadTestClusterBitmap32() : ModelCommand("read")
     {
-        AddArgument("attr-name", "bitmap32");
+        AddArgument("attr-name", "bitmap32", false);
         ModelCommand::AddArguments();
     }
 
@@ -22322,8 +22328,8 @@ class WriteTestClusterBitmap32 : public ModelCommand
 public:
     WriteTestClusterBitmap32() : ModelCommand("write")
     {
-        AddArgument("attr-name", "bitmap32");
-        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        AddArgument("attr-name", "bitmap32", false);
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22358,7 +22364,7 @@ class ReadTestClusterBitmap64 : public ModelCommand
 public:
     ReadTestClusterBitmap64() : ModelCommand("read")
     {
-        AddArgument("attr-name", "bitmap64");
+        AddArgument("attr-name", "bitmap64", false);
         ModelCommand::AddArguments();
     }
 
@@ -22389,8 +22395,8 @@ class WriteTestClusterBitmap64 : public ModelCommand
 public:
     WriteTestClusterBitmap64() : ModelCommand("write")
     {
-        AddArgument("attr-name", "bitmap64");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        AddArgument("attr-name", "bitmap64", false);
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22425,7 +22431,7 @@ class ReadTestClusterInt8u : public ModelCommand
 public:
     ReadTestClusterInt8u() : ModelCommand("read")
     {
-        AddArgument("attr-name", "int8u");
+        AddArgument("attr-name", "int8u", false);
         ModelCommand::AddArguments();
     }
 
@@ -22456,8 +22462,8 @@ class WriteTestClusterInt8u : public ModelCommand
 public:
     WriteTestClusterInt8u() : ModelCommand("write")
     {
-        AddArgument("attr-name", "int8u");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "int8u", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22492,7 +22498,7 @@ class ReadTestClusterInt16u : public ModelCommand
 public:
     ReadTestClusterInt16u() : ModelCommand("read")
     {
-        AddArgument("attr-name", "int16u");
+        AddArgument("attr-name", "int16u", false);
         ModelCommand::AddArguments();
     }
 
@@ -22523,8 +22529,8 @@ class WriteTestClusterInt16u : public ModelCommand
 public:
     WriteTestClusterInt16u() : ModelCommand("write")
     {
-        AddArgument("attr-name", "int16u");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "int16u", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22559,7 +22565,7 @@ class ReadTestClusterInt32u : public ModelCommand
 public:
     ReadTestClusterInt32u() : ModelCommand("read")
     {
-        AddArgument("attr-name", "int32u");
+        AddArgument("attr-name", "int32u", false);
         ModelCommand::AddArguments();
     }
 
@@ -22590,8 +22596,8 @@ class WriteTestClusterInt32u : public ModelCommand
 public:
     WriteTestClusterInt32u() : ModelCommand("write")
     {
-        AddArgument("attr-name", "int32u");
-        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        AddArgument("attr-name", "int32u", false);
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22626,7 +22632,7 @@ class ReadTestClusterInt64u : public ModelCommand
 public:
     ReadTestClusterInt64u() : ModelCommand("read")
     {
-        AddArgument("attr-name", "int64u");
+        AddArgument("attr-name", "int64u", false);
         ModelCommand::AddArguments();
     }
 
@@ -22657,8 +22663,8 @@ class WriteTestClusterInt64u : public ModelCommand
 public:
     WriteTestClusterInt64u() : ModelCommand("write")
     {
-        AddArgument("attr-name", "int64u");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        AddArgument("attr-name", "int64u", false);
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22693,7 +22699,7 @@ class ReadTestClusterInt8s : public ModelCommand
 public:
     ReadTestClusterInt8s() : ModelCommand("read")
     {
-        AddArgument("attr-name", "int8s");
+        AddArgument("attr-name", "int8s", false);
         ModelCommand::AddArguments();
     }
 
@@ -22724,8 +22730,8 @@ class WriteTestClusterInt8s : public ModelCommand
 public:
     WriteTestClusterInt8s() : ModelCommand("write")
     {
-        AddArgument("attr-name", "int8s");
-        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
+        AddArgument("attr-name", "int8s", false);
+        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22760,7 +22766,7 @@ class ReadTestClusterInt16s : public ModelCommand
 public:
     ReadTestClusterInt16s() : ModelCommand("read")
     {
-        AddArgument("attr-name", "int16s");
+        AddArgument("attr-name", "int16s", false);
         ModelCommand::AddArguments();
     }
 
@@ -22791,8 +22797,8 @@ class WriteTestClusterInt16s : public ModelCommand
 public:
     WriteTestClusterInt16s() : ModelCommand("write")
     {
-        AddArgument("attr-name", "int16s");
-        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        AddArgument("attr-name", "int16s", false);
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22827,7 +22833,7 @@ class ReadTestClusterInt32s : public ModelCommand
 public:
     ReadTestClusterInt32s() : ModelCommand("read")
     {
-        AddArgument("attr-name", "int32s");
+        AddArgument("attr-name", "int32s", false);
         ModelCommand::AddArguments();
     }
 
@@ -22858,8 +22864,8 @@ class WriteTestClusterInt32s : public ModelCommand
 public:
     WriteTestClusterInt32s() : ModelCommand("write")
     {
-        AddArgument("attr-name", "int32s");
-        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue);
+        AddArgument("attr-name", "int32s", false);
+        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22894,7 +22900,7 @@ class ReadTestClusterInt64s : public ModelCommand
 public:
     ReadTestClusterInt64s() : ModelCommand("read")
     {
-        AddArgument("attr-name", "int64s");
+        AddArgument("attr-name", "int64s", false);
         ModelCommand::AddArguments();
     }
 
@@ -22925,8 +22931,8 @@ class WriteTestClusterInt64s : public ModelCommand
 public:
     WriteTestClusterInt64s() : ModelCommand("write")
     {
-        AddArgument("attr-name", "int64s");
-        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        AddArgument("attr-name", "int64s", false);
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -22961,7 +22967,7 @@ class ReadTestClusterEnum8 : public ModelCommand
 public:
     ReadTestClusterEnum8() : ModelCommand("read")
     {
-        AddArgument("attr-name", "enum8");
+        AddArgument("attr-name", "enum8", false);
         ModelCommand::AddArguments();
     }
 
@@ -22992,8 +22998,8 @@ class WriteTestClusterEnum8 : public ModelCommand
 public:
     WriteTestClusterEnum8() : ModelCommand("write")
     {
-        AddArgument("attr-name", "enum8");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "enum8", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -23028,7 +23034,7 @@ class ReadTestClusterEnum16 : public ModelCommand
 public:
     ReadTestClusterEnum16() : ModelCommand("read")
     {
-        AddArgument("attr-name", "enum16");
+        AddArgument("attr-name", "enum16", false);
         ModelCommand::AddArguments();
     }
 
@@ -23059,8 +23065,8 @@ class WriteTestClusterEnum16 : public ModelCommand
 public:
     WriteTestClusterEnum16() : ModelCommand("write")
     {
-        AddArgument("attr-name", "enum16");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "enum16", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -23095,7 +23101,7 @@ class ReadTestClusterOctetString : public ModelCommand
 public:
     ReadTestClusterOctetString() : ModelCommand("read")
     {
-        AddArgument("attr-name", "octet-string");
+        AddArgument("attr-name", "octet-string", false);
         ModelCommand::AddArguments();
     }
 
@@ -23126,8 +23132,8 @@ class WriteTestClusterOctetString : public ModelCommand
 public:
     WriteTestClusterOctetString() : ModelCommand("write")
     {
-        AddArgument("attr-name", "octet-string");
-        AddArgument("attr-value", &mValue);
+        AddArgument("attr-name", "octet-string", false);
+        AddArgument("attr-value", &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -23162,7 +23168,7 @@ class ReadTestClusterListInt8u : public ModelCommand
 public:
     ReadTestClusterListInt8u() : ModelCommand("read")
     {
-        AddArgument("attr-name", "list-int8u");
+        AddArgument("attr-name", "list-int8u", false);
         ModelCommand::AddArguments();
     }
 
@@ -23196,7 +23202,7 @@ class ReadTestClusterListOctetString : public ModelCommand
 public:
     ReadTestClusterListOctetString() : ModelCommand("read")
     {
-        AddArgument("attr-name", "list-octet-string");
+        AddArgument("attr-name", "list-octet-string", false);
         ModelCommand::AddArguments();
     }
 
@@ -23231,7 +23237,7 @@ class ReadTestClusterListStructOctetString : public ModelCommand
 public:
     ReadTestClusterListStructOctetString() : ModelCommand("read")
     {
-        AddArgument("attr-name", "list-struct-octet-string");
+        AddArgument("attr-name", "list-struct-octet-string", false);
         ModelCommand::AddArguments();
     }
 
@@ -23266,7 +23272,7 @@ class ReadTestClusterLongOctetString : public ModelCommand
 public:
     ReadTestClusterLongOctetString() : ModelCommand("read")
     {
-        AddArgument("attr-name", "long-octet-string");
+        AddArgument("attr-name", "long-octet-string", false);
         ModelCommand::AddArguments();
     }
 
@@ -23297,8 +23303,8 @@ class WriteTestClusterLongOctetString : public ModelCommand
 public:
     WriteTestClusterLongOctetString() : ModelCommand("write")
     {
-        AddArgument("attr-name", "long-octet-string");
-        AddArgument("attr-value", &mValue);
+        AddArgument("attr-name", "long-octet-string", false);
+        AddArgument("attr-value", &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -23333,7 +23339,7 @@ class ReadTestClusterCharString : public ModelCommand
 public:
     ReadTestClusterCharString() : ModelCommand("read")
     {
-        AddArgument("attr-name", "char-string");
+        AddArgument("attr-name", "char-string", false);
         ModelCommand::AddArguments();
     }
 
@@ -23364,8 +23370,8 @@ class WriteTestClusterCharString : public ModelCommand
 public:
     WriteTestClusterCharString() : ModelCommand("write")
     {
-        AddArgument("attr-name", "char-string");
-        AddArgument("attr-value", &mValue);
+        AddArgument("attr-name", "char-string", false);
+        AddArgument("attr-value", &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -23400,7 +23406,7 @@ class ReadTestClusterLongCharString : public ModelCommand
 public:
     ReadTestClusterLongCharString() : ModelCommand("read")
     {
-        AddArgument("attr-name", "long-char-string");
+        AddArgument("attr-name", "long-char-string", false);
         ModelCommand::AddArguments();
     }
 
@@ -23431,8 +23437,8 @@ class WriteTestClusterLongCharString : public ModelCommand
 public:
     WriteTestClusterLongCharString() : ModelCommand("write")
     {
-        AddArgument("attr-name", "long-char-string");
-        AddArgument("attr-value", &mValue);
+        AddArgument("attr-name", "long-char-string", false);
+        AddArgument("attr-value", &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -23467,7 +23473,7 @@ class ReadTestClusterEpochUs : public ModelCommand
 public:
     ReadTestClusterEpochUs() : ModelCommand("read")
     {
-        AddArgument("attr-name", "epoch-us");
+        AddArgument("attr-name", "epoch-us", false);
         ModelCommand::AddArguments();
     }
 
@@ -23498,8 +23504,8 @@ class WriteTestClusterEpochUs : public ModelCommand
 public:
     WriteTestClusterEpochUs() : ModelCommand("write")
     {
-        AddArgument("attr-name", "epoch-us");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        AddArgument("attr-name", "epoch-us", false);
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -23534,7 +23540,7 @@ class ReadTestClusterEpochS : public ModelCommand
 public:
     ReadTestClusterEpochS() : ModelCommand("read")
     {
-        AddArgument("attr-name", "epoch-s");
+        AddArgument("attr-name", "epoch-s", false);
         ModelCommand::AddArguments();
     }
 
@@ -23565,8 +23571,8 @@ class WriteTestClusterEpochS : public ModelCommand
 public:
     WriteTestClusterEpochS() : ModelCommand("write")
     {
-        AddArgument("attr-name", "epoch-s");
-        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        AddArgument("attr-name", "epoch-s", false);
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -23601,7 +23607,7 @@ class ReadTestClusterVendorId : public ModelCommand
 public:
     ReadTestClusterVendorId() : ModelCommand("read")
     {
-        AddArgument("attr-name", "vendor-id");
+        AddArgument("attr-name", "vendor-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -23632,8 +23638,8 @@ class WriteTestClusterVendorId : public ModelCommand
 public:
     WriteTestClusterVendorId() : ModelCommand("write")
     {
-        AddArgument("attr-name", "vendor-id");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        AddArgument("attr-name", "vendor-id", false);
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -23668,7 +23674,7 @@ class ReadTestClusterListNullablesAndOptionalsStruct : public ModelCommand
 public:
     ReadTestClusterListNullablesAndOptionalsStruct() : ModelCommand("read")
     {
-        AddArgument("attr-name", "list-nullables-and-optionals-struct");
+        AddArgument("attr-name", "list-nullables-and-optionals-struct", false);
         ModelCommand::AddArguments();
     }
 
@@ -23703,7 +23709,7 @@ class ReadTestClusterUnsupported : public ModelCommand
 public:
     ReadTestClusterUnsupported() : ModelCommand("read")
     {
-        AddArgument("attr-name", "unsupported");
+        AddArgument("attr-name", "unsupported", false);
         ModelCommand::AddArguments();
     }
 
@@ -23734,8 +23740,8 @@ class WriteTestClusterUnsupported : public ModelCommand
 public:
     WriteTestClusterUnsupported() : ModelCommand("write")
     {
-        AddArgument("attr-name", "unsupported");
-        AddArgument("attr-value", 0, 1, &mValue);
+        AddArgument("attr-name", "unsupported", false);
+        AddArgument("attr-value", 0, 1, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -23770,7 +23776,7 @@ class ReadTestClusterClusterRevision : public ModelCommand
 public:
     ReadTestClusterClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -23879,10 +23885,12 @@ public:
     ThermostatGetWeeklySchedule() : ModelCommand("get-weekly-schedule")
     {
         AddArgument("DaysToReturn", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::DayOfWeek> *>(&mRequest.daysToReturn));
+                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::DayOfWeek> *>(&mRequest.daysToReturn),
+                    false);
         AddArgument(
             "ModeToReturn", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::ModeForSequence> *>(&mRequest.modeToReturn));
+            reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::ModeForSequence> *>(&mRequest.modeToReturn),
+            false);
         ModelCommand::AddArguments();
     }
 
@@ -23907,13 +23915,15 @@ class ThermostatSetWeeklySchedule : public ModelCommand
 public:
     ThermostatSetWeeklySchedule() : ModelCommand("set-weekly-schedule")
     {
-        AddArgument("NumberOfTransitionsForSequence", 0, UINT8_MAX, &mRequest.numberOfTransitionsForSequence);
+        AddArgument("NumberOfTransitionsForSequence", 0, UINT8_MAX, &mRequest.numberOfTransitionsForSequence, false);
         AddArgument(
             "DayOfWeekForSequence", 0, UINT8_MAX,
-            reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::DayOfWeek> *>(&mRequest.dayOfWeekForSequence));
-        AddArgument("ModeForSequence", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::ModeForSequence> *>(
-                        &mRequest.modeForSequence));
+            reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::DayOfWeek> *>(&mRequest.dayOfWeekForSequence),
+            false);
+        AddArgument(
+            "ModeForSequence", 0, UINT8_MAX,
+            reinterpret_cast<std::underlying_type_t<chip::app::Clusters::Thermostat::ModeForSequence> *>(&mRequest.modeForSequence),
+            false);
         // payload Array parsing is not supported yet
         ModelCommand::AddArguments();
     }
@@ -23939,8 +23949,9 @@ class ThermostatSetpointRaiseLower : public ModelCommand
 public:
     ThermostatSetpointRaiseLower() : ModelCommand("setpoint-raise-lower")
     {
-        AddArgument("Mode", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.mode)> *>(&mRequest.mode));
-        AddArgument("Amount", INT8_MIN, INT8_MAX, &mRequest.amount);
+        AddArgument("Mode", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.mode)> *>(&mRequest.mode),
+                    false);
+        AddArgument("Amount", INT8_MIN, INT8_MAX, &mRequest.amount, false);
         ModelCommand::AddArguments();
     }
 
@@ -23965,7 +23976,7 @@ class ReadThermostatLocalTemperature : public ModelCommand
 public:
     ReadThermostatLocalTemperature() : ModelCommand("read")
     {
-        AddArgument("attr-name", "local-temperature");
+        AddArgument("attr-name", "local-temperature", false);
         ModelCommand::AddArguments();
     }
 
@@ -23996,10 +24007,10 @@ class ReportThermostatLocalTemperature : public ModelCommand
 public:
     ReportThermostatLocalTemperature() : ModelCommand("report")
     {
-        AddArgument("attr-name", "local-temperature");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "local-temperature", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -24051,7 +24062,7 @@ class ReadThermostatAbsMinHeatSetpointLimit : public ModelCommand
 public:
     ReadThermostatAbsMinHeatSetpointLimit() : ModelCommand("read")
     {
-        AddArgument("attr-name", "abs-min-heat-setpoint-limit");
+        AddArgument("attr-name", "abs-min-heat-setpoint-limit", false);
         ModelCommand::AddArguments();
     }
 
@@ -24085,7 +24096,7 @@ class ReadThermostatAbsMaxHeatSetpointLimit : public ModelCommand
 public:
     ReadThermostatAbsMaxHeatSetpointLimit() : ModelCommand("read")
     {
-        AddArgument("attr-name", "abs-max-heat-setpoint-limit");
+        AddArgument("attr-name", "abs-max-heat-setpoint-limit", false);
         ModelCommand::AddArguments();
     }
 
@@ -24119,7 +24130,7 @@ class ReadThermostatAbsMinCoolSetpointLimit : public ModelCommand
 public:
     ReadThermostatAbsMinCoolSetpointLimit() : ModelCommand("read")
     {
-        AddArgument("attr-name", "abs-min-cool-setpoint-limit");
+        AddArgument("attr-name", "abs-min-cool-setpoint-limit", false);
         ModelCommand::AddArguments();
     }
 
@@ -24153,7 +24164,7 @@ class ReadThermostatAbsMaxCoolSetpointLimit : public ModelCommand
 public:
     ReadThermostatAbsMaxCoolSetpointLimit() : ModelCommand("read")
     {
-        AddArgument("attr-name", "abs-max-cool-setpoint-limit");
+        AddArgument("attr-name", "abs-max-cool-setpoint-limit", false);
         ModelCommand::AddArguments();
     }
 
@@ -24187,7 +24198,7 @@ class ReadThermostatOccupiedCoolingSetpoint : public ModelCommand
 public:
     ReadThermostatOccupiedCoolingSetpoint() : ModelCommand("read")
     {
-        AddArgument("attr-name", "occupied-cooling-setpoint");
+        AddArgument("attr-name", "occupied-cooling-setpoint", false);
         ModelCommand::AddArguments();
     }
 
@@ -24218,8 +24229,8 @@ class WriteThermostatOccupiedCoolingSetpoint : public ModelCommand
 public:
     WriteThermostatOccupiedCoolingSetpoint() : ModelCommand("write")
     {
-        AddArgument("attr-name", "occupied-cooling-setpoint");
-        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        AddArgument("attr-name", "occupied-cooling-setpoint", false);
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -24254,7 +24265,7 @@ class ReadThermostatOccupiedHeatingSetpoint : public ModelCommand
 public:
     ReadThermostatOccupiedHeatingSetpoint() : ModelCommand("read")
     {
-        AddArgument("attr-name", "occupied-heating-setpoint");
+        AddArgument("attr-name", "occupied-heating-setpoint", false);
         ModelCommand::AddArguments();
     }
 
@@ -24285,8 +24296,8 @@ class WriteThermostatOccupiedHeatingSetpoint : public ModelCommand
 public:
     WriteThermostatOccupiedHeatingSetpoint() : ModelCommand("write")
     {
-        AddArgument("attr-name", "occupied-heating-setpoint");
-        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        AddArgument("attr-name", "occupied-heating-setpoint", false);
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -24321,7 +24332,7 @@ class ReadThermostatMinHeatSetpointLimit : public ModelCommand
 public:
     ReadThermostatMinHeatSetpointLimit() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-heat-setpoint-limit");
+        AddArgument("attr-name", "min-heat-setpoint-limit", false);
         ModelCommand::AddArguments();
     }
 
@@ -24352,8 +24363,8 @@ class WriteThermostatMinHeatSetpointLimit : public ModelCommand
 public:
     WriteThermostatMinHeatSetpointLimit() : ModelCommand("write")
     {
-        AddArgument("attr-name", "min-heat-setpoint-limit");
-        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        AddArgument("attr-name", "min-heat-setpoint-limit", false);
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -24388,7 +24399,7 @@ class ReadThermostatMaxHeatSetpointLimit : public ModelCommand
 public:
     ReadThermostatMaxHeatSetpointLimit() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-heat-setpoint-limit");
+        AddArgument("attr-name", "max-heat-setpoint-limit", false);
         ModelCommand::AddArguments();
     }
 
@@ -24419,8 +24430,8 @@ class WriteThermostatMaxHeatSetpointLimit : public ModelCommand
 public:
     WriteThermostatMaxHeatSetpointLimit() : ModelCommand("write")
     {
-        AddArgument("attr-name", "max-heat-setpoint-limit");
-        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        AddArgument("attr-name", "max-heat-setpoint-limit", false);
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -24455,7 +24466,7 @@ class ReadThermostatMinCoolSetpointLimit : public ModelCommand
 public:
     ReadThermostatMinCoolSetpointLimit() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-cool-setpoint-limit");
+        AddArgument("attr-name", "min-cool-setpoint-limit", false);
         ModelCommand::AddArguments();
     }
 
@@ -24486,8 +24497,8 @@ class WriteThermostatMinCoolSetpointLimit : public ModelCommand
 public:
     WriteThermostatMinCoolSetpointLimit() : ModelCommand("write")
     {
-        AddArgument("attr-name", "min-cool-setpoint-limit");
-        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        AddArgument("attr-name", "min-cool-setpoint-limit", false);
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -24522,7 +24533,7 @@ class ReadThermostatMaxCoolSetpointLimit : public ModelCommand
 public:
     ReadThermostatMaxCoolSetpointLimit() : ModelCommand("read")
     {
-        AddArgument("attr-name", "max-cool-setpoint-limit");
+        AddArgument("attr-name", "max-cool-setpoint-limit", false);
         ModelCommand::AddArguments();
     }
 
@@ -24553,8 +24564,8 @@ class WriteThermostatMaxCoolSetpointLimit : public ModelCommand
 public:
     WriteThermostatMaxCoolSetpointLimit() : ModelCommand("write")
     {
-        AddArgument("attr-name", "max-cool-setpoint-limit");
-        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        AddArgument("attr-name", "max-cool-setpoint-limit", false);
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -24589,7 +24600,7 @@ class ReadThermostatMinSetpointDeadBand : public ModelCommand
 public:
     ReadThermostatMinSetpointDeadBand() : ModelCommand("read")
     {
-        AddArgument("attr-name", "min-setpoint-dead-band");
+        AddArgument("attr-name", "min-setpoint-dead-band", false);
         ModelCommand::AddArguments();
     }
 
@@ -24620,8 +24631,8 @@ class WriteThermostatMinSetpointDeadBand : public ModelCommand
 public:
     WriteThermostatMinSetpointDeadBand() : ModelCommand("write")
     {
-        AddArgument("attr-name", "min-setpoint-dead-band");
-        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
+        AddArgument("attr-name", "min-setpoint-dead-band", false);
+        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -24656,7 +24667,7 @@ class ReadThermostatControlSequenceOfOperation : public ModelCommand
 public:
     ReadThermostatControlSequenceOfOperation() : ModelCommand("read")
     {
-        AddArgument("attr-name", "control-sequence-of-operation");
+        AddArgument("attr-name", "control-sequence-of-operation", false);
         ModelCommand::AddArguments();
     }
 
@@ -24687,8 +24698,8 @@ class WriteThermostatControlSequenceOfOperation : public ModelCommand
 public:
     WriteThermostatControlSequenceOfOperation() : ModelCommand("write")
     {
-        AddArgument("attr-name", "control-sequence-of-operation");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "control-sequence-of-operation", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -24723,7 +24734,7 @@ class ReadThermostatSystemMode : public ModelCommand
 public:
     ReadThermostatSystemMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "system-mode");
+        AddArgument("attr-name", "system-mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -24754,8 +24765,8 @@ class WriteThermostatSystemMode : public ModelCommand
 public:
     WriteThermostatSystemMode() : ModelCommand("write")
     {
-        AddArgument("attr-name", "system-mode");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "system-mode", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -24790,7 +24801,7 @@ class ReadThermostatStartOfWeek : public ModelCommand
 public:
     ReadThermostatStartOfWeek() : ModelCommand("read")
     {
-        AddArgument("attr-name", "start-of-week");
+        AddArgument("attr-name", "start-of-week", false);
         ModelCommand::AddArguments();
     }
 
@@ -24824,7 +24835,7 @@ class ReadThermostatNumberOfWeeklyTransitions : public ModelCommand
 public:
     ReadThermostatNumberOfWeeklyTransitions() : ModelCommand("read")
     {
-        AddArgument("attr-name", "number-of-weekly-transitions");
+        AddArgument("attr-name", "number-of-weekly-transitions", false);
         ModelCommand::AddArguments();
     }
 
@@ -24858,7 +24869,7 @@ class ReadThermostatNumberOfDailyTransitions : public ModelCommand
 public:
     ReadThermostatNumberOfDailyTransitions() : ModelCommand("read")
     {
-        AddArgument("attr-name", "number-of-daily-transitions");
+        AddArgument("attr-name", "number-of-daily-transitions", false);
         ModelCommand::AddArguments();
     }
 
@@ -24892,7 +24903,7 @@ class ReadThermostatFeatureMap : public ModelCommand
 public:
     ReadThermostatFeatureMap() : ModelCommand("read")
     {
-        AddArgument("attr-name", "feature-map");
+        AddArgument("attr-name", "feature-map", false);
         ModelCommand::AddArguments();
     }
 
@@ -24926,7 +24937,7 @@ class ReadThermostatClusterRevision : public ModelCommand
 public:
     ReadThermostatClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -24972,7 +24983,7 @@ class ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode : public Mo
 public:
     ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "temperature-display-mode");
+        AddArgument("attr-name", "temperature-display-mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -25003,8 +25014,8 @@ class WriteThermostatUserInterfaceConfigurationTemperatureDisplayMode : public M
 public:
     WriteThermostatUserInterfaceConfigurationTemperatureDisplayMode() : ModelCommand("write")
     {
-        AddArgument("attr-name", "temperature-display-mode");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "temperature-display-mode", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -25039,7 +25050,7 @@ class ReadThermostatUserInterfaceConfigurationKeypadLockout : public ModelComman
 public:
     ReadThermostatUserInterfaceConfigurationKeypadLockout() : ModelCommand("read")
     {
-        AddArgument("attr-name", "keypad-lockout");
+        AddArgument("attr-name", "keypad-lockout", false);
         ModelCommand::AddArguments();
     }
 
@@ -25070,8 +25081,8 @@ class WriteThermostatUserInterfaceConfigurationKeypadLockout : public ModelComma
 public:
     WriteThermostatUserInterfaceConfigurationKeypadLockout() : ModelCommand("write")
     {
-        AddArgument("attr-name", "keypad-lockout");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "keypad-lockout", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -25106,7 +25117,7 @@ class ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility : pu
 public:
     ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility() : ModelCommand("read")
     {
-        AddArgument("attr-name", "schedule-programming-visibility");
+        AddArgument("attr-name", "schedule-programming-visibility", false);
         ModelCommand::AddArguments();
     }
 
@@ -25137,8 +25148,8 @@ class WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility : p
 public:
     WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility() : ModelCommand("write")
     {
-        AddArgument("attr-name", "schedule-programming-visibility");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "schedule-programming-visibility", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -25174,7 +25185,7 @@ class ReadThermostatUserInterfaceConfigurationClusterRevision : public ModelComm
 public:
     ReadThermostatUserInterfaceConfigurationClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -25302,7 +25313,7 @@ class ReadThreadNetworkDiagnosticsChannel : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsChannel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "channel");
+        AddArgument("attr-name", "channel", false);
         ModelCommand::AddArguments();
     }
 
@@ -25336,7 +25347,7 @@ class ReadThreadNetworkDiagnosticsRoutingRole : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRoutingRole() : ModelCommand("read")
     {
-        AddArgument("attr-name", "routing-role");
+        AddArgument("attr-name", "routing-role", false);
         ModelCommand::AddArguments();
     }
 
@@ -25370,7 +25381,7 @@ class ReadThreadNetworkDiagnosticsNetworkName : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsNetworkName() : ModelCommand("read")
     {
-        AddArgument("attr-name", "network-name");
+        AddArgument("attr-name", "network-name", false);
         ModelCommand::AddArguments();
     }
 
@@ -25404,7 +25415,7 @@ class ReadThreadNetworkDiagnosticsPanId : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsPanId() : ModelCommand("read")
     {
-        AddArgument("attr-name", "pan-id");
+        AddArgument("attr-name", "pan-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -25438,7 +25449,7 @@ class ReadThreadNetworkDiagnosticsExtendedPanId : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsExtendedPanId() : ModelCommand("read")
     {
-        AddArgument("attr-name", "extended-pan-id");
+        AddArgument("attr-name", "extended-pan-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -25472,7 +25483,7 @@ class ReadThreadNetworkDiagnosticsMeshLocalPrefix : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsMeshLocalPrefix() : ModelCommand("read")
     {
-        AddArgument("attr-name", "mesh-local-prefix");
+        AddArgument("attr-name", "mesh-local-prefix", false);
         ModelCommand::AddArguments();
     }
 
@@ -25506,7 +25517,7 @@ class ReadThreadNetworkDiagnosticsOverrunCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsOverrunCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "overrun-count");
+        AddArgument("attr-name", "overrun-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -25540,7 +25551,7 @@ class ReadThreadNetworkDiagnosticsNeighborTableList : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsNeighborTableList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "neighbor-table-list");
+        AddArgument("attr-name", "neighbor-table-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -25575,7 +25586,7 @@ class ReadThreadNetworkDiagnosticsRouteTableList : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRouteTableList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "route-table-list");
+        AddArgument("attr-name", "route-table-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -25610,7 +25621,7 @@ class ReadThreadNetworkDiagnosticsPartitionId : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsPartitionId() : ModelCommand("read")
     {
-        AddArgument("attr-name", "partition-id");
+        AddArgument("attr-name", "partition-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -25644,7 +25655,7 @@ class ReadThreadNetworkDiagnosticsWeighting : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsWeighting() : ModelCommand("read")
     {
-        AddArgument("attr-name", "weighting");
+        AddArgument("attr-name", "weighting", false);
         ModelCommand::AddArguments();
     }
 
@@ -25678,7 +25689,7 @@ class ReadThreadNetworkDiagnosticsDataVersion : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsDataVersion() : ModelCommand("read")
     {
-        AddArgument("attr-name", "data-version");
+        AddArgument("attr-name", "data-version", false);
         ModelCommand::AddArguments();
     }
 
@@ -25712,7 +25723,7 @@ class ReadThreadNetworkDiagnosticsStableDataVersion : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsStableDataVersion() : ModelCommand("read")
     {
-        AddArgument("attr-name", "stable-data-version");
+        AddArgument("attr-name", "stable-data-version", false);
         ModelCommand::AddArguments();
     }
 
@@ -25746,7 +25757,7 @@ class ReadThreadNetworkDiagnosticsLeaderRouterId : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsLeaderRouterId() : ModelCommand("read")
     {
-        AddArgument("attr-name", "leader-router-id");
+        AddArgument("attr-name", "leader-router-id", false);
         ModelCommand::AddArguments();
     }
 
@@ -25780,7 +25791,7 @@ class ReadThreadNetworkDiagnosticsDetachedRoleCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsDetachedRoleCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "detached-role-count");
+        AddArgument("attr-name", "detached-role-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -25814,7 +25825,7 @@ class ReadThreadNetworkDiagnosticsChildRoleCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsChildRoleCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "child-role-count");
+        AddArgument("attr-name", "child-role-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -25848,7 +25859,7 @@ class ReadThreadNetworkDiagnosticsRouterRoleCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRouterRoleCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "router-role-count");
+        AddArgument("attr-name", "router-role-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -25882,7 +25893,7 @@ class ReadThreadNetworkDiagnosticsLeaderRoleCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsLeaderRoleCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "leader-role-count");
+        AddArgument("attr-name", "leader-role-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -25916,7 +25927,7 @@ class ReadThreadNetworkDiagnosticsAttachAttemptCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsAttachAttemptCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "attach-attempt-count");
+        AddArgument("attr-name", "attach-attempt-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -25950,7 +25961,7 @@ class ReadThreadNetworkDiagnosticsPartitionIdChangeCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsPartitionIdChangeCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "partition-id-change-count");
+        AddArgument("attr-name", "partition-id-change-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -25984,7 +25995,7 @@ class ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount : public Mod
 public:
     ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "better-partition-attach-attempt-count");
+        AddArgument("attr-name", "better-partition-attach-attempt-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26018,7 +26029,7 @@ class ReadThreadNetworkDiagnosticsParentChangeCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsParentChangeCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "parent-change-count");
+        AddArgument("attr-name", "parent-change-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26052,7 +26063,7 @@ class ReadThreadNetworkDiagnosticsTxTotalCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxTotalCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-total-count");
+        AddArgument("attr-name", "tx-total-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26086,7 +26097,7 @@ class ReadThreadNetworkDiagnosticsTxUnicastCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxUnicastCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-unicast-count");
+        AddArgument("attr-name", "tx-unicast-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26120,7 +26131,7 @@ class ReadThreadNetworkDiagnosticsTxBroadcastCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxBroadcastCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-broadcast-count");
+        AddArgument("attr-name", "tx-broadcast-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26154,7 +26165,7 @@ class ReadThreadNetworkDiagnosticsTxAckRequestedCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxAckRequestedCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-ack-requested-count");
+        AddArgument("attr-name", "tx-ack-requested-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26188,7 +26199,7 @@ class ReadThreadNetworkDiagnosticsTxAckedCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxAckedCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-acked-count");
+        AddArgument("attr-name", "tx-acked-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26222,7 +26233,7 @@ class ReadThreadNetworkDiagnosticsTxNoAckRequestedCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxNoAckRequestedCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-no-ack-requested-count");
+        AddArgument("attr-name", "tx-no-ack-requested-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26256,7 +26267,7 @@ class ReadThreadNetworkDiagnosticsTxDataCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxDataCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-data-count");
+        AddArgument("attr-name", "tx-data-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26290,7 +26301,7 @@ class ReadThreadNetworkDiagnosticsTxDataPollCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxDataPollCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-data-poll-count");
+        AddArgument("attr-name", "tx-data-poll-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26324,7 +26335,7 @@ class ReadThreadNetworkDiagnosticsTxBeaconCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxBeaconCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-beacon-count");
+        AddArgument("attr-name", "tx-beacon-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26358,7 +26369,7 @@ class ReadThreadNetworkDiagnosticsTxBeaconRequestCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxBeaconRequestCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-beacon-request-count");
+        AddArgument("attr-name", "tx-beacon-request-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26392,7 +26403,7 @@ class ReadThreadNetworkDiagnosticsTxOtherCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxOtherCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-other-count");
+        AddArgument("attr-name", "tx-other-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26426,7 +26437,7 @@ class ReadThreadNetworkDiagnosticsTxRetryCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxRetryCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-retry-count");
+        AddArgument("attr-name", "tx-retry-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26460,7 +26471,7 @@ class ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount : public ModelComm
 public:
     ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-direct-max-retry-expiry-count");
+        AddArgument("attr-name", "tx-direct-max-retry-expiry-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26494,7 +26505,7 @@ class ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount : public ModelCo
 public:
     ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-indirect-max-retry-expiry-count");
+        AddArgument("attr-name", "tx-indirect-max-retry-expiry-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26528,7 +26539,7 @@ class ReadThreadNetworkDiagnosticsTxErrCcaCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxErrCcaCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-err-cca-count");
+        AddArgument("attr-name", "tx-err-cca-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26562,7 +26573,7 @@ class ReadThreadNetworkDiagnosticsTxErrAbortCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxErrAbortCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-err-abort-count");
+        AddArgument("attr-name", "tx-err-abort-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26596,7 +26607,7 @@ class ReadThreadNetworkDiagnosticsTxErrBusyChannelCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsTxErrBusyChannelCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tx-err-busy-channel-count");
+        AddArgument("attr-name", "tx-err-busy-channel-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26630,7 +26641,7 @@ class ReadThreadNetworkDiagnosticsRxTotalCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxTotalCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-total-count");
+        AddArgument("attr-name", "rx-total-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26664,7 +26675,7 @@ class ReadThreadNetworkDiagnosticsRxUnicastCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxUnicastCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-unicast-count");
+        AddArgument("attr-name", "rx-unicast-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26698,7 +26709,7 @@ class ReadThreadNetworkDiagnosticsRxBroadcastCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxBroadcastCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-broadcast-count");
+        AddArgument("attr-name", "rx-broadcast-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26732,7 +26743,7 @@ class ReadThreadNetworkDiagnosticsRxDataCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxDataCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-data-count");
+        AddArgument("attr-name", "rx-data-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26766,7 +26777,7 @@ class ReadThreadNetworkDiagnosticsRxDataPollCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxDataPollCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-data-poll-count");
+        AddArgument("attr-name", "rx-data-poll-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26800,7 +26811,7 @@ class ReadThreadNetworkDiagnosticsRxBeaconCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxBeaconCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-beacon-count");
+        AddArgument("attr-name", "rx-beacon-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26834,7 +26845,7 @@ class ReadThreadNetworkDiagnosticsRxBeaconRequestCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxBeaconRequestCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-beacon-request-count");
+        AddArgument("attr-name", "rx-beacon-request-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26868,7 +26879,7 @@ class ReadThreadNetworkDiagnosticsRxOtherCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxOtherCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-other-count");
+        AddArgument("attr-name", "rx-other-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26902,7 +26913,7 @@ class ReadThreadNetworkDiagnosticsRxAddressFilteredCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxAddressFilteredCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-address-filtered-count");
+        AddArgument("attr-name", "rx-address-filtered-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26936,7 +26947,7 @@ class ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-dest-addr-filtered-count");
+        AddArgument("attr-name", "rx-dest-addr-filtered-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -26970,7 +26981,7 @@ class ReadThreadNetworkDiagnosticsRxDuplicatedCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxDuplicatedCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-duplicated-count");
+        AddArgument("attr-name", "rx-duplicated-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27004,7 +27015,7 @@ class ReadThreadNetworkDiagnosticsRxErrNoFrameCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxErrNoFrameCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-err-no-frame-count");
+        AddArgument("attr-name", "rx-err-no-frame-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27038,7 +27049,7 @@ class ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount : public ModelComman
 public:
     ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-err-unknown-neighbor-count");
+        AddArgument("attr-name", "rx-err-unknown-neighbor-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27072,7 +27083,7 @@ class ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-err-invalid-src-addr-count");
+        AddArgument("attr-name", "rx-err-invalid-src-addr-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27106,7 +27117,7 @@ class ReadThreadNetworkDiagnosticsRxErrSecCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxErrSecCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-err-sec-count");
+        AddArgument("attr-name", "rx-err-sec-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27140,7 +27151,7 @@ class ReadThreadNetworkDiagnosticsRxErrFcsCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxErrFcsCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-err-fcs-count");
+        AddArgument("attr-name", "rx-err-fcs-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27174,7 +27185,7 @@ class ReadThreadNetworkDiagnosticsRxErrOtherCount : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsRxErrOtherCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rx-err-other-count");
+        AddArgument("attr-name", "rx-err-other-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27208,7 +27219,7 @@ class ReadThreadNetworkDiagnosticsActiveTimestamp : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsActiveTimestamp() : ModelCommand("read")
     {
-        AddArgument("attr-name", "active-timestamp");
+        AddArgument("attr-name", "active-timestamp", false);
         ModelCommand::AddArguments();
     }
 
@@ -27242,7 +27253,7 @@ class ReadThreadNetworkDiagnosticsPendingTimestamp : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsPendingTimestamp() : ModelCommand("read")
     {
-        AddArgument("attr-name", "pending-timestamp");
+        AddArgument("attr-name", "pending-timestamp", false);
         ModelCommand::AddArguments();
     }
 
@@ -27276,7 +27287,7 @@ class ReadThreadNetworkDiagnosticsDelay : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsDelay() : ModelCommand("read")
     {
-        AddArgument("attr-name", "delay");
+        AddArgument("attr-name", "delay", false);
         ModelCommand::AddArguments();
     }
 
@@ -27310,7 +27321,7 @@ class ReadThreadNetworkDiagnosticsSecurityPolicy : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsSecurityPolicy() : ModelCommand("read")
     {
-        AddArgument("attr-name", "security-policy");
+        AddArgument("attr-name", "security-policy", false);
         ModelCommand::AddArguments();
     }
 
@@ -27345,7 +27356,7 @@ class ReadThreadNetworkDiagnosticsChannelMask : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsChannelMask() : ModelCommand("read")
     {
-        AddArgument("attr-name", "channel-mask");
+        AddArgument("attr-name", "channel-mask", false);
         ModelCommand::AddArguments();
     }
 
@@ -27379,7 +27390,7 @@ class ReadThreadNetworkDiagnosticsOperationalDatasetComponents : public ModelCom
 public:
     ReadThreadNetworkDiagnosticsOperationalDatasetComponents() : ModelCommand("read")
     {
-        AddArgument("attr-name", "operational-dataset-components");
+        AddArgument("attr-name", "operational-dataset-components", false);
         ModelCommand::AddArguments();
     }
 
@@ -27414,7 +27425,7 @@ class ReadThreadNetworkDiagnosticsActiveNetworkFaultsList : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsActiveNetworkFaultsList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "active-network-faults-list");
+        AddArgument("attr-name", "active-network-faults-list", false);
         ModelCommand::AddArguments();
     }
 
@@ -27449,7 +27460,7 @@ class ReadThreadNetworkDiagnosticsClusterRevision : public ModelCommand
 public:
     ReadThreadNetworkDiagnosticsClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -27493,7 +27504,7 @@ class ReadWakeOnLanWakeOnLanMacAddress : public ModelCommand
 public:
     ReadWakeOnLanWakeOnLanMacAddress() : ModelCommand("read")
     {
-        AddArgument("attr-name", "wake-on-lan-mac-address");
+        AddArgument("attr-name", "wake-on-lan-mac-address", false);
         ModelCommand::AddArguments();
     }
 
@@ -27527,7 +27538,7 @@ class ReadWakeOnLanClusterRevision : public ModelCommand
 public:
     ReadWakeOnLanClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -27605,7 +27616,7 @@ class ReadWiFiNetworkDiagnosticsBssid : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsBssid() : ModelCommand("read")
     {
-        AddArgument("attr-name", "bssid");
+        AddArgument("attr-name", "bssid", false);
         ModelCommand::AddArguments();
     }
 
@@ -27639,7 +27650,7 @@ class ReadWiFiNetworkDiagnosticsSecurityType : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsSecurityType() : ModelCommand("read")
     {
-        AddArgument("attr-name", "security-type");
+        AddArgument("attr-name", "security-type", false);
         ModelCommand::AddArguments();
     }
 
@@ -27673,7 +27684,7 @@ class ReadWiFiNetworkDiagnosticsWiFiVersion : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsWiFiVersion() : ModelCommand("read")
     {
-        AddArgument("attr-name", "wi-fi-version");
+        AddArgument("attr-name", "wi-fi-version", false);
         ModelCommand::AddArguments();
     }
 
@@ -27707,7 +27718,7 @@ class ReadWiFiNetworkDiagnosticsChannelNumber : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsChannelNumber() : ModelCommand("read")
     {
-        AddArgument("attr-name", "channel-number");
+        AddArgument("attr-name", "channel-number", false);
         ModelCommand::AddArguments();
     }
 
@@ -27741,7 +27752,7 @@ class ReadWiFiNetworkDiagnosticsRssi : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsRssi() : ModelCommand("read")
     {
-        AddArgument("attr-name", "rssi");
+        AddArgument("attr-name", "rssi", false);
         ModelCommand::AddArguments();
     }
 
@@ -27775,7 +27786,7 @@ class ReadWiFiNetworkDiagnosticsBeaconLostCount : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsBeaconLostCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "beacon-lost-count");
+        AddArgument("attr-name", "beacon-lost-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27809,7 +27820,7 @@ class ReadWiFiNetworkDiagnosticsBeaconRxCount : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsBeaconRxCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "beacon-rx-count");
+        AddArgument("attr-name", "beacon-rx-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27843,7 +27854,7 @@ class ReadWiFiNetworkDiagnosticsPacketMulticastRxCount : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsPacketMulticastRxCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "packet-multicast-rx-count");
+        AddArgument("attr-name", "packet-multicast-rx-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27877,7 +27888,7 @@ class ReadWiFiNetworkDiagnosticsPacketMulticastTxCount : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsPacketMulticastTxCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "packet-multicast-tx-count");
+        AddArgument("attr-name", "packet-multicast-tx-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27911,7 +27922,7 @@ class ReadWiFiNetworkDiagnosticsPacketUnicastRxCount : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsPacketUnicastRxCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "packet-unicast-rx-count");
+        AddArgument("attr-name", "packet-unicast-rx-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27945,7 +27956,7 @@ class ReadWiFiNetworkDiagnosticsPacketUnicastTxCount : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsPacketUnicastTxCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "packet-unicast-tx-count");
+        AddArgument("attr-name", "packet-unicast-tx-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -27979,7 +27990,7 @@ class ReadWiFiNetworkDiagnosticsCurrentMaxRate : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsCurrentMaxRate() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-max-rate");
+        AddArgument("attr-name", "current-max-rate", false);
         ModelCommand::AddArguments();
     }
 
@@ -28013,7 +28024,7 @@ class ReadWiFiNetworkDiagnosticsOverrunCount : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsOverrunCount() : ModelCommand("read")
     {
-        AddArgument("attr-name", "overrun-count");
+        AddArgument("attr-name", "overrun-count", false);
         ModelCommand::AddArguments();
     }
 
@@ -28047,7 +28058,7 @@ class ReadWiFiNetworkDiagnosticsClusterRevision : public ModelCommand
 public:
     ReadWiFiNetworkDiagnosticsClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 
@@ -28137,8 +28148,8 @@ class WindowCoveringGoToLiftPercentage : public ModelCommand
 public:
     WindowCoveringGoToLiftPercentage() : ModelCommand("go-to-lift-percentage")
     {
-        AddArgument("LiftPercentageValue", 0, UINT8_MAX, &mRequest.liftPercentageValue);
-        AddArgument("LiftPercent100thsValue", 0, UINT16_MAX, &mRequest.liftPercent100thsValue);
+        AddArgument("LiftPercentageValue", 0, UINT8_MAX, &mRequest.liftPercentageValue, false);
+        AddArgument("LiftPercent100thsValue", 0, UINT16_MAX, &mRequest.liftPercent100thsValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -28163,7 +28174,7 @@ class WindowCoveringGoToLiftValue : public ModelCommand
 public:
     WindowCoveringGoToLiftValue() : ModelCommand("go-to-lift-value")
     {
-        AddArgument("LiftValue", 0, UINT16_MAX, &mRequest.liftValue);
+        AddArgument("LiftValue", 0, UINT16_MAX, &mRequest.liftValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -28188,8 +28199,8 @@ class WindowCoveringGoToTiltPercentage : public ModelCommand
 public:
     WindowCoveringGoToTiltPercentage() : ModelCommand("go-to-tilt-percentage")
     {
-        AddArgument("TiltPercentageValue", 0, UINT8_MAX, &mRequest.tiltPercentageValue);
-        AddArgument("TiltPercent100thsValue", 0, UINT16_MAX, &mRequest.tiltPercent100thsValue);
+        AddArgument("TiltPercentageValue", 0, UINT8_MAX, &mRequest.tiltPercentageValue, false);
+        AddArgument("TiltPercent100thsValue", 0, UINT16_MAX, &mRequest.tiltPercent100thsValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -28214,7 +28225,7 @@ class WindowCoveringGoToTiltValue : public ModelCommand
 public:
     WindowCoveringGoToTiltValue() : ModelCommand("go-to-tilt-value")
     {
-        AddArgument("TiltValue", 0, UINT16_MAX, &mRequest.tiltValue);
+        AddArgument("TiltValue", 0, UINT16_MAX, &mRequest.tiltValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -28281,7 +28292,7 @@ class ReadWindowCoveringType : public ModelCommand
 public:
     ReadWindowCoveringType() : ModelCommand("read")
     {
-        AddArgument("attr-name", "type");
+        AddArgument("attr-name", "type", false);
         ModelCommand::AddArguments();
     }
 
@@ -28315,7 +28326,7 @@ class ReadWindowCoveringCurrentPositionLift : public ModelCommand
 public:
     ReadWindowCoveringCurrentPositionLift() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-position-lift");
+        AddArgument("attr-name", "current-position-lift", false);
         ModelCommand::AddArguments();
     }
 
@@ -28349,7 +28360,7 @@ class ReadWindowCoveringCurrentPositionTilt : public ModelCommand
 public:
     ReadWindowCoveringCurrentPositionTilt() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-position-tilt");
+        AddArgument("attr-name", "current-position-tilt", false);
         ModelCommand::AddArguments();
     }
 
@@ -28383,7 +28394,7 @@ class ReadWindowCoveringConfigStatus : public ModelCommand
 public:
     ReadWindowCoveringConfigStatus() : ModelCommand("read")
     {
-        AddArgument("attr-name", "config-status");
+        AddArgument("attr-name", "config-status", false);
         ModelCommand::AddArguments();
     }
 
@@ -28417,7 +28428,7 @@ class ReadWindowCoveringCurrentPositionLiftPercentage : public ModelCommand
 public:
     ReadWindowCoveringCurrentPositionLiftPercentage() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-position-lift-percentage");
+        AddArgument("attr-name", "current-position-lift-percentage", false);
         ModelCommand::AddArguments();
     }
 
@@ -28448,10 +28459,10 @@ class ReportWindowCoveringCurrentPositionLiftPercentage : public ModelCommand
 public:
     ReportWindowCoveringCurrentPositionLiftPercentage() : ModelCommand("report")
     {
-        AddArgument("attr-name", "current-position-lift-percentage");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "current-position-lift-percentage", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -28504,7 +28515,7 @@ class ReadWindowCoveringCurrentPositionTiltPercentage : public ModelCommand
 public:
     ReadWindowCoveringCurrentPositionTiltPercentage() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-position-tilt-percentage");
+        AddArgument("attr-name", "current-position-tilt-percentage", false);
         ModelCommand::AddArguments();
     }
 
@@ -28535,10 +28546,10 @@ class ReportWindowCoveringCurrentPositionTiltPercentage : public ModelCommand
 public:
     ReportWindowCoveringCurrentPositionTiltPercentage() : ModelCommand("report")
     {
-        AddArgument("attr-name", "current-position-tilt-percentage");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "current-position-tilt-percentage", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -28591,7 +28602,7 @@ class ReadWindowCoveringOperationalStatus : public ModelCommand
 public:
     ReadWindowCoveringOperationalStatus() : ModelCommand("read")
     {
-        AddArgument("attr-name", "operational-status");
+        AddArgument("attr-name", "operational-status", false);
         ModelCommand::AddArguments();
     }
 
@@ -28622,10 +28633,10 @@ class ReportWindowCoveringOperationalStatus : public ModelCommand
 public:
     ReportWindowCoveringOperationalStatus() : ModelCommand("report")
     {
-        AddArgument("attr-name", "operational-status");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "operational-status", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -28678,7 +28689,7 @@ class ReadWindowCoveringTargetPositionLiftPercent100ths : public ModelCommand
 public:
     ReadWindowCoveringTargetPositionLiftPercent100ths() : ModelCommand("read")
     {
-        AddArgument("attr-name", "target-position-lift-percent100ths");
+        AddArgument("attr-name", "target-position-lift-percent100ths", false);
         ModelCommand::AddArguments();
     }
 
@@ -28709,10 +28720,10 @@ class ReportWindowCoveringTargetPositionLiftPercent100ths : public ModelCommand
 public:
     ReportWindowCoveringTargetPositionLiftPercent100ths() : ModelCommand("report")
     {
-        AddArgument("attr-name", "target-position-lift-percent100ths");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "target-position-lift-percent100ths", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -28765,7 +28776,7 @@ class ReadWindowCoveringTargetPositionTiltPercent100ths : public ModelCommand
 public:
     ReadWindowCoveringTargetPositionTiltPercent100ths() : ModelCommand("read")
     {
-        AddArgument("attr-name", "target-position-tilt-percent100ths");
+        AddArgument("attr-name", "target-position-tilt-percent100ths", false);
         ModelCommand::AddArguments();
     }
 
@@ -28796,10 +28807,10 @@ class ReportWindowCoveringTargetPositionTiltPercent100ths : public ModelCommand
 public:
     ReportWindowCoveringTargetPositionTiltPercent100ths() : ModelCommand("report")
     {
-        AddArgument("attr-name", "target-position-tilt-percent100ths");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "target-position-tilt-percent100ths", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -28852,7 +28863,7 @@ class ReadWindowCoveringEndProductType : public ModelCommand
 public:
     ReadWindowCoveringEndProductType() : ModelCommand("read")
     {
-        AddArgument("attr-name", "end-product-type");
+        AddArgument("attr-name", "end-product-type", false);
         ModelCommand::AddArguments();
     }
 
@@ -28886,7 +28897,7 @@ class ReadWindowCoveringCurrentPositionLiftPercent100ths : public ModelCommand
 public:
     ReadWindowCoveringCurrentPositionLiftPercent100ths() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-position-lift-percent100ths");
+        AddArgument("attr-name", "current-position-lift-percent100ths", false);
         ModelCommand::AddArguments();
     }
 
@@ -28917,10 +28928,10 @@ class ReportWindowCoveringCurrentPositionLiftPercent100ths : public ModelCommand
 public:
     ReportWindowCoveringCurrentPositionLiftPercent100ths() : ModelCommand("report")
     {
-        AddArgument("attr-name", "current-position-lift-percent100ths");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "current-position-lift-percent100ths", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -28973,7 +28984,7 @@ class ReadWindowCoveringCurrentPositionTiltPercent100ths : public ModelCommand
 public:
     ReadWindowCoveringCurrentPositionTiltPercent100ths() : ModelCommand("read")
     {
-        AddArgument("attr-name", "current-position-tilt-percent100ths");
+        AddArgument("attr-name", "current-position-tilt-percent100ths", false);
         ModelCommand::AddArguments();
     }
 
@@ -29004,10 +29015,10 @@ class ReportWindowCoveringCurrentPositionTiltPercent100ths : public ModelCommand
 public:
     ReportWindowCoveringCurrentPositionTiltPercent100ths() : ModelCommand("report")
     {
-        AddArgument("attr-name", "current-position-tilt-percent100ths");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "current-position-tilt-percent100ths", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -29060,7 +29071,7 @@ class ReadWindowCoveringInstalledOpenLimitLift : public ModelCommand
 public:
     ReadWindowCoveringInstalledOpenLimitLift() : ModelCommand("read")
     {
-        AddArgument("attr-name", "installed-open-limit-lift");
+        AddArgument("attr-name", "installed-open-limit-lift", false);
         ModelCommand::AddArguments();
     }
 
@@ -29094,7 +29105,7 @@ class ReadWindowCoveringInstalledClosedLimitLift : public ModelCommand
 public:
     ReadWindowCoveringInstalledClosedLimitLift() : ModelCommand("read")
     {
-        AddArgument("attr-name", "installed-closed-limit-lift");
+        AddArgument("attr-name", "installed-closed-limit-lift", false);
         ModelCommand::AddArguments();
     }
 
@@ -29128,7 +29139,7 @@ class ReadWindowCoveringInstalledOpenLimitTilt : public ModelCommand
 public:
     ReadWindowCoveringInstalledOpenLimitTilt() : ModelCommand("read")
     {
-        AddArgument("attr-name", "installed-open-limit-tilt");
+        AddArgument("attr-name", "installed-open-limit-tilt", false);
         ModelCommand::AddArguments();
     }
 
@@ -29162,7 +29173,7 @@ class ReadWindowCoveringInstalledClosedLimitTilt : public ModelCommand
 public:
     ReadWindowCoveringInstalledClosedLimitTilt() : ModelCommand("read")
     {
-        AddArgument("attr-name", "installed-closed-limit-tilt");
+        AddArgument("attr-name", "installed-closed-limit-tilt", false);
         ModelCommand::AddArguments();
     }
 
@@ -29196,7 +29207,7 @@ class ReadWindowCoveringMode : public ModelCommand
 public:
     ReadWindowCoveringMode() : ModelCommand("read")
     {
-        AddArgument("attr-name", "mode");
+        AddArgument("attr-name", "mode", false);
         ModelCommand::AddArguments();
     }
 
@@ -29227,8 +29238,8 @@ class WriteWindowCoveringMode : public ModelCommand
 public:
     WriteWindowCoveringMode() : ModelCommand("write")
     {
-        AddArgument("attr-name", "mode");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-name", "mode", false);
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue, false);
         ModelCommand::AddArguments();
     }
 
@@ -29263,7 +29274,7 @@ class ReadWindowCoveringSafetyStatus : public ModelCommand
 public:
     ReadWindowCoveringSafetyStatus() : ModelCommand("read")
     {
-        AddArgument("attr-name", "safety-status");
+        AddArgument("attr-name", "safety-status", false);
         ModelCommand::AddArguments();
     }
 
@@ -29294,10 +29305,10 @@ class ReportWindowCoveringSafetyStatus : public ModelCommand
 public:
     ReportWindowCoveringSafetyStatus() : ModelCommand("report")
     {
-        AddArgument("attr-name", "safety-status");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "safety-status", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 
@@ -29349,7 +29360,7 @@ class ReadWindowCoveringFeatureMap : public ModelCommand
 public:
     ReadWindowCoveringFeatureMap() : ModelCommand("read")
     {
-        AddArgument("attr-name", "feature-map");
+        AddArgument("attr-name", "feature-map", false);
         ModelCommand::AddArguments();
     }
 
@@ -29383,7 +29394,7 @@ class ReadWindowCoveringClusterRevision : public ModelCommand
 public:
     ReadWindowCoveringClusterRevision() : ModelCommand("read")
     {
-        AddArgument("attr-name", "cluster-revision");
+        AddArgument("attr-name", "cluster-revision", false);
         ModelCommand::AddArguments();
     }
 

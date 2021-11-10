@@ -116,7 +116,14 @@ private:
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -132,7 +139,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -148,7 +162,14 @@ private:
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -377,7 +398,14 @@ private:
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeOutOfService_0()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOutOfService(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -393,7 +421,14 @@ private:
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsOutOfService_1()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOutOfService(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -409,7 +444,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeOutOfService_2()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         bool outOfServiceArgument;
         outOfServiceArgument = 0;
@@ -425,7 +467,14 @@ private:
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeOutOfService_3()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOutOfService(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -441,7 +490,14 @@ private:
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsPresentValue_4()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePresentValue(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -457,7 +513,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryNonGlobalAttributePresentValue_5()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         bool presentValueArgument;
         presentValueArgument = 0;
@@ -473,7 +536,14 @@ private:
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributePresentValue_6()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePresentValue(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -489,7 +559,14 @@ private:
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeStatusFlags_7()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeStatusFlags(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -505,7 +582,14 @@ private:
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsStatusFlags_8()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeStatusFlags(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
     }
@@ -522,7 +606,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeStatusFlags_9()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t statusFlagsArgument;
         statusFlagsArgument = 0;
@@ -538,7 +629,14 @@ private:
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeStatusFlags_10()
     {
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeStatusFlags(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -647,7 +745,14 @@ private:
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
     {
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -663,7 +768,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -679,7 +791,14 @@ private:
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -804,7 +923,14 @@ private:
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeStateValue_0()
     {
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeStateValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -820,7 +946,14 @@ private:
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsStateValue_1()
     {
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeStateValue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -836,7 +969,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValueToMandatoryNonGlobalAttributeStateValue_2()
     {
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         bool stateValueArgument;
         stateValueArgument = 1;
@@ -852,7 +992,14 @@ private:
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeStateValue_3()
     {
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeStateValue(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -928,7 +1075,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_0()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 4U;
@@ -3181,7 +3335,14 @@ private:
     CHIP_ERROR TestReadsMandatoryAttributeCurrentHue_0()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentHue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -3197,7 +3358,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeCurrentHue_1()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentHue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -3214,7 +3382,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValueToMandatoryAttributeCurrentHue_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t currentHueArgument;
         currentHueArgument = 0;
@@ -3230,7 +3405,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentHue_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentHue(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -3246,7 +3428,14 @@ private:
     CHIP_ERROR TestReadsMandatoryAttributeCurrentSaturation_4()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentSaturation(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -3262,7 +3451,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeCurrentSaturation_5()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentSaturation(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -3279,7 +3475,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValueToMandatoryAttributeCurrentSaturation_6()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t currentSaturationArgument;
         currentSaturationArgument = 0;
@@ -3295,7 +3498,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentSaturation_7()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentSaturation(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -3311,7 +3521,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeCurrentX_8()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentX(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
     }
@@ -3327,7 +3544,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeCurrentX_9()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentX(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
     }
@@ -3344,7 +3568,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValueToMandatoryAttributeCurrentX_10()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t currentXArgument;
         currentXArgument = 24939U;
@@ -3360,7 +3591,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentX_11()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentX(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
     }
@@ -3376,7 +3614,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeCurrentY_12()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentY(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
     }
@@ -3392,7 +3637,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeCurrentY_13()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentY(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
     }
@@ -3409,7 +3661,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeCurrentY_14()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t currentYArgument;
         currentYArgument = 24701U;
@@ -3425,7 +3684,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentY_15()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentY(mOnSuccessCallback_15.Cancel(), mOnFailureCallback_15.Cancel());
     }
@@ -3441,7 +3707,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeColorTemperatureMireds_16()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorTemperature(mOnSuccessCallback_16.Cancel(), mOnFailureCallback_16.Cancel());
     }
@@ -3458,7 +3731,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeColorMode_17()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorMode(mOnSuccessCallback_17.Cancel(), mOnFailureCallback_17.Cancel());
     }
@@ -3475,7 +3755,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeOptions_18()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorControlOptions(mOnSuccessCallback_18.Cancel(), mOnFailureCallback_18.Cancel());
     }
@@ -3491,7 +3778,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeOptions_19()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorControlOptions(mOnSuccessCallback_19.Cancel(), mOnFailureCallback_19.Cancel());
     }
@@ -3507,7 +3801,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeOptions_20()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t colorControlOptionsArgument;
         colorControlOptionsArgument = 0;
@@ -3523,7 +3824,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeOptions_21()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorControlOptions(mOnSuccessCallback_21.Cancel(), mOnFailureCallback_21.Cancel());
     }
@@ -3539,7 +3847,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeEnhancedCurrentHue_22()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEnhancedCurrentHue(mOnSuccessCallback_22.Cancel(), mOnFailureCallback_22.Cancel());
     }
@@ -3555,7 +3870,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeEnhancedCurrentHue_23()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEnhancedCurrentHue(mOnSuccessCallback_23.Cancel(), mOnFailureCallback_23.Cancel());
     }
@@ -3571,7 +3893,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeEnhancedCurrentHue_24()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t enhancedCurrentHueArgument;
         enhancedCurrentHueArgument = 0U;
@@ -3587,7 +3916,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeEnhancedCurrentHue_25()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEnhancedCurrentHue(mOnSuccessCallback_25.Cancel(), mOnFailureCallback_25.Cancel());
     }
@@ -3603,7 +3939,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeEnhancedColorMode_26()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEnhancedColorMode(mOnSuccessCallback_26.Cancel(), mOnFailureCallback_26.Cancel());
     }
@@ -3619,7 +3962,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeColorLoopActive_27()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_27.Cancel(), mOnFailureCallback_27.Cancel());
     }
@@ -3635,7 +3985,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopActive_28()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_28.Cancel(), mOnFailureCallback_28.Cancel());
     }
@@ -3651,7 +4008,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopActive_29()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t colorLoopActiveArgument;
         colorLoopActiveArgument = 0;
@@ -3667,7 +4031,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopActive_30()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_30.Cancel(), mOnFailureCallback_30.Cancel());
     }
@@ -3683,7 +4054,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeColorLoopDirection_31()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_31.Cancel(), mOnFailureCallback_31.Cancel());
     }
@@ -3699,7 +4077,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopDirection_32()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_32.Cancel(), mOnFailureCallback_32.Cancel());
     }
@@ -3715,7 +4100,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopDirection_33()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t colorLoopDirectionArgument;
         colorLoopDirectionArgument = 0;
@@ -3731,7 +4123,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopDirection_34()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_34.Cancel(), mOnFailureCallback_34.Cancel());
     }
@@ -3747,7 +4146,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeColorLoopTime_35()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_35.Cancel(), mOnFailureCallback_35.Cancel());
     }
@@ -3763,7 +4169,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopTime_36()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_36.Cancel(), mOnFailureCallback_36.Cancel());
     }
@@ -3779,7 +4192,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopTime_37()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorLoopTimeArgument;
         colorLoopTimeArgument = 25U;
@@ -3795,7 +4215,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopTime_38()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_38.Cancel(), mOnFailureCallback_38.Cancel());
     }
@@ -3811,7 +4238,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeColorLoopStartEnhancedHue_39()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_39.Cancel(), mOnFailureCallback_39.Cancel());
     }
@@ -3827,7 +4261,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopStartEnhancedHue_40()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_40.Cancel(), mOnFailureCallback_40.Cancel());
     }
@@ -3843,7 +4284,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopStartEnhancedHue_41()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorLoopStartEnhancedHueArgument;
         colorLoopStartEnhancedHueArgument = 8960U;
@@ -3859,7 +4307,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopStartEnhancedHue_42()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_42.Cancel(), mOnFailureCallback_42.Cancel());
     }
@@ -3875,7 +4330,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeColorLoopStoredEnhancedHue_43()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopStoredEnhancedHue(mOnSuccessCallback_43.Cancel(), mOnFailureCallback_43.Cancel());
     }
@@ -3891,7 +4353,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopStoredEnhancedHue_44()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopStoredEnhancedHue(mOnSuccessCallback_44.Cancel(), mOnFailureCallback_44.Cancel());
     }
@@ -3907,7 +4376,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopStoredEnhancedHue_45()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorLoopStoredEnhancedHueArgument;
         colorLoopStoredEnhancedHueArgument = 0U;
@@ -3923,7 +4399,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopStoredEnhancedHue_46()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopStoredEnhancedHue(mOnSuccessCallback_46.Cancel(), mOnFailureCallback_46.Cancel());
     }
@@ -3939,7 +4422,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeColorCapabilities_47()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorCapabilities(mOnSuccessCallback_47.Cancel(), mOnFailureCallback_47.Cancel());
     }
@@ -3955,7 +4445,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeColorCapabilities_48()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorCapabilities(mOnSuccessCallback_48.Cancel(), mOnFailureCallback_48.Cancel());
     }
@@ -3972,7 +4469,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorCapabilities_49()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorCapabilitiesArgument;
         colorCapabilitiesArgument = 0U;
@@ -3988,7 +4492,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeColorCapabilities_50()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorCapabilities(mOnSuccessCallback_50.Cancel(), mOnFailureCallback_50.Cancel());
     }
@@ -4004,7 +4515,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeColorTempPhysicalMinMireds_51()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorTempPhysicalMin(mOnSuccessCallback_51.Cancel(), mOnFailureCallback_51.Cancel());
     }
@@ -4020,7 +4538,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeColorTempPhysicalMinMireds_52()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorTempPhysicalMin(mOnSuccessCallback_52.Cancel(), mOnFailureCallback_52.Cancel());
     }
@@ -4037,7 +4562,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorTempPhysicalMinMireds_53()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorTempPhysicalMinArgument;
         colorTempPhysicalMinArgument = 0U;
@@ -4053,7 +4585,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeColorTempPhysicalMinMireds_54()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorTempPhysicalMin(mOnSuccessCallback_54.Cancel(), mOnFailureCallback_54.Cancel());
     }
@@ -4069,7 +4608,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeColorTempPhysicalMaxMireds_55()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorTempPhysicalMax(mOnSuccessCallback_55.Cancel(), mOnFailureCallback_55.Cancel());
     }
@@ -4085,7 +4631,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeColorTempPhysicalMaxMireds_56()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorTempPhysicalMax(mOnSuccessCallback_56.Cancel(), mOnFailureCallback_56.Cancel());
     }
@@ -4102,7 +4655,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorTempPhysicalMaxMireds_57()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorTempPhysicalMaxArgument;
         colorTempPhysicalMaxArgument = 65279U;
@@ -4118,7 +4678,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeColorTempPhysicalMaxMireds_58()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorTempPhysicalMax(mOnSuccessCallback_58.Cancel(), mOnFailureCallback_58.Cancel());
     }
@@ -4134,7 +4701,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeCoupleColorTempToLevelMinMireds_59()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCoupleColorTempToLevelMinMireds(mOnSuccessCallback_59.Cancel(), mOnFailureCallback_59.Cancel());
     }
@@ -4150,7 +4724,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeCoupleColorTempToLevelMinMireds_60()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t coupleColorTempToLevelMinMiredsArgument;
         coupleColorTempToLevelMinMiredsArgument = 0U;
@@ -4166,7 +4747,14 @@ private:
     CHIP_ERROR TestReadsBackOptionalAttributeCoupleColorTempToLevelMinMireds_61()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCoupleColorTempToLevelMinMireds(mOnSuccessCallback_61.Cancel(), mOnFailureCallback_61.Cancel());
     }
@@ -4182,7 +4770,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeStartUpColorTemperatureMireds_62()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeStartUpColorTemperatureMireds(mOnSuccessCallback_62.Cancel(), mOnFailureCallback_62.Cancel());
     }
@@ -4199,7 +4794,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeStartUpColorTemperatureMireds_63()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t startUpColorTemperatureMiredsArgument;
         startUpColorTemperatureMiredsArgument = 0U;
@@ -4215,7 +4817,14 @@ private:
     CHIP_ERROR TestReadsBackOptionalAttributeStartUpColorTemperatureMireds_64()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeStartUpColorTemperatureMireds(mOnSuccessCallback_64.Cancel(), mOnFailureCallback_64.Cancel());
     }
@@ -4231,7 +4840,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeRemainingTime_65()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeRemainingTime(mOnSuccessCallback_65.Cancel(), mOnFailureCallback_65.Cancel());
     }
@@ -4247,7 +4863,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributeRemainingTime_66()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeRemainingTime(mOnSuccessCallback_66.Cancel(), mOnFailureCallback_66.Cancel());
     }
@@ -4264,7 +4887,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeRemainingTime_67()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t remainingTimeArgument;
         remainingTimeArgument = 0U;
@@ -4280,7 +4910,14 @@ private:
     CHIP_ERROR TestReadsBackOptionalAttributeRemainingTime_68()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeRemainingTime(mOnSuccessCallback_68.Cancel(), mOnFailureCallback_68.Cancel());
     }
@@ -4296,7 +4933,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeDriftCompensation_69()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeDriftCompensation(mOnSuccessCallback_69.Cancel(), mOnFailureCallback_69.Cancel());
     }
@@ -4313,7 +4957,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeDriftCompensation_70()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t driftCompensationArgument;
         driftCompensationArgument = static_cast<uint8_t>(0);
@@ -4329,7 +4980,14 @@ private:
     CHIP_ERROR TestReadsBackOptionalAttributeDriftCompensation_71()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeDriftCompensation(mOnSuccessCallback_71.Cancel(), mOnFailureCallback_71.Cancel());
     }
@@ -4345,7 +5003,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeCompensationText_72()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCompensationText(mOnSuccessCallback_72.Cancel(), mOnFailureCallback_72.Cancel());
     }
@@ -4362,7 +5027,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeNumberOfPrimaries_73()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeNumberOfPrimaries(mOnSuccessCallback_73.Cancel(), mOnFailureCallback_73.Cancel());
     }
@@ -4379,7 +5051,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributeNumberOfPrimaries_74()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t numberOfPrimariesArgument;
         numberOfPrimariesArgument = 0;
@@ -4395,7 +5074,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributeNumberOfPrimaries_75()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeNumberOfPrimaries(mOnSuccessCallback_75.Cancel(), mOnFailureCallback_75.Cancel());
     }
@@ -4411,7 +5097,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary1X_76()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary1X(mOnSuccessCallback_76.Cancel(), mOnFailureCallback_76.Cancel());
     }
@@ -4428,7 +5121,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary1X_77()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary1XArgument;
         primary1XArgument = 0U;
@@ -4444,7 +5144,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary1X_78()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary1X(mOnSuccessCallback_78.Cancel(), mOnFailureCallback_78.Cancel());
     }
@@ -4460,7 +5167,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary1Y_79()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary1Y(mOnSuccessCallback_79.Cancel(), mOnFailureCallback_79.Cancel());
     }
@@ -4477,7 +5191,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary1Y_80()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary1YArgument;
         primary1YArgument = 0U;
@@ -4493,7 +5214,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary1Y_81()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary1Y(mOnSuccessCallback_81.Cancel(), mOnFailureCallback_81.Cancel());
     }
@@ -4509,7 +5237,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary1Intensity_82()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary1Intensity(mOnSuccessCallback_82.Cancel(), mOnFailureCallback_82.Cancel());
     }
@@ -4525,7 +5260,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary2X_83()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary2X(mOnSuccessCallback_83.Cancel(), mOnFailureCallback_83.Cancel());
     }
@@ -4542,7 +5284,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary2X_84()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary2XArgument;
         primary2XArgument = 0U;
@@ -4558,7 +5307,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary2X_85()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary2X(mOnSuccessCallback_85.Cancel(), mOnFailureCallback_85.Cancel());
     }
@@ -4574,7 +5330,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary2Y_86()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary2Y(mOnSuccessCallback_86.Cancel(), mOnFailureCallback_86.Cancel());
     }
@@ -4591,7 +5354,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary2Y_87()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary2YArgument;
         primary2YArgument = 0U;
@@ -4607,7 +5377,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary2Y_88()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary2Y(mOnSuccessCallback_88.Cancel(), mOnFailureCallback_88.Cancel());
     }
@@ -4623,7 +5400,14 @@ private:
     CHIP_ERROR TestValidateConstraintsOfAttributePrimary2Intensity_89()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary2Intensity(mOnSuccessCallback_89.Cancel(), mOnFailureCallback_89.Cancel());
     }
@@ -4639,7 +5423,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary3X_90()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary3X(mOnSuccessCallback_90.Cancel(), mOnFailureCallback_90.Cancel());
     }
@@ -4656,7 +5447,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary3X_91()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary3XArgument;
         primary3XArgument = 0U;
@@ -4672,7 +5470,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary3X_92()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary3X(mOnSuccessCallback_92.Cancel(), mOnFailureCallback_92.Cancel());
     }
@@ -4688,7 +5493,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary3Y_93()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary3Y(mOnSuccessCallback_93.Cancel(), mOnFailureCallback_93.Cancel());
     }
@@ -4705,7 +5517,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary3Y_94()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary3YArgument;
         primary3YArgument = 0U;
@@ -4721,7 +5540,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary3Y_95()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary3Y(mOnSuccessCallback_95.Cancel(), mOnFailureCallback_95.Cancel());
     }
@@ -4737,7 +5563,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary3Intensity_96()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary3Intensity(mOnSuccessCallback_96.Cancel(), mOnFailureCallback_96.Cancel());
     }
@@ -4753,7 +5586,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary4X_97()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary4X(mOnSuccessCallback_97.Cancel(), mOnFailureCallback_97.Cancel());
     }
@@ -4770,7 +5610,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary4X_98()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary4XArgument;
         primary4XArgument = 0U;
@@ -4786,7 +5633,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary4X_99()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary4X(mOnSuccessCallback_99.Cancel(), mOnFailureCallback_99.Cancel());
     }
@@ -4802,7 +5656,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary4Y_100()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary4Y(mOnSuccessCallback_100.Cancel(), mOnFailureCallback_100.Cancel());
     }
@@ -4819,7 +5680,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary4Y_101()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary4YArgument;
         primary4YArgument = 0U;
@@ -4835,7 +5703,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary4Y_102()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary4Y(mOnSuccessCallback_102.Cancel(), mOnFailureCallback_102.Cancel());
     }
@@ -4851,7 +5726,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary4Intensity_103()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary4Intensity(mOnSuccessCallback_103.Cancel(), mOnFailureCallback_103.Cancel());
     }
@@ -4867,7 +5749,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary5X_104()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary5X(mOnSuccessCallback_104.Cancel(), mOnFailureCallback_104.Cancel());
     }
@@ -4884,7 +5773,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary5X_105()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary5XArgument;
         primary5XArgument = 0U;
@@ -4900,7 +5796,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary5X_106()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary5X(mOnSuccessCallback_106.Cancel(), mOnFailureCallback_106.Cancel());
     }
@@ -4916,7 +5819,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary5Y_107()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary5Y(mOnSuccessCallback_107.Cancel(), mOnFailureCallback_107.Cancel());
     }
@@ -4933,7 +5843,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary5Y_108()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary5YArgument;
         primary5YArgument = 0U;
@@ -4949,7 +5866,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary5Y_109()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary5Y(mOnSuccessCallback_109.Cancel(), mOnFailureCallback_109.Cancel());
     }
@@ -4965,7 +5889,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary5Intensity_110()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary5Intensity(mOnSuccessCallback_110.Cancel(), mOnFailureCallback_110.Cancel());
     }
@@ -4981,7 +5912,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary6X_111()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary6X(mOnSuccessCallback_111.Cancel(), mOnFailureCallback_111.Cancel());
     }
@@ -4998,7 +5936,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary6X_112()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary6XArgument;
         primary6XArgument = 0U;
@@ -5014,7 +5959,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary6X_113()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary6X(mOnSuccessCallback_113.Cancel(), mOnFailureCallback_113.Cancel());
     }
@@ -5030,7 +5982,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary6Y_114()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary6Y(mOnSuccessCallback_114.Cancel(), mOnFailureCallback_114.Cancel());
     }
@@ -5047,7 +6006,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary6Y_115()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t primary6YArgument;
         primary6YArgument = 0U;
@@ -5063,7 +6029,14 @@ private:
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary6Y_116()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary6Y(mOnSuccessCallback_116.Cancel(), mOnFailureCallback_116.Cancel());
     }
@@ -5079,7 +6052,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributePrimary6Intensity_117()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePrimary6Intensity(mOnSuccessCallback_117.Cancel(), mOnFailureCallback_117.Cancel());
     }
@@ -5095,7 +6075,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeWhitePointX_118()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeWhitePointX(mOnSuccessCallback_118.Cancel(), mOnFailureCallback_118.Cancel());
     }
@@ -5112,7 +6099,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeWhitePointX_119()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t whitePointXArgument;
         whitePointXArgument = 0U;
@@ -5128,7 +6122,14 @@ private:
     CHIP_ERROR TestReadBackTheOptionalAttributeWhitePointX_120()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeWhitePointX(mOnSuccessCallback_120.Cancel(), mOnFailureCallback_120.Cancel());
     }
@@ -5144,7 +6145,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeWhitePointY_121()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeWhitePointY(mOnSuccessCallback_121.Cancel(), mOnFailureCallback_121.Cancel());
     }
@@ -5161,7 +6169,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeWhitePointY_122()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t whitePointYArgument;
         whitePointYArgument = 0U;
@@ -5177,7 +6192,14 @@ private:
     CHIP_ERROR TestReadBackTheOptionalAttributeWhitePointY_123()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeWhitePointY(mOnSuccessCallback_123.Cancel(), mOnFailureCallback_123.Cancel());
     }
@@ -5193,7 +6215,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeColorPointRX_124()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointRX(mOnSuccessCallback_124.Cancel(), mOnFailureCallback_124.Cancel());
     }
@@ -5210,7 +6239,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointRX_125()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorPointRXArgument;
         colorPointRXArgument = 0U;
@@ -5226,7 +6262,14 @@ private:
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointRX_126()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointRX(mOnSuccessCallback_126.Cancel(), mOnFailureCallback_126.Cancel());
     }
@@ -5242,7 +6285,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeColorPointRY_127()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointRY(mOnSuccessCallback_127.Cancel(), mOnFailureCallback_127.Cancel());
     }
@@ -5259,7 +6309,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointRY_128()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorPointRYArgument;
         colorPointRYArgument = 0U;
@@ -5275,7 +6332,14 @@ private:
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointRY_129()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointRY(mOnSuccessCallback_129.Cancel(), mOnFailureCallback_129.Cancel());
     }
@@ -5291,7 +6355,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeColorPointRIntensity_130()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointRIntensity(mOnSuccessCallback_130.Cancel(), mOnFailureCallback_130.Cancel());
     }
@@ -5307,7 +6378,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeColorPointGX_131()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointGX(mOnSuccessCallback_131.Cancel(), mOnFailureCallback_131.Cancel());
     }
@@ -5324,7 +6402,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointGX_132()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorPointGXArgument;
         colorPointGXArgument = 0U;
@@ -5340,7 +6425,14 @@ private:
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointGX_133()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointGX(mOnSuccessCallback_133.Cancel(), mOnFailureCallback_133.Cancel());
     }
@@ -5356,7 +6448,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeColorPointGY_134()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointGY(mOnSuccessCallback_134.Cancel(), mOnFailureCallback_134.Cancel());
     }
@@ -5373,7 +6472,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointGY_135()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorPointGYArgument;
         colorPointGYArgument = 0U;
@@ -5389,7 +6495,14 @@ private:
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointGY_136()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointGY(mOnSuccessCallback_136.Cancel(), mOnFailureCallback_136.Cancel());
     }
@@ -5405,7 +6518,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeColorPointGIntensity_137()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointGIntensity(mOnSuccessCallback_137.Cancel(), mOnFailureCallback_137.Cancel());
     }
@@ -5421,7 +6541,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeColorPointBX_138()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointBX(mOnSuccessCallback_138.Cancel(), mOnFailureCallback_138.Cancel());
     }
@@ -5438,7 +6565,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointBX_139()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorPointBXArgument;
         colorPointBXArgument = 0U;
@@ -5454,7 +6588,14 @@ private:
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointBX_140()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointBX(mOnSuccessCallback_140.Cancel(), mOnFailureCallback_140.Cancel());
     }
@@ -5470,7 +6611,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeColorPointBY_141()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointBY(mOnSuccessCallback_141.Cancel(), mOnFailureCallback_141.Cancel());
     }
@@ -5487,7 +6635,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointBY_142()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t colorPointBYArgument;
         colorPointBYArgument = 0U;
@@ -5503,7 +6658,14 @@ private:
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointBY_143()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointBY(mOnSuccessCallback_143.Cancel(), mOnFailureCallback_143.Cancel());
     }
@@ -5519,7 +6681,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeColorPointBIntensity_144()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorPointBIntensity(mOnSuccessCallback_144.Cancel(), mOnFailureCallback_144.Cancel());
     }
@@ -5640,7 +6809,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -5664,7 +6840,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -5680,7 +6863,14 @@ private:
     CHIP_ERROR TestMoveToHueShortestDistanceCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -5709,7 +6899,14 @@ private:
     CHIP_ERROR TestMoveToHueLongestDistanceCommand_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -5738,7 +6935,14 @@ private:
     CHIP_ERROR TestMoveToHueUpCommand_4()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -5767,7 +6971,14 @@ private:
     CHIP_ERROR TestMoveToHueDownCommand_5()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -5796,7 +7007,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_6()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -5820,7 +7038,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_7()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -5941,7 +7166,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -5965,7 +7197,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -5981,7 +7220,14 @@ private:
     CHIP_ERROR TestMoveHueUpCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6009,7 +7255,14 @@ private:
     CHIP_ERROR TestMoveHueStopCommand_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6037,7 +7290,14 @@ private:
     CHIP_ERROR TestMoveHueDownCommand_4()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6065,7 +7325,14 @@ private:
     CHIP_ERROR TestMoveHueStopCommand_5()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6093,7 +7360,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_6()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6117,7 +7391,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_7()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -6230,7 +7511,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6254,7 +7542,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -6270,7 +7565,14 @@ private:
     CHIP_ERROR TestStepHueUpCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6299,7 +7601,14 @@ private:
     CHIP_ERROR TestStepHueDownCommand_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6328,7 +7637,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6352,7 +7668,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -6461,7 +7784,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6485,7 +7815,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -6501,7 +7838,14 @@ private:
     CHIP_ERROR TestMoveToSaturationCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6529,7 +7873,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6553,7 +7904,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -6666,7 +8024,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6690,7 +8055,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -6706,7 +8078,14 @@ private:
     CHIP_ERROR TestMoveSaturationUpCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6734,7 +8113,14 @@ private:
     CHIP_ERROR TestMoveSaturationDownCommand_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6762,7 +8148,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6786,7 +8179,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -6899,7 +8299,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6923,7 +8330,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -6939,7 +8353,14 @@ private:
     CHIP_ERROR TestStepSaturationUpCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6968,7 +8389,14 @@ private:
     CHIP_ERROR TestStepSaturationDownCommand_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -6997,7 +8425,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7021,7 +8456,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -7130,7 +8572,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7154,7 +8603,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -7170,7 +8626,14 @@ private:
     CHIP_ERROR TestMoveToCurrentHueAndSaturationCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7199,7 +8662,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7223,7 +8693,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -7332,7 +8809,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7356,7 +8840,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -7372,7 +8863,14 @@ private:
     CHIP_ERROR TestMoveToColorCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToColor::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7401,7 +8899,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7425,7 +8930,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -7538,7 +9050,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7562,7 +9081,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -7578,7 +9104,14 @@ private:
     CHIP_ERROR TestMoveColorCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColor::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7606,7 +9139,14 @@ private:
     CHIP_ERROR TestStopMoveStepCommand_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7632,7 +9172,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7656,7 +9203,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -7765,7 +9319,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7789,7 +9350,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -7805,7 +9373,14 @@ private:
     CHIP_ERROR TestStepColorCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::StepColor::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7834,7 +9409,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7858,7 +9440,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -7967,7 +9556,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -7991,7 +9587,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -8007,7 +9610,14 @@ private:
     CHIP_ERROR TestMoveToColorTemperatureCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8035,7 +9645,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8059,7 +9676,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -8176,7 +9800,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8200,7 +9831,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -8216,7 +9854,14 @@ private:
     CHIP_ERROR TestMoveUpColorTemperatureCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8246,7 +9891,14 @@ private:
     CHIP_ERROR TestStopColorTemperatureCommand_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8276,7 +9928,14 @@ private:
     CHIP_ERROR TestMoveDownColorTemperatureCommand_4()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8306,7 +9965,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8330,7 +9996,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -8443,7 +10116,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8467,7 +10147,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -8483,7 +10170,14 @@ private:
     CHIP_ERROR TestStepUpColorTemperatureCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8514,7 +10208,14 @@ private:
     CHIP_ERROR TestStepDownColorTemperatureCommand_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8545,7 +10246,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8569,7 +10277,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -8695,7 +10410,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8719,7 +10441,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -8735,7 +10464,14 @@ private:
     CHIP_ERROR TestEnhancedMoveToHueCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8764,7 +10500,14 @@ private:
     CHIP_ERROR TestCheckRemainingTimeAttributeValueMatchedTheValueSentByTheLastCommand_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeRemainingTime(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -8780,7 +10523,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8804,7 +10554,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -8925,7 +10682,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8949,7 +10713,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -8965,7 +10736,14 @@ private:
     CHIP_ERROR TestEnhancedMoveHueDownCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -8993,7 +10771,14 @@ private:
     CHIP_ERROR TestEnhancedMoveHueStopCommand_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9021,7 +10806,14 @@ private:
     CHIP_ERROR TestEnhancedMoveHueUpCommand_4()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9049,7 +10841,14 @@ private:
     CHIP_ERROR TestEnhancedMoveHueStopCommand_5()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9077,7 +10876,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_6()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9101,7 +10907,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_7()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -9214,7 +11027,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9238,7 +11058,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -9254,7 +11081,14 @@ private:
     CHIP_ERROR TestEnhancedStepHueUpCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9283,7 +11117,14 @@ private:
     CHIP_ERROR TestEnhancedStepHueDownCommand_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9312,7 +11153,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9336,7 +11184,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -9445,7 +11300,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9469,7 +11331,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -9485,7 +11354,14 @@ private:
     CHIP_ERROR TestEnhancedMoveToHueAndSaturationCommand_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9514,7 +11390,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9538,7 +11421,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -9792,7 +11682,14 @@ private:
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9816,7 +11713,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -9832,7 +11736,14 @@ private:
     CHIP_ERROR TestColorLoopSetCommandSetAllAttributs_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9863,7 +11774,14 @@ private:
     CHIP_ERROR TestCheckColorLoopDirectionValue_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -9879,7 +11797,14 @@ private:
     CHIP_ERROR TestCheckColorLoopTimeValue_4()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -9895,7 +11820,14 @@ private:
     CHIP_ERROR TestCheckColorLoopStartEnhancedHueValue_5()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -9911,7 +11843,14 @@ private:
     CHIP_ERROR TestCheckColorLoopActiveValue_6()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -9927,7 +11866,14 @@ private:
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_7()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -9958,7 +11904,14 @@ private:
     CHIP_ERROR TestCheckColorLoopActiveValue_8()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
     }
@@ -9974,7 +11927,14 @@ private:
     CHIP_ERROR TestColorLoopSetCommandSetDirectionAndTimeWhileRunning_9()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10005,7 +11965,14 @@ private:
     CHIP_ERROR TestCheckColorLoopDirectionValue_10()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -10021,7 +11988,14 @@ private:
     CHIP_ERROR TestCheckColorLoopTimeValue_11()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
     }
@@ -10037,7 +12011,14 @@ private:
     CHIP_ERROR TestColorLoopSetCommandSetDirectionWhileRunning_12()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10068,7 +12049,14 @@ private:
     CHIP_ERROR TestCheckColorLoopDirectionValue_13()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
     }
@@ -10084,7 +12072,14 @@ private:
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_14()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10108,7 +12103,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_15()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_15.Cancel(), mOnFailureCallback_15.Cancel());
     }
@@ -10528,7 +12530,14 @@ private:
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10552,7 +12561,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -10568,7 +12584,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10599,7 +12622,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -10615,7 +12645,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_4()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10646,7 +12683,14 @@ private:
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_5()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -10662,7 +12706,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_6()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10693,7 +12744,14 @@ private:
     CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_7()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -10709,7 +12767,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_8()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10740,7 +12805,14 @@ private:
     CHIP_ERROR TestReadColorLoopStartEnhancedHueAttributeFromDut_9()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
     }
@@ -10756,7 +12828,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_10()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10787,7 +12866,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_11()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
     }
@@ -10803,7 +12889,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_12()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10834,7 +12927,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_13()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
     }
@@ -10850,7 +12950,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_14()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10881,7 +12988,14 @@ private:
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_15()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_15.Cancel(), mOnFailureCallback_15.Cancel());
     }
@@ -10897,7 +13011,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_16()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10928,7 +13049,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_17()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_17.Cancel(), mOnFailureCallback_17.Cancel());
     }
@@ -10944,7 +13072,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_18()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -10975,7 +13110,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_19()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_19.Cancel(), mOnFailureCallback_19.Cancel());
     }
@@ -10991,7 +13133,14 @@ private:
     CHIP_ERROR TestEnhancedMoveToHueCommand10_20()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11022,7 +13171,14 @@ private:
     CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_22()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEnhancedCurrentHue(mOnSuccessCallback_22.Cancel(), mOnFailureCallback_22.Cancel());
     }
@@ -11038,7 +13194,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_23()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11069,7 +13232,14 @@ private:
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_24()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_24.Cancel(), mOnFailureCallback_24.Cancel());
     }
@@ -11085,7 +13255,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_25()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11116,7 +13293,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_26()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_26.Cancel(), mOnFailureCallback_26.Cancel());
     }
@@ -11132,7 +13316,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_27()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11163,7 +13354,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_28()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_28.Cancel(), mOnFailureCallback_28.Cancel());
     }
@@ -11179,7 +13377,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_29()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11210,7 +13415,14 @@ private:
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_30()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_30.Cancel(), mOnFailureCallback_30.Cancel());
     }
@@ -11226,7 +13438,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_31()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11257,7 +13476,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_32()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_32.Cancel(), mOnFailureCallback_32.Cancel());
     }
@@ -11273,7 +13499,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_33()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11304,7 +13537,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_34()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_34.Cancel(), mOnFailureCallback_34.Cancel());
     }
@@ -11320,7 +13560,14 @@ private:
     CHIP_ERROR TestTurnOffLightForColorControlTests_35()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11549,7 +13796,14 @@ private:
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11573,7 +13827,14 @@ private:
     CHIP_ERROR TestPreconditionCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -11589,7 +13850,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11620,7 +13888,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -11636,7 +13911,14 @@ private:
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_4()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -11652,7 +13934,14 @@ private:
     CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_5()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -11668,7 +13957,14 @@ private:
     CHIP_ERROR TestReadColorLoopStartEnhancedHueAttributeFromDut_6()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -11684,7 +13980,14 @@ private:
     CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_7()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11715,7 +14018,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_8()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
     }
@@ -11731,7 +14041,14 @@ private:
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_9()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11762,7 +14079,14 @@ private:
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_10()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -11778,7 +14102,14 @@ private:
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_11()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -11809,7 +14140,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_12()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
     }
@@ -11825,7 +14163,14 @@ private:
     CHIP_ERROR TestTurnOffLightForColorControlTests_13()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -12053,7 +14398,14 @@ private:
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -12077,7 +14429,14 @@ private:
     CHIP_ERROR TestPreconditionCheckOnOffAttributeValueIsTrueAfterOnCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -12093,7 +14452,14 @@ private:
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_2()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -12124,7 +14490,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_3()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -12140,7 +14513,14 @@ private:
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_4()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopDirection(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -12156,7 +14536,14 @@ private:
     CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_5()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -12172,7 +14559,14 @@ private:
     CHIP_ERROR TestReadColorLoopStartEnhancedHueAttributeFromDut_6()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopStartEnhancedHue(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -12188,7 +14582,14 @@ private:
     CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_7()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -12219,7 +14620,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_8()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
     }
@@ -12235,7 +14643,14 @@ private:
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_9()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -12266,7 +14681,14 @@ private:
     CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_10()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopTime(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -12282,7 +14704,14 @@ private:
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_11()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -12313,7 +14742,14 @@ private:
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_12()
     {
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeColorLoopActive(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
     }
@@ -12329,7 +14765,14 @@ private:
     CHIP_ERROR TestTurnOffLightForColorControlTests_13()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -12703,7 +15146,14 @@ private:
     CHIP_ERROR TestQueryInteractionModelVersion_0()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInteractionModelVersion(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -12719,7 +15169,14 @@ private:
     CHIP_ERROR TestQueryVendorName_1()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeVendorName(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -12736,7 +15193,14 @@ private:
     CHIP_ERROR TestQueryVendorID_2()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeVendorID(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -12752,7 +15216,14 @@ private:
     CHIP_ERROR TestQueryProductName_3()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeProductName(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -12769,7 +15240,14 @@ private:
     CHIP_ERROR TestQueryProductID_4()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeProductID(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -12785,7 +15263,14 @@ private:
     CHIP_ERROR TestQueryUserLabel_5()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeUserLabel(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -12802,7 +15287,14 @@ private:
     CHIP_ERROR TestQueryUserLocation_6()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeLocation(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -12820,7 +15312,14 @@ private:
     CHIP_ERROR TestQueryHardwareVersion_7()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeHardwareVersion(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -12836,7 +15335,14 @@ private:
     CHIP_ERROR TestQueryHardwareVersionString_8()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeHardwareVersionString(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
     }
@@ -12854,7 +15360,14 @@ private:
     CHIP_ERROR TestQuerySoftwareVersion_9()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeSoftwareVersion(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
     }
@@ -12870,7 +15383,14 @@ private:
     CHIP_ERROR TestQuerySoftwareVersionString_10()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeSoftwareVersionString(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -12889,7 +15409,14 @@ private:
     CHIP_ERROR TestQueryManufacturingDate_11()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeManufacturingDate(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
     }
@@ -12911,7 +15438,14 @@ private:
     CHIP_ERROR TestQueryPartNumber_12()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePartNumber(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
     }
@@ -12931,7 +15465,14 @@ private:
     CHIP_ERROR TestQueryProductURL_13()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeProductURL(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
     }
@@ -12952,7 +15493,14 @@ private:
     CHIP_ERROR TestQueryProductLabel_14()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeProductLabel(mOnSuccessCallback_14.Cancel(), mOnFailureCallback_14.Cancel());
     }
@@ -12972,7 +15520,14 @@ private:
     CHIP_ERROR TestQuerySerialNumber_15()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeSerialNumber(mOnSuccessCallback_15.Cancel(), mOnFailureCallback_15.Cancel());
     }
@@ -12992,7 +15547,14 @@ private:
     CHIP_ERROR TestQueryLocalConfigDisabled_16()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeLocalConfigDisabled(mOnSuccessCallback_16.Cancel(), mOnFailureCallback_16.Cancel());
     }
@@ -13011,7 +15573,14 @@ private:
     CHIP_ERROR TestQueryReachable_17()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeReachable(mOnSuccessCallback_17.Cancel(), mOnFailureCallback_17.Cancel());
     }
@@ -13202,7 +15771,14 @@ private:
     CHIP_ERROR TestQueryFabricsList_0()
     {
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeFabricsList(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -13221,7 +15797,14 @@ private:
     CHIP_ERROR TestQuerySupportedFabrics_1()
     {
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeSupportedFabrics(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -13237,7 +15820,14 @@ private:
     CHIP_ERROR TestQueryCommissionedFabrics_2()
     {
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCommissionedFabrics(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -13253,7 +15843,14 @@ private:
     CHIP_ERROR TestQueryUserTrustedRootCertificates_3()
     {
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeTrustedRootCertificates(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -13362,7 +15959,14 @@ private:
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
     {
         chip::Controller::ElectricalMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -13378,7 +15982,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         chip::Controller::ElectricalMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -13394,7 +16005,14 @@ private:
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
         chip::Controller::ElectricalMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -13470,7 +16088,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_0()
     {
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 2U;
@@ -13653,7 +16278,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_0()
     {
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -13669,7 +16301,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMinMeasuredValue_1()
     {
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMinMeasuredValue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -13685,7 +16324,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMaxMeasuredValue_2()
     {
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMaxMeasuredValue(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -13701,7 +16347,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMinMeasuredValue_3()
     {
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int16_t minMeasuredValueArgument;
         minMeasuredValueArgument = 0;
@@ -13717,7 +16370,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMaxMeasuredValue_4()
     {
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int16_t maxMeasuredValueArgument;
         maxMeasuredValueArgument = 0;
@@ -13733,7 +16393,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_5()
     {
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -13749,7 +16416,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMinMeasuredValue_6()
     {
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMinMeasuredValue(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -13765,7 +16439,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMaxMeasuredValue_7()
     {
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMaxMeasuredValue(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -13862,7 +16543,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_0()
     {
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -13878,7 +16566,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
     {
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -13954,7 +16649,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_0()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 4U;
@@ -14132,7 +16834,14 @@ private:
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_0()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -14148,7 +16857,14 @@ private:
     CHIP_ERROR TestSendsAMoveToLevelCommand_1()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -14178,7 +16894,14 @@ private:
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_3()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -14194,7 +16917,14 @@ private:
     CHIP_ERROR TestSendsAMoveToLevelCommand_4()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -14224,7 +16954,14 @@ private:
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_6()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -14240,7 +16977,14 @@ private:
     CHIP_ERROR TestReadsOnOffTransitionTimeAttributeFromDut_7()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOffTransitionTime(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -14256,7 +17000,14 @@ private:
     CHIP_ERROR TestSendsAMoveToLevelCommand_8()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -14286,7 +17037,14 @@ private:
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -14302,7 +17060,14 @@ private:
     CHIP_ERROR TestResetLevelTo0_11()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -14528,7 +17293,14 @@ private:
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_0()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -14544,7 +17316,14 @@ private:
     CHIP_ERROR TestReadsMaxLevelAttributeFromDut_1()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMaxLevel(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -14560,7 +17339,14 @@ private:
     CHIP_ERROR TestSendsAMoveUpCommand_2()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -14590,7 +17376,14 @@ private:
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -14606,7 +17399,14 @@ private:
     CHIP_ERROR TestReadsMinLevelAttributeFromDut_5()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMinLevel(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -14622,7 +17422,14 @@ private:
     CHIP_ERROR TestSendsAMoveDownCommand_6()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -14652,7 +17459,14 @@ private:
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_8()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
     }
@@ -14668,7 +17482,14 @@ private:
     CHIP_ERROR TestWriteDefaultMoveRateAttributeFromDut_9()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t defaultMoveRateArgument;
         defaultMoveRateArgument = 20;
@@ -14684,7 +17505,14 @@ private:
     CHIP_ERROR TestReadsDefaultMoveRateAttributeFromDut_10()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeDefaultMoveRate(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -14700,7 +17528,14 @@ private:
     CHIP_ERROR TestSendsAMoveUpCommandAtDefaultMoveRate_11()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -14730,7 +17565,14 @@ private:
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_13()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
     }
@@ -14875,7 +17717,14 @@ private:
     CHIP_ERROR TestSendingOnCommand_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -14899,7 +17748,14 @@ private:
     CHIP_ERROR TestPreconditionDutLevelIsSetTo0x80_1()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -14930,7 +17786,14 @@ private:
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_3()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -14946,7 +17809,14 @@ private:
     CHIP_ERROR TestSendsStepDownCommandToDut_4()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -14977,7 +17847,14 @@ private:
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_6()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -14993,7 +17870,14 @@ private:
     CHIP_ERROR TestSendsAStepUpCommand_7()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -15024,7 +17908,14 @@ private:
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_9()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentLevel(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
     }
@@ -15040,7 +17931,14 @@ private:
     CHIP_ERROR TestSendingOffCommand_10()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -15140,7 +18038,14 @@ private:
     CHIP_ERROR TestSendingOnCommand_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -15164,7 +18069,14 @@ private:
     CHIP_ERROR TestPreconditionDutLevelIsSetTo0x80_1()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -15195,7 +18107,14 @@ private:
     CHIP_ERROR TestSendsAMoveUpCommandToDut_3()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -15225,7 +18144,14 @@ private:
     CHIP_ERROR TestSendsStopCommandToDut_5()
     {
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LevelControl::Commands::Stop::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -15251,7 +18177,14 @@ private:
     CHIP_ERROR TestSendingOffCommand_6()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -15335,7 +18268,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_0()
     {
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -15403,7 +18343,14 @@ private:
     CHIP_ERROR TestPutTheDeviceIntoLowPowerMode_0()
     {
         chip::Controller::LowPowerClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LowPower::Commands::Sleep::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -16032,7 +18979,14 @@ private:
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -16048,7 +19002,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 2U;
@@ -16250,7 +19211,14 @@ private:
     CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancy_0()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOccupancy(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -16267,7 +19235,14 @@ private:
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancy_1()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t occupancyArgument;
         occupancyArgument = 0;
@@ -16283,7 +19258,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeOccupancy_2()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOccupancy(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -16299,7 +19281,14 @@ private:
     CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancySensorType_3()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOccupancySensorType(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -16316,7 +19305,14 @@ private:
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancySensorType_4()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t occupancySensorTypeArgument;
         occupancySensorTypeArgument = static_cast<uint8_t>(0);
@@ -16332,7 +19328,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeOccupancySensorType_5()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOccupancySensorType(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -16348,7 +19351,14 @@ private:
     CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancySensorTypeBitmap_6()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOccupancySensorTypeBitmap(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -16366,7 +19376,14 @@ private:
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancySensorTypeBitmap_7()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t occupancySensorTypeBitmapArgument;
         occupancySensorTypeBitmapArgument = 1;
@@ -16382,7 +19399,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeOccupancySensorTypeBitmap_8()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOccupancySensorTypeBitmap(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
     }
@@ -16479,7 +19503,14 @@ private:
     CHIP_ERROR TestReadsOccupancyAttributeFromDut_0()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOccupancy(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -16495,7 +19526,14 @@ private:
     CHIP_ERROR TestReadsOccupancyAttributeFromDut_1()
     {
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOccupancy(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -16647,7 +19685,14 @@ private:
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -16663,7 +19708,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 3U;
@@ -16679,7 +19731,14 @@ private:
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -16695,7 +19754,14 @@ private:
     CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_3()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeFeatureMap(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -16711,7 +19777,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint32_t featureMapArgument;
         featureMapArgument = 0UL;
@@ -16727,7 +19800,14 @@ private:
     CHIP_ERROR TestReadsBackOptionalGlobalAttributeFeatureMap_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeFeatureMap(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -16969,7 +20049,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeOnOff_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -16985,7 +20072,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeOnOff_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -17001,7 +20095,14 @@ private:
     CHIP_ERROR TestReadLtAttributeGlobalSceneControl_2()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeGlobalSceneControl(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -17017,7 +20118,14 @@ private:
     CHIP_ERROR TestReadLtAttributeOnTime_3()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -17033,7 +20141,14 @@ private:
     CHIP_ERROR TestReadLtAttributeOffWaitTime_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOffWaitTime(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -17049,7 +20164,14 @@ private:
     CHIP_ERROR TestReadLtAttributeStartUpOnOff_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeStartUpOnOff(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -17065,7 +20187,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOnTime_6()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t onTimeArgument;
         onTimeArgument = 0U;
@@ -17081,7 +20210,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOffWaitTime_7()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t offWaitTimeArgument;
         offWaitTimeArgument = 0U;
@@ -17097,7 +20233,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValueToLtAttributeStartUpOnOff_8()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t startUpOnOffArgument;
         startUpOnOffArgument = static_cast<uint8_t>(0);
@@ -17113,7 +20256,14 @@ private:
     CHIP_ERROR TestReadsBackLtAttributeOnTime_9()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
     }
@@ -17129,7 +20279,14 @@ private:
     CHIP_ERROR TestReadsBackLtAttributeOffWaitTime_10()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOffWaitTime(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -17145,7 +20302,14 @@ private:
     CHIP_ERROR TestReadsBackLtAttributeStartUpOnOff_11()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeStartUpOnOff(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
     }
@@ -17350,7 +20514,14 @@ private:
     CHIP_ERROR TestSendOffCommand_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -17374,7 +20545,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -17390,7 +20568,14 @@ private:
     CHIP_ERROR TestSendOnCommand_2()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -17414,7 +20599,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_3()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -17430,7 +20622,14 @@ private:
     CHIP_ERROR TestSendOffCommand_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -17454,7 +20653,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -17470,7 +20676,14 @@ private:
     CHIP_ERROR TestSendToggleCommand_6()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Toggle::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -17494,7 +20707,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterToggleCommand_7()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -17510,7 +20730,14 @@ private:
     CHIP_ERROR TestSendToggleCommand_8()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Toggle::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -17534,7 +20761,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterToggleCommand_9()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
     }
@@ -17550,7 +20784,14 @@ private:
     CHIP_ERROR TestSendOnCommand_10()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -17574,7 +20815,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_11()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
     }
@@ -17590,7 +20838,14 @@ private:
     CHIP_ERROR TestSendOffCommand_12()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -17614,7 +20869,14 @@ private:
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_13()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
     }
@@ -18259,7 +21521,14 @@ private:
     CHIP_ERROR TestSendOnCommand_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -18285,7 +21554,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_2()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -18301,7 +21577,14 @@ private:
     CHIP_ERROR TestReadsGlobalSceneControlAttributeFromDut_3()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeGlobalSceneControl(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -18317,7 +21600,14 @@ private:
     CHIP_ERROR TestSendOnCommand_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -18343,7 +21633,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_6()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -18359,7 +21656,14 @@ private:
     CHIP_ERROR TestReadsGlobalSceneControlAttributeFromDut_7()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeGlobalSceneControl(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -18375,7 +21679,14 @@ private:
     CHIP_ERROR TestSendOnCommand_8()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -18401,7 +21712,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_10()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -18417,7 +21735,14 @@ private:
     CHIP_ERROR TestReadsGlobalSceneControlAttributeFromDut_11()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeGlobalSceneControl(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
     }
@@ -18433,7 +21758,14 @@ private:
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_12()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
     }
@@ -18449,7 +21781,14 @@ private:
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_13()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOffWaitTime(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
     }
@@ -18465,7 +21804,14 @@ private:
     CHIP_ERROR TestSendOnCommand_14()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -18489,7 +21835,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_15()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_15.Cancel(), mOnFailureCallback_15.Cancel());
     }
@@ -18505,7 +21858,14 @@ private:
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_16()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_16.Cancel(), mOnFailureCallback_16.Cancel());
     }
@@ -18521,7 +21881,14 @@ private:
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_17()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOffWaitTime(mOnSuccessCallback_17.Cancel(), mOnFailureCallback_17.Cancel());
     }
@@ -18537,7 +21904,14 @@ private:
     CHIP_ERROR TestSendOffCommand_18()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -18561,7 +21935,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_19()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_19.Cancel(), mOnFailureCallback_19.Cancel());
     }
@@ -18577,7 +21958,14 @@ private:
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_20()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_20.Cancel(), mOnFailureCallback_20.Cancel());
     }
@@ -18593,7 +21981,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_21()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_21.Cancel(), mOnFailureCallback_21.Cancel());
     }
@@ -18609,7 +22004,14 @@ private:
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_22()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_22.Cancel(), mOnFailureCallback_22.Cancel());
     }
@@ -18625,7 +22027,14 @@ private:
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_23()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOffWaitTime(mOnSuccessCallback_23.Cancel(), mOnFailureCallback_23.Cancel());
     }
@@ -18641,7 +22050,14 @@ private:
     CHIP_ERROR TestSendOnCommand_24()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -18665,7 +22081,14 @@ private:
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_25()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_25.Cancel(), mOnFailureCallback_25.Cancel());
     }
@@ -18681,7 +22104,14 @@ private:
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_26()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOffWaitTime(mOnSuccessCallback_26.Cancel(), mOnFailureCallback_26.Cancel());
     }
@@ -18697,7 +22127,14 @@ private:
     CHIP_ERROR TestSendOffCommand_27()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -18721,7 +22158,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_28()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_28.Cancel(), mOnFailureCallback_28.Cancel());
     }
@@ -18737,7 +22181,14 @@ private:
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_29()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_29.Cancel(), mOnFailureCallback_29.Cancel());
     }
@@ -18753,7 +22204,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_30()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_30.Cancel(), mOnFailureCallback_30.Cancel());
     }
@@ -18769,7 +22227,14 @@ private:
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_31()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_31.Cancel(), mOnFailureCallback_31.Cancel());
     }
@@ -18785,7 +22250,14 @@ private:
     CHIP_ERROR TestSendOnCommand_32()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -18809,7 +22281,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_33()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_33.Cancel(), mOnFailureCallback_33.Cancel());
     }
@@ -18825,7 +22304,14 @@ private:
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_34()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_34.Cancel(), mOnFailureCallback_34.Cancel());
     }
@@ -18841,7 +22327,14 @@ private:
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_35()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOffWaitTime(mOnSuccessCallback_35.Cancel(), mOnFailureCallback_35.Cancel());
     }
@@ -18857,7 +22350,14 @@ private:
     CHIP_ERROR TestSendOffCommand_36()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -18881,7 +22381,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_37()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_37.Cancel(), mOnFailureCallback_37.Cancel());
     }
@@ -18897,7 +22404,14 @@ private:
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_38()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_38.Cancel(), mOnFailureCallback_38.Cancel());
     }
@@ -18913,7 +22427,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_39()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_39.Cancel(), mOnFailureCallback_39.Cancel());
     }
@@ -18929,7 +22450,14 @@ private:
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_40()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_40.Cancel(), mOnFailureCallback_40.Cancel());
     }
@@ -18945,7 +22473,14 @@ private:
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_41()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOffWaitTime(mOnSuccessCallback_41.Cancel(), mOnFailureCallback_41.Cancel());
     }
@@ -18961,7 +22496,14 @@ private:
     CHIP_ERROR TestReadsOnOffAttributeFromDut_42()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnOff(mOnSuccessCallback_42.Cancel(), mOnFailureCallback_42.Cancel());
     }
@@ -18977,7 +22519,14 @@ private:
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_43()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnTime(mOnSuccessCallback_43.Cancel(), mOnFailureCallback_43.Cancel());
     }
@@ -18993,7 +22542,14 @@ private:
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_44()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOffWaitTime(mOnSuccessCallback_44.Cancel(), mOnFailureCallback_44.Cancel());
     }
@@ -19009,7 +22565,14 @@ private:
     CHIP_ERROR TestSendOffCommand_45()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -19142,7 +22705,14 @@ private:
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -19158,7 +22728,14 @@ private:
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -19174,7 +22751,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 2U;
@@ -19190,7 +22774,14 @@ private:
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_3()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -19384,7 +22975,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeConstraintsMeasuredValue_0()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -19400,7 +22998,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMeasuredValue_1()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int16_t measuredValueArgument;
         measuredValueArgument = 0;
@@ -19416,7 +23021,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeMeasuredValue_2()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -19432,7 +23044,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeConstraintsMinMeasuredValue_3()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMinMeasuredValue(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -19448,7 +23067,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMinMeasuredValue_4()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int16_t minMeasuredValueArgument;
         minMeasuredValueArgument = 0;
@@ -19464,7 +23090,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeMinMeasuredValue_5()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMinMeasuredValue(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -19480,7 +23113,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeConstraintsMaxMeasuredValue_6()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMaxMeasuredValue(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -19496,7 +23136,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMaxMeasuredValue_7()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int16_t maxMeasuredValueArgument;
         maxMeasuredValueArgument = 0;
@@ -19512,7 +23159,14 @@ private:
     CHIP_ERROR TestReadsBackMandatoryAttributeMaxMeasuredValue_8()
     {
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMaxMeasuredValue(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
     }
@@ -19588,7 +23242,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_0()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 3U;
@@ -19785,7 +23446,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMaxPressure_0()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMaxPressure(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -19801,7 +23469,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeEffectiveOperationMode_1()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEffectiveOperationMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -19817,7 +23492,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeEffectiveControlMode_2()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEffectiveControlMode(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -19833,7 +23515,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeCapacity_3()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCapacity(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -19849,7 +23538,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMaxPressure_4()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMaxPressure(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -19865,7 +23561,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeEffectiveOperationMode_5()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEffectiveOperationMode(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -19881,7 +23584,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeEffectiveControlMode_6()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEffectiveControlMode(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -19897,7 +23607,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeCapacity_7()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCapacity(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -19994,7 +23711,14 @@ private:
     CHIP_ERROR TestWrite1ToTheOperationModeAttributeToDutOperationMode_0()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(1);
@@ -20010,7 +23734,14 @@ private:
     CHIP_ERROR TestWrite2ToTheOperationModeAttributeToDutOperationMode_1()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(2);
@@ -20026,7 +23757,14 @@ private:
     CHIP_ERROR TestWrite3ToTheOperationModeAttributeToDutOperationMode_2()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(3);
@@ -20119,7 +23857,14 @@ private:
     CHIP_ERROR TestWrite0ToTheOperationModeAttributeToDut_0()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(0);
@@ -20135,7 +23880,14 @@ private:
     CHIP_ERROR TestReadsTheAttributeEffectiveOperationMode_1()
     {
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEffectiveOperationMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -20211,7 +23963,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_0()
     {
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -20308,7 +24067,14 @@ private:
     CHIP_ERROR TestReadsConstraintsOfAttributeMeasuredValue_0()
     {
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -20324,7 +24090,14 @@ private:
     CHIP_ERROR TestReadsConstraintsOfAttributeMinMeasuredValue_1()
     {
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMinMeasuredValue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -20422,7 +24195,14 @@ private:
     CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_0()
     {
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -20438,7 +24218,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
     {
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -20547,7 +24334,14 @@ private:
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
     {
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -20563,7 +24357,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 3U;
@@ -20579,7 +24380,14 @@ private:
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -20660,7 +24468,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_0()
     {
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -20757,7 +24572,14 @@ private:
     CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_0()
     {
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -20773,7 +24595,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
     {
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -20849,7 +24678,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_0()
     {
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 5U;
@@ -20925,7 +24761,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_0()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 2U;
@@ -21228,7 +25071,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_0()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeTemperatureDisplayMode(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -21244,7 +25094,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_1()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeTemperatureDisplayMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -21260,7 +25117,14 @@ private:
     CHIP_ERROR TestWriteToTheMandatoryAttributeTemperatureDisplayMode_2()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t temperatureDisplayModeArgument;
         temperatureDisplayModeArgument = static_cast<uint8_t>(0);
@@ -21277,7 +25141,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_3()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeTemperatureDisplayMode(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -21293,7 +25164,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_4()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeTemperatureDisplayMode(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -21309,7 +25187,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_5()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeKeypadLockout(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -21325,7 +25210,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_6()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeKeypadLockout(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -21341,7 +25233,14 @@ private:
     CHIP_ERROR TestWriteToTheMandatoryAttributeKeypadLockout_7()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(0);
@@ -21358,7 +25257,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_8()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeKeypadLockout(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
     }
@@ -21374,7 +25280,14 @@ private:
     CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_9()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeKeypadLockout(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
     }
@@ -21390,7 +25303,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_10()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeScheduleProgrammingVisibility(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -21406,7 +25326,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_11()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeScheduleProgrammingVisibility(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
     }
@@ -21422,7 +25349,14 @@ private:
     CHIP_ERROR TestWriteToTheMandatoryAttributeScheduleProgrammingVisibility_12()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t scheduleProgrammingVisibilityArgument;
         scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
@@ -21439,7 +25373,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_13()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeScheduleProgrammingVisibility(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
     }
@@ -21455,7 +25396,14 @@ private:
     CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_14()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeScheduleProgrammingVisibility(mOnSuccessCallback_14.Cancel(), mOnFailureCallback_14.Cancel());
     }
@@ -21631,7 +25579,14 @@ private:
     CHIP_ERROR TestWritesAValueOf0ToTemperatureDisplayModeAttributeOfDut_0()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t temperatureDisplayModeArgument;
         temperatureDisplayModeArgument = static_cast<uint8_t>(0);
@@ -21648,7 +25603,14 @@ private:
     CHIP_ERROR TestWritesAValueOf1ToTemperatureDisplayModeAttributeOfDut_1()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t temperatureDisplayModeArgument;
         temperatureDisplayModeArgument = static_cast<uint8_t>(1);
@@ -21665,7 +25627,14 @@ private:
     CHIP_ERROR TestWritesAValueOf0ToKeypadLockoutAttributeOfDut_2()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(0);
@@ -21682,7 +25651,14 @@ private:
     CHIP_ERROR TestWritesAValueOf1ToKeypadLockoutAttributeOfDut_3()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(1);
@@ -21699,7 +25675,14 @@ private:
     CHIP_ERROR TestWritesAValueOf2ToKeypadLockoutAttributeOfDut_4()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(2);
@@ -21716,7 +25699,14 @@ private:
     CHIP_ERROR TestWritesAValueOf3ToKeypadLockoutAttributeOfDut_5()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(3);
@@ -21733,7 +25723,14 @@ private:
     CHIP_ERROR TestWritesAValueOf4ToKeypadLockoutAttributeOfDut_6()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(4);
@@ -21750,7 +25747,14 @@ private:
     CHIP_ERROR TestWritesAValueOf5ToKeypadLockoutAttributeOfDut_7()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(5);
@@ -21767,7 +25771,14 @@ private:
     CHIP_ERROR TestWritesAValueOf0ToScheduleProgrammingVisibilityAttributeOfDut_8()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t scheduleProgrammingVisibilityArgument;
         scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
@@ -21784,7 +25795,14 @@ private:
     CHIP_ERROR TestWritesAValueOf1ToScheduleProgrammingVisibilityAttributeOfDut_9()
     {
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t scheduleProgrammingVisibilityArgument;
         scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(1);
@@ -21894,7 +25912,14 @@ private:
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
     {
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -21910,7 +25935,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -21926,7 +25958,14 @@ private:
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -22067,7 +26106,14 @@ private:
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -22083,7 +26129,14 @@ private:
     CHIP_ERROR TestWriteTheDefaultValueToMandatoryGlobalAttributeClusterRevision_1()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 5U;
@@ -22099,7 +26152,14 @@ private:
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -22115,7 +26175,14 @@ private:
     CHIP_ERROR TestReadTheGlobalAttributeFeatureMap_3()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeFeatureMap(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -22131,7 +26198,14 @@ private:
     CHIP_ERROR TestReadsBackGlobalAttributeFeatureMap_4()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeFeatureMap(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -22367,7 +26441,14 @@ private:
     CHIP_ERROR TestReadTheRoMandatoryAttributeDefaultType_0()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeType(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -22383,7 +26464,14 @@ private:
     CHIP_ERROR TestReadsBackTheRoMandatoryAttributeType_1()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeType(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -22399,7 +26487,14 @@ private:
     CHIP_ERROR TestReadTheRoMandatoryAttributeDefaultConfigStatus_2()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeConfigStatus(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -22415,7 +26510,14 @@ private:
     CHIP_ERROR TestReadsBackTheRoMandatoryAttributeConfigStatus_3()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeConfigStatus(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -22431,7 +26533,14 @@ private:
     CHIP_ERROR TestReadTheRoMandatoryAttributeDefaultOperationalStatus_4()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOperationalStatus(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -22447,7 +26556,14 @@ private:
     CHIP_ERROR TestReadsBackTheRoMandatoryAttributeOperationalStatus_5()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOperationalStatus(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -22463,7 +26579,14 @@ private:
     CHIP_ERROR TestReadTheRoMandatoryAttributeDefaultEndProductType_6()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEndProductType(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -22479,7 +26602,14 @@ private:
     CHIP_ERROR TestReadsBackTheRoMandatoryAttributeEndProductType_7()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEndProductType(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -22495,7 +26625,14 @@ private:
     CHIP_ERROR TestReadTheRwMandatoryAttributeDefaultMode_8()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMode(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
     }
@@ -22511,7 +26648,14 @@ private:
     CHIP_ERROR TestWriteAValueIntoTheRwMandatoryAttributeMode_9()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t modeArgument;
         modeArgument = 7;
@@ -22527,7 +26671,14 @@ private:
     CHIP_ERROR TestReadsBackTheRwMandatoryAttributeMode_10()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMode(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -22672,7 +26823,14 @@ private:
     CHIP_ERROR TestReadsEndProductTypeAttributeFromDut_0()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEndProductType(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -22688,7 +26846,14 @@ private:
     CHIP_ERROR TestReadsEndProductTypeAttributeConstraintsFromDut_1()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEndProductType(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -22778,7 +26943,14 @@ private:
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonOpenPosition_0()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -22802,7 +26974,14 @@ private:
     CHIP_ERROR Test2aThSendsUpOrOpenCommandToDut_1()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -22826,7 +27005,14 @@ private:
     CHIP_ERROR Test3aThReadsOperationalStatusAttributeFromDut_2()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOperationalStatus(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -22915,7 +27101,14 @@ private:
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonClosedPosition_0()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -22939,7 +27132,14 @@ private:
     CHIP_ERROR Test2aThSendsDownOrCloseCommandToDut_1()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -22963,7 +27163,14 @@ private:
     CHIP_ERROR Test3aThReadsOperationalStatusAttributeFromDut_2()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOperationalStatus(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -23052,7 +27259,14 @@ private:
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonOpenPosition_0()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -23076,7 +27290,14 @@ private:
     CHIP_ERROR Test2aThSendsStopMotionCommandToDut_1()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::WindowCovering::Commands::StopMotion::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -23100,7 +27321,14 @@ private:
     CHIP_ERROR Test2bThReadsOperationalStatusAttributeFromDut_2()
     {
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOperationalStatus(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -23192,7 +27420,14 @@ private:
     CHIP_ERROR TestReadAttributeTargetNavigatorList_0()
     {
         chip::Controller::TargetNavigatorClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeTargetNavigatorList(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -23217,7 +27452,14 @@ private:
     CHIP_ERROR TestNavigateTargetCommand_1()
     {
         chip::Controller::TargetNavigatorClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type;
         using responseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType;
@@ -23323,7 +27565,14 @@ private:
     CHIP_ERROR TestReadAttributeAudioOutputList_0()
     {
         chip::Controller::AudioOutputClusterTest cluster;
-        cluster.Associate(mDevice, 2);
+        uint8_t endPoint = 2;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeAudioOutputList(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -23354,7 +27603,14 @@ private:
     CHIP_ERROR TestSelectOutputCommand_1()
     {
         chip::Controller::AudioOutputClusterTest cluster;
-        cluster.Associate(mDevice, 2);
+        uint8_t endPoint = 2;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -23379,7 +27635,14 @@ private:
     CHIP_ERROR TestRenameOutputCommand_2()
     {
         chip::Controller::AudioOutputClusterTest cluster;
-        cluster.Associate(mDevice, 2);
+        uint8_t endPoint = 2;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -23508,7 +27771,14 @@ private:
     CHIP_ERROR TestReadAttributeApplicationLauncherList_0()
     {
         chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeApplicationLauncherList(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -23529,7 +27799,14 @@ private:
     CHIP_ERROR TestLaunchAppCommand_1()
     {
         chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type;
         using responseType = chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType;
@@ -23560,7 +27837,14 @@ private:
     CHIP_ERROR TestReadAttributeCatalogVendorId_2()
     {
         chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCatalogVendorId(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -23576,7 +27860,14 @@ private:
     CHIP_ERROR TestReadAttributeApplicationId_3()
     {
         chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeApplicationId(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -23644,7 +27935,14 @@ private:
     CHIP_ERROR TestSendKeyCommand_0()
     {
         chip::Controller::KeypadInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::KeypadInput::Commands::SendKey::Type;
         using responseType = chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType;
@@ -23725,7 +28023,14 @@ private:
     CHIP_ERROR TestGetSetupPinCommand_0()
     {
         chip::Controller::AccountLoginClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type;
         using responseType = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType;
@@ -23750,7 +28055,14 @@ private:
     CHIP_ERROR TestLoginCommand_1()
     {
         chip::Controller::AccountLoginClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::AccountLogin::Commands::Login::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -23843,7 +28155,14 @@ private:
     CHIP_ERROR TestReadMacAddress_0()
     {
         chip::Controller::WakeOnLanClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeWakeOnLanMacAddress(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -23960,7 +28279,14 @@ private:
     CHIP_ERROR TestChangeStatusCommand_0()
     {
         chip::Controller::ApplicationBasicClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -23985,7 +28311,14 @@ private:
     CHIP_ERROR TestReadAttributeVendorId_1()
     {
         chip::Controller::ApplicationBasicClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeVendorId(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -24001,7 +28334,14 @@ private:
     CHIP_ERROR TestReadAttributeProductId_2()
     {
         chip::Controller::ApplicationBasicClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeProductId(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -24017,7 +28357,14 @@ private:
     CHIP_ERROR TestReadAttributeCatalogVendorId_3()
     {
         chip::Controller::ApplicationBasicClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCatalogVendorId(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -24125,7 +28472,14 @@ private:
     CHIP_ERROR TestMediaPlaybackPlayCommand_0()
     {
         chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type;
         using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType;
@@ -24153,7 +28507,14 @@ private:
     CHIP_ERROR TestMediaPlaybackPauseCommand_1()
     {
         chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type;
         using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType;
@@ -24181,7 +28542,14 @@ private:
     CHIP_ERROR TestMediaPlaybackStopCommand_2()
     {
         chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type;
         using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType;
@@ -24209,7 +28577,14 @@ private:
     CHIP_ERROR TestMediaPlaybackStartOverCommand_3()
     {
         chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type;
         using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType;
@@ -24237,7 +28612,14 @@ private:
     CHIP_ERROR TestMediaPlaybackPreviousCommand_4()
     {
         chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type;
         using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType;
@@ -24265,7 +28647,14 @@ private:
     CHIP_ERROR TestMediaPlaybackNextCommand_5()
     {
         chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type;
         using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType;
@@ -24293,7 +28682,14 @@ private:
     CHIP_ERROR TestMediaPlaybackRewindCommand_6()
     {
         chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type;
         using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType;
@@ -24321,7 +28717,14 @@ private:
     CHIP_ERROR TestMediaPlaybackFastForwardCommand_7()
     {
         chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type;
         using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType;
@@ -24349,7 +28752,14 @@ private:
     CHIP_ERROR TestMediaPlaybackSkipForwardCommand_8()
     {
         chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type;
         using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType;
@@ -24378,7 +28788,14 @@ private:
     CHIP_ERROR TestMediaPlaybackSkipBackwardCommand_9()
     {
         chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type;
         using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType;
@@ -24407,7 +28824,14 @@ private:
     CHIP_ERROR TestMediaPlaybackSeekCommand_10()
     {
         chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        uint8_t endPoint = 3;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type;
         using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType;
@@ -24515,7 +28939,14 @@ private:
     CHIP_ERROR TestReadAttributeTvChannelList_0()
     {
         chip::Controller::TvChannelClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeTvChannelList(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -24546,7 +28977,14 @@ private:
     CHIP_ERROR TestChangeChannelByNumberCommand_1()
     {
         chip::Controller::TvChannelClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -24572,7 +29010,14 @@ private:
     CHIP_ERROR TestSkipChannelCommand_2()
     {
         chip::Controller::TvChannelClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TvChannel::Commands::SkipChannel::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -24649,7 +29094,14 @@ private:
     CHIP_ERROR TestSleepInputStatusCommand_0()
     {
         chip::Controller::LowPowerClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::LowPower::Commands::Sleep::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -24777,7 +29229,14 @@ private:
     CHIP_ERROR TestReadAttributeMediaInputList_0()
     {
         chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeMediaInputList(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -24806,7 +29265,14 @@ private:
     CHIP_ERROR TestSelectInputCommand_1()
     {
         chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaInput::Commands::SelectInput::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -24831,7 +29297,14 @@ private:
     CHIP_ERROR TestReadCurrentInputList_2()
     {
         chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentMediaInput(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -24847,7 +29320,14 @@ private:
     CHIP_ERROR TestHideInputStatusCommand_3()
     {
         chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -24871,7 +29351,14 @@ private:
     CHIP_ERROR TestShowInputStatusCommand_4()
     {
         chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -24895,7 +29382,14 @@ private:
     CHIP_ERROR TestRenameInputCommand_5()
     {
         chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::MediaInput::Commands::RenameInput::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -26682,7 +31176,14 @@ private:
     CHIP_ERROR TestSendTestCommand_0()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::Test::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -26706,7 +31207,14 @@ private:
     CHIP_ERROR TestSendTestNotHandledCommand_1()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -26730,7 +31238,14 @@ private:
     CHIP_ERROR TestSendTestSpecificCommand_2()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestSpecific::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType;
@@ -26758,7 +31273,14 @@ private:
     CHIP_ERROR TestSendTestAddArgumentsCommand_3()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType;
@@ -26788,7 +31310,14 @@ private:
     CHIP_ERROR TestSendFailingTestAddArgumentsCommand_4()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType;
@@ -26814,7 +31343,14 @@ private:
     CHIP_ERROR TestReadAttributeBooleanDefaultValue_5()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBoolean(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
     }
@@ -26830,7 +31366,14 @@ private:
     CHIP_ERROR TestWriteAttributeBooleanTrue_6()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         bool booleanArgument;
         booleanArgument = 1;
@@ -26846,7 +31389,14 @@ private:
     CHIP_ERROR TestReadAttributeBooleanTrue_7()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBoolean(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
     }
@@ -26862,7 +31412,14 @@ private:
     CHIP_ERROR TestWriteAttributeBooleanFalse_8()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         bool booleanArgument;
         booleanArgument = 0;
@@ -26878,7 +31435,14 @@ private:
     CHIP_ERROR TestReadAttributeBooleanFalse_9()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBoolean(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
     }
@@ -26894,7 +31458,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap8DefaultValue_10()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap8(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
     }
@@ -26910,7 +31481,14 @@ private:
     CHIP_ERROR TestWriteAttributeBitmap8MaxValue_11()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t bitmap8Argument;
         bitmap8Argument = 255;
@@ -26926,7 +31504,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap8MaxValue_12()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap8(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
     }
@@ -26942,7 +31527,14 @@ private:
     CHIP_ERROR TestWriteAttributeBitmap8MinValue_13()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t bitmap8Argument;
         bitmap8Argument = 0;
@@ -26958,7 +31550,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap8MinValue_14()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap8(mOnSuccessCallback_14.Cancel(), mOnFailureCallback_14.Cancel());
     }
@@ -26974,7 +31573,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap16DefaultValue_15()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap16(mOnSuccessCallback_15.Cancel(), mOnFailureCallback_15.Cancel());
     }
@@ -26990,7 +31596,14 @@ private:
     CHIP_ERROR TestWriteAttributeBitmap16MaxValue_16()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t bitmap16Argument;
         bitmap16Argument = 65535U;
@@ -27006,7 +31619,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap16MaxValue_17()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap16(mOnSuccessCallback_17.Cancel(), mOnFailureCallback_17.Cancel());
     }
@@ -27022,7 +31642,14 @@ private:
     CHIP_ERROR TestWriteAttributeBitmap16MinValue_18()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t bitmap16Argument;
         bitmap16Argument = 0U;
@@ -27038,7 +31665,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap16MinValue_19()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap16(mOnSuccessCallback_19.Cancel(), mOnFailureCallback_19.Cancel());
     }
@@ -27054,7 +31688,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap32DefaultValue_20()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap32(mOnSuccessCallback_20.Cancel(), mOnFailureCallback_20.Cancel());
     }
@@ -27070,7 +31711,14 @@ private:
     CHIP_ERROR TestWriteAttributeBitmap32MaxValue_21()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint32_t bitmap32Argument;
         bitmap32Argument = 4294967295UL;
@@ -27086,7 +31734,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap32MaxValue_22()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap32(mOnSuccessCallback_22.Cancel(), mOnFailureCallback_22.Cancel());
     }
@@ -27102,7 +31757,14 @@ private:
     CHIP_ERROR TestWriteAttributeBitmap32MinValue_23()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint32_t bitmap32Argument;
         bitmap32Argument = 0UL;
@@ -27118,7 +31780,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap32MinValue_24()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap32(mOnSuccessCallback_24.Cancel(), mOnFailureCallback_24.Cancel());
     }
@@ -27134,7 +31803,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap64DefaultValue_25()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap64(mOnSuccessCallback_25.Cancel(), mOnFailureCallback_25.Cancel());
     }
@@ -27150,7 +31826,14 @@ private:
     CHIP_ERROR TestWriteAttributeBitmap64MaxValue_26()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint64_t bitmap64Argument;
         bitmap64Argument = 18446744073709551615ULL;
@@ -27166,7 +31849,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap64MaxValue_27()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap64(mOnSuccessCallback_27.Cancel(), mOnFailureCallback_27.Cancel());
     }
@@ -27182,7 +31872,14 @@ private:
     CHIP_ERROR TestWriteAttributeBitmap64MinValue_28()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint64_t bitmap64Argument;
         bitmap64Argument = 0ULL;
@@ -27198,7 +31895,14 @@ private:
     CHIP_ERROR TestReadAttributeBitmap64MinValue_29()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeBitmap64(mOnSuccessCallback_29.Cancel(), mOnFailureCallback_29.Cancel());
     }
@@ -27214,7 +31918,14 @@ private:
     CHIP_ERROR TestReadAttributeInt8uDefaultValue_30()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt8u(mOnSuccessCallback_30.Cancel(), mOnFailureCallback_30.Cancel());
     }
@@ -27230,7 +31941,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt8uMaxValue_31()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t int8uArgument;
         int8uArgument = 255;
@@ -27246,7 +31964,14 @@ private:
     CHIP_ERROR TestReadAttributeInt8uMaxValue_32()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt8u(mOnSuccessCallback_32.Cancel(), mOnFailureCallback_32.Cancel());
     }
@@ -27262,7 +31987,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt8uMinValue_33()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t int8uArgument;
         int8uArgument = 0;
@@ -27278,7 +32010,14 @@ private:
     CHIP_ERROR TestReadAttributeInt8uMinValue_34()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt8u(mOnSuccessCallback_34.Cancel(), mOnFailureCallback_34.Cancel());
     }
@@ -27294,7 +32033,14 @@ private:
     CHIP_ERROR TestReadAttributeInt16uDefaultValue_35()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt16u(mOnSuccessCallback_35.Cancel(), mOnFailureCallback_35.Cancel());
     }
@@ -27310,7 +32056,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt16uMaxValue_36()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t int16uArgument;
         int16uArgument = 65535U;
@@ -27326,7 +32079,14 @@ private:
     CHIP_ERROR TestReadAttributeInt16uMaxValue_37()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt16u(mOnSuccessCallback_37.Cancel(), mOnFailureCallback_37.Cancel());
     }
@@ -27342,7 +32102,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt16uMinValue_38()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t int16uArgument;
         int16uArgument = 0U;
@@ -27358,7 +32125,14 @@ private:
     CHIP_ERROR TestReadAttributeInt16uMinValue_39()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt16u(mOnSuccessCallback_39.Cancel(), mOnFailureCallback_39.Cancel());
     }
@@ -27374,7 +32148,14 @@ private:
     CHIP_ERROR TestReadAttributeInt32uDefaultValue_40()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt32u(mOnSuccessCallback_40.Cancel(), mOnFailureCallback_40.Cancel());
     }
@@ -27390,7 +32171,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt32uMaxValue_41()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint32_t int32uArgument;
         int32uArgument = 4294967295UL;
@@ -27406,7 +32194,14 @@ private:
     CHIP_ERROR TestReadAttributeInt32uMaxValue_42()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt32u(mOnSuccessCallback_42.Cancel(), mOnFailureCallback_42.Cancel());
     }
@@ -27422,7 +32217,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt32uMinValue_43()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint32_t int32uArgument;
         int32uArgument = 0UL;
@@ -27438,7 +32240,14 @@ private:
     CHIP_ERROR TestReadAttributeInt32uMinValue_44()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt32u(mOnSuccessCallback_44.Cancel(), mOnFailureCallback_44.Cancel());
     }
@@ -27454,7 +32263,14 @@ private:
     CHIP_ERROR TestReadAttributeInt64uDefaultValue_45()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt64u(mOnSuccessCallback_45.Cancel(), mOnFailureCallback_45.Cancel());
     }
@@ -27470,7 +32286,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt64uMaxValue_46()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint64_t int64uArgument;
         int64uArgument = 18446744073709551615ULL;
@@ -27486,7 +32309,14 @@ private:
     CHIP_ERROR TestReadAttributeInt64uMaxValue_47()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt64u(mOnSuccessCallback_47.Cancel(), mOnFailureCallback_47.Cancel());
     }
@@ -27502,7 +32332,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt64uMinValue_48()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint64_t int64uArgument;
         int64uArgument = 0ULL;
@@ -27518,7 +32355,14 @@ private:
     CHIP_ERROR TestReadAttributeInt64uMinValue_49()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt64u(mOnSuccessCallback_49.Cancel(), mOnFailureCallback_49.Cancel());
     }
@@ -27534,7 +32378,14 @@ private:
     CHIP_ERROR TestReadAttributeInt8sDefaultValue_50()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt8s(mOnSuccessCallback_50.Cancel(), mOnFailureCallback_50.Cancel());
     }
@@ -27550,7 +32401,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt8sMaxValue_51()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int8_t int8sArgument;
         int8sArgument = 127;
@@ -27566,7 +32424,14 @@ private:
     CHIP_ERROR TestReadAttributeInt8sMaxValue_52()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt8s(mOnSuccessCallback_52.Cancel(), mOnFailureCallback_52.Cancel());
     }
@@ -27582,7 +32447,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt8sMinValue_53()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int8_t int8sArgument;
         int8sArgument = -128;
@@ -27598,7 +32470,14 @@ private:
     CHIP_ERROR TestReadAttributeInt8sMinValue_54()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt8s(mOnSuccessCallback_54.Cancel(), mOnFailureCallback_54.Cancel());
     }
@@ -27614,7 +32493,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt8sDefaultValue_55()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int8_t int8sArgument;
         int8sArgument = 0;
@@ -27630,7 +32516,14 @@ private:
     CHIP_ERROR TestReadAttributeInt8sDefaultValue_56()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt8s(mOnSuccessCallback_56.Cancel(), mOnFailureCallback_56.Cancel());
     }
@@ -27646,7 +32539,14 @@ private:
     CHIP_ERROR TestReadAttributeInt16sDefaultValue_57()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt16s(mOnSuccessCallback_57.Cancel(), mOnFailureCallback_57.Cancel());
     }
@@ -27662,7 +32562,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt16sMaxValue_58()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int16_t int16sArgument;
         int16sArgument = 32767;
@@ -27678,7 +32585,14 @@ private:
     CHIP_ERROR TestReadAttributeInt16sMaxValue_59()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt16s(mOnSuccessCallback_59.Cancel(), mOnFailureCallback_59.Cancel());
     }
@@ -27694,7 +32608,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt16sMinValue_60()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int16_t int16sArgument;
         int16sArgument = -32768;
@@ -27710,7 +32631,14 @@ private:
     CHIP_ERROR TestReadAttributeInt16sMinValue_61()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt16s(mOnSuccessCallback_61.Cancel(), mOnFailureCallback_61.Cancel());
     }
@@ -27726,7 +32654,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt16sDefaultValue_62()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int16_t int16sArgument;
         int16sArgument = 0;
@@ -27742,7 +32677,14 @@ private:
     CHIP_ERROR TestReadAttributeInt16sDefaultValue_63()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt16s(mOnSuccessCallback_63.Cancel(), mOnFailureCallback_63.Cancel());
     }
@@ -27758,7 +32700,14 @@ private:
     CHIP_ERROR TestReadAttributeInt32sDefaultValue_64()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt32s(mOnSuccessCallback_64.Cancel(), mOnFailureCallback_64.Cancel());
     }
@@ -27774,7 +32723,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt32sMaxValue_65()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int32_t int32sArgument;
         int32sArgument = 2147483647L;
@@ -27790,7 +32746,14 @@ private:
     CHIP_ERROR TestReadAttributeInt32sMaxValue_66()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt32s(mOnSuccessCallback_66.Cancel(), mOnFailureCallback_66.Cancel());
     }
@@ -27806,7 +32769,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt32sMinValue_67()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int32_t int32sArgument;
         int32sArgument = -2147483648L;
@@ -27822,7 +32792,14 @@ private:
     CHIP_ERROR TestReadAttributeInt32sMinValue_68()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt32s(mOnSuccessCallback_68.Cancel(), mOnFailureCallback_68.Cancel());
     }
@@ -27838,7 +32815,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt32sDefaultValue_69()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int32_t int32sArgument;
         int32sArgument = 0L;
@@ -27854,7 +32838,14 @@ private:
     CHIP_ERROR TestReadAttributeInt32sDefaultValue_70()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt32s(mOnSuccessCallback_70.Cancel(), mOnFailureCallback_70.Cancel());
     }
@@ -27870,7 +32861,14 @@ private:
     CHIP_ERROR TestReadAttributeInt64sDefaultValue_71()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt64s(mOnSuccessCallback_71.Cancel(), mOnFailureCallback_71.Cancel());
     }
@@ -27886,7 +32884,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt64sMaxValue_72()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int64_t int64sArgument;
         int64sArgument = 9223372036854775807LL;
@@ -27902,7 +32907,14 @@ private:
     CHIP_ERROR TestReadAttributeInt64sMaxValue_73()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt64s(mOnSuccessCallback_73.Cancel(), mOnFailureCallback_73.Cancel());
     }
@@ -27918,7 +32930,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt64sMinValue_74()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int64_t int64sArgument;
         int64sArgument = -9223372036854775807LL;
@@ -27934,7 +32953,14 @@ private:
     CHIP_ERROR TestReadAttributeInt64sMinValue_75()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt64s(mOnSuccessCallback_75.Cancel(), mOnFailureCallback_75.Cancel());
     }
@@ -27950,7 +32976,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt64sDefaultValue_76()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         int64_t int64sArgument;
         int64sArgument = 0LL;
@@ -27966,7 +32999,14 @@ private:
     CHIP_ERROR TestReadAttributeInt64sDefaultValue_77()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt64s(mOnSuccessCallback_77.Cancel(), mOnFailureCallback_77.Cancel());
     }
@@ -27982,7 +33022,14 @@ private:
     CHIP_ERROR TestReadAttributeEnum8DefaultValue_78()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEnum8(mOnSuccessCallback_78.Cancel(), mOnFailureCallback_78.Cancel());
     }
@@ -27998,7 +33045,14 @@ private:
     CHIP_ERROR TestWriteAttributeEnum8MaxValue_79()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t enum8Argument;
         enum8Argument = static_cast<uint8_t>(255);
@@ -28014,7 +33068,14 @@ private:
     CHIP_ERROR TestReadAttributeEnum8MaxValue_80()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEnum8(mOnSuccessCallback_80.Cancel(), mOnFailureCallback_80.Cancel());
     }
@@ -28030,7 +33091,14 @@ private:
     CHIP_ERROR TestWriteAttributeEnum8MinValue_81()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint8_t enum8Argument;
         enum8Argument = static_cast<uint8_t>(0);
@@ -28046,7 +33114,14 @@ private:
     CHIP_ERROR TestReadAttributeEnum8MinValue_82()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEnum8(mOnSuccessCallback_82.Cancel(), mOnFailureCallback_82.Cancel());
     }
@@ -28062,7 +33137,14 @@ private:
     CHIP_ERROR TestReadAttributeEnum16DefaultValue_83()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEnum16(mOnSuccessCallback_83.Cancel(), mOnFailureCallback_83.Cancel());
     }
@@ -28078,7 +33160,14 @@ private:
     CHIP_ERROR TestWriteAttributeEnum16MaxValue_84()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t enum16Argument;
         enum16Argument = static_cast<uint16_t>(65535);
@@ -28094,7 +33183,14 @@ private:
     CHIP_ERROR TestReadAttributeEnum16MaxValue_85()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEnum16(mOnSuccessCallback_85.Cancel(), mOnFailureCallback_85.Cancel());
     }
@@ -28110,7 +33206,14 @@ private:
     CHIP_ERROR TestWriteAttributeEnum16MinValue_86()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t enum16Argument;
         enum16Argument = static_cast<uint16_t>(0);
@@ -28126,7 +33229,14 @@ private:
     CHIP_ERROR TestReadAttributeEnum16MinValue_87()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEnum16(mOnSuccessCallback_87.Cancel(), mOnFailureCallback_87.Cancel());
     }
@@ -28142,7 +33252,14 @@ private:
     CHIP_ERROR TestReadAttributeOctetStringDefaultValue_88()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOctetString(mOnSuccessCallback_88.Cancel(), mOnFailureCallback_88.Cancel());
     }
@@ -28158,7 +33275,14 @@ private:
     CHIP_ERROR TestWriteAttributeOctetString_89()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::ByteSpan octetStringArgument;
         octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), strlen("TestValue"));
@@ -28174,7 +33298,14 @@ private:
     CHIP_ERROR TestReadAttributeOctetString_90()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOctetString(mOnSuccessCallback_90.Cancel(), mOnFailureCallback_90.Cancel());
     }
@@ -28190,7 +33321,14 @@ private:
     CHIP_ERROR TestWriteAttributeOctetString_91()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::ByteSpan octetStringArgument;
         octetStringArgument =
@@ -28207,7 +33345,14 @@ private:
     CHIP_ERROR TestReadAttributeOctetString_92()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOctetString(mOnSuccessCallback_92.Cancel(), mOnFailureCallback_92.Cancel());
     }
@@ -28223,7 +33368,14 @@ private:
     CHIP_ERROR TestWriteAttributeOctetString_93()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::ByteSpan octetStringArgument;
         octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
@@ -28239,7 +33391,14 @@ private:
     CHIP_ERROR TestReadAttributeLongOctetStringDefaultValue_94()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeLongOctetString(mOnSuccessCallback_94.Cancel(), mOnFailureCallback_94.Cancel());
     }
@@ -28255,7 +33414,14 @@ private:
     CHIP_ERROR TestWriteAttributeLongOctetString_95()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::ByteSpan longOctetStringArgument;
         longOctetStringArgument = chip::ByteSpan(
@@ -28278,7 +33444,14 @@ private:
     CHIP_ERROR TestReadAttributeLongOctetString_96()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeLongOctetString(mOnSuccessCallback_96.Cancel(), mOnFailureCallback_96.Cancel());
     }
@@ -28298,7 +33471,14 @@ private:
     CHIP_ERROR TestWriteAttributeLongOctetString_97()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::ByteSpan longOctetStringArgument;
         longOctetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
@@ -28314,7 +33494,14 @@ private:
     CHIP_ERROR TestReadAttributeCharStringDefaultValue_98()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCharString(mOnSuccessCallback_98.Cancel(), mOnFailureCallback_98.Cancel());
     }
@@ -28330,7 +33517,14 @@ private:
     CHIP_ERROR TestWriteAttributeCharString_99()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("☉T☉", strlen("☉T☉"));
@@ -28346,7 +33540,14 @@ private:
     CHIP_ERROR TestWriteAttributeCharStringValueTooLong_100()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("☉TestValueLongerThan10☉", strlen("☉TestValueLongerThan10☉"));
@@ -28362,7 +33563,14 @@ private:
     CHIP_ERROR TestWriteAttributeCharStringEmpty_101()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("", strlen(""));
@@ -28378,7 +33586,14 @@ private:
     CHIP_ERROR TestReadAttributeLongCharStringDefaultValue_102()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeLongCharString(mOnSuccessCallback_102.Cancel(), mOnFailureCallback_102.Cancel());
     }
@@ -28394,7 +33609,14 @@ private:
     CHIP_ERROR TestWriteAttributeLongCharString_103()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::CharSpan longCharStringArgument;
         longCharStringArgument = chip::Span<const char>(
@@ -28416,7 +33638,14 @@ private:
     CHIP_ERROR TestReadAttributeLongCharString_104()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeLongCharString(mOnSuccessCallback_104.Cancel(), mOnFailureCallback_104.Cancel());
     }
@@ -28436,7 +33665,14 @@ private:
     CHIP_ERROR TestWriteAttributeLongCharString_105()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::CharSpan longCharStringArgument;
         longCharStringArgument = chip::Span<const char>("", strlen(""));
@@ -28452,7 +33688,14 @@ private:
     CHIP_ERROR TestReadAttributeList_106()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeListInt8u(mOnSuccessCallback_106.Cancel(), mOnFailureCallback_106.Cancel());
     }
@@ -28477,7 +33720,14 @@ private:
     CHIP_ERROR TestReadAttributeListOctetString_107()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeListOctetString(mOnSuccessCallback_107.Cancel(), mOnFailureCallback_107.Cancel());
     }
@@ -28502,7 +33752,14 @@ private:
     CHIP_ERROR TestReadAttributeListStructOctetString_108()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeListStructOctetString(mOnSuccessCallback_108.Cancel(), mOnFailureCallback_108.Cancel());
     }
@@ -28533,7 +33790,14 @@ private:
     CHIP_ERROR TestReadAttributeEpochUsDefaultValue_109()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEpochUs(mOnSuccessCallback_109.Cancel(), mOnFailureCallback_109.Cancel());
     }
@@ -28549,7 +33813,14 @@ private:
     CHIP_ERROR TestWriteAttributeEpochUsMaxValue_110()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint64_t epochUsArgument;
         epochUsArgument = 18446744073709551615ULL;
@@ -28565,7 +33836,14 @@ private:
     CHIP_ERROR TestReadAttributeEpochUsMaxValue_111()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEpochUs(mOnSuccessCallback_111.Cancel(), mOnFailureCallback_111.Cancel());
     }
@@ -28581,7 +33859,14 @@ private:
     CHIP_ERROR TestWriteAttributeEpochUsMinValue_112()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint64_t epochUsArgument;
         epochUsArgument = 0ULL;
@@ -28597,7 +33882,14 @@ private:
     CHIP_ERROR TestReadAttributeEpochUsMinValue_113()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEpochUs(mOnSuccessCallback_113.Cancel(), mOnFailureCallback_113.Cancel());
     }
@@ -28613,7 +33905,14 @@ private:
     CHIP_ERROR TestReadAttributeEpochSDefaultValue_114()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEpochS(mOnSuccessCallback_114.Cancel(), mOnFailureCallback_114.Cancel());
     }
@@ -28629,7 +33928,14 @@ private:
     CHIP_ERROR TestWriteAttributeEpochSMaxValue_115()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint32_t epochSArgument;
         epochSArgument = 4294967295UL;
@@ -28645,7 +33951,14 @@ private:
     CHIP_ERROR TestReadAttributeEpochSMaxValue_116()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEpochS(mOnSuccessCallback_116.Cancel(), mOnFailureCallback_116.Cancel());
     }
@@ -28661,7 +33974,14 @@ private:
     CHIP_ERROR TestWriteAttributeEpochSMinValue_117()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint32_t epochSArgument;
         epochSArgument = 0UL;
@@ -28677,7 +33997,14 @@ private:
     CHIP_ERROR TestReadAttributeEpochSMinValue_118()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeEpochS(mOnSuccessCallback_118.Cancel(), mOnFailureCallback_118.Cancel());
     }
@@ -28693,7 +34020,14 @@ private:
     CHIP_ERROR TestReadAttributeUnsupported_119()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeUnsupported(mOnSuccessCallback_119.Cancel(), mOnFailureCallback_119.Cancel());
     }
@@ -28712,7 +34046,14 @@ private:
     CHIP_ERROR TestWriteattributeUnsupported_120()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         bool unsupportedArgument;
         unsupportedArgument = 0;
@@ -28731,7 +34072,14 @@ private:
     CHIP_ERROR TestSendTestCommandToUnsupportedEndpoint_121()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 200);
+        uint8_t endPoint = 200;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::Test::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -28755,7 +34103,14 @@ private:
     CHIP_ERROR TestReadAttributeVendorIdDefaultValue_122()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeVendorId(mOnSuccessCallback_122.Cancel(), mOnFailureCallback_122.Cancel());
     }
@@ -28771,7 +34126,14 @@ private:
     CHIP_ERROR TestWriteAttributeVendorId_123()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::VendorId vendorIdArgument;
         vendorIdArgument = static_cast<chip::VendorId>(17);
@@ -28787,7 +34149,14 @@ private:
     CHIP_ERROR TestReadAttributeVendorId_124()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeVendorId(mOnSuccessCallback_124.Cancel(), mOnFailureCallback_124.Cancel());
     }
@@ -28803,7 +34172,14 @@ private:
     CHIP_ERROR TestRestoreAttributeVendorId_125()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::VendorId vendorIdArgument;
         vendorIdArgument = static_cast<chip::VendorId>(0);
@@ -28819,7 +34195,14 @@ private:
     CHIP_ERROR TestSendACommandWithAVendorIdAndEnum_126()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType;
@@ -28947,7 +34330,14 @@ private:
     CHIP_ERROR TestSendTestCommandWithStructArgumentAndArg1bIsTrue_0()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
@@ -28982,7 +34372,14 @@ private:
     CHIP_ERROR TestSendTestCommandWithStructArgumentAndArg1bIsFalse_1()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
@@ -29017,7 +34414,14 @@ private:
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndNoneOfThemIsSetTo0_2()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
@@ -29057,7 +34461,14 @@ private:
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndOneOfThemIsSetTo0_3()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
@@ -29098,7 +34509,14 @@ private:
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndGetItReversed_4()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
@@ -29157,7 +34575,14 @@ private:
     CHIP_ERROR TestSendTestCommandWithEmptyListOfInt8uAndGetAnEmptyListBack_5()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
@@ -29188,7 +34613,14 @@ private:
     CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_6()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
@@ -29234,7 +34666,14 @@ private:
     CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_7()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
@@ -29280,7 +34719,14 @@ private:
     CHIP_ERROR TestSendTestCommandWithOptionalArgSet_8()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
@@ -29321,7 +34767,14 @@ private:
     CHIP_ERROR TestSendTestCommandWithoutItsOptionalArg_9()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
@@ -29352,7 +34805,14 @@ private:
     CHIP_ERROR TestSendTestCommandWithOptionalArgSetToNull_10()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
         using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
@@ -29497,7 +34957,14 @@ private:
     CHIP_ERROR TestWriteAttributeInt32uValue_0()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint32_t int32uArgument;
         int32uArgument = 5UL;
@@ -29513,7 +34980,14 @@ private:
     CHIP_ERROR TestReadAttributeInt32uValueMinValueConstraints_1()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt32u(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -29529,7 +35003,14 @@ private:
     CHIP_ERROR TestReadAttributeInt32uValueMaxValueConstraints_2()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt32u(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -29545,7 +35026,14 @@ private:
     CHIP_ERROR TestReadAttributeInt32uValueNotValueConstraints_3()
     {
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeInt32u(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -29790,7 +35278,14 @@ private:
     CHIP_ERROR TestReadAttributeDeviceList_0()
     {
         chip::Controller::DescriptorClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeDeviceList(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -29810,7 +35305,14 @@ private:
     CHIP_ERROR TestReadAttributeServerList_1()
     {
         chip::Controller::DescriptorClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeServerList(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -29863,7 +35365,14 @@ private:
     CHIP_ERROR TestReadAttributeClientList_2()
     {
         chip::Controller::DescriptorClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeClientList(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -29880,7 +35389,14 @@ private:
     CHIP_ERROR TestReadAttributePartsList_3()
     {
         chip::Controller::DescriptorClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributePartsList(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -30004,7 +35520,14 @@ private:
     CHIP_ERROR TestReadLocation_0()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeLocation(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -30020,7 +35543,14 @@ private:
     CHIP_ERROR TestWriteLocation_1()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::CharSpan locationArgument;
         locationArgument = chip::Span<const char>("us", strlen("us"));
@@ -30036,7 +35566,14 @@ private:
     CHIP_ERROR TestReadBackLocation_2()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeLocation(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -30052,7 +35589,14 @@ private:
     CHIP_ERROR TestRestoreInitialLocationValue_3()
     {
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         chip::CharSpan locationArgument;
         locationArgument = chip::Span<const char>("", strlen(""));
@@ -30120,7 +35664,14 @@ private:
     CHIP_ERROR TestSendIdentifyCommandAndExpectSuccessResponse_0()
     {
         chip::Controller::IdentifyClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::Identify::Commands::Identify::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -30245,7 +35796,14 @@ private:
     CHIP_ERROR TestReadNumberOfSupportedFabrics_0()
     {
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeSupportedFabrics(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -30262,7 +35820,14 @@ private:
     CHIP_ERROR TestReadNumberOfCommissionedFabrics_1()
     {
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCommissionedFabrics(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -30279,7 +35844,14 @@ private:
     CHIP_ERROR TestReadCurrentFabricIndex_2()
     {
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        uint8_t endPoint = 0;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentFabricIndex(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -30457,7 +36029,14 @@ private:
     CHIP_ERROR TestReadCurrentMode_0()
     {
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentMode(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -30473,7 +36052,14 @@ private:
     CHIP_ERROR TestReadOnMode_1()
     {
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeOnMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -30489,7 +36075,14 @@ private:
     CHIP_ERROR TestReadStartUpMode_2()
     {
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeStartUpMode(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -30505,7 +36098,14 @@ private:
     CHIP_ERROR TestReadDescription_3()
     {
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeDescription(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
     }
@@ -30521,7 +36121,14 @@ private:
     CHIP_ERROR TestReadSupportedModes_4()
     {
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeSupportedModes(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
     }
@@ -30552,7 +36159,14 @@ private:
     CHIP_ERROR TestChangeToSupportedMode_5()
     {
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -30577,7 +36191,14 @@ private:
     CHIP_ERROR TestVerifyCurrentModeChange_6()
     {
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentMode(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
     }
@@ -30593,7 +36214,14 @@ private:
     CHIP_ERROR TestChangeToUnsupportedMode_7()
     {
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -30716,7 +36344,14 @@ private:
     CHIP_ERROR TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_0()
     {
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentHeapFree(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
@@ -30735,7 +36370,14 @@ private:
     CHIP_ERROR TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_1()
     {
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentHeapUsed(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
     }
@@ -30754,7 +36396,14 @@ private:
     CHIP_ERROR TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_2()
     {
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReadAttributeCurrentHeapHighWatermark(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
@@ -30904,7 +36553,14 @@ private:
     CHIP_ERROR TestSetOnOffAttributeToFalse_0()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -30928,7 +36584,14 @@ private:
     CHIP_ERROR TestReportSubscribeOnOffAttribute_1()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         ReturnErrorOnFailure(cluster.ReportAttributeOnOff(mOnSuccessCallback_1.Cancel()));
 
@@ -30948,7 +36611,14 @@ private:
     CHIP_ERROR TestSubscribeOnOffAttribute_2()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         uint16_t minIntervalArgument;
         minIntervalArgument = 2U;
@@ -30971,7 +36641,14 @@ private:
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_3()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -30995,7 +36672,14 @@ private:
     CHIP_ERROR TestCheckForAttributeReport_4()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReportAttributeOnOff(mOnSuccessCallback_4.Cancel());
     }
@@ -31014,7 +36698,14 @@ private:
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_5()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
         using responseType = chip::app::DataModel::NullObjectType;
@@ -31038,7 +36729,14 @@ private:
     CHIP_ERROR TestCheckForAttributeReport_6()
     {
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        uint8_t endPoint = 1;
+        Argument arg     = mOptionalArgs.at((size_t) 0);
+        if (arg.isProvided)
+        {
+            endPoint = mEndPointId;
+        }
+        ChipLogProgress(chipTool, "Was Provided: %s and Enpoint Value: %d", arg.isProvided ? "true" : "false", endPoint);
+        cluster.Associate(mDevice, endPoint);
 
         return cluster.ReportAttributeOnOff(mOnSuccessCallback_6.Cancel());
     }
