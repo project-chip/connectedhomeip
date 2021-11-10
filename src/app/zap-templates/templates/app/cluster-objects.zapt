@@ -6,6 +6,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
+#include <app/data-model/NullObject.h>
 #include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
 #include <lib/support/BitFlags.h>
@@ -90,6 +91,22 @@ namespace {{asUpperCamelCase name}} {
 {{#zcl_commands}}
 {{#first}}
 namespace Commands {
+ // Forward-declarations so we can reference these later.
+{{/first}}
+
+namespace {{asUpperCamelCase name}} {
+ struct Type;
+ struct DecodableType;
+} // namespace {{asUpperCamelCase name}}
+{{#last}}
+
+} // namespace Commands
+{{/last}}
+{{/zcl_commands}}
+
+{{#zcl_commands}}
+{{#first}}
+namespace Commands {
 {{/first}}
 namespace {{asUpperCamelCase name}} {
 enum class Fields {
@@ -110,6 +127,13 @@ public:
     {{/zcl_command_arguments}}
 
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
+
+    using ResponseType =
+    {{~#if responseRef}}
+      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{getResponseCommandName responseRef}}::DecodableType;
+    {{else}}
+      DataModel::NullObjectType;
+    {{/if}}
 };
 
 struct DecodableType {
