@@ -20,6 +20,7 @@ function getTests()
   const BinaryInput = [
     'Test_TC_BI_1_1',
     'Test_TC_BI_2_1',
+    'Test_TC_BI_2_2',
   ];
 
   const BooleanState = [
@@ -131,6 +132,7 @@ function getTests()
 
   const Thermostat = [
     'Test_TC_TSTAT_1_1',
+    'Test_TC_TSTAT_2_1',
   ];
 
   const ThermostatUserConfiguration = [
@@ -166,6 +168,7 @@ function getTests()
 
   const SoftwareDiagnostics = [
     'Test_TC_DIAGSW_1_1',
+    'Test_TC_DIAGSW_3_2',
   ];
 
   const Subscriptions = [
