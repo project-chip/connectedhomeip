@@ -24,7 +24,7 @@
 class ConfigureFabricCommand : public Command
 {
 public:
-    ConfigureFabricCommand() : Command("configure-fabric") { AddArgument("name", &mFabricName); }
+    ConfigureFabricCommand() : Command("configure-fabric") { AddArgument("name", &mFabricName, false); }
     CHIP_ERROR Run() override;
 
 private:

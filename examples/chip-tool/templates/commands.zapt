@@ -387,13 +387,13 @@ public:
         {{else if isStruct}}
         // {{label}} Struct parsing is not supported yet
         {{else if (isString type)}}
-        AddArgument("{{asUpperCamelCase label}}", &{{>field}});
+        AddArgument("{{asUpperCamelCase label}}", &{{>field}}, false);
         {{else}}
         AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}},
           {{~#if ./isEnum}}reinterpret_cast<std::underlying_type_t<decltype({{>field}})> *>(&{{>field}})
           {{else ./isBitmap}}reinterpret_cast<std::underlying_type_t<chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::{{asUpperCamelCase type}}> *>(&{{>field}})
           {{else}}&{{>field}}
-          {{/if~}}
+          {{/if~}}, false
         );
         {{/if}}
         {{/chip_cluster_command_arguments}}
@@ -431,7 +431,7 @@ class Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public Mode
 public:
     Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("read")
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
+        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}", false);
         ModelCommand::AddArguments();
     }
 
@@ -465,11 +465,11 @@ class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public Mod
 public:
     Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("write")
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
+        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}", false);
         {{#if (isString type)}}
-        AddArgument("attr-value", &mValue);
+        AddArgument("attr-value", &mValue, false);
         {{else}}
-        AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
+        AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue, false);
         {{/if}}
         ModelCommand::AddArguments();
     }
@@ -502,10 +502,10 @@ class Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public Mo
 public:
     Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("report")
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}", false);
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, false);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, false);
+        AddArgument("wait", 0, 1, &mWait, false);
         ModelCommand::AddArguments();
     }
 

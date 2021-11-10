@@ -107,8 +107,14 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv)
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
+    argc -= 3;
+    if (!command->InitOptionalArguments(argc, &argv[3]))
+    {
+        ShowCommand(argv[0], argv[1], command);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
-    if (!command->InitArguments(argc - 3, &argv[3]))
+    if (!command->InitArguments(argc, &argv[3]))
     {
         ShowCommand(argv[0], argv[1], command);
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -256,6 +262,13 @@ void Commands::ShowCommand(std::string executable, std::string clusterName, Comm
     {
         arguments += " ";
         arguments += command->GetArgumentName(i);
+    }
+    argumentsCount = command->GetOptionalArgumentsCount();
+    for (size_t i = 0; i < argumentsCount; i++)
+    {
+        arguments += " [";
+        arguments += command->GetOptionalArgumentName(i);
+        arguments += " {value}]";
     }
     fprintf(stderr, "  %s %s %s\n", executable.c_str(), clusterName.c_str(), arguments.c_str());
 }

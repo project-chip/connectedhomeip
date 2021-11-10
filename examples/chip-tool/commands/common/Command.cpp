@@ -32,6 +32,10 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#define NO_OPTIONAL_ARGS 0
+#define OPTIONAL_ARGS_OFFSET 2
+#define OPTIONAL_VALUE_OFFSET 1
+
 bool Command::InitArguments(int argc, char ** argv)
 {
     bool isValidCommand = false;
@@ -42,12 +46,65 @@ bool Command::InitArguments(int argc, char ** argv)
 
     for (size_t i = 0; i < argsCount; i++)
     {
-        if (!InitArgument(i, argv[i]))
+        if (!InitArgument(i, argv[i], false))
         {
             ExitNow();
         }
     }
 
+    isValidCommand = true;
+
+exit:
+    return isValidCommand;
+}
+
+bool Command::InitOptionalArguments(int & argc, char ** argv)
+{
+    bool isValidCommand = false;
+    int optArgsCount    = static_cast<int>(mOptionalArgs.size());
+    int argsCount       = static_cast<int>(mArgs.size());
+    int optionalArgC    = argc - argsCount;
+    int expectedArgs    = optionalArgC;
+    int optInits        = 0;
+
+    // If no optional args passed in, in return true.
+    if (optionalArgC == NO_OPTIONAL_ARGS)
+        return true;
+
+    // If too many optinoal args passed in, return false.
+    if (optArgsCount * OPTIONAL_ARGS_OFFSET < optionalArgC)
+    {
+        ChipLogError(chipTool, "Too Many arguments passed in.");
+        return false;
+    }
+    // Iterate the total configured optional args
+    for (int i = 0; i < optArgsCount; i++)
+    {
+        Argument arg = mOptionalArgs.at((size_t) i);
+        // Check to see if the argument matches what has been configured.
+        if (argv[optInits * OPTIONAL_ARGS_OFFSET + argsCount] != nullptr &&
+            strcmp(arg.name, argv[optInits * OPTIONAL_ARGS_OFFSET + argsCount]) == 0)
+        {
+            arg.isProvided                        = true;
+            mOptionalArgs[static_cast<size_t>(i)] = arg;
+            if (!InitArgument((size_t) i, argv[optInits * OPTIONAL_ARGS_OFFSET + OPTIONAL_VALUE_OFFSET + argsCount], true))
+            {
+                ExitNow();
+            }
+            optInits++; // Increment the initialized optional args
+        }
+    }
+
+    ChipLogError(chipTool, "Exit Loop");
+    // Subract the total initialized optional args passed in and reset pointer.
+    argc -= optInits * OPTIONAL_ARGS_OFFSET;
+    argv[argsCount] = nullptr;
+    // If the expected optional args are not inittialized, return false. ie wrong names.
+    if (optInits * OPTIONAL_ARGS_OFFSET != expectedArgs)
+    {
+        ChipLogError(chipTool, "Invalid optional argument.");
+        return false;
+    }
     isValidCommand = true;
 
 exit:
@@ -84,12 +141,21 @@ static bool ParseAddressWithInterface(const char * addressString, Command::Addre
     return true;
 }
 
-bool Command::InitArgument(size_t argIndex, char * argValue)
+bool Command::InitArgument(size_t argIndex, char * argValue, bool optional)
 {
     bool isValidArgument = false;
     bool isHexNotation   = strncmp(argValue, "0x", 2) == 0 || strncmp(argValue, "0X", 2) == 0;
 
-    Argument arg = mArgs.at(argIndex);
+    Argument arg;
+    if (optional)
+    {
+        arg = mOptionalArgs.at(argIndex);
+    }
+    else
+    {
+        arg = mArgs.at(argIndex);
+    }
+
     switch (arg.type)
     {
     case ArgumentType::Attribute: {
@@ -299,85 +365,147 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     return isValidArgument;
 }
 
-size_t Command::AddArgument(const char * name, const char * value)
+size_t Command::AddArgument(const char * name, const char * value, bool optional)
 {
     Argument arg;
-    arg.type  = ArgumentType::Attribute;
-    arg.name  = name;
-    arg.value = const_cast<void *>(reinterpret_cast<const void *>(value));
+    arg.type       = ArgumentType::Attribute;
+    arg.name       = name;
+    arg.value      = const_cast<void *>(reinterpret_cast<const void *>(value));
+    arg.isOptional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    if (optional)
+    {
+        mOptionalArgs.emplace_back(arg);
+    }
+    else
+    {
+        mArgs.emplace_back(arg);
+    }
+
+    return mArgs.size() + mOptionalArgs.size();
 }
 
-size_t Command::AddArgument(const char * name, char ** value)
+size_t Command::AddArgument(const char * name, char ** value, bool optional)
 {
     Argument arg;
-    arg.type  = ArgumentType::CharString;
-    arg.name  = name;
-    arg.value = reinterpret_cast<void *>(value);
+    arg.type       = ArgumentType::CharString;
+    arg.name       = name;
+    arg.value      = reinterpret_cast<void *>(value);
+    arg.isOptional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    if (optional)
+    {
+        mOptionalArgs.emplace_back(arg);
+    }
+    else
+    {
+        mArgs.emplace_back(arg);
+    }
+
+    return mArgs.size() + mOptionalArgs.size();
 }
 
-size_t Command::AddArgument(const char * name, chip::CharSpan * value)
+size_t Command::AddArgument(const char * name, chip::CharSpan * value, bool optional)
 {
     Argument arg;
-    arg.type  = ArgumentType::CharString;
-    arg.name  = name;
-    arg.value = reinterpret_cast<void *>(value);
+    arg.type       = ArgumentType::CharString;
+    arg.name       = name;
+    arg.value      = reinterpret_cast<void *>(value);
+    arg.isOptional = optional;
+    if (optional)
+    {
+        mOptionalArgs.emplace_back(arg);
+    }
+    else
+    {
+        mArgs.emplace_back(arg);
+    }
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return mArgs.size() + mOptionalArgs.size();
 }
 
-size_t Command::AddArgument(const char * name, chip::ByteSpan * value)
+size_t Command::AddArgument(const char * name, chip::ByteSpan * value, bool optional)
 {
     Argument arg;
-    arg.type  = ArgumentType::OctetString;
-    arg.name  = name;
-    arg.value = reinterpret_cast<void *>(value);
+    arg.type       = ArgumentType::OctetString;
+    arg.name       = name;
+    arg.value      = reinterpret_cast<void *>(value);
+    arg.isOptional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    if (optional)
+    {
+        mOptionalArgs.emplace_back(arg);
+    }
+    else
+    {
+        mArgs.emplace_back(arg);
+    }
+
+    return mArgs.size() + mOptionalArgs.size();
 }
 
-size_t Command::AddArgument(const char * name, AddressWithInterface * out)
+size_t Command::AddArgument(const char * name, AddressWithInterface * out, bool optional)
 {
     Argument arg;
-    arg.type  = ArgumentType::Address;
-    arg.name  = name;
-    arg.value = reinterpret_cast<void *>(out);
+    arg.type       = ArgumentType::Address;
+    arg.name       = name;
+    arg.value      = reinterpret_cast<void *>(out);
+    arg.isOptional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    if (optional)
+    {
+        mOptionalArgs.emplace_back(arg);
+    }
+    else
+    {
+        mArgs.emplace_back(arg);
+    }
+
+    return mArgs.size() + mOptionalArgs.size();
 }
 
-size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type)
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, bool optional)
 {
     Argument arg;
-    arg.type  = type;
-    arg.name  = name;
-    arg.value = out;
-    arg.min   = min;
-    arg.max   = max;
+    arg.type       = type;
+    arg.name       = name;
+    arg.value      = out;
+    arg.min        = min;
+    arg.max        = max;
+    arg.isOptional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    if (optional)
+    {
+        mOptionalArgs.emplace_back(arg);
+    }
+    else
+    {
+        mArgs.emplace_back(arg);
+    }
+
+    return mArgs.size() + mOptionalArgs.size();
 }
 
-size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out)
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, bool optional)
 {
     Argument arg;
-    arg.type  = ArgumentType::Number_uint8;
-    arg.name  = name;
-    arg.value = out;
-    arg.min   = min;
-    arg.max   = max;
+    arg.type       = ArgumentType::Number_uint8;
+    arg.name       = name;
+    arg.value      = out;
+    arg.min        = min;
+    arg.max        = max;
+    arg.isOptional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    if (optional)
+    {
+        mOptionalArgs.emplace_back(arg);
+    }
+    else
+    {
+        mArgs.emplace_back(arg);
+    }
+
+    return mArgs.size() + mOptionalArgs.size();
 }
 
 const char * Command::GetArgumentName(size_t index) const
@@ -385,6 +513,16 @@ const char * Command::GetArgumentName(size_t index) const
     if (index < mArgs.size())
     {
         return mArgs.at(index).name;
+    }
+
+    return nullptr;
+}
+
+const char * Command::GetOptionalArgumentName(size_t index) const
+{
+    if (index < mOptionalArgs.size())
+    {
+        return mOptionalArgs.at(index).name;
     }
 
     return nullptr;

@@ -23,7 +23,7 @@
 class AdditionalDataParseCommand : public Command
 {
 public:
-    AdditionalDataParseCommand() : Command("parse-additional-data-payload") { AddArgument("payload", &mPayload); }
+    AdditionalDataParseCommand() : Command("parse-additional-data-payload") { AddArgument("payload", &mPayload, false); }
     CHIP_ERROR Run() override;
 
 private:

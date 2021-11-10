@@ -40,8 +40,8 @@ public:
 
     void AddArguments()
     {
-        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
-        AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId);
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId, false);
+        AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId, false);
     }
 
     /////////// CHIPCommand Interface /////////

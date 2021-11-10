@@ -63,7 +63,7 @@ public:
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
         mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this)
     {
-        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId, false);
 
         switch (networkType)
         {
@@ -71,11 +71,11 @@ public:
         case PairingNetworkType::Ethernet:
             break;
         case PairingNetworkType::WiFi:
-            AddArgument("ssid", &mSSID);
-            AddArgument("password", &mPassword);
+            AddArgument("ssid", &mSSID, false);
+            AddArgument("password", &mPassword, false);
             break;
         case PairingNetworkType::Thread:
-            AddArgument("operationalDataset", &mOperationalDataset);
+            AddArgument("operationalDataset", &mOperationalDataset, false);
             break;
         }
 
@@ -85,34 +85,34 @@ public:
             break;
         case PairingMode::QRCode:
         case PairingMode::ManualCode:
-            AddArgument("payload", &mOnboardingPayload);
+            AddArgument("payload", &mOnboardingPayload, false);
             break;
         case PairingMode::Ble:
-            AddArgument("fabric-id", 0, UINT64_MAX, &mFabricId);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            AddArgument("fabric-id", 0, UINT64_MAX, &mFabricId, false);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode, false);
+            AddArgument("discriminator", 0, 4096, &mDiscriminator, false);
             break;
         case PairingMode::OnNetwork:
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode, false);
             break;
         case PairingMode::SoftAP:
-            AddArgument("fabric-id", 0, UINT64_MAX, &mFabricId);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
-            AddArgument("device-remote-ip", &mRemoteAddr);
-            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
+            AddArgument("fabric-id", 0, UINT64_MAX, &mFabricId, false);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode, false);
+            AddArgument("discriminator", 0, 4096, &mDiscriminator, false);
+            AddArgument("device-remote-ip", &mRemoteAddr, false);
+            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort, false);
             break;
         case PairingMode::Ethernet:
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
-            AddArgument("device-remote-ip", &mRemoteAddr);
-            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode, false);
+            AddArgument("discriminator", 0, 4096, &mDiscriminator, false);
+            AddArgument("device-remote-ip", &mRemoteAddr, false);
+            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort, false);
             break;
         case PairingMode::OpenCommissioningWindow:
-            AddArgument("option", 0, UINT8_MAX, &mCommissioningWindowOption);
-            AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-            AddArgument("iteration", 0, UINT16_MAX, &mIteration);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            AddArgument("option", 0, UINT8_MAX, &mCommissioningWindowOption, false);
+            AddArgument("timeout", 0, UINT16_MAX, &mTimeout, false);
+            AddArgument("iteration", 0, UINT16_MAX, &mIteration, false);
+            AddArgument("discriminator", 0, 4096, &mDiscriminator, false);
             break;
         }
 
@@ -121,25 +121,25 @@ public:
         case chip::Dnssd::DiscoveryFilterType::kNone:
             break;
         case chip::Dnssd::DiscoveryFilterType::kShort:
-            AddArgument("discriminator", 0, 15, &mDiscoveryFilterCode);
+            AddArgument("discriminator", 0, 15, &mDiscoveryFilterCode, false);
             break;
         case chip::Dnssd::DiscoveryFilterType::kLong:
-            AddArgument("discriminator", 0, 4096, &mDiscoveryFilterCode);
+            AddArgument("discriminator", 0, 4096, &mDiscoveryFilterCode, false);
             break;
         case chip::Dnssd::DiscoveryFilterType::kVendor:
-            AddArgument("vendor-id", 0, UINT16_MAX, &mDiscoveryFilterCode);
+            AddArgument("vendor-id", 0, UINT16_MAX, &mDiscoveryFilterCode, false);
             break;
         case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
-            AddArgument("fabric-id", 0, UINT64_MAX, &mDiscoveryFilterCode);
+            AddArgument("fabric-id", 0, UINT64_MAX, &mDiscoveryFilterCode, false);
             break;
         case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
         case chip::Dnssd::DiscoveryFilterType::kCommissioner:
             break;
         case chip::Dnssd::DiscoveryFilterType::kDeviceType:
-            AddArgument("device-type", 0, UINT16_MAX, &mDiscoveryFilterCode);
+            AddArgument("device-type", 0, UINT16_MAX, &mDiscoveryFilterCode, false);
             break;
         case chip::Dnssd::DiscoveryFilterType::kInstanceName:
-            AddArgument("name", &mDiscoveryFilterInstanceName);
+            AddArgument("name", &mDiscoveryFilterInstanceName, false);
             break;
         }
     }

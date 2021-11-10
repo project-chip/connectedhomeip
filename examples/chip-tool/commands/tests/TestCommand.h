@@ -27,6 +27,9 @@
 #include <type_traits>
 #include <zap-generated/tests/CHIPClustersTest.h>
 
+// Limits on endpoint values.
+#define CHIP_ZCL_ENDPOINT_MIN 0x00
+#define CHIP_ZCL_ENDPOINT_MAX 0xF0
 class TestCommand : public CHIPCommand
 {
 public:
@@ -34,8 +37,9 @@ public:
         CHIPCommand(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
-        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
-        AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
+        AddArgument("node-id", 0, UINT64_MAX, &mNodeId, false);
+        AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs, false);
+        AddArgument("--endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId, true);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -52,6 +56,7 @@ public:
 protected:
     ChipDevice * mDevice;
     chip::NodeId mNodeId;
+    uint8_t mEndPointId;
 
     static void OnDeviceConnectedFn(void * context, chip::DeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);

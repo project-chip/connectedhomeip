@@ -24,7 +24,7 @@
 class SetupPayloadParseCommand : public Command
 {
 public:
-    SetupPayloadParseCommand() : Command("parse-setup-payload") { AddArgument("payload", &mCode); }
+    SetupPayloadParseCommand() : Command("parse-setup-payload") { AddArgument("payload", &mCode, false); }
     CHIP_ERROR Run() override;
 
 private:

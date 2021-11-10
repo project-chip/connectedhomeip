@@ -27,8 +27,8 @@ class DiscoverCommand : public CHIPCommand, public chip::Controller::DeviceAddre
 public:
     DiscoverCommand(const char * commandName) : CHIPCommand(commandName)
     {
-        AddArgument("nodeid", 0, UINT64_MAX, &mNodeId);
-        AddArgument("fabricid", 0, UINT64_MAX, &mFabricId);
+        AddArgument("nodeid", 0, UINT64_MAX, &mNodeId, false);
+        AddArgument("fabricid", 0, UINT64_MAX, &mFabricId, false);
     }
 
     /////////// DeviceAddressUpdateDelegate Interface /////////
