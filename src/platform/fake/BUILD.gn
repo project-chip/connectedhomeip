@@ -21,6 +21,7 @@ assert(chip_device_platform == "fake")
 static_library("fake") {
   sources = [
     "CHIPDevicePlatformEvent.h",
+    "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
