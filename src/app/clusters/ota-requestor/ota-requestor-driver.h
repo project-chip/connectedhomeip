@@ -36,7 +36,3 @@ public:
     // Notify the application that the download is complete and the image can be applied
     virtual void ImageDownloadComplete() = 0;
 };
-
-
-
-

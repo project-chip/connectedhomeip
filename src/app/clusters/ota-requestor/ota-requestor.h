@@ -39,5 +39,3 @@ public:
 private:
     OTARequestorDriver *driver;
 };
-
-

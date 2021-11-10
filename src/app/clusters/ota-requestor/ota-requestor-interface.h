@@ -33,4 +33,3 @@ public:
     // Handler for the QueryImageResponse command
     virtual bool HandleQueryImageResponse(commandData_t) = 0;
 };
-

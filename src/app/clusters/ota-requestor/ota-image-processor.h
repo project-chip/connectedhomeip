@@ -68,5 +68,3 @@ public:
     // Invoked by an incoming block
     void HandleBlock();
 };
-
-
