@@ -14,12 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "DeviceAttestationCredsExample.h"
+#include "DeviceAttestationSe05xCredsExample.h"
 
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
+
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
+
+#define DEV_ATTESTATION_KEY 0xDADADADA
 
 namespace chip {
 namespace Credentials {
@@ -27,17 +33,7 @@ namespace Examples {
 
 namespace {
 
-// TODO: This should be moved to a method of P256Keypair
-CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
-    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
-    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
-    return keypair.Deserialize(serialized_keypair);
-}
-
-class ExampleDACProvider : public DeviceAttestationCredentialsProvider
+class ExampleSe05xDACProvider : public DeviceAttestationCredentialsProvider
 {
 public:
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & out_cd_buffer) override;
@@ -47,7 +43,7 @@ public:
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer) override;
 };
 
-CHIP_ERROR ExampleDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
+CHIP_ERROR ExampleSe05xDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
 {
     /*
     credentials/test/attestation/Chip-Test-DAC-FFF1-8000-000A-Cert.pem
@@ -96,7 +92,7 @@ CHIP_ERROR ExampleDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_da
     return CopySpanToMutableSpan(ByteSpan{ kDacCertificate }, out_dac_buffer);
 }
 
-CHIP_ERROR ExampleDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
+CHIP_ERROR ExampleSe05xDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
 {
     /*
     credentials/test/attestation/Chip-Test-PAI-FFF1-8000-Cert.pem
@@ -142,7 +138,7 @@ CHIP_ERROR ExampleDACProvider::GetProductAttestationIntermediateCert(MutableByte
     return CopySpanToMutableSpan(ByteSpan{ kPaiCertificate }, out_pai_buffer);
 }
 
-CHIP_ERROR ExampleDACProvider::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)
+CHIP_ERROR ExampleSe05xDACProvider::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)
 {
     // -> format_version = 1
     // -> vendor_id = 0xFFF1
@@ -173,7 +169,7 @@ CHIP_ERROR ExampleDACProvider::GetCertificationDeclaration(MutableByteSpan & out
     return CopySpanToMutableSpan(ByteSpan{ kCertificationDeclaration }, out_cd_buffer);
 }
 
-CHIP_ERROR ExampleDACProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
+CHIP_ERROR ExampleSe05xDACProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
 {
     // TODO: We need a real example FirmwareInformation to be populated.
     out_firmware_info_buffer.reduce_size(0);
@@ -181,7 +177,7 @@ CHIP_ERROR ExampleDACProvider::GetFirmwareInformation(MutableByteSpan & out_firm
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer)
+CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer)
 {
 
     /*
@@ -193,6 +189,7 @@ CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & dig
      -----END EC PRIVATE KEY-----
     */
 
+#if 0
     constexpr uint8_t dac_private_key[] = { 0x05, 0xc6, 0xc3, 0xa8, 0x4d, 0xc6, 0x05, 0xcc, 0x3c, 0xc8, 0x05,
                                             0x80, 0x09, 0xb0, 0x1b, 0x32, 0x9c, 0xf6, 0x0c, 0xf1, 0x59, 0x70,
                                             0xc6, 0xa9, 0x0e, 0xad, 0xaa, 0xe2, 0xde, 0x49, 0x64, 0x9e };
@@ -204,15 +201,17 @@ CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & dig
                                            0x37, 0xe1, 0x18, 0x13, 0x3f, 0x80, 0xf1, 0x76, 0x01, 0x13, 0x27, 0x8f, 0x91,
                                            0xf1, 0x5a, 0xa0, 0xf7, 0xf8, 0x79, 0x32, 0x09, 0x4f, 0xe6, 0x9f, 0xb7, 0x28,
                                            0x68, 0xa8, 0x1e, 0x26, 0x97, 0x9b, 0x36, 0x8b, 0x33, 0xb5, 0x54, 0x31, 0x03 };
+#endif
 
     Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
+    Crypto::P256KeypairHSM keypair;
+    keypair.SetKeyId(DEV_ATTESTATION_KEY);
+    keypair.provisioned_key = true;
+    keypair.Initialize();
 
     VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSpanUsable(digest_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan{ dac_private_key }, ByteSpan{ dac_public_key }, keypair));
     ReturnErrorOnFailure(keypair.ECDSA_sign_hash(digest_to_sign.data(), digest_to_sign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_signature_buffer);
@@ -220,9 +219,9 @@ CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & dig
 
 } // namespace
 
-DeviceAttestationCredentialsProvider * GetExampleDACProvider()
+DeviceAttestationCredentialsProvider * GetExampleSe05xDACProvider()
 {
-    static ExampleDACProvider example_dac_provider;
+    static ExampleSe05xDACProvider example_dac_provider;
 
     return &example_dac_provider;
 }
