@@ -72,7 +72,8 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityMan
 
 CHIP_ERROR WiFiDiagosticsAttrAccess::ReadWiFiBssId(AttributeValueEncoder & aEncoder)
 {
-    ByteSpan bssid;
+    // TODO: Use Nullable<ByteSpan> after we get darwin converted over to the new APIs.
+    Bssid::TypeInfo::Type bssid;
 
     if (ConnectivityMgr().GetWiFiBssId(bssid) == CHIP_NO_ERROR)
     {
