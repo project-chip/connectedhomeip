@@ -50,6 +50,16 @@ struct DeviceProxyInitParams
     FabricInfo * fabricInfo                  = nullptr;
 
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
+
+    CHIP_ERROR Validate()
+    {
+        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        return CHIP_NO_ERROR;
+    }
 };
 
 class OperationalDeviceProxy;
@@ -61,12 +71,9 @@ class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, public SessionEsta
 {
 public:
     virtual ~OperationalDeviceProxy();
-    OperationalDeviceProxy(DeviceProxyInitParams params, PeerId peerId)
+    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId)
     {
-        VerifyOrReturn(params.sessionManager != nullptr);
-        VerifyOrReturn(params.exchangeMgr != nullptr);
-        VerifyOrReturn(params.idAllocator != nullptr);
-        VerifyOrReturn(params.fabricInfo != nullptr);
+        VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);
 
         mInitParams = params;
         mPeerId     = peerId;

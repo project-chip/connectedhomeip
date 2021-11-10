@@ -149,6 +149,18 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     ReturnErrorOnFailure(ProcessControllerNOCChain(params));
 
+    CASESessionManagerInitParams sessionParams = {
+        .sessionInitParams.sessionManager = params.systemState->SessionMgr(),
+        .sessionInitParams.exchangeMgr    = params.systemState->ExchangeMgr(),
+        .sessionInitParams.idAllocator    = &mIDAllocator,
+        .sessionInitParams.fabricInfo     = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex),
+        .sessionInitParams.imDelegate     = params.systemState->IMDelegate(),
+        .dnsCache                         = &mDNSCache,
+    };
+
+    mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionParams);
+    VerifyOrReturnError(mCASESessionManager != nullptr, CHIP_ERROR_NO_MEMORY);
+
     mSystemState = params.systemState->Retain();
     mState       = State::Initialized;
     return CHIP_NO_ERROR;
@@ -227,6 +239,9 @@ CHIP_ERROR DeviceController::Shutdown()
     mDeviceDiscoveryDelegate     = nullptr;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
+    chip::Platform::Delete(mCASESessionManager);
+    mCASESessionManager = nullptr;
+
     return CHIP_NO_ERROR;
 }
 
@@ -240,117 +255,17 @@ bool DeviceController::DoesDevicePairingExist(const PeerId & deviceId)
     return false;
 }
 
-CHIP_ERROR DeviceController::GetOperationalDeviceWithAddress(NodeId deviceId, const Transport::PeerAddress & addr,
-                                                             Callback::Callback<OnDeviceConnected> * onConnection,
-                                                             Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
 {
-    OperationalDeviceProxy * device = FindOperationalDevice(deviceId);
-    if (device == nullptr)
-    {
-        FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
-        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        DeviceProxyInitParams initParams = {
-            .sessionManager = mSystemState->SessionMgr(),
-            .exchangeMgr    = mSystemState->ExchangeMgr(),
-            .idAllocator    = &mIDAllocator,
-            .fabricInfo     = fabric,
-            .imDelegate     = mSystemState->IMDelegate(),
-        };
-
-        PeerId peerID = fabric->GetPeerId();
-        peerID.SetNodeId(deviceId);
-
-        device = mOperationalDevices.CreateObject(initParams, peerID);
-        if (device == nullptr)
-        {
-            onFailure->mCall(onFailure->mContext, deviceId, CHIP_ERROR_NO_MEMORY);
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (addr != Transport::PeerAddress::UDP(Inet::IPAddress::Any))
-    {
-        uint32_t idleInterval;
-        uint32_t activeInterval;
-        device->GetMRPIntervals(idleInterval, activeInterval);
-        err = device->UpdateDeviceData(addr, idleInterval, activeInterval);
-        if (err != CHIP_NO_ERROR)
-        {
-            ReleaseOperationalDevice(device);
-            return err;
-        }
-    }
-
-    err = device->Connect(onConnection, onFailure);
-    if (err != CHIP_NO_ERROR)
-    {
-        ReleaseOperationalDevice(device);
-    }
-
-    return err;
+    VerifyOrReturn(mState == State::Initialized,
+                   ChipLogError(Controller, "ReleaseOperationalDevice was called in incorrect state"));
+    mCASESessionManager->ReleaseSession(remoteDeviceId);
 }
-
-CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    return Dnssd::Resolver::Instance().ResolveNodeId(PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(deviceId),
-                                                     chip::Inet::IPAddressType::kAny);
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-}
-
-void DeviceController::OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) {}
 
 void DeviceController::OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
-
-    OperationalDeviceProxy * device = FindOperationalDevice(session);
-    VerifyOrReturn(device != nullptr, ChipLogDetail(Controller, "OnConnectionExpired was called for unknown device, ignoring it."));
-
-    device->OnConnectionExpired(session);
-}
-
-OperationalDeviceProxy * DeviceController::FindOperationalDevice(SessionHandle session)
-{
-    OperationalDeviceProxy * foundDevice = nullptr;
-    mOperationalDevices.ForEachActiveObject([&](auto * deviceProxy) {
-        if (deviceProxy->MatchesSession(session))
-        {
-            foundDevice = deviceProxy;
-            return false;
-        }
-        return true;
-    });
-
-    return foundDevice;
-}
-
-OperationalDeviceProxy * DeviceController::FindOperationalDevice(NodeId id)
-{
-    OperationalDeviceProxy * foundDevice = nullptr;
-    mOperationalDevices.ForEachActiveObject([&](auto * deviceProxy) {
-        if (deviceProxy->GetDeviceId() == id)
-        {
-            foundDevice = deviceProxy;
-            return false;
-        }
-        return true;
-    });
-
-    return foundDevice;
-}
-
-void DeviceController::ReleaseOperationalDevice(NodeId id)
-{
-    ReleaseOperationalDevice(FindOperationalDevice(id));
-}
-
-void DeviceController::ReleaseOperationalDevice(OperationalDeviceProxy * device)
-{
-    mOperationalDevices.ReleaseObject(device);
+    mCASESessionManager->OnConnectionExpired(session, mgr);
 }
 
 CHIP_ERROR DeviceController::InitializePairedDeviceList()
@@ -422,10 +337,8 @@ void DeviceController::PersistNextKeyId()
 
 CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
-    VerifyOrReturnError(GetCompressedFabricId() == peerId.GetCompressedFabricId(), CHIP_ERROR_INVALID_ARGUMENT);
-    OperationalDeviceProxy * device = FindOperationalDevice(peerId.GetNodeId());
-    VerifyOrReturnError(device->GetAddress(addr, port), CHIP_ERROR_NOT_CONNECTED);
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    return mCASESessionManager->GetDeviceAddressAndPort(peerId.GetNodeId(), addr, port);
 }
 
 void DeviceController::OnOpenPairingWindowSuccessResponse(void * context)
@@ -473,7 +386,7 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
     ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, deviceId);
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    OperationalDeviceProxy * device = FindOperationalDevice(deviceId);
+    OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(deviceId);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     std::string QRCode;
@@ -567,22 +480,19 @@ Transport::PeerAddress DeviceController::ToPeerAddress(const chip::Dnssd::Resolv
 
 void DeviceController::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
-    OperationalDeviceProxy * device = FindOperationalDevice(nodeData.mPeerId.GetNodeId());
-    VerifyOrReturn(device != nullptr);
-
-    CHIP_ERROR err = device->UpdateDeviceData(
-        ToPeerAddress(nodeData), nodeData.GetMrpRetryIntervalIdle().ValueOr(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL),
-        nodeData.GetMrpRetryIntervalActive().ValueOr(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL));
-
+    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNodeIdResolved was called in incorrect state"));
+    mCASESessionManager->OnNodeIdResolved(nodeData);
     if (mDeviceAddressUpdateDelegate != nullptr)
     {
-        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeData.mPeerId.GetNodeId(), err);
+        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeData.mPeerId.GetNodeId(), CHIP_NO_ERROR);
     }
 };
 
 void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
 {
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
+    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNodeIdResolved was called in incorrect state"));
+    mCASESessionManager->OnNodeIdResolutionFailed(peer, error);
 
     if (mDeviceAddressUpdateDelegate != nullptr)
     {
@@ -1614,8 +1524,8 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
         mDeviceBeingCommissioned = nullptr;
     }
 
-    GetOperationalDeviceWithAddress(nodeData.mPeerId.GetNodeId(), ToPeerAddress(nodeData), &mOnDeviceConnectedCallback,
-                                    &mOnDeviceConnectionFailureCallback);
+    mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId.GetNodeId(), ToPeerAddress(nodeData), &mOnDeviceConnectedCallback,
+                                                &mOnDeviceConnectionFailureCallback);
 
     DeviceController::OnNodeIdResolved(nodeData);
 }

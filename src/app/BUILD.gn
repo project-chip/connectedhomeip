@@ -39,6 +39,8 @@ static_library("app") {
     "AttributePathExpandIterator.h",
     "AttributePathParams.cpp",
     "AttributePathParams.h",
+    "CASESessionManager.cpp",
+    "CASESessionManager.h",
     "Command.cpp",
     "Command.h",
     "CommandHandler.cpp",
