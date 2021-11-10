@@ -117,10 +117,11 @@ public:
             response.has_pairing_info           = true;
         }
 
-        if (DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number)) != CHIP_NO_ERROR) {
+        if (DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number)) !=
+            CHIP_NO_ERROR)
+        {
             snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
         }
-
 
         return pw::OkStatus();
     }
