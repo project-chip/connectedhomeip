@@ -199,7 +199,7 @@ class ClusterDetailFragment : Fragment() {
             objectCallback.clusterCallbackDataTv.text = callbackClassName
             objectCallback.clusterCallbackDataTv.setOnClickListener {
               AlertDialog.Builder(requireContext())
-                .setTitle(variableNameType.name)
+                .setTitle(callbackClassName)
                 .setMessage(objectString)
                 .create()
                 .show()
