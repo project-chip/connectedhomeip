@@ -6610,6 +6610,24 @@ class SoftwareDiagnostics:
 
     class Structs:
         @dataclass
+        class SoftwareFault(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="id", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="name", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(
+                            Label="faultRecording", Tag=2, Type=bytes),
+                    ])
+
+            id: 'uint' = None
+            name: 'str' = None
+            faultRecording: 'bytes' = None
+
+        @dataclass
         class ThreadMetrics(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6745,6 +6763,10 @@ class ThreadNetworkDiagnostics:
             kReed = 0x04
             kRouter = 0x05
             kLeader = 0x06
+
+        class ThreadConnectionStatus(IntEnum):
+            kConnected = 0x00
+            kNotConnected = 0x01
 
     class Structs:
         @dataclass
@@ -7762,6 +7784,12 @@ class WiFiNetworkDiagnostics:
     id: typing.ClassVar[int] = 0x0036
 
     class Enums:
+        class AssociationFailureCause(IntEnum):
+            kUnknown = 0x00
+            kAssociationFailed = 0x01
+            kAuthenticationFailed = 0x02
+            kSsidNotFound = 0x03
+
         class SecurityType(IntEnum):
             kUnspecified = 0x00
             kNone = 0x01
@@ -7769,6 +7797,10 @@ class WiFiNetworkDiagnostics:
             kWpa = 0x03
             kWpa2 = 0x04
             kWpa3 = 0x05
+
+        class WiFiConnectionStatus(IntEnum):
+            kConnected = 0x00
+            kNotConnected = 0x01
 
         class WiFiVersionType(IntEnum):
             k80211a = 0x00
