@@ -46,9 +46,7 @@ k32w0_sdk("sdk") {
   ]
 
   if (chip_with_se05x == 1) {
-    include_dirs += [
-      "${chip_root}/examples/platform/nxp/se05x",
-      ]
+    include_dirs += [ "${chip_root}/examples/platform/nxp/se05x" ]
   }
 
   defines = []
