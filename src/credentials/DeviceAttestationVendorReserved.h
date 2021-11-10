@@ -43,6 +43,7 @@ public:
     // read TLV until first profile tag
     CHIP_ERROR PrepareToReadVendorReservedElements(const ByteSpan & attestationElements, size_t count)
     {
+        mIsInitialized         = false;
         mNumVendorReservedData = count;
         mAttestationData       = attestationElements;
 
@@ -77,11 +78,12 @@ public:
      */
     CHIP_ERROR GetNextVendorReservedElement(struct VendorReservedElement & element)
     {
+        CHIP_ERROR err;
+
         VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-        while (1)
+        while ((err = Next()) == CHIP_NO_ERROR)
         {
-            ReturnErrorOnFailure(Next());
             uint64_t tag = tlvReader.GetTag();
             if (!TLV::IsProfileTag(tag))
             {
@@ -94,6 +96,8 @@ public:
 
             return tlvReader.GetByteView(element.vendorReservedData);
         }
+
+        return err;
     }
 
 private:
@@ -114,11 +118,8 @@ public:
 
     const_iterator Next()
     {
-        if ((mCurrentIndex + 1) == mNumEntriesUsed)
-        {
-            return nullptr;
-        }
-        return &mElements[++mCurrentIndex];
+        VerifyOrReturnError(mCurrentIndex < mNumEntriesUsed, nullptr);
+        return &mElements[mCurrentIndex++];
     }
 
     const_iterator cbegin()
