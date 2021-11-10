@@ -69,26 +69,27 @@ enum OTARequestorCommands
     kCommandNotifyUpdateApplied,
 };
 
+namespace {
 // TODO: Encapsulate these globals and the callbacks in some class
 ExchangeContext * exchangeCtx = nullptr;
 BdxDownloader bdxDownloader;
 enum OTARequestorCommands operationalDeviceContext;
 
-constexpr uint8_t kMaxUpdateTokenLen        = 32; // must be between 8 and 32
-uint8_t mOtaUpdateToken[kMaxUpdateTokenLen] = { 0 };
-uint8_t mOtaUpdateTokenLen                  = 0;
+constexpr uint8_t kMaxUpdateTokenLen       = 32; // must be between 8 and 32
+uint8_t otaUpdateToken[kMaxUpdateTokenLen] = { 0 };
+uint8_t otaUpdateTokenLen                  = 0;
 
 /* Callbacks for operational device proxy connect response */
-Callback<OnDeviceConnected> mOnConnectedCallback(OnConnected, &operationalDeviceContext);
-Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback(OnConnectionFailure, nullptr);
+Callback<OnDeviceConnected> onConnectedCallback(OnConnected, &operationalDeviceContext);
+Callback<OnDeviceConnectionFailure> onConnectionFailureCallback(OnConnectionFailure, nullptr);
 
 /* Callbacks for BDX data transfer */
-Callback<OnBdxBlockReceived> mOnBlockReceived(OnBlockReceived, nullptr);
-Callback<OnBdxTransferComplete> mOnTransferComplete(OnTransferComplete, nullptr);
-Callback<OnBdxTransferFailed> mOnTransferFailed(OnTransferFailed, nullptr);
+Callback<OnBdxBlockReceived> onBlockReceivedCallback(OnBlockReceived, nullptr);
+Callback<OnBdxTransferComplete> onTransferCompleteCallback(OnTransferComplete, nullptr);
+Callback<OnBdxTransferFailed> onTransferFailedCallback(OnTransferFailed, nullptr);
 
 FabricIndex providerFabricIndex = 1;
-uint16_t setupDiscriminator     = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
+} // namespace
 
 void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response)
 {
@@ -96,16 +97,31 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
 
     if (response.updateToken.HasValue())
     {
-        mOtaUpdateTokenLen = response.updateToken.Value().size();
-        memcpy(mOtaUpdateToken, response.updateToken.Value().data(), mOtaUpdateTokenLen);
+        otaUpdateTokenLen = response.updateToken.Value().size();
+        memcpy(otaUpdateToken, response.updateToken.Value().data(), otaUpdateTokenLen);
     }
+    if (response.imageURI.HasValue() == false)
+    {
+        ChipLogError(BDX, "OTA image URI missing");
+        return;
+    }
+
+    // TODO: Handle image URI for protocol other than bdx
+    // Ignore the first 23 "bdx://<NodeId>/"
+    char fileDesignator[128]; // 128 is arbitrary value
+    memset(fileDesignator, 0, sizeof(fileDesignator));
+    size_t fileDesignatorLength = response.imageURI.Value().size() - 23 + 1; // + 1 for \0
+    if ((response.imageURI.Value().size() - 23) > sizeof(fileDesignator))
+    {
+        fileDesignatorLength = sizeof(fileDesignator);
+    }
+    strlcpy(fileDesignator, response.imageURI.Value().data() + 23, fileDesignatorLength);
 
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = chip::bdx::TransferControlFlags::kReceiverDrive;
     initOptions.MaxBlockSize     = 1024;
-    char fileDesignator[11]      = { "blinky.bin" };
-    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(fileDesignator));
-    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(fileDesignator);
+    initOptions.FileDesLength    = static_cast<uint16_t>(fileDesignatorLength);
+    initOptions.FileDesignator   = reinterpret_cast<const uint8_t *>(fileDesignator);
 
     chip::OperationalDeviceProxy * operationalDeviceProxy = Server::GetInstance().GetOperationalDeviceProxy();
     if (operationalDeviceProxy != nullptr)
@@ -131,9 +147,9 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
     bdxDownloader.SetInitialExchange(exchangeCtx);
 
     BdxDownloaderCallbacks bdxCallbacks;
-    bdxCallbacks.onBlockReceived    = &mOnBlockReceived;
-    bdxCallbacks.onTransferComplete = &mOnTransferComplete;
-    bdxCallbacks.onTransferFailed   = &mOnTransferFailed;
+    bdxCallbacks.onBlockReceived    = &onBlockReceivedCallback;
+    bdxCallbacks.onTransferComplete = &onTransferCompleteCallback;
+    bdxCallbacks.onTransferFailed   = &onTransferFailedCallback;
     bdxDownloader.SetCallbacks(bdxCallbacks);
 
     // This will kick of a timer which will regularly check for updates to the bdx::TransferSession state machine.
@@ -208,7 +224,7 @@ void OnConnected(void * context, chip::DeviceProxy * deviceProxy)
         constexpr uint32_t kNewVersion = 1;
 
         ApplyUpdateRequest::Type args;
-        args.updateToken = ByteSpan(mOtaUpdateToken, mOtaUpdateTokenLen);
+        args.updateToken = ByteSpan(otaUpdateToken, otaUpdateTokenLen);
         args.newVersion  = kNewVersion;
 
         err = cluster.InvokeCommand(args, nullptr, OnApplyUpdateResponse, OnApplyUpdateRequestFailure);
@@ -258,6 +274,7 @@ void ConnectToProvider(const char * ipAddress, uint32_t nodeId)
     if (operationalDeviceProxy != nullptr && operationalDeviceProxy->GetDeviceId() != providerNodeId)
     {
         operationalDeviceProxy->Disconnect();
+        delete operationalDeviceProxy;
         operationalDeviceProxy = nullptr;
     }
 
@@ -291,7 +308,7 @@ void ConnectToProvider(const char * ipAddress, uint32_t nodeId)
         operationalDeviceProxy->UpdateDeviceData(addr, idleInterval, activeInterval);
     }
 
-    CHIP_ERROR err = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
+    CHIP_ERROR err = operationalDeviceProxy->Connect(&onConnectedCallback, &onConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot establish connection to peer device: %" CHIP_ERROR_FORMAT, err.Format());

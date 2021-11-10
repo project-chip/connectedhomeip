@@ -48,10 +48,6 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-const char * TAG = "ota-requester-app";
-
-static DeviceCallbacks EchoCallbacks;
-
 struct CmdArgs
 {
     struct arg_str * ipAddr;
@@ -59,7 +55,11 @@ struct CmdArgs
     struct arg_end * end;
 };
 
+namespace {
+const char * TAG = "ota-requester-app";
+static DeviceCallbacks EchoCallbacks;
 CmdArgs queryImageCmdArgs, applyUpdateCmdArgs;
+} // namespace
 
 void QueryImageTimerHandler(Layer * systemLayer, void * appState)
 {

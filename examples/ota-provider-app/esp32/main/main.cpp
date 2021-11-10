@@ -55,30 +55,29 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-const char * TAG = "ota-provider-app";
-
-static DeviceCallbacks EchoCallbacks;
-
-// TODO: this should probably be done dynamically
-constexpr chip::EndpointId kOtaProviderEndpoint = 0;
-
-constexpr uint32_t kMaxBdxBlockSize                 = 1024;
-constexpr chip::System::Clock::Timeout kBdxTimeout  = chip::System::Clock::Seconds16(5 * 60); // Specification mandates >= 5 minutes
-constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
-const char * gOtaFilename                           = "hello-world.bin";
-BdxOtaSender bdxServer;
-
-const esp_partition_t * otaPartition = nullptr;
-uint32_t otaImageLen                 = 0;
-uint32_t otaTransferInProgress       = false;
-
 CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
 void OnTransferComplete(void * context);
 void OnTransferFailed(void * context, BdxSenderErrorTypes status);
 
-chip::Callback::Callback<OnBdxBlockQuery> mOnBlockQuery(OnBlockQuery, nullptr);
-chip::Callback::Callback<OnBdxTransferComplete> mOnTransferComplete(OnTransferComplete, nullptr);
-chip::Callback::Callback<OnBdxTransferFailed> mOnTransferFailed(OnTransferFailed, nullptr);
+namespace {
+const char * TAG = "ota-provider-app";
+static DeviceCallbacks EchoCallbacks;
+BdxOtaSender bdxServer;
+
+// TODO: this should probably be done dynamically
+constexpr chip::EndpointId kOtaProviderEndpoint     = 0;
+constexpr uint32_t kMaxBdxBlockSize                 = 1024;
+constexpr chip::System::Clock::Timeout kBdxTimeout  = chip::System::Clock::Seconds16(5 * 60); // Specification mandates >= 5 minutes
+constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
+const char * otaFilename                            = "hello-world.bin";
+const esp_partition_t * otaPartition                = nullptr;
+uint32_t otaImageLen                                = 0;
+uint32_t otaTransferInProgress                      = false;
+
+chip::Callback::Callback<OnBdxBlockQuery> onBlockQueryCallback(OnBlockQuery, nullptr);
+chip::Callback::Callback<OnBdxTransferComplete> onTransferCompleteCallback(OnTransferComplete, nullptr);
+chip::Callback::Callback<OnBdxTransferFailed> onTransferFailedCallback(OnTransferFailed, nullptr);
+} // namespace
 
 CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset)
 {
@@ -184,9 +183,9 @@ extern "C" void app_main()
     }
 
     BdxOtaSenderCallbacks callbacks;
-    callbacks.onBlockQuery       = &mOnBlockQuery;
-    callbacks.onTransferComplete = &mOnTransferComplete;
-    callbacks.onTransferFailed   = &mOnTransferFailed;
+    callbacks.onBlockQuery       = &onBlockQueryCallback;
+    callbacks.onTransferComplete = &onTransferCompleteCallback;
+    callbacks.onTransferFailed   = &onTransferFailedCallback;
     bdxServer.SetCallbacks(callbacks);
 
     // If OTA image is available in flash storage then set to update available
@@ -212,7 +211,7 @@ extern "C" void app_main()
     if (otaImageLen > 0)
     {
         otaProvider.SetQueryImageBehavior(OTAProviderExample::kRespondWithUpdateAvailable);
-        otaProvider.SetOTAFilePath(gOtaFilename);
+        otaProvider.SetOTAFilePath(otaFilename);
     }
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);

@@ -27,55 +27,55 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-const char * TAG                            = "OTAUpdate";
-bool mOTAUpdateInProgress                   = false;
-const esp_partition_t * mOTAUpdatePartition = nullptr;
-esp_ota_handle_t mOTAUpdateHandle;
-uint32_t mOTAUpdateImageLen = 0;
+const char * TAG                           = "OTAUpdate";
+bool otaUpdateInProgress                   = false;
+const esp_partition_t * otaUpdatePartition = nullptr;
+esp_ota_handle_t otaUpdateHandle;
+uint32_t otaUpdateImageLen = 0;
 
 } // namespace
 
 bool OTAUpdater::IsInProgress(void)
 {
-    return mOTAUpdateInProgress;
+    return otaUpdateInProgress;
 }
 
 esp_err_t OTAUpdater::Begin(void)
 {
-    if (mOTAUpdateInProgress == true)
+    if (otaUpdateInProgress == true)
     {
         ESP_LOGW(TAG, "Already in progress");
         return ESP_ERR_INVALID_STATE;
     }
 
     ESP_LOGI(TAG, "Begin");
-    mOTAUpdatePartition = esp_ota_get_next_update_partition(NULL);
-    if (mOTAUpdatePartition == NULL)
+    otaUpdatePartition = esp_ota_get_next_update_partition(NULL);
+    if (otaUpdatePartition == NULL)
     {
         ESP_LOGE(TAG, "Partition not found");
         return ESP_ERR_NOT_FOUND;
     }
-    ESP_LOGI(TAG, "Writing to partition subtype %d at offset 0x%x", mOTAUpdatePartition->subtype, mOTAUpdatePartition->address);
+    ESP_LOGI(TAG, "Writing to partition subtype %d at offset 0x%x", otaUpdatePartition->subtype, otaUpdatePartition->address);
 
-    esp_err_t err = esp_ota_begin(mOTAUpdatePartition, OTA_WITH_SEQUENTIAL_WRITES, &mOTAUpdateHandle);
+    esp_err_t err = esp_ota_begin(otaUpdatePartition, OTA_WITH_SEQUENTIAL_WRITES, &otaUpdateHandle);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_begin failed (%s)", esp_err_to_name(err));
         return err;
     }
-    mOTAUpdateImageLen   = 0;
-    mOTAUpdateInProgress = true;
+    otaUpdateImageLen   = 0;
+    otaUpdateInProgress = true;
     return ESP_OK;
 }
 
 esp_err_t OTAUpdater::Write(const void * data, size_t length)
 {
-    if (mOTAUpdateInProgress == false)
+    if (otaUpdateInProgress == false)
     {
         return ESP_ERR_INVALID_STATE;
     }
 
-    esp_err_t err = esp_ota_write(mOTAUpdateHandle, data, length);
+    esp_err_t err = esp_ota_write(otaUpdateHandle, data, length);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
@@ -83,33 +83,33 @@ esp_err_t OTAUpdater::Write(const void * data, size_t length)
         return err;
     }
 
-    mOTAUpdateImageLen += length;
-    ESP_LOGI(TAG, "Written image length %d", mOTAUpdateImageLen);
+    otaUpdateImageLen += length;
+    ESP_LOGI(TAG, "Written image length %d", otaUpdateImageLen);
     return ESP_OK;
 }
 
 esp_err_t OTAUpdater::Abort(void)
 {
-    if (mOTAUpdateInProgress == false)
+    if (otaUpdateInProgress == false)
     {
         return ESP_ERR_INVALID_STATE;
     }
 
     ESP_LOGI(TAG, "Abort");
-    mOTAUpdateInProgress = false;
-    mOTAUpdateImageLen   = 0;
-    return esp_ota_abort(mOTAUpdateHandle);
+    otaUpdateInProgress = false;
+    otaUpdateImageLen   = 0;
+    return esp_ota_abort(otaUpdateHandle);
 }
 
 esp_err_t OTAUpdater::End(void)
 {
-    if (mOTAUpdateInProgress == false)
+    if (otaUpdateInProgress == false)
     {
         return ESP_ERR_INVALID_STATE;
     }
 
-    ESP_LOGI(TAG, "OTA image length %d bytes", mOTAUpdateImageLen);
-    esp_err_t err = esp_ota_end(mOTAUpdateHandle);
+    ESP_LOGI(TAG, "OTA image length %d bytes", otaUpdateImageLen);
+    esp_err_t err = esp_ota_end(otaUpdateHandle);
     if (err != ESP_OK)
     {
         if (err == ESP_ERR_OTA_VALIDATE_FAILED)
@@ -121,7 +121,7 @@ esp_err_t OTAUpdater::End(void)
             ESP_LOGE(TAG, "esp_ota_end failed (%s)!", esp_err_to_name(err));
         }
     }
-    mOTAUpdateInProgress = false;
+    otaUpdateInProgress = false;
     return err;
 }
 
@@ -135,19 +135,19 @@ void RestartTimerHandler(Layer * systemLayer, void * appState)
 // TODO: Handle applying update after reboot
 esp_err_t OTAUpdater::Apply(uint32_t delayedActionTime)
 {
-    if (mOTAUpdateInProgress == true)
+    if (otaUpdateInProgress == true)
     {
         return ESP_ERR_INVALID_STATE;
     }
 
-    esp_err_t err = esp_ota_set_boot_partition(mOTAUpdatePartition);
+    esp_err_t err = esp_ota_set_boot_partition(otaUpdatePartition);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_set_boot_partition failed (%s)!", esp_err_to_name(err));
         return err;
     }
 
-    ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%x", mOTAUpdatePartition->address);
+    ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%x", otaUpdatePartition->address);
     // Allow requestor to send the Ack for the previous message
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayedActionTime * 1000), RestartTimerHandler,
                                                 nullptr);
