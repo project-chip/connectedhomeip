@@ -134,8 +134,7 @@ for j in "${iter_array[@]}"; do
         # kicking off the subshell, sometimes we try to do it before
         # the data is there yet.
         background_pid="$(</tmp/pid)"
-        if  command -v dns-sd &> /dev/null
-        then
+        if command -v dns-sd &>/dev/null; then
             echo "          * [CI DEBUG] Looking for commissionable Nodes"
             # Ignore the error that timeout generates
             cat <(timeout 5 dns-sd -B _matterc._udp)
