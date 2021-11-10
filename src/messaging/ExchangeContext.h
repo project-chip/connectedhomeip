@@ -76,6 +76,8 @@ public:
 
     bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
 
+    bool IsGroupExchangeContext() const { return (mSession.HasValue() && mSession.Value().IsGroupSession()); }
+
     /**
      *  Send a CHIP message on this exchange.
      *
@@ -231,6 +233,8 @@ private:
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState);
 
     void DoClose(bool clearRetransTable);
+
+    static bool IsValidGroupMsgType(Protocols::Id protocolId, uint8_t msgType);
 
     /**
      * We have handled an application-level message in some way and should

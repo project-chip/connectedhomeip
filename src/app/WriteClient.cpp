@@ -244,19 +244,16 @@ CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::T
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    if (session.IsGroupSession())
-    {
-        // Exchange will be closed by WriteClientHandle::SendWriteRequest for group messages
-        err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
-                                         Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
-    }
-    else
-    {
-        mpExchangeCtx->SetResponseTimeout(timeout);
 
-        err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
-                                         Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
-        SuccessOrExit(err);
+    mpExchangeCtx->SetResponseTimeout(timeout);
+
+    // kExpectResponse is ignored by ExchangeContext in case of groupcast
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+    SuccessOrExit(err);
+
+    if (!session.IsGroupSession())
+    {
         MoveToState(State::AwaitingResponse);
     }
 

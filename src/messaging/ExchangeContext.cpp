@@ -119,6 +119,15 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
+    // Check if we can safely send message to a group
+    if (IsGroupExchangeContext())
+    {
+        if (!IsValidGroupMsgType(protocolId, msgType))
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+    }
+
     // we hold the exchange context here in case the entity that
     // originally generated it tries to close it as a result of
     // an error arising below. at the end, we have to close it.
@@ -129,11 +138,12 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
     // Treat unknown peer address as "not UDP", because we have no idea whether
     // it's safe to do MRP there.
-    bool isUDPTransport                = peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
-    bool reliableTransmissionRequested = isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
+    bool isUDPTransport = peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
+    bool reliableTransmissionRequested =
+        isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
 
     // If a response message is expected...
-    if (sendFlags.Has(SendMessageFlags::kExpectResponse))
+    if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
     {
         // Only one 'response expected' message can be outstanding at a time.
         if (IsResponseExpected())
@@ -497,6 +507,23 @@ void ExchangeContext::MessageHandled()
     }
 
     Close();
+}
+
+bool ExchangeContext::IsValidGroupMsgType(Protocols::Id protocolId, uint8_t msgType)
+{
+    // Spec 8.2.4
+    if (protocolId == Protocols::InteractionModel::Id)
+    {
+        switch (msgType)
+        {
+        case to_underlying(Protocols::InteractionModel::MsgType::WriteRequest):
+        case to_underlying(Protocols::InteractionModel::MsgType::InvokeCommandRequest):
+            return true;
+        default:
+            return false;
+        }
+    }
+    return false;
 }
 
 } // namespace Messaging
