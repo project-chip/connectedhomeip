@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "Options.h"
+
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <lib/support/CodeUtils.h>
@@ -25,54 +27,53 @@
 
 #include <zap-generated/test/Commands.h>
 
-TestCommand * gTestCommand = nullptr;
-
-void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+TestCommand * GetTargetTest()
 {
-    switch (event->Type)
+    const char * command = LinuxDeviceOptions::GetInstance().command;
+    if (command == nullptr)
     {
-    case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
-        ChipLogError(Zcl, "Commissioning complete");
-
-        TestCommand * command = reinterpret_cast<TestCommand *>(arg);
-        if (command == nullptr)
-        {
-            ChipLogError(Zcl, "No tests.");
-            return;
-        }
-
-        gTestCommand = command;
-        gTestCommand->NextTest();
-        break;
+        return nullptr;
     }
+
+    static auto test = GetTestCommand(command);
+    if (test.get() == nullptr)
+    {
+        ChipLogError(chipTool, "Specified test command does not exist: %s", command);
+        return nullptr;
+    }
+
+    return test.get();
 }
 
 void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath)
 {
-    VerifyOrReturn(gTestCommand != nullptr);
+    auto test = GetTargetTest();
+    VerifyOrReturn(test != nullptr && test->isRunning);
 
     ChipLogError(Zcl, "Receive command: Endpoint: %u, Cluster: " ChipLogFormatMEI ", Command: " ChipLogFormatMEI,
                  commandPath.mEndpointId, ChipLogValueMEI(commandPath.mClusterId), ChipLogValueMEI(commandPath.mCommandId));
 
-    gTestCommand->CheckCommandPath(commandPath);
+    test->CheckCommandPath(commandPath);
 }
 
 void MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath)
 {
-    VerifyOrReturn(gTestCommand != nullptr);
+    auto test = GetTargetTest();
+    VerifyOrReturn(test != nullptr && test->isRunning);
 
     ChipLogError(Zcl, "Receive READ attribute command: Endpoint: %u, Cluster: " ChipLogFormatMEI ", Attribute: " ChipLogFormatMEI,
                  attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId), ChipLogValueMEI(attributePath.mAttributeId));
 
-    gTestCommand->CheckAttributePath(attributePath);
+    test->CheckAttributePath(attributePath);
 }
 
 void MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath)
 {
-    VerifyOrReturn(gTestCommand != nullptr);
+    auto test = GetTargetTest();
+    VerifyOrReturn(test != nullptr && test->isRunning);
 
     ChipLogError(Zcl, "Receive WRITE attribute command: Endpoint: %u, Cluster: " ChipLogFormatMEI ", Attribute: " ChipLogFormatMEI,
                  attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId), ChipLogValueMEI(attributePath.mAttributeId));
 
-    gTestCommand->CheckAttributePath(attributePath);
+    test->CheckAttributePath(attributePath);
 }
