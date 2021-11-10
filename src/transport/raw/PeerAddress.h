@@ -201,10 +201,6 @@ public:
         return TCP(addr).SetPort(port).SetInterface(interface);
     }
 
-    static PeerAddress Multicast(chip::FabricId fabric, chip::NodeId node)
-    {
-        return Multicast(fabric, static_cast<uint16_t>(node & 0xffff));
-    }
     static PeerAddress Multicast(chip::FabricId fabric, chip::GroupId group)
     {
         constexpr uint8_t scope        = 0x05; // Site-Local
@@ -217,7 +213,7 @@ public:
         // * The lower 8-bits of the Fabric ID
         // * 0x00
         // * The 16-bits Group Identifier in big-endian order
-        uint32_t groupId = static_cast<uint32_t>((fabric << 24) & 0xff000000) | static_cast<uint32_t>(group & 0x0000ffff);
+        uint32_t groupId = static_cast<uint32_t>((fabric << 24) & 0xff000000) | group;
         return UDP(Inet::IPAddress::MakeIPv6PrefixMulticast(scope, prefixLength, prefix, groupId));
     }
 

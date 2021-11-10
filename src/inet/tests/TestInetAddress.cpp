@@ -25,6 +25,8 @@
  */
 
 #include <inet/IPAddress.h>
+#include <lib/core/DataModelTypes.h>
+#include <transport/raw/PeerAddress.h>
 
 #include <string.h>
 
@@ -839,6 +841,27 @@ void CheckIsIPv6LLA(nlTestSuite * inSuite, void * inContext)
  *  Test correct identification of IPv6 multicast addresses.
  */
 void CheckIsIPv6Multicast(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr chip::FabricId fabric = 0xa1a2a4a8b1b2b4b8;
+    constexpr chip::GroupId group = 0xe10f;
+    chip::Transport::PeerAddress addr = chip::Transport::PeerAddress::Multicast(fabric, group);
+    NL_TEST_ASSERT(inSuite, chip::Transport::Type::kUdp == addr.GetTransportType());
+
+    const Inet::IPAddress &ip = addr.GetIPAddress();
+    NL_TEST_ASSERT(inSuite, ip.IsMulticast());
+    NL_TEST_ASSERT(inSuite, IPAddressType::kIPv6 == ip.Type());
+
+    constexpr uint8_t expected[NL_INET_IPV6_ADDR_LEN_IN_BYTES] = { 0xff, 0x35, 0x00, 0x40, 0xfd, 0xa1, 0xa2, 0xa4, 0xa8, 0xb1, 0xb2, 0xb4, 0xb8, 0x00, 0xe1, 0x0f };
+    uint8_t result[NL_INET_IPV6_ADDR_LEN_IN_BYTES];
+    uint8_t *p = result;
+    ip.WriteAddress(p);
+    NL_TEST_ASSERT(inSuite, !memcmp(expected, result, NL_INET_IPV6_ADDR_LEN_IN_BYTES ));
+}
+
+/**
+ *  Test correct identification of IPv6 multicast addresses.
+ */
+void CheckBuildIPv6Multicast(nlTestSuite * inSuite, void * inContext)
 {
     const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
     IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
@@ -1734,6 +1757,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("IPv6 ULA Detection",                          CheckIsIPv6ULA),
     NL_TEST_DEF("IPv6 Link Local Detection",                   CheckIsIPv6LLA),
     NL_TEST_DEF("IPv6 Multicast Detection",                    CheckIsIPv6Multicast),
+    NL_TEST_DEF("IPv6 Multicast Build",                        CheckBuildIPv6Multicast),
     NL_TEST_DEF("Multicast Detection",                         CheckIsMulticast),
     NL_TEST_DEF("Equivalence Operator",                        CheckOperatorEqual),
     NL_TEST_DEF("Non-Equivalence Operator",                    CheckOperatorNotEqual),
