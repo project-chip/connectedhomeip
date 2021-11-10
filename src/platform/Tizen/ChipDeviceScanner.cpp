@@ -48,7 +48,7 @@ ChipDeviceScanner::~ChipDeviceScanner()
 {
     // In case scan is ongoing
     StopChipScan();
-    mDelegate    = nullptr;
+    mDelegate = nullptr;
 }
 
 std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(ChipDeviceScannerDelegate * delegate)
