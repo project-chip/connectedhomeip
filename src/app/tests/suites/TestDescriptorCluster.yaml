@@ -29,9 +29,26 @@ tests:
       command: "readAttribute"
       attribute: "Server List"
       response:
-          value: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    # CLUSTER_ID value is dummy 0 since yaml compares only the length of the List.
-    # right now
+          value: [
+                  0x0003, # Identify
+                  0x001D, # Descriptor
+                  0x0028, # Basic Information
+                  0x0029, # OTA Software Update Provider
+                  0x002A, # OTA Software Update Requestor
+                  0x0030, # General Commissioning
+                  0x0031, # Network Commissioning
+                  0x0032, # Diagnostic Logs
+                  0x0033, # General Diagnostics
+                  0x0034, # Software Diagnostics
+                  0x0035, # Thread Network Diagnostiscs
+                  0x0036, # WiFi Network Diagnostics
+                  0x0037, # Ethernet Network Diagnostics
+                  0x003C, # Administrator Commissioning
+                  0x003E, # Operational Credentials
+                  0x0405, # Relative Humidity Measurement (why on EP0?)
+                  0xF000, # Binding
+                  0xF004, # Group Key Management
+              ]
 
     - label: "Read attribute Client list"
       command: "readAttribute"

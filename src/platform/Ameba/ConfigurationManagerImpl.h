@@ -37,11 +37,19 @@ namespace DeviceLayer {
 class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
                                        private Internal::AmebaConfig
 {
+public:
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount);
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
+    CHIP_ERROR GetBootReasons(uint32_t & bootReasons);
+    CHIP_ERROR StoreBootReasons(uint32_t bootReasons);
+
+private:
     // Allow the ConfigurationManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConfigurationManager;
 
-private:
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

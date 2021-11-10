@@ -23,11 +23,6 @@
             "path": "../../../zap-templates/templates/app/tests/CHIPClusters-src.zapt",
             "name": "Tests C++ API",
             "output": "tests/CHIPClustersTest.cpp"
-        },
-        {
-            "path": "../../../zap-templates/templates/app/tests/CHIPClustersWrite-src.zapt",
-            "name": "Tests WriteAttribute instantiations",
-            "output": "tests/CHIPClustersTestWrite.cpp"
         }
     ]
 }

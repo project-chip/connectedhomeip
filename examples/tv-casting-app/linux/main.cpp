@@ -37,13 +37,13 @@ using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
 
-struct DeviceType
+struct TVExampleDeviceType
 {
     const char * name;
     uint16_t id;
 };
 
-constexpr DeviceType kKnownDeviceTypes[]             = { { "video-player", 35 }, { "dimmable-light", 257 } };
+constexpr TVExampleDeviceType kKnownDeviceTypes[]    = { { "video-player", 35 }, { "dimmable-light", 257 } };
 constexpr int kKnownDeviceTypesCount                 = sizeof kKnownDeviceTypes / sizeof *kKnownDeviceTypes;
 constexpr uint16_t kOptionDeviceType                 = 't';
 constexpr uint16_t kCommissioningWindowTimeoutInSec  = 3 * 60;

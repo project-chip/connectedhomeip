@@ -74,6 +74,12 @@ const AmebaConfig::Key AmebaConfig::kConfigKey_RegulatoryLocation          = { k
 const AmebaConfig::Key AmebaConfig::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
+// Keys stored in the Chip-counters namespace
+const AmebaConfig::Key AmebaConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
+const AmebaConfig::Key AmebaConfig::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
+const AmebaConfig::Key AmebaConfig::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters, "total-hours" };
+const AmebaConfig::Key AmebaConfig::kCounterKey_BootReason            = { kConfigNamespace_ChipCounters, "boot-reason" };
+
 CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, bool & val)
 {
     uint32_t intVal;

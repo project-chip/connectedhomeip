@@ -37,6 +37,8 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
                            ${CMAKE_CURRENT_SOURCE_DIR}/main/include/
                            ${APP_ROOT}/all-clusters-common
+                           ${APP_ROOT}/all-clusters-common/include
+                           ${APP_CLUSTERS}
                            ${MBED_COMMON}/util/include
                            ${CHIP_ROOT}/src/app
                            ${CHIP_ROOT}/third_party/nlio/repo/include
@@ -67,6 +69,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
 
                ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+               ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
                ${APP_UTIL}/DataModelHandler.cpp
                ${APP_UTIL}/af-event.cpp
@@ -112,7 +115,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/media-input-server/media-input-server.cpp
                ${APP_CLUSTERS}/media-playback-server/media-playback-server.cpp
                ${APP_CLUSTERS}/mode-select-server/mode-select-server.cpp
-               ${APP_CLUSTERS}/mode-select-server/static-supported-modes-manager.cpp
                ${APP_CLUSTERS}/network-commissioning/network-commissioning-ember.cpp
                ${APP_CLUSTERS}/network-commissioning/network-commissioning.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
@@ -120,6 +122,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/scenes/scenes.cpp
                ${APP_CLUSTERS}/target-navigator-server/target-navigator-server.cpp
                ${APP_CLUSTERS}/thermostat-server/thermostat-server.cpp
+               ${APP_CLUSTERS}/thermostat-user-interface-configuration-server/thermostat-user-interface-configuration-server.cpp
                ${APP_CLUSTERS}/tv-channel-server/tv-channel-server.cpp
                ${APP_CLUSTERS}/operational-credentials-server/operational-credentials-server.cpp
                ${APP_CLUSTERS}/test-cluster-server/test-cluster-server.cpp

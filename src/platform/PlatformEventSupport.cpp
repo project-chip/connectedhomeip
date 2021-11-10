@@ -41,18 +41,6 @@ CHIP_ERROR PlatformEventing::ScheduleLambdaBridge(System::Layer & aLayer, Lambda
     return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR PlatformEventing::PostEvent(System::Layer & aLayer, System::Object & aTarget, System::EventType aType,
-                                       uintptr_t aArgument)
-{
-    ChipDeviceEvent event;
-    event.Type                          = DeviceEventType::kChipSystemLayerEvent;
-    event.ChipSystemLayerEvent.Type     = aType;
-    event.ChipSystemLayerEvent.Target   = &aTarget;
-    event.ChipSystemLayerEvent.Argument = aArgument;
-
-    return PlatformMgr().PostEvent(&event);
-}
-
 CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, System::Clock::Timeout delay)
 {
     return PlatformMgr().StartChipTimer(delay);

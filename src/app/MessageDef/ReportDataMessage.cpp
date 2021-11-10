@@ -42,7 +42,7 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
-    AttributeDataList::Parser attributeDataList;
+    AttributeReportIBs::Parser AttributeReportIBs;
     EventReports::Parser EventReports;
 
     PRETTY_PRINT("ReportDataMessage =");
@@ -83,17 +83,17 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_AttributeDataList:
+        case kCsTag_AttributeReportIBs:
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributeDataList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_AttributeDataList);
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributeReportIBs)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_AttributeReportIBs);
             VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                attributeDataList.Init(reader);
+                AttributeReportIBs.Init(reader);
 
                 PRETTY_PRINT_INCDEPTH();
-                err = attributeDataList.CheckSchemaValidity();
+                err = AttributeReportIBs.CheckSchemaValidity();
                 SuccessOrExit(err);
                 PRETTY_PRINT_DECDEPTH();
             }
@@ -159,17 +159,17 @@ CHIP_ERROR ReportDataMessage::Parser::GetSubscriptionId(uint64_t * const apSubsc
     return GetUnsignedInteger(kCsTag_SubscriptionId, apSubscriptionId);
 }
 
-CHIP_ERROR ReportDataMessage::Parser::GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const
+CHIP_ERROR ReportDataMessage::Parser::GetAttributeReportIBs(AttributeReportIBs::Parser * const apAttributeReportIBs) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
 
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributeDataList), reader);
+    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributeReportIBs), reader);
     SuccessOrExit(err);
 
     VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    err = apAttributeDataList->Init(reader);
+    err = apAttributeReportIBs->Init(reader);
     SuccessOrExit(err);
 
 exit:
@@ -222,21 +222,21 @@ ReportDataMessage::Builder & ReportDataMessage::Builder::SubscriptionId(const ui
     return *this;
 }
 
-AttributeDataList::Builder & ReportDataMessage::Builder::CreateAttributeDataListBuilder()
+AttributeReportIBs::Builder & ReportDataMessage::Builder::CreateAttributeReportIBs()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mAttributeDataListBuilder.Init(mpWriter, kCsTag_AttributeDataList);
+        mError = mAttributeReportIBsBuilder.Init(mpWriter, kCsTag_AttributeReportIBs);
     }
     else
     {
-        mAttributeDataListBuilder.ResetError(mError);
+        mAttributeReportIBsBuilder.ResetError(mError);
     }
-    return mAttributeDataListBuilder;
+    return mAttributeReportIBsBuilder;
 }
 
-EventReports::Builder & ReportDataMessage::Builder::CreateEventReportsBuilder()
+EventReports::Builder & ReportDataMessage::Builder::CreateEventReports()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -245,7 +245,7 @@ EventReports::Builder & ReportDataMessage::Builder::CreateEventReportsBuilder()
     }
     else
     {
-        mAttributeDataListBuilder.ResetError(mError);
+        mAttributeReportIBsBuilder.ResetError(mError);
     }
     return mEventReportsBuilder;
 }

@@ -89,7 +89,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     return err;
 }
 
-void PairingCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+void PairingCommand::OnDeviceConnectedFn(void * context, chip::DeviceProxy * device)
 {
     PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
     command->OpenCommissioningWindow();
@@ -248,7 +248,7 @@ CHIP_ERROR PairingCommand::SetupNetwork()
         break;
     case PairingNetworkType::WiFi:
     case PairingNetworkType::Thread:
-        err = mController.GetDevice(mNodeId, &mDevice);
+        err = mController.GetDeviceBeingCommissioned(mNodeId, &mDevice);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Setup failure! No pairing for device: %" PRIu64, mNodeId));
 
         mCluster.Associate(mDevice, mEndpointId);

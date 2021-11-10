@@ -82,7 +82,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build pigweed-app example
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/examples/mbed_example.sh -a=pigweed-app -b=$APP_TARGET -p=$APP_PROFILE
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \

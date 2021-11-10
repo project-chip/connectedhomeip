@@ -284,6 +284,8 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    session->SetMRPIntervals(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL, CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+
     ReturnErrorOnFailure(pairing->DeriveSecureSession(session->GetCryptoContext(), direction));
 
     if (mCB != nullptr)

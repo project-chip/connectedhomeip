@@ -58,7 +58,7 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/MessageDef/AttributeDataElement.h>
+#include <app/MessageDef/AttributeDataIB.h>
 #include <app/data-model/Encode.h>
 
 #include <limits>
@@ -1468,7 +1468,7 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDFastPollingMode(bool onOff)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint32_t interval;
+    ConnectivityManager::SEDPollingMode mode;
 
     if (onOff)
     {
@@ -1480,14 +1480,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDFastP
             mFastPollingConsumers--;
     }
 
-    if (mFastPollingConsumers > 0)
-    {
-        err = SetSEDPollingMode(ConnectivityManager::SEDPollingMode::Active);
-    }
-    else
-    {
-        err = SetSEDPollingMode(ConnectivityManager::SEDPollingMode::Idle);
-    }
+    mode = mFastPollingConsumers > 0 ? ConnectivityManager::SEDPollingMode::Active : ConnectivityManager::SEDPollingMode::Idle;
+
+    if (mPollingMode != mode)
+        err = SetSEDPollingMode(mode);
 
     return err;
 }

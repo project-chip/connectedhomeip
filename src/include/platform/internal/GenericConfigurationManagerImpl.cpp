@@ -79,22 +79,27 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetFirmwareRevisionString
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSerialNumber(char * buf, size_t bufSize)
 {
     CHIP_ERROR err;
-    err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
+    size_t serialNumLen = 0; // without counting null-terminator
+    err                 = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
+
 #ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
     if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorCodeIf(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
         serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
         err          = CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-    SuccessOrExit(err);
 
-exit:
+    ReturnErrorOnFailure(err);
+
+    ReturnErrorCodeIf(serialNumLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(buf[serialNumLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+
     return err;
 }
 
@@ -469,8 +474,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         char serialNum[ConfigurationManager::kMaxSerialNumberLength + 1];
-        size_t serialNumLen;
-        err = GetSerialNumber(serialNum, sizeof(serialNum), serialNumLen);
+        err = GetSerialNumber(serialNum, sizeof(serialNum));
         ChipLogProgress(DeviceLayer, "  Serial Number: %s", (err == CHIP_NO_ERROR) ? serialNum : "(not set)");
     }
 

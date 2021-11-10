@@ -19,7 +19,7 @@
 #include <type_traits>
 
 #include <app/CommandSender.h>
-#include <controller/CHIPDevice.h>
+#include <app/DeviceProxy.h>
 #include <lib/support/CodeUtils.h>
 
 #include <controller/python/chip/interaction_model/Delegate.h>
@@ -32,9 +32,9 @@ using namespace chip::app;
 using PyObject = void *;
 
 extern "C" {
-chip::ChipError::StorageType pychip_CommandSender_SendCommand(void * appContext, Controller::Device * device,
-                                                              chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                              chip::CommandId commandId, const uint8_t * payload, size_t length);
+chip::ChipError::StorageType pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, chip::EndpointId endpointId,
+                                                              chip::ClusterId clusterId, chip::CommandId commandId,
+                                                              const uint8_t * payload, size_t length);
 }
 
 namespace chip {
@@ -121,9 +121,9 @@ void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onComman
     gOnCommandSenderDoneCallback     = onCommandSenderDoneCallback;
 }
 
-chip::ChipError::StorageType pychip_CommandSender_SendCommand(void * appContext, Controller::Device * device,
-                                                              chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                              chip::CommandId commandId, const uint8_t * payload, size_t length)
+chip::ChipError::StorageType pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, chip::EndpointId endpointId,
+                                                              chip::ClusterId clusterId, chip::CommandId commandId,
+                                                              const uint8_t * payload, size_t length)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

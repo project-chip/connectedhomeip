@@ -467,6 +467,42 @@ function chip_tests_item_response_type(options)
   return asPromise.call(this, promise, options);
 }
 
+// test_cluster_command_value and test_cluster_value-equals are recursive partials using #each. At some point the |global|
+// context is lost and it fails. Make sure to attach the global context as a property of the | value |
+// that is evaluated.
+function attachGlobal(global, value)
+{
+  if (Array.isArray(value)) {
+    value = value.map(v => attachGlobal(global, v));
+  } else if (value instanceof Object) {
+    for (key in value) {
+      if (key == "global") {
+        continue;
+      }
+      value[key] = attachGlobal(global, value[key]);
+    }
+  } else if (value === null) {
+    value = new NullObject();
+  } else {
+    switch (typeof value) {
+    case 'number':
+      value = new Number(value);
+      break;
+    case 'string':
+      value = new String(value);
+      break;
+    case 'boolean':
+      value = new Boolean(value);
+      break;
+    default:
+      throw new Error('Unsupported value: ' + JSON.stringify(value));
+    }
+  }
+
+  value.global = global;
+  return value;
+}
+
 function chip_tests_item_parameters(options)
 {
   const commandValues = this.arguments.values;
@@ -493,41 +529,6 @@ function chip_tests_item_parameters(options)
         printErrorAndExit(this,
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
-      }
-      // test_cluster_command_value is a recursive partial using #each. At some point the |global|
-      // context is lost and it fails. Make sure to attach the global context as a property of the | value |
-      // that is evaluated.
-      function attachGlobal(global, value)
-      {
-        if (Array.isArray(value)) {
-          value = value.map(v => attachGlobal(global, v));
-        } else if (value instanceof Object) {
-          for (key in value) {
-            if (key == "global") {
-              continue;
-            }
-            value[key] = attachGlobal(global, value[key]);
-          }
-        } else if (value === null) {
-          value = new NullObject();
-        } else {
-          switch (typeof value) {
-          case 'number':
-            value = new Number(value);
-            break;
-          case 'string':
-            value = new String(value);
-            break;
-          case 'boolean':
-            value = new Boolean(value);
-            break;
-          default:
-            throw new Error('Unsupported value: ' + JSON.stringify(value));
-          }
-        }
-
-        value.global = global;
-        return value;
       }
       commandArg.definedValue = attachGlobal(this.global, expected.value);
 
@@ -558,7 +559,7 @@ function chip_tests_item_response_parameters(options)
         const expected = responseValues.splice(expectedIndex, 1)[0];
         if ('value' in expected) {
           responseArg.hasExpectedValue = true;
-          responseArg.expectedValue    = expected.value;
+          responseArg.expectedValue    = attachGlobal(this.global, expected.value);
         }
 
         if ('constraints' in expected) {
@@ -590,6 +591,11 @@ function isLiteralNull(value, options)
   return (value === null) || (value instanceof NullObject);
 }
 
+function expectedValueHasProp(value, name)
+{
+  return name in value;
+}
+
 //
 // Module exports
 //
@@ -601,3 +607,4 @@ exports.chip_tests_item_response_parameters = chip_tests_item_response_parameter
 exports.chip_tests_pics                     = chip_tests_pics;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
+exports.expectedValueHasProp                = expectedValueHasProp;

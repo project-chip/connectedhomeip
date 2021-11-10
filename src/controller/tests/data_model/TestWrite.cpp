@@ -59,8 +59,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
-                                 bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+                                 AttributeReportIB::Builder & aAttributeReport)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -68,7 +68,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
     if (aClusterInfo.mClusterId == TestCluster::Id &&
-        aClusterInfo.mFieldId == TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
+        aClusterInfo.mAttributeId == TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
     {
         if (responseDirective == kSendAttributeSuccess)
         {
@@ -88,12 +88,12 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 
             VerifyOrReturnError(i == 4, CHIP_ERROR_INVALID_ARGUMENT);
 
-            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mFieldId);
+            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
             aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
         }
         else
         {
-            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mFieldId);
+            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
             aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Failure);
         }
 
@@ -148,8 +148,8 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
     auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB status,
                                              CHIP_ERROR aError) { onFailureCbInvoked = true; };
 
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
+    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
+                                                                                               value, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -189,8 +189,8 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
+    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
+                                                                                               value, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 

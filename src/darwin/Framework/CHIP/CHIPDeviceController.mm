@@ -25,6 +25,8 @@
 #import "CHIPP256KeypairBridge.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 #import "CHIPSetupPayload.h"
+#import <setup_payload/ManualSetupPayloadGenerator.h>
+#import <setup_payload/SetupPayload.h>
 #import <zap-generated/CHIPClustersObjc.h>
 
 #import "CHIPDeviceConnectionBridge.h"
@@ -430,6 +432,87 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     });
 
     return YES;
+}
+
+- (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (duration > UINT16_MAX) {
+        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+        }
+        return NO;
+    }
+
+    chip::SetupPayload setupPayload;
+    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 0, 0, 0, setupPayload);
+
+    if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:err];
+        }
+        return NO;
+    }
+
+    return YES;
+}
+
+- (NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
+                              duration:(NSUInteger)duration
+                         discriminator:(NSUInteger)discriminator
+                              setupPIN:(NSUInteger)setupPIN
+                                 error:(NSError * __autoreleasing *)error
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::SetupPayload setupPayload;
+
+    if (duration > UINT16_MAX) {
+        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+        }
+        return nil;
+    }
+
+    if (discriminator > 0xfff) {
+        CHIP_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+        }
+        return nil;
+    } else {
+        setupPayload.discriminator = (uint16_t) discriminator;
+    }
+
+    setupPIN &= ((1 << chip::kSetupPINCodeFieldLengthInBits) - 1);
+    setupPayload.setUpPINCode = (uint32_t) setupPIN;
+
+    err = self.cppCommissioner->OpenCommissioningWindow(
+        deviceID, (uint16_t) duration, 1000, (uint16_t) discriminator, 2, setupPayload);
+
+    if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    chip::ManualSetupPayloadGenerator generator(setupPayload);
+    std::string outCode;
+
+    if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Setup code is %s", outCode.c_str());
+    } else {
+        CHIP_LOG_ERROR("Failed to get decimal setup code");
+        return nil;
+    }
+
+    return [NSString stringWithCString:outCode.c_str() encoding:[NSString defaultCStringEncoding]];
 }
 
 - (void)setListenPort:(uint16_t)port

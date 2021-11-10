@@ -23,7 +23,7 @@ CHIP_ERROR TestCommand::RunCommand()
     return mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
-void TestCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+void TestCommand::OnDeviceConnectedFn(void * context, chip::DeviceProxy * device)
 {
     ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
     auto * command = static_cast<TestCommand *>(context);
@@ -109,17 +109,6 @@ bool TestCommand::CheckConstraintMaxLength(const char * itemName, uint64_t curre
     return true;
 }
 
-bool TestCommand::CheckValueAsList(const char * itemName, uint64_t current, uint64_t expected)
-{
-    if (current != expected)
-    {
-        Exit(std::string(itemName) + " count mismatch: " + std::to_string(current) + " != " + std::to_string(expected));
-        return false;
-    }
-
-    return true;
-}
-
 bool TestCommand::CheckValueAsString(const char * itemName, const chip::ByteSpan current, const char * expected)
 {
     const chip::ByteSpan expectedArgument = chip::ByteSpan(chip::Uint8::from_const_char(expected), strlen(expected));
@@ -138,7 +127,8 @@ bool TestCommand::CheckValueAsString(const char * itemName, const chip::CharSpan
     const chip::CharSpan expectedArgument(expected, strlen(expected));
     if (!current.data_equal(expectedArgument))
     {
-        Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));
+        Exit(std::string(itemName) + " value mismatch, expected '" + expected + "' but got '" +
+             std::string(current.data(), current.size()) + "'");
         return false;
     }
 
