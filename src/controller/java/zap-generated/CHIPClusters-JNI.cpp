@@ -5435,7 +5435,7 @@ JNI_METHOD(jlong, AccountLoginCluster, initWithDevice)(JNIEnv * env, jobject sel
     chip::DeviceLayer::StackLock lock;
     AccountLoginCluster * cppCluster = new AccountLoginCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -5550,7 +5550,7 @@ JNI_METHOD(jlong, AdministratorCommissioningCluster, initWithDevice)(JNIEnv * en
     chip::DeviceLayer::StackLock lock;
     AdministratorCommissioningCluster * cppCluster = new AdministratorCommissioningCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -5710,7 +5710,7 @@ JNI_METHOD(jlong, ApplicationBasicCluster, initWithDevice)(JNIEnv * env, jobject
     chip::DeviceLayer::StackLock lock;
     ApplicationBasicCluster * cppCluster = new ApplicationBasicCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -5766,7 +5766,7 @@ JNI_METHOD(jlong, ApplicationLauncherCluster, initWithDevice)(JNIEnv * env, jobj
     chip::DeviceLayer::StackLock lock;
     ApplicationLauncherCluster * cppCluster = new ApplicationLauncherCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -5829,7 +5829,7 @@ JNI_METHOD(jlong, AudioOutputCluster, initWithDevice)(JNIEnv * env, jobject self
     chip::DeviceLayer::StackLock lock;
     AudioOutputCluster * cppCluster = new AudioOutputCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -5936,7 +5936,7 @@ JNI_METHOD(jlong, BarrierControlCluster, initWithDevice)(JNIEnv * env, jobject s
     chip::DeviceLayer::StackLock lock;
     BarrierControlCluster * cppCluster = new BarrierControlCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -6040,7 +6040,7 @@ JNI_METHOD(jlong, BasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlon
     chip::DeviceLayer::StackLock lock;
     BasicCluster * cppCluster = new BasicCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -6193,7 +6193,7 @@ JNI_METHOD(jlong, BinaryInputBasicCluster, initWithDevice)(JNIEnv * env, jobject
     chip::DeviceLayer::StackLock lock;
     BinaryInputBasicCluster * cppCluster = new BinaryInputBasicCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -6375,7 +6375,7 @@ JNI_METHOD(jlong, BindingCluster, initWithDevice)(JNIEnv * env, jobject self, jl
     chip::DeviceLayer::StackLock lock;
     BindingCluster * cppCluster = new BindingCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -6480,7 +6480,7 @@ JNI_METHOD(jlong, BooleanStateCluster, initWithDevice)(JNIEnv * env, jobject sel
     chip::DeviceLayer::StackLock lock;
     BooleanStateCluster * cppCluster = new BooleanStateCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -6543,7 +6543,7 @@ JNI_METHOD(jlong, BridgedActionsCluster, initWithDevice)(JNIEnv * env, jobject s
     chip::DeviceLayer::StackLock lock;
     BridgedActionsCluster * cppCluster = new BridgedActionsCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -7128,7 +7128,7 @@ JNI_METHOD(jlong, BridgedDeviceBasicCluster, initWithDevice)(JNIEnv * env, jobje
     chip::DeviceLayer::StackLock lock;
     BridgedDeviceBasicCluster * cppCluster = new BridgedDeviceBasicCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -7169,7 +7169,7 @@ JNI_METHOD(jlong, ColorControlCluster, initWithDevice)(JNIEnv * env, jobject sel
     chip::DeviceLayer::StackLock lock;
     ColorControlCluster * cppCluster = new ColorControlCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -8803,7 +8803,7 @@ JNI_METHOD(jlong, ContentLauncherCluster, initWithDevice)(JNIEnv * env, jobject 
     chip::DeviceLayer::StackLock lock;
     ContentLauncherCluster * cppCluster = new ContentLauncherCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -8920,7 +8920,7 @@ JNI_METHOD(jlong, DescriptorCluster, initWithDevice)(JNIEnv * env, jobject self,
     chip::DeviceLayer::StackLock lock;
     DescriptorCluster * cppCluster = new DescriptorCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -8929,7 +8929,7 @@ JNI_METHOD(jlong, DiagnosticLogsCluster, initWithDevice)(JNIEnv * env, jobject s
     chip::DeviceLayer::StackLock lock;
     DiagnosticLogsCluster * cppCluster = new DiagnosticLogsCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -8993,7 +8993,7 @@ JNI_METHOD(jlong, DoorLockCluster, initWithDevice)(JNIEnv * env, jobject self, j
     chip::DeviceLayer::StackLock lock;
     DoorLockCluster * cppCluster = new DoorLockCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -10205,7 +10205,7 @@ JNI_METHOD(jlong, ElectricalMeasurementCluster, initWithDevice)(JNIEnv * env, jo
     chip::DeviceLayer::StackLock lock;
     ElectricalMeasurementCluster * cppCluster = new ElectricalMeasurementCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -10214,7 +10214,7 @@ JNI_METHOD(jlong, EthernetNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * en
     chip::DeviceLayer::StackLock lock;
     EthernetNetworkDiagnosticsCluster * cppCluster = new EthernetNetworkDiagnosticsCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -10270,7 +10270,7 @@ JNI_METHOD(jlong, FixedLabelCluster, initWithDevice)(JNIEnv * env, jobject self,
     chip::DeviceLayer::StackLock lock;
     FixedLabelCluster * cppCluster = new FixedLabelCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -10279,7 +10279,7 @@ JNI_METHOD(jlong, FlowMeasurementCluster, initWithDevice)(JNIEnv * env, jobject 
     chip::DeviceLayer::StackLock lock;
     FlowMeasurementCluster * cppCluster = new FlowMeasurementCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -10288,7 +10288,7 @@ JNI_METHOD(jlong, GeneralCommissioningCluster, initWithDevice)(JNIEnv * env, job
     chip::DeviceLayer::StackLock lock;
     GeneralCommissioningCluster * cppCluster = new GeneralCommissioningCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -10482,7 +10482,7 @@ JNI_METHOD(jlong, GeneralDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobje
     chip::DeviceLayer::StackLock lock;
     GeneralDiagnosticsCluster * cppCluster = new GeneralDiagnosticsCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -10491,7 +10491,7 @@ JNI_METHOD(jlong, GroupKeyManagementCluster, initWithDevice)(JNIEnv * env, jobje
     chip::DeviceLayer::StackLock lock;
     GroupKeyManagementCluster * cppCluster = new GroupKeyManagementCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -10500,7 +10500,7 @@ JNI_METHOD(jlong, GroupsCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
     chip::DeviceLayer::StackLock lock;
     GroupsCluster * cppCluster = new GroupsCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -10805,7 +10805,7 @@ JNI_METHOD(jlong, IdentifyCluster, initWithDevice)(JNIEnv * env, jobject self, j
     chip::DeviceLayer::StackLock lock;
     IdentifyCluster * cppCluster = new IdentifyCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -10989,7 +10989,7 @@ JNI_METHOD(jlong, IlluminanceMeasurementCluster, initWithDevice)(JNIEnv * env, j
     chip::DeviceLayer::StackLock lock;
     IlluminanceMeasurementCluster * cppCluster = new IlluminanceMeasurementCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -11053,7 +11053,7 @@ JNI_METHOD(jlong, KeypadInputCluster, initWithDevice)(JNIEnv * env, jobject self
     chip::DeviceLayer::StackLock lock;
     KeypadInputCluster * cppCluster = new KeypadInputCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -11110,7 +11110,7 @@ JNI_METHOD(jlong, LevelControlCluster, initWithDevice)(JNIEnv * env, jobject sel
     chip::DeviceLayer::StackLock lock;
     LevelControlCluster * cppCluster = new LevelControlCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -11779,7 +11779,7 @@ JNI_METHOD(jlong, LowPowerCluster, initWithDevice)(JNIEnv * env, jobject self, j
     chip::DeviceLayer::StackLock lock;
     LowPowerCluster * cppCluster = new LowPowerCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -11835,7 +11835,7 @@ JNI_METHOD(jlong, MediaInputCluster, initWithDevice)(JNIEnv * env, jobject self,
     chip::DeviceLayer::StackLock lock;
     MediaInputCluster * cppCluster = new MediaInputCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -12036,7 +12036,7 @@ JNI_METHOD(jlong, MediaPlaybackCluster, initWithDevice)(JNIEnv * env, jobject se
     chip::DeviceLayer::StackLock lock;
     MediaPlaybackCluster * cppCluster = new MediaPlaybackCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -12586,7 +12586,7 @@ JNI_METHOD(jlong, ModeSelectCluster, initWithDevice)(JNIEnv * env, jobject self,
     chip::DeviceLayer::StackLock lock;
     ModeSelectCluster * cppCluster = new ModeSelectCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -12728,7 +12728,7 @@ JNI_METHOD(jlong, NetworkCommissioningCluster, initWithDevice)(JNIEnv * env, job
     chip::DeviceLayer::StackLock lock;
     NetworkCommissioningCluster * cppCluster = new NetworkCommissioningCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -13172,7 +13172,7 @@ JNI_METHOD(jlong, OtaSoftwareUpdateProviderCluster, initWithDevice)(JNIEnv * env
     chip::DeviceLayer::StackLock lock;
     OtaSoftwareUpdateProviderCluster * cppCluster = new OtaSoftwareUpdateProviderCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -13344,7 +13344,7 @@ JNI_METHOD(jlong, OtaSoftwareUpdateRequestorCluster, initWithDevice)(JNIEnv * en
     chip::DeviceLayer::StackLock lock;
     OtaSoftwareUpdateRequestorCluster * cppCluster = new OtaSoftwareUpdateRequestorCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -13439,7 +13439,7 @@ JNI_METHOD(jlong, OccupancySensingCluster, initWithDevice)(JNIEnv * env, jobject
     chip::DeviceLayer::StackLock lock;
     OccupancySensingCluster * cppCluster = new OccupancySensingCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -13502,7 +13502,7 @@ JNI_METHOD(jlong, OnOffCluster, initWithDevice)(JNIEnv * env, jobject self, jlon
     chip::DeviceLayer::StackLock lock;
     OnOffCluster * cppCluster = new OnOffCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -13943,7 +13943,7 @@ JNI_METHOD(jlong, OnOffSwitchConfigurationCluster, initWithDevice)(JNIEnv * env,
     chip::DeviceLayer::StackLock lock;
     OnOffSwitchConfigurationCluster * cppCluster = new OnOffSwitchConfigurationCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -13982,7 +13982,7 @@ JNI_METHOD(jlong, OperationalCredentialsCluster, initWithDevice)(JNIEnv * env, j
     chip::DeviceLayer::StackLock lock;
     OperationalCredentialsCluster * cppCluster = new OperationalCredentialsCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -14467,7 +14467,7 @@ JNI_METHOD(jlong, PowerSourceCluster, initWithDevice)(JNIEnv * env, jobject self
     chip::DeviceLayer::StackLock lock;
     PowerSourceCluster * cppCluster = new PowerSourceCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -14476,7 +14476,7 @@ JNI_METHOD(jlong, PressureMeasurementCluster, initWithDevice)(JNIEnv * env, jobj
     chip::DeviceLayer::StackLock lock;
     PressureMeasurementCluster * cppCluster = new PressureMeasurementCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -14540,7 +14540,7 @@ JNI_METHOD(jlong, PumpConfigurationAndControlCluster, initWithDevice)(JNIEnv * e
     chip::DeviceLayer::StackLock lock;
     PumpConfigurationAndControlCluster * cppCluster = new PumpConfigurationAndControlCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -14722,7 +14722,7 @@ JNI_METHOD(jlong, RelativeHumidityMeasurementCluster, initWithDevice)(JNIEnv * e
     chip::DeviceLayer::StackLock lock;
     RelativeHumidityMeasurementCluster * cppCluster = new RelativeHumidityMeasurementCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -14842,7 +14842,7 @@ JNI_METHOD(jlong, ScenesCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
     chip::DeviceLayer::StackLock lock;
     ScenesCluster * cppCluster = new ScenesCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -15196,7 +15196,7 @@ JNI_METHOD(jlong, SoftwareDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobj
     chip::DeviceLayer::StackLock lock;
     SoftwareDiagnosticsCluster * cppCluster = new SoftwareDiagnosticsCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -15252,7 +15252,7 @@ JNI_METHOD(jlong, SwitchCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
     chip::DeviceLayer::StackLock lock;
     SwitchCluster * cppCluster = new SwitchCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -15315,7 +15315,7 @@ JNI_METHOD(jlong, TvChannelCluster, initWithDevice)(JNIEnv * env, jobject self, 
     chip::DeviceLayer::StackLock lock;
     TvChannelCluster * cppCluster = new TvChannelCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -15471,7 +15471,7 @@ JNI_METHOD(jlong, TargetNavigatorCluster, initWithDevice)(JNIEnv * env, jobject 
     chip::DeviceLayer::StackLock lock;
     TargetNavigatorCluster * cppCluster = new TargetNavigatorCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -15533,7 +15533,7 @@ JNI_METHOD(jlong, TemperatureMeasurementCluster, initWithDevice)(JNIEnv * env, j
     chip::DeviceLayer::StackLock lock;
     TemperatureMeasurementCluster * cppCluster = new TemperatureMeasurementCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -15653,7 +15653,7 @@ JNI_METHOD(jlong, TestClusterCluster, initWithDevice)(JNIEnv * env, jobject self
     chip::DeviceLayer::StackLock lock;
     TestClusterCluster * cppCluster = new TestClusterCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -16930,7 +16930,7 @@ JNI_METHOD(jlong, ThermostatCluster, initWithDevice)(JNIEnv * env, jobject self,
     chip::DeviceLayer::StackLock lock;
     ThermostatCluster * cppCluster = new ThermostatCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -17515,7 +17515,7 @@ JNI_METHOD(jlong, ThermostatUserInterfaceConfigurationCluster, initWithDevice)
     chip::DeviceLayer::StackLock lock;
     ThermostatUserInterfaceConfigurationCluster * cppCluster = new ThermostatUserInterfaceConfigurationCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -17620,7 +17620,7 @@ JNI_METHOD(jlong, ThreadNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env,
     chip::DeviceLayer::StackLock lock;
     ThreadNetworkDiagnosticsCluster * cppCluster = new ThreadNetworkDiagnosticsCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -17676,7 +17676,7 @@ JNI_METHOD(jlong, WakeOnLanCluster, initWithDevice)(JNIEnv * env, jobject self, 
     chip::DeviceLayer::StackLock lock;
     WakeOnLanCluster * cppCluster = new WakeOnLanCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -17685,7 +17685,7 @@ JNI_METHOD(jlong, WiFiNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env, j
     chip::DeviceLayer::StackLock lock;
     WiFiNetworkDiagnosticsCluster * cppCluster = new WiFiNetworkDiagnosticsCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -17741,7 +17741,7 @@ JNI_METHOD(jlong, WindowCoveringCluster, initWithDevice)(JNIEnv * env, jobject s
     chip::DeviceLayer::StackLock lock;
     WindowCoveringCluster * cppCluster = new WindowCoveringCluster();
 
-    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 

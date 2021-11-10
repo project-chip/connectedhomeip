@@ -31,6 +31,10 @@
         {
             "name": "commandValue",
             "path": "partials/test_cluster_command_value.zapt"
+        },
+        {
+            "name": "valueEquals",
+            "path": "partials/test_cluster_value_equals.zapt"
         }
     ],
     "templates": [

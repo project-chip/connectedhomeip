@@ -88,11 +88,6 @@
             "path": "templates/app/CHIPClustersInvoke-src.zapt",
             "name": "C++ ZCL Invoke API",
             "output": "CHIPClustersInvoke.cpp"
-        },
-        {
-            "path": "templates/app/CHIPClustersWrite-src.zapt",
-            "name": "C++ ZCL Write API",
-            "output": "CHIPClustersWrite.cpp"
         }
     ]
 }

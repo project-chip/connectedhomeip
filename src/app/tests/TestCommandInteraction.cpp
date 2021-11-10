@@ -140,7 +140,12 @@ public:
 class MockCommandHandlerCallback : public CommandHandler::Callback
 {
 public:
-    void OnDone(chip::app::CommandHandler * apCommandHandler) final { onFinalCalledTimes++; }
+    void OnDone(CommandHandler & apCommandHandler) final { onFinalCalledTimes++; }
+    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) final
+    {
+        DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
+    }
+    bool CommandExists(const ConcreteCommandPath & aCommandPath) { return ServerClusterCommandExists(aCommandPath); }
 
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;

@@ -343,7 +343,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
 void ServerBase::OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::System::PacketBufferHandle && buffer,
                                      const chip::Inet::IPPacketInfo * info)
 {
-    ServerBase * srv = static_cast<ServerBase *>(endPoint->AppState);
+    ServerBase * srv = static_cast<ServerBase *>(endPoint->mAppState);
     if (!srv->mDelegate)
     {
         return;

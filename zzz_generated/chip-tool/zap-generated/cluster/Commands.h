@@ -1998,6 +1998,11 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 
 } // anonymous namespace
 
+static void OnDefaultSuccessResponseWithoutExit(void * context)
+{
+    ChipLogProgress(chipTool, "Default Success Response");
+}
+
 static void OnDefaultSuccessResponse(void * context)
 {
     ChipLogProgress(chipTool, "Default Success Response");
@@ -2024,79 +2029,124 @@ static void OnDefaultFailure(void * context, EmberAfStatus status)
     OnDefaultFailureResponse(context, status);
 };
 
-static void OnBooleanAttributeResponse(void * context, bool value)
+static void OnBooleanAttributeReport(void * context, bool value)
 {
     ChipLogProgress(chipTool, "Boolean attribute Response: %d", value);
+}
+
+static void OnBooleanAttributeResponse(void * context, bool value)
+{
+    OnBooleanAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt8uAttributeReport(void * context, uint8_t value)
+{
+    ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
 }
 
 static void OnInt8uAttributeResponse(void * context, uint8_t value)
 {
-    ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
+    OnInt8uAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt16uAttributeReport(void * context, uint16_t value)
+{
+    ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
 }
 
 static void OnInt16uAttributeResponse(void * context, uint16_t value)
 {
-    ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
+    OnInt16uAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt32uAttributeReport(void * context, uint32_t value)
+{
+    ChipLogProgress(chipTool, "Int32u attribute Response: %" PRIu32, value);
 }
 
 static void OnInt32uAttributeResponse(void * context, uint32_t value)
 {
-    ChipLogProgress(chipTool, "Int32u attribute Response: %" PRIu32, value);
+    OnInt32uAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt64uAttributeReport(void * context, uint64_t value)
+{
+    ChipLogProgress(chipTool, "Int64u attribute Response: %" PRIu64, value);
 }
 
 static void OnInt64uAttributeResponse(void * context, uint64_t value)
 {
-    ChipLogProgress(chipTool, "Int64u attribute Response: %" PRIu64, value);
+    OnInt64uAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt8sAttributeReport(void * context, int8_t value)
+{
+    ChipLogProgress(chipTool, "Int8s attribute Response: %" PRId8, value);
 }
 
 static void OnInt8sAttributeResponse(void * context, int8_t value)
 {
-    ChipLogProgress(chipTool, "Int8s attribute Response: %" PRId8, value);
+    OnInt8sAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt16sAttributeReport(void * context, int16_t value)
+{
+    ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
 }
 
 static void OnInt16sAttributeResponse(void * context, int16_t value)
 {
-    ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
+    OnInt16sAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt32sAttributeReport(void * context, int32_t value)
+{
+    ChipLogProgress(chipTool, "Int32s attribute Response: %" PRId32, value);
 }
 
 static void OnInt32sAttributeResponse(void * context, int32_t value)
 {
-    ChipLogProgress(chipTool, "Int32s attribute Response: %" PRId32, value);
+    OnInt32sAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt64sAttributeReport(void * context, int64_t value)
+{
+    ChipLogProgress(chipTool, "Int64s attribute Response: %" PRId64, value);
 }
 
 static void OnInt64sAttributeResponse(void * context, int64_t value)
 {
-    ChipLogProgress(chipTool, "Int64s attribute Response: %" PRId64, value);
+    OnInt64sAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnOctetStringAttributeResponse(void * context, const chip::ByteSpan value)
+static void OnOctetStringAttributeReport(void * context, const chip::ByteSpan value)
 {
     char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     if (CHIP_NO_ERROR ==
@@ -2108,14 +2158,24 @@ static void OnOctetStringAttributeResponse(void * context, const chip::ByteSpan 
     {
         ChipLogProgress(chipTool, "OctetString attribute Response len: %zu", value.size());
     }
+}
+
+static void OnOctetStringAttributeResponse(void * context, const chip::ByteSpan value)
+{
+    OnOctetStringAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnCharStringAttributeResponse(void * context, const chip::CharSpan value)
+static void OnCharStringAttributeReport(void * context, const chip::CharSpan value)
 {
     ChipLogProgress(chipTool, "CharString attribute Response: %.*s", static_cast<int>(value.size()), value.data());
+}
+
+static void OnCharStringAttributeResponse(void * context, const chip::CharSpan value)
+{
+    OnCharStringAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -5981,12 +6041,14 @@ public:
         AddArgument("attr-name", "present-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportBinaryInputBasicPresentValue()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -5998,25 +6060,29 @@ public:
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributePresentValue(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributePresentValue(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributePresentValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                      mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributePresentValue(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -6061,12 +6127,14 @@ public:
         AddArgument("attr-name", "status-flags");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportBinaryInputBasicStatusFlags()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -6078,25 +6146,29 @@ public:
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeStatusFlags(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeStatusFlags(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeStatusFlags(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                     mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeStatusFlags(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -6286,12 +6358,14 @@ public:
         AddArgument("attr-name", "state-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportBooleanStateStateValue()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -6303,25 +6377,29 @@ public:
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeStateValue(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeStateValue(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeStateValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                    mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeStateValue(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -8086,12 +8164,14 @@ public:
         AddArgument("attr-name", "current-hue");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportColorControlCurrentHue()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -8103,25 +8183,29 @@ public:
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCurrentHue(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCurrentHue(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCurrentHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                    mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCurrentHue(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -8166,12 +8250,14 @@ public:
         AddArgument("attr-name", "current-saturation");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportColorControlCurrentSaturation()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -8183,25 +8269,30 @@ public:
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCurrentSaturation(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCurrentSaturation(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCurrentSaturation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCurrentSaturation(successCallback, onFailureCallback->Cancel(), mMinInterval,
                                                            mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -8280,12 +8371,14 @@ public:
         AddArgument("attr-name", "current-x");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportColorControlCurrentX()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -8297,25 +8390,29 @@ public:
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCurrentX(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCurrentX(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCurrentX(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                  mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCurrentX(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -8360,12 +8457,14 @@ public:
         AddArgument("attr-name", "current-y");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportColorControlCurrentY()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -8377,25 +8476,29 @@ public:
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCurrentY(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCurrentY(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCurrentY(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                  mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCurrentY(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -8508,12 +8611,14 @@ public:
         AddArgument("attr-name", "color-temperature");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportColorControlColorTemperature()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -8525,25 +8630,29 @@ public:
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeColorTemperature(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeColorTemperature(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeColorTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                          mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeColorTemperature(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -11571,12 +11680,14 @@ public:
         AddArgument("attr-name", "lock-state");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportDoorLockLockState()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -11588,25 +11699,29 @@ public:
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeLockState(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeLockState(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeLockState(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                   mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeLockState(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -13853,12 +13968,14 @@ public:
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportIlluminanceMeasurementMeasuredValue()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -13870,25 +13987,29 @@ public:
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeMeasuredValue(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeMeasuredValue(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                       mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeMeasuredValue(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -14419,12 +14540,14 @@ public:
         AddArgument("attr-name", "current-level");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportLevelControlCurrentLevel()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -14436,25 +14559,29 @@ public:
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCurrentLevel(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCurrentLevel(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCurrentLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                      mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCurrentLevel(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -16099,12 +16226,14 @@ public:
         AddArgument("attr-name", "current-mode");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportModeSelectCurrentMode()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -16116,25 +16245,29 @@ public:
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCurrentMode(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCurrentMode(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCurrentMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                     mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCurrentMode(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -17006,12 +17139,14 @@ public:
         AddArgument("attr-name", "occupancy");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportOccupancySensingOccupancy()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -17023,25 +17158,29 @@ public:
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeOccupancy(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeOccupancy(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeOccupancy(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                   mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeOccupancy(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -17349,12 +17488,14 @@ public:
         AddArgument("attr-name", "on-off");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportOnOffOnOff()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -17366,25 +17507,29 @@ public:
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeOnOff(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeOnOff(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeOnOff(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                               mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeOnOff(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -18743,12 +18888,14 @@ public:
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportPressureMeasurementMeasuredValue()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -18760,25 +18907,29 @@ public:
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeMeasuredValue(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeMeasuredValue(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                       mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeMeasuredValue(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -19399,12 +19550,14 @@ public:
         AddArgument("attr-name", "pump-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportPumpConfigurationAndControlPumpStatus()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -19416,25 +19569,29 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributePumpStatus(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributePumpStatus(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributePumpStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                    mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributePumpStatus(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -19547,12 +19704,14 @@ public:
         AddArgument("attr-name", "capacity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportPumpConfigurationAndControlCapacity()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -19564,25 +19723,29 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCapacity(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCapacity(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCapacity(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                  mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCapacity(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -19944,12 +20107,14 @@ public:
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportRelativeHumidityMeasurementMeasuredValue()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -19961,25 +20126,29 @@ public:
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeMeasuredValue(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeMeasuredValue(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                       mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeMeasuredValue(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -20092,12 +20261,14 @@ public:
         AddArgument("attr-name", "tolerance");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportRelativeHumidityMeasurementTolerance()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -20109,25 +20280,29 @@ public:
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeTolerance(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeTolerance(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeTolerance(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                   mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeTolerance(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -20832,12 +21007,14 @@ public:
         AddArgument("attr-name", "current-position");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportSwitchCurrentPosition()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -20849,25 +21026,29 @@ public:
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCurrentPosition(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCurrentPosition(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCurrentPosition(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                         mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCurrentPosition(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -21361,12 +21542,14 @@ public:
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportTemperatureMeasurementMeasuredValue()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -21378,25 +21561,29 @@ public:
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeMeasuredValue(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeMeasuredValue(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                       mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeMeasuredValue(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -21509,12 +21696,14 @@ public:
         AddArgument("attr-name", "tolerance");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportTemperatureMeasurementTolerance()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -21526,25 +21715,29 @@ public:
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeTolerance(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeTolerance(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeTolerance(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                   mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeTolerance(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -23806,12 +23999,14 @@ public:
         AddArgument("attr-name", "local-temperature");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportThermostatLocalTemperature()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -23823,25 +24018,29 @@ public:
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeLocalTemperature(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeLocalTemperature(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeLocalTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                          mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeLocalTemperature(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -28252,12 +28451,14 @@ public:
         AddArgument("attr-name", "current-position-lift-percentage");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportWindowCoveringCurrentPositionLiftPercentage()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -28269,25 +28470,30 @@ public:
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCurrentPositionLiftPercentage(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCurrentPositionLiftPercentage(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCurrentPositionLiftPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                       mMinInterval, mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCurrentPositionLiftPercentage(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                                       mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -28332,12 +28538,14 @@ public:
         AddArgument("attr-name", "current-position-tilt-percentage");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportWindowCoveringCurrentPositionTiltPercentage()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -28349,25 +28557,30 @@ public:
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCurrentPositionTiltPercentage(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCurrentPositionTiltPercentage(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCurrentPositionTiltPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                       mMinInterval, mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCurrentPositionTiltPercentage(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                                       mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -28412,12 +28625,14 @@ public:
         AddArgument("attr-name", "operational-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportWindowCoveringOperationalStatus()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -28429,25 +28644,30 @@ public:
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeOperationalStatus(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeOperationalStatus(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeOperationalStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeOperationalStatus(successCallback, onFailureCallback->Cancel(), mMinInterval,
                                                            mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -28492,12 +28712,14 @@ public:
         AddArgument("attr-name", "target-position-lift-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportWindowCoveringTargetPositionLiftPercent100ths()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -28509,25 +28731,30 @@ public:
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeTargetPositionLiftPercent100ths(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeTargetPositionLiftPercent100ths(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeTargetPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                         mMinInterval, mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeTargetPositionLiftPercent100ths(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                                         mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -28572,12 +28799,14 @@ public:
         AddArgument("attr-name", "target-position-tilt-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportWindowCoveringTargetPositionTiltPercent100ths()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -28589,25 +28818,30 @@ public:
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeTargetPositionTiltPercent100ths(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeTargetPositionTiltPercent100ths(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeTargetPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                         mMinInterval, mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeTargetPositionTiltPercent100ths(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                                         mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -28686,12 +28920,14 @@ public:
         AddArgument("attr-name", "current-position-lift-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportWindowCoveringCurrentPositionLiftPercent100ths()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -28703,25 +28939,30 @@ public:
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCurrentPositionLiftPercent100ths(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCurrentPositionLiftPercent100ths(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCurrentPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCurrentPositionLiftPercent100ths(successCallback, onFailureCallback->Cancel(),
                                                                           mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -28766,12 +29007,14 @@ public:
         AddArgument("attr-name", "current-position-tilt-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportWindowCoveringCurrentPositionTiltPercent100ths()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -28783,25 +29026,30 @@ public:
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeCurrentPositionTiltPercent100ths(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeCurrentPositionTiltPercent100ths(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeCurrentPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeCurrentPositionTiltPercent100ths(successCallback, onFailureCallback->Cancel(),
                                                                           mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -29049,12 +29297,14 @@ public:
         AddArgument("attr-name", "safety-status");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~ReportWindowCoveringSafetyStatus()
     {
         delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
         delete onFailureCallback;
         delete onReportCallback;
     }
@@ -29066,25 +29316,29 @@ public:
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeSafetyStatus(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttributeSafetyStatus(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttributeSafetyStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                      mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeSafetyStatus(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*

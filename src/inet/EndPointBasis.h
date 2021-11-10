@@ -19,28 +19,13 @@
 /**
  *    @file
  *      This file contains the basis class for all the various transport
- *      endpoint classes in the Inet layer, i.e. TCP, UDP, Raw and Tun.
+ *      endpoint classes in the Inet layer, i.e. TCP and UDP.
  */
 
 #pragma once
 
 #include <inet/InetConfig.h>
-
-#include <inet/IPAddress.h>
 #include <lib/support/DLLUtil.h>
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <system/SocketEvents.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#include <Network/Network.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-struct udp_pcb;
-struct tcp_pcb;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
 namespace Inet {
@@ -50,65 +35,28 @@ class InetLayer;
 /**
  * Basis of internet transport endpoint classes.
  */
-class DLL_EXPORT EndPointBasis
+class DLL_EXPORT EndPointBase
 {
 public:
+    EndPointBase(InetLayer & aInetLayer, void * aAppState = nullptr) : mAppState(aAppState), mInetLayer(aInetLayer) {}
+    virtual ~EndPointBase() = default;
+
     /**
      *  Returns a reference to the Inet layer object that owns this basis object.
      */
-    InetLayer & Layer() const { return *mInetLayer; }
+    InetLayer & Layer() const { return mInetLayer; }
 
-    /**
-     *  Returns \c true if the basis object was obtained by the specified Inet layer instance.
-     *
-     *  @note
-     *      Does not check whether the object is actually obtained by the system layer instance associated with the Inet layer
-     *      instance. It merely tests whether \c aInetLayer is the Inet layer instance that was provided to \c InitInetLayerBasis.
-     */
-    bool IsCreatedByInetLayer(const InetLayer & aInetLayer) const { return mInetLayer == &aInetLayer; }
-
-    void * AppState;
+    void * mAppState;
 
 private:
-    InetLayer * mInetLayer; /**< Pointer to the InetLayer object that owns this object. */
-
-protected:
-    void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = nullptr);
-
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    nw_parameters_t mParameters;
-    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
-#endif
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    static constexpr int kInvalidSocketFd = -1;
-    int mSocket;                     /**< Encapsulated socket descriptor. */
-    IPAddressType mAddrType;         /**< Protocol family, i.e. IPv4 or IPv6. */
-    System::SocketWatchToken mWatch; /**< Socket event watcher */
-#endif                               // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    /** Encapsulated LwIP protocol control block */
-    union
-    {
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        udp_pcb * mUDP; /**< User datagram protocol (UDP) control */
-#endif                  // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        tcp_pcb * mTCP; /**< Transmission control protocol (TCP) control */
-#endif                  // INET_CONFIG_ENABLE_TCP_ENDPOINT
-    };
-
-    enum class LwIPEndPointType : uint8_t
-    {
-        Unknown = 0,
-        Raw     = 1,
-        UDP     = 2,
-        UCP     = 3,
-        TCP     = 4
-    } mLwIPEndPointType;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    InetLayer & mInetLayer; /**< InetLayer object that owns this object. */
 };
 
 } // namespace Inet
 } // namespace chip
+
+#ifdef CHIP_INET_END_POINT_IMPL_CONFIG_FILE
+#include CHIP_INET_END_POINT_IMPL_CONFIG_FILE
+#else // CHIP_INET_END_POINT_IMPL_CONFIG_FILE
+#include <inet/EndPointBasisImplSockets.h>
+#endif // CHIP_INET_END_POINT_IMPL_CONFIG_FILE

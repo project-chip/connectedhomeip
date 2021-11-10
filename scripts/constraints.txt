@@ -113,7 +113,7 @@ numpy==1.20.3
     # via pandas
 packaging==20.9
     # via west
-pandas==1.2.4 ; platform_machine != "aarch64"
+pandas==1.2.4 ; platform_machine != "aarch64" and platform_machine != "arm64"
     # via -r requirements.txt
 parso==0.8.2
     # via jedi

@@ -90,7 +90,7 @@ public:
     /**
      *  @brief Get a TLVReader for the ClusterId. Next() must be called before accessing them.
      *
-     *  @param [in] apClusterId    A pointer to apClusterId
+     *  @param [in] apCluster    A pointer to apCluster
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
@@ -101,7 +101,7 @@ public:
     /**
      *  @brief Get a TLVReader for the EventId. Next() must be called before accessing them.
      *
-     *  @param [in] apEventId    A pointer to apEventId
+     *  @param [in] apEvent    A pointer to apEvent
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
@@ -110,9 +110,9 @@ public:
     CHIP_ERROR GetEvent(EventId * const apEvent) const;
 
     /**
-     *  @brief Get a TLVReader for the EventId. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the bool isUrgent. Next() must be called before accessing them.
      *
-     *  @param [in] apEventId    A pointer to apEventId
+     *  @param [in] apISUrgent  A pointer to apIsUrgent
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
@@ -136,7 +136,7 @@ public:
     /**
      *  @brief Inject Endpoint into the TLV stream.
      *
-     *  @param [in] aEndpoint EndpointId for this eevent path
+     *  @param [in] aEndpoint EndpointId for this event path
      *
      *  @return A reference to *this
      */
@@ -154,16 +154,16 @@ public:
     /**
      *  @brief Inject Event into the TLV stream.
      *
-     *  @param [in] aEvent ClusterId for this event path
+     *  @param [in] aEvent EventId for this event path
      *
      *  @return A reference to *this
      */
     EventPathIB::Builder & Event(const EventId aEvent);
 
     /**
-     *  @brief Inject EventId into the TLV stream.
+     *  @brief Inject urgent boolean into the TLV stream.
      *
-     *  @param [in] aEventId ClusterId for this event path
+     *  @param [in] aIsUrgent boolean for this event path
      *
      *  @return A reference to *this
      */

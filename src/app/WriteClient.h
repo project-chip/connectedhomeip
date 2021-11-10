@@ -66,10 +66,10 @@ public:
          * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call before it shuts down the object.
          *
-         * @param[in] apWriteClient: The write client object that initiated the write transaction.
-         * @param[in] aPath: The attribute path field in write response.
-         * @param[in] attributeStatus: Attribute-specific status, containing an InteractionModel::Status code as well as
-         *                             an optional cluster-specific status code.
+         * @param[in] apWriteClient   The write client object that initiated the write transaction.
+         * @param[in] aPath           The attribute path field in write response.
+         * @param[in] attributeStatus Attribute-specific status, containing an InteractionModel::Status code as well as
+         *                            an optional cluster-specific status code.
          */
         virtual void OnResponse(const WriteClient * apWriteClient, const ConcreteAttributePath & aPath, StatusIB attributeStatus) {}
 
@@ -84,8 +84,8 @@ public:
          * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call before it shuts down the object.
          *
-         * @param[in] apWriteClient: The write client object that initiated the attribute write transaction.
-         * @param[in] aError: A system error code that conveys the overall error code.
+         * @param[in] apWriteClient The write client object that initiated the attribute write transaction.
+         * @param[in] aError        A system error code that conveys the overall error code.
          */
         virtual void OnError(const WriteClient * apWriteClient, CHIP_ERROR aError) {}
 
@@ -98,7 +98,7 @@ public:
          *      - Be called even in error circumstances.
          *      - Only be called after a successful call to SendWriteRequest as been made.
          *
-         * @param[in] apWriteClient: The write client object of the terminated write transaction.
+         * @param[in] apWriteClient The write client object of the terminated write transaction.
          */
         virtual void OnDone(WriteClient * apWriteClient) = 0;
     };

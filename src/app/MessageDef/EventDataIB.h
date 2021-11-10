@@ -175,7 +175,7 @@ public:
      *  @brief Inject PriorityLevel into the TLV stream to indicate the priority level associated with
      *  the cluster that is referenced by the path.
      *
-     *  @param [in] aPriorityLevel This is an integer representation of the priority level.
+     *  @param [in] aPriority This is an integer representation of the priority level.
      *
      *  @return A reference to *this
      */

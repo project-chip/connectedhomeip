@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,14 +15,39 @@
  *    limitations under the License.
  */
 
-#include <platform/ConfigurationManager.h>
+/**
+ *    @file
+ *          Implements a getter and setter for a singleton ConfigurationManager object.
+ */
+
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-/** Singleton instance of the ConfigurationManager implementation object.
+class ConfigurationManager;
+
+namespace {
+
+/** Singleton pointer to the ConfigurationManager implementation.
  */
-ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
+ConfigurationManager * gInstance = nullptr;
+
+} // namespace
+
+ConfigurationManager & ConfigurationMgr()
+{
+    VerifyOrDie(gInstance != nullptr);
+    return *gInstance;
+}
+
+void SetConfigurationMgr(ConfigurationManager * configurationManager)
+{
+    if (configurationManager != nullptr)
+    {
+        gInstance = configurationManager;
+    }
+}
 
 } // namespace DeviceLayer
 } // namespace chip
