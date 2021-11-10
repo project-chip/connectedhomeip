@@ -132,25 +132,25 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(Mutab
     size_t offset = 0;
 
     // Add one to the length of each chunk, since snprintf writes a null terminator.
-    ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.SubSpan(offset, kManualSetupCodeChunk1CharLength + 1), chunk1));
+    ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.subspan(offset, kManualSetupCodeChunk1CharLength + 1), chunk1));
     offset += kManualSetupCodeChunk1CharLength;
-    ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.SubSpan(offset, kManualSetupCodeChunk2CharLength + 1), chunk2));
+    ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.subspan(offset, kManualSetupCodeChunk2CharLength + 1), chunk2));
     offset += kManualSetupCodeChunk2CharLength;
-    ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.SubSpan(offset, kManualSetupCodeChunk3CharLength + 1), chunk3));
+    ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.subspan(offset, kManualSetupCodeChunk3CharLength + 1), chunk3));
     offset += kManualSetupCodeChunk3CharLength;
 
     if (useLongCode)
     {
         ReturnErrorOnFailure(
-            decimalStringWithPadding(outBuffer.SubSpan(offset, kManualSetupVendorIdCharLength + 1), mPayloadContents.vendorID));
+            decimalStringWithPadding(outBuffer.subspan(offset, kManualSetupVendorIdCharLength + 1), mPayloadContents.vendorID));
         offset += kManualSetupVendorIdCharLength;
         ReturnErrorOnFailure(
-            decimalStringWithPadding(outBuffer.SubSpan(offset, kManualSetupProductIdCharLength + 1), mPayloadContents.productID));
+            decimalStringWithPadding(outBuffer.subspan(offset, kManualSetupProductIdCharLength + 1), mPayloadContents.productID));
         offset += kManualSetupProductIdCharLength;
     }
 
     int checkDigit = Verhoeff10::CharToVal(Verhoeff10::ComputeCheckChar(outBuffer.data()));
-    ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.SubSpan(offset, 2), static_cast<uint32_t>(checkDigit)));
+    ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.subspan(offset, 2), static_cast<uint32_t>(checkDigit)));
 
     return CHIP_NO_ERROR;
 }

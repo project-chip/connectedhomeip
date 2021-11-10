@@ -147,7 +147,7 @@ CHIP_ERROR BytesCircularBuffer::ReadFront(MutableByteSpan & dest) const
     if (dest.size() < length)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    dest = dest.SubSpan(0, length);
+    dest = dest.subspan(0, length);
 
     Read(dest.data(), length, sizeof(SizeType) /* offset */);
     return CHIP_NO_ERROR;

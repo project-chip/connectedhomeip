@@ -183,7 +183,7 @@ CHIP_ERROR ConvertIntegerRawToDerInternal(const ByteSpan & raw_integer, MutableB
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    out_der_integer = out_der_integer.SubSpan(0, actually_written);
+    out_der_integer = out_der_integer.subspan(0, actually_written);
 
     return CHIP_NO_ERROR;
 }
@@ -528,7 +528,7 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_
     // Write R (first `fe_length_bytes` block of raw signature)
     {
         MutableByteSpan out_der_integer(cursor, remaining);
-        ReturnErrorOnFailure(ConvertIntegerRawToDer(raw_sig.SubSpan(0, fe_length_bytes), out_der_integer));
+        ReturnErrorOnFailure(ConvertIntegerRawToDer(raw_sig.subspan(0, fe_length_bytes), out_der_integer));
         VerifyOrReturnError(out_der_integer.size() <= remaining, CHIP_ERROR_INTERNAL);
 
         integers_length += out_der_integer.size();
@@ -539,7 +539,7 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_
     // Write S (second `fe_length_bytes` block of raw signature)
     {
         MutableByteSpan out_der_integer(cursor, remaining);
-        ReturnErrorOnFailure(ConvertIntegerRawToDer(raw_sig.SubSpan(fe_length_bytes, fe_length_bytes), out_der_integer));
+        ReturnErrorOnFailure(ConvertIntegerRawToDer(raw_sig.subspan(fe_length_bytes, fe_length_bytes), out_der_integer));
         VerifyOrReturnError(out_der_integer.size() <= remaining, CHIP_ERROR_INTERNAL);
         integers_length += out_der_integer.size();
     }
@@ -575,7 +575,7 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_
     size_t actually_written = 0;
     VerifyOrReturnError(writer.Fit(actually_written), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    out_asn1_sig = out_asn1_sig.SubSpan(0, actually_written);
+    out_asn1_sig = out_asn1_sig.subspan(0, actually_written);
     return CHIP_NO_ERROR;
 }
 
@@ -612,7 +612,7 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1
     // Read S
     ReturnErrorOnFailure(ReadDerUnsignedIntegerIntoRaw(reader, MutableByteSpan{ raw_cursor, fe_length_bytes }));
 
-    out_raw_sig = out_raw_sig.SubSpan(0, (2u * fe_length_bytes));
+    out_raw_sig = out_raw_sig.subspan(0, (2u * fe_length_bytes));
 
     return CHIP_NO_ERROR;
 }
@@ -651,7 +651,7 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
     // Resize output to final bounds on success
     if (status == CHIP_NO_ERROR)
     {
-        out_compressed_fabric_id = out_compressed_fabric_id.SubSpan(0, kCompressedFabricIdentifierSize);
+        out_compressed_fabric_id = out_compressed_fabric_id.subspan(0, kCompressedFabricIdentifierSize);
     }
 
     return status;

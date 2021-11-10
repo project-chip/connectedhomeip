@@ -272,7 +272,7 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
 
     const int result = mbedtls_sha256_finish_ret(context, Uint8::to_uchar(out_buffer.data()));
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
-    out_buffer = out_buffer.SubSpan(0, kSHA256_Hash_Length);
+    out_buffer = out_buffer.subspan(0, kSHA256_Hash_Length);
 
     return CHIP_NO_ERROR;
 }

@@ -1160,7 +1160,7 @@ CHIP_ERROR CASESession::ConstructSaltSigma2(const ByteSpan & rand, const Crypto:
 
     size_t saltWritten = 0;
     VerifyOrReturnError(bbuf.Fit(saltWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
-    salt = salt.SubSpan(0, saltWritten);
+    salt = salt.subspan(0, saltWritten);
 
     return CHIP_NO_ERROR;
 }
@@ -1178,7 +1178,7 @@ CHIP_ERROR CASESession::ConstructSaltSigma3(const ByteSpan & ipk, MutableByteSpa
 
     size_t saltWritten = 0;
     VerifyOrReturnError(bbuf.Fit(saltWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
-    salt = salt.SubSpan(0, saltWritten);
+    salt = salt.subspan(0, saltWritten);
 
     return CHIP_NO_ERROR;
 }

@@ -421,7 +421,7 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
     SHA256_CTX * const context = to_inner_hash_sha256_context(&mContext);
     const int result           = SHA256_Final(Uint8::to_uchar(out_buffer.data()), context);
     VerifyOrReturnError(result == 1, CHIP_ERROR_INTERNAL);
-    out_buffer = out_buffer.SubSpan(0, kSHA256_Hash_Length);
+    out_buffer = out_buffer.subspan(0, kSHA256_Hash_Length);
 
     return CHIP_NO_ERROR;
 }

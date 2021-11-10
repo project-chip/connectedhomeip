@@ -183,7 +183,7 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize());
-    attestationElements = attestationElements.SubSpan(0, tlvWriter.GetLengthWritten());
+    attestationElements = attestationElements.subspan(0, tlvWriter.GetLengthWritten());
 
     return CHIP_NO_ERROR;
 }

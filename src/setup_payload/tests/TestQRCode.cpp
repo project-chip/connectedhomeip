@@ -124,22 +124,22 @@ void TestBase38(nlTestSuite * inSuite, void * inContext)
     MutableCharSpan encodedSpan(encodedBuf);
 
     // basic stuff
-    base38Encode(inputSpan.SubSpan(0, 0), encodedSpan);
+    base38Encode(inputSpan.subspan(0, 0), encodedSpan);
     NL_TEST_ASSERT(inSuite, strlen(encodedBuf) == 0);
-    base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
+    base38Encode(inputSpan.subspan(0, 1), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "A0") == 0);
-    base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
+    base38Encode(inputSpan.subspan(0, 2), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "OT10") == 0);
     base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "-N.B0") == 0);
 
     // test null termination of output buffer
-    MutableCharSpan subSpan = encodedSpan.SubSpan(0, 2);
-    NL_TEST_ASSERT(inSuite, base38Encode(inputSpan.SubSpan(0, 1), subSpan) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    MutableCharSpan subSpan = encodedSpan.subspan(0, 2);
+    NL_TEST_ASSERT(inSuite, base38Encode(inputSpan.subspan(0, 1), subSpan) == CHIP_ERROR_BUFFER_TOO_SMALL);
     // Force no nulls in output buffer
     memset(encodedSpan.data(), '?', encodedSpan.size());
-    subSpan = encodedSpan.SubSpan(0, 3);
-    base38Encode(inputSpan.SubSpan(0, 1), subSpan);
+    subSpan = encodedSpan.subspan(0, 3);
+    base38Encode(inputSpan.subspan(0, 1), subSpan);
     size_t encodedLen = strnlen(encodedSpan.data(), ArraySize(encodedBuf));
     NL_TEST_ASSERT(inSuite, encodedLen == strlen("A0"));
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "A0") == 0);
@@ -168,12 +168,12 @@ void TestBase38(nlTestSuite * inSuite, void * inContext)
     // verify chunks of 1,2 and 3 bytes result in fixed-length strings padded with '0'
     // for 1 byte we need always 2 characters
     input[0] = 35;
-    base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
+    base38Encode(inputSpan.subspan(0, 1), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "Z0") == 0);
     // for 2 bytes we need always 4 characters
     input[0] = 255;
     input[1] = 0;
-    base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
+    base38Encode(inputSpan.subspan(0, 2), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "R600") == 0);
     // for 3 bytes we need always 5 characters
     input[0] = 46;
@@ -185,12 +185,12 @@ void TestBase38(nlTestSuite * inSuite, void * inContext)
     // verify maximum available values for each chunk size to check selecting proper characters number
     // for 1 byte we need 2 characters
     input[0] = 255;
-    base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
+    base38Encode(inputSpan.subspan(0, 1), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "R6") == 0);
     // for 2 bytes we need 4 characters
     input[0] = 255;
     input[1] = 255;
-    base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
+    base38Encode(inputSpan.subspan(0, 2), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "NE71") == 0);
     // for 3 bytes we need 5 characters
     input[0] = 255;

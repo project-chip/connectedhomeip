@@ -82,7 +82,7 @@ public:
     template <class U, size_t N, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
     inline bool data_equal(const FixedSpan<U, N> & other) const;
 
-    Span SubSpan(size_t offset, size_t length) const
+    Span subspan(size_t offset, size_t length) const
     {
         VerifyOrDie(offset <= mDataLen);
         VerifyOrDie(length <= mDataLen - offset);
