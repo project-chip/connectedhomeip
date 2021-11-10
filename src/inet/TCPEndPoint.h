@@ -75,8 +75,9 @@ class DLL_EXPORT TCPEndPoint : public EndPointBasis, public ReferenceCounted<TCP
 
 public:
     TCPEndPoint(InetLayer & inetLayer, void * appState = nullptr) :
-        EndPointBasis(inetLayer, appState), mState(State::kReady), mReceiveEnabled(true),
-        mConnectTimeoutMsecs(0) // Initialize to zero for using system defaults.
+        EndPointBasis(inetLayer, appState), OnConnectComplete(nullptr), OnDataReceived(nullptr), OnDataSent(nullptr),
+        OnConnectionClosed(nullptr), OnPeerClose(nullptr), OnConnectionReceived(nullptr), OnAcceptError(nullptr),
+        mState(State::kReady), mReceiveEnabled(true), mConnectTimeoutMsecs(0) // Initialize to zero for using system defaults.
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
         ,
         mUserTimeoutMillis(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC), mUserTimeoutTimerRunning(false)

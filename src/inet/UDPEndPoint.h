@@ -63,7 +63,11 @@ public:
 class DLL_EXPORT UDPEndPoint : public EndPointBasis, public ReferenceCounted<UDPEndPoint, UDPEndPointDeletor>
 {
 public:
-    UDPEndPoint(InetLayer & inetLayer, void * appState = nullptr) : EndPointBasis(inetLayer, appState) { InitImpl(); }
+    UDPEndPoint(InetLayer & inetLayer, void * appState = nullptr) :
+        EndPointBasis(inetLayer, appState), mState(State::kReady), OnMessageReceived(nullptr), OnReceiveError(nullptr)
+    {
+        InitImpl();
+    }
 
     UDPEndPoint(const UDPEndPoint &) = delete;
     UDPEndPoint(UDPEndPoint &&)      = delete;
