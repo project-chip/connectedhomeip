@@ -25,6 +25,8 @@
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
 
+#ifdef ENABLE_HSM_DEVICE_ATTESTATION
+
 #define DEV_ATTESTATION_KEY 0xDADADADA
 
 namespace chip {
@@ -229,3 +231,5 @@ DeviceAttestationCredentialsProvider * GetExampleSe05xDACProvider()
 } // namespace Examples
 } // namespace Credentials
 } // namespace chip
+
+#endif //#ifdef ENABLE_HSM_DEVICE_ATTESTATION
