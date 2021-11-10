@@ -23,12 +23,19 @@
 
 #pragma once
 
+#include <lib/support/CodeUtils.h>
+
 #include <array>
 #include <assert.h>
 #include <atomic>
 #include <limits>
 #include <new>
 #include <stddef.h>
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+#include <mutex>
+#include <set>
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 namespace chip {
 
@@ -159,5 +166,108 @@ private:
         T mMemoryViewForDebug[N]; // Just for debugger
     } mData;
 };
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+/**
+ *  @brief
+ *      A class template used for allocating Object subclass objects from an ObjectArena<> template union.
+ *
+ *  @tparam     T   a class to be allocated from the arena.
+ */
+template <class T>
+class HeapObjectPool
+{
+public:
+    template <typename... Args>
+    T * CreateObject(Args &&... args)
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        T * object = new T(std::forward<Args>(args)...);
+        if (object == nullptr)
+        {
+            return nullptr;
+        }
+
+        mObjects.insert(object);
+        return object;
+    }
+
+    void ReleaseObject(T * object)
+    {
+        if (object == nullptr)
+            return;
+
+        std::lock_guard<std::mutex> lock(mutex);
+        auto iter = mObjects.find(object);
+        VerifyOrDie(iter != mObjects.end());
+        mObjects.erase(iter);
+        delete object;
+    }
+
+    template <typename... Args>
+    void ResetObject(T * element, Args &&... args)
+    {
+        element->~T();
+        new (element) T(std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief
+     *   Run a functor for each active object in the pool
+     *
+     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
+     *  @return    bool     Returns false if broke during iteration
+     */
+    template <typename Function>
+    bool ForEachActiveObject(Function && function)
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        // Create a new copy of original set, allowing add/remove elements while iterating in the same thread.
+        for (auto object : std::set<T *>(mObjects))
+        {
+            if (!function(object))
+                return false;
+        }
+        return true;
+    }
+
+private:
+    std::mutex mutex;
+    std::set<T *> mObjects;
+};
+
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+template <typename T, unsigned int N>
+using ObjectPool = HeapObjectPool<T>;
+#else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+template <typename T, unsigned int N>
+using ObjectPool = BitMapObjectPool<T, N>;
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+enum class ObjectPoolMem
+{
+    kStatic,
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    kDynamic
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+};
+
+template <typename T, size_t N, ObjectPoolMem P>
+class MemTypeObjectPool;
+
+template <typename T, size_t N>
+class MemTypeObjectPool<T, N, ObjectPoolMem::kStatic> : public BitMapObjectPool<T, N>
+{
+};
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+template <typename T, size_t N>
+class MemTypeObjectPool<T, N, ObjectPoolMem::kDynamic> : public HeapObjectPool<T>
+{
+};
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 } // namespace chip

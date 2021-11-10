@@ -129,6 +129,71 @@ void TestCreateReleaseStruct(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+void TestReleaseNullDynamic(nlTestSuite * inSuite, void * inContext)
+{
+    HeapObjectPool<uint32_t> pool;
+    pool.ReleaseObject(nullptr);
+    // Not crashing is good.
+}
+
+void TestCreateReleaseObjectDynamic(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr const size_t size = 100;
+    HeapObjectPool<uint32_t> pool;
+    uint32_t * obj[size];
+    for (size_t i = 0; i < size; ++i)
+    {
+        obj[i] = pool.CreateObject();
+        NL_TEST_ASSERT(inSuite, obj[i] != nullptr);
+        for (size_t j = 0; j < i; ++j)
+        {
+            NL_TEST_ASSERT(inSuite, obj[i] != obj[j]);
+        }
+    }
+
+    pool.ReleaseObject(obj[55]);
+    obj[55] = pool.CreateObject();
+    NL_TEST_ASSERT(inSuite, obj[55] != nullptr);
+
+    for (size_t i = 0; i < size; ++i)
+    {
+        pool.ReleaseObject(obj[i]);
+    }
+}
+
+void TestCreateReleaseStructDynamic(nlTestSuite * inSuite, void * inContext)
+{
+    struct S
+    {
+        S(std::set<S *> & set) : mSet(set) { mSet.insert(this); }
+        ~S() { mSet.erase(this); }
+        std::set<S *> & mSet;
+    };
+
+    std::set<S *> objs1;
+
+    constexpr const size_t size = 100;
+    HeapObjectPool<S> pool;
+    S * objs2[size];
+    for (size_t i = 0; i < size; ++i)
+    {
+        objs2[i] = pool.CreateObject(objs1);
+        NL_TEST_ASSERT(inSuite, objs2[i] != nullptr);
+        for (size_t j = 0; j < i; ++j)
+        {
+            NL_TEST_ASSERT(inSuite, objs2[i] != objs2[j]);
+        }
+    }
+    for (size_t i = 0; i < size; ++i)
+    {
+        pool.ReleaseObject(objs2[i]);
+    }
+}
+
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
 int Setup(void * inContext)
 {
     return SUCCESS;
@@ -145,8 +210,19 @@ int Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestReleaseNull), NL_TEST_DEF_FN(TestCreateReleaseObject),
-                                 NL_TEST_DEF_FN(TestCreateReleaseStruct), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = {
+    // clang-format off
+    NL_TEST_DEF_FN(TestReleaseNull),
+    NL_TEST_DEF_FN(TestCreateReleaseObject),
+    NL_TEST_DEF_FN(TestCreateReleaseStruct),
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    NL_TEST_DEF_FN(TestReleaseNullDynamic),
+    NL_TEST_DEF_FN(TestCreateReleaseObjectDynamic),
+    NL_TEST_DEF_FN(TestCreateReleaseStructDynamic),
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    NL_TEST_SENTINEL()
+    // clang-format on
+};
 
 int TestPool()
 {
