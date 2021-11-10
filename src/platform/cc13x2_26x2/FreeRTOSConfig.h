@@ -106,7 +106,7 @@
 #define configTIMER_TASK_PRIORITY (6)
 #define configTIMER_QUEUE_LENGTH (20)
 #define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 2)
-
+#define configIDLE_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE)
 #define configENABLE_BACKWARD_COMPATIBILITY 1
 
 #if defined(__TI_COMPILER_VERSION__) || defined(__ti_version__)

@@ -166,12 +166,14 @@ int AppTask::Init()
     Button_Params_init(&buttonParams);
     buttonParams.buttonEventMask   = Button_EV_CLICKED;
     buttonParams.longPressDuration = 1000U; // ms
-    sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, ButtonLeftEventHandler, &buttonParams);
+    sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
+    Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
 
     Button_Params_init(&buttonParams);
     buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGPRESSED;
     buttonParams.longPressDuration = 5000U; // ms
-    sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, ButtonRightEventHandler, &buttonParams);
+    sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
+    Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
 
     // Initialize Pump module
     PLAT_LOG("Initialize Pump");
@@ -182,7 +184,7 @@ int AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlag::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     return 0;
 }

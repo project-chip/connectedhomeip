@@ -145,7 +145,7 @@ ECJPAKE1.$name = "CONFIG_ECJPAKE_0";
 
 NVS1.$name                    = "CONFIG_NVSINTERNAL";
 NVS1.internalFlash.$name      = "ti_drivers_nvs_NVSCC26XX0";
-NVS1.internalFlash.regionBase = 0x78000;
+NVS1.internalFlash.regionBase = 0xAA000;
 NVS1.internalFlash.regionSize = 0x4000;
 
 RTOS.name = "FreeRTOS";
@@ -169,25 +169,33 @@ UART2.$name               = "CONFIG_DISPLAY_UART";
 UART2.txPinInstance.$name = "CONFIG_PIN_6";
 UART2.rxPinInstance.$name = "CONFIG_PIN_7";
 
-Button1.$name                     = "CONFIG_BTN_LEFT";
-Button1.gpioPin.$name             = "CONFIG_GPIO_BTN1";
-Button1.gpioPin.gpioPin.$assign   = "boosterpack.32";
-Button1.gpioPin.pinInstance.$name = "CONFIG_PIN_BTN1";
+/* Left Button */
+Button1.$name                       = "CONFIG_BTN_LEFT";
+Button1.$hardware                   = system.deviceData.board.components["BTN-1"];
+Button1.gpioPin.$name               = "CONFIG_GPIO_BTN1";
+Button1.gpioPin.pull                = "Pull Up";
+Button1.gpioPin.interruptTrigger    = "Falling Edge";
 
-Button2.$name                     = "CONFIG_BTN_RIGHT";
-Button2.gpioPin.$name             = "CONFIG_GPIO_BTN2";
-Button2.gpioPin.gpioPin.$assign   = "boosterpack.13";
-Button2.gpioPin.pinInstance.$name = "CONFIG_PIN_BTN2";
+/* Left Button */
+Button2.$name                       = "CONFIG_BTN_RIGHT";
+Button2.$hardware                   = system.deviceData.board.components["BTN-2"];
+Button2.gpioPin.$name               = "CONFIG_GPIO_BTN2";
+Button2.gpioPin.pull                = "Pull Up";
+Button2.gpioPin.interruptTrigger    = "Falling Edge";
 
-LED1.$name                     = "CONFIG_LED_RED";
-LED1.gpioPin.$name             = "CONFIG_GPIO_RLED";
-LED1.gpioPin.gpioPin.$assign   = "boosterpack.10";
-LED1.gpioPin.pinInstance.$name = "CONFIG_PIN_RLED";
+/* Red LED */
+LED1.$name                      = "CONFIG_LED_RED";
+LED1.$hardware                  = system.deviceData.board.components.LED_RED;
+LED1.gpioPin.$name              = "CONFIG_GPIO_RLED";
+LED1.gpioPin.mode               = "Output";
+LED1.gpioPin.callbackFunction   = "";
 
-LED2.$name                     = "CONFIG_LED_GREEN";
-LED2.gpioPin.$name             = "CONFIG_GPIO_GLED";
-LED2.gpioPin.gpioPin.$assign   = "boosterpack.39";
-LED2.gpioPin.pinInstance.$name = "CONFIG_PIN_GLED";
+/* Green LED */
+LED2.$name                      = "CONFIG_LED_GREEN";
+LED2.$hardware                  = system.deviceData.board.components.LED_GREEN;
+LED2.gpioPin.$name              = "CONFIG_GPIO_GLED";
+LED2.gpioPin.mode               = "Output";
+LED2.gpioPin.callbackFunction   = "";
 
 thread.deviceTypeReadOnly                    = true;
 thread.pm.$name                              = "ti_thread_pm_thread_pm0";

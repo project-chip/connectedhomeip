@@ -75,8 +75,8 @@ section will need to be done when migrating to new versions of the SDK.
         packaged with the TI SDK. Check the following section for a list of
         changes needed.
 
--   Download and install [SysConfig][sysconfig]
-    ([sysconfig-1.5.0_1397][sysconfig-1.5.0_1397])
+-   Download and install [SysConfig][sysconfig] ([recommended
+    version][sysconfig_recommended])
 
     -   This may have already been installed with your SimpleLink SDK install.
 
@@ -100,7 +100,7 @@ section will need to be done when migrating to new versions of the SDK.
 
     ```
     $ cd ~/connectedhomeip
-    $ source ./script/bootstrap.sh
+    $ source ./scripts/bootstrap.sh
 
     ```
 
@@ -113,21 +113,21 @@ Ninja to build the executable.
 
     ```
     $ cd ~/connectedhomeip
-    $ source ./script/activate.sh
+    $ source ./scripts/activate.sh
 
     ```
 
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/simplelink_cc13x2_26x2_sdk_4_40_05_02_eng` and
-    `/home/username/ti/sysconfig_1.6.0`. On Windows the default directory is
-    `C:\ti`
+    `/home/username/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng` and
+    `/home/username/ti/sysconfig_1.10.0`. On Windows the default directory is
+    `C:\ti`.
 
     ```
-    $ cd ~/connectedhomeip/examples/pump-app/cc13x2_26x2
-    $ export TI_SIMPLELINK_SDK_ROOT=<path-to-simplelink-sdk>
-    $ export TI_SYSCONFIG_ROOT=<path-to-sysconfig-sdk>
+    $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
+    $ export TI_SIMPLELINK_SDK_ROOT=$HOME/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng
+    $ export TI_SYSCONFIG_ROOT=$HOME/ti/sysconfig_1.10.0
     $ gn gen out/debug --args="ti_simplelink_sdk_root=\"${TI_SIMPLELINK_SDK_ROOT}\" ti_sysconfig_root=\"${TI_SYSCONFIG_ROOT}\""
     $ ninja -C out/debug
 
@@ -220,12 +220,9 @@ Additionally, we welcome any feedback.
 [matter]: https://github.com/project-chip/connectedhomeip
 [cc1352r1_launchxl]: https://www.ti.com/tool/LAUNCHXL-CC1352R1
 [e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
-[simplelink_sdk]: https://www.ti.com/tool/SIMPLELINK-CC13X2-26X2-SDK
-[simplelink_sdk_4.30.00.54]:
-    https://www.ti.com/tool/download/SIMPLELINK-CC13X2-26X2-SDK/4.30.00.54
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
-[sysconfig-1.5.0_1397]:
-    http://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.5.0_1397-setup.run
+[sysconfig_recommended]:
+    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.10.0_2163-setup.run
 [ti_thread_dnd]:
     https://www.ti.com/wireless-connectivity/thread/design-development.html
 [ti_cc13x2_26x2_r7_matter_request]: https://ti.com/chip_sdk
