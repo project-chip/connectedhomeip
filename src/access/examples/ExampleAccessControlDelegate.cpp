@@ -130,7 +130,7 @@ private:
     static bool IsValid(NodeId node) { return node != kUndefinedNodeId; }
 
 private:
-    static_assert(sizeof(NodeId) == 8);
+    static_assert(sizeof(NodeId) == 8, "Expecting 8 byte node ID");
 
 private:
     NodeId mNode;
@@ -206,14 +206,10 @@ private:
         constexpr Target::Flags kNotAll     = Target::kEndpoint | Target::kDeviceType;
         constexpr Target::Flags kAtLeastOne = kNotAll | Target::kCluster;
         constexpr Target::Flags kNone       = ~kAtLeastOne;
-        const auto & flags                  = target.flags;
-        const auto & cluster                = target.cluster;
-        const auto & endpoint               = target.endpoint;
-        const auto & deviceType             = target.deviceType;
-        return ((flags & kNone) == 0) && ((flags & kAtLeastOne) != 0) && ((flags & kNotAll) != kNotAll) &&
-            !((flags & Target::kCluster) && !IsValidCluster(cluster)) &&
-            !((flags & Target::kEndpoint) && !IsValidEndpoint(endpoint)) &&
-            !((flags & Target::kDeviceType) && !IsValidDeviceType(deviceType));
+        return ((target.flags & kNone) == 0) && ((target.flags & kAtLeastOne) != 0) && ((target.flags & kNotAll) != kNotAll) &&
+            !((target.flags & Target::kCluster) && !IsValidCluster(target.cluster)) &&
+            !((target.flags & Target::kEndpoint) && !IsValidEndpoint(target.endpoint)) &&
+            !((target.flags & Target::kDeviceType) && !IsValidDeviceType(target.deviceType));
     }
 
 private:
@@ -274,9 +270,9 @@ private:
     }
 
 private:
-    static_assert(sizeof(ClusterId) == 4);
-    static_assert(sizeof(EndpointId) == 2);
-    static_assert(sizeof(DeviceTypeId) == 4);
+    static_assert(sizeof(ClusterId) == 4, "Expecting 4 byte cluster ID");
+    static_assert(sizeof(EndpointId) == 2, "Expecting 2 byte endpoint ID");
+    static_assert(sizeof(DeviceTypeId) == 4, "Expecting 4 byte device type ID");
 
     // (mCluster == kClusterEmpty) --> mCluster contains no cluster
     static constexpr ClusterId kClusterEmpty = 0xFFFFFFFF;
@@ -1046,9 +1042,9 @@ private:
     CHIP_ERROR SaveToFlash() { return CHIP_NO_ERROR; }
 };
 
-static_assert(std::is_pod<SubjectStorage>());
-static_assert(std::is_pod<TargetStorage>());
-static_assert(std::is_pod<EntryStorage>());
+static_assert(std::is_pod<SubjectStorage>(), "Storage type must be POD");
+static_assert(std::is_pod<TargetStorage>(), "Storage type must be POD");
+static_assert(std::is_pod<EntryStorage>(), "Storage type must be POD");
 
 EntryStorage EntryStorage::acl[];
 EntryStorage EntryStorage::pool[];

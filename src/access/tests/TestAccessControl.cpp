@@ -209,20 +209,20 @@ CHIP_ERROR CompareEntry(const Entry & entry, const EntryData & entryData)
     size_t subjectCount;
     ReturnErrorOnFailure(entry.GetSubjectCount(subjectCount));
     ReturnErrorCodeIf(subjectCount != entryData.GetSubjectCount(), CHIP_ERROR_INCORRECT_STATE);
-    for (size_t j = 0; j < subjectCount; ++j)
+    for (size_t i = 0; i < subjectCount; ++i)
     {
         NodeId subject;
-        ReturnErrorOnFailure(entry.GetSubject(j, subject));
-        ReturnErrorCodeIf(subject != entryData.subjects[j], CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(entry.GetSubject(i, subject));
+        ReturnErrorCodeIf(subject != entryData.subjects[i], CHIP_ERROR_INCORRECT_STATE);
     }
     size_t targetCount;
     ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
     ReturnErrorCodeIf(targetCount != entryData.GetTargetCount(), CHIP_ERROR_INCORRECT_STATE);
-    for (size_t j = 0; j < targetCount; ++j)
+    for (size_t i = 0; i < targetCount; ++i)
     {
         Target target;
-        ReturnErrorOnFailure(entry.GetTarget(j, target));
-        ReturnErrorCodeIf(target != entryData.targets[j], CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(entry.GetTarget(i, target));
+        ReturnErrorCodeIf(target != entryData.targets[i], CHIP_ERROR_INCORRECT_STATE);
     }
     return CHIP_NO_ERROR;
 }

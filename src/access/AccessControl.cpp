@@ -26,16 +26,16 @@ using namespace chip::Access;
 AccessControl defaultAccessControl;
 AccessControl * globalAccessControl = &defaultAccessControl;
 
-static_assert((int(Privilege::kAdminister) & int(Privilege::kManage)) == 0);
-static_assert((int(Privilege::kAdminister) & int(Privilege::kOperate)) == 0);
-static_assert((int(Privilege::kAdminister) & int(Privilege::kView)) == 0);
-static_assert((int(Privilege::kAdminister) & int(Privilege::kProxyView)) == 0);
-static_assert((int(Privilege::kManage) & int(Privilege::kOperate)) == 0);
-static_assert((int(Privilege::kManage) & int(Privilege::kView)) == 0);
-static_assert((int(Privilege::kManage) & int(Privilege::kProxyView)) == 0);
-static_assert((int(Privilege::kOperate) & int(Privilege::kView)) == 0);
-static_assert((int(Privilege::kOperate) & int(Privilege::kProxyView)) == 0);
-static_assert((int(Privilege::kView) & int(Privilege::kProxyView)) == 0);
+static_assert((int(Privilege::kAdminister) & int(Privilege::kManage)) == 0, "Privilege bits must be unique");
+static_assert((int(Privilege::kAdminister) & int(Privilege::kOperate)) == 0, "Privilege bits must be unique");
+static_assert((int(Privilege::kAdminister) & int(Privilege::kView)) == 0, "Privilege bits must be unique");
+static_assert((int(Privilege::kAdminister) & int(Privilege::kProxyView)) == 0, "Privilege bits must be unique");
+static_assert((int(Privilege::kManage) & int(Privilege::kOperate)) == 0, "Privilege bits must be unique");
+static_assert((int(Privilege::kManage) & int(Privilege::kView)) == 0, "Privilege bits must be unique");
+static_assert((int(Privilege::kManage) & int(Privilege::kProxyView)) == 0, "Privilege bits must be unique");
+static_assert((int(Privilege::kOperate) & int(Privilege::kView)) == 0, "Privilege bits must be unique");
+static_assert((int(Privilege::kOperate) & int(Privilege::kProxyView)) == 0, "Privilege bits must be unique");
+static_assert((int(Privilege::kView) & int(Privilege::kProxyView)) == 0, "Privilege bits must be unique");
 
 bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Privilege entryPrivilege)
 {
