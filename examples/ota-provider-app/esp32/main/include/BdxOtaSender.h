@@ -38,7 +38,7 @@ enum BdxSenderErrorTypes
  * @param[out] isEof    Flag which tells whether it is final block or not
  * @param[in]  offset   Offset to read data from
  *
- * @return \c CHIP_NO_ERROR on success; return appropriate error code otherwise
+ * @return CHIP_NO_ERROR on success; return appropriate error code otherwise
  */
 typedef CHIP_ERROR (*OnBdxBlockQuery)(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof,
                                       uint32_t offset);
