@@ -65,6 +65,11 @@ SessionHandle MessagingContext::GetSessionAliceToBob()
     return SessionHandle(GetBobNodeId(), GetAliceKeyId(), GetBobKeyId(), mDestFabricIndex);
 }
 
+SessionHandle MessagingContext::GetSessionBobToFriends()
+{
+    return SessionHandle(GetBobKeyId(), GetFriendsGroupId(), GetFabricIndex());
+}
+
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
     return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mAliceAddress).Value(), delegate);

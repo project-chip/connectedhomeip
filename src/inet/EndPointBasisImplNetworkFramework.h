@@ -34,7 +34,7 @@ namespace Inet {
 class DLL_EXPORT EndPointImplNetworkFramework : public EndPointBase
 {
 protected:
-    void InitEndPointBasisImpl() override {}
+    EndPointImplNetworkFramework(InetLayer & inetLayer, void * appState = nullptr) : EndPointBase(inetLayer, appState) {}
 
     nw_parameters_t mParameters;
     IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */

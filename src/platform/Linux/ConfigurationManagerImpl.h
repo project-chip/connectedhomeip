@@ -34,16 +34,17 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Linux platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                       private Internal::PosixConfig
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+                                 private Internal::PosixConfig
 {
 public:
-    CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
-    CHIP_ERROR StoreRebootCount(uint32_t rebootCount);
-    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
-    CHIP_ERROR GetBootReasons(uint32_t & bootReasons);
-    CHIP_ERROR StoreBootReasons(uint32_t bootReasons);
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetBootReasons(uint32_t & bootReasons) override;
+    CHIP_ERROR StoreBootReasons(uint32_t bootReasons) override;
+    static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
@@ -68,39 +69,10 @@ private:
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
-    // ===== Members for internal use by the following friends.
-
-    friend ConfigurationManager & ConfigurationMgr();
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl();
-
-    static ConfigurationManagerImpl sInstance;
-
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
 };
-
-/**
- * Returns the public interface of the ConfigurationManager singleton object.
- *
- * chip applications should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
- */
-inline ConfigurationManager & ConfigurationMgr()
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
- *
- * chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the ESP32 platform.
- */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl()
-{
-    return ConfigurationManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip
