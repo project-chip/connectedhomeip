@@ -256,6 +256,11 @@ void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::Fabri
 {
     Server * server           = &(Server::GetInstance());
     chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(peerFabricIndex);
+    if (fabric == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Did not find fabric for index %d", peerFabricIndex);
+        return;
+    }
 
     chip::DeviceProxyInitParams initParams = {
         .sessionManager = &(server->GetSecureSessionManager()),
@@ -266,9 +271,14 @@ void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::Fabri
         .imDelegate = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
     };
 
-    PeerId peerID = fabric->GetPeerId();
-    peerID.SetNodeId(peerNodeId);
-    chip::OperationalDeviceProxy * operationalDeviceProxy = new chip::OperationalDeviceProxy(initParams, peerID);
+    chip::OperationalDeviceProxy * operationalDeviceProxy =
+        chip::Platform::New<chip::OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(peerNodeId));
+    if (operationalDeviceProxy == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Failed in creating an instance of OperationalDeviceProxy");
+        return;
+    }
+
     server->SetOperationalDeviceProxy(operationalDeviceProxy);
 
     // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node ID
@@ -281,8 +291,7 @@ void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::Fabri
     operationalDeviceProxy->GetMRPIntervals(idleInterval, activeInterval);
     operationalDeviceProxy->UpdateDeviceData(addr, idleInterval, activeInterval);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
+    CHIP_ERROR err = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot establish connection to peer device: %" CHIP_ERROR_FORMAT, err.Format());
