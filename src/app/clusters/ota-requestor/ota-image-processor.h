@@ -37,7 +37,6 @@ public:
     virtual CHIP_ERROR ProcessBlock(ByteSpan & data) = 0;
 
     // Close file, close persistent storage, etc
-    // (probably should not actually apply the image)
     virtual CHIP_ERROR Finalize() = 0;
 
     virtual chip::Optional<uint8_t> PercentComplete() = 0;
@@ -45,26 +44,4 @@ public:
     // Clean up the download which could mean erasing everything that was written,
     // releasing buffers, etc.
     virtual CHIP_ERROR Abort() = 0;
-};
-
-// A class that abstracts the image download functionality from the particular
-// protocol used for that (BDX or possibly HTTPS)
-class OTADownloader : public BlockWriter
-{
-public:
-    // API declarations start
-
-    // Application calls this method to direct OTADownloader to begin the download
-    void BeginDownload();
-
-    // Platform calls this method upon the completion of PrepareDownload() processing
-    void OnDownloadPrepared();
-
-    // Platform calls this method upon the completion of ProcessBlock() processing
-    void OnBlockProcessed(action);
-
-    // API declarations end
-
-    // Invoked by an incoming block
-    void HandleBlock();
 };

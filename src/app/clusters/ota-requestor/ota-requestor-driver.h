@@ -32,7 +32,7 @@ public:
     // A call into the application logic to give it a chance to allow or stop the Requestor
     // from proceeding with actual image download. Returning TRUE will allow the download
     // to proceed, returning FALSE will abort the download process.
-    virtual bool AllowImageDownload() = 0;
+    virtual bool CheckImageDownloadAllowed() = 0;
 
     // Notify the application that the download is complete and the image can be applied
     virtual void ImageDownloadComplete() = 0;
