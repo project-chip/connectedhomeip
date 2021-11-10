@@ -55,6 +55,7 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/retransmit/tests",
     ]
 
+    # Skip DNSSD tests for Mbed platform due to flash memory size limitations
     if (current_os != "mbed") {
       deps += [
         "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
