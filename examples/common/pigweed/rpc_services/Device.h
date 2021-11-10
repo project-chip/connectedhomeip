@@ -77,7 +77,9 @@ public:
         if (DeviceLayer::ConfigurationMgr().GetVendorId(vendor_id) == CHIP_NO_ERROR)
         {
             response.vendor_id = static_cast<uint32_t>(vendor_id);
-        } else {
+        }
+        else
+        {
             response.vendor_id = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
         }
 
@@ -85,7 +87,9 @@ public:
         if (DeviceLayer::ConfigurationMgr().GetProductId(product_id) == CHIP_NO_ERROR)
         {
             response.product_id = static_cast<uint32_t>(product_id);
-        } else {
+        }
+        else
+        {
             response.product_id = CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID;
         }
 
@@ -93,7 +97,9 @@ public:
         if (DeviceLayer::ConfigurationMgr().GetFirmwareRevision(software_version) == CHIP_NO_ERROR)
         {
             response.software_version = software_version;
-        } else {
+        }
+        else
+        {
             response.software_version = CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_REVISION;
         }
 
