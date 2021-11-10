@@ -96,7 +96,8 @@ void AndroidChipPlatformJNI_OnUnload(JavaVM * jvm, void * reserved)
     chip::Platform::MemoryShutdown();
 }
 
-JNI_METHOD(void, initChipStack)(JNIEnv * env, jobject self) {
+JNI_METHOD(void, initChipStack)(JNIEnv * env, jobject self)
+{
     CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Error initializing CHIP stack: %s", ErrorStr(err)));
 }
