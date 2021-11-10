@@ -149,23 +149,19 @@ CHIP_ERROR InetLayer::Shutdown()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    // Abort all TCP endpoints owned by this instance.
-    TCPEndPointImpl::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-        if ((lEndPoint != nullptr) && &lEndPoint->Layer() == this)
-        {
-            lEndPoint->Abort();
-        }
+    // Abort all TCP endpoints owned by this instance. (There should be none.)
+    ForEachTCPEndPoint([](TCPEndPoint * lEndPoint) -> bool {
+        ChipLogError(Inet, "Leaked TCP endpoint");
+        lEndPoint->Abort();
         return true;
     });
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    // Close all UDP endpoints owned by this instance.
-    UDPEndPointImpl::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
-        if ((lEndPoint != nullptr) && &lEndPoint->Layer() == this)
-        {
-            lEndPoint->Close();
-        }
+    // Close all UDP endpoints owned by this instance. (There should be none.)
+    ForEachUDPEndPoint([](UDPEndPoint * lEndPoint) -> bool {
+        ChipLogError(Inet, "Leaked UDP endpoint");
+        lEndPoint->Close();
         return true;
     });
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
@@ -203,23 +199,13 @@ void InetLayer::SetPlatformData(void * aPlatformData)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
 bool InetLayer::IsIdleTimerRunning()
 {
-    bool timerRunning = false;
-
     // See if there are any TCP connections with the idle timer check in use.
-    TCPEndPointImpl::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-        if ((lEndPoint != nullptr) && (lEndPoint->mIdleTimeout != 0))
-        {
-            timerRunning = true;
-            return false;
-        }
-        return true;
-    });
-
-    return timerRunning;
+    return !ForEachTCPEndPoint([](TCPEndPoint * lEndPoint) { return (lEndPoint->mIdleTimeout == 0); });
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 /**
  *  Creates a new TCPEndPoint object.
  *
@@ -245,7 +231,7 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = TCPEndPointImpl::sPool.CreateObject(*this);
+    *retEndPoint = CreateTCPEndPoint(*this);
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "TCP");
@@ -256,6 +242,7 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     return CHIP_NO_ERROR;
 }
+
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
@@ -284,7 +271,7 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = UDPEndPointImpl::sPool.CreateObject(*this);
+    *retEndPoint = CreateUDPEndPoint(*this);
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "UDP");
@@ -295,6 +282,7 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     return CHIP_NO_ERROR;
 }
+
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -303,9 +291,7 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
     InetLayer & lInetLayer = *reinterpret_cast<InetLayer *>(aAppState);
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();
 
-    TCPEndPointImpl::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-        if (&lEndPoint->Layer() != &lInetLayer)
-            return true;
+    lInetLayer.ForEachTCPEndPoint([](TCPEndPoint * lEndPoint) -> bool {
         if (!lEndPoint->IsConnected())
             return true;
         if (lEndPoint->mIdleTimeout == 0)

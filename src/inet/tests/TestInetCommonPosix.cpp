@@ -80,7 +80,7 @@ using namespace chip::Inet;
 
 System::LayerImpl gSystemLayer;
 
-Inet::InetLayer gInet;
+Inet::InetLayerImpl gInet;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static sys_mbox_t * sLwIPEventQueue   = NULL;

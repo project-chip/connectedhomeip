@@ -73,16 +73,10 @@ public:
 class DLL_EXPORT UDPEndPoint : public EndPointBase, public ReferenceCounted<UDPEndPoint, UDPEndPointDeletor>
 {
 public:
-    UDPEndPoint(InetLayer & inetLayer, void * appState = nullptr) :
-        EndPointBase(inetLayer, appState), mState(State::kReady), OnMessageReceived(nullptr), OnReceiveError(nullptr)
-    {}
-
     UDPEndPoint(const UDPEndPoint &) = delete;
     UDPEndPoint(UDPEndPoint &&)      = delete;
     UDPEndPoint & operator=(const UDPEndPoint &) = delete;
     UDPEndPoint & operator=(UDPEndPoint &&) = delete;
-
-    virtual ~UDPEndPoint() = default;
 
     /**
      * Type of message text reception event handling function.
@@ -274,6 +268,12 @@ public:
     virtual void Free() = 0;
 
 protected:
+    UDPEndPoint(InetLayer & inetLayer, void * appState = nullptr) :
+        EndPointBase(inetLayer, appState), mState(State::kReady), OnMessageReceived(nullptr), OnReceiveError(nullptr)
+    {}
+
+    virtual ~UDPEndPoint() = default;
+
     /**
      * Basic dynamic state of the underlying endpoint.
      *
@@ -296,9 +296,6 @@ protected:
     /** The endpoint's receive error event handling function delegate. */
     OnReceiveErrorFunct OnReceiveError;
 
-    friend class UDPEndPointDeletor;
-    virtual void Delete() = 0;
-
     /*
      * Implementation helpers for shared methods.
      */
@@ -313,11 +310,6 @@ protected:
     virtual CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg)                     = 0;
     virtual void CloseImpl()                                                                                                  = 0;
 };
-
-inline void UDPEndPointDeletor::Release(UDPEndPoint * obj)
-{
-    obj->Delete();
-}
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -334,9 +326,6 @@ public:
 
 private:
     friend class InetLayer;
-    friend class BitMapObjectPool<UDPEndPointImplLwIP, INET_CONFIG_NUM_UDP_ENDPOINTS>;
-    static BitMapObjectPool<UDPEndPointImplLwIP, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
-    void Delete() override { sPool.ReleaseObject(this); }
 
     // UDPEndPoint overrides.
 #if INET_CONFIG_ENABLE_IPV4
@@ -404,9 +393,6 @@ public:
 
 private:
     friend class InetLayer;
-    friend class BitMapObjectPool<UDPEndPointImplSockets, INET_CONFIG_NUM_UDP_ENDPOINTS>;
-    static BitMapObjectPool<UDPEndPointImplSockets, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
-    void Delete() override { sPool.ReleaseObject(this); }
 
     // UDPEndPoint overrides.
 #if INET_CONFIG_ENABLE_IPV4
@@ -461,9 +447,6 @@ public:
 
 private:
     friend class InetLayer;
-    friend class BitMapObjectPool<UDPEndPointImplNetworkFramework, INET_CONFIG_NUM_UDP_ENDPOINTS>;
-    static BitMapObjectPool<UDPEndPointImplNetworkFramework, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
-    void Delete() override { sPool.ReleaseObject(this); }
 
     // UDPEndPoint overrides.
 #if INET_CONFIG_ENABLE_IPV4

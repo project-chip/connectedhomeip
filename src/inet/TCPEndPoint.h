@@ -31,7 +31,6 @@
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/ReferenceCounted.h>
-#include <lib/support/Pool.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -77,25 +76,6 @@ public:
 class DLL_EXPORT TCPEndPoint : public EndPointBase, public ReferenceCounted<TCPEndPoint, TCPEndPointDeletor>
 {
 public:
-    TCPEndPoint(InetLayer & inetLayer, void * appState = nullptr) :
-        EndPointBase(inetLayer, appState), OnConnectComplete(nullptr), OnDataReceived(nullptr), OnDataSent(nullptr),
-        OnConnectionClosed(nullptr), OnPeerClose(nullptr), OnConnectionReceived(nullptr), OnAcceptError(nullptr),
-        mState(State::kReady), mReceiveEnabled(true), mConnectTimeoutMsecs(0) // Initialize to zero for using system defaults.
-#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-        ,
-        mUserTimeoutMillis(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC), mUserTimeoutTimerRunning(false)
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-        ,
-        mIsTCPSendIdle(true), mTCPSendQueuePollPeriodMillis(INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC),
-        mTCPSendQueueRemainingPollCount(
-            MaxTCPSendQueuePolls(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC, INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC)),
-        OnTCPSendIdleChanged(nullptr)
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    {}
-
-    virtual ~TCPEndPoint() = default;
-
     /**
      * @brief   Bind the endpoint to an interface IP address.
      *
@@ -604,6 +584,25 @@ protected:
     friend class ::chip::Transport::TCPTest;
     friend class TCPTest;
 
+    TCPEndPoint(InetLayer & inetLayer, void * appState = nullptr) :
+        EndPointBase(inetLayer, appState), OnConnectComplete(nullptr), OnDataReceived(nullptr), OnDataSent(nullptr),
+        OnConnectionClosed(nullptr), OnPeerClose(nullptr), OnConnectionReceived(nullptr), OnAcceptError(nullptr),
+        mState(State::kReady), mReceiveEnabled(true), mConnectTimeoutMsecs(0) // Initialize to zero for using system defaults.
+#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+        ,
+        mUserTimeoutMillis(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC), mUserTimeoutTimerRunning(false)
+#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
+        ,
+        mIsTCPSendIdle(true), mTCPSendQueuePollPeriodMillis(INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC),
+        mTCPSendQueueRemainingPollCount(
+            MaxTCPSendQueuePolls(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC, INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC)),
+        OnTCPSendIdleChanged(nullptr)
+#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
+#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+    {}
+
+    virtual ~TCPEndPoint() = default;
+
     /**
      * Basic dynamic state of the underlying endpoint.
      *
@@ -693,7 +692,6 @@ protected:
     void StopConnectTimer();
 
     friend class TCPEndPointDeletor;
-    virtual void Delete() = 0;
 
     /*
      * Implementation helpers for shared methods.
@@ -707,11 +705,6 @@ protected:
     virtual void HandleConnectCompleteImpl()                                                                   = 0;
     virtual void DoCloseImpl(CHIP_ERROR err, State oldState)                                                   = 0;
 };
-
-inline void TCPEndPointDeletor::Release(TCPEndPoint * obj)
-{
-    obj->Delete();
-}
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -734,9 +727,6 @@ public:
 
 private:
     friend class InetLayer;
-    friend class BitMapObjectPool<TCPEndPointImplLwIP, INET_CONFIG_NUM_TCP_ENDPOINTS>;
-    static BitMapObjectPool<TCPEndPointImplLwIP, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
-    void Delete() override { sPool.ReleaseObject(this); }
 
     // TCPEndPoint overrides.
     CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr) override;
@@ -809,9 +799,6 @@ public:
 
 private:
     friend class InetLayer;
-    friend class BitMapObjectPool<TCPEndPointImplSockets, INET_CONFIG_NUM_TCP_ENDPOINTS>;
-    static BitMapObjectPool<TCPEndPointImplSockets, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
-    void Delete() override { sPool.ReleaseObject(this); }
 
     // TCPEndPoint overrides.
     CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr) override;

@@ -147,8 +147,6 @@ CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & a
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-BitMapObjectPool<UDPEndPointImplLwIP, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPointImplLwIP::sPool;
-
 CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
                                          InterfaceId interfaceId)
 {
@@ -702,8 +700,6 @@ IPPacketInfo * UDPEndPointImplLwIP::GetPacketInfo(const System::PacketBufferHand
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-BitMapObjectPool<UDPEndPointImplSockets, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPointImplSockets::sPool;
 
 namespace {
 
@@ -1449,8 +1445,6 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-BitMapObjectPool<UDPEndPointImplNetworkFramework, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPointImplNetworkFramework::sPool;
-
 CHIP_ERROR UDPEndPointImplNetworkFramework::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
                                                      InterfaceId intfId)
 {
@@ -2090,6 +2084,11 @@ CHIP_ERROR UDPEndPoint::LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAd
 
 exit:
     return (lRetval);
+}
+
+void UDPEndPointDeletor::Release(UDPEndPoint * obj)
+{
+    obj->Layer().DeleteUDPEndPoint(obj);
 }
 
 } // namespace Inet

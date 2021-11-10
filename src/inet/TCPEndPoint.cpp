@@ -89,8 +89,6 @@ namespace Inet {
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-BitMapObjectPool<TCPEndPointImplLwIP, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPointImplLwIP::sPool;
-
 namespace {
 
 /*
@@ -1180,8 +1178,6 @@ void TCPEndPointImplLwIP::LwIPHandleError(void * arg, err_t lwipErr)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-BitMapObjectPool<TCPEndPointImplSockets, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPointImplSockets::sPool;
 
 CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
 {
@@ -2782,6 +2778,11 @@ void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void
 }
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+
+void TCPEndPointDeletor::Release(TCPEndPoint * obj)
+{
+    obj->Layer().DeleteTCPEndPoint(obj);
+}
 
 } // namespace Inet
 } // namespace chip

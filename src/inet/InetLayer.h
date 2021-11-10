@@ -55,14 +55,8 @@
 #include <inet/IPPrefix.h>
 #include <inet/InetError.h>
 #include <inet/InetInterface.h>
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
 #include <inet/UDPEndPoint.h>
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 #include <system/SystemLayer.h>
 #include <system/SystemStats.h>
@@ -74,8 +68,6 @@
 
 namespace chip {
 namespace Inet {
-
-class InetLayer;
 
 /**
  *  @class InetLayer
@@ -106,8 +98,6 @@ class DLL_EXPORT InetLayer
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 public:
-    InetLayer();
-
     CHIP_ERROR Init(chip::System::Layer & aSystemLayer, void * aContext);
 
     // Must be called before System::Layer::Shutdown(), since this holds a pointer to that.
@@ -119,6 +109,10 @@ public:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR NewTCPEndPoint(TCPEndPoint ** retEndPoint);
+#if INET_TCP_IDLE_CHECK_INTERVAL > 0
+    static void HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState);
+    bool IsIdleTimerRunning();
+#endif // INET_TCP_IDLE_CHECK_INTERVAL > 0
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
@@ -128,18 +122,91 @@ public:
     void * GetPlatformData();
     void SetPlatformData(void * aPlatformData);
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-    static void HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState);
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
+protected:
+    InetLayer();
+    virtual ~InetLayer() {}
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    friend class TCPEndPointDeletor;
+
+    virtual TCPEndPoint * CreateTCPEndPoint(InetLayer & layer) = 0;
+    virtual void DeleteTCPEndPoint(TCPEndPoint * endPoint)     = 0;
+
+    using TCPEndPointVisitor                                          = bool (*)(TCPEndPoint *);
+    virtual bool ForEachTCPEndPoint(const TCPEndPointVisitor visitor) = 0;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
+    friend class UDPEndPointDeletor;
+    virtual UDPEndPoint * CreateUDPEndPoint(InetLayer & layer) = 0;
+    virtual void DeleteUDPEndPoint(UDPEndPoint * endPoint)     = 0;
+
+    using UDPEndPointVisitor                                         = bool (*)(UDPEndPoint *);
+    virtual bool ForEachUDPEndPoint(const UDPEndPointVisitor vistor) = 0;
+#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 private:
     ObjectLifeCycle mLayerState;
     void * mContext;
     void * mPlatformData;
     chip::System::Layer * mSystemLayer;
-
-    bool IsIdleTimerRunning();
 };
+
+template <typename T, typename U>
+class InetLayerPoolImpl : public InetLayer
+{
+    using TCPEndPointType = T;
+    using UDPEndPointType = U;
+
+public:
+protected:
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    TCPEndPoint * CreateTCPEndPoint(InetLayer & layer) override { return sTCPEndPointPool.CreateObject(layer); }
+    void DeleteTCPEndPoint(TCPEndPoint * endPoint) override
+    {
+        sTCPEndPointPool.ReleaseObject(static_cast<TCPEndPointImpl *>(endPoint));
+    }
+    bool ForEachTCPEndPoint(const TCPEndPointVisitor visitor) override
+    {
+        return sTCPEndPointPool.ForEachActiveObject(
+            [&](TCPEndPoint * endPoint) -> bool { return (&endPoint->Layer() == this) ? visitor(endPoint) : true; });
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
+    UDPEndPoint * CreateUDPEndPoint(InetLayer & layer) override { return sUDPEndPointPool.CreateObject(layer); }
+    void DeleteUDPEndPoint(UDPEndPoint * endPoint) override
+    {
+        sUDPEndPointPool.ReleaseObject(static_cast<UDPEndPointImpl *>(endPoint));
+    }
+    bool ForEachUDPEndPoint(const UDPEndPointVisitor visitor) override
+    {
+        return sUDPEndPointPool.ForEachActiveObject(
+            [&](UDPEndPoint * endPoint) -> bool { return (&endPoint->Layer() == this) ? visitor(endPoint) : true; });
+    }
+#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
+
+private:
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    static ObjectPool<TCPEndPointType, INET_CONFIG_NUM_TCP_ENDPOINTS> sTCPEndPointPool;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
+    static ObjectPool<UDPEndPointType, INET_CONFIG_NUM_UDP_ENDPOINTS> sUDPEndPointPool;
+#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
+};
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+template <typename T, typename U>
+ObjectPool<T, INET_CONFIG_NUM_TCP_ENDPOINTS> InetLayerPoolImpl<T, U>::sTCPEndPointPool;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
+template <typename T, typename U>
+ObjectPool<U, INET_CONFIG_NUM_UDP_ENDPOINTS> InetLayerPoolImpl<T, U>::sUDPEndPointPool;
+#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
+
+using InetLayerImpl = InetLayerPoolImpl<TCPEndPointImpl, UDPEndPointImpl>;
 
 /**
  *  @class IPPacketInfo

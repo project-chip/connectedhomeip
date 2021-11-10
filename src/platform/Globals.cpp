@@ -27,7 +27,7 @@ namespace DeviceLayer {
 
 chip::Inet::InetLayer & InetLayer()
 {
-    static chip::Inet::InetLayer gInetLayer;
+    static chip::Inet::InetLayerImpl gInetLayer;
     return gInetLayer;
 }
 

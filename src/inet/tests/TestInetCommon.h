@@ -53,7 +53,7 @@
 
 extern chip::System::LayerImpl gSystemLayer;
 
-extern chip::Inet::InetLayer gInet;
+extern chip::Inet::InetLayerImpl gInet;
 
 extern bool gDone;
 
