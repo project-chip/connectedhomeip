@@ -25,7 +25,8 @@
 
 // Interface class to connect the OTA Software Update Requestor cluster command processing
 // with the core OTA Requestor logic. The OTARequestor class implements this interface
-class OTARequestorInterface {
+class OTARequestorInterface
+{
 public:
     // Handler for the AnnounceOTAProvider command
     virtual bool HandleAnnounceOTAProvider(commandData_t) = 0;

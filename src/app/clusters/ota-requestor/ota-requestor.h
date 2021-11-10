@@ -20,13 +20,14 @@
  * Applications implementing the OTA Requestor functionality must include this file.
  */
 
-#include <ota-requestor-interface.h>
 #include <ota-requestor-driver.h>
+#include <ota-requestor-interface.h>
 
 #pragma once
 
 // This class implements all of the core logic of the OTA Requestor
-class OTARequestor : public OTARequestorInterface {
+class OTARequestor : public OTARequestorInterface
+{
 public:
     // Application interface declarations start
 
@@ -37,5 +38,5 @@ public:
     // Application interface declarations end
 
 private:
-    OTARequestorDriver *driver;
+    OTARequestorDriver * driver;
 };

@@ -29,9 +29,9 @@
 
 // A class that abstracts the image download functionality from the particular
 // protocol used for that (BDX or possibly HTTPS)
-class OTADownloader : public BlockWriter {
+class OTADownloader : public BlockWriter
+{
 public:
-
     // API declarations start
 
     // Application calls this method to direct OTADownloader to begin the download

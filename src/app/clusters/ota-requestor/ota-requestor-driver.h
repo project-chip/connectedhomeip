@@ -26,7 +26,8 @@
 
 // Interface class to abstract the OTA-related business logic. Each application
 // must implement this interface. All calls must be non-blocking unless stated otherwise
-class OTARequestorDriver {
+class OTARequestorDriver
+{
 public:
     // A call into the application logic to give it a chance to allow or stop the Requestor
     // from proceeding with actual image download. Returning TRUE will allow the download

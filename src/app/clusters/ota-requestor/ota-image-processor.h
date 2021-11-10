@@ -23,12 +23,12 @@
 
 #pragma once
 
-
 // This is a platform-agnostic interface for processing downloaded
 // chunks of OTA image data (data could be raw image data meant for flash or
 // metadata). Each platform should provide an implementation of this
 // interface.
-class OTAImageProcessor {
+class OTAImageProcessor
+{
 public:
     // Open file, find block of space in persistent memory, or allocate a buffer, etc.
     virtual CHIP_ERROR PrepareDownload() = 0;
@@ -49,9 +49,9 @@ public:
 
 // A class that abstracts the image download functionality from the particular
 // protocol used for that (BDX or possibly HTTPS)
-class OTADownloader : public BlockWriter {
+class OTADownloader : public BlockWriter
+{
 public:
-
     // API declarations start
 
     // Application calls this method to direct OTADownloader to begin the download
