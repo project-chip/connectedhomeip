@@ -190,20 +190,21 @@ class ClusterDetailFragment : Fragment() {
           emptyCallback.clusterCallbackNameTv.text = "Result is empty"
           callbackList.addView(emptyCallback)
         } else {
-          response.forEach {
+          response.forEachIndexed { index, it ->
             val objectCallback =
               inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-            objectCallback.clusterCallbackNameTv.text = variableNameType.name
+            objectCallback.clusterCallbackNameTv.text = variableNameType.name + "[$index]"
             val objectString = it.toString()
-            objectCallback.clusterCallbackDataTv.text = it!!.javaClass.toString().split('$').last()
+            val callbackClassName = it!!.javaClass.toString().split('$').last()
+            objectCallback.clusterCallbackDataTv.text = callbackClassName
             objectCallback.clusterCallbackDataTv.setOnClickListener {
               AlertDialog.Builder(requireContext())
-                .setTitle(variableNameType.name)
+                .setTitle(callbackClassName)
                 .setMessage(objectString)
                 .create()
                 .show()
             }
-            objectCallback.clusterCallbackTypeTv.text = variableNameType.type
+            objectCallback.clusterCallbackTypeTv.text = "List<$callbackClassName>"
             callbackList.addView(objectCallback)
           }
         }
