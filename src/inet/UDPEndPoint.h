@@ -63,7 +63,11 @@ public:
 class DLL_EXPORT UDPEndPoint : public EndPointBasis, public ReferenceCounted<UDPEndPoint, UDPEndPointDeletor>
 {
 public:
-    UDPEndPoint() = default;
+    UDPEndPoint(InetLayer & inetLayer, void * appState = nullptr) :
+        EndPointBasis(inetLayer, appState), mState(State::kReady), OnMessageReceived(nullptr), OnReceiveError(nullptr)
+    {
+        InitImpl();
+    }
 
     UDPEndPoint(const UDPEndPoint &) = delete;
     UDPEndPoint(UDPEndPoint &&)      = delete;
@@ -261,8 +265,6 @@ public:
 
 private:
     friend class InetLayer;
-
-    void Init(InetLayer * inetLayer);
 
     /**
      * Basic dynamic state of the underlying endpoint.
