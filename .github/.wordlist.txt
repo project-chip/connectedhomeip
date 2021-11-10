@@ -486,8 +486,11 @@ IPv
 ISCAN
 itemName
 iterable
+jdk
 jinja
 jlink
+jre
+JDK
 JLink
 JLinkExe
 JLinkRTTClient
@@ -669,6 +672,7 @@ Onboarding
 onboardingcodes
 oneshot
 onnetwork
+openjdk
 OnOff
 OnOffClusterTest
 OnPlatformEvent
@@ -970,6 +974,7 @@ unblur
 UNBLUR
 uncommissioned
 unfocus
+userguide
 Unicast
 UniFlash
 unpair

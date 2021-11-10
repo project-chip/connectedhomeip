@@ -64,7 +64,7 @@ architecture:
 
 We are using Gradle 7.1.1 for all android project which does not support Java 17
 (https://docs.gradle.org/current/userguide/compatibility.html) while the default
-JDK version on MacOS for Apple Silicon is openjdk 17.0.1 or above.
+JDK version on MacOS for Apple Silicon is 'openjdk 17.0.1' or above.
 
 Using JDK bundled with Android Studio will help on that.
 
