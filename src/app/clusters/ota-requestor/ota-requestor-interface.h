@@ -16,28 +16,21 @@
  *    limitations under the License.
  */
 
-/* This file contains the declarations for the Matter OTA Requestor implementation and API.
- * Applications implementing the OTA Requestor functionality must include this file.
+/* This file contains the declaration for the OTA Requestor interface.
+ * Any implementation of the OTA Requestor (e.g. the OTARequestor class) must implement
+ * this interface.
  */
-
-#include <ota-requestor-interface.h>
-#include <ota-requestor-driver.h>
 
 #pragma once
 
-// This class implements all of the core logic of the OTA Requestor
-class OTARequestor : public OTARequestorInterface {
+// Interface class to connect the OTA Software Update Requestor cluster command processing
+// with the core OTA Requestor logic. The OTARequestor class implements this interface
+class OTARequestorInterface {
 public:
-    // Application interface declarations start
+    // Handler for the AnnounceOTAProvider command
+    virtual bool HandleAnnounceOTAProvider(commandData_t) = 0;
 
-    // Application directs the Requestor to start the Image Query process
-    // and download the new image if available
-    void TriggerImmediateQuery();
-
-    // Application interface declarations end
-
-private:
-    OTARequestorDriver *driver;
+    // Handler for the QueryImageResponse command
+    virtual bool HandleQueryImageResponse(commandData_t) = 0;
 };
-
 
