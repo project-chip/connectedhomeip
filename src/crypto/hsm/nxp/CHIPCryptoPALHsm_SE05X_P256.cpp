@@ -53,7 +53,7 @@ P256KeypairHSM::~P256KeypairHSM()
     {
         if (provisioned_key == false)
         {
-            ChipLogDetail(Crypto, "Deleting key with id - %lx !", keyid);
+            ChipLogDetail(Crypto, "Deleting key with id - %x !", keyid);
             se05x_delete_key(keyid);
         }
         else
