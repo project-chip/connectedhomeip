@@ -65,7 +65,22 @@ public:
     template <typename RequestDataT>
     CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
                              CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb,
-                             CommandResponseFailureCallback failureCb);
+                             CommandResponseFailureCallback failureCb)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
+                                                const typename RequestDataT::ResponseType & responseData) {
+            successCb(context, responseData);
+        };
+
+        auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+            failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
+        };
+
+        return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
+                                    onSuccessCb, onFailureCb);
+    };
 
     /**
      * Functions for writing attributes.  We have lots of different

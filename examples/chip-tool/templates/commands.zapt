@@ -10,6 +10,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Nullable.h>
 #include <commands/clusters/ModelCommand.h>
+#include <commands/common/CommandInvoker.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/Span.h>
@@ -411,9 +412,7 @@ public:
         {{/if}}
         {{/chip_cluster_command_non_expanded_arguments}}
 
-        chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, {{#if hasSpecificResponse}}On{{asUpperCamelCase parent.name}}{{asUpperCamelCase response.name}}Success{{else}}OnDefaultSuccess{{/if}}, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, {{#if hasSpecificResponse}}On{{asUpperCamelCase parent.name}}{{asUpperCamelCase response.name}}Success{{else}}OnDefaultSuccess{{/if}}, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:

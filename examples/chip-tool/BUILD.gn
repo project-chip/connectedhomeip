@@ -30,6 +30,7 @@ executable("chip-tool") {
     "commands/common/CHIPCommand.cpp",
     "commands/common/CHIPCommand.h",
     "commands/common/Command.cpp",
+    "commands/common/CommandInvoker.h",
     "commands/common/Commands.cpp",
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
