@@ -615,6 +615,7 @@ private:
     DevicePairingDelegate * mPairingDelegate;
 
     CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
+    DeviceProxy * mDeviceOperational                   = nullptr;
 
     Credentials::CertificateType mCertificateTypeBeingRequested = Credentials::CertificateType::kUnknown;
 
