@@ -19,6 +19,12 @@
 #include <esp_ota_ops.h>
 #include <esp_system.h>
 
+#include <CHIPDeviceManager.h>
+
+using namespace ::chip;
+using namespace ::chip::System;
+using namespace ::chip::DeviceLayer;
+
 namespace {
 
 const char * TAG                            = "OTAUpdate";
@@ -119,6 +125,12 @@ esp_err_t OTAUpdater::End(void)
     return err;
 }
 
+void RestartTimerHandler(Layer * systemLayer, void * appState)
+{
+    ESP_LOGI(TAG, "Prepare to restart system!");
+    esp_restart();
+}
+
 // TODO: Apply update after delayed action time
 // TODO: Handle applying update after reboot
 esp_err_t OTAUpdater::Apply(uint32_t delayedActionTime)
@@ -136,6 +148,7 @@ esp_err_t OTAUpdater::Apply(uint32_t delayedActionTime)
     }
 
     ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%x", mOTAUpdatePartition->address);
-    ESP_LOGI(TAG, "Prepare to restart system!");
-    esp_restart();
+    // Allow requestor to send the Ack for the previous message
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayedActionTime * 1000), RestartTimerHandler, nullptr);
+    return ESP_OK;
 }
