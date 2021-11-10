@@ -47,23 +47,21 @@ public:
         mNumVendorReservedData = count;
         mAttestationData       = attestationElements;
 
-        tlvReader.Init(mAttestationData);
-        ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
-        ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+        mTlvReader.Init(mAttestationData);
+        ReturnErrorOnFailure(mTlvReader.Next(containerType, TLV::AnonymousTag));
+        ReturnErrorOnFailure(mTlvReader.EnterContainer(containerType));
 
         // position to first ProfileTag
         while (true)
         {
-            ReturnErrorOnFailure(tlvReader.Next());
-            if (!TLV::IsProfileTag(tlvReader.GetTag()))
+            ReturnErrorOnFailure(mTlvReader.Next());
+            if (!TLV::IsProfileTag(mTlvReader.GetTag()))
                 break;
         }
         // positioned to first context tag (vendor reserved data)
         mIsInitialized = true;
         return CHIP_NO_ERROR;
     }
-
-    CHIP_ERROR Next() { return tlvReader.Next(); }
 
     size_t GetNumberOfElements() { return mNumVendorReservedData; }
 
@@ -82,9 +80,9 @@ public:
 
         VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-        while ((err = Next()) == CHIP_NO_ERROR)
+        while ((err = mTlvReader.Next()) == CHIP_NO_ERROR)
         {
-            uint64_t tag = tlvReader.GetTag();
+            uint64_t tag = mTlvReader.GetTag();
             if (!TLV::IsProfileTag(tag))
             {
                 continue;
@@ -94,7 +92,7 @@ public:
             element.profileNum = TLV::ProfileNumFromTag(tag);
             element.tagNum     = TLV::TagNumFromTag(tag);
 
-            return tlvReader.GetByteView(element.vendorReservedData);
+            return mTlvReader.GetByteView(element.vendorReservedData);
         }
 
         return err;
@@ -104,7 +102,7 @@ private:
     size_t mNumVendorReservedData; // number of VendorReserved entries (could be 0)
     ByteSpan mAttestationData;
     bool mIsInitialized = false;
-    TLV::ContiguousBufferTLVReader tlvReader;
+    TLV::ContiguousBufferTLVReader mTlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 };
 
@@ -124,7 +122,8 @@ public:
 
     const_iterator cbegin()
     {
-        do_sorting(); // when beginning to iterator, make a linked list and return the head element
+        // sort the array in place and return the head element.
+        do_sorting();
         mCurrentIndex = 0;
         return mElements;
     }
