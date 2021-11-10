@@ -555,9 +555,9 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
             Query query(instanceQName);
 
             query
-                .SetClass(QClass::IN)       //
-                .SetType(QType::ANY)        //
-                .SetAnswerViaUnicast(false) //
+                .SetClass(QClass::IN)      //
+                .SetType(QType::ANY)       //
+                .SetAnswerViaUnicast(true) //
                 ;
 
             // NOTE: type above is NOT A or AAAA because the name searched for is
