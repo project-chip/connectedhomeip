@@ -21,6 +21,7 @@
  */
 #pragma once
 
+#include <crypto/RandUtils.h>
 #include <lib/support/PersistedCounter.h>
 
 namespace chip {
@@ -106,8 +107,14 @@ private:
 class LocalSessionMessageCounter : public MessageCounter
 {
 public:
-    static constexpr uint32_t kInitialValue = 1;
-    LocalSessionMessageCounter() : value(kInitialValue) {}
+    static constexpr uint32_t kInitialValue                 = 1;         ///< Used for initializing peer counter
+    static constexpr uint32_t kMessageCounterRandomInitMask = 0x0FFFFFF; ///< 28-bit mask
+
+    /**
+     * Initialize a local message counter with random value between [0, 2^28-1]. This increases the difficulty of traffic analysis
+     * attacks by making it harder to determine how long a particular session has been open.
+     */
+    LocalSessionMessageCounter() { value = Crypto::GetRandU32() & kMessageCounterRandomInitMask; }
 
     Type GetType() override { return Session; }
     uint32_t Value() override { return value; }
