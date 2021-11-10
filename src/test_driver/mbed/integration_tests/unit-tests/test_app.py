@@ -21,7 +21,7 @@ def test_unit_tests(device):
     # smoke test
     ret = device.wait_for_output("Mbed unit-tests application start")
     assert ret != None and len(ret) > 0
-    ret = device.wait_for_output("Mbed unit-tests application run")
+    ret = device.wait_for_output("Mbed unit-tests application run", 60)
     assert ret != None and len(ret) > 0
 
     ret = device.wait_for_output("CHIP test status:", 500)
