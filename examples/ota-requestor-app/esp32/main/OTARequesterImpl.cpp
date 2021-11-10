@@ -38,8 +38,8 @@ using chip::FabricIndex;
 using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
-using chip::PeerId;
 using chip::Optional;
+using chip::PeerId;
 using chip::Server;
 using chip::VendorId;
 using chip::bdx::TransferSession;
@@ -280,8 +280,8 @@ void ConnectToProvider(const char * ipAddress, uint32_t nodeId)
         operationalDeviceProxy = new chip::OperationalDeviceProxy(initParams, peerID);
         server->SetOperationalDeviceProxy(operationalDeviceProxy);
 
-        // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node ID
-        // and fabric index
+        // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node
+        // ID and fabric index
         IPAddress ipAddr;
         IPAddress::FromString(ipAddress, ipAddr);
         PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
