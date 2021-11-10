@@ -187,7 +187,6 @@ public:
 
     // Endpoints
     virtual bool HasGroupNamesSupport()                                                                 = 0;
-    virtual uint8_t GetGroupCapacity(chip::FabricIndex fabric_index, chip::GroupId group_id)            = 0;
     virtual bool GroupMappingExists(chip::FabricIndex fabric_index, const GroupMapping & mapping)       = 0;
     virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping)    = 0;
     virtual CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping) = 0;

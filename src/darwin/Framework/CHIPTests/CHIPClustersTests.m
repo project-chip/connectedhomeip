@@ -19972,7 +19972,7 @@ CHIPDevice * GetConnectedDevice()
 
                     XCTAssertEqual(err.code, 0);
 
-                    XCTAssertEqual([values[@"capacity"] unsignedCharValue], 5);
+                    XCTAssertEqual([values[@"capacity"] unsignedCharValue], 255);
                     XCTAssertEqual([values[@"groupList"] count], 2);
 
                     [expectation fulfill];
@@ -20170,7 +20170,7 @@ CHIPDevice * GetConnectedDevice()
 
                     XCTAssertEqual(err.code, 0);
 
-                    XCTAssertEqual([values[@"capacity"] unsignedCharValue], 6);
+                    XCTAssertEqual([values[@"capacity"] unsignedCharValue], 255);
                     XCTAssertEqual([values[@"groupList"] count], 2);
 
                     [expectation fulfill];

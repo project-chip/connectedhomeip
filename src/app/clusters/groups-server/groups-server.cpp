@@ -261,30 +261,33 @@ exit:
     return true;
 }
 
-struct GetGroupMembershipResponse
+struct GroupMembershipResponse
 {
 public:
+    // A capacity of 0xFF means that it is unknown if any further groups MAY be added.
+    static constexpr uint8_t kCapacityUnknown = 0xff;
+
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
 
-    GetGroupMembershipResponse(const Commands::GetGroupMembership::DecodableType & data,
-                               GroupDataProvider::GroupMappingIterator * iter, uint8_t capacity) :
+    GroupMembershipResponse(const Commands::GetGroupMembership::DecodableType & data,
+                            GroupDataProvider::GroupMappingIterator * iter) :
         mCommandData(data),
-        mIterator(iter), mCapacity(capacity)
+        mIterator(iter)
     {}
 
     const Commands::GetGroupMembership::DecodableType & mCommandData;
     GroupDataProvider::GroupMappingIterator * mIterator = nullptr;
-    uint8_t mCapacity                                   = 0;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     {
         TLV::TLVType outer;
+
         ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
 
         ReturnErrorOnFailure(app::DataModel::Encode(
-            writer, TLV::ContextTag(to_underlying(Commands::GetGroupMembershipResponse::Fields::kCapacity)), mCapacity));
+            writer, TLV::ContextTag(to_underlying(Commands::GetGroupMembershipResponse::Fields::kCapacity)), kCapacityUnknown));
         {
             TLV::TLVType type;
             ReturnErrorOnFailure(
@@ -349,11 +352,10 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
     }
     else
     {
-        auto capacity = provider->GetGroupCapacity(fabricIndex, commandPath.mEndpointId);
-        auto iter     = provider->IterateGroupMappings(fabricIndex, commandPath.mEndpointId);
+        auto iter = provider->IterateGroupMappings(fabricIndex, commandPath.mEndpointId);
         VerifyOrExit(nullptr != iter, err = CHIP_ERROR_NO_MEMORY);
 
-        err = commandObj->AddResponseData(commandPath, GetGroupMembershipResponse(commandData, iter, capacity));
+        err = commandObj->AddResponseData(commandPath, GroupMembershipResponse(commandData, iter));
         iter->Release();
         if (CHIP_NO_ERROR == err)
         {

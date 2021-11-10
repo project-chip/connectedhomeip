@@ -351,34 +351,6 @@ public:
     // Endpoints
     bool HasGroupNamesSupport() override { return true; }
 
-    uint8_t GetGroupCapacity(chip::FabricIndex fabric_index, chip::GroupId group_id) override
-    {
-        size_t count    = 0;
-        Fabric * fabric = GetExistingFabric(fabric_index);
-        VerifyOrReturnError(nullptr != fabric, 0);
-
-        for (size_t i = 0; i < kEndpointEntriesMax; ++i)
-        {
-            const EndpointEntry & entry = fabric->endpoints[i];
-            if (entry.in_use && entry.endpoint == group_id)
-            {
-                count++;
-            }
-        }
-        if (count >= kEndpointEntriesMax)
-        {
-            return 0;
-        }
-        if (kEndpointEntriesMax - count >= 0xfe)
-        {
-            return 0xfe;
-        }
-        else
-        {
-            return static_cast<uint8_t>(kEndpointEntriesMax - count);
-        }
-    }
-
     bool GroupMappingExists(chip::FabricIndex fabric_index, const GroupMapping & mapping) override
     {
         VerifyOrReturnError(mInitialized, false);
