@@ -57,6 +57,8 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+
     esp_err_t err;
     // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
     Internal::ESP32Utils::RegisterESP32ErrorFormatter();
@@ -131,9 +133,9 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     {
         uint32_t totalOperationalHours = 0;
 
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgrImpl().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -170,7 +172,7 @@ CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
 {
     uint32_t count = 0;
 
-    CHIP_ERROR err = ConfigurationMgrImpl().GetRebootCount(count);
+    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -201,7 +203,7 @@ CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperat
     if (_GetUpTime(upTime) == CHIP_NO_ERROR)
     {
         uint32_t totalHours = 0;
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
+        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
         {
             VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
             totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);

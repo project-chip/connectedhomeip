@@ -35,8 +35,8 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Android platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                       private Internal::AndroidConfig
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+                                 private Internal::AndroidConfig
 {
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
@@ -46,6 +46,7 @@ class ConfigurationManagerImpl final : public Internal::GenericConfigurationMana
 
 public:
     void InitializeWithObject(jobject managerObject);
+    static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -64,41 +65,12 @@ private:
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
-    // ===== Members for internal use by the following friends.
-
-    friend ConfigurationManager & ConfigurationMgr();
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl();
-
-    static ConfigurationManagerImpl sInstance;
-
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
 
     jobject mConfigurationManagerObject = nullptr;
 };
-
-/**
- * Returns the public interface of the ConfigurationManager singleton object.
- *
- * chip applications should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
- */
-inline ConfigurationManager & ConfigurationMgr()
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
- *
- * chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the Android platform.
- */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl()
-{
-    return ConfigurationManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -148,8 +148,8 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
     auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB status,
                                              CHIP_ERROR aError) { onFailureCbInvoked = true; };
 
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
+    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
+                                                                                               value, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -189,8 +189,8 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
+    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
+                                                                                               value, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 

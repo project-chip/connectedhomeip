@@ -779,7 +779,8 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
 CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                   Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
-    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == deviceId)
+    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == deviceId &&
+        mDeviceBeingCommissioned->IsSecureConnected())
     {
         onConnection->mCall(onConnection->mContext, mDeviceBeingCommissioned);
         return CHIP_NO_ERROR;
@@ -959,11 +960,9 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 
     if (mDeviceBeingCommissioned != nullptr)
     {
-        // Let's release the device that's being paired.
-        // If pairing was successful, its information is
-        // already persisted. The application will use GetDevice()
-        // method to get access to the device, which will fetch
-        // the device information from the persistent storage.
+        // Release the commissionee device. For BLE, this is stored,
+        // for IP commissioning, we have taken a reference to the
+        // operational node to send the completion command.
         ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
         mDeviceBeingCommissioned = nullptr;
     }
@@ -984,6 +983,12 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
     }
 
     RendezvousCleanup(err);
+
+    if (mDeviceBeingCommissioned != nullptr)
+    {
+        ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
+        mDeviceBeingCommissioned = nullptr;
+    }
 }
 
 void DeviceCommissioner::OnSessionEstablished()
@@ -1620,6 +1625,14 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
     ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID 0x" ChipLogFormatX64,
                     ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
     VerifyOrReturn(mState == State::Initialized);
+
+    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == nodeData.mPeerId.GetNodeId())
+    {
+        // Let's release the device that's being paired, if pairing was successful,
+        // and the device is available on the operational network.
+        ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
+        mDeviceBeingCommissioned = nullptr;
+    }
 
     GetOperationalDeviceWithAddress(nodeData.mPeerId.GetNodeId(), ToPeerAddress(nodeData), &mOnDeviceConnectedCallback,
                                     &mOnDeviceConnectionFailureCallback);

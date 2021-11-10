@@ -23,6 +23,14 @@
         {
             "name": "CHIPCallbackBridge",
             "path": "partials/CHIPCallbackBridge.zapt"
+        },
+        {
+            "name": "encode_command",
+            "path": "partials/encode_command.zapt"
+        },
+        {
+            "name": "decode_response",
+            "path": "partials/decode_response.zapt"
         }
     ],
     "templates": [

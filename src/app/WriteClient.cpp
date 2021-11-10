@@ -244,12 +244,21 @@ CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::T
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(timeout);
+    if (session.IsGroupSession())
+    {
+        // Exchange will be closed by WriteClientHandle::SendWriteRequest for group messages
+        err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
+                                         Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    }
+    else
+    {
+        mpExchangeCtx->SetResponseTimeout(timeout);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
-    SuccessOrExit(err);
-    MoveToState(State::AwaitingResponse);
+        err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
+                                         Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+        SuccessOrExit(err);
+        MoveToState(State::AwaitingResponse);
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -350,10 +359,11 @@ CHIP_ERROR WriteClientHandle::SendWriteRequest(SessionHandle session, System::Cl
 {
     CHIP_ERROR err = mpWriteClient->SendWriteRequest(session, timeout);
 
-    if (err == CHIP_NO_ERROR)
+    // Transferring ownership of the underlying WriteClient to the IM layer. IM will manage its lifetime.
+    // For groupcast writes, there is no transfer of ownership since the interaction is done upon transmission of the action
+    if (err == CHIP_NO_ERROR && !session.IsGroupSession())
     {
-        // On success, the InteractionModelEngine will be responible to take care of the lifecycle of the WriteClient, so we release
-        // the WriteClient without closing it.
+        // Release the WriteClient without closing it.
         mpWriteClient = nullptr;
     }
     else

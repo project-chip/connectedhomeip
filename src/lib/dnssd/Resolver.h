@@ -126,6 +126,7 @@ struct DiscoveredNodeData
     }
     DiscoveredNodeData() { Reset(); }
     bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
+    bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
 
     Optional<uint32_t> GetMrpRetryIntervalIdle() const
@@ -175,11 +176,15 @@ struct DiscoveredNodeData
         }
         if (pairingHint > 0)
         {
-            ChipLogDetail(Discovery, "\tPairing Hint: 0x%x", pairingHint);
+            ChipLogDetail(Discovery, "\tPairing Hint: %u", pairingHint);
         }
         if (!IsHost(""))
         {
             ChipLogDetail(Discovery, "\tHostname: %s", hostName);
+        }
+        if (!IsInstanceName(""))
+        {
+            ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
         }
         for (int j = 0; j < numIPs; j++)
         {
