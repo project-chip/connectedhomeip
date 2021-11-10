@@ -842,20 +842,21 @@ void CheckIsIPv6LLA(nlTestSuite * inSuite, void * inContext)
  */
 void CheckIsIPv6Multicast(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr chip::FabricId fabric = 0xa1a2a4a8b1b2b4b8;
-    constexpr chip::GroupId group = 0xe10f;
+    constexpr chip::FabricId fabric   = 0xa1a2a4a8b1b2b4b8;
+    constexpr chip::GroupId group     = 0xe10f;
     chip::Transport::PeerAddress addr = chip::Transport::PeerAddress::Multicast(fabric, group);
     NL_TEST_ASSERT(inSuite, chip::Transport::Type::kUdp == addr.GetTransportType());
 
-    const Inet::IPAddress &ip = addr.GetIPAddress();
+    const Inet::IPAddress & ip = addr.GetIPAddress();
     NL_TEST_ASSERT(inSuite, ip.IsMulticast());
     NL_TEST_ASSERT(inSuite, IPAddressType::kIPv6 == ip.Type());
 
-    constexpr uint8_t expected[NL_INET_IPV6_ADDR_LEN_IN_BYTES] = { 0xff, 0x35, 0x00, 0x40, 0xfd, 0xa1, 0xa2, 0xa4, 0xa8, 0xb1, 0xb2, 0xb4, 0xb8, 0x00, 0xe1, 0x0f };
+    constexpr uint8_t expected[NL_INET_IPV6_ADDR_LEN_IN_BYTES] = { 0xff, 0x35, 0x00, 0x40, 0xfd, 0xa1, 0xa2, 0xa4,
+                                                                   0xa8, 0xb1, 0xb2, 0xb4, 0xb8, 0x00, 0xe1, 0x0f };
     uint8_t result[NL_INET_IPV6_ADDR_LEN_IN_BYTES];
-    uint8_t *p = result;
+    uint8_t * p = result;
     ip.WriteAddress(p);
-    NL_TEST_ASSERT(inSuite, !memcmp(expected, result, NL_INET_IPV6_ADDR_LEN_IN_BYTES ));
+    NL_TEST_ASSERT(inSuite, !memcmp(expected, result, NL_INET_IPV6_ADDR_LEN_IN_BYTES));
 }
 
 /**
