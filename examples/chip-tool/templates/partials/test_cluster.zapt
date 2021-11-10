@@ -134,22 +134,21 @@ class {{filename}}: public TestCommand
         cluster.Associate(mDevice, {{endpoint}});
 
         {{#if isCommand}}
-        using requestType  = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
-        using responseType = chip::app::{{chip_tests_item_response_type}};
+        using RequestType = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
 
-        chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type request;
+        RequestType request;
         {{#chip_tests_item_parameters}}
         {{>commandValue ns=parent.cluster container=(concat "request." (asLowerCamelCase label)) definedValue=definedValue}}
         {{/chip_tests_item_parameters}}
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<{{filename}} *>(context))->OnSuccessResponse_{{index}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}data.{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(status);
         };
-        {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.InvokeCommand<requestType, responseType>(request, this, success, failure){{#if async}}){{/if}};
+        {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.InvokeCommand(request, this, success, failure){{#if async}}){{/if}};
         {{else}}
         {{#chip_tests_item_parameters}}
         {{zapTypeToEncodableClusterObjectType type ns=parent.cluster}} {{asLowerCamelCase name}}Argument;

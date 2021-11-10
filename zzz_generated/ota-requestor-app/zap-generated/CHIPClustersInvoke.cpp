@@ -30,41 +30,42 @@ using namespace Encoding::LittleEndian;
 
 namespace Controller {
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type,
-                           chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type>(
     const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type>(
     const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type,
-                           chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType>(
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template <typename RequestDataT, typename ResponseDataT>
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type>(
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type &, void *,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type::ResponseType>,
+    CommandResponseFailureCallback);
+
+template <typename RequestDataT>
 CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
-                                      CommandResponseSuccessCallback<ResponseDataT> successCb,
+                                      CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb,
                                       CommandResponseFailureCallback failureCb)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
-                                            const ResponseDataT & responseData) { successCb(context, responseData); };
+                                            const typename RequestDataT::ResponseType & responseData) {
+        successCb(context, responseData);
+    };
 
     auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
         failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
     };
 
-    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                               requestData, onSuccessCb, onFailureCb);
+    return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
+                                onSuccessCb, onFailureCb);
 };
 
 } // namespace Controller

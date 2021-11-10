@@ -159,7 +159,15 @@ private:
 void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+    // We want to send a TestSimpleArgumentRequest::Type, but get a
+    // TestStructArrayArgumentResponse in return, so need to shadow the actual
+    // ResponseType that TestSimpleArgumentRequest has.
+    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    {
+        using ResponseType = TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType;
+    };
+
+    FakeRequest request;
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
@@ -196,8 +204,8 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     responseDirective = kSendDataResponse;
 
-    chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
+    chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+                                           onFailureCb);
 
     ctx.DrainAndServiceIO();
 
