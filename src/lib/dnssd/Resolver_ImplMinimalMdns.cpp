@@ -427,8 +427,7 @@ CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Mini
 
     mdns::Minimal::Query query(qname);
     query.SetType(type).SetClass(mdns::Minimal::QClass::IN);
-    // TODO(cecille): Not sure why unicast response isn't working - fix.
-    query.SetAnswerViaUnicast(false);
+    query.SetAnswerViaUnicast(true);
 
     builder.AddQuery(query);
 
