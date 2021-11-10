@@ -139,9 +139,11 @@ namespace {{asUpperCamelCase label}} {
     {{#if entryType}}
         using Type = {{zapTypeToEncodableClusterObjectType entryType forceNotOptional=true}};
         using DecodableType = {{zapTypeToDecodableClusterObjectType entryType forceNotOptional=true}};
+        using DecodableArgType = {{zapTypeToDecodableClusterObjectType entryType forceNotOptional=true isArgument=true}};
     {{else}}
         using Type = {{zapTypeToEncodableClusterObjectType type forceNotOptional=true}};
         using DecodableType = {{zapTypeToDecodableClusterObjectType type forceNotOptional=true}};
+        using DecodableArgType = {{zapTypeToDecodableClusterObjectType type forceNotOptional=true isArgument=true}};
     {{/if}}
 
         static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
