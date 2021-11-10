@@ -146,10 +146,6 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
 
     ChipLogProgress(Controller, "newDeviceController() called");
 
-    // sSystemLayer and sInetLayer are in platform/android to share with app server
-    err = DeviceLayer::PlatformMgr().InitChipStack();
-    SuccessOrExit(err);
-
     wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, &DeviceLayer::SystemLayer(),
                                                           &DeviceLayer::InetLayer(), &err);
     SuccessOrExit(err);
