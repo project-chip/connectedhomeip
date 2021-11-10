@@ -134,10 +134,11 @@ for j in "${iter_array[@]}"; do
         # kicking off the subshell, sometimes we try to do it before
         # the data is there yet.
         background_pid="$(</tmp/pid)"
+        # Only look for commissionable nodes if dns-sd is available
         if command -v dns-sd &>/dev/null; then
             echo "          * [CI DEBUG] Looking for commissionable Nodes"
             # Ignore the error that timeout generates
-            cat <(timeout 5 dns-sd -B _matterc._udp)
+            cat <(timeout 1 dns-sd -B _matterc._udp)
         fi
         echo "          * Pairing to device"
         "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00 | tee "$pairing_log_file"
