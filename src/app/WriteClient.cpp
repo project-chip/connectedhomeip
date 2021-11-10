@@ -246,7 +246,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::T
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     if (session.IsGroupSession())
     {
-        // Exchange will be close by WriteClientHandle::SendWriteRequest for group messages
+        // Exchange will be closed by WriteClientHandle::SendWriteRequest for group messages
         err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
                                          Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
     }
@@ -359,12 +359,11 @@ CHIP_ERROR WriteClientHandle::SendWriteRequest(SessionHandle session, System::Cl
 {
     CHIP_ERROR err = mpWriteClient->SendWriteRequest(session, timeout);
 
-    // The InteractionModelEngine will only close the writeClienHandle upon reception of a writeResponse
-    // This won't happen in a Groupcast communication.
+    // Transferring ownership of the underlying WriteClient to the IM layer. IM will manage its lifetime.
+    // For groupcast writes, there is no transfer of ownership since the interaction is done upon transmission of the action
     if (err == CHIP_NO_ERROR && !session.IsGroupSession())
     {
-        // On success, the InteractionModelEngine will be responible to take care of the lifecycle of the WriteClient, so we release
-        // the WriteClient without closing it.
+        // Release the WriteClient without closing it.
         mpWriteClient = nullptr;
     }
     else
