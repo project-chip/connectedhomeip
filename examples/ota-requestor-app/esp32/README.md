@@ -44,6 +44,12 @@ OTA Provider and start the OTA image transfer using BDX protocol.
 esp32> QueryImage <OTAProviderIpAddress> <OTAProviderNodeId>
 ```
 
+OTA image transfer takes some time and once done it prints following log
+
+```
+I (322620) OTARequesterImpl: Transfer complete!
+```
+
 ## Apply update request
 
 Once transfer is complete OTA Requestor should take permission from the OTA

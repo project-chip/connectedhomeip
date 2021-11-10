@@ -35,7 +35,7 @@ esptool.py -p <ProviderSerialPort> write_flash 0x206400 hello-world-flash-in-ota
 NOTE: This is a modified binary which contains the size of OTA image at first 4
 bytes.
 
-Re-run the idf monitor
+Run the idf monitor
 
 ```
 idf.py -p <OTAProviderSerialPort> monitor
