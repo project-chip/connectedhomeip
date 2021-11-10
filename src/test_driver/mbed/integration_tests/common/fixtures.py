@@ -68,7 +68,7 @@ class BoardAllocation:
 
 class BoardAllocator:
     def __init__(self, platforms_supported: List[str], serial_inter_byte_delay: float, baudrate: int):
-        mbed_ls = mbed_lstools.create()
+        mbed_ls = mbed_lstools.create(list_unmounted=True)
         boards = mbed_ls.list_mbeds(filter_function=lambda m: m['platform_name'] in platforms_supported)
         self.board_description = boards
         self.allocation = []
