@@ -179,7 +179,8 @@ CHIP_ERROR ExampleSe05xDACProvider::GetFirmwareInformation(MutableByteSpan & out
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer)
+CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign,
+                                                                 MutableByteSpan & out_signature_buffer)
 {
 
     /*
