@@ -9,7 +9,7 @@
       android:layout_width="80dp"
       android:layout_height="wrap_content"
       android:layout_marginHorizontal="10dp"
-      android:padding="16dp"
+      android:padding="8dp"
       android:minWidth="48dp"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toStartOf="@id/clusterCallbackDataTv"
