@@ -27,7 +27,7 @@
 // chunks of OTA image data (data could be raw image data meant for flash or
 // metadata). Each platform should provide an implementation of this
 // interface.
-class OTAImageProcessor
+class OTAImageProcessorDriver
 {
 public:
     // Open file, find block of space in persistent memory, or allocate a buffer, etc.

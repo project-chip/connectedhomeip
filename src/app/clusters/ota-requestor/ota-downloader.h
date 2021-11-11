@@ -51,9 +51,9 @@ public:
     void virtual OnBlockProcessed(blockActionType action);
 
     // A setter for the delegate class pointer
-    void setImageProcessorDelegate(OTAImageProcessor * delegate)
+    void SetImageProcessorDelegate(OTAImageProcessorDriver * delegate)
 
         // API declarations end
 
-        private : OTAImageProcessor * imageProcessorDelegate;
+        private : OTAImageProcessorDriver * imageProcessorDelegate;
 };
