@@ -248,6 +248,7 @@ public:
     CHIP_ERROR ResetEthNetworkDiagnosticsCounts();
 
     // WiFi network diagnostics methods
+    CHIP_ERROR GetWiFiBssId(ByteSpan & value);
     CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
     CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber);
@@ -518,6 +519,11 @@ inline CHIP_ERROR ConnectivityManager::GetEthOverrunCount(uint64_t & overrunCoun
 inline CHIP_ERROR ConnectivityManager::ResetEthNetworkDiagnosticsCounts()
 {
     return static_cast<ImplClass *>(this)->_ResetEthNetworkDiagnosticsCounts();
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiBssId(ByteSpan & value)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiBssId(value);
 }
 
 inline CHIP_ERROR ConnectivityManager::GetWiFiSecurityType(uint8_t & securityType)
