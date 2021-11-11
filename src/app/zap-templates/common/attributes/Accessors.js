@@ -62,8 +62,8 @@ async function accessorGetterType(attr)
     type = "chip::MutableByteSpan";
   } else {
     mayNeedPointer = true;
-    const options = { 'hash' : {} };
-    type = await zclHelper.asUnderlyingZclType.call(this, attr.type, options);
+    const options  = { 'hash' : {} };
+    type           = await zclHelper.asUnderlyingZclType.call(this, attr.type, options);
   }
 
   if (attr.isNullable) {
