@@ -35,8 +35,9 @@ namespace Inet {
 class DLL_EXPORT EndPointImplLwIP : public EndPointBase
 {
 protected:
-    // EndPointBase overrides
-    void InitEndPointBasisImpl() override { mLwIPEndPointType = LwIPEndPointType::Unknown; }
+    EndPointImplLwIP(InetLayer & inetLayer, void * appState = nullptr) :
+        EndPointBase(inetLayer, appState), mLwIPEndPointType(LwIPEndPointType::Unknown)
+    {}
 
     /** Encapsulated LwIP protocol control block */
     union

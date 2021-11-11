@@ -20,6 +20,7 @@ assert(chip_device_platform == "mbed")
 
 static_library("mbed") {
   sources = [
+    "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "ConfigurationManagerImpl.cpp",

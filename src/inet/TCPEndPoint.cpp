@@ -2594,35 +2594,6 @@ bool TCPEndPoint::IsConnected(State state)
         state == State::kClosing;
 }
 
-void TCPEndPoint::Init(InetLayer * inetLayer)
-{
-    InitEndPointBasis(*inetLayer);
-
-    mReceiveEnabled = true;
-
-    // Initialize to zero for using system defaults.
-    mConnectTimeoutMsecs = 0;
-
-#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    mUserTimeoutMillis = INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC;
-
-    mUserTimeoutTimerRunning = false;
-
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    mIsTCPSendIdle = true;
-
-    mTCPSendQueuePollPeriodMillis = INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC;
-
-    mTCPSendQueueRemainingPollCount = MaxTCPSendQueuePolls();
-
-    OnTCPSendIdleChanged = NULL;
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
-#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-
-    InitImpl();
-}
-
 CHIP_ERROR TCPEndPoint::DriveSending()
 {
     CHIP_ERROR err = DriveSendingImpl();

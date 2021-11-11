@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,26 +17,36 @@
 
 /**
  *    @file
- *          Provides an implementation of the PlatformManager object
- *          for Tizen platforms.
+ *          Implements a getter and setter for a singleton ConfigurationManager object.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+class ConfigurationManager;
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+namespace {
+
+/** Singleton pointer to the ConfigurationManager implementation.
+ */
+ConfigurationManager * gInstance = nullptr;
+
+} // namespace
+
+ConfigurationManager & ConfigurationMgr()
 {
-    ReturnErrorOnFailure(Internal::PosixConfig::Init());
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    VerifyOrDie(gInstance != nullptr);
+    return *gInstance;
+}
 
-    return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
+void SetConfigurationMgr(ConfigurationManager * configurationManager)
+{
+    if (configurationManager != nullptr)
+    {
+        gInstance = configurationManager;
+    }
 }
 
 } // namespace DeviceLayer
