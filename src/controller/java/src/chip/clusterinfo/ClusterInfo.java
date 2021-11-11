@@ -21,6 +21,10 @@ public class ClusterInfo {
     return commands;
   }
 
+  public void combineCommands(Map<String, CommandInfo> newCommands) {
+    this.commands.putAll(newCommands);
+  }
+
   /**
    * The functional interface provides a uniform way to create cluster through create function. In
    * ClusterInfoMapping, each ClusterConstructor was generated using the intended function. Using
