@@ -35,8 +35,11 @@ public:
     // and download the new image if available
     void TriggerImmediateQuery();
 
+    // A setter for the delegate class pointer
+    void setOtaRequestorDriver(OTARequestorDriver * driver);
+
     // Application interface declarations end
 
 private:
-    OTARequestorDriver * driver;
+    OTARequestorDriver * otaRequestorDriver;
 };
