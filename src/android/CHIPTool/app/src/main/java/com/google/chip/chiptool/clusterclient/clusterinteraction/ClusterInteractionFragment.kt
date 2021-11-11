@@ -1,5 +1,3 @@
-
-
 package com.google.chip.chiptool.clusterclient.clusterinteraction
 
 import android.os.Bundle
