@@ -151,9 +151,7 @@ public:
      *                                      on successful completion of this function. On failure, it will be updated to point to
      *                                      nullptr.
      *  @param[in]      aInteractionType    Type of interaction (read or subscription) that the requested ReadClient should execute.
-     *  @param[in]      aAppIdentifier      A unique token that can be attached to the returned ReadClient object that will be
-     *                                      passed through some of the methods in the registered InteractionModelDelegate.
-     *  @param[in]      apDelegateOverride  If not-null, permits overriding the default delegate registered with the
+     *  @param[in]      aCallback           If not-null, permits overriding the default delegate registered with the
      *                                      InteractionModelEngine that will be used by the ReadClient.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available

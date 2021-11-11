@@ -26,7 +26,10 @@ public final class AndroidChipPlatform {
       ConfigurationManager cfg,
       ServiceResolver resolver,
       ChipMdnsCallback chipMdnsCallback) {
+    // Order is important here: initChipStack() initializes the BLEManagerImpl, which depends on the
+    // BLEManager being set. setConfigurationManager() depends on the CHIP stack being initialized.
     setBLEManager(ble);
+    initChipStack();
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
     setServiceResolver(resolver, chipMdnsCallback);
@@ -71,6 +74,9 @@ public final class AndroidChipPlatform {
 
   // for ConfigurationManager
   private native void setConfigurationManager(ConfigurationManager manager);
+
+  /** Initialize the CHIP stack. */
+  private native void initChipStack();
 
   // for ServiceResolver
   private void setServiceResolver(ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback) {

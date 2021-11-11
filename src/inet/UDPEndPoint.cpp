@@ -588,8 +588,6 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
     ep->Retain();
     CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
         ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
-        InetLayer & lInetLayer = ep->Layer();
-        lInetLayer.DroppableEventDequeued();
         ep->Release();
     });
     if (err == CHIP_NO_ERROR)

@@ -89,101 +89,6 @@ namespace Inet {
  */
 InetLayer::InetLayer() {}
 
-#if INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_NO_LOCKING
-
-CHIP_ERROR InetLayer::InitQueueLimiter(void)
-{
-    mDroppableEvents = 0;
-    return CHIP_NO_ERROR;
-}
-
-bool InetLayer::CanEnqueueDroppableEvent(void)
-{
-    if (__sync_add_and_fetch(&mDroppableEvents, 1) <= INET_CONFIG_MAX_DROPPABLE_EVENTS)
-    {
-        return true;
-    }
-    else
-    {
-        __sync_add_and_fetch(&mDroppableEvents, -1);
-        return false;
-    }
-}
-
-void InetLayer::DroppableEventDequeued(void)
-{
-    __sync_add_and_fetch(&mDroppableEvents, -1);
-}
-
-#elif CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-
-CHIP_ERROR InetLayer::InitQueueLimiter(void)
-{
-    const unsigned portBASE_TYPE maximum = INET_CONFIG_MAX_DROPPABLE_EVENTS;
-    const unsigned portBASE_TYPE initial = INET_CONFIG_MAX_DROPPABLE_EVENTS;
-
-#if (configSUPPORT_STATIC_ALLOCATION == 1)
-    mDroppableEvents                     = xSemaphoreCreateCountingStatic(maximum, initial, &mDroppableEventsObj);
-#else
-    mDroppableEvents = xSemaphoreCreateCounting(maximum, initial);
-#endif
-
-    if (mDroppableEvents != NULL)
-        return CHIP_NO_ERROR;
-    else
-        return CHIP_ERROR_NO_MEMORY;
-}
-
-bool InetLayer::CanEnqueueDroppableEvent(void)
-{
-    if (xSemaphoreTake(mDroppableEvents, 0) != pdTRUE)
-    {
-        return false;
-    }
-    return true;
-}
-
-void InetLayer::DroppableEventDequeued(void)
-{
-    xSemaphoreGive(mDroppableEvents);
-}
-
-#else // !CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-
-CHIP_ERROR InetLayer::InitQueueLimiter(void)
-{
-    if (sem_init(&mDroppableEvents, 0, INET_CONFIG_MAX_DROPPABLE_EVENTS) != 0)
-    {
-        return CHIP_ERROR_POSIX(errno);
-    }
-    return CHIP_NO_ERROR;
-}
-
-bool InetLayer::CanEnqueueDroppableEvent(void)
-{
-    // Striclty speaking, we should check for EAGAIN.  But, other
-    // errno values probably should signal that that we should drop
-    // the packet: EINVAL means that the semaphore is not valid (we
-    // failed initialization), and EINTR should probably also lead to
-    // dropping a packet.
-
-    if (sem_trywait(&mDroppableEvents) != 0)
-    {
-        return false;
-    }
-    return true;
-}
-
-void InetLayer::DroppableEventDequeued(void)
-{
-    sem_post(&mDroppableEvents);
-}
-
-#endif // !CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-#endif // INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
-
 /**
  *  This is the InetLayer explicit initializer. This must be called
  *  and complete successfully before the InetLayer may be used.
@@ -223,10 +128,6 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 
     mSystemLayer = &aSystemLayer;
     mContext     = aContext;
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    ReturnErrorOnFailure(InitQueueLimiter());
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     mLayerState.SetInitialized();
 
