@@ -81,8 +81,6 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-#define QRCODE_BASE_URL "https://dhrishi.github.io/connectedhomeip/qrcode.html"
-
 #if CONFIG_DEVICE_TYPE_M5STACK
 
 #define BUTTON_1_GPIO_NUM GPIO_NUM_39    // Left button on M5Stack
@@ -495,119 +493,6 @@ void SetupPretendDevices()
     AddAttribute("State", "Closed");
 }
 
-void GetGatewayIP(char * ip_buf, size_t ip_len)
-{
-    esp_netif_ip_info_t ipInfo;
-    esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_AP_DEF"), &ipInfo);
-    esp_ip4addr_ntoa(&ipInfo.ip, ip_buf, ip_len);
-    ESP_LOGI(TAG, "Got gateway ip %s", ip_buf);
-}
-
-bool isRendezvousBLE()
-{
-    RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
-    return flags.Has(RendezvousInformationFlag::kBLE);
-}
-
-std::string createSetupPayload()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    std::string result;
-
-    uint16_t discriminator;
-    err = ConfigurationMgr().GetSetupDiscriminator(discriminator);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Couldn't get discriminator: %s", ErrorStr(err));
-        return result;
-    }
-    ESP_LOGI(TAG, "Setup discriminator: %u (0x%x)", discriminator, discriminator);
-
-    uint32_t setupPINCode;
-    err = ConfigurationMgr().GetSetupPinCode(setupPINCode);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Couldn't get setupPINCode: %s", ErrorStr(err));
-        return result;
-    }
-    ESP_LOGI(TAG, "Setup PIN code: %u (0x%x)", setupPINCode, setupPINCode);
-
-    uint16_t vendorId;
-    err = ConfigurationMgr().GetVendorId(vendorId);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Couldn't get vendorId: %s", ErrorStr(err));
-        return result;
-    }
-
-    uint16_t productId;
-    err = ConfigurationMgr().GetProductId(productId);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Couldn't get productId: %s", ErrorStr(err));
-        return result;
-    }
-
-    SetupPayload payload;
-    payload.version               = 0;
-    payload.discriminator         = discriminator;
-    payload.setUpPINCode          = setupPINCode;
-    payload.rendezvousInformation = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
-    payload.vendorID              = vendorId;
-    payload.productID             = productId;
-
-    if (!isRendezvousBLE())
-    {
-        char gw_ip[INET6_ADDRSTRLEN];
-        GetGatewayIP(gw_ip, sizeof(gw_ip));
-        payload.addOptionalVendorData(EXAMPLE_VENDOR_TAG_IP, gw_ip);
-
-        QRCodeSetupPayloadGenerator generator(payload);
-
-        size_t tlvDataLen = sizeof(gw_ip);
-        uint8_t tlvDataStart[tlvDataLen];
-        err = generator.payloadBase38Representation(result, tlvDataStart, tlvDataLen);
-    }
-    else
-    {
-        QRCodeSetupPayloadGenerator generator(payload);
-        err = generator.payloadBase38Representation(result);
-    }
-
-    {
-        ManualSetupPayloadGenerator generator(payload);
-        std::string outCode;
-
-        if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR)
-        {
-            ESP_LOGI(TAG, "Short Manual(decimal) setup code: %s", outCode.c_str());
-        }
-        else
-        {
-            ESP_LOGE(TAG, "Failed to get decimal setup code");
-        }
-
-        payload.commissioningFlow = CommissioningFlow::kCustom;
-        generator                 = ManualSetupPayloadGenerator(payload);
-
-        if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR)
-        {
-            // intentional extra space here to align the log with the short code
-            ESP_LOGI(TAG, "Long Manual(decimal) setup code:  %s", outCode.c_str());
-        }
-        else
-        {
-            ESP_LOGE(TAG, "Failed to get decimal setup code");
-        }
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Couldn't get payload string %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    return result;
-};
-
 WiFiWidget pairingWindowLED;
 
 class AppCallbacks : public AppDelegate
@@ -696,18 +581,8 @@ extern "C" void app_main()
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
-    std::string qrCodeText = createSetupPayload();
-    ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
-
-    {
-        std::vector<char> qrCode(3 * qrCodeText.size() + 1);
-        CHIP_ERROR error = EncodeQRCodeToUrl(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
-        if (error == CHIP_NO_ERROR)
-        {
-            ESP_LOGI(TAG, "Copy/paste the below URL in a browser to see the QR CODE:\n\t%s?data=%s", QRCODE_BASE_URL,
-                     qrCode.data());
-        }
-    }
+    // Print QR Code URL
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
 #if CONFIG_HAVE_DISPLAY
     // Initialize the display device.
