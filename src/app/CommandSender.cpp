@@ -26,6 +26,7 @@
 #include "Command.h"
 #include "CommandHandler.h"
 #include "InteractionModelEngine.h"
+#include "StatusResponse.h"
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -91,12 +92,31 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
                                             System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse),
-                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-
-    err = ProcessInvokeResponse(std::move(aPayload));
+    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse))
+    {
+        err = ProcessInvokeResponse(std::move(aPayload));
+        SuccessOrExit(err);
+    }
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    {
+        Protocols::InteractionModel::Status status;
+        err           = StatusResponse::ProcessStatusResponse(apExchangeContext, std::move(aPayload), status);
+        mpExchangeCtx = nullptr;
+        SuccessOrExit(err);
+        if (status == Protocols::InteractionModel::Status::ResourceExhausted)
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+        }
+        else
+        {
+            err = CHIP_ERROR_INCORRECT_STATE;
+        }
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    }
 
 exit:
     if (mpCallback != nullptr)
