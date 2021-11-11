@@ -24,8 +24,8 @@ An example test application showing the persistent storage system for
 This example serves to test the key value storage implementation and API and
 offers information on proper usage of the KVS system.
 
-This example is enabled to build for CC2652R7 devices. This upcoming devices
-are currently not yet in full production. For more information on device
+This example is enabled to build for CC2652R7 devices. This upcoming devices are
+currently not yet in full production. For more information on device
 availability or early access to an engineering build of our Matter-enabled SDK,
 please reach out [here][ti_cc13x2_26x2_r7_matter_request].
 

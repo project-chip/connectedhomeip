@@ -1,7 +1,7 @@
 # Texas Instruments platform overview
 
-The TI platform is a [Matter][matter_gh] platform based on the Texas
-Instruments Incorporated SimpleLink SDK.
+The TI platform is a [Matter][matter_gh] platform based on the Texas Instruments
+Incorporated SimpleLink SDK.
 
 The following diagram is a simplified representation of a Matter application
 which built on the TI Platform.
@@ -22,8 +22,8 @@ stack supporting Bluetooth 5.2, Bluetooth Mesh, Thread 1.1.1 networking stack
 based on OpenThread, Zigbee 3.0 compliant protocol suite, RF-Proprietary
 examples, TI’s 15.4 Stack as well as the TI-RTOS kernel and TI Drivers in one
 easy-to-use software package along with example applications and documentation.
-In addition, the Dynamic Multi-Protocol Manager (DMM) software component
-enables multiprotocol development on a single SimpleLink wireless MCU through
+In addition, the Dynamic Multi-Protocol Manager (DMM) software component enables
+multiprotocol development on a single SimpleLink wireless MCU through
 time-division multiplexing.
 
 The SimpleLink MCU portfolio offers a single development environment that
@@ -53,15 +53,15 @@ repository for Thread communication. Platform support source is built from the
 SimpleLink SDK.
 
 These connection protocols can be run concurrently by using the Texas
-Instruments Dynamic Multi-protocol Manager. 
+Instruments Dynamic Multi-protocol Manager.
 
 <hr>
 
 ## LwIP stack
 
 The Lightweight IP stack interfaces with the OpenThread stack to offer standard
-IP connectivity protocols that OpenThread does not natively support. This
-offers a standard socket based interface to the Matter platform.
+IP connectivity protocols that OpenThread does not natively support. This offers
+a standard socket based interface to the Matter platform.
 
 <hr>
 
@@ -71,8 +71,8 @@ The MbedTLS library is used by OpenThread and Matter for a wide variety of
 protocols. This ranges from basic AES and SHA to cryptographic protocols like
 ECDSA and ECDH.
 
-The MbedTLS library is hardware accelerated using the TI SimpleLink SDK
-drivers. This is achieved through the usage of `_ALT` defines in the MbedTLS
+The MbedTLS library is hardware accelerated using the TI SimpleLink SDK drivers.
+This is achieved through the usage of `_ALT` defines in the MbedTLS
 configuration file.
 
 <hr>
