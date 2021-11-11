@@ -52,6 +52,7 @@ executable("chip-tool") {
   defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
 
   deps = [
+    "${chip_root}/src/app/server",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
