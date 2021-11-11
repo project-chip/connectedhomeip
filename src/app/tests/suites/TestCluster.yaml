@@ -594,6 +594,18 @@ tests:
       response:
           value: ""
 
+    - label: "Write attribute OCTET_STRING with embedded null"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "Tes\x00ti\x00ng"
+
+    - label: "Read attribute OCTET_STRING with embedded null"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "Tes\x00ti\x00ng"
+
     - label: "Write attribute OCTET_STRING"
       command: "writeAttribute"
       attribute: "octet_string"

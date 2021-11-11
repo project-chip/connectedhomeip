@@ -582,6 +582,18 @@ function expectedValueHasProp(value, name)
   return name in value;
 }
 
+function octetStringEscapedForCLiteral(value)
+{
+  return value.replace(/\p{Control}/gu, ch => {
+    let code = ch.charCodeAt(0);
+    code     = code.toString();
+    if (code.length == 1) {
+      code = "0" + code;
+    }
+    return "\\x" + code;
+  });
+}
+
 //
 // Module exports
 //
@@ -593,3 +605,4 @@ exports.chip_tests_pics                     = chip_tests_pics;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
 exports.expectedValueHasProp                = expectedValueHasProp;
+exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;

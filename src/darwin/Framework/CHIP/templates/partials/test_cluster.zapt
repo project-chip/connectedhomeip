@@ -21,8 +21,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     {{#chip_tests_item_parameters}}
     {{#if (isString type)}}
     {{#if (isOctetString type)}}
-    NSString * {{asLowerCamelCase name}}ArgumentString= @"{{definedValue}}";
-    NSData * {{asLowerCamelCase name}}Argument = [{{asLowerCamelCase name}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    NSData * {{asLowerCamelCase name}}Argument = [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral definedValue}}" length:{{definedValue.length}}];
     {{else}}
     NSString * {{asLowerCamelCase name}}Argument= @"{{definedValue}}";
     {{/if}}
@@ -67,8 +66,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         {{else}}
         {{#if (isString type)}}
         {{#if (isOctetString type)}}
-        NSString * {{asLowerCamelCase name}}ArgumentString= @"{{expectedValue}}";
-        NSData * {{asLowerCamelCase name}}Argument = [{{asLowerCamelCase name}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+        NSData * {{asLowerCamelCase name}}Argument = [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral expectedValue}}" length:{{expectedValue.length}}];
         XCTAssertTrue([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToData:{{asLowerCamelCase name}}Argument]);
         {{else}}
         NSString * {{asLowerCamelCase name}}Argument= @"{{expectedValue}}";
