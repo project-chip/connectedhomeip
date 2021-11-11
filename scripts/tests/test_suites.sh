@@ -48,8 +48,8 @@ usage() {
 
 declare privileged_run=""
 
-if [[ `whoami` != "root" ]]; then
-  privileged_run='sudo'
+if [[ $(whoami) != "root" ]]; then
+    privileged_run='sudo'
 fi
 
 declare app_run_prefix=""
@@ -57,81 +57,79 @@ declare tool_run_prefix=""
 declare rm_run_prefix=""
 
 netns_setup() {
-     # 2 virtual hosts: for app and for the tool
-     ${privileged_run} ip netns add app
-     ${privileged_run} ip netns add tool
+    # 2 virtual hosts: for app and for the tool
+    ${privileged_run} ip netns add app
+    ${privileged_run} ip netns add tool
 
+    # create links for switch to net connections
+    ${privileged_run} ip link add eth-app type veth peer name eth-app-switch
+    ${privileged_run} ip link add eth-tool type veth peer name eth-tool-switch
 
+    # link the connections together
+    ${privileged_run} ip link set eth-app netns app
+    ${privileged_run} ip link set eth-tool netns tool
 
-     # create links for switch to net connections
-     ${privileged_run} ip link add eth-app type veth peer name eth-app-switch
-     ${privileged_run} ip link add eth-tool type veth peer name eth-tool-switch
+    ${privileged_run} ip link add name br1 type bridge
+    ${privileged_run} ip link set br1 up
+    ${privileged_run} ip link set eth-app-switch master br1
+    ${privileged_run} ip link set eth-tool-switch master br1
 
-     # link the connections together
-     ${privileged_run} ip link set eth-app netns app
-     ${privileged_run} ip link set eth-tool netns tool
+    # mark connections up
+    ${privileged_run} ip netns exec app ip addr add 10.10.10.1/24 dev eth-app
+    ${privileged_run} ip netns exec app ip link set dev eth-app up
+    ${privileged_run} ip netns exec app ip link set dev lo up
+    ${privileged_run} ip link set dev eth-app-switch up
 
-     ${privileged_run} ip link add name br1 type bridge
-     ${privileged_run} ip link set br1 up
-     ${privileged_run} ip link set eth-app-switch master br1
-     ${privileged_run} ip link set eth-tool-switch master br1
-
-     # mark connections up
-     ${privileged_run} ip netns exec app ip addr add 10.10.10.1/24 dev eth-app
-     ${privileged_run} ip netns exec app ip link set dev eth-app up
-     ${privileged_run} ip netns exec app ip link set dev lo up
-     ${privileged_run} ip link set dev eth-app-switch up
-
-     ${privileged_run} ip netns exec tool ip addr add 10.10.10.2/24 dev eth-tool
-     ${privileged_run} ip netns exec tool ip link set dev eth-tool up
-     ${privileged_run} ip netns exec tool ip link set dev lo up
-     ${privileged_run} ip link set dev eth-tool-switch up
+    ${privileged_run} ip netns exec tool ip addr add 10.10.10.2/24 dev eth-tool
+    ${privileged_run} ip netns exec tool ip link set dev eth-tool up
+    ${privileged_run} ip netns exec tool ip link set dev lo up
+    ${privileged_run} ip link set dev eth-tool-switch up
 
 }
 
 netns_cleanup() {
-   ${privileged_run} ip netns del app || true
-   ${privileged_run} ip netns del tool || true
-   ${privileged_run} ip link del br1 || true
+    ${privileged_run} ip netns del app || true
+    ${privileged_run} ip netns del tool || true
+    ${privileged_run} ip link del br1 || true
 
-   # attempt  to delete orphaned items just in case
-   ${privileged_run} ip link del eth-tool || true
-   ${privileged_run} ip link del eth-tool-switch || true
-   ${privileged_run} ip link del eth-app || true
-   ${privileged_run} ip link del eth-app-switch || true
+    # attempt  to delete orphaned items just in case
+    ${privileged_run} ip link del eth-tool || true
+    ${privileged_run} ip link del eth-tool-switch || true
+    ${privileged_run} ip link del eth-app || true
+    ${privileged_run} ip link del eth-app-switch || true
 }
 
 # read shell arguments
 while getopts a:d:i:hs:w:nc flag; do
     case "$flag" in
-        a) application=$OPTARG ;;
-        d) delay=$OPTARG ;;
-        h) usage ;;
-        i) iterations=$OPTARG ;;
-        s) single_case=$OPTARG ;;
-        w) test_case_wrapper=("$OPTARG") ;;
-        n) use_netns=1 ;;
-        c) pre_clean_netns=1 ;;
+    a) application=$OPTARG ;;
+    d) delay=$OPTARG ;;
+    h) usage ;;
+    i) iterations=$OPTARG ;;
+    s) single_case=$OPTARG ;;
+    w) test_case_wrapper=("$OPTARG") ;;
+    n) use_netns=1 ;;
+    c) pre_clean_netns=1 ;;
     esac
 done
 
 if [[ $pre_clean_netns != 0 ]]; then
-   echo "Cleaning netowrk namespaces"
-   netns_cleanup
-   exit 0
+    echo "Cleaning netowrk namespaces"
+    netns_cleanup
+    exit 0
 fi
 
 if [[ $use_netns != 0 ]]; then
-   echo "Using Netowrk namespaces"
-   netns_setup
+    echo "Using Netowrk namespaces"
+    netns_setup
 
-   app_run_prefix="${privileged_run} ip netns exec app"
-   tool_run_prefix="${privileged_run} ip netns exec tool"
+    app_run_prefix="${privileged_run} ip netns exec app"
+    tool_run_prefix="${privileged_run} ip netns exec tool"
 
-   # APPs run privileged
-   rm_run_prefix="${privileged_run}"
+    # APPs run privileged
+    rm_run_prefix="${privileged_run}"
 
-   trap netns_cleanup EXIT
+    trap netns_cleanup EXIT
 fi
 
 if [[ $application == "tv" ]]; then
