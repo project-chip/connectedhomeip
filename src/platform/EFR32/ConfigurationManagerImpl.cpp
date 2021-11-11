@@ -113,57 +113,57 @@ exit:
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(EFR32Config::Key key, bool & val)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
 {
     return EFR32Config::ReadConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(EFR32Config::Key key, uint32_t & val)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
     return EFR32Config::ReadConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(EFR32Config::Key key, uint64_t & val)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint64_t & val)
 {
     return EFR32Config::ReadConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(EFR32Config::Key key, char * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     return EFR32Config::ReadConfigValueStr(key, buf, bufSize, outLen);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(EFR32Config::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     return EFR32Config::ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(EFR32Config::Key key, bool val)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
 {
     return EFR32Config::WriteConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(EFR32Config::Key key, uint32_t val)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint32_t val)
 {
     return EFR32Config::WriteConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(EFR32Config::Key key, uint64_t val)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint64_t val)
 {
     return EFR32Config::WriteConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(EFR32Config::Key key, const char * str)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str)
 {
     return EFR32Config::WriteConfigValueStr(key, str);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(EFR32Config::Key key, const char * str, size_t strLen)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
     return EFR32Config::WriteConfigValueStr(key, str, strLen);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(EFR32Config::Key key, const uint8_t * data, size_t dataLen)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
     return EFR32Config::WriteConfigValueBin(key, data, dataLen);
 }

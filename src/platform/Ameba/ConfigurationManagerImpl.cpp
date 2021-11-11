@@ -74,7 +74,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!AmebaConfig::ConfigValueExists(kAmebaConfig::CounterKey_TotalOperationalHours))
+    if (!AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_TotalOperationalHours))
     {
         err = StoreTotalOperationalHours(0);
         SuccessOrExit(err);
@@ -175,57 +175,57 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
     return WriteConfigValue(configKey, value);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(AmebaConfig::Key key, bool & val)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
 {
     return AmebaConfig::ReadConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(AmebaConfig::Key key, uint32_t & val)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
     return AmebaConfig::ReadConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(AmebaConfig::Key key, uint64_t & val)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint64_t & val)
 {
     return AmebaConfig::ReadConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(AmebaConfig::Key key, char * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     return AmebaConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(AmebaConfig::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     return AmebaConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(AmebaConfig::Key key, bool val)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
 {
     return AmebaConfig::WriteConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(AmebaConfig::Key key, uint32_t val)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint32_t val)
 {
     return AmebaConfig::WriteConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(AmebaConfig::Key key, uint64_t val)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint64_t val)
 {
     return AmebaConfig::WriteConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(AmebaConfig::Key key, const char * str)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str)
 {
     return AmebaConfig::WriteConfigValueStr(key, str);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(AmebaConfig::Key key, const char * str, size_t strLen)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
     return AmebaConfig::WriteConfigValueStr(key, str, strLen);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(AmebaConfig::Key key, const uint8_t * data, size_t dataLen)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
     return AmebaConfig::WriteConfigValueBin(key, data, dataLen);
 }
