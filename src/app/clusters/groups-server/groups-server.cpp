@@ -130,8 +130,8 @@ static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, Gr
     }
     else
     {
-        emberAfGroupsClusterPrint("ERR: Failed to add mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
-                                  err.Format());
+        ChipLogDetail(Zcl, "ERR: Failed to add mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
+                      err.Format());
         return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
     }
 }
@@ -139,26 +139,23 @@ static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, Gr
 static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
 {
     VerifyOrReturnError(IsFabricGroupId(groupId), EMBER_ZCL_STATUS_INVALID_VALUE);
+    VerifyOrReturnError(GroupExists(fabricIndex, endpointId, groupId), EMBER_ZCL_STATUS_NOT_FOUND);
 
-    if (GroupExists(fabricIndex, endpointId, groupId))
+    GroupDataProvider * provider = GetGroupDataProvider();
+    VerifyOrReturnError(nullptr != provider, EMBER_ZCL_STATUS_NOT_FOUND);
+    GroupDataProvider::GroupMapping mapping(endpointId, groupId);
+
+    CHIP_ERROR err = provider->RemoveGroupMapping(fabricIndex, mapping);
+    if (CHIP_NO_ERROR == err)
     {
-        GroupDataProvider * provider = GetGroupDataProvider();
-        VerifyOrReturnError(nullptr != provider, EMBER_ZCL_STATUS_NOT_FOUND);
-        GroupDataProvider::GroupMapping mapping(endpointId, groupId);
-
-        CHIP_ERROR err = provider->RemoveGroupMapping(fabricIndex, mapping);
-        if (CHIP_NO_ERROR == err)
-        {
-            return EMBER_ZCL_STATUS_SUCCESS;
-        }
-        else
-        {
-            emberAfGroupsClusterPrint("ERR: Failed to remove mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId,
-                                      groupId, err.Format());
-            return EMBER_ZCL_STATUS_FAILURE;
-        }
+        return EMBER_ZCL_STATUS_SUCCESS;
     }
-    return EMBER_ZCL_STATUS_NOT_FOUND;
+    else
+    {
+        ChipLogDetail(Zcl, "ERR: Failed to remove mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
+                      err.Format());
+        return EMBER_ZCL_STATUS_NOT_FOUND;
+    }
 }
 
 void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
@@ -169,7 +166,7 @@ void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
     EmberAfStatus status = Attributes::NameSupport::Set(endpointId, nameSupport);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfGroupsClusterPrint("ERR: writing name support %x", status);
+        ChipLogDetail(Zcl, "ERR: writing name support %x", status);
     }
 }
 
@@ -177,14 +174,14 @@ bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, cons
                                           const Commands::AddGroup::DecodableType & commandData)
 {
     auto fabricIndex = GetFabricIndex(commandObj);
-    auto & groupId   = commandData.groupId;
-    auto & groupName = commandData.groupName;
+    auto groupId     = commandData.groupId;
+    auto groupName   = commandData.groupName;
     auto endpointId  = commandPath.mEndpointId;
 
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    emberAfGroupsClusterPrintln("RX: AddGroup 0x%2x, \"%.*s\"", groupId, static_cast<int>(groupName.size()), groupName.data());
+    ChipLogDetail(Zcl, "RX: AddGroup 0x%2x, \"%.*s\"", groupId, static_cast<int>(groupName.size()), groupName.data());
 
     status = GroupAdd(fabricIndex, endpointId, groupId, groupName);
 
@@ -217,17 +214,13 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
                                            const Commands::ViewGroup::DecodableType & commandData)
 {
     auto fabricIndex = GetFabricIndex(commandObj);
-    auto & groupId   = commandData.groupId;
+    auto groupId     = commandData.groupId;
     auto endpointId  = commandPath.mEndpointId;
 
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     CHIP_ERROR err       = CHIP_NO_ERROR;
     CharSpan groupName;
 
-    emberAfGroupsClusterPrintln("RX: ViewGroup 0x%02x", groupId);
-
-    // For all networks, View Group commands can only be addressed to a
-    // single device.
     if (emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST && emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST_REPLY)
     {
         return true;
@@ -263,7 +256,6 @@ exit:
 
 struct GroupMembershipResponse
 {
-public:
     // A capacity of 0xFF means that it is unknown if any further groups MAY be added.
     static constexpr uint8_t kCapacityUnknown = 0xff;
 
@@ -299,7 +291,7 @@ public:
                 size_t matchCount     = 0;
                 ReturnErrorOnFailure(mCommandData.groupList.ComputeSize(&requestedCount));
 
-                emberAfGroupsClusterPrint("RX: GetGroupMembership [");
+                ChipLogDetail(Zcl, "RX: GetGroupMembership [");
                 if (0 == requestedCount)
                 {
                     // 1.3.6.3.1. If the GroupList field is empty, the entity SHALL respond with all group identifiers of which the
@@ -308,7 +300,7 @@ public:
                     {
                         ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag, mapping.group));
                         matchCount++;
-                        emberAfGroupsClusterPrint(" 0x%02" PRIx16, mapping.group);
+                        ChipLogDetail(Zcl, " 0x%02" PRIx16, mapping.group);
                     }
                 }
                 else
@@ -322,14 +314,14 @@ public:
                             {
                                 ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag, mapping.group));
                                 matchCount++;
-                                emberAfGroupsClusterPrint(" 0x%02" PRIx16, mapping.group);
+                                ChipLogDetail(Zcl, " 0x%02" PRIx16, mapping.group);
                                 break;
                             }
                         }
                         ReturnErrorOnFailure(iter.GetStatus());
                     }
                 }
-                emberAfGroupsClusterPrintln("]");
+                ChipLogDetail(Zcl, "]");
             }
             ReturnErrorOnFailure(writer.EndContainer(type));
         }
@@ -365,7 +357,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
 exit:
     if (EMBER_SUCCESS != status)
     {
-        emberAfGroupsClusterPrint("Groups: failed to send get_group_membership response: 0x%x", status);
+        ChipLogDetail(Zcl, "Groups: failed to send get_group_membership response: 0x%x", status);
     }
     return true;
 }
@@ -374,12 +366,12 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
                                              const Commands::RemoveGroup::DecodableType & commandData)
 {
     auto fabricIndex = GetFabricIndex(commandObj);
-    auto & groupId   = commandData.groupId;
+    auto groupId     = commandData.groupId;
     auto endpointId  = commandPath.mEndpointId;
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    emberAfGroupsClusterPrintln("RX: RemoveGroup 0x%2x", groupId);
+    ChipLogDetail(Zcl, "RX: RemoveGroup 0x%2x", groupId);
 
     status = GroupRemove(fabricIndex, endpointId, groupId);
 
@@ -420,7 +412,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
     EmberStatus sendStatus       = EMBER_SUCCESS;
     CHIP_ERROR err               = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
 
-    emberAfGroupsClusterPrintln("RX: RemoveAllGroups");
+    ChipLogDetail(Zcl, "RX: RemoveAllGroups");
     VerifyOrReturnError(nullptr != provider, true);
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -430,9 +422,6 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
     GroupDataProvider::GroupMapping mapping;
     while (groupIter->Next(mapping))
     {
-        // EMAPPFWKV2-1414: if we remove a group, we should remove any scene
-        // associated with it. ZCL6: 3.6.2.3.5: "Note that if a group is
-        // removed the scenes associated with that group SHOULD be removed."
         emberAfScenesClusterRemoveScenesInGroupCallback(endpointId, mapping.group);
     }
     groupIter->Release();
@@ -444,7 +433,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
     sendStatus = emberAfSendImmediateDefaultResponse(CHIP_NO_ERROR == err ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
     if (EMBER_SUCCESS != sendStatus)
     {
-        emberAfGroupsClusterPrintln("Groups: failed to send %s: 0x%x", "default_response", sendStatus);
+        ChipLogDetail(Zcl, "Groups: failed to send %s: 0x%x", "default_response", sendStatus);
     }
     return true;
 }
@@ -454,15 +443,14 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
                                                        const Commands::AddGroupIfIdentifying::DecodableType & commandData)
 {
     auto fabricIndex = GetFabricIndex(commandObj);
-    auto & groupId   = commandData.groupId;
-    auto & groupName = commandData.groupName;
+    auto groupId     = commandData.groupId;
+    auto groupName   = commandData.groupName;
     auto endpointId  = commandPath.mEndpointId;
 
     EmberAfStatus status;
     EmberStatus sendStatus = EMBER_SUCCESS;
 
-    emberAfGroupsClusterPrintln("RX: AddGroupIfIdentifying 0x%2x, \"%.*s\"", groupId, static_cast<int>(groupName.size()),
-                                groupName.data());
+    ChipLogDetail(Zcl, "RX: AddGroupIfIdentifying 0x%2x, \"%.*s\"", groupId, static_cast<int>(groupName.size()), groupName.data());
 
     if (!emberAfIsDeviceIdentifying(endpointId))
     {
@@ -477,7 +465,7 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
     sendStatus = emberAfSendImmediateDefaultResponse(status);
     if (EMBER_SUCCESS != sendStatus)
     {
-        emberAfGroupsClusterPrintln("Groups: failed to send %s: 0x%x", "default_response", sendStatus);
+        ChipLogDetail(Zcl, "Groups: failed to send %s: 0x%x", "default_response", sendStatus);
     }
     return true;
 }

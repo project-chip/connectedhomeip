@@ -631,12 +631,12 @@
             /* Endpoint: 1, Cluster: Window Covering (server), little-endian */                                                    \
                                                                                                                                    \
             /* 1377 - FeatureMap, */                                                                                               \
-            0x00, 0x00, 0x00, 0x01,                                                                                                \
+            0x01, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Window Covering (server), little-endian */                                                    \
                                                                                                                                    \
             /* 1381 - FeatureMap, */                                                                                               \
-            0x00, 0x00, 0x00, 0x01,                                                                                                \
+            0x01, 0x00, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU
