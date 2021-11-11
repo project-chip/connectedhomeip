@@ -508,12 +508,11 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
     if (attrOverride != nullptr)
     {
-        bool dataWrite;
         ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
+        AttributeValueDecoder valueDecoder(aReader);
+        ReturnErrorOnFailure(attrOverride->Write(path, valueDecoder));
 
-        ReturnErrorOnFailure(attrOverride->Write(path, aReader, &dataWrite));
-
-        if (dataWrite)
+        if (valueDecoder.TriedDecode())
         {
             return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
         }

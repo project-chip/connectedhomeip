@@ -40,10 +40,25 @@ using namespace chip::app::Clusters::TestCluster;
 using namespace chip::app::Clusters::TestCluster::Commands;
 using namespace chip::app::Clusters::TestCluster::Attributes;
 
-constexpr uint8_t kAttributeListLength  = 4;
+// The number of elements in the test attribute list
+constexpr uint8_t kAttributeListLength = 4;
+
+// The maximum length of the test attribute list element in bytes
 constexpr uint8_t kAttributeEntryLength = 6;
 
 namespace {
+
+class OctetStringData
+{
+public:
+    uint8_t * Data() { return mDataBuf; }
+    size_t Length() const { return mDataLen; }
+    void SetLength(size_t size) { mDataLen = size; }
+
+private:
+    uint8_t mDataBuf[kAttributeEntryLength];
+    size_t mDataLen = 0;
+};
 
 class TestAttrAccess : public AttributeAccessInterface
 {
@@ -52,23 +67,23 @@ public:
     TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id) {}
 
     CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, bool * aDataWrite) override;
+    CHIP_ERROR Write(const ConcreteAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadListInt8uAttribute(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR WriteListInt8uAttribute(TLV::TLVReader & aReader);
+    CHIP_ERROR WriteListInt8uAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR WriteListOctetStringAttribute(TLV::TLVReader & aReader);
+    CHIP_ERROR WriteListOctetStringAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListStructOctetStringAttribute(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR WriteListStructOctetStringAttribute(TLV::TLVReader & aReader);
+    CHIP_ERROR WriteListStructOctetStringAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR WriteListNullablesAndOptionalsStructAttribute(TLV::TLVReader & aReader);
+    CHIP_ERROR WriteListNullablesAndOptionalsStructAttribute(AttributeValueDecoder & aDecoder);
 };
 
 TestAttrAccess gAttrAccess;
 uint8_t gListUint8Data[kAttributeListLength];
-char gListOctetStringData[kAttributeListLength][kAttributeEntryLength];
-char gListOperationalCert[kAttributeListLength][kAttributeEntryLength];
+OctetStringData gListOctetStringData[kAttributeListLength];
+OctetStringData gListOperationalCert[kAttributeListLength];
 Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
 
 CHIP_ERROR TestAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -95,26 +110,23 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeVa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestAttrAccess::Write(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, bool * aDataWrite)
+CHIP_ERROR TestAttrAccess::Write(const ConcreteAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    *aDataWrite = true;
-
     switch (aPath.mAttributeId)
     {
     case ListInt8u::Id: {
-        return WriteListInt8uAttribute(aReader);
+        return WriteListInt8uAttribute(aDecoder);
     }
     case ListOctetString::Id: {
-        return WriteListOctetStringAttribute(aReader);
+        return WriteListOctetStringAttribute(aDecoder);
     }
     case ListStructOctetString::Id: {
-        return WriteListStructOctetStringAttribute(aReader);
+        return WriteListStructOctetStringAttribute(aDecoder);
     }
     case ListNullablesAndOptionalsStruct::Id: {
-        return WriteListNullablesAndOptionalsStructAttribute(aReader);
+        return WriteListNullablesAndOptionalsStructAttribute(aDecoder);
     }
     default: {
-        *aDataWrite = false;
         break;
     }
     }
@@ -133,26 +145,23 @@ CHIP_ERROR TestAttrAccess::ReadListInt8uAttribute(AttributeValueEncoder & aEncod
     });
 }
 
-CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(TLV::TLVReader & aReader)
+CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(AttributeValueDecoder & aDecoder)
 {
-    DataModel::DecodableList<uint8_t> list;
+    ListInt8u::TypeInfo::DecodableType list;
 
-    ReturnErrorOnFailure(DataModel::Decode(aReader, list));
+    ReturnErrorOnFailure(aDecoder.Decode(list));
 
     uint8_t index = 0;
     auto iter     = list.begin();
     while (iter.Next())
     {
-        auto & entry            = iter.GetValue();
+        auto & entry = iter.GetValue();
+
+        VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         gListUint8Data[index++] = entry;
     }
 
-    if (iter.GetStatus() != CHIP_NO_ERROR)
-    {
-        return CHIP_ERROR_INVALID_DATA_LIST;
-    }
-
-    return CHIP_NO_ERROR;
+    return iter.GetStatus();
 }
 
 CHIP_ERROR TestAttrAccess::ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder)
@@ -160,18 +169,18 @@ CHIP_ERROR TestAttrAccess::ReadListOctetStringAttribute(AttributeValueEncoder & 
     return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
         for (uint8_t index = 0; index < kAttributeListLength; index++)
         {
-            ByteSpan span(Uint8::from_char(gListOctetStringData[index]), strlen(gListOctetStringData[index]));
+            ByteSpan span(gListOctetStringData[index].Data(), gListOctetStringData[index].Length());
             ReturnErrorOnFailure(encoder.Encode(span));
         }
         return CHIP_NO_ERROR;
     });
 }
 
-CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(TLV::TLVReader & aReader)
+CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(AttributeValueDecoder & aDecoder)
 {
-    DataModel::DecodableList<ByteSpan> list;
+    ListOctetString::TypeInfo::DecodableType list;
 
-    ReturnErrorOnFailure(DataModel::Decode(aReader, list));
+    ReturnErrorOnFailure(aDecoder.Decode(list));
 
     uint8_t index = 0;
     auto iter     = list.begin();
@@ -180,7 +189,9 @@ CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(TLV::TLVReader & aReade
         const auto & entry = iter.GetValue();
 
         VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-        Platform::CopyString(gListOctetStringData[index], sizeof(gListOctetStringData[index]), entry);
+        VerifyOrReturnError(entry.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(gListOctetStringData[index].Data(), entry.data(), entry.size());
+        gListOctetStringData[index].SetLength(entry.size());
         index++;
     }
 
@@ -202,11 +213,11 @@ CHIP_ERROR TestAttrAccess::ReadListStructOctetStringAttribute(AttributeValueEnco
     });
 }
 
-CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(TLV::TLVReader & aReader)
+CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(AttributeValueDecoder & aDecoder)
 {
-    DataModel::DecodableList<Structs::TestListStructOctet::Type> list;
+    ListStructOctetString::TypeInfo::DecodableType list;
 
-    ReturnErrorOnFailure(DataModel::Decode(aReader, list));
+    ReturnErrorOnFailure(aDecoder.Decode(list));
 
     uint8_t index = 0;
     auto iter     = list.begin();
@@ -215,10 +226,13 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(TLV::TLVReader & 
         const auto & entry = iter.GetValue();
 
         VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-        Platform::CopyString(gListOperationalCert[index], sizeof(gListOperationalCert[index]), entry.operationalCert);
+        VerifyOrReturnError(entry.operationalCert.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(gListOperationalCert[index].Data(), entry.operationalCert.data(), entry.operationalCert.size());
+        gListOperationalCert[index].SetLength(entry.operationalCert.size());
+
         listStructOctetStringData[index].fabricIndex = entry.fabricIndex;
         listStructOctetStringData[index].operationalCert =
-            ByteSpan(Uint8::from_char(gListOperationalCert[index]), strlen(gListOperationalCert[index]));
+            ByteSpan(gListOperationalCert[index].Data(), gListOperationalCert[index].Length());
         index++;
     }
 
@@ -241,7 +255,7 @@ CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(Attribut
     });
 }
 
-CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(TLV::TLVReader & aReader)
+CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(AttributeValueDecoder & aDecoder)
 {
     // TODO Add yaml test case for NullablesAndOptionalsStruct list
     return CHIP_NO_ERROR;
